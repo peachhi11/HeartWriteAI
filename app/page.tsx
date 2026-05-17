@@ -14,6 +14,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import { CharacterCardImportExport } from "@/components/character-card-import-export";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -105,6 +106,8 @@ export default function Home() {
             <ModeToggle />
           </div>
         </header>
+
+        <CharacterCardImportExport />
 
         <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
           <Card className="border bg-card/85 shadow-2xl backdrop-blur">
