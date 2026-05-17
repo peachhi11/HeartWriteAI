@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@config "../tailwind.config.js";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -118,5 +120,13 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  .amour-studio-ambient {
+    background:
+      radial-gradient(circle at top left, var(--muted), transparent 34%),
+      radial-gradient(circle at bottom right, var(--secondary), transparent 30%);
   }
 }

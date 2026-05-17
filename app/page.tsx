@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { invoke } from "@tauri-apps/api/core";
+import Link from "next/link";
 import {
   BadgeCheck,
   BookOpenText,
@@ -24,9 +24,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { ImageIntakePreview } from "@/components/image-pipeline/image-intake-preview";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { getNativeAppVersion, greetNative } from "@/lib/tauri/native";
 
 const workflowCards = [
   {
@@ -65,21 +67,26 @@ export default function Home() {
     "Paste a messy character idea here. AmourAI will eventually split it into character card fields, persona notes, scenario hooks, and lorebook entries.",
   );
   const [nativeStatus, setNativeStatus] = useState("Tauri bridge not checked yet.");
+  const [nativeVersion, setNativeVersion] = useState<string | null>(null);
 
   async function checkNativeBridge() {
     try {
-      const response = await invoke<string>("greet", { name: "AmourAI" });
+      const response = await greetNative("AmourAI");
+      const version = await getNativeAppVersion();
+
       setNativeStatus(response);
+      setNativeVersion(version);
     } catch {
       setNativeStatus(
         "Running in browser preview. Tauri bridge will respond inside the desktop shell.",
       );
+      setNativeVersion(null);
     }
   }
 
   return (
     <main className="min-h-screen overflow-hidden bg-background text-foreground">
-      <div className="pointer-events-none fixed inset-0 -z-10 bg-[radial-gradient(circle_at_top_left,var(--muted),transparent_34%),radial-gradient(circle_at_bottom_right,var(--secondary),transparent_30%)]" />
+      <div className="amour-studio-ambient pointer-events-none fixed inset-0 -z-10" />
       <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-6 py-6">
         <header className="flex items-center justify-between rounded-3xl border bg-card/80 px-6 py-4 shadow-xl backdrop-blur">
           <div className="flex flex-col gap-1">
@@ -144,6 +151,11 @@ export default function Home() {
               <p className="rounded-2xl border bg-muted/45 p-4 text-sm text-muted-foreground">
                 {nativeStatus}
               </p>
+              {nativeVersion ? (
+                <p className="text-xs text-muted-foreground">
+                  Native app version: {nativeVersion}
+                </p>
+              ) : null}
               <Separator />
               <div className="grid gap-2 text-sm">
                 {migrationLanes.map((lane) => (
@@ -156,6 +168,8 @@ export default function Home() {
             </CardContent>
           </Card>
         </section>
+
+        <ImageIntakePreview />
 
         <Tabs defaultValue="workspace" className="rounded-3xl border bg-card/75 p-4 shadow-xl backdrop-blur">
           <TabsList>
@@ -186,6 +200,11 @@ export default function Home() {
                   recent chat, and summaries compile into one shared token budget.
                 </CardDescription>
               </CardHeader>
+              <CardContent>
+                <Button asChild variant="outline">
+                  <Link href="/chat">Open chat preview</Link>
+                </Button>
+              </CardContent>
             </Card>
           </TabsContent>
           <TabsContent value="lore" className="mt-4">
