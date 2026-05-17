@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "allowJs": false,
+    "declaration": false,
+    "incremental": false,
+    "lib": [
+      "es2022"
+    ],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noEmit": false,
+    "outDir": ".tmp-tests",
+    "rootDir": ".",
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "lib/character-card/**/*.ts",
+    "tests/character-card/**/*.ts",
+    "types/character-card/**/*.ts",
+    "types/vendor/**/*.d.ts"
+  ]
+}

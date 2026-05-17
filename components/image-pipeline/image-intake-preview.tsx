@@ -5,6 +5,7 @@ import Image from "next/image";
 import { Blurhash } from "react-blurhash";
 import { ImagePlus } from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -17,6 +18,7 @@ import {
   processImageFiles,
   ProcessedImageItem,
 } from "@/lib/image-pipeline";
+import { getCharacterCardDisplayName } from "@/lib/character-card/getCharacterCardDisplayName";
 
 function formatBytes(bytes: number) {
   return `${(bytes / 1024).toFixed(1)} KB`;
@@ -124,6 +126,17 @@ export function ImageIntakePreview() {
                   </p>
                   <p>{item.photoDate ? `Photo date: ${item.photoDate}` : "No date found"}</p>
                   <p>{item.blurhash ? "Blurhash generated" : "Blurhash unavailable"}</p>
+                  {item.characterCard ? (
+                    <div className="mt-2 flex flex-wrap items-center gap-2">
+                      <Badge variant="secondary">
+                        {item.characterCard.source === "ccv3" ? "CCV3" : "Legacy card"}
+                      </Badge>
+                      <span className="truncate text-foreground">
+                        {getCharacterCardDisplayName(item.characterCard.card) ??
+                          "Unnamed card"}
+                      </span>
+                    </div>
+                  ) : null}
                 </div>
               </div>
             ))}

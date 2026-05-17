@@ -1,3 +1,5 @@
+import { CharacterCardReadResult } from "../../types/character-card/CharacterCardReadResult";
+
 export const MAX_IMAGE_SIZE_BYTES = 20 * 1024 * 1024;
 export const COMPRESSION_THRESHOLD_BYTES = 1024 * 1024;
 export const MAX_COMPRESSED_IMAGE_EDGE = 1920;
@@ -21,6 +23,7 @@ export interface ProcessedImageItem {
   imageDataUrl: string;
   blurhash: string;
   photoDate?: string;
+  characterCard?: CharacterCardReadResult;
   wasCompressed: boolean;
 }
 

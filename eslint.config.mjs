@@ -7,6 +7,7 @@ const eslintConfig = defineConfig([
   ...nextTs,
   globalIgnores([
     ".next/**",
+    ".tmp-tests/**",
     "out/**",
     "node_modules/**",
     "src-tauri/target/**",

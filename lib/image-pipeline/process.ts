@@ -1,6 +1,7 @@
 import { encodeImageToBlurhash } from "./blurhash";
 import { compressImage } from "./compression";
 import { extractPhotoDate } from "./exif";
+import { extractCharacterCardMetadata } from "./extractCharacterCardMetadata";
 import { PendingImageBatch, ProcessedImageItem } from "./types";
 import { validateImageFile } from "./validation";
 
@@ -11,9 +12,10 @@ export async function processImageFile(file: File): Promise<ProcessedImageItem> 
     throw new Error(validationError);
   }
 
-  const [{ dataUrl, size, wasCompressed }, photoDate] = await Promise.all([
+  const [{ dataUrl, size, wasCompressed }, photoDate, characterCard] = await Promise.all([
     compressImage(file),
     extractPhotoDate(file),
+    extractCharacterCardMetadata(file),
   ]);
 
   let blurhash = "";
@@ -33,6 +35,7 @@ export async function processImageFile(file: File): Promise<ProcessedImageItem> 
     imageDataUrl: dataUrl,
     blurhash,
     photoDate,
+    characterCard,
     wasCompressed,
   };
 }

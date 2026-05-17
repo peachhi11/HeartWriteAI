@@ -65,8 +65,9 @@ Implemented in the current scaffold:
 - Starter landing/workspace page for the intake-first workflow.
 - Temporary `/chat` preview route for Ollama streaming shape tests.
 - Browser-side image intake pipeline for validation, compression, blurhash, and EXIF date extraction.
+- CCV3 PNG metadata read/write layer with V1/V2 conversion support through `@risuai/ccardlib`.
 - Tauri bridge helper for frontend/native command calls.
-- PNG text-chunk dependencies for future CCV3 card import/export:
+- PNG text-chunk dependencies for CCV3 card import/export:
   - `png-chunks-extract`
   - `png-chunks-encode`
   - `png-chunk-text`
@@ -74,7 +75,7 @@ Implemented in the current scaffold:
 
 Immediate next milestone:
 
-- Build the CCV3 PNG codec layer and import/export UI so character-card PNGs can be read, edited through user-facing fields, and exported with embedded `ccv3` metadata.
+- Build the import/export UI so character-card PNGs can be read, edited through user-facing fields, and exported with embedded `ccv3` metadata.
 
 ## Project Shape
 
@@ -106,6 +107,14 @@ Auto-update is intentionally disabled. Do not add updater config with placeholde
 
 The secure activation plan is tracked in [`docs/auto-update-security.md`](docs/auto-update-security.md).
 
+## Compatibility Notes
+
+CCV3 and JanitorAI compatibility research is tracked in [`docs/character-card-compatibility.md`](docs/character-card-compatibility.md).
+
 ## Attribution
 
-Initial Tauri + Next.js + shadcn structure was adapted from the local checkout of [`nomandhoni-cs/tauri-nextjs-shadcn-boilerplate`](https://github.com/nomandhoni-cs/tauri-nextjs-shadcn-boilerplate), then renamed and adjusted for AmourAI.
+AmourAI is a rebuild descended from the local CharacterGen project. CharacterGen is the original application lineage for the roleplay asset workflow, character-generation concepts, and user goals being carried forward here.
+
+The initial Tauri + Next.js + shadcn scaffold used for this rebuild was also adapted from the local checkout of [`nomandhoni-cs/tauri-nextjs-shadcn-boilerplate`](https://github.com/nomandhoni-cs/tauri-nextjs-shadcn-boilerplate), then renamed and adjusted for AmourAI.
+
+Character Card V3 compatibility follows the upstream [`kwaroran/character-card-spec-v3`](https://github.com/kwaroran/character-card-spec-v3) specification, especially `SPEC_V3.md`.
