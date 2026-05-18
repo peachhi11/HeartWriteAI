@@ -22,6 +22,8 @@ export interface MasterCharacterCardPayload {
     lore_entries?: CharacterCardData["loreEntries"];
     lorebook_summary?: GeneratedLorebookSummaryData;
     post_history_instructions?: CharacterCardData["postHistoryInstructions"];
+    speech_examples?: CharacterCardData["speechExamples"];
+    speech_style?: CharacterCardData["speechStyle"];
     tone?: CharacterCardData["tone"];
     world_lore_placeholders?: CharacterCardData["worldLorePlaceholders"];
   };
@@ -63,6 +65,7 @@ export function createMasterCharacterCardPayload(
       `Species: ${identity.species?.type ?? "Human"} (${identity.race?.macroGroup ?? "Unspecified"} | ${identity.ethnicity?.culturalHeritage ?? "Unspecified"})`,
       `Occupation: ${identity.occupation?.jobTitle ?? "Unspecified"}`,
       `Relationship Status: ${identity.relationshipStatus?.currentLabel ?? "Single"}`,
+      `Speech Style: ${identity.speechStyle?.register ?? "Clipped_Command"} | ${identity.speechStyle?.vocabularyMode ?? "Sparse_Minimal"}`,
       "",
       "--- WORLD LORE SUMMARY ---",
       `Setting: ${lorebook?.universeAnchor ?? "Contemporary Romance Local Canon"}`,
@@ -84,6 +87,8 @@ export function createMasterCharacterCardPayload(
       lore_entries: identity.loreEntries,
       lorebook_summary: lorebook,
       post_history_instructions: identity.postHistoryInstructions,
+      speech_examples: identity.speechExamples,
+      speech_style: identity.speechStyle,
       tone: identity.tone,
       world_lore_placeholders: identity.worldLorePlaceholders,
     },

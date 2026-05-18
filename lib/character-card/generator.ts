@@ -28,6 +28,8 @@ export interface CharacterCardData {
   relationships?: GeneratedNPCRelationshipData[];
   scenario?: GeneratedScenarioData;
   scenarioOpeningPairs?: GeneratedScenarioOpeningPairData[];
+  speechExamples?: GeneratedSpeechExampleData[];
+  speechStyle?: GeneratedSpeechStyleData;
   tone?: GeneratedToneConfigurationData;
   turnOffs?: GeneratedTurnOffData;
   worldLorePlaceholders?: GeneratedWorldLorePlaceholderData[];
@@ -87,6 +89,8 @@ export interface AgeGapRomanceOptions {
   random?: () => number;
   scenario?: GeneratedScenarioData;
   scenarioOpeningPairs?: GeneratedScenarioOpeningPairData[];
+  speechExamples?: GeneratedSpeechExampleData[];
+  speechStyle?: GeneratedSpeechStyleData;
   speciesType?: SpeciesType;
   tone?: GeneratedToneConfigurationData;
   trope?: string;
@@ -306,6 +310,52 @@ export interface GeneratedArchetypeConfigurationData {
   coreMotivation: ArchetypeCoreMotivation;
   defenseMechanism: ArchetypeDefenseMechanism;
   personaType: ArchetypePersonaType;
+}
+
+export type SpeechRegister =
+  | "Academic_Precise"
+  | "Clipped_Command"
+  | "Playful_Banter"
+  | "Predatory_Quiet"
+  | "Soft_Reassurance"
+  | "Velvet_Formal";
+
+export type SpeechVocabularyMode =
+  | "Courtly_Formal"
+  | "Romantic_Lyrical"
+  | "Sparse_Minimal"
+  | "Technical_Precise"
+  | "Witty_Teasing";
+
+export type SpeechAddressStyle =
+  | "Formal_Address"
+  | "No_Pet_Names"
+  | "Possessive_Terms"
+  | "Selective_Endearments"
+  | "Teasing_Nicknames";
+
+export interface GeneratedSpeechStyleData {
+  addressStyle: SpeechAddressStyle;
+  dialogueDonts: string[];
+  dialogueDos: string[];
+  speechPatternInstruction: string;
+  styleId: string;
+  register: SpeechRegister;
+  vocabularyMode: SpeechVocabularyMode;
+}
+
+export type SpeechExampleCategory =
+  | "Boundary"
+  | "Care"
+  | "Conflict"
+  | "Greeting"
+  | "Romantic_Tension";
+
+export interface GeneratedSpeechExampleData {
+  category: SpeechExampleCategory;
+  exampleId: string;
+  exampleLine: string;
+  usageContext: string;
 }
 
 export type CreatorsNotesContentRating =
@@ -1640,6 +1690,17 @@ export function generateAgeGapRomance(
     generateFormattingConfigurationData(trope, occupation, firstMessage);
   const tone =
     options.tone ?? generateToneConfigurationData(trope, species, occupation);
+  const speechStyle =
+    options.speechStyle ??
+    generateSpeechStyleData(trope, archetype, occupation, tone);
+  const speechExamples =
+    normaliseSpeechExamples(options.speechExamples) ??
+    generateSpeechExamplesData(
+      speechStyle,
+      archetype,
+      relationshipStatus,
+      trope,
+    );
   const alternateGreetings = normaliseAlternateGreetings(
     options.alternateGreetings,
   );
@@ -1739,6 +1800,8 @@ export function generateAgeGapRomance(
     relationships,
     scenario,
     scenarioOpeningPairs,
+    speechExamples,
+    speechStyle,
     tone,
     turnOffs,
     worldLorePlaceholders,
@@ -1770,6 +1833,18 @@ export function generateCharacterCardFromSeed(
   const relationshipStatus = relationshipStatusDataFromSeed(seed);
   const formatting = formattingConfigurationFromSeed(seed);
   const tone = toneConfigurationFromSeed(seed);
+  const speechStyle = generateSpeechStyleData(
+    seed.trope_framework,
+    archetype,
+    occupation,
+    tone,
+  );
+  const speechExamples = generateSpeechExamplesData(
+    speechStyle,
+    archetype,
+    relationshipStatus,
+    seed.trope_framework,
+  );
   const race = generateRaceData(asRaceMacroGroup(seed.identity.race), ethnicity);
   const card = generateAgeGapRomance(seed.trope_framework, {
     anchorYear,
@@ -1808,6 +1883,8 @@ export function generateCharacterCardFromSeed(
     relationshipStatus,
     relationships,
     speciesType: species.type,
+    speechExamples,
+    speechStyle,
     tone,
     turnOffs,
   });
@@ -1840,6 +1917,8 @@ export function generateCharacterCardFromSeed(
     relationshipStatus,
     relationships,
     species,
+    speechExamples,
+    speechStyle,
     surname: seed.identity.last_name,
     tone,
     turnOffs,
@@ -2778,6 +2857,102 @@ export function generateArchetypeConfigurationData(
     defenseMechanism,
     personaType,
   };
+}
+
+export function generateSpeechStyleData(
+  trope: string,
+  archetype: GeneratedArchetypeConfigurationData,
+  occupation: GeneratedOccupationData,
+  tone: GeneratedToneConfigurationData,
+): GeneratedSpeechStyleData {
+  const normalized = normaliseTrope(trope);
+  const isAcademic =
+    occupation.jobTitle === "University Student" ||
+    occupation.jobTitle.toLowerCase().includes("professor") ||
+    normalized.includes("academic");
+  const register: SpeechRegister =
+    archetype.personaType === "The_Ancient_Predator"
+      ? "Predatory_Quiet"
+      : archetype.personaType === "The_Ruthless_Architect" ||
+          tone.proseTexture === "Formal_Poetic"
+        ? "Velvet_Formal"
+        : archetype.personaType === "The_Rogue_Instigator"
+          ? "Playful_Banter"
+          : archetype.personaType === "The_Golden_Retriever" ||
+              archetype.personaType === "The_Quiet_Guardian"
+            ? "Soft_Reassurance"
+            : isAcademic || archetype.personaType === "The_Perfectionist"
+              ? "Academic_Precise"
+              : "Clipped_Command";
+  const vocabularyMode = vocabularyModeForSpeech(register, tone);
+  const addressStyle = addressStyleForSpeech(register, normalized);
+  const dialogueDos = dialogueDosForSpeech(register);
+  const dialogueDonts = dialogueDontsForSpeech(register);
+
+  return {
+    addressStyle,
+    dialogueDonts,
+    dialogueDos,
+    register,
+    speechPatternInstruction: buildSpeechPatternInstruction(
+      register,
+      vocabularyMode,
+      addressStyle,
+    ),
+    styleId: createStableSpeechStyleId(register, vocabularyMode, addressStyle),
+    vocabularyMode,
+  };
+}
+
+export function generateSpeechExamplesData(
+  speechStyle: GeneratedSpeechStyleData,
+  archetype: GeneratedArchetypeConfigurationData,
+  relationshipStatus: GeneratedRelationshipStatusData,
+  trope: string,
+): GeneratedSpeechExampleData[] {
+  const normalized = normaliseTrope(trope);
+  const examples: Array<Omit<GeneratedSpeechExampleData, "exampleId">> = [
+    {
+      category: "Greeting",
+      exampleLine: exampleLineForGreeting(speechStyle.register),
+      usageContext:
+        "Use as a tonal reference for first contact or the first turn after scene setup.",
+    },
+    {
+      category: "Conflict",
+      exampleLine: exampleLineForConflict(speechStyle.register),
+      usageContext:
+        "Use when {{user}} challenges {{char}}, violates pacing, or forces a rivalry beat.",
+    },
+    {
+      category:
+        relationshipStatus.emotionalAvailability === "Fully_Open" ||
+        archetype.personaType === "The_Golden_Retriever"
+          ? "Care"
+          : "Romantic_Tension",
+      exampleLine: exampleLineForSoftening(speechStyle.register),
+      usageContext:
+        "Use when defenses lower, but keep {{char}} from confessing too quickly.",
+    },
+  ];
+
+  if (normalized.includes("dark") || normalized.includes("arranged")) {
+    examples.push({
+      category: "Boundary",
+      exampleLine: exampleLineForBoundary(speechStyle.register),
+      usageContext:
+        "Use when the contract, taboo, or power imbalance needs to be reinforced without writing for {{user}}.",
+    });
+  }
+
+  return examples.slice(0, 5).map((example) => ({
+    ...example,
+    exampleId: createStableSpeechExampleId(
+      example.category,
+      speechStyle.register,
+      example.exampleLine,
+    ),
+  }));
 }
 
 export function generateEthnicityData(
@@ -4459,6 +4634,21 @@ function normaliseLoreEntries(entries: GeneratedLoreEntryData[] | undefined) {
     }));
 }
 
+function normaliseSpeechExamples(
+  examples: GeneratedSpeechExampleData[] | undefined,
+) {
+  return examples
+    ?.filter(
+      (example) => example.exampleLine.trim() && example.usageContext.trim(),
+    )
+    .slice(0, 5)
+    .map((example) => ({
+      ...example,
+      exampleLine: example.exampleLine.trim(),
+      usageContext: example.usageContext.trim(),
+    }));
+}
+
 function createWorldLorePlaceholder(
   variableKey: string,
   macroType: WorldLorePlaceholderMacroType,
@@ -4693,6 +4883,40 @@ function createStableArchetypeConfigurationId(
   const hex = hash.toString(16).padStart(8, "0");
 
   return `${hex}-9999-4000-8000-000000000000`;
+}
+
+function createStableSpeechStyleId(
+  register: SpeechRegister,
+  vocabularyMode: SpeechVocabularyMode,
+  addressStyle: SpeechAddressStyle,
+) {
+  const source = `${register}:${vocabularyMode}:${addressStyle}`;
+  let hash = 0;
+
+  for (let index = 0; index < source.length; index += 1) {
+    hash = (hash * 71 + source.charCodeAt(index)) >>> 0;
+  }
+
+  const hex = hash.toString(16).padStart(8, "0");
+
+  return `${hex}-aaaa-4000-8000-000000000000`;
+}
+
+function createStableSpeechExampleId(
+  category: SpeechExampleCategory,
+  register: SpeechRegister,
+  exampleLine: string,
+) {
+  const source = `${category}:${register}:${exampleLine}`;
+  let hash = 0;
+
+  for (let index = 0; index < source.length; index += 1) {
+    hash = (hash * 73 + source.charCodeAt(index)) >>> 0;
+  }
+
+  const hex = hash.toString(16).padStart(8, "0");
+
+  return `${hex}-bbbb-4000-8000-000000000000`;
 }
 
 function buildArchetypeBehaviorPrompt(
@@ -4945,6 +5169,200 @@ function applyArchetypeToIntimacyStyle(
   }
 
   return intimacyStyle;
+}
+
+function vocabularyModeForSpeech(
+  register: SpeechRegister,
+  tone: GeneratedToneConfigurationData,
+): SpeechVocabularyMode {
+  if (register === "Academic_Precise") {
+    return "Technical_Precise";
+  }
+
+  if (register === "Playful_Banter") {
+    return "Witty_Teasing";
+  }
+
+  if (register === "Velvet_Formal" || tone.proseTexture === "Formal_Poetic") {
+    return "Courtly_Formal";
+  }
+
+  if (register === "Soft_Reassurance" || tone.proseTexture === "Angsty_Melancholic") {
+    return "Romantic_Lyrical";
+  }
+
+  return "Sparse_Minimal";
+}
+
+function addressStyleForSpeech(
+  register: SpeechRegister,
+  normalizedTrope: string,
+): SpeechAddressStyle {
+  if (register === "Academic_Precise") {
+    return "Formal_Address";
+  }
+
+  if (register === "Playful_Banter") {
+    return "Teasing_Nicknames";
+  }
+
+  if (
+    register === "Predatory_Quiet" ||
+    normalizedTrope.includes("dark") ||
+    normalizedTrope.includes("arranged")
+  ) {
+    return "Possessive_Terms";
+  }
+
+  if (register === "Soft_Reassurance") {
+    return "Selective_Endearments";
+  }
+
+  return "No_Pet_Names";
+}
+
+function dialogueDosForSpeech(register: SpeechRegister) {
+  switch (register) {
+    case "Academic_Precise":
+      return [
+        "Use exact, articulate phrasing",
+        "Let corrections and careful questions reveal attraction",
+        "Keep banter intellectually competitive",
+      ];
+    case "Playful_Banter":
+      return [
+        "Use teasing reversals",
+        "Hide sincerity behind charm until trust is earned",
+        "Keep the rhythm quick and responsive",
+      ];
+    case "Predatory_Quiet":
+      return [
+        "Use low, patient lines",
+        "Let silences carry threat and fascination",
+        "Speak as if every word is chosen deliberately",
+      ];
+    case "Soft_Reassurance":
+      return [
+        "Use warm check-ins",
+        "Offer praise through grounded, specific observations",
+        "Let care interrupt hesitation",
+      ];
+    case "Velvet_Formal":
+      return [
+        "Use polished restraint",
+        "Frame affection as negotiation, etiquette, or controlled confession",
+        "Keep menace soft-spoken when tension rises",
+      ];
+    case "Clipped_Command":
+    default:
+      return [
+        "Use short, controlled sentences",
+        "Let action carry emotion before dialogue admits it",
+        "Keep vulnerability indirect and rare",
+      ];
+  }
+}
+
+function dialogueDontsForSpeech(register: SpeechRegister) {
+  const baseDonts = [
+    "Do not write dialogue for {{user}}",
+    "Do not over-explain {{char}}'s feelings in speech",
+    "Do not resolve romantic tension in one turn",
+  ];
+
+  if (register === "Academic_Precise") {
+    return [...baseDonts, "Do not make {{char}} sound casual or careless"];
+  }
+
+  if (register === "Soft_Reassurance") {
+    return [...baseDonts, "Do not turn comfort into instant confession"];
+  }
+
+  if (register === "Playful_Banter") {
+    return [...baseDonts, "Do not let teasing become shallow cruelty"];
+  }
+
+  return [...baseDonts, "Do not soften the voice before the scene earns it"];
+}
+
+function buildSpeechPatternInstruction(
+  register: SpeechRegister,
+  vocabularyMode: SpeechVocabularyMode,
+  addressStyle: SpeechAddressStyle,
+) {
+  return `SPEECH OVERRIDE: {{char}} speaks in ${register.replace(/_/g, " ").toLowerCase()} cadence with ${vocabularyMode.replace(/_/g, " ").toLowerCase()} vocabulary and ${addressStyle.replace(/_/g, " ").toLowerCase()} address rules. Treat speech examples as voice references, not reusable script.`;
+}
+
+function exampleLineForGreeting(register: SpeechRegister) {
+  switch (register) {
+    case "Academic_Precise":
+      return `{{char}}: "If we're being forced to collaborate, we may as well establish the rules before you start improvising."`;
+    case "Playful_Banter":
+      return `{{char}}: "Careful. Keep looking at me like that and I'll start thinking you missed me."`;
+    case "Predatory_Quiet":
+      return `{{char}}: "You felt the room change when I entered. Good. Trust that instinct."`;
+    case "Soft_Reassurance":
+      return `{{char}}: "Hey. Breathe first. We can solve the rest once your hands stop shaking."`;
+    case "Velvet_Formal":
+      return `{{char}}: "Protocol says I should be polite. Fortunately, protocol has always underestimated us both."`;
+    case "Clipped_Command":
+    default:
+      return `{{char}}: "Stay close. Argue later."`;
+  }
+}
+
+function exampleLineForConflict(register: SpeechRegister) {
+  switch (register) {
+    case "Academic_Precise":
+      return `{{char}}: "That was a confident conclusion. Unfortunately, confidence is not evidence."`;
+    case "Playful_Banter":
+      return `{{char}}: "That mouth is going to get you into trouble. I haven't decided if I should stop it."`;
+    case "Predatory_Quiet":
+      return `{{char}}: "Do not mistake my patience for permission."`;
+    case "Soft_Reassurance":
+      return `{{char}}: "I'm not angry. I just need you to hear me before this hurts us both."`;
+    case "Velvet_Formal":
+      return `{{char}}: "If this is a challenge, darling, choose your next words with better care."`;
+    case "Clipped_Command":
+    default:
+      return `{{char}}: "No. Try again. Honestly this time."`;
+  }
+}
+
+function exampleLineForSoftening(register: SpeechRegister) {
+  switch (register) {
+    case "Academic_Precise":
+      return `{{char}}: "For the record, your argument was infuriatingly sound. I may have respected it."`;
+    case "Playful_Banter":
+      return `{{char}}: "Don't look so pleased. I said I liked having you around, not that I'm becoming sensible."`;
+    case "Predatory_Quiet":
+      return `{{char}}: "I remember every promise made in fear. Yours, I intend to keep."`;
+    case "Soft_Reassurance":
+      return `{{char}}: "You don't have to earn being cared for. Not with me."`;
+    case "Velvet_Formal":
+      return `{{char}}: "You have become a complication I am no longer interested in solving."`;
+    case "Clipped_Command":
+    default:
+      return `{{char}}: "I noticed. Of course I noticed."`;
+  }
+}
+
+function exampleLineForBoundary(register: SpeechRegister) {
+  switch (register) {
+    case "Academic_Precise":
+      return `{{char}}: "Boundary conditions matter. Cross that one again and this conversation ends."`;
+    case "Playful_Banter":
+      return `{{char}}: "Tempting, but no. I like trouble. I don't like being cornered."`;
+    case "Predatory_Quiet":
+      return `{{char}}: "A bargain is not a cage unless you make me close the door."`;
+    case "Soft_Reassurance":
+      return `{{char}}: "I care about you too much to let this become careless."`;
+    case "Velvet_Formal":
+      return `{{char}}: "There are lines even desire does not get to cross."`;
+    case "Clipped_Command":
+    default:
+      return `{{char}}: "Stop. I mean it."`;
+  }
 }
 
 function toneVocabularyDirectives(

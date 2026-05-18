@@ -47,6 +47,8 @@ import {
   generateRelationshipStatusData,
   generateScenarioData,
   generateScenarioOpeningPairData,
+  generateSpeechExamplesData,
+  generateSpeechStyleData,
   generateSpeciesData,
   generateToneConfigurationData,
   generateTurnOffData,
@@ -2282,6 +2284,53 @@ test("generates archetype config and cross-links intimacy behavior", () => {
       "archetype" in exported.data.extensions.amourai,
     true,
   );
+});
+
+test("generates speech style and example macros for card voice", () => {
+  const darkRomance = generateAgeGapRomance("Dark Romance Arranged Marriage", {
+    occupationProfessionalDomain: "Underworld",
+    occupationSocioeconomicTier: "Shadow_Economy",
+    random: () => 0,
+  });
+  const academic = generateAgeGapRomance("Academic Rivals", {
+    occupationJobTitle: "University Student",
+    random: () => 0,
+  });
+  const speechStyle = generateSpeechStyleData(
+    "Academic Rivals",
+    academic.archetype!,
+    academic.occupation!,
+    academic.tone!,
+  );
+  const speechExamples = generateSpeechExamplesData(
+    speechStyle,
+    academic.archetype!,
+    academic.relationshipStatus!,
+    "Academic Rivals",
+  );
+  const exported = createGeneratedCharacterCardPayload(darkRomance, "Hello.");
+  const masterPayload = createMasterCharacterCardPayload(darkRomance);
+  const prompt = compileSystemPrompt(darkRomance);
+
+  assert.equal(darkRomance.speechStyle?.register, "Clipped_Command");
+  assert.equal(academic.speechStyle?.register, "Academic_Precise");
+  assert.equal(speechStyle.vocabularyMode, "Technical_Precise");
+  assert.match(speechStyle.speechPatternInstruction, /SPEECH OVERRIDE/);
+  assert.equal(speechExamples.length >= 3, true);
+  assert.match(speechExamples[0].exampleLine, /\{\{char\}\}:/);
+  assert.match(prompt, /SPEECH STYLE CONFIGURATION/);
+  assert.match(prompt, /VOICE REFERENCES ONLY/);
+  assert.equal(
+    masterPayload.metadata.speech_style?.addressStyle,
+    "Possessive_Terms",
+  );
+  assert.equal(
+    exported.data.extensions.amourai &&
+      typeof exported.data.extensions.amourai === "object" &&
+      "speech_style_generation" in exported.data.extensions.amourai,
+    true,
+  );
+  assert.match(exported.data.mes_example, /<START>/);
 });
 
 test("selects expanded archetype profiles for elite rebel and supernatural paths", () => {

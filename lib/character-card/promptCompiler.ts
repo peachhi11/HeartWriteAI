@@ -85,6 +85,16 @@ export function compileSystemPrompt(
   const framework = config.framework;
   const tone = config.tone;
   const archetype = config.archetype;
+  const speechStyle = config.speechStyle;
+  const speechExamples = config.speechExamples?.length
+    ? config.speechExamples
+        .slice(0, 5)
+        .map(
+          (example) =>
+            `${readable(example.category)} | ${example.usageContext}: ${example.exampleLine}`,
+        )
+        .join("\n")
+    : "None";
   const lorebookRules = lorebookSummary
     ? lorebookSummary.worldSystemRules.slice(0, 4).join(" | ")
     : "None";
@@ -188,11 +198,22 @@ ${scenarioOpeningPairContext}
 - CORE MOTIVATION: ${archetype?.coreMotivation ?? "Autonomy_Freedom"}
 - ARCHETYPE BEHAVIOR RULE: ${archetype?.aiBehaviorPrompt ?? "Keep {{char}} psychologically consistent and do not flatten their emotional armor too quickly."}
 
+--- SPEECH STYLE CONFIGURATION ---
+- REGISTER: ${speechStyle?.register ?? "Clipped_Command"}
+- VOCABULARY MODE: ${speechStyle?.vocabularyMode ?? "Sparse_Minimal"}
+- ADDRESS STYLE: ${speechStyle?.addressStyle ?? "No_Pet_Names"}
+- DIALOGUE DO: ${formatList(speechStyle?.dialogueDos)}
+- DIALOGUE DON'T: ${formatList(speechStyle?.dialogueDonts)}
+- SPEECH PATTERN RULE: ${speechStyle?.speechPatternInstruction ?? "{{char}} should speak in a consistent romance-roleplay voice that matches archetype, tone, and scene pressure."}
+- SPEECH EXAMPLES ARE VOICE REFERENCES ONLY. Do not copy them verbatim unless the generated line naturally belongs in the current scene.
+- EXAMPLES:
+${speechExamples}
+
 --- FORMATTING PROTOCOL ---
 1. Write exclusively in third-person limited perspective, focusing entirely on {{char}}'s inner thoughts and outer actions.
 2. Never, under any circumstances, speak, think, write, or act for {{user}}. Stop writing immediately when it is {{user}}'s turn to respond.
 3. Preserve the exact macro string {{char}} for the character name inside generated card prose when referring to the character by macro.
-4. Incorporate the sensory details organically. Use dialogue tags that match the dialogue style and current mood valve.
+4. Incorporate the sensory details organically. Use dialogue tags that match the speech style, dialogue examples, and current mood valve.
 5. Output ONLY the raw character text string for the final first_mes. Do not include labels, analysis, prefaces, or markdown fences.
 `.trim();
 }

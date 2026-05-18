@@ -108,6 +108,8 @@ export function createGeneratedCharacterCardPayload(
               }),
             )
             .slice(0, 5),
+          speech_style_generation: cardData.speechStyle,
+          speech_example_generation: cardData.speechExamples?.slice(0, 5),
           name_generation: {
             char: name,
             firstname: cardData.given_name,
@@ -271,7 +273,7 @@ export function createGeneratedCharacterCardPayload(
         .map((groupGreeting) => groupGreeting.completedGreeting.trim())
         .filter(Boolean)
         .slice(0, 5) ?? [],
-      mes_example: "",
+      mes_example: createMessageExamplesText(cardData),
       name,
       personality: "",
       post_history_instructions: createPostHistoryInstructionsText(cardData),
@@ -380,6 +382,8 @@ function createMasterDescription(cardData: CharacterCardData) {
     `Kink Role: ${cardData.kink?.primaryRole ?? "Switch"} (Intensity: ${cardData.kink?.intensityLevel ?? "Mild_Vanilla"})`,
     `Turn-offs: ${cardData.turnOffs?.behavioralTurnOffs.join(", ") ?? "None"}`,
     `Boundaries: ${cardData.turnOffs?.aiReactionPrompt ?? "Respect pacing and consent."}`,
+    `Speech Style: ${cardData.speechStyle?.register ?? "Clipped_Command"} | ${cardData.speechStyle?.vocabularyMode ?? "Sparse_Minimal"} | ${cardData.speechStyle?.addressStyle ?? "No_Pet_Names"}`,
+    `Speech Rule: ${cardData.speechStyle?.speechPatternInstruction ?? "{{char}} should keep dialogue consistent with archetype and scene pressure."}`,
     "",
     "--- WORLD LORE SUMMARY ---",
     `Setting: ${lorebook?.universeAnchor ?? "Contemporary Romance Local Canon"}`,
@@ -397,6 +401,18 @@ function createMasterDescription(cardData: CharacterCardData) {
     "Bloodline Feud: {{bloodline_feud}}",
     "Taboo History: {{taboo_history}}",
   ].join("\n");
+}
+
+function createMessageExamplesText(cardData: CharacterCardData) {
+  return (
+    cardData.speechExamples
+      ?.slice(0, 5)
+      .map(
+        (example) =>
+          `<START>\n${example.exampleLine}\n[Context: ${example.usageContext}]`,
+      )
+      .join("\n\n") ?? ""
+  );
 }
 
 function toSafeFilename(name: string) {

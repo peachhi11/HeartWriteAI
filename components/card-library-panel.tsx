@@ -14,8 +14,10 @@ import {
   SearchFilters,
   useCardLibrary,
 } from "@/hooks/useCardLibrary";
+import { cn } from "@/lib/utils";
 
 export interface CardLibraryPanelProps {
+  className?: string;
   library: ReturnType<typeof useCardLibrary>;
   onCardSelect: (filePath: string) => void;
 }
@@ -35,6 +37,7 @@ const relationships = [
 ] as const;
 
 export default function CardLibraryPanel({
+  className,
   library,
   onCardSelect,
 }: CardLibraryPanelProps) {
@@ -79,7 +82,12 @@ export default function CardLibraryPanel({
   }
 
   return (
-    <aside className="flex h-screen w-84 shrink-0 select-none flex-col border-r border-zinc-800 bg-zinc-950 text-zinc-100">
+    <aside
+      className={cn(
+        "flex h-screen w-84 shrink-0 select-none flex-col border-r border-zinc-800 bg-zinc-950 text-zinc-100",
+        className,
+      )}
+    >
       <div className="shrink-0 space-y-3 border-b border-zinc-800 p-4">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
@@ -248,4 +256,3 @@ function relationshipLabel(relationship: string) {
     .replace("(", "")
     .replace(")", "");
 }
-

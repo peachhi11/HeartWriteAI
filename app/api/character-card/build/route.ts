@@ -510,6 +510,53 @@ const buildRequestSchema = z
       )
       .max(5)
       .optional(),
+    speechExamples: z
+      .array(
+        z.object({
+          category: z.enum([
+            "Greeting",
+            "Conflict",
+            "Care",
+            "Boundary",
+            "Romantic_Tension",
+          ]),
+          exampleId: z.string().uuid(),
+          exampleLine: z.string().trim().min(1),
+          usageContext: z.string().trim().min(1),
+        }),
+      )
+      .max(5)
+      .optional(),
+    speechStyle: z
+      .object({
+        addressStyle: z.enum([
+          "No_Pet_Names",
+          "Selective_Endearments",
+          "Formal_Address",
+          "Teasing_Nicknames",
+          "Possessive_Terms",
+        ]),
+        dialogueDonts: z.array(z.string().trim().min(1)).max(8),
+        dialogueDos: z.array(z.string().trim().min(1)).max(8),
+        register: z.enum([
+          "Clipped_Command",
+          "Velvet_Formal",
+          "Playful_Banter",
+          "Soft_Reassurance",
+          "Academic_Precise",
+          "Predatory_Quiet",
+        ]),
+        speechPatternInstruction: z.string().trim().min(1),
+        styleId: z.string().uuid(),
+        vocabularyMode: z.enum([
+          "Sparse_Minimal",
+          "Romantic_Lyrical",
+          "Witty_Teasing",
+          "Technical_Precise",
+          "Courtly_Formal",
+        ]),
+      })
+      .optional(),
     tone: z
       .object({
         aiVocabularyDirectives: z.array(z.string().trim().min(1)).min(1).max(12),
@@ -611,6 +658,8 @@ export async function POST(request: Request) {
     scenario: requestResult.data?.scenario,
     scenarioOpeningPairs: requestResult.data?.scenarioOpeningPairs,
     speciesType: requestResult.data?.speciesType,
+    speechExamples: requestResult.data?.speechExamples,
+    speechStyle: requestResult.data?.speechStyle,
     tone: requestResult.data?.tone,
     trope,
     turnOffs: requestResult.data?.turnOffs,
@@ -648,6 +697,9 @@ export async function POST(request: Request) {
   const turnOffHook = randomizedData.turnOffs
     ? ` Boundary reaction: ${randomizedData.turnOffs.aiReactionPrompt}`
     : "";
+  const speechHook = randomizedData.speechStyle
+    ? ` Speech style: ${randomizedData.speechStyle.speechPatternInstruction}`
+    : "";
   const firstMessageHook = randomizedData.firstMessage
     ? ` The opening starts as ${randomizedData.firstMessage.entryPoint.replace(/_/g, " ").toLowerCase()} and ends with ${randomizedData.firstMessage.userCallToAction.replace(/_/g, " ").toLowerCase()}.`
     : "";
@@ -656,7 +708,7 @@ export async function POST(request: Request) {
     : "";
   const systemPrompt = compileSystemPrompt(randomizedData);
   const greeting = [
-    `{{char}} pauses at the edge of the room, the name ${fullName} carrying more weight than either of you expected.${scenarioHook}${firstMessageHook}${speciesHook}${nationalityHook}${occupationHook}${relationshipHook}${availabilityHook}${kinkHook}${fetishHook}${intimacyHook}${turnOffHook}`,
+    `{{char}} pauses at the edge of the room, the name ${fullName} carrying more weight than either of you expected.${scenarioHook}${firstMessageHook}${speciesHook}${nationalityHook}${occupationHook}${relationshipHook}${availabilityHook}${kinkHook}${fetishHook}${intimacyHook}${turnOffHook}${speechHook}`,
     `"You should probably decide now if you're going to run from this," they say, voice controlled enough to sound calm and tense enough to betray them, "because I am already deciding not to."`,
   ].join("\n\n");
 

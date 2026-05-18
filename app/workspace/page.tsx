@@ -6,6 +6,7 @@ import CardLibraryPanel from "@/components/card-library-panel";
 import { DevToolsPanel } from "@/components/dev-tools-panel";
 import DropZoneOverlay from "@/components/DropZoneOverlay";
 import ExpressionManager from "@/components/expression-manager";
+import { StudioShell } from "@/components/studio-shell";
 import StructuredCardEditor from "@/components/structured-card-editor";
 import { useCharacterLibrary } from "@/hooks/character-card/useCharacterLibrary";
 import { useFileDialogs } from "@/hooks/useFileDialogs";
@@ -118,7 +119,57 @@ export default function WorkspacePage() {
   }
 
   return (
-    <main className="relative flex h-screen w-screen overflow-hidden bg-zinc-950 text-zinc-100">
+    <StudioShell
+      eyebrow="Character Cards"
+      title="CCV3 Matrix Architecture Studio"
+      subtitle={currentFilePath ?? "No active tracking file loaded."}
+      actions={
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={handleManualImportClick}
+            className="rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted"
+          >
+            Import
+          </button>
+          {activeCard ? (
+            <>
+              <button
+                type="button"
+                onClick={handleSaveWorkspacePngAs}
+                disabled={!canSavePngMetadata}
+                className="hidden rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted disabled:opacity-50 md:inline-flex"
+                title={
+                  canSavePngMetadata
+                    ? "Save this card to a new PNG destination."
+                    : "Save As PNG needs a PNG/APNG source image."
+                }
+              >
+                Save PNG
+              </button>
+              <button
+                type="button"
+                onClick={handleExportWorkspaceCharx}
+                disabled={!currentFilePath}
+                className="hidden rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted disabled:opacity-50 md:inline-flex"
+              >
+                Export CHARX
+              </button>
+              <button
+                type="button"
+                onClick={handlePersistWorkspaceChanges}
+                disabled={isSaving || !currentFilePath}
+                className="rounded-lg bg-rose-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-rose-700 disabled:opacity-50"
+                title="Save edited CCV3 data back to the active PNG, JSON, or CHARX source."
+              >
+                {isSaving ? "Saving..." : "Save"}
+              </button>
+            </>
+          ) : null}
+        </div>
+      }
+    >
+      <div className="relative grid gap-5 xl:grid-cols-[22rem_minmax(0,1fr)]">
       <DropZoneOverlay
         onAssetTranscoded={(filePath) =>
           setWorkspaceMessage(`Converted image asset to ${filePath}.`)
@@ -131,67 +182,14 @@ export default function WorkspacePage() {
       />
 
       <CardLibraryPanel
+        className="h-[calc(100vh-9rem)] w-full rounded-xl border border-zinc-800 xl:sticky xl:top-24"
         library={library}
         onCardSelect={(filePath) => {
           void handleCardSelect(filePath);
         }}
       />
 
-      <div className="flex-1 space-y-6 overflow-y-auto p-6">
-        <header className="flex shrink-0 items-center justify-between gap-4 border-b border-zinc-800 pb-4">
-          <div>
-            <h1 className="text-xl font-bold tracking-tight">
-              CCV3 Matrix Architecture Studio
-            </h1>
-            <p className="max-w-[52rem] truncate font-mono text-xs text-violet-300">
-              {currentFilePath ?? "No active tracking file loaded."}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              type="button"
-              onClick={handleManualImportClick}
-              className="rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2 text-xs font-bold text-zinc-200 transition hover:bg-zinc-800"
-            >
-              Import File...
-            </button>
-            {activeCard ? (
-              <>
-                <button
-                  type="button"
-                  onClick={handleSaveWorkspacePngAs}
-                  disabled={!canSavePngMetadata}
-                  className="rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2 text-xs font-bold text-zinc-200 transition hover:bg-zinc-800 disabled:opacity-50"
-                  title={
-                    canSavePngMetadata
-                      ? "Save this card to a new PNG destination."
-                      : "Save As PNG needs a PNG/APNG source image."
-                  }
-                >
-                  Save PNG As...
-                </button>
-              <button
-                type="button"
-                onClick={handleExportWorkspaceCharx}
-                disabled={!currentFilePath}
-                className="rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2 text-xs font-bold text-zinc-200 transition hover:bg-zinc-800 disabled:opacity-50"
-              >
-                Export CHARX...
-              </button>
-              <button
-                type="button"
-                onClick={handlePersistWorkspaceChanges}
-                disabled={isSaving || !currentFilePath}
-                className="rounded-lg bg-violet-600 px-4 py-2 text-xs font-bold text-zinc-100 transition hover:bg-violet-700 disabled:opacity-50"
-                title="Save edited CCV3 data back to the active PNG, JSON, or CHARX source."
-              >
-                {isSaving ? "Rewriting Source..." : "Save Changes"}
-              </button>
-              </>
-            ) : null}
-          </div>
-        </header>
-
+      <div className="min-w-0 space-y-6">
         {workspaceMessage ? (
           <p className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-400">
             {workspaceMessage}
@@ -234,6 +232,7 @@ export default function WorkspacePage() {
 
         <DevToolsPanel onSeeded={library.refresh} />
       </div>
-    </main>
+      </div>
+    </StudioShell>
   );
 }

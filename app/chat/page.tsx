@@ -1,8 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
-import Link from "next/link";
-import { ArrowLeft, SendHorizontal, Sparkles } from "lucide-react";
+import { SendHorizontal, Sparkles } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,6 +21,7 @@ import {
   toOllamaMessages,
 } from "@/lib/chat/messages";
 import { cn } from "@/lib/utils";
+import { StudioShell } from "@/components/studio-shell";
 
 const OLLAMA_CHAT_ENDPOINT = "http://localhost:11434/api/chat";
 const DEFAULT_MODEL = "llama3";
@@ -29,7 +29,7 @@ const DEFAULT_MODEL = "llama3";
 const initialMessages: RoleplayMessage[] = [
   createRoleplayMessage(
     "assistant",
-    "*The tavern door creaks open, letting in a gust of cold mountain air.* What brings a traveler like you to the edge of the realm?",
+    "*Rain beads against the high-rise windows while {{char}} pauses beside the conference table, one hand still resting on the unsigned contract.* \"You came back after all.\"",
   ),
 ];
 
@@ -144,59 +144,47 @@ export default function RoleplayChat() {
   }
 
   return (
-    <main className="flex h-screen overflow-hidden bg-background text-foreground">
-      <section className="hidden w-80 flex-col gap-5 border-r bg-card/80 p-6 shadow-xl backdrop-blur md:flex">
-        <Button asChild variant="ghost" className="w-fit">
-          <Link href="/">
-            <ArrowLeft data-icon="inline-start" />
-            Back to studio
-          </Link>
-        </Button>
+    <StudioShell
+      eyebrow="Character Chat"
+      title="Chat Preview"
+      subtitle="A temporary local-model romance chat surface for testing streaming response shape before the full context compiler lands."
+      actions={<Badge variant="outline">Ollama: {DEFAULT_MODEL}</Badge>}
+    >
+      <div className="grid min-h-[calc(100vh-9rem)] gap-5 xl:grid-cols-[20rem_minmax(0,1fr)]">
+        <section className="hidden flex-col gap-5 xl:flex">
+          <Card className="bg-card/85">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Sparkles data-icon="inline-start" />
+                Active Persona
+              </CardTitle>
+              <CardDescription>Romance runtime sandbox</CardDescription>
+            </CardHeader>
+            <CardContent className="flex items-center gap-3">
+              <div className="flex size-11 items-center justify-center rounded-full bg-primary text-lg text-primary-foreground">
+                H
+              </div>
+              <div>
+                <p className="text-sm font-medium">HeartWrite Preview</p>
+                <p className="text-xs text-muted-foreground">
+                  Local model: {DEFAULT_MODEL}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
-        <div className="flex flex-col gap-2">
-          <Badge variant="secondary" className="w-fit">
-            Runtime sandbox
-          </Badge>
-          <h1 className="text-2xl font-semibold tracking-tight">Chat Preview</h1>
-          <p className="text-sm text-muted-foreground">
-            A temporary local-model chat surface for testing streaming response
-            shape before the full context compiler lands.
-          </p>
-        </div>
+          <Card className="bg-card/85">
+            <CardHeader>
+              <CardTitle className="text-base">Runtime Notes</CardTitle>
+              <CardDescription>
+                Final chat will compile character, persona, scenario, active
+                lore, memory summary, and post-history guardrails before sending.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </section>
 
-        <Card className="bg-background/70">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-base">
-              <Sparkles data-icon="inline-start" />
-              Active Persona
-            </CardTitle>
-            <CardDescription>Fantasy interactive fiction</CardDescription>
-          </CardHeader>
-          <CardContent className="flex items-center gap-3">
-            <div className="flex size-11 items-center justify-center rounded-full bg-primary text-lg text-primary-foreground">
-              M
-            </div>
-            <div>
-              <p className="text-sm font-medium">The Storyteller</p>
-              <p className="text-xs text-muted-foreground">
-                Ollama model: {DEFAULT_MODEL}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </section>
-
-      <section className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between border-b bg-card/60 px-5 py-4 backdrop-blur md:hidden">
-          <Button asChild variant="ghost" size="sm">
-            <Link href="/">
-              <ArrowLeft data-icon="inline-start" />
-              Studio
-            </Link>
-          </Button>
-          <Badge variant="secondary">Chat Preview</Badge>
-        </header>
-
+        <section className="flex min-h-[calc(100vh-9rem)] min-w-0 flex-col overflow-hidden rounded-xl border bg-card/70 shadow-xl backdrop-blur">
         <ScrollArea className="flex-1">
           <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-5 py-8">
             {messages.map((message) => (
@@ -265,6 +253,7 @@ export default function RoleplayChat() {
           </form>
         </div>
       </section>
-    </main>
+      </div>
+    </StudioShell>
   );
 }
