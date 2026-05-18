@@ -7,6 +7,7 @@ pub mod mock_generator;
 pub mod png_injector;
 pub mod png_parser;
 pub mod universal_parser;
+pub mod universal_saver;
 
 #[cfg(test)]
 pub mod png_tests;

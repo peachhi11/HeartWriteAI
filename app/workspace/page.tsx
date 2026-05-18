@@ -6,7 +6,9 @@ import CardLibraryPanel from "@/components/card-library-panel";
 import { DevToolsPanel } from "@/components/dev-tools-panel";
 import DropZoneOverlay from "@/components/DropZoneOverlay";
 import ExpressionManager from "@/components/expression-manager";
+import StructuredCardEditor from "@/components/structured-card-editor";
 import { useCharacterLibrary } from "@/hooks/character-card/useCharacterLibrary";
+import { useFileDialogs } from "@/hooks/useFileDialogs";
 import { useCardLibrary } from "@/hooks/useCardLibrary";
 import { ExpressionSprite } from "@/types/character-card/ExpressionSprite";
 import { ValidatedCharacterCardV3 } from "@/types/ccv3";
@@ -20,8 +22,12 @@ export default function WorkspacePage() {
     useState<ExpressionSprite | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const library = useCardLibrary(12);
-  const { exportCharacterToCharx, importCardFromPath, writeEditedCardToPng } =
-    useCharacterLibrary();
+  const { importCardFromPath, saveWorkspaceChanges } = useCharacterLibrary();
+  const {
+    triggerCharxExport,
+    triggerPngMetadataSave,
+    triggerUniversalImport,
+  } = useFileDialogs();
   const canSavePngMetadata = currentFilePath
     ? /\.(apng|png)$/i.test(currentFilePath)
     : false;
@@ -51,12 +57,11 @@ export default function WorkspacePage() {
     }
 
     setIsSaving(true);
-    setWorkspaceMessage("Saving card metadata and refreshing cache...");
+    setWorkspaceMessage("Saving card data back to the active source file...");
 
-    const result = await writeEditedCardToPng({
-      sourceImagePath: currentFilePath,
-      targetSavePath: currentFilePath,
-      updatedCardData: activeCard,
+    const result = await saveWorkspaceChanges({
+      activeSessionPath: currentFilePath,
+      currentWorkspaceCard: activeCard,
     });
 
     setIsSaving(false);
@@ -64,11 +69,22 @@ export default function WorkspacePage() {
     if (result.ok) {
       library.refresh();
       setWorkspaceMessage(
-        `Saved ${activeCard.data.name} and refreshed the library cache.`,
+        result.message ??
+          `Saved ${activeCard.data.name} and refreshed the library cache.`,
       );
     } else {
       setWorkspaceMessage(result.error ?? "Save failure.");
     }
+  }
+
+  async function handleManualImportClick() {
+    const result = await triggerUniversalImport();
+    if (!result) {
+      return;
+    }
+
+    handleCardLoaded(result.card, result.path);
+    setWorkspaceMessage(`Loaded ${result.card.data.name} from ${result.path}.`);
   }
 
   async function handleExportWorkspaceCharx() {
@@ -76,20 +92,28 @@ export default function WorkspacePage() {
       return;
     }
 
-    const destinationPath = createSiblingCharxPath(currentFilePath);
-    setWorkspaceMessage("Packaging CHARX bundle with expression sprites...");
+    setWorkspaceMessage("Choose a CHARX destination...");
 
-    const result = await exportCharacterToCharx({
-      currentWorkspaceCard: activeCard,
-      destinationCharxPath: destinationPath,
-      sourceCardFilePath: currentFilePath,
-    });
+    const destinationPath = await triggerCharxExport(currentFilePath, activeCard);
 
-    if (result.ok) {
+    if (destinationPath) {
       library.refresh();
-      setWorkspaceMessage(result.message ?? `Exported CHARX to ${destinationPath}.`);
-    } else {
-      setWorkspaceMessage(result.error ?? "CHARX export failure.");
+      setWorkspaceMessage(`Exported CHARX to ${destinationPath}.`);
+    }
+  }
+
+  async function handleSaveWorkspacePngAs() {
+    if (!activeCard || !currentFilePath || !canSavePngMetadata) {
+      return;
+    }
+
+    setWorkspaceMessage("Choose a PNG destination...");
+
+    const savedPath = await triggerPngMetadataSave(currentFilePath, activeCard);
+    if (savedPath) {
+      setCurrentFilePath(savedPath);
+      library.refresh();
+      setWorkspaceMessage(`Saved embedded PNG card to ${savedPath}.`);
     }
   }
 
@@ -117,38 +141,55 @@ export default function WorkspacePage() {
         <header className="flex shrink-0 items-center justify-between gap-4 border-b border-zinc-800 pb-4">
           <div>
             <h1 className="text-xl font-bold tracking-tight">
-              CCV3 Real-Time Editor
+              CCV3 Matrix Architecture Studio
             </h1>
-            <p className="text-xs text-zinc-400">
-              Workspace edits save back into card files and refresh the cache
-              index.
+            <p className="max-w-[52rem] truncate font-mono text-xs text-violet-300">
+              {currentFilePath ?? "No active tracking file loaded."}
             </p>
           </div>
-          {activeCard ? (
-            <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={handleManualImportClick}
+              className="rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2 text-xs font-bold text-zinc-200 transition hover:bg-zinc-800"
+            >
+              Import File...
+            </button>
+            {activeCard ? (
+              <>
+                <button
+                  type="button"
+                  onClick={handleSaveWorkspacePngAs}
+                  disabled={!canSavePngMetadata}
+                  className="rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2 text-xs font-bold text-zinc-200 transition hover:bg-zinc-800 disabled:opacity-50"
+                  title={
+                    canSavePngMetadata
+                      ? "Save this card to a new PNG destination."
+                      : "Save As PNG needs a PNG/APNG source image."
+                  }
+                >
+                  Save PNG As...
+                </button>
               <button
                 type="button"
                 onClick={handleExportWorkspaceCharx}
                 disabled={!currentFilePath}
                 className="rounded-lg border border-zinc-700 bg-zinc-900 px-4 py-2 text-xs font-bold text-zinc-200 transition hover:bg-zinc-800 disabled:opacity-50"
               >
-                Export CHARX
+                Export CHARX...
               </button>
               <button
                 type="button"
                 onClick={handlePersistWorkspaceChanges}
-                disabled={isSaving || !canSavePngMetadata}
+                disabled={isSaving || !currentFilePath}
                 className="rounded-lg bg-violet-600 px-4 py-2 text-xs font-bold text-zinc-100 transition hover:bg-violet-700 disabled:opacity-50"
-                title={
-                  canSavePngMetadata
-                    ? "Save edited CCV3 metadata into the PNG and refresh the cache."
-                    : "PNG/APNG save is available now; JSON and CHARX save are next."
-                }
+                title="Save edited CCV3 data back to the active PNG, JSON, or CHARX source."
               >
-                {isSaving ? "Saving Header..." : "Save Changes"}
+                {isSaving ? "Rewriting Source..." : "Save Changes"}
               </button>
-            </div>
-          ) : null}
+              </>
+            ) : null}
+          </div>
         </header>
 
         {workspaceMessage ? (
@@ -158,50 +199,10 @@ export default function WorkspacePage() {
         ) : null}
 
         {activeCard ? (
-          <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-900/70 p-6 shadow-md">
-            <div className="flex flex-col gap-1">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
-                Character Identity String
-              </label>
-              <input
-                type="text"
-                value={activeCard.data.name}
-                onChange={(event) =>
-                  setActiveCard({
-                    ...activeCard,
-                    data: {
-                      ...activeCard.data,
-                      name: event.currentTarget.value,
-                    },
-                  })
-                }
-                className="w-full rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs font-semibold text-zinc-200 outline-none focus:border-violet-500"
-              />
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <label className="text-[10px] font-bold uppercase tracking-wider text-zinc-500">
-                Dynamic Character Description Matrix
-              </label>
-            <textarea
-              value={activeCard.data.description}
-              onChange={(event) =>
-                setActiveCard({
-                  ...activeCard,
-                  data: {
-                    ...activeCard.data,
-                    description: event.currentTarget.value,
-                  },
-                })
-              }
-                className="h-48 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
-            />
-            </div>
-
-            <p className="truncate font-mono text-[10px] text-zinc-600">
-              FileSystem Mount: {currentFilePath ?? "unsaved"}
-            </p>
-          </div>
+          <StructuredCardEditor
+            activeCard={activeCard}
+            setActiveCard={setActiveCard}
+          />
         ) : (
           <div className="flex min-h-64 flex-col justify-center rounded-lg border border-dashed border-zinc-800 bg-zinc-900/20 p-6 text-center">
             {currentFilePath ? (
@@ -210,8 +211,8 @@ export default function WorkspacePage() {
               </p>
             ) : (
               <p className="text-sm text-zinc-500">
-                Drop any verified PNG, CHARX, or JSON card onto the window to
-                begin editing.
+                Click Import File or drop any verified PNG, CHARX, or JSON card
+                onto the window to begin editing.
               </p>
             )}
           </div>
@@ -235,8 +236,4 @@ export default function WorkspacePage() {
       </div>
     </main>
   );
-}
-
-function createSiblingCharxPath(filePath: string) {
-  return filePath.replace(/\.[^/.]+$/, ".charx");
 }

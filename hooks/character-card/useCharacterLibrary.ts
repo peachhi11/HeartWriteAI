@@ -34,6 +34,12 @@ export interface FullCharxExportResult {
   error: string | null;
 }
 
+export interface WorkspaceSaveResult {
+  message: string | null;
+  ok: boolean;
+  error: string | null;
+}
+
 export interface PngInjectionResult {
   filePath: string | null;
   ok: boolean;
@@ -241,6 +247,30 @@ export function useCharacterLibrary() {
     }
   }, []);
 
+  const saveWorkspaceChanges = useCallback(async function saveWorkspaceChanges({
+    activeSessionPath,
+    currentWorkspaceCard,
+  }: {
+    activeSessionPath: string;
+    currentWorkspaceCard: unknown;
+  }): Promise<WorkspaceSaveResult> {
+    try {
+      const validCard = CharacterCardV3Schema.parse(currentWorkspaceCard);
+      const message = await invoke<string>("save_workspace_changes", {
+        activeSessionPath,
+        currentWorkspaceCard: validCard satisfies ValidatedCharacterCardV3,
+      });
+
+      return { message, ok: true, error: null };
+    } catch (error) {
+      return {
+        message: null,
+        ok: false,
+        error: formatCharacterCardBoundaryError(error),
+      };
+    }
+  }, []);
+
   const convertAssetToStandardPng = useCallback(async function convertAssetToStandardPng(
     inputPath: string,
     outputPath: string,
@@ -291,6 +321,7 @@ export function useCharacterLibrary() {
     importCardFromPng,
     injectCardIntoPng,
     saveCard,
+    saveWorkspaceChanges,
     transcodeAssetToPng,
     writeEditedCardToPng,
   };

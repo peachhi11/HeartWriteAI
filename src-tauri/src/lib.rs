@@ -23,6 +23,7 @@ pub fn run() {
         .manage(AppState {
             db: Mutex::new(None),
         })
+        .plugin(tauri_plugin_dialog::init())
         .register_asynchronous_uri_scheme_protocol("ccv3-asset", |_ctx, request, responder| {
             let native_file_path = decode_asset_uri_path(request.uri().path());
             std::thread::spawn(move || {
@@ -89,8 +90,11 @@ pub fn run() {
             commands::character_card::import_png_card,
             commands::character_card::inject_ccv3_card_into_png,
             commands::character_card::save_ccv3_card,
+            commands::character_card::save_workspace_changes,
             commands::character_card::transcode_asset_to_png,
             commands::character_card::write_edited_card_to_png,
+            utils::assets::attach_expression_sprite,
+            utils::assets::remove_expression_sprite,
             utils::assets::scan_character_expressions
         ])
         .run(tauri::generate_context!())

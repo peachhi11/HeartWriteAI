@@ -2,6 +2,7 @@ use crate::codecs::charx_card::{create_charx_bundle, extract_ccv3_from_charx};
 use crate::codecs::image_asset::convert_to_standard_png;
 use crate::codecs::png_card::{extract_ccv3_from_png, inject_ccv3_into_png};
 use crate::models::character_card::{AppMacroExtensions, CharacterCardV3};
+use crate::utils::universal_saver::save_changes_to_source_path;
 use crate::AppState;
 use tauri::Manager;
 
@@ -79,6 +80,20 @@ pub async fn write_edited_card_to_png(
     upsert_saved_card_path(&state, &target_save_path, &updated_card_data)?;
 
     Ok(())
+}
+
+#[tauri::command]
+pub async fn save_workspace_changes(
+    state: tauri::State<'_, AppState>,
+    active_session_path: String,
+    current_workspace_card: CharacterCardV3,
+) -> Result<String, String> {
+    save_changes_to_source_path(&active_session_path, &current_workspace_card)?;
+    upsert_saved_card_path(&state, &active_session_path, &current_workspace_card)?;
+
+    Ok(format!(
+        "Changes successfully committed back to: {active_session_path}"
+    ))
 }
 
 #[tauri::command]
