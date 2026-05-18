@@ -1,0 +1,20 @@
+{
+  "brand": "HeartWrite AI",
+  "namespace": "heartwriteai",
+  "palette": {
+    "charcoal": "#120f14",
+    "ivory": "#fff7f3",
+    "rose": "#f48fa3",
+    "wine": "#861d33",
+    "mauve": "#b5799f"
+  },
+  "assets": {
+    "mark": "/brand/brand-mark.svg",
+    "appIcon": "/brand/app-icon.svg",
+    "favicon": "/brand/favicon.svg",
+    "wordmark": "/brand/wordmark.svg",
+    "horizontalLockup": "/brand/horizontal-lockup.svg",
+    "stackedLockup": "/brand/stacked-lockup.svg",
+    "watermark": "/brand/watermark-horizontal.svg"
+  }
+}

@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 168" role="img" aria-labelledby="title">
+  <title id="title">HeartWrite AI export watermark</title>
+  <g opacity=".88">
+    <g transform="translate(32 20) scale(.5)">
+      <path d="M128 215C80 174 42 140 42 96c0-26 19-46 45-46 18 0 32 9 41 25 9-16 23-25 41-25 26 0 45 20 45 46 0 44-38 78-86 119Z" fill="none" stroke="#f48fa3" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M165 52c-42 18-69 52-73 100-2 22 4 42 17 59 43-21 72-56 78-103 3-22-4-42-22-56Z" fill="#f48fa3"/>
+      <path d="M108 210c20-47 43-89 77-134" fill="none" stroke="#73182a" stroke-width="10" stroke-linecap="round"/>
+    </g>
+    <text x="185" y="103" fill="#861d33" font-family="Georgia, 'Times New Roman', serif" font-size="64" letter-spacing="1">HeartWrite AI</text>
+  </g>
+</svg>

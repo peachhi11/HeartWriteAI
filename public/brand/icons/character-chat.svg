@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" role="img" aria-labelledby="title">
+  <title id="title">Character Chat</title>
+  <path d="M10 16h34a8 8 0 0 1 8 8v12a8 8 0 0 1-8 8H27L14 53v-9h-4V16Z"/>
+  <path d="M23 30h.1M31 30h.1M39 30h.1"/>
+  <path d="M49 43c2-3 7-2 7 2 0 5-7 8-7 8s-7-3-7-8c0-4 5-5 7-2Z" fill="currentColor" stroke="none"/>
+</svg>

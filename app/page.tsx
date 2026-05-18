@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   BadgeCheck,
@@ -85,9 +86,19 @@ export default function Home() {
       <div className="amour-studio-ambient pointer-events-none fixed inset-0 -z-10" />
       <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-6 py-6">
         <header className="flex items-center justify-between rounded-3xl border bg-card/80 px-6 py-4 shadow-xl backdrop-blur">
-          <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-4">
+            <div className="flex size-16 items-center justify-center rounded-2xl bg-rose-50 shadow-inner dark:bg-rose-950/30">
+              <Image
+                src="/brand/brand-mark.svg"
+                alt=""
+                width={48}
+                height={48}
+                priority
+              />
+            </div>
+            <div className="flex flex-col gap-1">
             <Badge variant="secondary" className="w-fit">
-              Working title
+              Romance creation suite
             </Badge>
             <h1 className="text-3xl font-semibold tracking-tight">
               HeartWriteAI
@@ -96,6 +107,7 @@ export default function Home() {
               A local-first studio for character cards, persona matching, lorebooks,
               scenario arcs, and eventually a fully integrated desktop chat runtime.
             </p>
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <Badge variant="outline">Next.js</Badge>
