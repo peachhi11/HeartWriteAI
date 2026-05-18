@@ -1,5 +1,8 @@
+use crate::codecs::card_path::parse_card_by_path;
+use crate::models::character_card::CharacterCardV3;
 use crate::models::search::{PaginatedResponse, SearchFilters};
 use crate::synthesis::mock_card::generate_random_mock_ccv3;
+use crate::utils::charx_exporter::compile_full_charx_bundle;
 use crate::AppState;
 
 #[tauri::command]
@@ -24,6 +27,37 @@ pub async fn search_library_cache(
         .ok_or_else(|| "Database engine currently sleeping.".to_string())?;
 
     db.query_library_page(filter)
+}
+
+#[tauri::command]
+pub async fn import_card_from_path(
+    state: tauri::State<'_, AppState>,
+    file_path: String,
+) -> Result<CharacterCardV3, String> {
+    let parsed_card = parse_card_by_path(&file_path)?;
+    upsert_imported_card_path(&state, &file_path, &parsed_card)?;
+
+    Ok(parsed_card)
+}
+
+#[tauri::command]
+pub async fn export_character_to_charx(
+    state: tauri::State<'_, AppState>,
+    destination_charx_path: String,
+    source_card_file_path: String,
+    current_workspace_card: CharacterCardV3,
+) -> Result<String, String> {
+    compile_full_charx_bundle(
+        &destination_charx_path,
+        &current_workspace_card,
+        &source_card_file_path,
+    )?;
+
+    upsert_imported_card_path(&state, &destination_charx_path, &current_workspace_card)?;
+
+    Ok(format!(
+        "Successfully packaged character configuration alongside alternative expressions to: {destination_charx_path}"
+    ))
 }
 
 fn seed_mock_library_cache_with_state(
@@ -62,6 +96,23 @@ pub fn seed_mock_library_cache_in_db(
     Ok(format!(
         "Successfully provisioned and indexed {count} mock CCV3 characters inside cache engine."
     ))
+}
+
+fn upsert_imported_card_path(
+    state: &tauri::State<'_, AppState>,
+    file_path: &str,
+    card: &CharacterCardV3,
+) -> Result<(), String> {
+    let db_guard = state
+        .db
+        .lock()
+        .map_err(|_| "Failed lock orchestration structures".to_string())?;
+
+    if let Some(db) = db_guard.as_ref() {
+        db.upsert_card(file_path, card)?;
+    }
+
+    Ok(())
 }
 
 #[cfg(test)]

@@ -28,6 +28,12 @@ export interface ExportCharacterCardResult {
   error: string | null;
 }
 
+export interface FullCharxExportResult {
+  message: string | null;
+  ok: boolean;
+  error: string | null;
+}
+
 export interface PngInjectionResult {
   filePath: string | null;
   ok: boolean;
@@ -94,6 +100,25 @@ export function useCharacterLibrary() {
     }
   }, []);
 
+  const importCardFromPath = useCallback(async function importCardFromPath(
+    path: string,
+  ): Promise<ImportCharacterCardResult> {
+    try {
+      const card = await invoke<unknown>("import_card_from_path", {
+        filePath: path,
+      });
+      const validCard = CharacterCardV3Schema.parse(card);
+
+      return { card: validCard, ok: true, error: null };
+    } catch (error) {
+      return {
+        card: null,
+        ok: false,
+        error: formatCharacterCardBoundaryError(error),
+      };
+    }
+  }, []);
+
   const exportCardToCharx = useCallback(async function exportCardToCharx({
     additionalAssetsDir,
     avatarPath,
@@ -123,6 +148,34 @@ export function useCharacterLibrary() {
       };
     }
   }, []);
+
+  const exportCharacterToCharx = useCallback(async function exportCharacterToCharx({
+    currentWorkspaceCard,
+    destinationCharxPath,
+    sourceCardFilePath,
+  }: {
+    currentWorkspaceCard: unknown;
+    destinationCharxPath: string;
+    sourceCardFilePath: string;
+  }): Promise<FullCharxExportResult> {
+    try {
+      const validCard = CharacterCardV3Schema.parse(currentWorkspaceCard);
+      const message = await invoke<string>("export_character_to_charx", {
+        currentWorkspaceCard: validCard satisfies ValidatedCharacterCardV3,
+        destinationCharxPath,
+        sourceCardFilePath,
+      });
+
+      return { message, ok: true, error: null };
+    } catch (error) {
+      return {
+        message: null,
+        ok: false,
+        error: formatCharacterCardBoundaryError(error),
+      };
+    }
+  }, []);
+
 
   const extractCardMacroExtensions = useCallback(async function extractCardMacroExtensions(
     cardData: unknown,
@@ -232,6 +285,8 @@ export function useCharacterLibrary() {
     convertAssetToStandardPng,
     extractCardMacroExtensions,
     exportCardToCharx,
+    exportCharacterToCharx,
+    importCardFromPath,
     importCardFromCharx,
     importCardFromPng,
     injectCardIntoPng,

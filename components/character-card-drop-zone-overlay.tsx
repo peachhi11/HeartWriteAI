@@ -16,8 +16,7 @@ export function CharacterCardDropZoneOverlay({
   onDropError,
 }: CharacterCardDropZoneOverlayProps) {
   const [isDragging, setIsDragging] = useState(false);
-  const { importCardFromCharx, importCardFromPng, transcodeAssetToPng } =
-    useCharacterLibrary();
+  const { importCardFromPath, transcodeAssetToPng } = useCharacterLibrary();
 
   useEffect(() => {
     let isMounted = true;
@@ -55,18 +54,12 @@ export function CharacterCardDropZoneOverlay({
 
           const assetKind = getDroppedCharacterCardAssetKind(targetFile);
 
-          if (assetKind === "png-card") {
-            const result = await importCardFromPng(targetFile);
-            if (result.card) {
-              onCardParsed(result.card, targetFile);
-            } else if (result.error) {
-              onDropError?.(result.error);
-            }
-            return;
-          }
-
-          if (assetKind === "charx") {
-            const result = await importCardFromCharx(targetFile);
+          if (
+            assetKind === "png-card" ||
+            assetKind === "charx" ||
+            assetKind === "json-card"
+          ) {
+            const result = await importCardFromPath(targetFile);
             if (result.card) {
               onCardParsed(result.card, targetFile);
             } else if (result.error) {
@@ -86,7 +79,9 @@ export function CharacterCardDropZoneOverlay({
             return;
           }
 
-          onDropError?.("Drop a PNG/APNG character card, CHARX bundle, or JPG/WebP image asset.");
+          onDropError?.(
+            "Drop a PNG/APNG character card, CHARX/JSON card, or JPG/WebP image asset.",
+          );
         },
       );
 
@@ -110,8 +105,7 @@ export function CharacterCardDropZoneOverlay({
       cleanupListeners?.();
     };
   }, [
-    importCardFromCharx,
-    importCardFromPng,
+    importCardFromPath,
     onAssetTranscoded,
     onCardParsed,
     onDropError,

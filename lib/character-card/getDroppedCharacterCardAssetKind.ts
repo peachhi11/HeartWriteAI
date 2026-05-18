@@ -9,6 +9,10 @@ export function getDroppedCharacterCardAssetKind(
     return "charx";
   }
 
+  if (lowerPath.endsWith(".json")) {
+    return "json-card";
+  }
+
   if (lowerPath.endsWith(".png") || lowerPath.endsWith(".apng")) {
     return "png-card";
   }

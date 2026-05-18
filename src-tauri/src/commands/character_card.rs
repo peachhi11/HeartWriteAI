@@ -2,11 +2,13 @@ use crate::codecs::charx_card::{create_charx_bundle, extract_ccv3_from_charx};
 use crate::codecs::image_asset::convert_to_standard_png;
 use crate::codecs::png_card::{extract_ccv3_from_png, inject_ccv3_into_png};
 use crate::models::character_card::{AppMacroExtensions, CharacterCardV3};
+use crate::AppState;
 use tauri::Manager;
 
 #[tauri::command]
 pub async fn save_ccv3_card(
     app_handle: tauri::AppHandle,
+    state: tauri::State<'_, AppState>,
     card: CharacterCardV3,
 ) -> Result<String, String> {
     let app_dir = app_handle
@@ -25,7 +27,10 @@ pub async fn save_ccv3_card(
     std::fs::write(&file_path, json_string)
         .map_err(|error| format!("Disk IO write failure: {error}"))?;
 
-    Ok(file_path.to_string_lossy().into_owned())
+    let saved_path = file_path.to_string_lossy().into_owned();
+    upsert_saved_card_path(&state, &saved_path, &card)?;
+
+    Ok(saved_path)
 }
 
 #[tauri::command]
@@ -52,26 +57,33 @@ pub async fn extract_card_macro_extensions(
 
 #[tauri::command]
 pub async fn inject_ccv3_card_into_png(
+    state: tauri::State<'_, AppState>,
     source_image_path: String,
     output_png_path: String,
     card: CharacterCardV3,
 ) -> Result<String, String> {
     inject_ccv3_into_png(&source_image_path, &output_png_path, &card)?;
+    upsert_saved_card_path(&state, &output_png_path, &card)?;
 
     Ok(output_png_path)
 }
 
 #[tauri::command]
 pub async fn write_edited_card_to_png(
+    state: tauri::State<'_, AppState>,
     source_img_path: String,
     target_save_path: String,
     updated_card_data: CharacterCardV3,
 ) -> Result<(), String> {
-    inject_ccv3_into_png(&source_img_path, &target_save_path, &updated_card_data)
+    inject_ccv3_into_png(&source_img_path, &target_save_path, &updated_card_data)?;
+    upsert_saved_card_path(&state, &target_save_path, &updated_card_data)?;
+
+    Ok(())
 }
 
 #[tauri::command]
 pub async fn export_ccv3_card_to_charx(
+    state: tauri::State<'_, AppState>,
     output_path: String,
     card: CharacterCardV3,
     avatar_path: Option<String>,
@@ -84,11 +96,14 @@ pub async fn export_ccv3_card_to_charx(
         additional_assets_dir.as_deref(),
     )?;
 
+    upsert_saved_card_path(&state, &output_path, &card)?;
+
     Ok(output_path)
 }
 
 #[tauri::command]
 pub async fn export_charx_card(
+    state: tauri::State<'_, AppState>,
     destination_zip: String,
     card: CharacterCardV3,
     avatar_src: Option<String>,
@@ -99,7 +114,10 @@ pub async fn export_charx_card(
         &card,
         avatar_src.as_deref(),
         assets_src.as_deref(),
-    )
+    )?;
+    upsert_saved_card_path(&state, &destination_zip, &card)?;
+
+    Ok(())
 }
 
 #[tauri::command]
@@ -141,6 +159,23 @@ fn create_safe_card_file_name(name: &str) -> String {
     } else {
         safe_name
     }
+}
+
+fn upsert_saved_card_path(
+    state: &tauri::State<'_, AppState>,
+    file_path: &str,
+    card: &CharacterCardV3,
+) -> Result<(), String> {
+    let db_guard = state
+        .db
+        .lock()
+        .map_err(|_| "Failed capturing database mutex lock context".to_string())?;
+
+    if let Some(db) = db_guard.as_ref() {
+        db.upsert_card(file_path, card)?;
+    }
+
+    Ok(())
 }
 
 #[cfg(test)]

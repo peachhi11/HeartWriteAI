@@ -6,6 +6,10 @@ pub mod synthesis;
 pub mod utils;
 
 use crate::cache::card_cache::CacheDatabase;
+use crate::utils::assets::{
+    decode_asset_uri_path, is_supported_expression_path, mime_type_for_expression_path,
+};
+use std::path::PathBuf;
 use std::sync::Mutex;
 use tauri::Manager;
 
@@ -18,6 +22,31 @@ pub fn run() {
     tauri::Builder::default()
         .manage(AppState {
             db: Mutex::new(None),
+        })
+        .register_asynchronous_uri_scheme_protocol("ccv3-asset", |_ctx, request, responder| {
+            let native_file_path = decode_asset_uri_path(request.uri().path());
+            std::thread::spawn(move || {
+                let path = PathBuf::from(native_file_path);
+                let response = if path.is_file() && is_supported_expression_path(&path) {
+                    match std::fs::read(&path) {
+                        Ok(image_bytes) => tauri::http::Response::builder()
+                            .header("Content-Type", mime_type_for_expression_path(&path))
+                            .body(image_bytes)
+                            .unwrap_or_else(|_| tauri::http::Response::new(Vec::new())),
+                        Err(_) => tauri::http::Response::builder()
+                            .status(404)
+                            .body(Vec::new())
+                            .unwrap_or_else(|_| tauri::http::Response::new(Vec::new())),
+                    }
+                } else {
+                    tauri::http::Response::builder()
+                        .status(403)
+                        .body(Vec::new())
+                        .unwrap_or_else(|_| tauri::http::Response::new(Vec::new()))
+                };
+
+                responder.respond(response);
+            });
         })
         .plugin(tauri_plugin_store::Builder::default().build())
         .setup(|app| {
@@ -47,6 +76,8 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             commands::app::greet,
             commands::app::get_app_version,
+            commands::cache::export_character_to_charx,
+            commands::cache::import_card_from_path,
             commands::cache::search_library_cache,
             commands::cache::seed_mock_library_cache,
             commands::character_card::convert_asset_to_standard_png,
@@ -59,7 +90,8 @@ pub fn run() {
             commands::character_card::inject_ccv3_card_into_png,
             commands::character_card::save_ccv3_card,
             commands::character_card::transcode_asset_to_png,
-            commands::character_card::write_edited_card_to_png
+            commands::character_card::write_edited_card_to_png,
+            utils::assets::scan_character_expressions
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
