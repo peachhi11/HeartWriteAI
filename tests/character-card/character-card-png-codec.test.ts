@@ -15,6 +15,64 @@ import { parseMessyCharacterIntake } from "../../lib/character-card/parseMessyCh
 import { CharacterCardMacroClassificationSchema } from "../../types/character-card/CharacterCardMacroClassification";
 import { CharacterCardV3Schema } from "../../types/character-card/CharacterCardV3Schema";
 import { CharacterCardPayload } from "../../types/character-card/CharacterCardPayload";
+import {
+  calculateZodiac,
+  characterCardSeeds,
+  daysInMonth,
+  generateAgeGapRomance,
+  generateAlternateGreetingData,
+  generateArchetypeConfigurationData,
+  generateCharacterCardFromSeed,
+  generateDefaultAlternateGreetingForks,
+  generateDefaultScenarioOpeningPairs,
+  generateEthnicityData,
+  generateFetishData,
+  generateFirstMessageData,
+  generateFormattingConfigurationData,
+  generateFrameworkConfigurationData,
+  generateDefaultGroupGreetingSet,
+  generateDefaultGroupAlternateGreetingForks,
+  generateGroupAlternateGreetingData,
+  generateGroupGreetingData,
+  generateIntimacyStyleData,
+  generateKinkData,
+  generateLoreEntriesData,
+  generateLorebookSummaryData,
+  generateCreatorsNotesData,
+  generateNationalityData,
+  generateOccupationData,
+  generatePostHistoryInstructionsData,
+  generateRaceData,
+  generateRelationshipsData,
+  generateRelationshipStatusData,
+  generateScenarioData,
+  generateScenarioOpeningPairData,
+  generateSpeciesData,
+  generateToneConfigurationData,
+  generateTurnOffData,
+  generateWorldLorePlaceholders,
+  isLeapYear,
+} from "../../lib/character-card/generator";
+import { parseActiveLore } from "../../lib/character-card/lorebookParser";
+import {
+  compileMasterJsonPayload,
+  createMasterCharacterCardPayload,
+} from "../../lib/character-card/masterCardCompiler";
+import { createGeneratedCharacterCardPayload } from "../../lib/character-card/exportGeneratedCardToDesktop";
+import { generateScenarioOpeningPair } from "../../lib/character-card/pairCompiler";
+import {
+  appendPostHistoryOverride,
+  createPostHistoryOverride,
+} from "../../lib/character-card/postHistoryRuntime";
+import {
+  resolveDescriptionWorldPlaceholders,
+  resolveWorldPlaceholders,
+} from "../../lib/character-card/placeholderResolver";
+import { compileSystemPrompt } from "../../lib/character-card/promptCompiler";
+import {
+  createFrameworkSerializablePayload,
+  createSerializedCardString,
+} from "../../lib/character-card/frameworkSerializer";
 
 function encodeCard(card: CharacterCardPayload): string {
   return Buffer.from(JSON.stringify(card), "utf8").toString("base64");
@@ -873,4 +931,1467 @@ test("imports fixture png values and exports edited ccv3 metadata", () => {
     "Group hello",
     "Second group hello",
   ]);
+});
+
+test("calculates leap years and dynamic month bounds", () => {
+  assert.equal(isLeapYear(2024), true);
+  assert.equal(isLeapYear(1900), false);
+  assert.equal(isLeapYear(2000), true);
+  assert.equal(daysInMonth(2024, 2), 29);
+  assert.equal(daysInMonth(2023, 2), 28);
+  assert.equal(daysInMonth(2023, 4), 30);
+  assert.equal(daysInMonth(2023, 1), 31);
+});
+
+test("calculates zodiac signs from month and day boundaries", () => {
+  assert.equal(calculateZodiac(3, 21), "Aries");
+  assert.equal(calculateZodiac(4, 19), "Aries");
+  assert.equal(calculateZodiac(4, 20), "Taurus");
+  assert.equal(calculateZodiac(11, 22), "Sagittarius");
+  assert.equal(calculateZodiac(12, 22), "Capricorn");
+  assert.equal(calculateZodiac(2, 19), "Pisces");
+});
+
+test("generates age gap romance data with bounded senior age and birthdate", () => {
+  const generated = generateAgeGapRomance("Age Gap (Senior)", {
+    anchorYear: 2026,
+    powerDynamic: "Age Gap (Senior)",
+    random: () => 0,
+  });
+
+  assert.equal(generated.given_name, "Cole");
+  assert.equal(generated.surname, "Askew");
+  assert.equal(generated.age, 31);
+  assert.equal(generated.birth_year, 1995);
+  assert.equal(generated.birth_month, "January");
+  assert.equal(generated.birth_day, 1);
+  assert.equal(generated.zodiac, "Capricorn");
+});
+
+test("uses trope birthdate presets when supplied", () => {
+  const generated = generateAgeGapRomance("Age Gap (Senior)", {
+    anchorYear: 2026,
+    powerDynamic: "Age Gap (Senior)",
+    random: () => 0,
+    trope: "Dark/Possessive Anti-Hero",
+  });
+
+  assert.equal(generated.birth_month, "November");
+  assert.equal(generated.birth_day, 11);
+  assert.equal(generated.zodiac, "Scorpio");
+});
+
+test("keeps human species as the mortal baseline generation path", () => {
+  const generated = generateAgeGapRomance("Age Gap (Senior)", {
+    anchorYear: 2026,
+    powerDynamic: "Age Gap (Senior)",
+    random: () => 0,
+    speciesType: "Human",
+  });
+
+  assert.equal(generated.species?.type, "Human");
+  assert.equal(generated.species?.isImmortal, false);
+  assert.equal(generated.species?.instinctualTrait, "Mortal / Baseline");
+  assert.equal(generated.species?.dietaryNeed, "Standard food");
+  assert.equal(generated.apparent_age, undefined);
+  assert.equal(generated.age, 31);
+  assert.equal(generated.birth_year, 1995);
+});
+
+test("does not trigger age gap math unless the power dynamic requests it", () => {
+  const generated = generateAgeGapRomance("Generated Preview", {
+    anchorYear: 2026,
+    powerDynamic: "Peers / Equals",
+    random: () => 0,
+    speciesType: "Human",
+  });
+
+  assert.equal(generated.species?.type, "Human");
+  assert.equal(generated.age, 25);
+  assert.equal(generated.birth_year, 2001);
+  assert.equal(generated.apparent_age, undefined);
+});
+
+test("applies supernatural species age and name modifiers only when selected", () => {
+  const fae = generateAgeGapRomance("Age Gap (Senior)", {
+    random: () => 0,
+    speciesType: "Fae",
+  });
+  const werewolf = generateAgeGapRomance("Age Gap (Senior)", {
+    anchorYear: 2026,
+    random: () => 0,
+    speciesType: "Werewolf",
+  });
+  const human = generateSpeciesData("Human", () => 0);
+
+  assert.equal(fae.given_name, "Caspian");
+  assert.equal(fae.surname, "Thorne");
+  assert.equal(fae.species?.type, "Fae");
+  assert.equal(fae.species?.isImmortal, true);
+  assert.equal(fae.species?.heritage, "Gaelic & Celtic");
+  assert.equal(fae.species?.nameAura, "Elite / Noble");
+  assert.equal(fae.species?.nameEra, "Medieval & Ancient");
+  assert.equal(fae.age, 342);
+  assert.equal(fae.apparent_age, 27);
+  assert.equal(fae.birth_year, 1684);
+  assert.equal(fae.zodiac, "Capricorn");
+
+  assert.equal(werewolf.species?.type, "Werewolf");
+  assert.equal(werewolf.species?.nameAura, "Gritty / Edgy");
+  assert.equal(werewolf.species?.instinctualTrait, "Fated Mates / Pack Alpha");
+  assert.equal(werewolf.age, 21);
+  assert.equal(werewolf.apparent_age, undefined);
+
+  assert.equal(human.nameAura, undefined);
+});
+
+test("selects curated supernatural seeds by species", () => {
+  const demon = generateAgeGapRomance("Generated Preview", {
+    random: () => 0,
+    speciesType: "Demon",
+  });
+  const angel = generateAgeGapRomance("Generated Preview", {
+    random: () => 0,
+    speciesType: "Angel",
+  });
+  const siren = generateAgeGapRomance("Generated Preview", {
+    random: () => 0,
+    speciesType: "Siren",
+  });
+  const wraith = generateAgeGapRomance("Generated Preview", {
+    random: () => 0,
+    speciesType: "Wraith",
+  });
+
+  assert.equal(demon.given_name, "Valerius");
+  assert.equal(demon.species?.instinctualTrait.includes("Aura Siphoning"), true);
+  assert.equal(demon.age, 666);
+
+  assert.equal(angel.given_name, "Gideon");
+  assert.equal(angel.zodiac, "Leo");
+  assert.equal(angel.apparent_age, 29);
+
+  assert.equal(siren.given_name, "Ronan");
+  assert.equal(siren.species?.dietaryNeed, "Emotional fixation");
+  assert.equal(siren.birth_year, 1928);
+
+  assert.equal(wraith.given_name, "Alistair");
+  assert.equal(wraith.species?.instinctualTrait.includes("Intangible Touch"), true);
+  assert.equal(wraith.zodiac, "Sagittarius");
+});
+
+test("routes ethnicity classifiers into surname pools and metadata", () => {
+  const southern = generateAgeGapRomance("Generated Preview", {
+    anchorYear: 2026,
+    ethnicityRegion: "Southern_European",
+    linguisticMatrix: "Latinate / Romance",
+    powerDynamic: "Peers / Equals",
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const slavic = generateAgeGapRomance("Generated Preview", {
+    anchorYear: 2026,
+    ethnicityRegion: "Eastern_European_Slavic",
+    linguisticMatrix: "Slavic / Cyrillic-Derived",
+    powerDynamic: "Peers / Equals",
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const diaspora = generateEthnicityData(
+    "Italian-American",
+    "Diaspora_Blended",
+    "Latinate / Romance",
+    () => 0.9,
+  );
+
+  assert.equal(southern.surname, "Bello");
+  assert.equal(southern.ethnicity?.region, "Southern_European");
+  assert.equal(southern.ethnicity?.linguisticMatrix, "Latinate / Romance");
+  assert.equal(southern.ethnicity?.nativeLanguage, "Romance-language endearment markers");
+
+  assert.equal(slavic.surname, "Anatowicz");
+  assert.equal(slavic.ethnicity?.region, "Eastern_European_Slavic");
+  assert.equal(slavic.ethnicity?.nativeLanguage, "Slavic endearment markers");
+
+  assert.equal(diaspora.region, "Diaspora_Blended");
+  assert.equal(diaspora.societalContext, "Multigenerational Diaspora");
+  assert.equal(diaspora.hasDiasporicBaggage, true);
+});
+
+test("routes nationality separately from ethnicity and race", () => {
+  const southern = generateAgeGapRomance("Generated Preview", {
+    anchorYear: 2026,
+    ethnicityRegion: "Southern_European",
+    linguisticMatrix: "Latinate / Romance",
+    powerDynamic: "Peers / Equals",
+    random: () => 0.5,
+    speciesType: "Human",
+  });
+  const diasporaEthnicity = generateEthnicityData(
+    "Italian-American",
+    "Diaspora_Blended",
+    "Latinate / Romance",
+    () => 0,
+  );
+  const diasporaNationality = generateNationalityData(
+    undefined,
+    undefined,
+    undefined,
+    undefined,
+    diasporaEthnicity,
+  );
+  const fictionalNationality = generateNationalityData(
+    "Solar Fae Court",
+    "Fictional_Empire",
+    "Dual_Citizen",
+    undefined,
+    southern.ethnicity!,
+  );
+
+  assert.equal(southern.nationality?.passportCountry, "Italy");
+  assert.equal(southern.nationality?.regionalAlliance, "EU_Schengen");
+  assert.equal(southern.nationality?.legalStatus, "Native");
+  assert.equal(
+    southern.nationality?.linguisticVibe.includes("Italy"),
+    true,
+  );
+
+  assert.equal(diasporaNationality.passportCountry, "United States");
+  assert.equal(diasporaNationality.regionalAlliance, "Western_Allies");
+  assert.equal(diasporaNationality.legalStatus, "Naturalized");
+
+  assert.equal(fictionalNationality.passportCountry, "Solar Fae Court");
+  assert.equal(fictionalNationality.regionalAlliance, "Fictional_Empire");
+  assert.equal(fictionalNationality.legalStatus, "Dual_Citizen");
+  assert.equal(
+    fictionalNationality.linguisticVibe.includes("Code-switches"),
+    true,
+  );
+});
+
+test("routes professional occupation metadata by trope and explicit fields", () => {
+  const inferred = generateAgeGapRomance("Billionaire CEO Office Romance", {
+    anchorYear: 2026,
+    powerDynamic: "Peers / Equals",
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const explicit = generateOccupationData({
+    authorityDynamic: "Outsider",
+    jobTitle: "Personal Bodyguard",
+    professionalDomain: "Security_Defense",
+    socioeconomicTier: "High_Professional",
+    workplaceVibe: "Armored private security office",
+  });
+
+  assert.equal(inferred.occupation?.kind, "professional");
+  assert.equal(inferred.occupation?.jobTitle, "Chief Executive Officer");
+  assert.equal(inferred.occupation?.authorityDynamic, "Superior");
+  if (inferred.occupation?.kind === "professional") {
+    assert.equal(inferred.occupation.socioeconomicTier, "Ultra_Elite");
+    assert.equal(inferred.occupation.professionalDomain, "Corporate_Finance");
+  }
+
+  assert.equal(explicit.kind, "professional");
+  assert.equal(explicit.jobTitle, "Personal Bodyguard");
+  assert.equal(explicit.authorityDynamic, "Outsider");
+  if (explicit.kind === "professional") {
+    assert.equal(explicit.professionalDomain, "Security_Defense");
+  }
+});
+
+test("switches university student occupation into academic schema", () => {
+  const academicRival = generateAgeGapRomance("Academic_Rivals", {
+    anchorYear: 2026,
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const student = generateOccupationData({
+    academicYear: "Postgrad_PhD",
+    campusAffiliation: "Varsity Rowing Team",
+    fundingType: "Legacy_Trust",
+    jobTitle: "University Student",
+    majorField: "Athletics",
+  });
+
+  assert.equal(academicRival.occupation?.kind, "student");
+  assert.equal(academicRival.occupation?.jobTitle, "University Student");
+  assert.equal(academicRival.age, 21);
+  if (academicRival.occupation?.kind === "student") {
+    assert.equal(academicRival.occupation.academicYear, "Senior");
+    assert.equal(academicRival.occupation.majorField, "Humanities_Law");
+    assert.equal(academicRival.occupation.authorityDynamic, "Equal");
+    assert.equal(
+      academicRival.occupation.workplaceVibe.includes("library archive"),
+      true,
+    );
+  }
+
+  assert.equal(student.kind, "student");
+  if (student.kind === "student") {
+    assert.equal(student.academicYear, "Postgrad_PhD");
+    assert.equal(student.fundingType, "Legacy_Trust");
+    assert.equal(student.majorField, "Athletics");
+    assert.equal(student.campusAffiliation, "Varsity Rowing Team");
+  }
+});
+
+test("routes romance NPC relationships by trope and caps custom arrays", () => {
+  const arranged = generateAgeGapRomance("Arranged Marriage", {
+    anchorYear: 2026,
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const fakeDatingRelationships = generateRelationshipsData("Fake Dating");
+  const custom = generateAgeGapRomance("Generated Preview", {
+    relationships: [
+      {
+        connectionType: "Family_Lineage",
+        emotionalStatus: "Dependent_Protected",
+        npcName: "Julian Thorne",
+        oneLineDescription: "A younger brother {{char}} protects from family debt.",
+        romanceFunction: "The_Secret_Keeper",
+      },
+      {
+        connectionType: "Found_Family",
+        emotionalStatus: "Devoted_Loyal",
+        npcName: "Beatrice Volkov",
+        oneLineDescription: "A loyal roommate who pushes {{char}} toward honesty.",
+        romanceFunction: "The_Matchmaker",
+      },
+      {
+        connectionType: "Professional_Circle",
+        emotionalStatus: "Strained_Fractured",
+        npcName: "Maeve Cross",
+        oneLineDescription: "A business partner who distrusts romantic distractions.",
+        romanceFunction: "The_Barrier",
+      },
+      {
+        connectionType: "Antagonistic_Force",
+        emotionalStatus: "Estranged_Ghosted",
+        npcName: "Roxie",
+        oneLineDescription: "A jealous ex who should be trimmed by the cap.",
+        romanceFunction: "The_Jealousy_Instigator",
+      },
+    ],
+    random: () => 0,
+  });
+
+  assert.equal(arranged.relationships?.length, 1);
+  assert.equal(arranged.relationships?.[0].npcName, "Lord Arthur Thorne");
+  assert.equal(arranged.relationships?.[0].connectionType, "Family_Lineage");
+  assert.equal(arranged.relationships?.[0].romanceFunction, "The_Barrier");
+  assert.equal(arranged.relationships?.[0].emotionalStatus, "Strained_Fractured");
+
+  assert.equal(fakeDatingRelationships[0].npcName, "Roxie");
+  assert.equal(
+    fakeDatingRelationships[0].romanceFunction,
+    "The_Jealousy_Instigator",
+  );
+  assert.equal(fakeDatingRelationships[0].connectionType, "Antagonistic_Force");
+
+  assert.equal(custom.relationships?.length, 3);
+  assert.equal(custom.relationships?.[2].npcName, "Maeve Cross");
+});
+
+test("routes relationship status availability by trope and industry", () => {
+  const secondChance = generateAgeGapRomance("Second Chance Romance", {
+    anchorYear: 2026,
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const underworldArranged = generateAgeGapRomance("Arranged Marriage", {
+    occupationProfessionalDomain: "Underworld",
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const fakeDating = generateRelationshipStatusData("Fake Dating");
+  const defaultStatus = generateRelationshipStatusData("Generated Preview");
+
+  assert.equal(secondChance.relationshipStatus?.currentLabel, "Divorced_Separated");
+  assert.equal(
+    secondChance.relationshipStatus?.emotionalAvailability,
+    "Lingering_Past",
+  );
+  assert.equal(
+    secondChance.relationshipStatus?.statusContext.includes("{{user}}"),
+    true,
+  );
+
+  assert.equal(
+    underworldArranged.relationshipStatus?.currentLabel,
+    "Betrothed_Promised",
+  );
+  assert.equal(
+    underworldArranged.relationshipStatus?.emotionalAvailability,
+    "Guarded_Closed",
+  );
+  assert.equal(underworldArranged.relationshipStatus?.scandalFactor, "High_Taboo");
+
+  assert.equal(fakeDating.currentLabel, "It_Complicated");
+  assert.equal(fakeDating.emotionalAvailability, "Casual_Only");
+  assert.equal(defaultStatus.currentLabel, "Single");
+  assert.equal(defaultStatus.scandalFactor, "None");
+});
+
+test("routes opt-in adult intimacy metadata by trope species and authority", () => {
+  const vampire = generateAgeGapRomance("Dark Romance", {
+    random: () => 0,
+    speciesType: "Vampire",
+  });
+  const grumpyBoss = generateKinkData("Grumpy Sunshine", "Human", "Superior");
+  const defaultKink = generateKinkData("Generated Preview", "Human", "Equal");
+  const custom = generateAgeGapRomance("Generated Preview", {
+    kink: {
+      intensityLevel: "Moderate_Sensory",
+      nsfwEnabled: true,
+      preferredSensoryTags: ["Praise", "Control"],
+      primaryRole: "Dominant",
+      systemPromptInstruction:
+        "When adult scenes are explicitly invited, keep {{char}} attentive and consent-forward.",
+    },
+    random: () => 0,
+  });
+
+  assert.equal(vampire.kink?.nsfwEnabled, true);
+  assert.equal(vampire.kink?.primaryRole, "Primal");
+  assert.equal(vampire.kink?.intensityLevel, "Intense_Heavy");
+  assert.equal(vampire.kink?.preferredSensoryTags.includes("Marking"), true);
+  assert.equal(
+    vampire.kink?.systemPromptInstruction.includes("consent checks"),
+    true,
+  );
+
+  assert.equal(grumpyBoss.nsfwEnabled, true);
+  assert.equal(grumpyBoss.primaryRole, "Dominant");
+  assert.equal(grumpyBoss.intensityLevel, "Moderate_Sensory");
+  assert.equal(defaultKink.nsfwEnabled, false);
+  assert.equal(defaultKink.primaryRole, "Switch");
+
+  assert.equal(custom.kink?.nsfwEnabled, true);
+  assert.equal(custom.kink?.preferredSensoryTags.length, 2);
+});
+
+test("routes opt-in fetish metadata separately from kink behavior", () => {
+  const workplaceElite = generateAgeGapRomance("Workplace Romance", {
+    occupationSocioeconomicTier: "Ultra_Elite",
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const vampire = generateFetishData("Generated Preview", "Vampire");
+  const darkRomance = generateAgeGapRomance("Dark Romance", {
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const defaultFetish = generateFetishData("Generated Preview", "Human");
+  const custom = generateAgeGapRomance("Generated Preview", {
+    fetish: {
+      aiDescriptiveFocus:
+        "Focus narrative descriptions on silk garments and held eye contact.",
+      anatomicalFocus: "Hair_Face",
+      fetishEnabled: true,
+      materialPreference: "Lace_Silk",
+      situationalTrigger: "Exhibitionism_Risk",
+      sizeFantasyModifier: "Standard_Scale",
+    },
+    random: () => 0,
+  });
+
+  assert.equal(workplaceElite.fetish?.fetishEnabled, true);
+  assert.equal(workplaceElite.fetish?.materialPreference, "Uniforms_Suits");
+  assert.equal(workplaceElite.fetish?.situationalTrigger, "Exhibitionism_Risk");
+  assert.equal(workplaceElite.fetish?.anatomicalFocus, "Hair_Face");
+  assert.equal(
+    workplaceElite.fetish?.aiDescriptiveFocus.includes("business attire"),
+    true,
+  );
+
+  assert.equal(vampire.fetishEnabled, true);
+  assert.equal(vampire.situationalTrigger, "Sanguine_Biting");
+  assert.equal(vampire.materialPreference, "Leather_Latex");
+  assert.equal(vampire.sizeFantasyModifier, "Extreme_Height_Gap");
+  assert.equal(darkRomance.fetish?.situationalTrigger, "Sanguine_Biting");
+  assert.equal(defaultFetish.fetishEnabled, false);
+  assert.equal(defaultFetish.anatomicalFocus, "None");
+
+  assert.equal(custom.fetish?.fetishEnabled, true);
+  assert.equal(custom.fetish?.materialPreference, "Lace_Silk");
+});
+
+test("routes intimacy style separately from kink and fetish metadata", () => {
+  const hurtComfort = generateAgeGapRomance("Hurt Comfort", {
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const forcedProximity = generateIntimacyStyleData("Forced Proximity");
+  const enemies = generateIntimacyStyleData(
+    "Enemies to Lovers",
+    "Gritty / Edgy",
+  );
+  const custom = generateAgeGapRomance("Generated Preview", {
+    intimacyStyle: {
+      aftercareStyle: "The_Confessor",
+      aiBehaviorPrompt:
+        "During private moments, {{char}} gets honest before they get brave.",
+      expressionType: "Vulnerable_Yielding",
+      physicalLoveLanguage: "Verbal_Affirmation",
+      verbalCadence: "Hesitant_Reassurance",
+    },
+    random: () => 0,
+  });
+
+  assert.equal(hurtComfort.intimacyStyle?.expressionType, "Vulnerable_Yielding");
+  assert.equal(hurtComfort.intimacyStyle?.aftercareStyle, "The_Nurturer");
+  assert.equal(hurtComfort.intimacyStyle?.verbalCadence, "Praise_Validation");
+  assert.equal(
+    hurtComfort.intimacyStyle?.physicalLoveLanguage,
+    "Touch_Holding",
+  );
+
+  assert.equal(forcedProximity.expressionType, "Vulnerable_Yielding");
+  assert.equal(enemies.expressionType, "Stoic_Restrained");
+  assert.equal(enemies.aftercareStyle, "The_Processor");
+  assert.equal(enemies.verbalCadence, "Silent_Connection");
+  assert.equal(enemies.physicalLoveLanguage, "Protective_Proximity");
+
+  assert.equal(custom.intimacyStyle?.aftercareStyle, "The_Confessor");
+  assert.equal(custom.intimacyStyle?.verbalCadence, "Hesitant_Reassurance");
+});
+
+test("routes turn-off constraints from kink role intimacy style and aura", () => {
+  const dominantPraise = generateTurnOffData(
+    "Generated Preview",
+    {
+      intensityLevel: "Moderate_Sensory",
+      nsfwEnabled: true,
+      preferredSensoryTags: ["Praise"],
+      primaryRole: "Dominant",
+      systemPromptInstruction: "Praise-heavy dominant mode.",
+    },
+    {
+      aftercareStyle: "The_Nurturer",
+      aiBehaviorPrompt: "Soft praise.",
+      expressionType: "Intense_Devoted",
+      physicalLoveLanguage: "Touch_Holding",
+      verbalCadence: "Praise_Validation",
+    },
+  );
+  const slowBurn = generateTurnOffData(
+    "Slow Burn",
+    {
+      intensityLevel: "Mild_Vanilla",
+      nsfwEnabled: false,
+      preferredSensoryTags: [],
+      primaryRole: "Switch",
+      systemPromptInstruction: "Default.",
+    },
+    generateIntimacyStyleData("Generated Preview"),
+    "Gritty / Edgy",
+  );
+  const generated = generateAgeGapRomance("Slow Burn", {
+    random: () => 0,
+    speciesType: "Werewolf",
+  });
+
+  assert.equal(dominantPraise.dynamicHardlines, "No_Role_Reversal");
+  assert.equal(dominantPraise.behavioralTurnOffs.includes("Entitlement"), true);
+  assert.equal(
+    dominantPraise.sensoryTurnOffs.includes("Overly aggressive touch"),
+    true,
+  );
+
+  assert.equal(slowBurn.dynamicHardlines, "No_Rushed_Pacing");
+  assert.equal(slowBurn.behavioralTurnOffs.includes("Desperation"), true);
+
+  assert.equal(generated.turnOffs?.dynamicHardlines, "No_Rushed_Pacing");
+  assert.equal(
+    generated.turnOffs?.aiReactionPrompt.includes("slow down"),
+    true,
+  );
+});
+
+test("routes scenario metadata from trope occupation and taboo context", () => {
+  const forcedProximity = generateScenarioData("Forced Proximity");
+  const academicRivals = generateAgeGapRomance("Academic_Rivals", {
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const darkRomance = generateAgeGapRomance("Dark Romance", {
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const custom = generateAgeGapRomance("Generated Preview", {
+    random: () => 0,
+    scenario: {
+      plotHook: "The_Crisis",
+      scenePremiseDescription:
+        "{{char}} and {{user}} are stranded in a coastal estate during a blackout.",
+      sensoryDetails: ["Salt air", "Cold marble", "Distant thunder"],
+      settingType: "Contained_Insular",
+      startingTension: "Vulnerable_Exhausted",
+    },
+  });
+
+  assert.equal(forcedProximity.settingType, "Contained_Insular");
+  assert.equal(forcedProximity.plotHook, "The_Crisis");
+  assert.equal(forcedProximity.startingTension, "Charged_Electric");
+  assert.equal(academicRivals.scenario?.settingType, "Corporate_Institutional");
+  assert.equal(academicRivals.scenario?.plotHook, "The_Mandate");
+  assert.equal(academicRivals.scenario?.startingTension, "Combative_Friction");
+  assert.equal(darkRomance.scenario?.plotHook, "The_Secret_Transaction");
+  assert.equal(darkRomance.scenario?.settingType, "Atmospheric_Wilderness");
+  assert.equal(custom.scenario?.scenePremiseDescription.includes("coastal estate"), true);
+  assert.equal(custom.scenario?.startingTension, "Vulnerable_Exhausted");
+});
+
+test("compiles full character and scenario data into a system prompt", () => {
+  const generated = generateAgeGapRomance("Workplace Romance", {
+    occupationSocioeconomicTier: "Ultra_Elite",
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const systemPrompt = compileSystemPrompt(generated);
+
+  assert.equal(systemPrompt.includes("NAME: {{char}}"), true);
+  assert.equal(systemPrompt.includes("PARTNER: {{user}}"), true);
+  assert.equal(systemPrompt.includes("CURRENT ACTIVE SCENARIO"), true);
+  assert.equal(systemPrompt.includes("Soft hum of a server rack"), true);
+  assert.equal(systemPrompt.includes("Never, under any circumstances"), true);
+  assert.equal(systemPrompt.includes("No fetish focus is active"), false);
+  assert.equal(systemPrompt.includes("corporate risk"), true);
+});
+
+test("routes first message presentation metadata from scenario and style", () => {
+  const forcedProximity = generateAgeGapRomance("Forced Proximity", {
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const enemies = generateAgeGapRomance("Enemies to Lovers", {
+    random: () => 0,
+    speciesType: "Werewolf",
+  });
+  const custom = generateAgeGapRomance("Generated Preview", {
+    firstMessage: {
+      aiOutputConstraint:
+        "Output exactly three paragraphs and end with a direct challenge to {{user}}.",
+      entryPoint: "Mid_Action_Dialogue",
+      literaryStyle: "Chat_Symphonic",
+      tokenLengthCap: 360,
+      userCallToAction: "Direct_Question",
+    },
+    random: () => 0,
+  });
+  const direct = generateFirstMessageData("Generated Preview", {
+    plotHook: "The_Chance_Encounter",
+    scenePremiseDescription: "{{char}} and {{user}} collide.",
+    sensoryDetails: ["A sharp sound"],
+    settingType: "Public_HighExposure",
+    startingTension: "Charged_Electric",
+  });
+
+  assert.equal(forcedProximity.firstMessage?.entryPoint, "Post_Crisis_Quiet");
+  assert.equal(
+    forcedProximity.firstMessage?.userCallToAction,
+    "Vulnerable_Slip",
+  );
+  assert.equal(enemies.firstMessage?.literaryStyle, "Internal_Monologue_Heavy");
+  assert.equal(enemies.firstMessage?.tokenLengthCap, 520);
+  assert.equal(custom.firstMessage?.literaryStyle, "Chat_Symphonic");
+  assert.equal(
+    custom.firstMessage?.aiOutputConstraint.includes("three paragraphs"),
+    true,
+  );
+  assert.equal(direct.entryPoint, "Active_Collision");
+  assert.equal(direct.aiOutputConstraint.includes("Output ONLY"), true);
+});
+
+test("includes first message execution rules in compiled prompts", () => {
+  const generated = generateAgeGapRomance("Forced Proximity", {
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const systemPrompt = compileSystemPrompt(generated);
+
+  assert.equal(systemPrompt.includes("FIRST MESSAGE EXECUTION ARRAY"), true);
+  assert.equal(systemPrompt.includes("ENTRY POINT: Post Crisis Quiet"), true);
+  assert.equal(systemPrompt.includes("TOKEN LENGTH CAP"), true);
+  assert.equal(systemPrompt.includes("Output ONLY the raw character text string"), true);
+  assert.equal(
+    systemPrompt.includes("strictly forbidden from writing or completing actions for {{user}}"),
+    true,
+  );
+});
+
+test("normalizes alternate greeting fork metadata and caps arrays", () => {
+  const base = generateAgeGapRomance("Workplace Billionaire", {
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const generatedFork = generateAlternateGreetingData(base, {
+    aiGenerationDirective:
+      "Generate a Universe AU greeting where {{char}} is a Vampire Lord and {{user}} is a political captive.",
+    associatedTrope: "Dark Fantasy AU",
+    forkType: "Universe_AU",
+  });
+  const defaults = generateDefaultAlternateGreetingForks(base);
+  const capped = generateAgeGapRomance("Generated Preview", {
+    alternateGreetings: [
+      generatedFork,
+      ...defaults,
+      ...defaults.map((fork, index) => ({
+        ...fork,
+        greetingId: `${index + 4}4444444-0000-4000-8000-000000000000`,
+      })),
+    ],
+    random: () => 0,
+  });
+
+  assert.equal(generatedFork.greetingId.includes("-4000-8000-"), true);
+  assert.equal(generatedFork.completedGreeting.includes("Vampire Lord"), true);
+  assert.equal(defaults.length, 3);
+  assert.equal(defaults[0].forkType, "Timeline_Shift");
+  assert.equal(capped.alternateGreetings?.length, 5);
+});
+
+test("includes alternate greeting fork directives in compiled prompts", () => {
+  const base = generateAgeGapRomance("Generated Preview", {
+    alternateGreetings: [
+      {
+        aiGenerationDirective:
+          "Generate a breakup AU where {{char}} and {{user}} have just separated after a major betrayal.",
+        associatedTrope: "Breakup / AU Friction",
+        completedGreeting:
+          "{{char}} stands in the hallway with the key still in his palm.",
+        forkType: "Canon_Divergence",
+        greetingId: "aaaaaaaa-0000-4000-8000-000000000000",
+      },
+    ],
+    random: () => 0,
+  });
+  const systemPrompt = compileSystemPrompt(base);
+
+  assert.equal(systemPrompt.includes("ALTERNATE GREETING FORKS"), true);
+  assert.equal(systemPrompt.includes("Breakup / AU Friction"), true);
+  assert.equal(systemPrompt.includes("Generate no more than five"), true);
+});
+
+test("normalizes group greeting room metadata and caps arrays", () => {
+  const base = generateAgeGapRomance("Generated Preview", {
+    relationships: [
+      {
+        connectionType: "Found_Family",
+        emotionalStatus: "Devoted_Loyal",
+        npcName: "Alistair Sterling",
+        oneLineDescription: "A loyal friend who reads the room too quickly.",
+        romanceFunction: "The_Matchmaker",
+      },
+    ],
+    random: () => 0,
+  });
+  const generatedRoom = generateGroupGreetingData(base, {
+    aiGroupDirective:
+      "Generate a group greeting where Cole and Alistair are mid-argument in the office when {{user}} enters.",
+    formattingStyle: "Explicit_Name_Tags",
+    interpersonalDynamic: "Love_Triangle_Rivalry",
+    participatingCharacters: ["Cole Vance", "Alistair Sterling"],
+    spotlightDistribution: "Duo_Synergy",
+  });
+  const defaults = generateDefaultGroupGreetingSet(base);
+  const capped = generateAgeGapRomance("Generated Preview", {
+    groupGreetings: [
+      generatedRoom,
+      ...defaults,
+      ...defaults.map((room, index) => ({
+        ...room,
+        greetingId: `${index + 6}6666666-1111-4000-8000-000000000000`,
+      })),
+      {
+        ...generatedRoom,
+        greetingId: "99999999-1111-4000-8000-000000000000",
+      },
+    ],
+    random: () => 0,
+  });
+
+  assert.equal(generatedRoom.greetingId.includes("-1111-4000-"), true);
+  assert.equal(generatedRoom.completedGreeting.includes("Cole Vance"), true);
+  assert.equal(defaults.length, 2);
+  assert.equal(defaults[0].spotlightDistribution, "Leader_Alpha");
+  assert.equal(defaults[0].participatingCharacters[1], "Alistair Sterling");
+  assert.equal(capped.groupGreetings?.length, 5);
+});
+
+test("includes group greeting room directives in compiled prompts", () => {
+  const base = generateAgeGapRomance("Generated Preview", {
+    groupGreetings: [
+      {
+        aiGroupDirective:
+          "Generate an opening scene where Cole speaks first while Alistair reacts defensively as {{user}} enters.",
+        completedGreeting:
+          "**Cole Vance:** \"Sit down.\"\n\nAlistair folds his arms by the door.",
+        formattingStyle: "Explicit_Name_Tags",
+        greetingId: "bbbbbbbb-1111-4000-8000-000000000000",
+        interpersonalDynamic: "Wingman_Loop",
+        participatingCharacters: ["Cole Vance", "Alistair Sterling"],
+        spotlightDistribution: "Leader_Alpha",
+      },
+    ],
+    random: () => 0,
+  });
+  const systemPrompt = compileSystemPrompt(base);
+
+  assert.equal(systemPrompt.includes("GROUP GREETING ROOMS"), true);
+  assert.equal(systemPrompt.includes("Cole Vance, Alistair Sterling"), true);
+  assert.equal(systemPrompt.includes("dialogue attribution"), true);
+});
+
+test("normalizes group alternate greeting fork metadata and caps arrays", () => {
+  const base = generateAgeGapRomance("Generated Preview", {
+    relationships: [
+      {
+        connectionType: "Professional_Circle",
+        emotionalStatus: "Strained_Fractured",
+        npcName: "Roxie Knight",
+        oneLineDescription: "A fixer with divided loyalty.",
+        romanceFunction: "The_Secret_Keeper",
+      },
+    ],
+    random: () => 0,
+  });
+  const generatedFork = generateGroupAlternateGreetingData(base, {
+    aiMultiCharacterPrompt:
+      "Generate a group alternate greeting where the corporate cast is re-skinned as an underworld crew interrogating {{user}} in a warehouse backroom.",
+    forkCategory: "Collective_AU",
+    includedNpcNames: ["Cole Vance", "Roxie Knight"],
+    targetSettingVibe: "Gritty Safehouse",
+  });
+  const defaults = generateDefaultGroupAlternateGreetingForks(base);
+  const capped = generateAgeGapRomance("Generated Preview", {
+    groupAlternateGreetings: [
+      generatedFork,
+      ...defaults,
+      ...defaults.map((fork, index) => ({
+        ...fork,
+        altGreetingId: `${index + 8}8888888-2222-4000-8000-000000000000`,
+      })),
+      {
+        ...generatedFork,
+        altGreetingId: "eeeeeeee-2222-4000-8000-000000000000",
+      },
+    ],
+    random: () => 0,
+  });
+
+  assert.equal(generatedFork.altGreetingId.includes("-2222-4000-"), true);
+  assert.equal(generatedFork.completedGreeting.includes("Gritty Safehouse"), true);
+  assert.equal(defaults.length, 2);
+  assert.equal(defaults[0].forkCategory, "Team_Loyalty_Shift");
+  assert.equal(defaults[0].includedNpcNames[1], "Roxie Knight");
+  assert.equal(capped.groupAlternateGreetings?.length, 5);
+});
+
+test("includes group alternate greeting fork directives in compiled prompts", () => {
+  const base = generateAgeGapRomance("Generated Preview", {
+    groupAlternateGreetings: [
+      {
+        aiMultiCharacterPrompt:
+          "Generate a period court intrigue fork where the whole cast confronts {{user}} over a broken engagement contract.",
+        altGreetingId: "cccccccc-2222-4000-8000-000000000000",
+        completedGreeting:
+          "The ballroom stills as every member of the family turns toward {{user}}.",
+        forkCategory: "Collective_AU",
+        includedNpcNames: ["Cole Vance", "Alistair Sterling"],
+        targetSettingVibe: "Regency Ballroom",
+      },
+    ],
+    random: () => 0,
+  });
+  const systemPrompt = compileSystemPrompt(base);
+
+  assert.equal(systemPrompt.includes("GROUP ALTERNATE GREETING FORKS"), true);
+  assert.equal(systemPrompt.includes("Regency Ballroom"), true);
+  assert.equal(systemPrompt.includes("Collective AU"), true);
+});
+
+test("normalizes linked scenario opening pairs and caps arrays", () => {
+  const base = generateAgeGapRomance("Generated Preview", {
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const generatedPair = generateScenarioOpeningPairData(base, "Status_Valve");
+  const compiledPair = generateScenarioOpeningPair(
+    base,
+    "Environmental_Anchor",
+  );
+  const defaults = generateDefaultScenarioOpeningPairs(base);
+  const capped = generateAgeGapRomance("Generated Preview", {
+    random: () => 0,
+    scenarioOpeningPairs: [
+      generatedPair,
+      ...defaults,
+      ...defaults.map((pair, index) => ({
+        ...pair,
+        pairId: `${index + 9}9999999-3333-4000-8000-000000000000`,
+      })),
+    ],
+  });
+
+  assert.equal(generatedPair.pairId.includes("-3333-4000-"), true);
+  assert.equal(generatedPair.classificationType, "Status_Valve");
+  assert.equal(generatedPair.pairTitle, "Aftermath of the Betrayal");
+  assert.equal(
+    generatedPair.alternateScenarioContext.settingType,
+    "Contained_Insular",
+  );
+  assert.equal(compiledPair.pairTitle, "Blizzard Cabin Refuge");
+  assert.equal(defaults.length, 3);
+  assert.equal(defaults[1].classificationType, "Timeline_Link");
+  assert.equal(capped.scenarioOpeningPairs?.length, 5);
+});
+
+test("includes linked scenario opening pairs in compiled prompts", () => {
+  const base = generateAgeGapRomance("Generated Preview", {
+    random: () => 0,
+    scenarioOpeningPairs: [
+      {
+        alternateFirstMessage:
+          "*{{char}} keeps one hand braced on the locked safehouse door.*",
+        alternateScenarioContext: {
+          plotHook: "The_Secret_Transaction",
+          scenePremiseDescription:
+            "{{char}} and {{user}} are trapped inside an underworld backroom after a deal goes wrong.",
+          sensoryDetails: ["Stale smoke", "Rainwater on concrete"],
+          settingType: "Contained_Insular",
+          startingTension: "Combative_Friction",
+        },
+        classificationType: "Environmental_Anchor",
+        pairId: "dddddddd-3333-4000-8000-000000000000",
+        pairTitle: "Underworld Safehouse Lock-In",
+      },
+    ],
+  });
+  const systemPrompt = compileSystemPrompt(base);
+
+  assert.equal(
+    systemPrompt.includes("LINKED ALTERNATE SCENARIO OPENING PAIRS"),
+    true,
+  );
+  assert.equal(systemPrompt.includes("Underworld Safehouse Lock-In"), true);
+  assert.equal(systemPrompt.includes("inseparable"), true);
+  assert.equal(systemPrompt.includes("Rainwater on concrete"), true);
+});
+
+test("generates compressed lorebook summaries from character context", () => {
+  const supernatural = generateAgeGapRomance("Dark Romance", {
+    random: () => 0,
+    speciesType: "Vampire",
+  });
+  const corporate = generateAgeGapRomance("Billionaire CEO Office Romance", {
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const direct = generateLorebookSummaryData(
+    "Academic Rivals",
+    corporate.species!,
+    {
+      academicYear: "Senior",
+      authorityDynamic: "Equal",
+      campusAffiliation: "Debate Society",
+      fundingType: "Scholarship",
+      jobTitle: "University Student",
+      kind: "student",
+      majorField: "Humanities_Law",
+      workplaceVibe: "Old campus library",
+    },
+    [],
+  );
+
+  assert.equal(supernatural.lorebookSummary?.universeAnchor, "Modern Dark Fantasy Hidden World");
+  assert.equal(
+    supernatural.lorebookSummary?.worldSystemRules.some((rule) =>
+      rule.includes("Vampire"),
+    ),
+    true,
+  );
+  assert.equal(corporate.lorebookSummary?.universeAnchor, "Contemporary Corporate High Society");
+  assert.equal(direct.universeAnchor, "Contemporary University Social Field");
+  assert.equal(direct.worldSystemRules.length, 3);
+});
+
+test("includes lorebook summary in compiled prompts and master payloads", () => {
+  const base = generateAgeGapRomance("Generated Preview", {
+    lorebookSummary: {
+      aiLoreInstruction:
+        "Maintain strict dark-fantasy suspicion around {{char}} without adding exposition.",
+      factionOrDynastyContext:
+        "The Volkov family is fighting a quiet turf war under corporate cover.",
+      tokenOptimizationCap: 150,
+      universeAnchor: "Neo-London Dark Corporate Coven",
+      worldSystemRules: [
+        "Magic requires equal exchange.",
+        "The Corporate Syndicate controls local law enforcement.",
+      ],
+    },
+    random: () => 0,
+    scenarioOpeningPairs: generateDefaultScenarioOpeningPairs(
+      generateAgeGapRomance("Generated Preview", { random: () => 0 }),
+    ),
+  });
+  const systemPrompt = compileSystemPrompt(base);
+  const masterPayload = createMasterCharacterCardPayload(base);
+  const masterJson = compileMasterJsonPayload(base);
+
+  assert.equal(systemPrompt.includes("LOREBOOK SUMMARY"), true);
+  assert.equal(systemPrompt.includes("Neo-London Dark Corporate Coven"), true);
+  assert.equal(masterPayload.metadata.lorebook_summary?.tokenOptimizationCap, 150);
+  assert.equal(masterPayload.alt_greetings.length, 3);
+  assert.equal(masterJson.includes("linked_pairs"), true);
+});
+
+test("generates human-facing creator notes and exports them to card metadata", () => {
+  const dark = generateAgeGapRomance("Dark Romance", {
+    random: () => 0,
+    speciesType: "Vampire",
+  });
+  const direct = generateCreatorsNotesData(
+    "Grumpy Sunshine",
+    generateKinkData("Grumpy Sunshine", "Human", "Superior"),
+    generateFetishData("Generated Preview", "Human"),
+    dark.lorebookSummary!,
+  );
+  const exported = createGeneratedCharacterCardPayload(dark, "Hello.");
+  const masterPayload = createMasterCharacterCardPayload(dark);
+
+  assert.equal(dark.creatorsNotes?.contentRating, "Dark_Romance_Heavy");
+  assert.equal(
+    dark.creatorsNotes?.recommendedModels.every((model) =>
+      model.startsWith("YOUR_API"),
+    ),
+    true,
+  );
+  assert.equal(
+    dark.creatorsNotes?.triggerWarnings.includes("Dark romance tension"),
+    true,
+  );
+  assert.equal(direct.contentRating, "M_Rated_Sensory");
+  assert.match(exported.data.creator_notes, /CREATOR NOTES \/ READ ME/);
+  assert.match(exported.data.creator_notes, /YOUR_API/);
+  assert.equal(
+    exported.data.extensions.amourai &&
+      typeof exported.data.extensions.amourai === "object" &&
+      "creators_notes" in exported.data.extensions.amourai,
+    true,
+  );
+  assert.equal(masterPayload.metadata.creators_notes?.contentRating, "Dark_Romance_Heavy");
+});
+
+test("generates post-history runtime instructions and exports injection text", () => {
+  const slowBurn = generateAgeGapRomance("Enemies to Lovers Slow Burn", {
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const direct = generatePostHistoryInstructionsData(
+    "Hurt Comfort",
+    slowBurn.turnOffs!,
+    generateIntimacyStyleData("Hurt Comfort"),
+    slowBurn.lorebookSummary!,
+  );
+  const exported = createGeneratedCharacterCardPayload(slowBurn, "Hello.");
+  const masterPayload = createMasterCharacterCardPayload(slowBurn);
+
+  assert.equal(slowBurn.postHistoryInstructions?.injectionTokenWeight, 50);
+  assert.equal(
+    slowBurn.postHistoryInstructions?.driftControlRules.some((rule) =>
+      rule.includes("slow-burn resistance"),
+    ),
+    true,
+  );
+  assert.equal(
+    slowBurn.postHistoryInstructions?.formattingHardlines.some((rule) =>
+      rule.includes("Never write"),
+    ),
+    true,
+  );
+  assert.equal(
+    direct.dynamicToneModifiers.some((modifier) =>
+      modifier.includes("hidden caregiving"),
+    ),
+    true,
+  );
+  assert.match(
+    exported.data.post_history_instructions,
+    /POST-HISTORY RUNTIME OVERRIDES/,
+  );
+  assert.match(exported.data.post_history_instructions, /Never write/);
+  assert.equal(
+    exported.data.extensions.amourai &&
+      typeof exported.data.extensions.amourai === "object" &&
+      "post_history_instructions_generation" in exported.data.extensions.amourai,
+    true,
+  );
+  assert.equal(
+    masterPayload.metadata.post_history_instructions?.injectionTokenWeight,
+    50,
+  );
+});
+
+test("appends post-history override as the final hidden chat system message", () => {
+  const postHistory = generateAgeGapRomance("Enemies to Lovers Slow Burn", {
+    random: () => 0,
+    speciesType: "Human",
+  }).postHistoryInstructions!;
+  const override = createPostHistoryOverride(postHistory);
+  const optimizedMessages = appendPostHistoryOverride(
+    [{ role: "user", content: "I step into the room." }],
+    postHistory,
+  );
+
+  assert.match(override, /POST-HISTORY EXECUTION OVERRIDE/);
+  assert.match(override, /CURRENT CHARACTER INTENT/);
+  assert.match(override, /CONDITIONAL RESPONSE SHIFT/);
+  assert.match(override, /HARD ARCHITECTURAL LIMITS/);
+  assert.match(override, /Never write thoughts, actions, decisions, or dialogue for \{\{user\}\}/);
+  assert.equal(optimizedMessages.length, 2);
+  assert.equal(optimizedMessages[1].role, "system");
+  assert.equal(optimizedMessages[1].content, override);
+});
+
+test("generates and resolves world lore placeholders without bloating card text", () => {
+  const vampire = generateAgeGapRomance("Dark Romance Mafia", {
+    occupationProfessionalDomain: "Underworld",
+    random: () => 0,
+    speciesType: "Vampire",
+  });
+  const generatedPlaceholders = generateWorldLorePlaceholders(
+    "Dark Romance Mafia",
+    vampire.species!,
+    vampire.occupation!,
+    vampire.lorebookSummary!,
+  );
+  const resolved = resolveWorldPlaceholders(
+    vampire,
+    "Setting: {{world_setting}}\nSpecies: {{species_status}}\nLaw: {{law_system}}\nSecret: {{taboo_history}}",
+  );
+  const directResolved = resolveDescriptionWorldPlaceholders(
+    "HQ: {{faction_hq}}",
+    generatedPlaceholders,
+  );
+  const exported = createGeneratedCharacterCardPayload(vampire, "Hello.");
+  const masterPayload = createMasterCharacterCardPayload(vampire);
+
+  assert.equal(vampire.worldLorePlaceholders?.length, 9);
+  assert.equal(
+    vampire.worldLorePlaceholders?.some(
+      (placeholder) => placeholder.variableKey === "{{species_status}}",
+    ),
+    true,
+  );
+  assert.doesNotMatch(resolved, /\{\{world_setting\}\}/);
+  assert.match(resolved, /Vampire status/);
+  assert.match(directResolved, /safehouse/);
+  assert.doesNotMatch(exported.data.description, /\{\{law_system\}\}/);
+  assert.equal(
+    exported.data.extensions.amourai &&
+      typeof exported.data.extensions.amourai === "object" &&
+      "world_lore_placeholder" in exported.data.extensions.amourai,
+    true,
+  );
+  assert.equal(masterPayload.metadata.world_lore_placeholders?.length, 9);
+});
+
+test("generates keyed lore entries and injects active lore on chat triggers", () => {
+  const vampire = generateAgeGapRomance("Dark Romance Mafia", {
+    occupationProfessionalDomain: "Underworld",
+    random: () => 0,
+    speciesType: "Vampire",
+  });
+  const generatedLoreEntries = generateLoreEntriesData(
+    "Dark Romance Mafia",
+    vampire.species!,
+    vampire.occupation!,
+    vampire.relationships!,
+    vampire.lorebookSummary!,
+    vampire.worldLorePlaceholders!,
+  );
+  const activeLoreMessages = parseActiveLore(
+    "The coven mentioned a blood bond inside the syndicate safehouse.",
+    vampire.loreEntries!,
+  );
+  const exported = createGeneratedCharacterCardPayload(vampire, "Hello.");
+  const masterPayload = createMasterCharacterCardPayload(vampire);
+
+  assert.equal(vampire.loreEntries?.length, 4);
+  assert.equal(generatedLoreEntries.length, 4);
+  assert.equal(
+    vampire.loreEntries?.some((entry) =>
+      entry.activationKeys.includes("blood bond"),
+    ),
+    true,
+  );
+  assert.equal(
+    vampire.loreEntries?.some((entry) =>
+      entry.activationKeys.includes("syndicate"),
+    ),
+    true,
+  );
+  assert.equal(activeLoreMessages[0]?.role, "system");
+  assert.match(activeLoreMessages[0]?.content ?? "", /LOREBOOK ACTIVATION/);
+  assert.equal(exported.data.character_book?.entries.length, 4);
+  assert.equal(
+    exported.data.extensions.amourai &&
+      typeof exported.data.extensions.amourai === "object" &&
+      "lore_entries" in exported.data.extensions.amourai,
+    true,
+  );
+  assert.equal(masterPayload.metadata.lore_entries?.length, 4);
+});
+
+test("generates framework config and serializes by target specification", () => {
+  const generated = generateAgeGapRomance("Dark Romance Mafia", {
+    occupationProfessionalDomain: "Underworld",
+    random: () => 0,
+    speciesType: "Vampire",
+  });
+  const framework = generateFrameworkConfigurationData(
+    "Dark Romance Mafia",
+    generated.lorebookSummary!,
+    generated.firstMessage!,
+  );
+  const payload = createFrameworkSerializablePayload(generated, "Hello.");
+  const v2Serialized = createSerializedCardString(payload, {
+    ...framework,
+    targetSpecification: "V2_Card_Standard",
+  });
+  const agnosticSerialized = createSerializedCardString(payload, {
+    ...framework,
+    targetSpecification: "Raw_Agnostic_JSON",
+  });
+  const exported = createGeneratedCharacterCardPayload(generated, "Hello.");
+  const prompt = compileSystemPrompt(generated);
+
+  assert.equal(generated.framework?.targetSpecification, "V3_Card_Layout");
+  assert.equal(framework.injectionPipelineRouter, "Dynamic_Variable_Loop");
+  assert.match(v2Serialized, /"spec": "chara_card_v2"/);
+  assert.match(agnosticSerialized, /"framework"/);
+  assert.match(prompt, /FRAMEWORK CONFIGURATION/);
+  assert.equal(
+    exported.data.extensions.amourai &&
+      typeof exported.data.extensions.amourai === "object" &&
+      "framework" in exported.data.extensions.amourai,
+    true,
+  );
+});
+
+test("generates formatting config and exports strict render rules", () => {
+  const generated = generateAgeGapRomance("Enemies to Lovers Dark Romance", {
+    occupationJobTitle: "Cybersecurity Analyst",
+    occupationProfessionalDomain: "Corporate_Finance",
+    random: () => 0,
+  });
+  const formatting = generateFormattingConfigurationData(
+    "Enemies to Lovers Dark Romance",
+    generated.occupation!,
+    generated.firstMessage!,
+  );
+  const exported = createGeneratedCharacterCardPayload(generated, "Hello.");
+  const masterPayload = createMasterCharacterCardPayload(generated);
+  const prompt = compileSystemPrompt(generated);
+
+  assert.equal(generated.formatting?.narrativePerspective, "Third_Person_Past");
+  assert.equal(formatting.markdownEmphasisStyle, "Code_Block_Shielding");
+  assert.match(
+    formatting.formattingSystemPromptInjection,
+    /MANDATORY FORMATTING/,
+  );
+  assert.match(prompt, /FORMATTING CONFIGURATION/);
+  assert.equal(masterPayload.metadata.formatting?.maxParagraphsPerTurn, 4);
+  assert.equal(
+    exported.data.extensions.amourai &&
+      typeof exported.data.extensions.amourai === "object" &&
+      "formatting" in exported.data.extensions.amourai,
+    true,
+  );
+});
+
+test("generates tone config and exports narrative atmosphere rules", () => {
+  const vampire = generateAgeGapRomance("Dark Romance", {
+    occupationProfessionalDomain: "Underworld",
+    random: () => 0,
+    speciesType: "Vampire",
+  });
+  const wholesome = generateAgeGapRomance("Friends to Lovers Small Town", {
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const tone = generateToneConfigurationData(
+    "Dark Romance",
+    vampire.species!,
+    vampire.occupation!,
+  );
+  const exported = createGeneratedCharacterCardPayload(vampire, "Hello.");
+  const masterPayload = createMasterCharacterCardPayload(vampire);
+  const prompt = compileSystemPrompt(vampire);
+
+  assert.equal(vampire.tone?.proseTexture, "Gritty_Melodramatic");
+  assert.equal(vampire.tone?.pacingVelocity, "Slow_Tease_Prose");
+  assert.equal(tone.worldviewFilter, "Ruthless_Cynical");
+  assert.deepEqual(wholesome.tone?.aiVocabularyDirectives.slice(0, 2), [
+    "soft",
+    "warmth",
+  ]);
+  assert.match(tone.toneSystemPromptInjection, /NARRATIVE TONE/);
+  assert.match(prompt, /TONE CONFIGURATION/);
+  assert.equal(masterPayload.metadata.tone?.worldviewFilter, "Ruthless_Cynical");
+  assert.equal(
+    exported.data.extensions.amourai &&
+      typeof exported.data.extensions.amourai === "object" &&
+      "tone" in exported.data.extensions.amourai,
+    true,
+  );
+});
+
+test("generates archetype config and cross-links intimacy behavior", () => {
+  const grumpy = generateAgeGapRomance("Grumpy Sunshine", {
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const fakeDating = generateAgeGapRomance("Fake Dating Banter", {
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const archetype = generateArchetypeConfigurationData(
+    "Grumpy Sunshine",
+    grumpy.species!,
+    grumpy.occupation!,
+  );
+  const exported = createGeneratedCharacterCardPayload(grumpy, "Hello.");
+  const masterPayload = createMasterCharacterCardPayload(grumpy);
+  const prompt = compileSystemPrompt(grumpy);
+
+  assert.equal(grumpy.archetype?.personaType, "The_Stoic_Wall");
+  assert.equal(grumpy.archetype?.defenseMechanism, "Silent_Withdrawal");
+  assert.equal(archetype.coreMotivation, "Security_Protection");
+  assert.equal(grumpy.intimacyStyle?.expressionType, "Stoic_Restrained");
+  assert.equal(fakeDating.archetype?.personaType, "The_Rogue_Instigator");
+  assert.equal(fakeDating.intimacyStyle?.expressionType, "Playful_Teasing");
+  assert.match(prompt, /ARCHETYPE CONFIGURATION/);
+  assert.equal(masterPayload.metadata.archetype?.personaType, "The_Stoic_Wall");
+  assert.equal(
+    exported.data.extensions.amourai &&
+      typeof exported.data.extensions.amourai === "object" &&
+      "archetype" in exported.data.extensions.amourai,
+    true,
+  );
+});
+
+test("selects expanded archetype profiles for elite rebel and supernatural paths", () => {
+  const vampire = generateAgeGapRomance("Vampire Mutual Longing", {
+    random: () => 0,
+    speciesType: "Vampire",
+  });
+  const fae = generateAgeGapRomance("Arranged Marriage Forbidden Love", {
+    random: () => 0,
+    speciesType: "Fae",
+  });
+  const oldMoney = generateAgeGapRomance("Old Money Forced Proximity", {
+    random: () => 0,
+    speciesType: "Human",
+  });
+  const veteran = generateAgeGapRomance("Second Chance Romance Age Gap", {
+    random: () => 0,
+    speciesType: "Human",
+  });
+
+  assert.equal(vampire.archetype?.personaType, "The_Ancient_Predator");
+  assert.equal(
+    vampire.archetype?.defenseMechanism,
+    "Temporal_Disconnection",
+  );
+  assert.equal(fae.archetype?.personaType, "The_Fae_Deal_Maker");
+  assert.equal(fae.archetype?.coreMotivation, "Autonomy_Freedom");
+  assert.equal(oldMoney.archetype?.personaType, "The_Ruthless_Architect");
+  assert.equal(oldMoney.archetype?.defenseMechanism, "Intellectualization");
+  assert.equal(veteran.archetype?.personaType, "The_Jaded_Veteran");
+  assert.equal(veteran.archetype?.coreMotivation, "Peace_Quiet");
+});
+
+test("hydrates curated character card seeds into engine modules", () => {
+  const [darkRomanceSeed, academicSeed, vampireSeed, sunshineSeed] =
+    characterCardSeeds;
+  const darkRomance = generateCharacterCardFromSeed(darkRomanceSeed);
+  const academic = generateCharacterCardFromSeed(academicSeed);
+  const vampire = generateCharacterCardFromSeed(vampireSeed);
+  const sunshine = generateCharacterCardFromSeed(sunshineSeed);
+
+  assert.equal(characterCardSeeds.length, 4);
+  assert.equal(darkRomance.given_name, "Nikolai");
+  assert.equal(darkRomance.surname, "Volkov");
+  assert.equal(darkRomance.age, 31);
+  assert.equal(darkRomance.birth_month, "November");
+  assert.equal(darkRomance.birth_day, 11);
+  assert.equal(darkRomance.archetype?.personaType, "The_Ruthless_Architect");
+  assert.equal(darkRomance.occupation?.jobTitle, "Syndicate Underboss");
+  assert.equal(darkRomance.relationshipStatus?.currentLabel, "Betrothed_Promised");
+  assert.equal(darkRomance.kink?.primaryRole, "Dominant");
+  assert.equal(darkRomance.fetish?.situationalTrigger, "Exhibitionism_Risk");
+  assert.equal(darkRomance.tone?.proseTexture, "Gritty_Melodramatic");
+  assert.equal(darkRomance.framework?.targetSpecification, "V2_Card_Standard");
+
+  assert.equal(academic.occupation?.kind, "student");
+  assert.equal(
+    academic.occupation?.kind === "student"
+      ? academic.occupation.academicYear
+      : "",
+    "Senior",
+  );
+  assert.equal(academic.archetype?.defenseMechanism, "Hyper_Rationalization");
+  assert.equal(academic.formatting?.narrativePerspective, "Third_Person_Present");
+
+  assert.equal(vampire.species?.type, "Vampire");
+  assert.equal(vampire.age, 450);
+  assert.equal(vampire.apparent_age, 28);
+  assert.equal(vampire.framework?.targetSpecification, "V3_Card_Layout");
+  assert.equal(vampire.fetish?.situationalTrigger, "Sanguine_Biting");
+  assert.equal(vampire.relationships?.[0]?.npcName, "Lilith Crowley");
+
+  assert.equal(sunshine.archetype?.personaType, "The_Golden_Retriever");
+  assert.equal(sunshine.intimacyStyle?.aftercareStyle, "The_Seeker");
+  assert.equal(sunshine.relationshipStatus?.emotionalAvailability, "Fully_Open");
+  assert.equal(sunshine.race?.syncMode, "Homogeneous Alignment");
+});
+
+test("keeps race default aligned to the primary european database path", () => {
+  const generated = generateAgeGapRomance("Generated Preview", {
+    anchorYear: 2026,
+    ethnicityRegion: "Northern_Western_European",
+    linguisticMatrix: "Celtic / Gaelic",
+    powerDynamic: "Peers / Equals",
+    random: () => 0,
+    speciesType: "Human",
+  });
+
+  assert.equal(generated.race?.macroGroup, "White_Caucasian");
+  assert.equal(generated.race?.syncMode, "Homogeneous Alignment");
+  assert.equal(generated.race?.isCulturallySalient, false);
+  assert.equal(generated.race?.narrativeStyle, "Stylised / Aesthetic Focus");
+  assert.equal(
+    generated.race?.physicalDescriptors.includes("fair to olive undertones"),
+    true,
+  );
+});
+
+test("marks non-default race and diaspora pairings as diasporic shifts", () => {
+  const ethnicity = generateEthnicityData(
+    "British Black",
+    "Diaspora_Blended",
+    "Anglophone",
+    () => 0,
+  );
+  const race = generateRaceData("Black_African", ethnicity);
+
+  assert.equal(race.macroGroup, "Black_African");
+  assert.equal(race.syncMode, "Diasporic Shift");
+  assert.equal(race.isCulturallySalient, true);
+  assert.equal(race.narrativeStyle, "Phenotypic Palette Focus");
+  assert.equal(race.physicalDescriptors.includes("deep brown undertones"), true);
 });

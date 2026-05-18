@@ -32,3 +32,4 @@ image = "0.25"
 rusqlite = { version = "0.32", features = ["bundled"] }
 rand = "0.8"
 tauri-plugin-dialog = "2.3.0"
+tauri-plugin-fs = "2.5.1"

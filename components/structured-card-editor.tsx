@@ -3,6 +3,77 @@
 import { Dispatch, FormEvent, ReactNode, SetStateAction, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 
+import CharacterCardPreview from "@/components/character-card-preview";
+import {
+  buildCharacterCard,
+  BuildCharacterCardResult,
+  CreatorsNotesContentRating,
+} from "@/lib/character-card/buildCharacterCard";
+import {
+  AlternateGreetingForkType,
+  ArchetypeCoreMotivation,
+  ArchetypeDefenseMechanism,
+  ArchetypePersonaType,
+  EthnicityRegion,
+  FetishAnatomicalFocus,
+  FetishMaterialPreference,
+  FetishSituationalTrigger,
+  FetishSizeFantasyModifier,
+  FirstMessageEntryPoint,
+  FirstMessageLiteraryStyle,
+  FirstMessageUserCallToAction,
+  FormattingActionWrappingStandard,
+  FormattingMarkdownEmphasisStyle,
+  FormattingNarrativePerspective,
+  GeneratedFormattingConfigurationData,
+  GeneratedArchetypeConfigurationData,
+  FrameworkInjectionPipelineRouter,
+  FrameworkMemoryBudgetStrategy,
+  FrameworkTargetSpecification,
+  GeneratedFrameworkConfigurationData,
+  GroupGreetingFormattingStyle,
+  GroupGreetingInterpersonalDynamic,
+  GroupGreetingSpotlightDistribution,
+  GroupAlternateGreetingForkCategory,
+  IntimacyAftercareStyle,
+  IntimacyExpressionType,
+  IntimacyPhysicalLoveLanguage,
+  IntimacyVerbalCadence,
+  KinkIntensityLevel,
+  KinkPrimaryRole,
+  LoreEntryDomainScope,
+  LoreEntryInsertionPriority,
+  LinguisticMatrix,
+  GeneratedLoreEntryData,
+  GeneratedLorebookSummaryData,
+  GeneratedToneConfigurationData,
+  GeneratedWorldLorePlaceholderData,
+  NationalityLegalStatus,
+  NationalityRegionalAlliance,
+  NPCConnectionType,
+  NPCEmotionalStatus,
+  NPCRomanceFunction,
+  OccupationAuthorityDynamic,
+  OccupationProfessionalDomain,
+  OccupationSocioeconomicTier,
+  RaceMacroGroup,
+  RelationshipCurrentLabel,
+  RelationshipEmotionalAvailability,
+  RelationshipScandalFactor,
+  ScenarioPlotHook,
+  ScenarioOpeningPairClassificationType,
+  ScenarioSettingType,
+  ScenarioStartingTension,
+  SpeciesType,
+  StudentAcademicYear,
+  StudentFundingType,
+  StudentMajorField,
+  TonePacingVelocity,
+  ToneProseTexture,
+  ToneWorldviewFilter,
+  TurnOffDynamicHardline,
+} from "@/lib/character-card/generator";
+import { AppMacroExtensions } from "@/types/character-card/AppMacroExtensions";
 import { ValidatedCharacterCardV3 } from "@/types/character-card/CharacterCardV3Schema";
 
 interface StructuredCardEditorProps {
@@ -11,8 +82,1074 @@ interface StructuredCardEditorProps {
 }
 
 type EditorTab = "identity" | "behavior" | "greetings";
+interface NameGenerationExtension {
+  firstname: string;
+  surname: string;
+  title: string;
+  alias: string;
+  heritage: string;
+  era: string;
+  aura: string;
+  composition: string;
+}
+interface AlternateGreetingGenerationExtension {
+  aiGenerationDirective: string;
+  associatedTrope: string;
+  completedGreeting: string;
+  forkType: AlternateGreetingForkType;
+  greetingId: string;
+}
+interface AgeGenerationExtension {
+  age: string;
+  apparent_age: string;
+  birth_year: string;
+  birth_month: string;
+  birth_day: string;
+  zodiac: string;
+  developmental_stage: string;
+  legal_status: string;
+  power_dynamic: string;
+  temporal_anchor: string;
+  zodiac_alignment: string;
+  seasonal_vibe: string;
+  birthdate_preset: string;
+}
+interface KinkGenerationExtension {
+  intensityLevel: KinkIntensityLevel;
+  nsfwEnabled: boolean;
+  preferredSensoryTags: string[];
+  primaryRole: KinkPrimaryRole;
+  systemPromptInstruction: string;
+}
+interface FetishGenerationExtension {
+  aiDescriptiveFocus: string;
+  anatomicalFocus: FetishAnatomicalFocus;
+  fetishEnabled: boolean;
+  materialPreference: FetishMaterialPreference;
+  situationalTrigger: FetishSituationalTrigger;
+  sizeFantasyModifier: FetishSizeFantasyModifier;
+}
+interface FirstMessageGenerationExtension {
+  aiOutputConstraint: string;
+  entryPoint: FirstMessageEntryPoint;
+  literaryStyle: FirstMessageLiteraryStyle;
+  tokenLengthCap: number;
+  userCallToAction: FirstMessageUserCallToAction;
+}
+type FormattingConfigurationExtension = GeneratedFormattingConfigurationData;
+type FrameworkConfigurationExtension = GeneratedFrameworkConfigurationData;
+type ToneConfigurationExtension = GeneratedToneConfigurationData;
+type ArchetypeConfigurationExtension = GeneratedArchetypeConfigurationData;
+interface GroupGreetingGenerationExtension {
+  aiGroupDirective: string;
+  completedGreeting: string;
+  formattingStyle: GroupGreetingFormattingStyle;
+  greetingId: string;
+  interpersonalDynamic: GroupGreetingInterpersonalDynamic;
+  participatingCharacters: string[];
+  spotlightDistribution: GroupGreetingSpotlightDistribution;
+}
+interface GroupAlternateGreetingGenerationExtension {
+  aiMultiCharacterPrompt: string;
+  altGreetingId: string;
+  completedGreeting: string;
+  forkCategory: GroupAlternateGreetingForkCategory;
+  includedNpcNames: string[];
+  targetSettingVibe: string;
+}
+interface IntimacyStyleGenerationExtension {
+  aftercareStyle: IntimacyAftercareStyle;
+  aiBehaviorPrompt: string;
+  expressionType: IntimacyExpressionType;
+  physicalLoveLanguage: IntimacyPhysicalLoveLanguage;
+  verbalCadence: IntimacyVerbalCadence;
+}
+interface TurnOffGenerationExtension {
+  aiReactionPrompt: string;
+  behavioralTurnOffs: string[];
+  dynamicHardlines: TurnOffDynamicHardline;
+  sensoryTurnOffs: string[];
+}
+interface ScenarioGenerationExtension {
+  plotHook: ScenarioPlotHook;
+  scenePremiseDescription: string;
+  sensoryDetails: string[];
+  settingType: ScenarioSettingType;
+  startingTension: ScenarioStartingTension;
+}
+interface ScenarioOpeningPairGenerationExtension {
+  alternateFirstMessage: string;
+  alternateScenarioContext: ScenarioGenerationExtension;
+  classificationType: ScenarioOpeningPairClassificationType;
+  pairId: string;
+  pairTitle: string;
+}
+type LorebookSummaryGenerationExtension = GeneratedLorebookSummaryData;
+type LoreEntryGenerationExtension = GeneratedLoreEntryData;
+interface CreatorsNotesGenerationExtension {
+  contentRating: CreatorsNotesContentRating;
+  idealUserPersona: string;
+  recommendedModels: string[];
+  technicalNotesText: string;
+  triggerWarnings: string[];
+}
+interface PostHistoryInstructionsGenerationExtension {
+  driftControlRules: string[];
+  dynamicToneModifiers: string[];
+  formattingHardlines: string[];
+  injectionTokenWeight: number;
+}
+type WorldLorePlaceholderGenerationExtension = GeneratedWorldLorePlaceholderData;
+interface SpeciesGenerationExtension {
+  type: SpeciesType;
+  isImmortal: boolean;
+  instinctualTrait: string;
+  apparentAge: string;
+  dietaryNeed: string;
+  lifespanAnchor: string;
+  biologyTag: string;
+}
+interface EthnicityGenerationExtension {
+  region: EthnicityRegion;
+  culturalHeritage: string;
+  nativeLanguage: string;
+  hasDiasporicBaggage: boolean;
+  societalContext: string;
+  linguisticMatrix: LinguisticMatrix;
+}
+interface NationalityGenerationExtension {
+  passportCountry: string;
+  regionalAlliance: NationalityRegionalAlliance;
+  legalStatus: NationalityLegalStatus;
+  linguisticVibe: string;
+}
+interface OccupationGenerationExtension {
+  jobTitle: string;
+  socioeconomicTier: OccupationSocioeconomicTier;
+  professionalDomain: OccupationProfessionalDomain;
+  authorityDynamic: OccupationAuthorityDynamic;
+  workplaceVibe: string;
+  academicYear: StudentAcademicYear;
+  majorField: StudentMajorField;
+  fundingType: StudentFundingType;
+  campusAffiliation: string;
+}
+interface RaceGenerationExtension {
+  macroGroup: RaceMacroGroup;
+  physicalDescriptors: string[];
+  isCulturallySalient: boolean;
+  syncMode: string;
+  narrativeStyle: string;
+}
+interface RelationshipGenerationExtension {
+  connectionType: NPCConnectionType;
+  emotionalStatus: NPCEmotionalStatus;
+  npcName: string;
+  oneLineDescription: string;
+  romanceFunction: NPCRomanceFunction;
+}
+interface RelationshipStatusGenerationExtension {
+  currentLabel: RelationshipCurrentLabel;
+  emotionalAvailability: RelationshipEmotionalAvailability;
+  scandalFactor: RelationshipScandalFactor;
+  statusContext: string;
+}
 
 const EDITOR_TABS: EditorTab[] = ["identity", "behavior", "greetings"];
+const AMOURAI_EXTENSION_NAMESPACE = "amourai";
+const DEFAULT_MACRO_EXTENSION: AppMacroExtensions = {
+  framework: "Sandbox",
+  formatting: "JSON",
+  relationship: "Symmetric",
+  tones: [],
+  micro_tropes: [],
+};
+const FRAMEWORKS = [
+  "Sandbox",
+  "Narrative RPG",
+  "Text Adventure",
+  "Scene-Locked",
+] as const;
+const FORMATTINGS = ["W++", "JSON", "Boostyle", "Natural Language"] as const;
+const RELATIONSHIPS = [
+  "Symmetric",
+  "Asymmetric (Bot Dominant)",
+  "Asymmetric (User Dominant)",
+  "Antagonistic",
+] as const;
+const AVAILABLE_TONES = [
+  "Slow-Burn",
+  "Dark Romance",
+  "Angsty",
+  "Fluff",
+  "Cozy Romance",
+];
+const AVAILABLE_TROPES = [
+  "Enemies to Lovers",
+  "Only One Bed",
+  "Who Hurt You?",
+  "Fake Dating",
+  "Grumpy x Sunshine",
+];
+const DEFAULT_NAME_GENERATION: NameGenerationExtension = {
+  firstname: "",
+  surname: "",
+  title: "",
+  alias: "",
+  heritage: "Anglo-Saxon",
+  era: "Contemporary Classic",
+  aura: "Soft / Wholesome",
+  composition: "First Name",
+};
+const HERITAGE_TAGS = [
+  "Anglo-Saxon",
+  "Gaelic & Celtic",
+  "Romance Languages",
+  "Germanic & Nordic",
+  "Slavic",
+];
+const ERA_TAGS = [
+  "Regency & Victorian",
+  "Medieval & Ancient",
+  "Contemporary Classic",
+  "Trendy / Neoteric",
+];
+const AURA_TAGS = [
+  "Elite / Noble",
+  "Gritty / Edgy",
+  "Soft / Wholesome",
+  "Ethereal / Gothic",
+];
+const COMPOSITION_TAGS = [
+  "First Name",
+  "Double / Hyphenated",
+  "Aristocratic Particle",
+  "Surname Style",
+];
+const ALTERNATE_GREETING_FORK_TYPES: AlternateGreetingForkType[] = [
+  "Timeline_Shift",
+  "Universe_AU",
+  "Tone_Escalation",
+  "Canon_Divergence",
+];
+const DEFAULT_ALTERNATE_GREETING_GENERATION: AlternateGreetingGenerationExtension[] =
+  [
+    {
+      aiGenerationDirective:
+        "Generate a prequel origin greeting where {{char}} and {{user}} meet before the main timeline, preserving core identity and boundaries.",
+      associatedTrope: "Prequel / Origin Story",
+      completedGreeting: "",
+      forkType: "Timeline_Shift",
+      greetingId: "11111111-0000-4000-8000-000000000000",
+    },
+    {
+      aiGenerationDirective:
+        "Generate an established romance greeting where {{char}} and {{user}} are already together, focusing on domestic intimacy without speaking for {{user}}.",
+      associatedTrope: "Established Romance / Sequel",
+      completedGreeting: "",
+      forkType: "Timeline_Shift",
+      greetingId: "22222222-0000-4000-8000-000000000000",
+    },
+    {
+      aiGenerationDirective:
+        "Generate a high-friction alternate greeting that opens mid-argument and ends with a clear reply opportunity for {{user}}.",
+      associatedTrope: "High-Friction / Aggressive Clash",
+      completedGreeting: "",
+      forkType: "Tone_Escalation",
+      greetingId: "33333333-0000-4000-8000-000000000000",
+    },
+  ];
+const DEFAULT_AGE_GENERATION: AgeGenerationExtension = {
+  age: "",
+  apparent_age: "",
+  birth_year: "",
+  birth_month: "",
+  birth_day: "",
+  zodiac: "",
+  developmental_stage: "Prime Adult",
+  legal_status: "Full Independence",
+  power_dynamic: "Peers / Equals",
+  temporal_anchor: "Contemporary Baseline",
+  zodiac_alignment: "Earth Signs",
+  seasonal_vibe: "Spring Child",
+  birthdate_preset: "None",
+};
+const DEVELOPMENTAL_STAGE_TAGS = [
+  "Young Adult",
+  "Prime Adult",
+  "Middle Mature",
+  "Elder",
+  "Immortal / Ageless",
+];
+const LEGAL_STATUS_TAGS = [
+  "Legal Majority",
+  "Full Independence",
+  "Historical Adulthood",
+];
+const AGE_POWER_DYNAMIC_TAGS = [
+  "Peers / Equals",
+  "Age Gap (Junior)",
+  "Age Gap (Senior)",
+  "Time-Defying",
+];
+const TEMPORAL_ANCHOR_TAGS = [
+  "Contemporary Baseline",
+  "Historical Regency Anchor",
+  "Historical Medieval Anchor",
+  "Futuristic / Sci-Fi Anchor",
+];
+const ZODIAC_ALIGNMENT_TAGS = [
+  "Fire Signs",
+  "Earth Signs",
+  "Air Signs",
+  "Water Signs",
+];
+const SEASONAL_VIBE_TAGS = [
+  "Spring Child",
+  "Summer Child",
+  "Autumn Child",
+  "Winter Child",
+];
+const ZODIAC_SIGNS = [
+  "Aries",
+  "Taurus",
+  "Gemini",
+  "Cancer",
+  "Leo",
+  "Virgo",
+  "Libra",
+  "Scorpio",
+  "Sagittarius",
+  "Capricorn",
+  "Aquarius",
+  "Pisces",
+];
+const BIRTHDATE_PRESETS = [
+  "None",
+  "Dark/Possessive Anti-Hero",
+  "Sunshine / Innocent Partner",
+  "Cruel Prince / Aloof Aristocrat",
+  "Free-Spirited Rogue / Rebel",
+  "Traumatized/Protected Soul",
+];
+const DEFAULT_KINK_GENERATION: KinkGenerationExtension = {
+  intensityLevel: "Mild_Vanilla",
+  nsfwEnabled: false,
+  preferredSensoryTags: [],
+  primaryRole: "Switch",
+  systemPromptInstruction:
+    "Keep intimacy optional, consent-forward, and emotionally responsive unless the adult module is explicitly enabled.",
+};
+const KINK_PRIMARY_ROLES: KinkPrimaryRole[] = [
+  "Dominant",
+  "Submissive",
+  "Switch",
+  "Primal",
+];
+const KINK_INTENSITY_LEVELS: KinkIntensityLevel[] = [
+  "Mild_Vanilla",
+  "Moderate_Sensory",
+  "Intense_Heavy",
+];
+const KINK_SENSORY_TAGS = [
+  "Control",
+  "Marking",
+  "Praise",
+  "Possessiveness",
+  "Restraints",
+  "Sensory Focus",
+  "Risk",
+  "Worship",
+];
+const DEFAULT_FETISH_GENERATION: FetishGenerationExtension = {
+  aiDescriptiveFocus:
+    "No fetish focus is active. Keep sensory descriptions broad and character-driven.",
+  anatomicalFocus: "None",
+  fetishEnabled: false,
+  materialPreference: "None",
+  situationalTrigger: "None",
+  sizeFantasyModifier: "Standard_Scale",
+};
+const FETISH_ANATOMICAL_FOCUSES: FetishAnatomicalFocus[] = [
+  "None",
+  "Feet_Footwear",
+  "Thighs_Midriff",
+  "Hair_Face",
+  "Muscular_Texture",
+];
+const FETISH_MATERIAL_PREFERENCES: FetishMaterialPreference[] = [
+  "None",
+  "Leather_Latex",
+  "Uniforms_Suits",
+  "Lace_Silk",
+  "Eyewear_Chokers",
+];
+const FETISH_SITUATIONAL_TRIGGERS: FetishSituationalTrigger[] = [
+  "None",
+  "Breeding_Claiming",
+  "Exhibitionism_Risk",
+  "Vulnerability_Sleep",
+  "Sanguine_Biting",
+];
+const FETISH_SIZE_MODIFIERS: FetishSizeFantasyModifier[] = [
+  "Standard_Scale",
+  "Extreme_Height_Gap",
+  "Micro_Macro_Scale",
+];
+const DEFAULT_FIRST_MESSAGE_GENERATION: FirstMessageGenerationExtension = {
+  aiOutputConstraint: [
+    "Open with active collision pacing.",
+    "Render in action dialogue hybrid format.",
+    "Target 300-450 tokens.",
+    "End with direct question that clearly hands action back to {{user}}.",
+    "Output ONLY the raw character text string.",
+    "You are strictly forbidden from writing or completing actions for {{user}}. Your output must terminate immediately after {{char}}'s closing action or line of dialogue.",
+  ].join("\n"),
+  entryPoint: "Active_Collision",
+  literaryStyle: "Action_Dialogue_Hybrid",
+  tokenLengthCap: 450,
+  userCallToAction: "Direct_Question",
+};
+const FIRST_MESSAGE_ENTRY_POINTS: FirstMessageEntryPoint[] = [
+  "The_Approach",
+  "Active_Collision",
+  "Post_Crisis_Quiet",
+  "Mid_Action_Dialogue",
+];
+const FIRST_MESSAGE_LITERARY_STYLES: FirstMessageLiteraryStyle[] = [
+  "Action_Dialogue_Hybrid",
+  "Internal_Monologue_Heavy",
+  "Novella_Prose",
+  "Chat_Symphonic",
+];
+const FIRST_MESSAGE_USER_CALLS_TO_ACTION: FirstMessageUserCallToAction[] = [
+  "Direct_Question",
+  "Physical_Gesture",
+  "Weighted_StandOff",
+  "Vulnerable_Slip",
+];
+const GROUP_GREETING_SPOTLIGHT_DISTRIBUTIONS: GroupGreetingSpotlightDistribution[] =
+  ["Ensemble_Equal", "Leader_Alpha", "Duo_Synergy", "User_Ambush"];
+const GROUP_GREETING_INTERPERSONAL_DYNAMICS: GroupGreetingInterpersonalDynamic[] =
+  [
+    "Love_Triangle_Rivalry",
+    "Wingman_Loop",
+    "Hostile_Front",
+    "Internal_Fracture",
+  ];
+const GROUP_GREETING_FORMATTING_STYLES: GroupGreetingFormattingStyle[] = [
+  "Explicit_Name_Tags",
+  "Paragraph_Isolated",
+  "Choreographed",
+];
+const DEFAULT_GROUP_GREETING_GENERATION: GroupGreetingGenerationExtension[] = [
+  {
+    aiGroupDirective:
+      "Generate a group opening where {{char}} speaks first while the secondary character silently pressures the room when {{user}} enters.",
+    completedGreeting: "",
+    formattingStyle: "Explicit_Name_Tags",
+    greetingId: "44444444-1111-4000-8000-000000000000",
+    interpersonalDynamic: "Wingman_Loop",
+    participatingCharacters: ["{{char}}", "Julian Thorne"],
+    spotlightDistribution: "Leader_Alpha",
+  },
+  {
+    aiGroupDirective:
+      "Generate a group opening where two characters are mid-argument around a shared table before pivoting their attention to {{user}}.",
+    completedGreeting: "",
+    formattingStyle: "Choreographed",
+    greetingId: "55555555-1111-4000-8000-000000000000",
+    interpersonalDynamic: "Love_Triangle_Rivalry",
+    participatingCharacters: ["{{char}}", "Alistair Sterling"],
+    spotlightDistribution: "Duo_Synergy",
+  },
+];
+const GROUP_ALTERNATE_GREETING_FORK_CATEGORIES: GroupAlternateGreetingForkCategory[] =
+  ["Team_Loyalty_Shift", "Collective_AU", "Group_Escalation_Climax"];
+const DEFAULT_GROUP_ALTERNATE_GREETING_GENERATION: GroupAlternateGreetingGenerationExtension[] =
+  [
+    {
+      aiMultiCharacterPrompt:
+        "Generate a group alternate greeting where the whole cast is united in a high-pressure intervention as {{user}} enters the room.",
+      altGreetingId: "66666666-2222-4000-8000-000000000000",
+      completedGreeting: "",
+      forkCategory: "Team_Loyalty_Shift",
+      includedNpcNames: ["{{char}}", "Julian Thorne"],
+      targetSettingVibe: "Mid-Crisis Boardroom",
+    },
+    {
+      aiMultiCharacterPrompt:
+        "Generate a collective AU where the group is re-skinned into a gritty syndicate safehouse with old roles transformed into underworld hierarchy.",
+      altGreetingId: "77777777-2222-4000-8000-000000000000",
+      completedGreeting: "",
+      forkCategory: "Collective_AU",
+      includedNpcNames: ["{{char}}", "Alistair Sterling"],
+      targetSettingVibe: "Gritty Safehouse",
+    },
+  ];
+const DEFAULT_INTIMACY_STYLE_GENERATION: IntimacyStyleGenerationExtension = {
+  aftercareStyle: "The_Nurturer",
+  aiBehaviorPrompt:
+    "During private moments, keep {{char}} emotionally attentive, consent-aware, and responsive to {{user}}'s comfort cues.",
+  expressionType: "Intense_Devoted",
+  physicalLoveLanguage: "Touch_Holding",
+  verbalCadence: "Praise_Validation",
+};
+const INTIMACY_EXPRESSION_TYPES: IntimacyExpressionType[] = [
+  "Intense_Devoted",
+  "Playful_Teasing",
+  "Stoic_Restrained",
+  "Vulnerable_Yielding",
+];
+const INTIMACY_AFTERCARE_STYLES: IntimacyAftercareStyle[] = [
+  "The_Nurturer",
+  "The_Seeker",
+  "The_Processor",
+  "The_Confessor",
+];
+const INTIMACY_VERBAL_CADENCES: IntimacyVerbalCadence[] = [
+  "Praise_Validation",
+  "High_Intensity_Dirty",
+  "Silent_Connection",
+  "Hesitant_Reassurance",
+];
+const INTIMACY_PHYSICAL_LOVE_LANGUAGES: IntimacyPhysicalLoveLanguage[] = [
+  "Touch_Holding",
+  "Acts_of_Service",
+  "Verbal_Affirmation",
+  "Protective_Proximity",
+];
+const DEFAULT_TURN_OFF_GENERATION: TurnOffGenerationExtension = {
+  aiReactionPrompt:
+    "If {{user}} becomes cruel, careless, or pushes past clear emotional pacing, {{char}} should pause the scene and re-establish boundaries.",
+  behavioralTurnOffs: ["Cruelty", "Disinterest / Emotional Coldness"],
+  dynamicHardlines: "No_Unprompted_Aggression",
+  sensoryTurnOffs: ["Lack of hygiene", "Overly aggressive touch"],
+};
+const TURN_OFF_DYNAMIC_HARDLINES: TurnOffDynamicHardline[] = [
+  "No_Role_Reversal",
+  "No_Rushed_Pacing",
+  "No_Unprompted_Aggression",
+];
+const DEFAULT_SCENARIO_GENERATION: ScenarioGenerationExtension = {
+  plotHook: "The_Chance_Encounter",
+  scenePremiseDescription:
+    "{{char}} and {{user}} collide in a crowded public space at the exact wrong moment, turning an ordinary interruption into a charged first exchange.",
+  sensoryDetails: [
+    "Low golden lighting",
+    "Crowded room noise",
+    "Warm coffee and rain",
+  ],
+  settingType: "Public_HighExposure",
+  startingTension: "Charged_Electric",
+};
+const FRAMEWORK_TARGET_SPECIFICATIONS: FrameworkTargetSpecification[] = [
+  "V2_Card_Standard",
+  "V3_Card_Layout",
+  "Raw_Agnostic_JSON",
+  "Vercel_Structured_Zod",
+];
+const FRAMEWORK_MEMORY_BUDGET_STRATEGIES: FrameworkMemoryBudgetStrategy[] = [
+  "Ultra_Lean_Context",
+  "Extended_Deep_Lore",
+  "Dynamic_User_Sliders",
+];
+const FRAMEWORK_INJECTION_PIPELINE_ROUTERS: FrameworkInjectionPipelineRouter[] =
+  [
+    "Monolithic_System_Prompt",
+    "Segmented_Placements",
+    "Dynamic_Variable_Loop",
+  ];
+const FORMATTING_ACTION_WRAPPING_STANDARDS: FormattingActionWrappingStandard[] =
+  [
+    "Asterisk_Standard_RP",
+    "Quote_Isolated_Prose",
+    "Bracket_Monologue",
+    "Raw_Script",
+  ];
+const FORMATTING_MARKDOWN_EMPHASIS_STYLES: FormattingMarkdownEmphasisStyle[] = [
+  "Clean_Prose",
+  "Weighted_Bold_Impact",
+  "Code_Block_Shielding",
+];
+const FORMATTING_NARRATIVE_PERSPECTIVES: FormattingNarrativePerspective[] = [
+  "Third_Person_Past",
+  "Third_Person_Present",
+  "Second_Person_Direct",
+  "First_Person_I",
+];
+const TONE_PROSE_TEXTURES: ToneProseTexture[] = [
+  "Gritty_Melodramatic",
+  "Lighthearted_Wholesome",
+  "Angsty_Melancholic",
+  "Formal_Poetic",
+];
+const TONE_PACING_VELOCITIES: TonePacingVelocity[] = [
+  "Clipped_Rapid",
+  "Measured_Deliberate",
+  "Slow_Tease_Prose",
+];
+const TONE_WORLDVIEW_FILTERS: ToneWorldviewFilter[] = [
+  "Ruthless_Cynical",
+  "Optimistic_Idealistic",
+  "Jaded_Weary",
+];
+const ARCHETYPE_PERSONA_TYPES: ArchetypePersonaType[] = [
+  "The_Stoic_Wall",
+  "The_Ruthless_Architect",
+  "The_Broken_Heir",
+  "The_Rogue_Instigator",
+  "The_Vigilante_Outcast",
+  "The_Golden_Retriever",
+  "The_Quiet_Guardian",
+  "The_Perfectionist",
+  "The_Jaded_Veteran",
+  "The_Ancient_Predator",
+  "The_Fae_Deal_Maker",
+];
+const ARCHETYPE_DEFENSE_MECHANISMS: ArchetypeDefenseMechanism[] = [
+  "Aggressive_Deflection",
+  "Silent_Withdrawal",
+  "Hyper_Independence",
+  "Intellectualization",
+  "Hyper_Charm_Deflection",
+  "People_Pleasing_Inversion",
+  "Vulnerability_Martyrdom",
+  "Hyper_Rationalization",
+  "Jaded_Resignation",
+  "Temporal_Disconnection",
+  "Defiant_Autonomy",
+];
+const ARCHETYPE_CORE_MOTIVATIONS: ArchetypeCoreMotivation[] = [
+  "Security_Protection",
+  "Security_Proximity",
+  "Validation_Approval",
+  "Autonomy_Freedom",
+  "Peace_Quiet",
+  "Vengeance_Claiming",
+  "Vengeance_Redress",
+];
+const DEFAULT_FRAMEWORK_CONFIGURATION: FrameworkConfigurationExtension = {
+  frameworkId: "11111111-6666-4000-8000-000000000000",
+  globalTokenSafetyBuffer: 200,
+  injectionPipelineRouter: "Segmented_Placements",
+  memoryBudgetStrategy: "Extended_Deep_Lore",
+  systemPromptJailbreakOverride:
+    "Output only the requested card text or JSON payload. Preserve {{char}} and {{user}} macros exactly. Never write actions, thoughts, or dialogue for {{user}}.",
+  targetSpecification: "V3_Card_Layout",
+};
+const DEFAULT_FORMATTING_CONFIGURATION: FormattingConfigurationExtension = {
+  actionWrappingStandard: "Asterisk_Standard_RP",
+  formattingId: "11111111-7777-4000-8000-000000000000",
+  formattingSystemPromptInjection:
+    "MANDATORY: Format using standard asterisk RP. Keep actions in single asterisks, speech in quotation marks, and never write for {{user}}.",
+  markdownEmphasisStyle: "Clean_Prose",
+  maxParagraphsPerTurn: 3,
+  narrativePerspective: "Third_Person_Past",
+};
+const DEFAULT_TONE_CONFIGURATION: ToneConfigurationExtension = {
+  aiVocabularyDirectives: ["soft", "warmth", "glance", "quiet", "tension"],
+  pacingVelocity: "Measured_Deliberate",
+  proseTexture: "Angsty_Melancholic",
+  toneId: "11111111-8888-4000-8000-000000000000",
+  toneSystemPromptInjection:
+    "NARRATIVE TONE: Keep the prose emotionally grounded, quietly romantic, and consistent with the active trope.",
+  worldviewFilter: "Jaded_Weary",
+};
+const DEFAULT_ARCHETYPE_CONFIGURATION: ArchetypeConfigurationExtension = {
+  aiBehaviorPrompt:
+    "CORE PSYCHOLOGY: {{char}} is guarded, emotionally consistent, and slow to reveal vulnerability. Preserve their armor until {{user}} earns a clear shift on-page.",
+  archetypeId: "11111111-9999-4000-8000-000000000000",
+  coreMotivation: "Autonomy_Freedom",
+  defenseMechanism: "Silent_Withdrawal",
+  personaType: "The_Stoic_Wall",
+};
+const DEFAULT_LOREBOOK_SUMMARY_GENERATION: LorebookSummaryGenerationExtension = {
+  aiLoreInstruction:
+    "Maintain the contemporary romance lore baseline. Keep lore references compact and only surface rules that directly sharpen the current scene.",
+  factionOrDynastyContext:
+    "Local social pressure shapes {{char}}'s choices without replacing the active relationship dynamic.",
+  tokenOptimizationCap: 150,
+  universeAnchor: "Contemporary Romance Local Canon",
+  worldSystemRules: [
+    "Social reputation, private history, and everyday obligations constrain choices.",
+    "NPCs should remember existing relationships and current emotional stakes.",
+    "Lore should support the scene rather than becoming exposition.",
+  ],
+};
+const CREATORS_NOTES_CONTENT_RATINGS: CreatorsNotesContentRating[] = [
+  "SFW_Wholesome",
+  "M_Rated_Sensory",
+  "X_Rated_Explicit",
+  "Dark_Romance_Heavy",
+];
+const DEFAULT_CREATORS_NOTES_GENERATION: CreatorsNotesGenerationExtension = {
+  contentRating: "M_Rated_Sensory",
+  idealUserPersona:
+    "Best played as a responsive {{user}} with clear agency, grounded reactions, and respect for slow-burn pacing.",
+  recommendedModels: ["YOUR_API_roleplay_model", "YOUR_API_balanced_model"],
+  technicalNotesText:
+    "Recommended context window: 8k+ tokens.\nUse third-person past tense with asterisks for actions.\nSuggested sampler baseline: Temperature 0.8-0.9, Min-P 0.05, light repetition penalty.",
+  triggerWarnings: ["Slow-burn pacing", "Romantic tension"],
+};
+const DEFAULT_POST_HISTORY_INSTRUCTIONS_GENERATION: PostHistoryInstructionsGenerationExtension =
+  {
+    driftControlRules: [
+      "Preserve {{char}}'s established personality, relationship status, and current emotional pace.",
+      "Use lorebook summary only when it affects the active scene; do not dump unrelated background lore.",
+    ],
+    dynamicToneModifiers: [
+      "If {{user}} triggers a hard limit, intensify boundaries immediately.",
+      "If {{user}} offers genuine comfort or accountability, lower {{char}}'s defenses by one small visible beat only.",
+    ],
+    formattingHardlines: [
+      "CRITICAL: Never write thoughts, actions, decisions, or dialogue for {{user}}.",
+      "Do not conclude the scene, skip time, or resolve conflict unless {{user}} has explicitly moved there.",
+      "Use standard roleplay prose with concise dialogue in quotation marks.",
+    ],
+    injectionTokenWeight: 50,
+  };
+const WORLD_LORE_PLACEHOLDER_MACRO_TYPES: WorldLorePlaceholderGenerationExtension["macroType"][] =
+  ["Environmental_Anchor", "Population_Baseline", "Legacy_Tag"];
+const DEFAULT_WORLD_LORE_PLACEHOLDER_GENERATION: WorldLorePlaceholderGenerationExtension[] =
+  [
+    {
+      currentDataPayload: "Contemporary Romance Local Canon",
+      isDynamic: false,
+      macroType: "Environmental_Anchor",
+      placeholderId: "11111111-4444-4000-8000-000000000000",
+      variableKey: "{{world_setting}}",
+    },
+    {
+      currentDataPayload:
+        "Baseline mortal population with social pressure shaped by reputation and profession",
+      isDynamic: true,
+      macroType: "Population_Baseline",
+      placeholderId: "22222222-4444-4000-8000-000000000000",
+      variableKey: "{{species_status}}",
+    },
+    {
+      currentDataPayload:
+        "A private crisis from {{char}}'s past can surface only when the current scene triggers it",
+      isDynamic: true,
+      macroType: "Legacy_Tag",
+      placeholderId: "33333333-4444-4000-8000-000000000000",
+      variableKey: "{{lore_catalyst}}",
+    },
+  ];
+const LORE_ENTRY_DOMAIN_SCOPES: LoreEntryDomainScope[] = [
+  "Geopolitical_Faction",
+  "Biographical_NPC",
+  "Mythological_Rules",
+  "Societal_Customs",
+];
+const LORE_ENTRY_INSERTION_PRIORITIES: LoreEntryInsertionPriority[] = [
+  "Constant_Anchor",
+  "Reactive_Contextual",
+  "Recursive_Linked",
+];
+const DEFAULT_LORE_ENTRY_GENERATION: LoreEntryGenerationExtension[] = [
+  {
+    activationKeys: ["world setting", "faction", "law system"],
+    domainScope: "Geopolitical_Faction",
+    entryContent:
+      "Core world context, faction pressure, and local law that must remain stable during chat.",
+    entryId: "11111111-5555-4000-8000-000000000000",
+    insertionPriority: "Constant_Anchor",
+    title: "Core World Context",
+    tokenReserveCost: 100,
+  },
+  {
+    activationKeys: ["family", "barrier", "secret keeper"],
+    domainScope: "Biographical_NPC",
+    entryContent:
+      "Named NPC pressure, relationship function, and emotional status for reactive cast insertion.",
+    entryId: "22222222-5555-4000-8000-000000000000",
+    insertionPriority: "Reactive_Contextual",
+    title: "Relationship Network File",
+    tokenReserveCost: 90,
+  },
+  {
+    activationKeys: ["custom", "scandal", "reputation"],
+    domainScope: "Societal_Customs",
+    entryContent:
+      "Social codes and public consequences that should activate only when the scene references them.",
+    entryId: "33333333-5555-4000-8000-000000000000",
+    insertionPriority: "Reactive_Contextual",
+    title: "Societal Custom Rules",
+    tokenReserveCost: 100,
+  },
+];
+const SCENARIO_OPENING_PAIR_CLASSIFICATIONS: ScenarioOpeningPairClassificationType[] =
+  ["Environmental_Anchor", "Timeline_Link", "Status_Valve"];
+const DEFAULT_SCENARIO_OPENING_PAIR_GENERATION: ScenarioOpeningPairGenerationExtension[] =
+  [
+    {
+      alternateFirstMessage:
+        "*A blizzard pins {{char}} and {{user}} inside the cabin as the hearth becomes the only warm thing left between them.*",
+      alternateScenarioContext: {
+        plotHook: "The_Crisis",
+        scenePremiseDescription:
+          "An alternate scenario where {{char}} and {{user}} are stranded inside a remote mountain cabin during a blinding winter blizzard, forced to share the only heat source.",
+        sensoryDetails: [
+          "Crackling hearth fire",
+          "Sound of howling wind outside",
+          "Smell of cedar wood",
+        ],
+        settingType: "Contained_Insular",
+        startingTension: "Vulnerable_Exhausted",
+      },
+      classificationType: "Environmental_Anchor",
+      pairId: "88888888-3333-4000-8000-000000000000",
+      pairTitle: "Blizzard Cabin Refuge",
+    },
+    {
+      alternateFirstMessage:
+        "*Five years earlier, {{char}} looks up from a rain-spattered campus table and sees {{user}} for the first time.*",
+      alternateScenarioContext: {
+        plotHook: "The_Chance_Encounter",
+        scenePremiseDescription:
+          "An alternate flashback scenario set five years earlier on a university campus, where {{char}} meets {{user}} before either of them knows what they will become to each other.",
+        sensoryDetails: [
+          "Rain on old campus stone",
+          "Library dust",
+          "Cheap coffee steam",
+        ],
+        settingType: "Corporate_Institutional",
+        startingTension: "Charged_Electric",
+      },
+      classificationType: "Timeline_Link",
+      pairId: "99999999-3333-4000-8000-000000000000",
+      pairTitle: "College AU Flashback",
+    },
+  ];
+const SCENARIO_SETTING_TYPES: ScenarioSettingType[] = [
+  "Contained_Insular",
+  "Corporate_Institutional",
+  "Public_HighExposure",
+  "Atmospheric_Wilderness",
+];
+const SCENARIO_PLOT_HOOKS: ScenarioPlotHook[] = [
+  "The_Mandate",
+  "The_Crisis",
+  "The_Chance_Encounter",
+  "The_Secret_Transaction",
+];
+const SCENARIO_STARTING_TENSIONS: ScenarioStartingTension[] = [
+  "Combative_Friction",
+  "Vulnerable_Exhausted",
+  "Charged_Electric",
+  "Formal_Chilling",
+];
+const DEFAULT_ETHNICITY_GENERATION: EthnicityGenerationExtension = {
+  region: "Northern_Western_European",
+  culturalHeritage: "British Isles / Scandinavian lineage",
+  nativeLanguage: "English",
+  hasDiasporicBaggage: false,
+  societalContext: "Indigenous / Native Home Ground",
+  linguisticMatrix: "Anglophone",
+};
+const ETHNICITY_REGIONS: EthnicityRegion[] = [
+  "Northern_Western_European",
+  "Southern_European",
+  "Eastern_European_Slavic",
+  "Diaspora_Blended",
+];
+const SOCIETAL_CONTEXTS = [
+  "Indigenous / Native Home Ground",
+  "First-Generation Immigrant",
+  "Multigenerational Diaspora",
+];
+const LINGUISTIC_MATRICES: LinguisticMatrix[] = [
+  "Anglophone",
+  "Celtic / Gaelic",
+  "Latinate / Romance",
+  "Slavic / Cyrillic-Derived",
+];
+const DEFAULT_NATIONALITY_GENERATION: NationalityGenerationExtension = {
+  passportCountry: "United Kingdom",
+  regionalAlliance: "Non_EU_European",
+  legalStatus: "Native",
+  linguisticVibe:
+    "Native dialect from United Kingdom with local slang and natural civic confidence.",
+};
+const NATIONALITY_REGIONAL_ALLIANCES: NationalityRegionalAlliance[] = [
+  "EU_Schengen",
+  "Non_EU_European",
+  "Western_Allies",
+  "Fictional_Empire",
+];
+const NATIONALITY_LEGAL_STATUSES: NationalityLegalStatus[] = [
+  "Native",
+  "Dual_Citizen",
+  "Naturalized",
+  "Expat_Visa",
+];
+const DEFAULT_OCCUPATION_GENERATION: OccupationGenerationExtension = {
+  jobTitle: "Software Engineer",
+  socioeconomicTier: "High_Professional",
+  professionalDomain: "Corporate_Finance",
+  authorityDynamic: "Equal",
+  workplaceVibe:
+    "Quiet glass office lined with monitors, whiteboards, and late-night coffee",
+  academicYear: "Junior",
+  majorField: "STEM_Medical",
+  fundingType: "Scholarship",
+  campusAffiliation: "Independent study cohort",
+};
+const OCCUPATION_SOCIOECONOMIC_TIERS: OccupationSocioeconomicTier[] = [
+  "Ultra_Elite",
+  "High_Professional",
+  "Creative_Public",
+  "Working_Class",
+  "Shadow_Economy",
+];
+const OCCUPATION_PROFESSIONAL_DOMAINS: OccupationProfessionalDomain[] = [
+  "Corporate_Finance",
+  "Medical_Science",
+  "Arts_Entertainment",
+  "Security_Defense",
+  "Underworld",
+];
+const OCCUPATION_AUTHORITY_DYNAMICS: OccupationAuthorityDynamic[] = [
+  "Superior",
+  "Equal",
+  "Subordinate",
+  "Outsider",
+];
+const STUDENT_ACADEMIC_YEARS: StudentAcademicYear[] = [
+  "Freshman",
+  "Sophomore",
+  "Junior",
+  "Senior",
+  "Postgrad_PhD",
+];
+const STUDENT_MAJOR_FIELDS: StudentMajorField[] = [
+  "STEM_Medical",
+  "Humanities_Law",
+  "Arts_Design",
+  "Athletics",
+];
+const STUDENT_FUNDING_TYPES: StudentFundingType[] = [
+  "Legacy_Trust",
+  "Scholarship",
+  "Self_Funded",
+  "International",
+];
+const DEFAULT_RACE_GENERATION: RaceGenerationExtension = {
+  macroGroup: "White_Caucasian",
+  physicalDescriptors: [
+    "fair to olive undertones",
+    "sharp blue or hazel eyes",
+    "ash-brown or silver-blonde hair",
+  ],
+  isCulturallySalient: false,
+  syncMode: "Homogeneous Alignment",
+  narrativeStyle: "Stylised / Aesthetic Focus",
+};
+const RACE_MACRO_GROUPS: RaceMacroGroup[] = [
+  "White_Caucasian",
+  "Black_African",
+  "East_Southeast_Asian",
+  "South_Central_Asian",
+  "Indigenous_First_Nations",
+  "Middle_Eastern_North_African",
+  "Multiracial_Blended",
+];
+const RACE_SYNC_MODES = ["Homogeneous Alignment", "Diasporic Shift"];
+const RACE_NARRATIVE_STYLES = [
+  "Phenotypic Palette Focus",
+  "Stylised / Aesthetic Focus",
+];
+const DEFAULT_RELATIONSHIP_GENERATION: RelationshipGenerationExtension[] = [
+  {
+    connectionType: "Found_Family",
+    emotionalStatus: "Devoted_Loyal",
+    npcName: "Mara Finch",
+    oneLineDescription:
+      "The loyal confidant who notices every shift in {{char}}'s mood and nudges them toward honesty before pride ruins the romance.",
+    romanceFunction: "The_Matchmaker",
+  },
+];
+const NPC_CONNECTION_TYPES: NPCConnectionType[] = [
+  "Family_Lineage",
+  "Found_Family",
+  "Professional_Circle",
+  "Antagonistic_Force",
+];
+const NPC_ROMANCE_FUNCTIONS: NPCRomanceFunction[] = [
+  "The_Barrier",
+  "The_Matchmaker",
+  "The_Secret_Keeper",
+  "The_Jealousy_Instigator",
+];
+const NPC_EMOTIONAL_STATUSES: NPCEmotionalStatus[] = [
+  "Devoted_Loyal",
+  "Strained_Fractured",
+  "Estranged_Ghosted",
+  "Dependent_Protected",
+];
+const DEFAULT_RELATIONSHIP_STATUS_GENERATION: RelationshipStatusGenerationExtension =
+  {
+    currentLabel: "Single",
+    emotionalAvailability: "Fully_Open",
+    scandalFactor: "None",
+    statusContext:
+      "Unattached and socially free to pursue a genuine connection if trust develops.",
+  };
+const RELATIONSHIP_CURRENT_LABELS: RelationshipCurrentLabel[] = [
+  "Single",
+  "Betrothed_Promised",
+  "Divorced_Separated",
+  "Widowed",
+  "It_Complicated",
+];
+const RELATIONSHIP_EMOTIONAL_AVAILABILITIES: RelationshipEmotionalAvailability[] =
+  ["Fully_Open", "Guarded_Closed", "Lingering_Past", "Casual_Only"];
+const RELATIONSHIP_SCANDAL_FACTORS: RelationshipScandalFactor[] = [
+  "None",
+  "Low_Gossip",
+  "High_Taboo",
+  "Career_Threatening",
+];
+const DEFAULT_SPECIES_GENERATION: SpeciesGenerationExtension = {
+  type: "Human",
+  isImmortal: false,
+  instinctualTrait: "Mortal / Baseline",
+  apparentAge: "",
+  dietaryNeed: "Standard food",
+  lifespanAnchor: "Fixed Mortal",
+  biologyTag: "Mortal / Baseline",
+};
+const SPECIES_TYPES: SpeciesType[] = [
+  "Human",
+  "Vampire",
+  "Werewolf",
+  "Fae",
+  "Demon",
+  "Angel",
+  "Siren",
+  "Wraith",
+];
+const BIOLOGY_TAGS = [
+  "Mortal / Baseline",
+  "Undead / Sanguine",
+  "Therianthrope / Shifter",
+  "Fae / Immortal Folk",
+  "Celestial / Abyssal",
+];
+const LIFESPAN_ANCHORS = [
+  "Fixed Mortal",
+  "Extended / Juvenile Lifespan",
+  "Static Agelessness",
+];
+const INSTINCTUAL_TRAITS = [
+  "Mortal / Baseline",
+  "Fated Mates / Soul Bonds",
+  "The Hunger / Feed Dynamics",
+  "Territorial / Possessive Instincts",
+  "Glamour / Seduction Aura",
+];
 
 export default function StructuredCardEditor({
   activeCard,
@@ -21,6 +1158,52 @@ export default function StructuredCardEditor({
   const [activeTab, setActiveTab] = useState<EditorTab>("identity");
   const [newAlternateGreeting, setNewAlternateGreeting] = useState("");
   const [newGroupGreeting, setNewGroupGreeting] = useState("");
+  const [previewResult, setPreviewResult] =
+    useState<BuildCharacterCardResult | null>(null);
+  const [previewError, setPreviewError] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const macroExtension = readMacroExtension(activeCard.data.extensions);
+  const archetypeConfiguration =
+    readArchetypeConfigurationExtension(activeCard);
+  const alternateGreetingGeneration =
+    readAlternateGreetingGenerationExtension(activeCard);
+  const nameGeneration = readNameGenerationExtension(activeCard);
+  const ageGeneration = readAgeGenerationExtension(activeCard);
+  const fetishGeneration = readFetishGenerationExtension(activeCard);
+  const firstMessageGeneration = readFirstMessageGenerationExtension(activeCard);
+  const formattingConfiguration =
+    readFormattingConfigurationExtension(activeCard);
+  const frameworkConfiguration =
+    readFrameworkConfigurationExtension(activeCard);
+  const groupAlternateGreetingGeneration =
+    readGroupAlternateGreetingGenerationExtension(activeCard);
+  const groupGreetingGeneration =
+    readGroupGreetingGenerationExtension(activeCard);
+  const intimacyStyleGeneration =
+    readIntimacyStyleGenerationExtension(activeCard);
+  const kinkGeneration = readKinkGenerationExtension(activeCard);
+  const ethnicityGeneration = readEthnicityGenerationExtension(activeCard);
+  const nationalityGeneration = readNationalityGenerationExtension(activeCard);
+  const occupationGeneration = readOccupationGenerationExtension(activeCard);
+  const raceGeneration = readRaceGenerationExtension(activeCard);
+  const relationshipGeneration = readRelationshipGenerationExtension(activeCard);
+  const relationshipStatusGeneration =
+    readRelationshipStatusGenerationExtension(activeCard);
+  const speciesGeneration = readSpeciesGenerationExtension(activeCard);
+  const scenarioGeneration = readScenarioGenerationExtension(activeCard);
+  const scenarioOpeningPairGeneration =
+    readScenarioOpeningPairGenerationExtension(activeCard);
+  const lorebookSummaryGeneration =
+    readLorebookSummaryGenerationExtension(activeCard);
+  const loreEntryGeneration = readLoreEntryGenerationExtension(activeCard);
+  const creatorsNotesGeneration =
+    readCreatorsNotesGenerationExtension(activeCard);
+  const postHistoryInstructionsGeneration =
+    readPostHistoryInstructionsGenerationExtension(activeCard);
+  const worldLorePlaceholderGeneration =
+    readWorldLorePlaceholderGenerationExtension(activeCard);
+  const toneConfiguration = readToneConfigurationExtension(activeCard);
+  const turnOffGeneration = readTurnOffGenerationExtension(activeCard);
 
   function updateField<Key extends keyof ValidatedCharacterCardV3["data"]>(
     key: Key,
@@ -55,6 +1238,1079 @@ export default function StructuredCardEditor({
     setNewAlternateGreeting("");
   }
 
+  function updateMacroExtension<Key extends keyof AppMacroExtensions>(
+    key: Key,
+    value: AppMacroExtensions[Key],
+  ) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentMacro = readMacroExtension(currentCard.data.extensions);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              macro: {
+                ...currentMacro,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateNameGeneration<Key extends keyof NameGenerationExtension>(
+    key: Key,
+    value: NameGenerationExtension[Key],
+  ) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentNameGeneration = readNameGenerationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              name_generation: {
+                ...currentNameGeneration,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateAgeGeneration<Key extends keyof AgeGenerationExtension>(
+    key: Key,
+    value: AgeGenerationExtension[Key],
+  ) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentAgeGeneration = readAgeGenerationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              age_generation: {
+                ...currentAgeGeneration,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateAlternateGreetingGeneration(
+    index: number,
+    patch: Partial<AlternateGreetingGenerationExtension>,
+  ) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentAlternateGreetingGeneration =
+        readAlternateGreetingGenerationExtension(currentCard);
+      const nextAlternateGreetingGeneration =
+        currentAlternateGreetingGeneration.map((alternateGreeting, itemIndex) =>
+          itemIndex === index
+            ? { ...alternateGreeting, ...patch }
+            : alternateGreeting,
+        );
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              alternate_greeting_generation:
+                nextAlternateGreetingGeneration.slice(0, 5),
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateKinkGeneration<Key extends keyof KinkGenerationExtension>(
+    key: Key,
+    value: KinkGenerationExtension[Key],
+  ) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentKinkGeneration = readKinkGenerationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              kink_generation: {
+                ...currentKinkGeneration,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateFetishGeneration<Key extends keyof FetishGenerationExtension>(
+    key: Key,
+    value: FetishGenerationExtension[Key],
+  ) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentFetishGeneration = readFetishGenerationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              fetish_generation: {
+                ...currentFetishGeneration,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateIntimacyStyleGeneration<
+    Key extends keyof IntimacyStyleGenerationExtension,
+  >(key: Key, value: IntimacyStyleGenerationExtension[Key]) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentIntimacyStyleGeneration =
+        readIntimacyStyleGenerationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              intimacy_style_generation: {
+                ...currentIntimacyStyleGeneration,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateFirstMessageGeneration<
+    Key extends keyof FirstMessageGenerationExtension,
+  >(key: Key, value: FirstMessageGenerationExtension[Key]) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentFirstMessageGeneration =
+        readFirstMessageGenerationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              first_message_generation: {
+                ...currentFirstMessageGeneration,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateGroupGreetingGeneration(
+    index: number,
+    patch: Partial<GroupGreetingGenerationExtension>,
+  ) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentGroupGreetingGeneration =
+        readGroupGreetingGenerationExtension(currentCard);
+      const nextGroupGreetingGeneration = currentGroupGreetingGeneration.map(
+        (groupGreeting, itemIndex) =>
+          itemIndex === index ? { ...groupGreeting, ...patch } : groupGreeting,
+      );
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              group_greeting_generation: nextGroupGreetingGeneration.slice(0, 5),
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateGroupAlternateGreetingGeneration(
+    index: number,
+    patch: Partial<GroupAlternateGreetingGenerationExtension>,
+  ) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentGroupAlternateGreetingGeneration =
+        readGroupAlternateGreetingGenerationExtension(currentCard);
+      const nextGroupAlternateGreetingGeneration =
+        currentGroupAlternateGreetingGeneration.map(
+          (groupAlternateGreeting, itemIndex) =>
+            itemIndex === index
+              ? { ...groupAlternateGreeting, ...patch }
+              : groupAlternateGreeting,
+        );
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              group_alternate_greeting_generation:
+                nextGroupAlternateGreetingGeneration.slice(0, 5),
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateTurnOffGeneration<Key extends keyof TurnOffGenerationExtension>(
+    key: Key,
+    value: TurnOffGenerationExtension[Key],
+  ) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentTurnOffGeneration = readTurnOffGenerationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              turn_off_generation: {
+                ...currentTurnOffGeneration,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateScenarioGeneration<Key extends keyof ScenarioGenerationExtension>(
+    key: Key,
+    value: ScenarioGenerationExtension[Key],
+  ) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentScenarioGeneration =
+        readScenarioGenerationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              scenario_generation: {
+                ...currentScenarioGeneration,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateScenarioOpeningPairGeneration(
+    index: number,
+    patch: Partial<ScenarioOpeningPairGenerationExtension>,
+  ) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentScenarioOpeningPairGeneration =
+        readScenarioOpeningPairGenerationExtension(currentCard);
+      const nextScenarioOpeningPairGeneration =
+        currentScenarioOpeningPairGeneration.map((pair, itemIndex) =>
+          itemIndex === index ? { ...pair, ...patch } : pair,
+        );
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              scenario_opening_pair_generation:
+                nextScenarioOpeningPairGeneration.slice(0, 5),
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateScenarioOpeningPairScenario(
+    index: number,
+    patch: Partial<ScenarioGenerationExtension>,
+  ) {
+    const currentPair = scenarioOpeningPairGeneration[index];
+    if (!currentPair) {
+      return;
+    }
+
+    updateScenarioOpeningPairGeneration(index, {
+      alternateScenarioContext: {
+        ...currentPair.alternateScenarioContext,
+        ...patch,
+      },
+    });
+  }
+
+  function updateLorebookSummaryGeneration<
+    Key extends keyof LorebookSummaryGenerationExtension,
+  >(key: Key, value: LorebookSummaryGenerationExtension[Key]) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentLorebookSummary =
+        readLorebookSummaryGenerationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              lorebook_summary: {
+                ...currentLorebookSummary,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateCreatorsNotesGeneration<
+    Key extends keyof CreatorsNotesGenerationExtension,
+  >(key: Key, value: CreatorsNotesGenerationExtension[Key]) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentCreatorsNotes = readCreatorsNotesGenerationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              creators_notes: {
+                ...currentCreatorsNotes,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updatePostHistoryInstructionsGeneration<
+    Key extends keyof PostHistoryInstructionsGenerationExtension,
+  >(key: Key, value: PostHistoryInstructionsGenerationExtension[Key]) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentInstructions =
+        readPostHistoryInstructionsGenerationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              post_history_instructions_generation: {
+                ...currentInstructions,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateWorldLorePlaceholderGeneration(
+    index: number,
+    patch: Partial<WorldLorePlaceholderGenerationExtension>,
+  ) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentPlaceholders =
+        readWorldLorePlaceholderGenerationExtension(currentCard);
+      const nextPlaceholders = currentPlaceholders.map((placeholder, itemIndex) =>
+        itemIndex === index ? { ...placeholder, ...patch } : placeholder,
+      );
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              world_lore_placeholder: nextPlaceholders.slice(0, 12),
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateLoreEntryGeneration(
+    index: number,
+    patch: Partial<LoreEntryGenerationExtension>,
+  ) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentLoreEntries = readLoreEntryGenerationExtension(currentCard);
+      const nextLoreEntries = currentLoreEntries.map((entry, itemIndex) =>
+        itemIndex === index ? { ...entry, ...patch } : entry,
+      );
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              lore_entries: nextLoreEntries.slice(0, 20),
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateFrameworkConfiguration<Key extends keyof FrameworkConfigurationExtension>(
+    key: Key,
+    value: FrameworkConfigurationExtension[Key],
+  ) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentFramework = readFrameworkConfigurationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              framework: {
+                ...currentFramework,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateFormattingConfiguration<
+    Key extends keyof FormattingConfigurationExtension,
+  >(key: Key, value: FormattingConfigurationExtension[Key]) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentFormatting = readFormattingConfigurationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              formatting: {
+                ...currentFormatting,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateToneConfiguration<Key extends keyof ToneConfigurationExtension>(
+    key: Key,
+    value: ToneConfigurationExtension[Key],
+  ) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentTone = readToneConfigurationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              tone: {
+                ...currentTone,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateArchetypeConfiguration<
+    Key extends keyof ArchetypeConfigurationExtension,
+  >(key: Key, value: ArchetypeConfigurationExtension[Key]) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentArchetype = readArchetypeConfigurationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              archetype: {
+                ...currentArchetype,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateSpeciesGeneration<Key extends keyof SpeciesGenerationExtension>(
+    key: Key,
+    value: SpeciesGenerationExtension[Key],
+  ) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentSpeciesGeneration =
+        readSpeciesGenerationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              species_generation: {
+                ...currentSpeciesGeneration,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateEthnicityGeneration<
+    Key extends keyof EthnicityGenerationExtension,
+  >(key: Key, value: EthnicityGenerationExtension[Key]) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentEthnicityGeneration =
+        readEthnicityGenerationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              ethnicity_generation: {
+                ...currentEthnicityGeneration,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateRaceGeneration<Key extends keyof RaceGenerationExtension>(
+    key: Key,
+    value: RaceGenerationExtension[Key],
+  ) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentRaceGeneration = readRaceGenerationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              race_generation: {
+                ...currentRaceGeneration,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateNationalityGeneration<
+    Key extends keyof NationalityGenerationExtension,
+  >(key: Key, value: NationalityGenerationExtension[Key]) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentNationalityGeneration =
+        readNationalityGenerationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              nationality_generation: {
+                ...currentNationalityGeneration,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateOccupationGeneration<
+    Key extends keyof OccupationGenerationExtension,
+  >(key: Key, value: OccupationGenerationExtension[Key]) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentOccupationGeneration =
+        readOccupationGenerationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              occupation_generation: {
+                ...currentOccupationGeneration,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateRelationshipGeneration(
+    index: number,
+    nextRelationship: RelationshipGenerationExtension,
+  ) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentRelationships =
+        readRelationshipGenerationExtension(currentCard);
+      const nextRelationships = currentRelationships.map((relationship, itemIndex) =>
+        itemIndex === index ? nextRelationship : relationship,
+      );
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              relationship_generation: nextRelationships.slice(0, 3),
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function addRelationshipGeneration() {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentRelationships =
+        readRelationshipGenerationExtension(currentCard);
+
+      if (currentRelationships.length >= 3) {
+        return currentCard;
+      }
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              relationship_generation: [
+                ...currentRelationships,
+                {
+                  ...DEFAULT_RELATIONSHIP_GENERATION[0],
+                  npcName: "",
+                  oneLineDescription: "",
+                },
+              ],
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function removeRelationshipGeneration(indexToRemove: number) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentRelationships =
+        readRelationshipGenerationExtension(currentCard);
+      const nextRelationships = currentRelationships.filter(
+        (_relationship, index) => index !== indexToRemove,
+      );
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              relationship_generation: nextRelationships,
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function updateRelationshipStatusGeneration<
+    Key extends keyof RelationshipStatusGenerationExtension,
+  >(key: Key, value: RelationshipStatusGenerationExtension[Key]) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentRelationshipStatus =
+        readRelationshipStatusGenerationExtension(currentCard);
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              relationship_status_generation: {
+                ...currentRelationshipStatus,
+                [key]: value,
+              },
+            },
+          },
+        },
+      };
+    });
+  }
+
+  function toggleMacroArrayElement(
+    key: "tones" | "micro_tropes",
+    selectedValue: string,
+  ) {
+    const currentValues = macroExtension[key];
+    const nextValues = currentValues.includes(selectedValue)
+      ? currentValues.filter((value) => value !== selectedValue)
+      : [...currentValues, selectedValue];
+
+    updateMacroExtension(key, nextValues);
+  }
+
   function handleAddGroupGreeting(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const greeting = newGroupGreeting.trim();
@@ -87,6 +2343,353 @@ export default function StructuredCardEditor({
     );
   }
 
+  async function handleGeneratePreview() {
+    setPreviewLoading(true);
+    setPreviewError(null);
+
+    try {
+      const result = await buildCharacterCard({
+        alternateGreetings: alternateGreetingGeneration,
+        archetype: archetypeConfiguration,
+        creatorsNotes: creatorsNotesGeneration,
+        ethnicityRegion: ethnicityGeneration.region,
+        fetish: fetishGeneration,
+        firstMessage: firstMessageGeneration,
+        formatting: formattingConfiguration,
+        framework: frameworkConfiguration,
+        groupAlternateGreetings: groupAlternateGreetingGeneration,
+        groupGreetings: groupGreetingGeneration,
+        intimacyStyle: intimacyStyleGeneration,
+        kink: kinkGeneration,
+        linguisticMatrix: ethnicityGeneration.linguisticMatrix,
+        loreEntries: loreEntryGeneration,
+        lorebookSummary: lorebookSummaryGeneration,
+        nationalityCountry: nationalityGeneration.passportCountry || undefined,
+        nationalityLegalStatus: nationalityGeneration.legalStatus,
+        nationalityLinguisticVibe:
+          nationalityGeneration.linguisticVibe || undefined,
+        nationalityRegionalAlliance: nationalityGeneration.regionalAlliance,
+        occupationAcademicYear: occupationGeneration.academicYear,
+        occupationAuthorityDynamic: occupationGeneration.authorityDynamic,
+        occupationCampusAffiliation:
+          occupationGeneration.campusAffiliation || undefined,
+        occupationFundingType: occupationGeneration.fundingType,
+        occupationJobTitle: occupationGeneration.jobTitle || undefined,
+        occupationMajorField: occupationGeneration.majorField,
+        occupationProfessionalDomain: occupationGeneration.professionalDomain,
+        occupationSocioeconomicTier: occupationGeneration.socioeconomicTier,
+        occupationWorkplaceVibe:
+          occupationGeneration.workplaceVibe || undefined,
+        powerDynamic: ageGeneration.power_dynamic,
+        postHistoryInstructions: postHistoryInstructionsGeneration,
+        raceMacroGroup: raceGeneration.macroGroup,
+        relationships: relationshipGeneration
+          .filter(
+            (relationship) =>
+              relationship.npcName.trim() &&
+              relationship.oneLineDescription.trim(),
+          )
+          .slice(0, 3),
+        relationshipStatus: relationshipStatusGeneration,
+        scenario: scenarioGeneration,
+        scenarioOpeningPairs: scenarioOpeningPairGeneration,
+        speciesType: speciesGeneration.type,
+        tone: toneConfiguration,
+        trope: ageGeneration.birthdate_preset || macroExtension.relationship,
+        turnOffs: turnOffGeneration,
+        worldLorePlaceholders: worldLorePlaceholderGeneration,
+      });
+      setPreviewResult(result);
+      applyGeneratedPreview(result);
+    } catch (caughtError) {
+      setPreviewError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Character preview generation failed.",
+      );
+    } finally {
+      setPreviewLoading(false);
+    }
+  }
+
+  function applyGeneratedPreview(result: BuildCharacterCardResult) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+      const currentNameGeneration = readNameGenerationExtension(currentCard);
+      const currentAlternateGreetingGeneration =
+        readAlternateGreetingGenerationExtension(currentCard);
+      const currentAgeGeneration = readAgeGenerationExtension(currentCard);
+      const currentArchetypeConfiguration =
+        readArchetypeConfigurationExtension(currentCard);
+      const currentFetishGeneration = readFetishGenerationExtension(currentCard);
+      const currentFirstMessageGeneration =
+        readFirstMessageGenerationExtension(currentCard);
+      const currentGroupAlternateGreetingGeneration =
+        readGroupAlternateGreetingGenerationExtension(currentCard);
+      const currentGroupGreetingGeneration =
+        readGroupGreetingGenerationExtension(currentCard);
+      const currentIntimacyStyleGeneration =
+        readIntimacyStyleGenerationExtension(currentCard);
+      const currentKinkGeneration = readKinkGenerationExtension(currentCard);
+      const currentEthnicityGeneration =
+        readEthnicityGenerationExtension(currentCard);
+      const currentNationalityGeneration =
+        readNationalityGenerationExtension(currentCard);
+      const currentOccupationGeneration =
+        readOccupationGenerationExtension(currentCard);
+      const currentRaceGeneration = readRaceGenerationExtension(currentCard);
+      const currentRelationshipGeneration =
+        readRelationshipGenerationExtension(currentCard);
+      const currentRelationshipStatusGeneration =
+        readRelationshipStatusGenerationExtension(currentCard);
+      const currentScenarioGeneration =
+        readScenarioGenerationExtension(currentCard);
+      const currentScenarioOpeningPairGeneration =
+        readScenarioOpeningPairGenerationExtension(currentCard);
+      const currentLorebookSummaryGeneration =
+        readLorebookSummaryGenerationExtension(currentCard);
+      const currentLoreEntryGeneration =
+        readLoreEntryGenerationExtension(currentCard);
+      const currentFrameworkConfiguration =
+        readFrameworkConfigurationExtension(currentCard);
+      const currentFormattingConfiguration =
+        readFormattingConfigurationExtension(currentCard);
+      const currentToneConfiguration = readToneConfigurationExtension(currentCard);
+      const currentCreatorsNotesGeneration =
+        readCreatorsNotesGenerationExtension(currentCard);
+      const currentPostHistoryInstructionsGeneration =
+        readPostHistoryInstructionsGenerationExtension(currentCard);
+      const currentWorldLorePlaceholderGeneration =
+        readWorldLorePlaceholderGenerationExtension(currentCard);
+      const currentSpeciesGeneration =
+        readSpeciesGenerationExtension(currentCard);
+      const currentTurnOffGeneration = readTurnOffGenerationExtension(currentCard);
+      const generatedName = `${result.meta.given_name} ${result.meta.surname}`;
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          alternate_greetings:
+            [
+              ...(result.meta.alternateGreetings ?? []),
+              ...(result.meta.scenarioOpeningPairs ?? []),
+            ]
+              .map((alternateGreeting) =>
+                "completedGreeting" in alternateGreeting
+                  ? alternateGreeting.completedGreeting.trim()
+                  : alternateGreeting.alternateFirstMessage.trim(),
+              )
+              .filter(Boolean)
+              .slice(0, 5) ?? currentCard.data.alternate_greetings,
+          group_only_greetings:
+            [
+              ...(result.meta.groupGreetings ?? []),
+              ...(result.meta.groupAlternateGreetings ?? []),
+            ]
+              .map((groupGreeting) => groupGreeting.completedGreeting.trim())
+              .filter(Boolean)
+              .slice(0, 5) ?? currentCard.data.group_only_greetings,
+          first_mes: result.greeting,
+          name: generatedName,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              alternate_greeting_generation:
+                result.meta.alternateGreetings ??
+                currentAlternateGreetingGeneration,
+              archetype:
+                result.meta.archetype ?? currentArchetypeConfiguration,
+              creators_notes:
+                result.meta.creatorsNotes ?? currentCreatorsNotesGeneration,
+              formatting:
+                result.meta.formatting ?? currentFormattingConfiguration,
+              framework:
+                result.meta.framework ?? currentFrameworkConfiguration,
+              lore_entries:
+                result.meta.loreEntries ?? currentLoreEntryGeneration,
+              tone: result.meta.tone ?? currentToneConfiguration,
+              post_history_instructions_generation:
+                result.meta.postHistoryInstructions ??
+                currentPostHistoryInstructionsGeneration,
+              world_lore_placeholder:
+                result.meta.worldLorePlaceholders ??
+                currentWorldLorePlaceholderGeneration,
+              age_generation: {
+                ...currentAgeGeneration,
+                age: String(result.meta.age),
+                apparent_age: result.meta.apparent_age
+                  ? String(result.meta.apparent_age)
+                  : currentAgeGeneration.apparent_age,
+                birth_day: String(result.meta.birth_day),
+                birth_month: result.meta.birth_month,
+                birth_year: String(result.meta.birth_year),
+                zodiac: result.meta.zodiac,
+              },
+              name_generation: {
+                ...currentNameGeneration,
+                aura:
+                  result.meta.species?.nameAura ?? currentNameGeneration.aura,
+                firstname: result.meta.given_name,
+                era: result.meta.species?.nameEra ?? currentNameGeneration.era,
+                heritage:
+                  result.meta.ethnicity?.culturalHeritage ??
+                  result.meta.species?.heritage ??
+                  currentNameGeneration.heritage,
+                surname: result.meta.surname,
+              },
+              fetish_generation: result.meta.fetish ?? currentFetishGeneration,
+              first_message_generation:
+                result.meta.firstMessage ?? currentFirstMessageGeneration,
+              group_greeting_generation:
+                result.meta.groupGreetings ?? currentGroupGreetingGeneration,
+              group_alternate_greeting_generation:
+                result.meta.groupAlternateGreetings ??
+                currentGroupAlternateGreetingGeneration,
+              intimacy_style_generation:
+                result.meta.intimacyStyle ?? currentIntimacyStyleGeneration,
+              kink_generation: result.meta.kink ?? currentKinkGeneration,
+              lorebook_summary:
+                result.meta.lorebookSummary ??
+                currentLorebookSummaryGeneration,
+              ethnicity_generation: {
+                ...currentEthnicityGeneration,
+                culturalHeritage:
+                  result.meta.ethnicity?.culturalHeritage ??
+                  currentEthnicityGeneration.culturalHeritage,
+                hasDiasporicBaggage:
+                  result.meta.ethnicity?.hasDiasporicBaggage ??
+                  currentEthnicityGeneration.hasDiasporicBaggage,
+                linguisticMatrix:
+                  result.meta.ethnicity?.linguisticMatrix ??
+                  currentEthnicityGeneration.linguisticMatrix,
+                nativeLanguage:
+                  result.meta.ethnicity?.nativeLanguage ??
+                  currentEthnicityGeneration.nativeLanguage,
+                region:
+                  result.meta.ethnicity?.region ??
+                  currentEthnicityGeneration.region,
+                societalContext:
+                  result.meta.ethnicity?.societalContext ??
+                  currentEthnicityGeneration.societalContext,
+              },
+              nationality_generation: {
+                ...currentNationalityGeneration,
+                legalStatus:
+                  result.meta.nationality?.legalStatus ??
+                  currentNationalityGeneration.legalStatus,
+                linguisticVibe:
+                  result.meta.nationality?.linguisticVibe ??
+                  currentNationalityGeneration.linguisticVibe,
+                passportCountry:
+                  result.meta.nationality?.passportCountry ??
+                  currentNationalityGeneration.passportCountry,
+                regionalAlliance:
+                  result.meta.nationality?.regionalAlliance ??
+                  currentNationalityGeneration.regionalAlliance,
+              },
+              occupation_generation: {
+                ...currentOccupationGeneration,
+                academicYear:
+                  result.meta.occupation?.kind === "student"
+                    ? result.meta.occupation.academicYear
+                    : currentOccupationGeneration.academicYear,
+                authorityDynamic:
+                  result.meta.occupation?.authorityDynamic ??
+                  currentOccupationGeneration.authorityDynamic,
+                campusAffiliation:
+                  result.meta.occupation?.kind === "student"
+                    ? result.meta.occupation.campusAffiliation
+                    : currentOccupationGeneration.campusAffiliation,
+                fundingType:
+                  result.meta.occupation?.kind === "student"
+                    ? result.meta.occupation.fundingType
+                    : currentOccupationGeneration.fundingType,
+                jobTitle:
+                  result.meta.occupation?.jobTitle ??
+                  currentOccupationGeneration.jobTitle,
+                majorField:
+                  result.meta.occupation?.kind === "student"
+                    ? result.meta.occupation.majorField
+                    : currentOccupationGeneration.majorField,
+                professionalDomain:
+                  result.meta.occupation?.kind === "professional"
+                    ? result.meta.occupation.professionalDomain
+                    : currentOccupationGeneration.professionalDomain,
+                socioeconomicTier:
+                  result.meta.occupation?.kind === "professional"
+                    ? result.meta.occupation.socioeconomicTier
+                    : currentOccupationGeneration.socioeconomicTier,
+                workplaceVibe:
+                  result.meta.occupation?.workplaceVibe ??
+                  currentOccupationGeneration.workplaceVibe,
+              },
+              race_generation: {
+                ...currentRaceGeneration,
+                isCulturallySalient:
+                  result.meta.race?.isCulturallySalient ??
+                  currentRaceGeneration.isCulturallySalient,
+                macroGroup:
+                  result.meta.race?.macroGroup ??
+                  currentRaceGeneration.macroGroup,
+                narrativeStyle:
+                  result.meta.race?.narrativeStyle ??
+                  currentRaceGeneration.narrativeStyle,
+                physicalDescriptors:
+                  result.meta.race?.physicalDescriptors ??
+                  currentRaceGeneration.physicalDescriptors,
+                syncMode:
+                  result.meta.race?.syncMode ?? currentRaceGeneration.syncMode,
+              },
+              relationship_generation:
+                result.meta.relationships?.slice(0, 3) ??
+                currentRelationshipGeneration,
+              relationship_status_generation:
+                result.meta.relationshipStatus ??
+                currentRelationshipStatusGeneration,
+              scenario_generation:
+                result.meta.scenario ?? currentScenarioGeneration,
+              scenario_opening_pair_generation:
+                result.meta.scenarioOpeningPairs ??
+                currentScenarioOpeningPairGeneration,
+              species_generation: {
+                ...currentSpeciesGeneration,
+                apparentAge: result.meta.species?.apparentAge
+                  ? String(result.meta.species.apparentAge)
+                  : currentSpeciesGeneration.apparentAge,
+                biologyTag: result.meta.species
+                  ? speciesTypeToBiologyTag(result.meta.species.type)
+                  : currentSpeciesGeneration.biologyTag,
+                dietaryNeed:
+                  result.meta.species?.dietaryNeed ??
+                  currentSpeciesGeneration.dietaryNeed,
+                instinctualTrait:
+                  result.meta.species?.instinctualTrait ??
+                  currentSpeciesGeneration.instinctualTrait,
+                isImmortal:
+                  result.meta.species?.isImmortal ??
+                  currentSpeciesGeneration.isImmortal,
+                lifespanAnchor: result.meta.species?.isImmortal
+                  ? "Static Agelessness"
+                  : currentSpeciesGeneration.lifespanAnchor,
+                type: result.meta.species?.type ?? currentSpeciesGeneration.type,
+              },
+              turn_off_generation:
+                result.meta.turnOffs ?? currentTurnOffGeneration,
+            },
+          },
+        },
+      };
+    });
+  }
+
   return (
     <section className="flex min-h-[520px] flex-1 flex-col overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/30">
       <div className="flex shrink-0 gap-1 border-b border-zinc-800 bg-zinc-950/60 p-1">
@@ -108,27 +2711,1934 @@ export default function StructuredCardEditor({
 
       <div className="flex-1 space-y-6 overflow-y-auto p-6">
         {activeTab === "identity" ? (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <Field label="Name Key">
-                <input
-                  type="text"
-                  value={activeCard.data.name}
-                  onChange={(event) => updateField("name", event.currentTarget.value)}
-                  className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+          <div className="space-y-6">
+            <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+              <div className="space-y-4">
+                <Field label="Name Key">
+                  <input
+                    type="text"
+                    value={activeCard.data.name}
+                    onChange={(event) =>
+                      updateField("name", event.currentTarget.value)
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+
+                <Field label="Card Version">
+                  <input
+                    type="text"
+                    value={activeCard.data.character_version}
+                    onChange={(event) =>
+                      updateField("character_version", event.currentTarget.value)
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4 sm:grid-cols-2 lg:col-span-2">
+                <MacroButtonGroup
+                  activeValue={macroExtension.framework}
+                  label="Simulation Framework"
+                  options={FRAMEWORKS}
+                  tone="violet"
+                  onSelect={(value) => updateMacroExtension("framework", value)}
+                />
+
+                <MacroButtonGroup
+                  activeValue={macroExtension.relationship}
+                  label="Relationship Matrix"
+                  options={RELATIONSHIPS}
+                  tone="emerald"
+                  onSelect={(value) => updateMacroExtension("relationship", value)}
+                />
+
+                <MacroButtonGroup
+                  activeValue={macroExtension.formatting}
+                  label="Prompt Formatting"
+                  options={FORMATTINGS}
+                  tone="sky"
+                  onSelect={(value) => updateMacroExtension("formatting", value)}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Formatting Configuration
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Strict typography, markdown, perspective, and paragraph caps
+                  used by the chat stream and generated card prose.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+                <MacroButtonGroup
+                  activeValue={formattingConfiguration.actionWrappingStandard}
+                  label="Render Standard"
+                  options={FORMATTING_ACTION_WRAPPING_STANDARDS}
+                  tone="violet"
+                  onSelect={(value) =>
+                    updateFormattingConfiguration(
+                      "actionWrappingStandard",
+                      value,
+                    )
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={formattingConfiguration.markdownEmphasisStyle}
+                  label="Markup Control"
+                  options={FORMATTING_MARKDOWN_EMPHASIS_STYLES}
+                  tone="emerald"
+                  onSelect={(value) =>
+                    updateFormattingConfiguration("markdownEmphasisStyle", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={formattingConfiguration.narrativePerspective}
+                  label="Perspective Lock"
+                  options={FORMATTING_NARRATIVE_PERSPECTIVES}
+                  tone="sky"
+                  onSelect={(value) =>
+                    updateFormattingConfiguration("narrativePerspective", value)
+                  }
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <Field label="Formatting ID">
+                  <input
+                    type="text"
+                    value={formattingConfiguration.formattingId}
+                    onChange={(event) =>
+                      updateFormattingConfiguration(
+                        "formattingId",
+                        event.currentTarget.value,
+                      )
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 font-mono text-xs text-zinc-400 outline-none focus:border-violet-500"
+                  />
+                </Field>
+
+                <Field label="Max Paragraphs Per Turn">
+                  <input
+                    type="number"
+                    min={1}
+                    max={12}
+                    value={formattingConfiguration.maxParagraphsPerTurn}
+                    onChange={(event) =>
+                      updateFormattingConfiguration(
+                        "maxParagraphsPerTurn",
+                        Number(event.currentTarget.value),
+                      )
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+              </div>
+
+              <Field label="Formatting System Prompt Injection">
+                <textarea
+                  value={formattingConfiguration.formattingSystemPromptInjection}
+                  onChange={(event) =>
+                    updateFormattingConfiguration(
+                      "formattingSystemPromptInjection",
+                      event.currentTarget.value,
+                    )
+                  }
+                  className="h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
                 />
               </Field>
+            </div>
 
-              <Field label="Card Version">
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Lore Entry Trigger Matrix
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Full granular lore cards keyed by regex-style activation terms
+                  for reactive context injection during chat.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                {loreEntryGeneration.slice(0, 20).map((entry, index) => (
+                  <div
+                    key={entry.entryId}
+                    className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-950 p-3"
+                  >
+                    <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+                      <MacroButtonGroup
+                        activeValue={entry.domainScope}
+                        label={`Lore Entry ${index + 1}`}
+                        options={LORE_ENTRY_DOMAIN_SCOPES}
+                        tone="sky"
+                        onSelect={(value) =>
+                          updateLoreEntryGeneration(index, {
+                            domainScope: value,
+                          })
+                        }
+                      />
+
+                      <MacroButtonGroup
+                        activeValue={entry.insertionPriority}
+                        label="Insertion Strategy"
+                        options={LORE_ENTRY_INSERTION_PRIORITIES}
+                        tone="emerald"
+                        onSelect={(value) =>
+                          updateLoreEntryGeneration(index, {
+                            insertionPriority: value,
+                          })
+                        }
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+                      <Field label="Title">
+                        <input
+                          type="text"
+                          value={entry.title}
+                          onChange={(event) =>
+                            updateLoreEntryGeneration(index, {
+                              title: event.currentTarget.value,
+                            })
+                          }
+                          className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                        />
+                      </Field>
+
+                      <Field label="Token Reserve">
+                        <input
+                          type="number"
+                          min={25}
+                          max={1000}
+                          value={entry.tokenReserveCost}
+                          onChange={(event) =>
+                            updateLoreEntryGeneration(index, {
+                              tokenReserveCost: Number(event.currentTarget.value),
+                            })
+                          }
+                          className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                        />
+                      </Field>
+
+                      <Field label="Entry ID">
+                        <input
+                          type="text"
+                          value={entry.entryId}
+                          onChange={(event) =>
+                            updateLoreEntryGeneration(index, {
+                              entryId: event.currentTarget.value,
+                            })
+                          }
+                          className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 font-mono text-xs text-zinc-400 outline-none focus:border-violet-500"
+                        />
+                      </Field>
+                    </div>
+
+                    <Field label="Activation Keys">
+                      <input
+                        type="text"
+                        value={entry.activationKeys.join(", ")}
+                        onChange={(event) =>
+                          updateLoreEntryGeneration(index, {
+                            activationKeys: event.currentTarget.value
+                              .split(",")
+                              .map((key) => key.trim())
+                              .filter(Boolean)
+                              .slice(0, 12),
+                          })
+                        }
+                        className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 font-mono text-xs text-zinc-200 outline-none focus:border-violet-500"
+                      />
+                    </Field>
+
+                    <Field label="Entry Content">
+                      <textarea
+                        value={entry.entryContent}
+                        onChange={(event) =>
+                          updateLoreEntryGeneration(index, {
+                            entryContent: event.currentTarget.value,
+                          })
+                        }
+                        className="h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                      />
+                    </Field>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  World Lore Placeholder Matrix
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Token-saving macro variables that resolve dense world details
+                  only when the card compiles or a matching trigger needs them.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                {worldLorePlaceholderGeneration.slice(0, 12).map((placeholder, index) => (
+                  <div
+                    key={placeholder.placeholderId}
+                    className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-950 p-3"
+                  >
+                    <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+                      <MacroButtonGroup
+                        activeValue={placeholder.macroType}
+                        label={`Placeholder ${index + 1}`}
+                        options={WORLD_LORE_PLACEHOLDER_MACRO_TYPES}
+                        tone="violet"
+                        onSelect={(value) =>
+                          updateWorldLorePlaceholderGeneration(index, {
+                            macroType: value,
+                          })
+                        }
+                      />
+
+                      <Field label="Variable Key">
+                        <input
+                          type="text"
+                          value={placeholder.variableKey}
+                          onChange={(event) =>
+                            updateWorldLorePlaceholderGeneration(index, {
+                              variableKey: event.currentTarget.value,
+                            })
+                          }
+                          className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 font-mono text-xs text-zinc-200 outline-none focus:border-violet-500"
+                        />
+                      </Field>
+
+                      <Field label="Placeholder ID">
+                        <input
+                          type="text"
+                          value={placeholder.placeholderId}
+                          onChange={(event) =>
+                            updateWorldLorePlaceholderGeneration(index, {
+                              placeholderId: event.currentTarget.value,
+                            })
+                          }
+                          className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 font-mono text-xs text-zinc-400 outline-none focus:border-violet-500"
+                        />
+                      </Field>
+                    </div>
+
+                    <label className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs font-semibold text-zinc-300">
+                      <input
+                        type="checkbox"
+                        checked={placeholder.isDynamic}
+                        onChange={(event) =>
+                          updateWorldLorePlaceholderGeneration(index, {
+                            isDynamic: event.currentTarget.checked,
+                          })
+                        }
+                        className="size-3.5 accent-violet-500"
+                      />
+                      Dynamic rewrite allowed when chat history triggers this
+                      placeholder
+                    </label>
+
+                    <Field label="Current Data Payload">
+                      <textarea
+                        value={placeholder.currentDataPayload}
+                        onChange={(event) =>
+                          updateWorldLorePlaceholderGeneration(index, {
+                            currentDataPayload: event.currentTarget.value,
+                          })
+                        }
+                        className="h-20 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                      />
+                    </Field>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Intimacy Style Matrix
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Emotional tone, aftercare, dialogue cadence, and physical
+                  love language for private romantic moments.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <MacroButtonGroup
+                  activeValue={intimacyStyleGeneration.expressionType}
+                  label="Tone Tag"
+                  options={INTIMACY_EXPRESSION_TYPES}
+                  tone="violet"
+                  onSelect={(value) =>
+                    updateIntimacyStyleGeneration("expressionType", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={intimacyStyleGeneration.aftercareStyle}
+                  label="Grounding Tag"
+                  options={INTIMACY_AFTERCARE_STYLES}
+                  tone="emerald"
+                  onSelect={(value) =>
+                    updateIntimacyStyleGeneration("aftercareStyle", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={intimacyStyleGeneration.verbalCadence}
+                  label="Verbal Vibe Tag"
+                  options={INTIMACY_VERBAL_CADENCES}
+                  tone="sky"
+                  onSelect={(value) =>
+                    updateIntimacyStyleGeneration("verbalCadence", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={intimacyStyleGeneration.physicalLoveLanguage}
+                  label="Physical Love Language"
+                  options={INTIMACY_PHYSICAL_LOVE_LANGUAGES}
+                  tone="violet"
+                  onSelect={(value) =>
+                    updateIntimacyStyleGeneration(
+                      "physicalLoveLanguage",
+                      value,
+                    )
+                  }
+                />
+              </div>
+
+              <Field label="AI Behavior Prompt">
+                <textarea
+                  value={intimacyStyleGeneration.aiBehaviorPrompt}
+                  onChange={(event) =>
+                    updateIntimacyStyleGeneration(
+                      "aiBehaviorPrompt",
+                      event.currentTarget.value,
+                    )
+                  }
+                  className="h-20 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Turn-Off Boundary Matrix
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Attitude, sensory, and role-hardline constraints that make
+                  {" {{char}}"} pause, withdraw, or re-establish boundaries.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <MacroButtonGroup
+                  activeValue={turnOffGeneration.dynamicHardlines}
+                  label="Power Hardline"
+                  options={TURN_OFF_DYNAMIC_HARDLINES}
+                  tone="violet"
+                  onSelect={(value) =>
+                    updateTurnOffGeneration("dynamicHardlines", value)
+                  }
+                />
+
+                <Field label="Attitude Killers">
+                  <input
+                    type="text"
+                    value={turnOffGeneration.behavioralTurnOffs.join(", ")}
+                    onChange={(event) =>
+                      updateTurnOffGeneration(
+                        "behavioralTurnOffs",
+                        event.currentTarget.value
+                          .split(",")
+                          .map((item) => item.trim())
+                          .filter(Boolean),
+                      )
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+
+                <Field label="Aesthetic Killers">
+                  <input
+                    type="text"
+                    value={turnOffGeneration.sensoryTurnOffs.join(", ")}
+                    onChange={(event) =>
+                      updateTurnOffGeneration(
+                        "sensoryTurnOffs",
+                        event.currentTarget.value
+                          .split(",")
+                          .map((item) => item.trim())
+                          .filter(Boolean),
+                      )
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+              </div>
+
+              <Field label="AI Reaction Prompt">
+                <textarea
+                  value={turnOffGeneration.aiReactionPrompt}
+                  onChange={(event) =>
+                    updateTurnOffGeneration(
+                      "aiReactionPrompt",
+                      event.currentTarget.value,
+                    )
+                  }
+                  className="h-20 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Opening Scenario Matrix
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Location, catalyst, and mood controls that shape the first
+                  message setup without taking over {"{{user}}"}&apos;s turn.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <MacroButtonGroup
+                  activeValue={scenarioGeneration.settingType}
+                  label="Location Tag"
+                  options={SCENARIO_SETTING_TYPES}
+                  tone="violet"
+                  onSelect={(value) =>
+                    updateScenarioGeneration("settingType", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={scenarioGeneration.plotHook}
+                  label="Plot Hook"
+                  options={SCENARIO_PLOT_HOOKS}
+                  tone="emerald"
+                  onSelect={(value) =>
+                    updateScenarioGeneration("plotHook", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={scenarioGeneration.startingTension}
+                  label="Mood Valve"
+                  options={SCENARIO_STARTING_TENSIONS}
+                  tone="sky"
+                  onSelect={(value) =>
+                    updateScenarioGeneration("startingTension", value)
+                  }
+                />
+              </div>
+
+              <Field label="Sensory Details">
                 <input
                   type="text"
-                  value={activeCard.data.character_version}
+                  value={scenarioGeneration.sensoryDetails.join(", ")}
                   onChange={(event) =>
-                    updateField("character_version", event.currentTarget.value)
+                    updateScenarioGeneration(
+                      "sensoryDetails",
+                      event.currentTarget.value
+                        .split(",")
+                        .map((item) => item.trim())
+                        .filter(Boolean),
+                    )
                   }
                   className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
                 />
               </Field>
+
+              <Field label="Scene Premise Description">
+                <textarea
+                  value={scenarioGeneration.scenePremiseDescription}
+                  onChange={(event) =>
+                    updateScenarioGeneration(
+                      "scenePremiseDescription",
+                      event.currentTarget.value,
+                    )
+                  }
+                  className="h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  First Message Output Matrix
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Presentation rules for the final greeting payload: where it
+                  enters, how it reads, and how it hands action back.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <MacroButtonGroup
+                  activeValue={firstMessageGeneration.entryPoint}
+                  label="Entry Point"
+                  options={FIRST_MESSAGE_ENTRY_POINTS}
+                  tone="violet"
+                  onSelect={(value) =>
+                    updateFirstMessageGeneration("entryPoint", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={firstMessageGeneration.literaryStyle}
+                  label="Card Presentation"
+                  options={FIRST_MESSAGE_LITERARY_STYLES}
+                  tone="emerald"
+                  onSelect={(value) =>
+                    updateFirstMessageGeneration("literaryStyle", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={firstMessageGeneration.userCallToAction}
+                  label="User CTA"
+                  options={FIRST_MESSAGE_USER_CALLS_TO_ACTION}
+                  tone="sky"
+                  onSelect={(value) =>
+                    updateFirstMessageGeneration("userCallToAction", value)
+                  }
+                />
+              </div>
+
+              <Field label="Token Length Cap">
+                <input
+                  type="number"
+                  min={200}
+                  max={1200}
+                  value={firstMessageGeneration.tokenLengthCap}
+                  onChange={(event) =>
+                    updateFirstMessageGeneration(
+                      "tokenLengthCap",
+                      Number(event.currentTarget.value),
+                    )
+                  }
+                  className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                />
+              </Field>
+
+              <Field label="AI Output Constraint">
+                <textarea
+                  value={firstMessageGeneration.aiOutputConstraint}
+                  onChange={(event) =>
+                    updateFirstMessageGeneration(
+                      "aiOutputConstraint",
+                      event.currentTarget.value,
+                    )
+                  }
+                  className="h-28 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Tone Configuration
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Narrative atmosphere, pacing velocity, worldview framing, and
+                  vocabulary families for the generated prose.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+                <MacroButtonGroup
+                  activeValue={toneConfiguration.proseTexture}
+                  label="Prose Texture"
+                  options={TONE_PROSE_TEXTURES}
+                  tone="violet"
+                  onSelect={(value) =>
+                    updateToneConfiguration("proseTexture", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={toneConfiguration.pacingVelocity}
+                  label="Pacing Velocity"
+                  options={TONE_PACING_VELOCITIES}
+                  tone="emerald"
+                  onSelect={(value) =>
+                    updateToneConfiguration("pacingVelocity", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={toneConfiguration.worldviewFilter}
+                  label="Worldview Filter"
+                  options={TONE_WORLDVIEW_FILTERS}
+                  tone="sky"
+                  onSelect={(value) =>
+                    updateToneConfiguration("worldviewFilter", value)
+                  }
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <Field label="Tone ID">
+                  <input
+                    type="text"
+                    value={toneConfiguration.toneId}
+                    onChange={(event) =>
+                      updateToneConfiguration(
+                        "toneId",
+                        event.currentTarget.value,
+                      )
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 font-mono text-xs text-zinc-400 outline-none focus:border-violet-500"
+                  />
+                </Field>
+
+                <Field label="Vocabulary Directives">
+                  <input
+                    type="text"
+                    value={toneConfiguration.aiVocabularyDirectives.join(", ")}
+                    onChange={(event) =>
+                      updateToneConfiguration(
+                        "aiVocabularyDirectives",
+                        event.currentTarget.value
+                          .split(",")
+                          .map((directive) => directive.trim())
+                          .filter(Boolean)
+                          .slice(0, 12),
+                      )
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+              </div>
+
+              <Field label="Tone System Prompt Injection">
+                <textarea
+                  value={toneConfiguration.toneSystemPromptInjection}
+                  onChange={(event) =>
+                    updateToneConfiguration(
+                      "toneSystemPromptInjection",
+                      event.currentTarget.value,
+                    )
+                  }
+                  className="h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Archetype Configuration
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Core psychology, emotional armor, and hidden motivation that
+                  shape behavior before trope dynamics bend the relationship.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+                <MacroButtonGroup
+                  activeValue={archetypeConfiguration.personaType}
+                  label="Persona Type"
+                  options={ARCHETYPE_PERSONA_TYPES}
+                  tone="violet"
+                  onSelect={(value) =>
+                    updateArchetypeConfiguration("personaType", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={archetypeConfiguration.defenseMechanism}
+                  label="Defense Mechanism"
+                  options={ARCHETYPE_DEFENSE_MECHANISMS}
+                  tone="emerald"
+                  onSelect={(value) =>
+                    updateArchetypeConfiguration("defenseMechanism", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={archetypeConfiguration.coreMotivation}
+                  label="Core Motivation"
+                  options={ARCHETYPE_CORE_MOTIVATIONS}
+                  tone="sky"
+                  onSelect={(value) =>
+                    updateArchetypeConfiguration("coreMotivation", value)
+                  }
+                />
+              </div>
+
+              <Field label="Archetype ID">
+                <input
+                  type="text"
+                  value={archetypeConfiguration.archetypeId}
+                  onChange={(event) =>
+                    updateArchetypeConfiguration(
+                      "archetypeId",
+                      event.currentTarget.value,
+                    )
+                  }
+                  className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 font-mono text-xs text-zinc-400 outline-none focus:border-violet-500"
+                />
+              </Field>
+
+              <Field label="AI Behavior Prompt">
+                <textarea
+                  value={archetypeConfiguration.aiBehaviorPrompt}
+                  onChange={(event) =>
+                    updateArchetypeConfiguration(
+                      "aiBehaviorPrompt",
+                      event.currentTarget.value,
+                    )
+                  }
+                  className="h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                    Adult Intimacy Layer
+                  </h3>
+                  <p className="mt-1 text-[11px] text-zinc-500">
+                    Optional private-scene guidance. Disabled exports only keep
+                    the safety switch, not the detailed tags.
+                  </p>
+                </div>
+
+                <label className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs font-semibold text-zinc-300">
+                  <input
+                    type="checkbox"
+                    checked={kinkGeneration.nsfwEnabled}
+                    onChange={(event) =>
+                      updateKinkGeneration(
+                        "nsfwEnabled",
+                        event.currentTarget.checked,
+                      )
+                    }
+                    className="size-3.5 accent-violet-500"
+                  />
+                  Enable adult module
+                </label>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <MacroButtonGroup
+                  activeValue={kinkGeneration.primaryRole}
+                  label="Authority Tag"
+                  options={KINK_PRIMARY_ROLES}
+                  tone="violet"
+                  onSelect={(value) =>
+                    updateKinkGeneration("primaryRole", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={kinkGeneration.intensityLevel}
+                  label="Intensity Level"
+                  options={KINK_INTENSITY_LEVELS}
+                  tone="emerald"
+                  onSelect={(value) =>
+                    updateKinkGeneration("intensityLevel", value)
+                  }
+                />
+              </div>
+
+              <MacroToggleGroup
+                activeValues={kinkGeneration.preferredSensoryTags}
+                label="Boundary / Intent Tags"
+                options={KINK_SENSORY_TAGS}
+                tone="violet"
+                onToggle={(value) => {
+                  const nextTags = kinkGeneration.preferredSensoryTags.includes(
+                    value,
+                  )
+                    ? kinkGeneration.preferredSensoryTags.filter(
+                        (tag) => tag !== value,
+                      )
+                    : [...kinkGeneration.preferredSensoryTags, value];
+
+                  updateKinkGeneration("preferredSensoryTags", nextTags);
+                }}
+              />
+
+              <Field label="System Prompt Instruction">
+                <textarea
+                  value={kinkGeneration.systemPromptInstruction}
+                  onChange={(event) =>
+                    updateKinkGeneration(
+                      "systemPromptInstruction",
+                      event.currentTarget.value,
+                    )
+                  }
+                  className="h-20 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                    Fetish Focus Matrix
+                  </h3>
+                  <p className="mt-1 text-[11px] text-zinc-500">
+                    Optional fixation metadata for anatomy, garments,
+                    body-scale modifiers, and situational triggers.
+                  </p>
+                </div>
+
+                <label className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs font-semibold text-zinc-300">
+                  <input
+                    type="checkbox"
+                    checked={fetishGeneration.fetishEnabled}
+                    onChange={(event) =>
+                      updateFetishGeneration(
+                        "fetishEnabled",
+                        event.currentTarget.checked,
+                      )
+                    }
+                    className="size-3.5 accent-violet-500"
+                  />
+                  Enable fetish module
+                </label>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <MacroButtonGroup
+                  activeValue={fetishGeneration.anatomicalFocus}
+                  label="Anatomical Matrix"
+                  options={FETISH_ANATOMICAL_FOCUSES}
+                  tone="violet"
+                  onSelect={(value) =>
+                    updateFetishGeneration("anatomicalFocus", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={fetishGeneration.materialPreference}
+                  label="Object Classifier"
+                  options={FETISH_MATERIAL_PREFERENCES}
+                  tone="emerald"
+                  onSelect={(value) =>
+                    updateFetishGeneration("materialPreference", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={fetishGeneration.situationalTrigger}
+                  label="Environment Tag"
+                  options={FETISH_SITUATIONAL_TRIGGERS}
+                  tone="sky"
+                  onSelect={(value) =>
+                    updateFetishGeneration("situationalTrigger", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={fetishGeneration.sizeFantasyModifier}
+                  label="Body Alteration Tag"
+                  options={FETISH_SIZE_MODIFIERS}
+                  tone="violet"
+                  onSelect={(value) =>
+                    updateFetishGeneration("sizeFantasyModifier", value)
+                  }
+                />
+              </div>
+
+              <Field label="AI Descriptive Focus">
+                <textarea
+                  value={fetishGeneration.aiDescriptiveFocus}
+                  onChange={(event) =>
+                    updateFetishGeneration(
+                      "aiDescriptiveFocus",
+                      event.currentTarget.value,
+                    )
+                  }
+                  className="h-20 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Nationality & Civic Router
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Legal citizenship, mobility rights, and accent handling stay
+                  separate from race and ethnicity.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <Field label="Passport Country">
+                  <input
+                    type="text"
+                    value={nationalityGeneration.passportCountry}
+                    onChange={(event) =>
+                      updateNationalityGeneration(
+                        "passportCountry",
+                        event.currentTarget.value,
+                      )
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+
+                <MacroButtonGroup
+                  activeValue={nationalityGeneration.regionalAlliance}
+                  label="Law & Freedom Tag"
+                  options={NATIONALITY_REGIONAL_ALLIANCES}
+                  tone="sky"
+                  onSelect={(value) =>
+                    updateNationalityGeneration("regionalAlliance", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={nationalityGeneration.legalStatus}
+                  label="Citizenship Tag"
+                  options={NATIONALITY_LEGAL_STATUSES}
+                  tone="emerald"
+                  onSelect={(value) =>
+                    updateNationalityGeneration("legalStatus", value)
+                  }
+                />
+              </div>
+
+              <Field label="AI Accent & Slang Modifier">
+                <textarea
+                  value={nationalityGeneration.linguisticVibe}
+                  onChange={(event) =>
+                    updateNationalityGeneration(
+                      "linguisticVibe",
+                      event.currentTarget.value,
+                    )
+                  }
+                  className="h-20 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Name Variables
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Bracketed values are generated character outputs. Heritage,
+                  era, aura, and composition are backend filter tags.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+                <Field label="{{char}} full name">
+                  <input
+                    type="text"
+                    value={activeCard.data.name}
+                    onChange={(event) =>
+                      updateField("name", event.currentTarget.value)
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+
+                <Field label="{{firstname}}">
+                  <input
+                    type="text"
+                    value={nameGeneration.firstname}
+                    onChange={(event) =>
+                      updateNameGeneration("firstname", event.currentTarget.value)
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+
+                <Field label="{{surname}}">
+                  <input
+                    type="text"
+                    value={nameGeneration.surname}
+                    onChange={(event) =>
+                      updateNameGeneration("surname", event.currentTarget.value)
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+
+                <Field label="{{title}}">
+                  <input
+                    type="text"
+                    value={nameGeneration.title}
+                    onChange={(event) =>
+                      updateNameGeneration("title", event.currentTarget.value)
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+
+                <Field label="{{alias}}">
+                  <input
+                    type="text"
+                    value={nameGeneration.alias}
+                    onChange={(event) =>
+                      updateNameGeneration("alias", event.currentTarget.value)
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <MacroButtonGroup
+                  activeValue={nameGeneration.heritage}
+                  label="Heritage Tag"
+                  options={HERITAGE_TAGS}
+                  tone="sky"
+                  onSelect={(value) => updateNameGeneration("heritage", value)}
+                />
+
+                <MacroButtonGroup
+                  activeValue={nameGeneration.era}
+                  label="Era Tag"
+                  options={ERA_TAGS}
+                  tone="violet"
+                  onSelect={(value) => updateNameGeneration("era", value)}
+                />
+
+                <MacroButtonGroup
+                  activeValue={nameGeneration.aura}
+                  label="Aura Tag"
+                  options={AURA_TAGS}
+                  tone="emerald"
+                  onSelect={(value) => updateNameGeneration("aura", value)}
+                />
+
+                <MacroButtonGroup
+                  activeValue={nameGeneration.composition}
+                  label="Composition Slot"
+                  options={COMPOSITION_TAGS}
+                  tone="sky"
+                  onSelect={(value) => updateNameGeneration("composition", value)}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Occupation & Status Matrix
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Work, wealth, hierarchy, and campus roles shape daily routine,
+                  dialogue, and professional romance stakes.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <Field label="Job Title">
+                  <input
+                    type="text"
+                    value={occupationGeneration.jobTitle}
+                    onChange={(event) =>
+                      updateOccupationGeneration(
+                        "jobTitle",
+                        event.currentTarget.value,
+                      )
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+
+                <MacroButtonGroup
+                  activeValue={occupationGeneration.authorityDynamic}
+                  label="Hierarchy Tag"
+                  options={OCCUPATION_AUTHORITY_DYNAMICS}
+                  tone="emerald"
+                  onSelect={(value) =>
+                    updateOccupationGeneration("authorityDynamic", value)
+                  }
+                />
+
+                <label className="inline-flex items-center gap-2 self-end rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs font-semibold text-zinc-300">
+                  <input
+                    type="checkbox"
+                    checked={occupationGeneration.jobTitle === "University Student"}
+                    onChange={(event) =>
+                      updateOccupationGeneration(
+                        "jobTitle",
+                        event.currentTarget.checked
+                          ? "University Student"
+                          : DEFAULT_OCCUPATION_GENERATION.jobTitle,
+                      )
+                    }
+                    className="size-3.5 accent-violet-500"
+                  />
+                  Use university student schema
+                </label>
+              </div>
+
+              {occupationGeneration.jobTitle === "University Student" ? (
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                  <MacroButtonGroup
+                    activeValue={occupationGeneration.academicYear}
+                    label="Academic Hierarchy"
+                    options={STUDENT_ACADEMIC_YEARS}
+                    tone="violet"
+                    onSelect={(value) =>
+                      updateOccupationGeneration("academicYear", value)
+                    }
+                  />
+
+                  <MacroButtonGroup
+                    activeValue={occupationGeneration.majorField}
+                    label="Major & Discipline"
+                    options={STUDENT_MAJOR_FIELDS}
+                    tone="sky"
+                    onSelect={(value) =>
+                      updateOccupationGeneration("majorField", value)
+                    }
+                  />
+
+                  <MacroButtonGroup
+                    activeValue={occupationGeneration.fundingType}
+                    label="Funding Source"
+                    options={STUDENT_FUNDING_TYPES}
+                    tone="emerald"
+                    onSelect={(value) =>
+                      updateOccupationGeneration("fundingType", value)
+                    }
+                  />
+
+                  <Field label="Campus Affiliation">
+                    <input
+                      type="text"
+                      value={occupationGeneration.campusAffiliation}
+                      onChange={(event) =>
+                        updateOccupationGeneration(
+                          "campusAffiliation",
+                          event.currentTarget.value,
+                        )
+                      }
+                      className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                    />
+                  </Field>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                  <MacroButtonGroup
+                    activeValue={occupationGeneration.socioeconomicTier}
+                    label="Wealth & Status Tag"
+                    options={OCCUPATION_SOCIOECONOMIC_TIERS}
+                    tone="violet"
+                    onSelect={(value) =>
+                      updateOccupationGeneration("socioeconomicTier", value)
+                    }
+                  />
+
+                  <MacroButtonGroup
+                    activeValue={occupationGeneration.professionalDomain}
+                    label="Industry Filter"
+                    options={OCCUPATION_PROFESSIONAL_DOMAINS}
+                    tone="sky"
+                    onSelect={(value) =>
+                      updateOccupationGeneration("professionalDomain", value)
+                    }
+                  />
+                </div>
+              )}
+
+              <Field label="Workplace Vibe">
+                <textarea
+                  value={occupationGeneration.workplaceVibe}
+                  onChange={(event) =>
+                    updateOccupationGeneration(
+                      "workplaceVibe",
+                      event.currentTarget.value,
+                    )
+                  }
+                  className="h-20 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Age Variables
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Output variables map to card placeholders. Life phase,
+                  context, and power dynamics stay as generator filter tags.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <Field label="{{age}}">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={ageGeneration.age}
+                    onChange={(event) =>
+                      updateAgeGeneration("age", event.currentTarget.value)
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+
+                <Field label="{{apparent_age}}">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={ageGeneration.apparent_age}
+                    onChange={(event) =>
+                      updateAgeGeneration(
+                        "apparent_age",
+                        event.currentTarget.value,
+                      )
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+
+                <Field label="{{birth_year}}">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={ageGeneration.birth_year}
+                    onChange={(event) =>
+                      updateAgeGeneration("birth_year", event.currentTarget.value)
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <Field label="{{birth_month}}">
+                  <input
+                    type="text"
+                    value={ageGeneration.birth_month}
+                    onChange={(event) =>
+                      updateAgeGeneration("birth_month", event.currentTarget.value)
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+
+                <Field label="{{birth_day}}">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={ageGeneration.birth_day}
+                    onChange={(event) =>
+                      updateAgeGeneration("birth_day", event.currentTarget.value)
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+
+                <Field label="{{zodiac}}">
+                  <select
+                    value={ageGeneration.zodiac}
+                    onChange={(event) =>
+                      updateAgeGeneration("zodiac", event.currentTarget.value)
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  >
+                    <option value="">Unassigned</option>
+                    {ZODIAC_SIGNS.map((sign) => (
+                      <option key={sign} value={sign}>
+                        {sign}
+                      </option>
+                    ))}
+                  </select>
+                </Field>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <MacroButtonGroup
+                  activeValue={ageGeneration.developmental_stage}
+                  label="Life Phase Tag"
+                  options={DEVELOPMENTAL_STAGE_TAGS}
+                  tone="violet"
+                  onSelect={(value) =>
+                    updateAgeGeneration("developmental_stage", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={ageGeneration.legal_status}
+                  label="Context Tag"
+                  options={LEGAL_STATUS_TAGS}
+                  tone="sky"
+                  onSelect={(value) => updateAgeGeneration("legal_status", value)}
+                />
+
+                <MacroButtonGroup
+                  activeValue={ageGeneration.power_dynamic}
+                  label="Vibe Tag"
+                  options={AGE_POWER_DYNAMIC_TAGS}
+                  tone="emerald"
+                  onSelect={(value) => updateAgeGeneration("power_dynamic", value)}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <MacroButtonGroup
+                  activeValue={ageGeneration.temporal_anchor}
+                  label="Setting Timeline"
+                  options={TEMPORAL_ANCHOR_TAGS}
+                  tone="violet"
+                  onSelect={(value) =>
+                    updateAgeGeneration("temporal_anchor", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={ageGeneration.zodiac_alignment}
+                  label="Romance Zodiac Tag"
+                  options={ZODIAC_ALIGNMENT_TAGS}
+                  tone="emerald"
+                  onSelect={(value) =>
+                    updateAgeGeneration("zodiac_alignment", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={ageGeneration.seasonal_vibe}
+                  label="Seasonal Aesthetic Tag"
+                  options={SEASONAL_VIBE_TAGS}
+                  tone="sky"
+                  onSelect={(value) =>
+                    updateAgeGeneration("seasonal_vibe", value)
+                  }
+                />
+              </div>
+
+              <MacroButtonGroup
+                activeValue={ageGeneration.birthdate_preset}
+                label="Trope-Specific Birth Date Preset"
+                options={BIRTHDATE_PRESETS}
+                tone="violet"
+                onSelect={(value) =>
+                  updateAgeGeneration("birthdate_preset", value)
+                }
+              />
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Relationship Status Availability
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Public relationship status, emotional readiness, and scandal
+                  pressure define how hard attraction to {"{{user}}"} should
+                  be resisted.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <MacroButtonGroup
+                  activeValue={relationshipStatusGeneration.currentLabel}
+                  label="Structural Tag"
+                  options={RELATIONSHIP_CURRENT_LABELS}
+                  tone="violet"
+                  onSelect={(value) =>
+                    updateRelationshipStatusGeneration("currentLabel", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={
+                    relationshipStatusGeneration.emotionalAvailability
+                  }
+                  label="Availability Tag"
+                  options={RELATIONSHIP_EMOTIONAL_AVAILABILITIES}
+                  tone="emerald"
+                  onSelect={(value) =>
+                    updateRelationshipStatusGeneration(
+                      "emotionalAvailability",
+                      value,
+                    )
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={relationshipStatusGeneration.scandalFactor}
+                  label="Trope Alignment Tag"
+                  options={RELATIONSHIP_SCANDAL_FACTORS}
+                  tone="sky"
+                  onSelect={(value) =>
+                    updateRelationshipStatusGeneration("scandalFactor", value)
+                  }
+                />
+              </div>
+
+              <Field label="Status Context">
+                <textarea
+                  value={relationshipStatusGeneration.statusContext}
+                  onChange={(event) =>
+                    updateRelationshipStatusGeneration(
+                      "statusContext",
+                      event.currentTarget.value,
+                    )
+                  }
+                  className="h-20 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                    Relationship NPC Matrix
+                  </h3>
+                  <p className="mt-1 text-[11px] text-zinc-500">
+                    Up to three supporting NPCs who create pressure, comfort,
+                    secrets, or jealousy around the romance.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={addRelationshipGeneration}
+                  disabled={relationshipGeneration.length >= 3}
+                  className="inline-flex h-9 items-center gap-2 rounded-md border border-zinc-700 bg-zinc-950 px-3 text-xs font-semibold text-zinc-300 transition hover:border-violet-500/50 hover:text-violet-200 disabled:opacity-50"
+                >
+                  <Plus className="h-3.5 w-3.5" aria-hidden="true" />
+                  Add NPC
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                {relationshipGeneration.map((relationship, index) => (
+                  <div
+                    key={`${relationship.npcName}-${index}`}
+                    className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950 p-3"
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <span className="font-mono text-[10px] uppercase tracking-wider text-zinc-500">
+                        NPC #{index + 1}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeRelationshipGeneration(index)}
+                        className="inline-flex size-8 items-center justify-center rounded-md border border-zinc-800 text-zinc-500 transition hover:border-rose-500/40 hover:text-rose-300"
+                        title="Remove NPC relationship"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+                      </button>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                      <Field label="NPC Name">
+                        <input
+                          type="text"
+                          value={relationship.npcName}
+                          onChange={(event) =>
+                            updateRelationshipGeneration(index, {
+                              ...relationship,
+                              npcName: event.currentTarget.value,
+                            })
+                          }
+                          className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                        />
+                      </Field>
+
+                      <MacroButtonGroup
+                        activeValue={relationship.connectionType}
+                        label="Connection Tag"
+                        options={NPC_CONNECTION_TYPES}
+                        tone="violet"
+                        onSelect={(value) =>
+                          updateRelationshipGeneration(index, {
+                            ...relationship,
+                            connectionType: value,
+                          })
+                        }
+                      />
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                      <MacroButtonGroup
+                        activeValue={relationship.romanceFunction}
+                        label="Trope Catalyst Tag"
+                        options={NPC_ROMANCE_FUNCTIONS}
+                        tone="emerald"
+                        onSelect={(value) =>
+                          updateRelationshipGeneration(index, {
+                            ...relationship,
+                            romanceFunction: value,
+                          })
+                        }
+                      />
+
+                      <MacroButtonGroup
+                        activeValue={relationship.emotionalStatus}
+                        label="Dynamics Tag"
+                        options={NPC_EMOTIONAL_STATUSES}
+                        tone="sky"
+                        onSelect={(value) =>
+                          updateRelationshipGeneration(index, {
+                            ...relationship,
+                            emotionalStatus: value,
+                          })
+                        }
+                      />
+                    </div>
+
+                    <Field label="One-Line Description">
+                      <textarea
+                        value={relationship.oneLineDescription}
+                        onChange={(event) =>
+                          updateRelationshipGeneration(index, {
+                            ...relationship,
+                            oneLineDescription: event.currentTarget.value,
+                          })
+                        }
+                        className="h-20 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                      />
+                    </Field>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Species Biology Matrix
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Biology and lifespan tags modify the generator while
+                  instinctual traits shape romance behavior notes.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <MacroButtonGroup
+                  activeValue={speciesGeneration.type}
+                  label="Species Type"
+                  options={SPECIES_TYPES}
+                  tone="violet"
+                  onSelect={(value) => updateSpeciesGeneration("type", value)}
+                />
+
+                <MacroButtonGroup
+                  activeValue={speciesGeneration.biologyTag}
+                  label="Biology Tag"
+                  options={BIOLOGY_TAGS}
+                  tone="sky"
+                  onSelect={(value) =>
+                    updateSpeciesGeneration("biologyTag", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={speciesGeneration.lifespanAnchor}
+                  label="Age Modifier"
+                  options={LIFESPAN_ANCHORS}
+                  tone="emerald"
+                  onSelect={(value) =>
+                    updateSpeciesGeneration("lifespanAnchor", value)
+                  }
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <MacroButtonGroup
+                  activeValue={speciesGeneration.instinctualTrait}
+                  label="Trope Catalyst Tag"
+                  options={INSTINCTUAL_TRAITS}
+                  tone="violet"
+                  onSelect={(value) =>
+                    updateSpeciesGeneration("instinctualTrait", value)
+                  }
+                />
+
+                <Field label="Dietary Need">
+                  <input
+                    type="text"
+                    value={speciesGeneration.dietaryNeed}
+                    onChange={(event) =>
+                      updateSpeciesGeneration(
+                        "dietaryNeed",
+                        event.currentTarget.value,
+                      )
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+
+                <Field label="Apparent Age">
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={speciesGeneration.apparentAge}
+                    onChange={(event) =>
+                      updateSpeciesGeneration(
+                        "apparentAge",
+                        event.currentTarget.value,
+                      )
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+              </div>
+
+              <label className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs font-semibold text-zinc-300">
+                <input
+                  type="checkbox"
+                  checked={speciesGeneration.isImmortal}
+                  onChange={(event) =>
+                    updateSpeciesGeneration(
+                      "isImmortal",
+                      event.currentTarget.checked,
+                    )
+                  }
+                  className="size-3.5 accent-violet-500"
+                />
+                Immortal or ageless physiology
+              </label>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Ethnicity & Naming Router
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Region, diaspora context, and linguistic matrix route naming
+                  pools without reducing the character to shallow stereotypes.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <MacroButtonGroup
+                  activeValue={ethnicityGeneration.region}
+                  label="Global Anchor"
+                  options={ETHNICITY_REGIONS}
+                  tone="violet"
+                  onSelect={(value) =>
+                    updateEthnicityGeneration("region", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={ethnicityGeneration.societalContext}
+                  label="Integration Tag"
+                  options={SOCIETAL_CONTEXTS}
+                  tone="sky"
+                  onSelect={(value) =>
+                    updateEthnicityGeneration("societalContext", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={ethnicityGeneration.linguisticMatrix}
+                  label="Database Router"
+                  options={LINGUISTIC_MATRICES}
+                  tone="emerald"
+                  onSelect={(value) =>
+                    updateEthnicityGeneration("linguisticMatrix", value)
+                  }
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <Field label="Cultural Heritage">
+                  <input
+                    type="text"
+                    value={ethnicityGeneration.culturalHeritage}
+                    onChange={(event) =>
+                      updateEthnicityGeneration(
+                        "culturalHeritage",
+                        event.currentTarget.value,
+                      )
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+
+                <Field label="Native / Ancestral Language">
+                  <input
+                    type="text"
+                    value={ethnicityGeneration.nativeLanguage}
+                    onChange={(event) =>
+                      updateEthnicityGeneration(
+                        "nativeLanguage",
+                        event.currentTarget.value,
+                      )
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+              </div>
+
+              <label className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs font-semibold text-zinc-300">
+                <input
+                  type="checkbox"
+                  checked={ethnicityGeneration.hasDiasporicBaggage}
+                  onChange={(event) =>
+                    updateEthnicityGeneration(
+                      "hasDiasporicBaggage",
+                      event.currentTarget.checked,
+                    )
+                  }
+                  className="size-3.5 accent-violet-500"
+                />
+                Diaspora or immigrant identity affects the romance conflict
+              </label>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Race & Description Router
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Race macro groups sync with ethnicity/name routing and guide
+                  descriptive style without using generic labels in prose.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+                <MacroButtonGroup
+                  activeValue={raceGeneration.macroGroup}
+                  label="Macro Group"
+                  options={RACE_MACRO_GROUPS}
+                  tone="violet"
+                  onSelect={(value) =>
+                    updateRaceGeneration("macroGroup", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={raceGeneration.syncMode}
+                  label="System Router"
+                  options={RACE_SYNC_MODES}
+                  tone="sky"
+                  onSelect={(value) => updateRaceGeneration("syncMode", value)}
+                />
+
+                <MacroButtonGroup
+                  activeValue={raceGeneration.narrativeStyle}
+                  label="AI Vibe Modifier"
+                  options={RACE_NARRATIVE_STYLES}
+                  tone="emerald"
+                  onSelect={(value) =>
+                    updateRaceGeneration("narrativeStyle", value)
+                  }
+                />
+              </div>
+
+              <Field label="Physical Descriptor Keywords">
+                <input
+                  type="text"
+                  value={raceGeneration.physicalDescriptors.join(", ")}
+                  onChange={(event) =>
+                    updateRaceGeneration(
+                      "physicalDescriptors",
+                      event.currentTarget.value
+                        .split(",")
+                        .map((descriptor) => descriptor.trim())
+                        .filter(Boolean),
+                    )
+                  }
+                  className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                />
+              </Field>
+
+              <label className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs font-semibold text-zinc-300">
+                <input
+                  type="checkbox"
+                  checked={raceGeneration.isCulturallySalient}
+                  onChange={(event) =>
+                    updateRaceGeneration(
+                      "isCulturallySalient",
+                      event.currentTarget.checked,
+                    )
+                  }
+                  className="size-3.5 accent-violet-500"
+                />
+                Racial identity or social dynamics affect romance conflict
+              </label>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 border-t border-zinc-800 pt-4 sm:grid-cols-2">
+              <MacroToggleGroup
+                activeValues={macroExtension.tones}
+                label="Story Tone Classifiers"
+                options={AVAILABLE_TONES}
+                tone="violet"
+                onToggle={(value) => toggleMacroArrayElement("tones", value)}
+              />
+
+              <MacroToggleGroup
+                activeValues={macroExtension.micro_tropes}
+                label="Active Romantic Micro-Tropes"
+                options={AVAILABLE_TROPES}
+                tone="emerald"
+                onToggle={(value) => toggleMacroArrayElement("micro_tropes", value)}
+              />
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                    Generated Card Preview
+                  </h3>
+                  <p className="mt-1 text-[11px] text-zinc-500">
+                    Builds a first-message preview from the current generation
+                    classifiers and writes it into the active card.
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => void handleGeneratePreview()}
+                  disabled={previewLoading}
+                  className="rounded-lg border border-violet-500/40 bg-violet-500/10 px-4 py-2 text-xs font-bold text-violet-200 transition hover:bg-violet-500/20 disabled:opacity-50"
+                >
+                  {previewLoading ? "Generating..." : "Generate Preview"}
+                </button>
+              </div>
+
+              {previewError ? (
+                <p className="rounded-lg border border-rose-500/20 bg-rose-500/5 p-3 text-xs text-rose-300">
+                  {previewError}
+                </p>
+              ) : null}
+
+              {previewResult ? (
+                <CharacterCardPreview
+                  cardData={previewResult.meta}
+                  greeting={previewResult.greeting}
+                />
+              ) : null}
             </div>
 
             <Field label="Core Personality Definitions">
@@ -173,6 +4683,271 @@ export default function StructuredCardEditor({
               />
             </Field>
 
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Framework Configuration
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Controls export target, context budgeting, prompt placement,
+                  and global serialization rules before card compilation.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+                <MacroButtonGroup
+                  activeValue={frameworkConfiguration.targetSpecification}
+                  label="Target Specification"
+                  options={FRAMEWORK_TARGET_SPECIFICATIONS}
+                  tone="violet"
+                  onSelect={(value) =>
+                    updateFrameworkConfiguration("targetSpecification", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={frameworkConfiguration.memoryBudgetStrategy}
+                  label="Memory Budget"
+                  options={FRAMEWORK_MEMORY_BUDGET_STRATEGIES}
+                  tone="emerald"
+                  onSelect={(value) =>
+                    updateFrameworkConfiguration("memoryBudgetStrategy", value)
+                  }
+                />
+
+                <MacroButtonGroup
+                  activeValue={frameworkConfiguration.injectionPipelineRouter}
+                  label="Pipeline Router"
+                  options={FRAMEWORK_INJECTION_PIPELINE_ROUTERS}
+                  tone="sky"
+                  onSelect={(value) =>
+                    updateFrameworkConfiguration(
+                      "injectionPipelineRouter",
+                      value,
+                    )
+                  }
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <Field label="Framework ID">
+                  <input
+                    type="text"
+                    value={frameworkConfiguration.frameworkId}
+                    onChange={(event) =>
+                      updateFrameworkConfiguration(
+                        "frameworkId",
+                        event.currentTarget.value,
+                      )
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 font-mono text-xs text-zinc-400 outline-none focus:border-violet-500"
+                  />
+                </Field>
+
+                <Field label="Global Token Safety Buffer">
+                  <input
+                    type="number"
+                    min={50}
+                    max={2000}
+                    value={frameworkConfiguration.globalTokenSafetyBuffer}
+                    onChange={(event) =>
+                      updateFrameworkConfiguration(
+                        "globalTokenSafetyBuffer",
+                        Number(event.currentTarget.value),
+                      )
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+              </div>
+
+              <Field label="System Prompt Override">
+                <textarea
+                  value={frameworkConfiguration.systemPromptJailbreakOverride}
+                  onChange={(event) =>
+                    updateFrameworkConfiguration(
+                      "systemPromptJailbreakOverride",
+                      event.currentTarget.value,
+                    )
+                  }
+                  className="h-20 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Lorebook Summary Matrix
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Compresses canon, world rules, species logic, and faction
+                  pressure into the system prompt without flooding the context.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <Field label="Universe Anchor">
+                  <input
+                    type="text"
+                    value={lorebookSummaryGeneration.universeAnchor}
+                    onChange={(event) =>
+                      updateLorebookSummaryGeneration(
+                        "universeAnchor",
+                        event.currentTarget.value,
+                      )
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+
+                <Field label="Token Optimization Cap">
+                  <input
+                    type="number"
+                    min={50}
+                    max={1000}
+                    value={lorebookSummaryGeneration.tokenOptimizationCap}
+                    onChange={(event) =>
+                      updateLorebookSummaryGeneration(
+                        "tokenOptimizationCap",
+                        Number(event.currentTarget.value),
+                      )
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+              </div>
+
+              <Field label="World System Rules">
+                <textarea
+                  value={lorebookSummaryGeneration.worldSystemRules.join("\n")}
+                  onChange={(event) =>
+                    updateLorebookSummaryGeneration(
+                      "worldSystemRules",
+                      event.currentTarget.value
+                        .split("\n")
+                        .map((rule) => rule.trim())
+                        .filter(Boolean)
+                        .slice(0, 4),
+                    )
+                  }
+                  className="h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+
+              <Field label="Faction / Dynasty Context">
+                <textarea
+                  value={lorebookSummaryGeneration.factionOrDynastyContext}
+                  onChange={(event) =>
+                    updateLorebookSummaryGeneration(
+                      "factionOrDynastyContext",
+                      event.currentTarget.value,
+                    )
+                  }
+                  className="h-20 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+
+              <Field label="AI Lore Instruction">
+                <textarea
+                  value={lorebookSummaryGeneration.aiLoreInstruction}
+                  onChange={(event) =>
+                    updateLorebookSummaryGeneration(
+                      "aiLoreInstruction",
+                      event.currentTarget.value,
+                    )
+                  }
+                  className="h-20 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Creator Notes Read Me
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Human-facing runtime guidance for model choice, content
+                  rating, trigger warnings, and ideal player setup.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <MacroButtonGroup
+                  activeValue={creatorsNotesGeneration.contentRating}
+                  label="Content Rating"
+                  options={CREATORS_NOTES_CONTENT_RATINGS}
+                  tone="violet"
+                  onSelect={(value) =>
+                    updateCreatorsNotesGeneration("contentRating", value)
+                  }
+                />
+
+                <Field label="Recommended Models">
+                  <input
+                    type="text"
+                    value={creatorsNotesGeneration.recommendedModels.join(", ")}
+                    onChange={(event) =>
+                      updateCreatorsNotesGeneration(
+                        "recommendedModels",
+                        event.currentTarget.value
+                          .split(",")
+                          .map((model) => model.trim())
+                          .filter(Boolean)
+                          .slice(0, 5),
+                      )
+                    }
+                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                  />
+                </Field>
+              </div>
+
+              <Field label="Trigger Warnings">
+                <input
+                  type="text"
+                  value={creatorsNotesGeneration.triggerWarnings.join(", ")}
+                  onChange={(event) =>
+                    updateCreatorsNotesGeneration(
+                      "triggerWarnings",
+                      event.currentTarget.value
+                        .split(",")
+                        .map((warning) => warning.trim())
+                        .filter(Boolean)
+                        .slice(0, 12),
+                    )
+                  }
+                  className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                />
+              </Field>
+
+              <Field label="Ideal User Persona">
+                <textarea
+                  value={creatorsNotesGeneration.idealUserPersona}
+                  onChange={(event) =>
+                    updateCreatorsNotesGeneration(
+                      "idealUserPersona",
+                      event.currentTarget.value,
+                    )
+                  }
+                  className="h-20 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+
+              <Field label="Technical Notes">
+                <textarea
+                  value={creatorsNotesGeneration.technicalNotesText}
+                  onChange={(event) =>
+                    updateCreatorsNotesGeneration(
+                      "technicalNotesText",
+                      event.currentTarget.value,
+                    )
+                  }
+                  className="h-28 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+            </div>
+
             <Field label="Example Messages">
               <textarea
                 value={activeCard.data.mes_example}
@@ -192,6 +4967,91 @@ export default function StructuredCardEditor({
                 className="h-32 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
               />
             </Field>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Post-History Runtime Matrix
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  High-priority after-history reminders that control drift,
+                  tone shifts, and response formatting in long chats.
+                </p>
+              </div>
+
+              <Field label="Injection Token Weight">
+                <input
+                  type="number"
+                  min={10}
+                  max={500}
+                  value={postHistoryInstructionsGeneration.injectionTokenWeight}
+                  onChange={(event) =>
+                    updatePostHistoryInstructionsGeneration(
+                      "injectionTokenWeight",
+                      Number(event.currentTarget.value),
+                    )
+                  }
+                  className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                />
+              </Field>
+
+              <Field label="Drift Control Rules">
+                <textarea
+                  value={postHistoryInstructionsGeneration.driftControlRules.join(
+                    "\n",
+                  )}
+                  onChange={(event) =>
+                    updatePostHistoryInstructionsGeneration(
+                      "driftControlRules",
+                      event.currentTarget.value
+                        .split("\n")
+                        .map((rule) => rule.trim())
+                        .filter(Boolean)
+                        .slice(0, 8),
+                    )
+                  }
+                  className="h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+
+              <Field label="Dynamic Tone Modifiers">
+                <textarea
+                  value={postHistoryInstructionsGeneration.dynamicToneModifiers.join(
+                    "\n",
+                  )}
+                  onChange={(event) =>
+                    updatePostHistoryInstructionsGeneration(
+                      "dynamicToneModifiers",
+                      event.currentTarget.value
+                        .split("\n")
+                        .map((modifier) => modifier.trim())
+                        .filter(Boolean)
+                        .slice(0, 8),
+                    )
+                  }
+                  className="h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+
+              <Field label="Formatting Hardlines">
+                <textarea
+                  value={postHistoryInstructionsGeneration.formattingHardlines.join(
+                    "\n",
+                  )}
+                  onChange={(event) =>
+                    updatePostHistoryInstructionsGeneration(
+                      "formattingHardlines",
+                      event.currentTarget.value
+                        .split("\n")
+                        .map((hardline) => hardline.trim())
+                        .filter(Boolean)
+                        .slice(0, 8),
+                    )
+                  }
+                  className="h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                />
+              </Field>
+            </div>
 
             <Field label="Post-History Instructions Injection">
               <textarea
@@ -217,6 +5077,229 @@ export default function StructuredCardEditor({
               />
             </Field>
 
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Alternate Greeting Fork Matrix
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Fork directives keep identity and boundaries intact while
+                  producing up to five alternate opening strings.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                {alternateGreetingGeneration.slice(0, 5).map((fork, index) => (
+                  <div
+                    key={fork.greetingId}
+                    className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-950 p-3"
+                  >
+                    <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+                      <MacroButtonGroup
+                        activeValue={fork.forkType}
+                        label={`Fork ${index + 1}`}
+                        options={ALTERNATE_GREETING_FORK_TYPES}
+                        tone="violet"
+                        onSelect={(value) =>
+                          updateAlternateGreetingGeneration(index, {
+                            forkType: value,
+                          })
+                        }
+                      />
+
+                      <Field label="Associated Trope">
+                        <input
+                          type="text"
+                          value={fork.associatedTrope}
+                          onChange={(event) =>
+                            updateAlternateGreetingGeneration(index, {
+                              associatedTrope: event.currentTarget.value,
+                            })
+                          }
+                          className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                        />
+                      </Field>
+
+                      <Field label="Greeting ID">
+                        <input
+                          type="text"
+                          value={fork.greetingId}
+                          onChange={(event) =>
+                            updateAlternateGreetingGeneration(index, {
+                              greetingId: event.currentTarget.value,
+                            })
+                          }
+                          className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 font-mono text-xs text-zinc-400 outline-none focus:border-violet-500"
+                        />
+                      </Field>
+                    </div>
+
+                    <Field label="AI Generation Directive">
+                      <textarea
+                        value={fork.aiGenerationDirective}
+                        onChange={(event) =>
+                          updateAlternateGreetingGeneration(index, {
+                            aiGenerationDirective: event.currentTarget.value,
+                          })
+                        }
+                        className="h-20 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                      />
+                    </Field>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Scenario Opening Pair Matrix
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Hard-links alternate scenario contexts to matching opening
+                  text so every alternate greeting carries its own world state.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                {scenarioOpeningPairGeneration
+                  .slice(0, 5)
+                  .map((pair, index) => (
+                    <div
+                      key={pair.pairId}
+                      className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-950 p-3"
+                    >
+                      <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+                        <MacroButtonGroup
+                          activeValue={pair.classificationType}
+                          label={`Pair ${index + 1}`}
+                          options={SCENARIO_OPENING_PAIR_CLASSIFICATIONS}
+                          tone="violet"
+                          onSelect={(value) =>
+                            updateScenarioOpeningPairGeneration(index, {
+                              classificationType: value,
+                            })
+                          }
+                        />
+
+                        <Field label="Pair Title">
+                          <input
+                            type="text"
+                            value={pair.pairTitle}
+                            onChange={(event) =>
+                              updateScenarioOpeningPairGeneration(index, {
+                                pairTitle: event.currentTarget.value,
+                              })
+                            }
+                            className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                          />
+                        </Field>
+
+                        <Field label="Pair ID">
+                          <input
+                            type="text"
+                            value={pair.pairId}
+                            onChange={(event) =>
+                              updateScenarioOpeningPairGeneration(index, {
+                                pairId: event.currentTarget.value,
+                              })
+                            }
+                            className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 font-mono text-xs text-zinc-400 outline-none focus:border-violet-500"
+                          />
+                        </Field>
+                      </div>
+
+                      <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+                        <MacroButtonGroup
+                          activeValue={pair.alternateScenarioContext.settingType}
+                          label="Scenario Setting"
+                          options={SCENARIO_SETTING_TYPES}
+                          tone="emerald"
+                          onSelect={(value) =>
+                            updateScenarioOpeningPairScenario(index, {
+                              settingType: value,
+                            })
+                          }
+                        />
+
+                        <MacroButtonGroup
+                          activeValue={pair.alternateScenarioContext.plotHook}
+                          label="Plot Hook"
+                          options={SCENARIO_PLOT_HOOKS}
+                          tone="sky"
+                          onSelect={(value) =>
+                            updateScenarioOpeningPairScenario(index, {
+                              plotHook: value,
+                            })
+                          }
+                        />
+
+                        <MacroButtonGroup
+                          activeValue={
+                            pair.alternateScenarioContext.startingTension
+                          }
+                          label="Tension"
+                          options={SCENARIO_STARTING_TENSIONS}
+                          tone="violet"
+                          onSelect={(value) =>
+                            updateScenarioOpeningPairScenario(index, {
+                              startingTension: value,
+                            })
+                          }
+                        />
+                      </div>
+
+                      <Field label="Scenario Sensory Details">
+                        <input
+                          type="text"
+                          value={pair.alternateScenarioContext.sensoryDetails.join(
+                            ", ",
+                          )}
+                          onChange={(event) =>
+                            updateScenarioOpeningPairScenario(index, {
+                              sensoryDetails: event.currentTarget.value
+                                .split(",")
+                                .map((detail) => detail.trim())
+                                .filter(Boolean),
+                            })
+                          }
+                          className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                        />
+                      </Field>
+
+                      <Field label="Alternate Scenario Context">
+                        <textarea
+                          value={
+                            pair.alternateScenarioContext
+                              .scenePremiseDescription
+                          }
+                          onChange={(event) =>
+                            updateScenarioOpeningPairScenario(index, {
+                              scenePremiseDescription:
+                                event.currentTarget.value,
+                            })
+                          }
+                          className="h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                        />
+                      </Field>
+
+                      <Field label="Alternate First Message">
+                        <textarea
+                          value={pair.alternateFirstMessage}
+                          onChange={(event) =>
+                            updateScenarioOpeningPairGeneration(index, {
+                              alternateFirstMessage:
+                                event.currentTarget.value,
+                            })
+                          }
+                          className="h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                        />
+                      </Field>
+                    </div>
+                  ))}
+              </div>
+            </div>
+
             <GreetingList
               addLabel="Add alternate greeting"
               emptyLabel="No alternate variations defined for this character."
@@ -227,6 +5310,186 @@ export default function StructuredCardEditor({
               onInputChange={setNewAlternateGreeting}
               onRemove={handleRemoveAlternateGreeting}
             />
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Group Greeting Room Matrix
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Multi-character room setups for group chats, with explicit
+                  cast placement and dialogue segregation rules.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                {groupGreetingGeneration.slice(0, 5).map((group, index) => (
+                  <div
+                    key={group.greetingId}
+                    className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-950 p-3"
+                  >
+                    <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+                      <MacroButtonGroup
+                        activeValue={group.spotlightDistribution}
+                        label={`Room ${index + 1}`}
+                        options={GROUP_GREETING_SPOTLIGHT_DISTRIBUTIONS}
+                        tone="violet"
+                        onSelect={(value) =>
+                          updateGroupGreetingGeneration(index, {
+                            spotlightDistribution: value,
+                          })
+                        }
+                      />
+
+                      <MacroButtonGroup
+                        activeValue={group.interpersonalDynamic}
+                        label="Friction Valve"
+                        options={GROUP_GREETING_INTERPERSONAL_DYNAMICS}
+                        tone="emerald"
+                        onSelect={(value) =>
+                          updateGroupGreetingGeneration(index, {
+                            interpersonalDynamic: value,
+                          })
+                        }
+                      />
+
+                      <MacroButtonGroup
+                        activeValue={group.formattingStyle}
+                        label="Syntax Parser"
+                        options={GROUP_GREETING_FORMATTING_STYLES}
+                        tone="sky"
+                        onSelect={(value) =>
+                          updateGroupGreetingGeneration(index, {
+                            formattingStyle: value,
+                          })
+                        }
+                      />
+                    </div>
+
+                    <Field label="Participating Characters">
+                      <input
+                        type="text"
+                        value={group.participatingCharacters.join(", ")}
+                        onChange={(event) =>
+                          updateGroupGreetingGeneration(index, {
+                            participatingCharacters: event.currentTarget.value
+                              .split(",")
+                              .map((item) => item.trim())
+                              .filter(Boolean)
+                              .slice(0, 4),
+                          })
+                        }
+                        className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                      />
+                    </Field>
+
+                    <Field label="AI Group Directive">
+                      <textarea
+                        value={group.aiGroupDirective}
+                        onChange={(event) =>
+                          updateGroupGreetingGeneration(index, {
+                            aiGroupDirective: event.currentTarget.value,
+                          })
+                        }
+                        className="h-20 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                      />
+                    </Field>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+              <div>
+                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  Group Alternate Fork Matrix
+                </h3>
+                <p className="mt-1 text-[11px] text-zinc-500">
+                  Spatial and timeline forks that re-skin the whole cast while
+                  preserving collective relationship traits.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                {groupAlternateGreetingGeneration
+                  .slice(0, 5)
+                  .map((fork, index) => (
+                    <div
+                      key={fork.altGreetingId}
+                      className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-950 p-3"
+                    >
+                      <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+                        <MacroButtonGroup
+                          activeValue={fork.forkCategory}
+                          label={`Group AU ${index + 1}`}
+                          options={GROUP_ALTERNATE_GREETING_FORK_CATEGORIES}
+                          tone="violet"
+                          onSelect={(value) =>
+                            updateGroupAlternateGreetingGeneration(index, {
+                              forkCategory: value,
+                            })
+                          }
+                        />
+
+                        <Field label="Target Setting Vibe">
+                          <input
+                            type="text"
+                            value={fork.targetSettingVibe}
+                            onChange={(event) =>
+                              updateGroupAlternateGreetingGeneration(index, {
+                                targetSettingVibe: event.currentTarget.value,
+                              })
+                            }
+                            className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                          />
+                        </Field>
+
+                        <Field label="Alt Greeting ID">
+                          <input
+                            type="text"
+                            value={fork.altGreetingId}
+                            onChange={(event) =>
+                              updateGroupAlternateGreetingGeneration(index, {
+                                altGreetingId: event.currentTarget.value,
+                              })
+                            }
+                            className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 font-mono text-xs text-zinc-400 outline-none focus:border-violet-500"
+                          />
+                        </Field>
+                      </div>
+
+                      <Field label="Included NPC Names">
+                        <input
+                          type="text"
+                          value={fork.includedNpcNames.join(", ")}
+                          onChange={(event) =>
+                            updateGroupAlternateGreetingGeneration(index, {
+                              includedNpcNames: event.currentTarget.value
+                                .split(",")
+                                .map((item) => item.trim())
+                                .filter(Boolean)
+                                .slice(0, 4),
+                            })
+                          }
+                          className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
+                        />
+                      </Field>
+
+                      <Field label="AI Multi-Character Prompt">
+                        <textarea
+                          value={fork.aiMultiCharacterPrompt}
+                          onChange={(event) =>
+                            updateGroupAlternateGreetingGeneration(index, {
+                              aiMultiCharacterPrompt: event.currentTarget.value,
+                            })
+                          }
+                          className="h-20 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+                        />
+                      </Field>
+                    </div>
+                  ))}
+              </div>
+            </div>
 
             <GreetingList
               addLabel="Add group greeting"
@@ -259,6 +5522,90 @@ function Field({
       </span>
       {children}
     </label>
+  );
+}
+
+function MacroButtonGroup<Value extends string>({
+  activeValue,
+  label,
+  onSelect,
+  options,
+  tone,
+}: {
+  activeValue: string;
+  label: string;
+  onSelect: (value: Value) => void;
+  options: readonly Value[];
+  tone: "emerald" | "sky" | "violet";
+}) {
+  return (
+    <div className="flex flex-col gap-2">
+      <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+        {label}
+      </span>
+      <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+        {options.map((option) => {
+          const isActive = activeValue === option;
+
+          return (
+            <button
+              key={option}
+              type="button"
+              onClick={() => onSelect(option)}
+              className={`rounded-md border p-2 text-left text-[11px] font-semibold transition ${
+                isActive
+                  ? activeMacroClassName(tone)
+                  : "border-zinc-800 bg-zinc-950 text-zinc-500 hover:text-zinc-300"
+              }`}
+            >
+              {option.replace("Asymmetric ", "")}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function MacroToggleGroup({
+  activeValues,
+  label,
+  onToggle,
+  options,
+  tone,
+}: {
+  activeValues: string[];
+  label: string;
+  onToggle: (value: string) => void;
+  options: string[];
+  tone: "emerald" | "violet";
+}) {
+  return (
+    <div className="space-y-2">
+      <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+        {label}
+      </span>
+      <div className="flex flex-wrap gap-1.5">
+        {options.map((option) => {
+          const isActive = activeValues.includes(option);
+
+          return (
+            <button
+              key={option}
+              type="button"
+              onClick={() => onToggle(option)}
+              className={`rounded-full border px-3 py-1 text-[10px] font-medium transition ${
+                isActive
+                  ? activeMacroClassName(tone)
+                  : "border-zinc-800 bg-zinc-950 text-zinc-500 hover:text-zinc-300"
+              }`}
+            >
+              {option}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 }
 
@@ -332,4 +5679,1584 @@ function GreetingList({
       )}
     </div>
   );
+}
+
+function readMacroExtension(
+  extensions: Record<string, unknown>,
+): AppMacroExtensions {
+  const namespace = readExtensionNamespace(
+    extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawMacro = namespace.macro ?? namespace;
+
+  if (!isRecord(rawMacro)) {
+    return DEFAULT_MACRO_EXTENSION;
+  }
+
+  return {
+    framework: readString(rawMacro.framework, DEFAULT_MACRO_EXTENSION.framework),
+    formatting: readString(rawMacro.formatting, DEFAULT_MACRO_EXTENSION.formatting),
+    relationship: readString(
+      rawMacro.relationship,
+      DEFAULT_MACRO_EXTENSION.relationship,
+    ),
+    tones: readStringArray(rawMacro.tones),
+    micro_tropes: readStringArray(rawMacro.micro_tropes),
+  };
+}
+
+function readNameGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): NameGenerationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawNameGeneration = namespace.name_generation;
+
+  if (!isRecord(rawNameGeneration)) {
+    return {
+      ...DEFAULT_NAME_GENERATION,
+      ...readNamePartsFromCardName(card.data.name),
+    };
+  }
+
+  return {
+    firstname: readString(
+      rawNameGeneration.firstname,
+      readNamePartsFromCardName(card.data.name).firstname,
+    ),
+    surname: readString(
+      rawNameGeneration.surname,
+      readNamePartsFromCardName(card.data.name).surname,
+    ),
+    title: readString(rawNameGeneration.title, DEFAULT_NAME_GENERATION.title),
+    alias: readString(rawNameGeneration.alias, DEFAULT_NAME_GENERATION.alias),
+    heritage: readString(
+      rawNameGeneration.heritage,
+      DEFAULT_NAME_GENERATION.heritage,
+    ),
+    era: readString(rawNameGeneration.era, DEFAULT_NAME_GENERATION.era),
+    aura: readString(rawNameGeneration.aura, DEFAULT_NAME_GENERATION.aura),
+    composition: readString(
+      rawNameGeneration.composition,
+      DEFAULT_NAME_GENERATION.composition,
+    ),
+  };
+}
+
+function readAgeGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): AgeGenerationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawAgeGeneration = namespace.age_generation;
+
+  if (!isRecord(rawAgeGeneration)) {
+    return DEFAULT_AGE_GENERATION;
+  }
+
+  return {
+    age: readString(rawAgeGeneration.age, DEFAULT_AGE_GENERATION.age),
+    apparent_age: readString(
+      rawAgeGeneration.apparent_age,
+      DEFAULT_AGE_GENERATION.apparent_age,
+    ),
+    birth_year: readString(
+      rawAgeGeneration.birth_year,
+      DEFAULT_AGE_GENERATION.birth_year,
+    ),
+    birth_month: readString(
+      rawAgeGeneration.birth_month,
+      DEFAULT_AGE_GENERATION.birth_month,
+    ),
+    birth_day: readString(
+      rawAgeGeneration.birth_day,
+      DEFAULT_AGE_GENERATION.birth_day,
+    ),
+    zodiac: readString(rawAgeGeneration.zodiac, DEFAULT_AGE_GENERATION.zodiac),
+    developmental_stage: readString(
+      rawAgeGeneration.developmental_stage,
+      DEFAULT_AGE_GENERATION.developmental_stage,
+    ),
+    legal_status: readString(
+      rawAgeGeneration.legal_status,
+      DEFAULT_AGE_GENERATION.legal_status,
+    ),
+    power_dynamic: readString(
+      rawAgeGeneration.power_dynamic,
+      DEFAULT_AGE_GENERATION.power_dynamic,
+    ),
+    temporal_anchor: readString(
+      rawAgeGeneration.temporal_anchor,
+      DEFAULT_AGE_GENERATION.temporal_anchor,
+    ),
+    zodiac_alignment: readString(
+      rawAgeGeneration.zodiac_alignment,
+      DEFAULT_AGE_GENERATION.zodiac_alignment,
+    ),
+    seasonal_vibe: readString(
+      rawAgeGeneration.seasonal_vibe,
+      DEFAULT_AGE_GENERATION.seasonal_vibe,
+    ),
+    birthdate_preset: readString(
+      rawAgeGeneration.birthdate_preset,
+      DEFAULT_AGE_GENERATION.birthdate_preset,
+    ),
+  };
+}
+
+function readKinkGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): KinkGenerationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawKinkGeneration = namespace.kink_generation;
+
+  if (!isRecord(rawKinkGeneration)) {
+    return DEFAULT_KINK_GENERATION;
+  }
+
+  return {
+    intensityLevel: readKinkIntensityLevel(rawKinkGeneration.intensityLevel),
+    nsfwEnabled: readBoolean(
+      rawKinkGeneration.nsfwEnabled,
+      DEFAULT_KINK_GENERATION.nsfwEnabled,
+    ),
+    preferredSensoryTags: readStringArray(
+      rawKinkGeneration.preferredSensoryTags,
+    ),
+    primaryRole: readKinkPrimaryRole(rawKinkGeneration.primaryRole),
+    systemPromptInstruction: readString(
+      rawKinkGeneration.systemPromptInstruction,
+      DEFAULT_KINK_GENERATION.systemPromptInstruction,
+    ),
+  };
+}
+
+function readAlternateGreetingGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): AlternateGreetingGenerationExtension[] {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawAlternateGreetingGeneration =
+    namespace.alternate_greeting_generation;
+
+  if (!Array.isArray(rawAlternateGreetingGeneration)) {
+    return DEFAULT_ALTERNATE_GREETING_GENERATION;
+  }
+
+  const parsed = rawAlternateGreetingGeneration
+    .filter(isRecord)
+    .map((alternateGreeting, index) => ({
+      aiGenerationDirective: readString(
+        alternateGreeting.aiGenerationDirective,
+        DEFAULT_ALTERNATE_GREETING_GENERATION[index]
+          ?.aiGenerationDirective ??
+          DEFAULT_ALTERNATE_GREETING_GENERATION[0].aiGenerationDirective,
+      ),
+      associatedTrope: readString(
+        alternateGreeting.associatedTrope,
+        DEFAULT_ALTERNATE_GREETING_GENERATION[index]?.associatedTrope ??
+          DEFAULT_ALTERNATE_GREETING_GENERATION[0].associatedTrope,
+      ),
+      completedGreeting: readString(alternateGreeting.completedGreeting, ""),
+      forkType: readAlternateGreetingForkType(alternateGreeting.forkType),
+      greetingId: readString(
+        alternateGreeting.greetingId,
+        DEFAULT_ALTERNATE_GREETING_GENERATION[index]?.greetingId ??
+          DEFAULT_ALTERNATE_GREETING_GENERATION[0].greetingId,
+      ),
+    }))
+    .slice(0, 5);
+
+  return parsed.length ? parsed : DEFAULT_ALTERNATE_GREETING_GENERATION;
+}
+
+function readGroupGreetingGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): GroupGreetingGenerationExtension[] {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawGroupGreetingGeneration = namespace.group_greeting_generation;
+
+  if (!Array.isArray(rawGroupGreetingGeneration)) {
+    return DEFAULT_GROUP_GREETING_GENERATION;
+  }
+
+  const parsed = rawGroupGreetingGeneration
+    .filter(isRecord)
+    .map((groupGreeting, index) => ({
+      aiGroupDirective: readString(
+        groupGreeting.aiGroupDirective,
+        DEFAULT_GROUP_GREETING_GENERATION[index]?.aiGroupDirective ??
+          DEFAULT_GROUP_GREETING_GENERATION[0].aiGroupDirective,
+      ),
+      completedGreeting: readString(groupGreeting.completedGreeting, ""),
+      formattingStyle: readGroupGreetingFormattingStyle(
+        groupGreeting.formattingStyle,
+      ),
+      greetingId: readString(
+        groupGreeting.greetingId,
+        DEFAULT_GROUP_GREETING_GENERATION[index]?.greetingId ??
+          DEFAULT_GROUP_GREETING_GENERATION[0].greetingId,
+      ),
+      interpersonalDynamic: readGroupGreetingInterpersonalDynamic(
+        groupGreeting.interpersonalDynamic,
+      ),
+      participatingCharacters: readStringArray(
+        groupGreeting.participatingCharacters,
+      ).slice(0, 4),
+      spotlightDistribution: readGroupGreetingSpotlightDistribution(
+        groupGreeting.spotlightDistribution,
+      ),
+    }))
+    .filter((groupGreeting) => groupGreeting.participatingCharacters.length >= 2)
+    .slice(0, 5);
+
+  return parsed.length ? parsed : DEFAULT_GROUP_GREETING_GENERATION;
+}
+
+function readGroupAlternateGreetingGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): GroupAlternateGreetingGenerationExtension[] {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawGroupAlternateGreetingGeneration =
+    namespace.group_alternate_greeting_generation;
+
+  if (!Array.isArray(rawGroupAlternateGreetingGeneration)) {
+    return DEFAULT_GROUP_ALTERNATE_GREETING_GENERATION;
+  }
+
+  const parsed = rawGroupAlternateGreetingGeneration
+    .filter(isRecord)
+    .map((fork, index) => ({
+      aiMultiCharacterPrompt: readString(
+        fork.aiMultiCharacterPrompt,
+        DEFAULT_GROUP_ALTERNATE_GREETING_GENERATION[index]
+          ?.aiMultiCharacterPrompt ??
+          DEFAULT_GROUP_ALTERNATE_GREETING_GENERATION[0].aiMultiCharacterPrompt,
+      ),
+      altGreetingId: readString(
+        fork.altGreetingId,
+        DEFAULT_GROUP_ALTERNATE_GREETING_GENERATION[index]?.altGreetingId ??
+          DEFAULT_GROUP_ALTERNATE_GREETING_GENERATION[0].altGreetingId,
+      ),
+      completedGreeting: readString(fork.completedGreeting, ""),
+      forkCategory: readGroupAlternateGreetingForkCategory(fork.forkCategory),
+      includedNpcNames: readStringArray(fork.includedNpcNames).slice(0, 4),
+      targetSettingVibe: readString(
+        fork.targetSettingVibe,
+        DEFAULT_GROUP_ALTERNATE_GREETING_GENERATION[index]
+          ?.targetSettingVibe ??
+          DEFAULT_GROUP_ALTERNATE_GREETING_GENERATION[0].targetSettingVibe,
+      ),
+    }))
+    .filter((fork) => fork.includedNpcNames.length >= 2)
+    .slice(0, 5);
+
+  return parsed.length ? parsed : DEFAULT_GROUP_ALTERNATE_GREETING_GENERATION;
+}
+
+function readFetishGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): FetishGenerationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawFetishGeneration = namespace.fetish_generation;
+
+  if (!isRecord(rawFetishGeneration)) {
+    return DEFAULT_FETISH_GENERATION;
+  }
+
+  return {
+    aiDescriptiveFocus: readString(
+      rawFetishGeneration.aiDescriptiveFocus,
+      DEFAULT_FETISH_GENERATION.aiDescriptiveFocus,
+    ),
+    anatomicalFocus: readFetishAnatomicalFocus(
+      rawFetishGeneration.anatomicalFocus,
+    ),
+    fetishEnabled: readBoolean(
+      rawFetishGeneration.fetishEnabled,
+      DEFAULT_FETISH_GENERATION.fetishEnabled,
+    ),
+    materialPreference: readFetishMaterialPreference(
+      rawFetishGeneration.materialPreference,
+    ),
+    situationalTrigger: readFetishSituationalTrigger(
+      rawFetishGeneration.situationalTrigger,
+    ),
+    sizeFantasyModifier: readFetishSizeFantasyModifier(
+      rawFetishGeneration.sizeFantasyModifier,
+    ),
+  };
+}
+
+function readIntimacyStyleGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): IntimacyStyleGenerationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawIntimacyStyleGeneration = namespace.intimacy_style_generation;
+
+  if (!isRecord(rawIntimacyStyleGeneration)) {
+    return DEFAULT_INTIMACY_STYLE_GENERATION;
+  }
+
+  return {
+    aftercareStyle: readIntimacyAftercareStyle(
+      rawIntimacyStyleGeneration.aftercareStyle,
+    ),
+    aiBehaviorPrompt: readString(
+      rawIntimacyStyleGeneration.aiBehaviorPrompt,
+      DEFAULT_INTIMACY_STYLE_GENERATION.aiBehaviorPrompt,
+    ),
+    expressionType: readIntimacyExpressionType(
+      rawIntimacyStyleGeneration.expressionType,
+    ),
+    physicalLoveLanguage: readIntimacyPhysicalLoveLanguage(
+      rawIntimacyStyleGeneration.physicalLoveLanguage,
+    ),
+    verbalCadence: readIntimacyVerbalCadence(
+      rawIntimacyStyleGeneration.verbalCadence,
+    ),
+  };
+}
+
+function readFirstMessageGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): FirstMessageGenerationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawFirstMessageGeneration = namespace.first_message_generation;
+
+  if (!isRecord(rawFirstMessageGeneration)) {
+    return DEFAULT_FIRST_MESSAGE_GENERATION;
+  }
+
+  return {
+    aiOutputConstraint: readString(
+      rawFirstMessageGeneration.aiOutputConstraint,
+      DEFAULT_FIRST_MESSAGE_GENERATION.aiOutputConstraint,
+    ),
+    entryPoint: readFirstMessageEntryPoint(
+      rawFirstMessageGeneration.entryPoint,
+    ),
+    literaryStyle: readFirstMessageLiteraryStyle(
+      rawFirstMessageGeneration.literaryStyle,
+    ),
+    tokenLengthCap: readNumber(
+      rawFirstMessageGeneration.tokenLengthCap,
+      DEFAULT_FIRST_MESSAGE_GENERATION.tokenLengthCap,
+    ),
+    userCallToAction: readFirstMessageUserCallToAction(
+      rawFirstMessageGeneration.userCallToAction,
+    ),
+  };
+}
+
+function readTurnOffGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): TurnOffGenerationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawTurnOffGeneration = namespace.turn_off_generation;
+
+  if (!isRecord(rawTurnOffGeneration)) {
+    return DEFAULT_TURN_OFF_GENERATION;
+  }
+
+  return {
+    aiReactionPrompt: readString(
+      rawTurnOffGeneration.aiReactionPrompt,
+      DEFAULT_TURN_OFF_GENERATION.aiReactionPrompt,
+    ),
+    behavioralTurnOffs: readStringArray(rawTurnOffGeneration.behavioralTurnOffs),
+    dynamicHardlines: readTurnOffDynamicHardline(
+      rawTurnOffGeneration.dynamicHardlines,
+    ),
+    sensoryTurnOffs: readStringArray(rawTurnOffGeneration.sensoryTurnOffs),
+  };
+}
+
+function readScenarioGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): ScenarioGenerationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawScenarioGeneration = namespace.scenario_generation;
+
+  if (!isRecord(rawScenarioGeneration)) {
+    return DEFAULT_SCENARIO_GENERATION;
+  }
+
+  return {
+    ...readScenarioGenerationValue(
+      rawScenarioGeneration,
+      DEFAULT_SCENARIO_GENERATION,
+    ),
+  };
+}
+
+function readScenarioOpeningPairGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): ScenarioOpeningPairGenerationExtension[] {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawScenarioOpeningPairGeneration =
+    namespace.scenario_opening_pair_generation;
+
+  if (!Array.isArray(rawScenarioOpeningPairGeneration)) {
+    return DEFAULT_SCENARIO_OPENING_PAIR_GENERATION;
+  }
+
+  const parsed = rawScenarioOpeningPairGeneration
+    .filter(isRecord)
+    .map((pair, index) => {
+      const fallback =
+        DEFAULT_SCENARIO_OPENING_PAIR_GENERATION[index] ??
+        DEFAULT_SCENARIO_OPENING_PAIR_GENERATION[0];
+
+      return {
+        alternateFirstMessage: readString(
+          pair.alternateFirstMessage,
+          fallback.alternateFirstMessage,
+        ),
+        alternateScenarioContext: readScenarioGenerationValue(
+          pair.alternateScenarioContext,
+          fallback.alternateScenarioContext,
+        ),
+        classificationType: readScenarioOpeningPairClassificationType(
+          pair.classificationType,
+        ),
+        pairId: readString(pair.pairId, fallback.pairId),
+        pairTitle: readString(pair.pairTitle, fallback.pairTitle),
+      };
+    })
+    .slice(0, 5);
+
+  return parsed.length ? parsed : DEFAULT_SCENARIO_OPENING_PAIR_GENERATION;
+}
+
+function readLorebookSummaryGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): LorebookSummaryGenerationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawLorebookSummary = namespace.lorebook_summary;
+
+  if (!isRecord(rawLorebookSummary)) {
+    return DEFAULT_LOREBOOK_SUMMARY_GENERATION;
+  }
+
+  const worldSystemRules = readStringArray(rawLorebookSummary.worldSystemRules)
+    .slice(0, 4);
+
+  return {
+    aiLoreInstruction: readString(
+      rawLorebookSummary.aiLoreInstruction,
+      DEFAULT_LOREBOOK_SUMMARY_GENERATION.aiLoreInstruction,
+    ),
+    factionOrDynastyContext: readString(
+      rawLorebookSummary.factionOrDynastyContext,
+      DEFAULT_LOREBOOK_SUMMARY_GENERATION.factionOrDynastyContext,
+    ),
+    tokenOptimizationCap: readNumber(
+      rawLorebookSummary.tokenOptimizationCap,
+      DEFAULT_LOREBOOK_SUMMARY_GENERATION.tokenOptimizationCap,
+    ),
+    universeAnchor: readString(
+      rawLorebookSummary.universeAnchor,
+      DEFAULT_LOREBOOK_SUMMARY_GENERATION.universeAnchor,
+    ),
+    worldSystemRules: worldSystemRules.length
+      ? worldSystemRules
+      : DEFAULT_LOREBOOK_SUMMARY_GENERATION.worldSystemRules,
+  };
+}
+
+function readCreatorsNotesGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): CreatorsNotesGenerationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawCreatorsNotes = namespace.creators_notes;
+
+  if (!isRecord(rawCreatorsNotes)) {
+    return DEFAULT_CREATORS_NOTES_GENERATION;
+  }
+
+  const recommendedModels = readStringArray(rawCreatorsNotes.recommendedModels)
+    .slice(0, 5);
+  const triggerWarnings = readStringArray(rawCreatorsNotes.triggerWarnings)
+    .slice(0, 12);
+
+  return {
+    contentRating: readCreatorsNotesContentRating(
+      rawCreatorsNotes.contentRating,
+    ),
+    idealUserPersona: readString(
+      rawCreatorsNotes.idealUserPersona,
+      DEFAULT_CREATORS_NOTES_GENERATION.idealUserPersona,
+    ),
+    recommendedModels: recommendedModels.length
+      ? recommendedModels
+      : DEFAULT_CREATORS_NOTES_GENERATION.recommendedModels,
+    technicalNotesText: readString(
+      rawCreatorsNotes.technicalNotesText,
+      DEFAULT_CREATORS_NOTES_GENERATION.technicalNotesText,
+    ),
+    triggerWarnings: triggerWarnings.length
+      ? triggerWarnings
+      : DEFAULT_CREATORS_NOTES_GENERATION.triggerWarnings,
+  };
+}
+
+function readPostHistoryInstructionsGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): PostHistoryInstructionsGenerationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawInstructions = namespace.post_history_instructions_generation;
+
+  if (!isRecord(rawInstructions)) {
+    return DEFAULT_POST_HISTORY_INSTRUCTIONS_GENERATION;
+  }
+
+  const driftControlRules = readStringArray(rawInstructions.driftControlRules)
+    .slice(0, 8);
+  const dynamicToneModifiers = readStringArray(
+    rawInstructions.dynamicToneModifiers,
+  ).slice(0, 8);
+  const formattingHardlines = readStringArray(rawInstructions.formattingHardlines)
+    .slice(0, 8);
+
+  return {
+    driftControlRules: driftControlRules.length
+      ? driftControlRules
+      : DEFAULT_POST_HISTORY_INSTRUCTIONS_GENERATION.driftControlRules,
+    dynamicToneModifiers: dynamicToneModifiers.length
+      ? dynamicToneModifiers
+      : DEFAULT_POST_HISTORY_INSTRUCTIONS_GENERATION.dynamicToneModifiers,
+    formattingHardlines: formattingHardlines.length
+      ? formattingHardlines
+      : DEFAULT_POST_HISTORY_INSTRUCTIONS_GENERATION.formattingHardlines,
+    injectionTokenWeight: readNumber(
+      rawInstructions.injectionTokenWeight,
+      DEFAULT_POST_HISTORY_INSTRUCTIONS_GENERATION.injectionTokenWeight,
+    ),
+  };
+}
+
+function readWorldLorePlaceholderGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): WorldLorePlaceholderGenerationExtension[] {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawPlaceholders = namespace.world_lore_placeholder;
+
+  if (!Array.isArray(rawPlaceholders)) {
+    return DEFAULT_WORLD_LORE_PLACEHOLDER_GENERATION;
+  }
+
+  const parsed = rawPlaceholders
+    .filter(isRecord)
+    .map((placeholder, index) => {
+      const fallback =
+        DEFAULT_WORLD_LORE_PLACEHOLDER_GENERATION[index] ??
+        DEFAULT_WORLD_LORE_PLACEHOLDER_GENERATION[0];
+
+      return {
+        currentDataPayload: readString(
+          placeholder.currentDataPayload,
+          fallback.currentDataPayload,
+        ),
+        isDynamic: readBoolean(placeholder.isDynamic, fallback.isDynamic),
+        macroType: readWorldLorePlaceholderMacroType(placeholder.macroType),
+        placeholderId: readString(
+          placeholder.placeholderId,
+          fallback.placeholderId,
+        ),
+        variableKey: readString(placeholder.variableKey, fallback.variableKey),
+      };
+    })
+    .slice(0, 12);
+
+  return parsed.length ? parsed : DEFAULT_WORLD_LORE_PLACEHOLDER_GENERATION;
+}
+
+function readLoreEntryGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): LoreEntryGenerationExtension[] {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawEntries = namespace.lore_entries;
+
+  if (!Array.isArray(rawEntries)) {
+    return DEFAULT_LORE_ENTRY_GENERATION;
+  }
+
+  const parsed = rawEntries
+    .filter(isRecord)
+    .map((entry, index) => {
+      const fallback =
+        DEFAULT_LORE_ENTRY_GENERATION[index] ?? DEFAULT_LORE_ENTRY_GENERATION[0];
+
+      return {
+        activationKeys: readStringArray(entry.activationKeys).length
+          ? readStringArray(entry.activationKeys).slice(0, 12)
+          : fallback.activationKeys,
+        domainScope: readLoreEntryDomainScope(entry.domainScope),
+        entryContent: readString(entry.entryContent, fallback.entryContent),
+        entryId: readString(entry.entryId, fallback.entryId),
+        insertionPriority: readLoreEntryInsertionPriority(
+          entry.insertionPriority,
+        ),
+        title: readString(entry.title, fallback.title),
+        tokenReserveCost: readNumber(
+          entry.tokenReserveCost,
+          fallback.tokenReserveCost,
+        ),
+      };
+    })
+    .slice(0, 20);
+
+  return parsed.length ? parsed : DEFAULT_LORE_ENTRY_GENERATION;
+}
+
+function readFrameworkConfigurationExtension(
+  card: ValidatedCharacterCardV3,
+): FrameworkConfigurationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawFramework = namespace.framework;
+
+  if (!isRecord(rawFramework)) {
+    return DEFAULT_FRAMEWORK_CONFIGURATION;
+  }
+
+  return {
+    frameworkId: readString(
+      rawFramework.frameworkId,
+      DEFAULT_FRAMEWORK_CONFIGURATION.frameworkId,
+    ),
+    globalTokenSafetyBuffer: readNumber(
+      rawFramework.globalTokenSafetyBuffer,
+      DEFAULT_FRAMEWORK_CONFIGURATION.globalTokenSafetyBuffer,
+    ),
+    injectionPipelineRouter: readFrameworkInjectionPipelineRouter(
+      rawFramework.injectionPipelineRouter,
+    ),
+    memoryBudgetStrategy: readFrameworkMemoryBudgetStrategy(
+      rawFramework.memoryBudgetStrategy,
+    ),
+    systemPromptJailbreakOverride: readString(
+      rawFramework.systemPromptJailbreakOverride,
+      DEFAULT_FRAMEWORK_CONFIGURATION.systemPromptJailbreakOverride,
+    ),
+    targetSpecification: readFrameworkTargetSpecification(
+      rawFramework.targetSpecification,
+    ),
+  };
+}
+
+function readFormattingConfigurationExtension(
+  card: ValidatedCharacterCardV3,
+): FormattingConfigurationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawFormatting = namespace.formatting;
+
+  if (!isRecord(rawFormatting)) {
+    return DEFAULT_FORMATTING_CONFIGURATION;
+  }
+
+  return {
+    actionWrappingStandard: readFormattingActionWrappingStandard(
+      rawFormatting.actionWrappingStandard,
+    ),
+    formattingId: readString(
+      rawFormatting.formattingId,
+      DEFAULT_FORMATTING_CONFIGURATION.formattingId,
+    ),
+    formattingSystemPromptInjection: readString(
+      rawFormatting.formattingSystemPromptInjection,
+      DEFAULT_FORMATTING_CONFIGURATION.formattingSystemPromptInjection,
+    ),
+    markdownEmphasisStyle: readFormattingMarkdownEmphasisStyle(
+      rawFormatting.markdownEmphasisStyle,
+    ),
+    maxParagraphsPerTurn: readNumber(
+      rawFormatting.maxParagraphsPerTurn,
+      DEFAULT_FORMATTING_CONFIGURATION.maxParagraphsPerTurn,
+    ),
+    narrativePerspective: readFormattingNarrativePerspective(
+      rawFormatting.narrativePerspective,
+    ),
+  };
+}
+
+function readToneConfigurationExtension(
+  card: ValidatedCharacterCardV3,
+): ToneConfigurationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawTone = namespace.tone;
+
+  if (!isRecord(rawTone)) {
+    return DEFAULT_TONE_CONFIGURATION;
+  }
+
+  const vocabularyDirectives = readStringArray(rawTone.aiVocabularyDirectives)
+    .slice(0, 12);
+
+  return {
+    aiVocabularyDirectives: vocabularyDirectives.length
+      ? vocabularyDirectives
+      : DEFAULT_TONE_CONFIGURATION.aiVocabularyDirectives,
+    pacingVelocity: readTonePacingVelocity(rawTone.pacingVelocity),
+    proseTexture: readToneProseTexture(rawTone.proseTexture),
+    toneId: readString(rawTone.toneId, DEFAULT_TONE_CONFIGURATION.toneId),
+    toneSystemPromptInjection: readString(
+      rawTone.toneSystemPromptInjection,
+      DEFAULT_TONE_CONFIGURATION.toneSystemPromptInjection,
+    ),
+    worldviewFilter: readToneWorldviewFilter(rawTone.worldviewFilter),
+  };
+}
+
+function readArchetypeConfigurationExtension(
+  card: ValidatedCharacterCardV3,
+): ArchetypeConfigurationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawArchetype = namespace.archetype;
+
+  if (!isRecord(rawArchetype)) {
+    return DEFAULT_ARCHETYPE_CONFIGURATION;
+  }
+
+  return {
+    aiBehaviorPrompt: readString(
+      rawArchetype.aiBehaviorPrompt,
+      DEFAULT_ARCHETYPE_CONFIGURATION.aiBehaviorPrompt,
+    ),
+    archetypeId: readString(
+      rawArchetype.archetypeId,
+      DEFAULT_ARCHETYPE_CONFIGURATION.archetypeId,
+    ),
+    coreMotivation: readArchetypeCoreMotivation(
+      rawArchetype.coreMotivation,
+    ),
+    defenseMechanism: readArchetypeDefenseMechanism(
+      rawArchetype.defenseMechanism,
+    ),
+    personaType: readArchetypePersonaType(rawArchetype.personaType),
+  };
+}
+
+function readScenarioGenerationValue(
+  value: unknown,
+  fallback: ScenarioGenerationExtension,
+): ScenarioGenerationExtension {
+  if (!isRecord(value)) {
+    return fallback;
+  }
+
+  const sensoryDetails = readStringArray(value.sensoryDetails);
+
+  return {
+    plotHook: readScenarioPlotHook(value.plotHook),
+    scenePremiseDescription: readString(
+      value.scenePremiseDescription,
+      fallback.scenePremiseDescription,
+    ),
+    sensoryDetails: sensoryDetails.length ? sensoryDetails : fallback.sensoryDetails,
+    settingType: readScenarioSettingType(value.settingType),
+    startingTension: readScenarioStartingTension(value.startingTension),
+  };
+}
+
+function readSpeciesGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): SpeciesGenerationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawSpeciesGeneration = namespace.species_generation;
+
+  if (!isRecord(rawSpeciesGeneration)) {
+    return DEFAULT_SPECIES_GENERATION;
+  }
+
+  return {
+    apparentAge: readString(
+      rawSpeciesGeneration.apparentAge,
+      DEFAULT_SPECIES_GENERATION.apparentAge,
+    ),
+    biologyTag: readString(
+      rawSpeciesGeneration.biologyTag,
+      DEFAULT_SPECIES_GENERATION.biologyTag,
+    ),
+    dietaryNeed: readString(
+      rawSpeciesGeneration.dietaryNeed,
+      DEFAULT_SPECIES_GENERATION.dietaryNeed,
+    ),
+    instinctualTrait: readString(
+      rawSpeciesGeneration.instinctualTrait,
+      DEFAULT_SPECIES_GENERATION.instinctualTrait,
+    ),
+    isImmortal: readBoolean(
+      rawSpeciesGeneration.isImmortal,
+      DEFAULT_SPECIES_GENERATION.isImmortal,
+    ),
+    lifespanAnchor: readString(
+      rawSpeciesGeneration.lifespanAnchor,
+      DEFAULT_SPECIES_GENERATION.lifespanAnchor,
+    ),
+    type: readSpeciesType(rawSpeciesGeneration.type),
+  };
+}
+
+function readEthnicityGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): EthnicityGenerationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawEthnicityGeneration = namespace.ethnicity_generation;
+
+  if (!isRecord(rawEthnicityGeneration)) {
+    return DEFAULT_ETHNICITY_GENERATION;
+  }
+
+  return {
+    culturalHeritage: readString(
+      rawEthnicityGeneration.culturalHeritage,
+      DEFAULT_ETHNICITY_GENERATION.culturalHeritage,
+    ),
+    hasDiasporicBaggage: readBoolean(
+      rawEthnicityGeneration.hasDiasporicBaggage,
+      DEFAULT_ETHNICITY_GENERATION.hasDiasporicBaggage,
+    ),
+    linguisticMatrix: readLinguisticMatrix(
+      rawEthnicityGeneration.linguisticMatrix,
+    ),
+    nativeLanguage: readString(
+      rawEthnicityGeneration.nativeLanguage,
+      DEFAULT_ETHNICITY_GENERATION.nativeLanguage,
+    ),
+    region: readEthnicityRegion(rawEthnicityGeneration.region),
+    societalContext: readString(
+      rawEthnicityGeneration.societalContext,
+      DEFAULT_ETHNICITY_GENERATION.societalContext,
+    ),
+  };
+}
+
+function readNationalityGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): NationalityGenerationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawNationalityGeneration = namespace.nationality_generation;
+
+  if (!isRecord(rawNationalityGeneration)) {
+    return DEFAULT_NATIONALITY_GENERATION;
+  }
+
+  return {
+    legalStatus: readNationalityLegalStatus(
+      rawNationalityGeneration.legalStatus,
+    ),
+    linguisticVibe: readString(
+      rawNationalityGeneration.linguisticVibe,
+      DEFAULT_NATIONALITY_GENERATION.linguisticVibe,
+    ),
+    passportCountry: readString(
+      rawNationalityGeneration.passportCountry,
+      DEFAULT_NATIONALITY_GENERATION.passportCountry,
+    ),
+    regionalAlliance: readNationalityRegionalAlliance(
+      rawNationalityGeneration.regionalAlliance,
+    ),
+  };
+}
+
+function readOccupationGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): OccupationGenerationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawOccupationGeneration = namespace.occupation_generation;
+
+  if (!isRecord(rawOccupationGeneration)) {
+    return DEFAULT_OCCUPATION_GENERATION;
+  }
+
+  return {
+    academicYear: readStudentAcademicYear(
+      rawOccupationGeneration.academicYear,
+    ),
+    authorityDynamic: readOccupationAuthorityDynamic(
+      rawOccupationGeneration.authorityDynamic,
+    ),
+    campusAffiliation: readString(
+      rawOccupationGeneration.campusAffiliation,
+      DEFAULT_OCCUPATION_GENERATION.campusAffiliation,
+    ),
+    fundingType: readStudentFundingType(rawOccupationGeneration.fundingType),
+    jobTitle: readString(
+      rawOccupationGeneration.jobTitle,
+      DEFAULT_OCCUPATION_GENERATION.jobTitle,
+    ),
+    majorField: readStudentMajorField(rawOccupationGeneration.majorField),
+    professionalDomain: readOccupationProfessionalDomain(
+      rawOccupationGeneration.professionalDomain,
+    ),
+    socioeconomicTier: readOccupationSocioeconomicTier(
+      rawOccupationGeneration.socioeconomicTier,
+    ),
+    workplaceVibe: readString(
+      rawOccupationGeneration.workplaceVibe,
+      DEFAULT_OCCUPATION_GENERATION.workplaceVibe,
+    ),
+  };
+}
+
+function readRaceGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): RaceGenerationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawRaceGeneration = namespace.race_generation;
+
+  if (!isRecord(rawRaceGeneration)) {
+    return DEFAULT_RACE_GENERATION;
+  }
+
+  return {
+    isCulturallySalient: readBoolean(
+      rawRaceGeneration.isCulturallySalient,
+      DEFAULT_RACE_GENERATION.isCulturallySalient,
+    ),
+    macroGroup: readRaceMacroGroup(rawRaceGeneration.macroGroup),
+    narrativeStyle: readString(
+      rawRaceGeneration.narrativeStyle,
+      DEFAULT_RACE_GENERATION.narrativeStyle,
+    ),
+    physicalDescriptors: readStringArray(
+      rawRaceGeneration.physicalDescriptors,
+    ),
+    syncMode: readString(
+      rawRaceGeneration.syncMode,
+      DEFAULT_RACE_GENERATION.syncMode,
+    ),
+  };
+}
+
+function readRelationshipGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): RelationshipGenerationExtension[] {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawRelationships = namespace.relationship_generation;
+
+  if (!Array.isArray(rawRelationships)) {
+    return DEFAULT_RELATIONSHIP_GENERATION;
+  }
+
+  const relationships = rawRelationships
+    .filter(isRecord)
+    .slice(0, 3)
+    .map((relationship) => ({
+      connectionType: readNPCConnectionType(relationship.connectionType),
+      emotionalStatus: readNPCEmotionalStatus(relationship.emotionalStatus),
+      npcName: readString(relationship.npcName, ""),
+      oneLineDescription: readString(relationship.oneLineDescription, ""),
+      romanceFunction: readNPCRomanceFunction(relationship.romanceFunction),
+    }));
+
+  return relationships.length > 0 ? relationships : DEFAULT_RELATIONSHIP_GENERATION;
+}
+
+function readRelationshipStatusGenerationExtension(
+  card: ValidatedCharacterCardV3,
+): RelationshipStatusGenerationExtension {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const rawRelationshipStatus = namespace.relationship_status_generation;
+
+  if (!isRecord(rawRelationshipStatus)) {
+    return DEFAULT_RELATIONSHIP_STATUS_GENERATION;
+  }
+
+  return {
+    currentLabel: readRelationshipCurrentLabel(
+      rawRelationshipStatus.currentLabel,
+    ),
+    emotionalAvailability: readRelationshipEmotionalAvailability(
+      rawRelationshipStatus.emotionalAvailability,
+    ),
+    scandalFactor: readRelationshipScandalFactor(
+      rawRelationshipStatus.scandalFactor,
+    ),
+    statusContext: readString(
+      rawRelationshipStatus.statusContext,
+      DEFAULT_RELATIONSHIP_STATUS_GENERATION.statusContext,
+    ),
+  };
+}
+
+function readNamePartsFromCardName(name: string) {
+  const [firstname = "", ...remainingNameParts] = name.trim().split(/\s+/);
+
+  return {
+    firstname,
+    surname: remainingNameParts.join(" "),
+  };
+}
+
+function readExtensionNamespace(value: unknown): Record<string, unknown> {
+  return isRecord(value) ? value : {};
+}
+
+function readString(value: unknown, fallback: string) {
+  return typeof value === "string" ? value : fallback;
+}
+
+function readBoolean(value: unknown, fallback: boolean) {
+  return typeof value === "boolean" ? value : fallback;
+}
+
+function readNumber(value: unknown, fallback: number) {
+  return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function readSpeciesType(value: unknown): SpeciesType {
+  return SPECIES_TYPES.includes(value as SpeciesType)
+    ? (value as SpeciesType)
+    : DEFAULT_SPECIES_GENERATION.type;
+}
+
+function readAlternateGreetingForkType(value: unknown): AlternateGreetingForkType {
+  return ALTERNATE_GREETING_FORK_TYPES.includes(
+    value as AlternateGreetingForkType,
+  )
+    ? (value as AlternateGreetingForkType)
+    : DEFAULT_ALTERNATE_GREETING_GENERATION[0].forkType;
+}
+
+function readGroupGreetingSpotlightDistribution(
+  value: unknown,
+): GroupGreetingSpotlightDistribution {
+  return GROUP_GREETING_SPOTLIGHT_DISTRIBUTIONS.includes(
+    value as GroupGreetingSpotlightDistribution,
+  )
+    ? (value as GroupGreetingSpotlightDistribution)
+    : DEFAULT_GROUP_GREETING_GENERATION[0].spotlightDistribution;
+}
+
+function readGroupGreetingInterpersonalDynamic(
+  value: unknown,
+): GroupGreetingInterpersonalDynamic {
+  return GROUP_GREETING_INTERPERSONAL_DYNAMICS.includes(
+    value as GroupGreetingInterpersonalDynamic,
+  )
+    ? (value as GroupGreetingInterpersonalDynamic)
+    : DEFAULT_GROUP_GREETING_GENERATION[0].interpersonalDynamic;
+}
+
+function readGroupGreetingFormattingStyle(
+  value: unknown,
+): GroupGreetingFormattingStyle {
+  return GROUP_GREETING_FORMATTING_STYLES.includes(
+    value as GroupGreetingFormattingStyle,
+  )
+    ? (value as GroupGreetingFormattingStyle)
+    : DEFAULT_GROUP_GREETING_GENERATION[0].formattingStyle;
+}
+
+function readGroupAlternateGreetingForkCategory(
+  value: unknown,
+): GroupAlternateGreetingForkCategory {
+  return GROUP_ALTERNATE_GREETING_FORK_CATEGORIES.includes(
+    value as GroupAlternateGreetingForkCategory,
+  )
+    ? (value as GroupAlternateGreetingForkCategory)
+    : DEFAULT_GROUP_ALTERNATE_GREETING_GENERATION[0].forkCategory;
+}
+
+function readEthnicityRegion(value: unknown): EthnicityRegion {
+  return ETHNICITY_REGIONS.includes(value as EthnicityRegion)
+    ? (value as EthnicityRegion)
+    : DEFAULT_ETHNICITY_GENERATION.region;
+}
+
+function readLinguisticMatrix(value: unknown): LinguisticMatrix {
+  return LINGUISTIC_MATRICES.includes(value as LinguisticMatrix)
+    ? (value as LinguisticMatrix)
+    : DEFAULT_ETHNICITY_GENERATION.linguisticMatrix;
+}
+
+function readNationalityRegionalAlliance(
+  value: unknown,
+): NationalityRegionalAlliance {
+  return NATIONALITY_REGIONAL_ALLIANCES.includes(
+    value as NationalityRegionalAlliance,
+  )
+    ? (value as NationalityRegionalAlliance)
+    : DEFAULT_NATIONALITY_GENERATION.regionalAlliance;
+}
+
+function readNationalityLegalStatus(value: unknown): NationalityLegalStatus {
+  return NATIONALITY_LEGAL_STATUSES.includes(value as NationalityLegalStatus)
+    ? (value as NationalityLegalStatus)
+    : DEFAULT_NATIONALITY_GENERATION.legalStatus;
+}
+
+function readOccupationSocioeconomicTier(
+  value: unknown,
+): OccupationSocioeconomicTier {
+  return OCCUPATION_SOCIOECONOMIC_TIERS.includes(
+    value as OccupationSocioeconomicTier,
+  )
+    ? (value as OccupationSocioeconomicTier)
+    : DEFAULT_OCCUPATION_GENERATION.socioeconomicTier;
+}
+
+function readOccupationProfessionalDomain(
+  value: unknown,
+): OccupationProfessionalDomain {
+  return OCCUPATION_PROFESSIONAL_DOMAINS.includes(
+    value as OccupationProfessionalDomain,
+  )
+    ? (value as OccupationProfessionalDomain)
+    : DEFAULT_OCCUPATION_GENERATION.professionalDomain;
+}
+
+function readOccupationAuthorityDynamic(
+  value: unknown,
+): OccupationAuthorityDynamic {
+  return OCCUPATION_AUTHORITY_DYNAMICS.includes(
+    value as OccupationAuthorityDynamic,
+  )
+    ? (value as OccupationAuthorityDynamic)
+    : DEFAULT_OCCUPATION_GENERATION.authorityDynamic;
+}
+
+function readStudentAcademicYear(value: unknown): StudentAcademicYear {
+  return STUDENT_ACADEMIC_YEARS.includes(value as StudentAcademicYear)
+    ? (value as StudentAcademicYear)
+    : DEFAULT_OCCUPATION_GENERATION.academicYear;
+}
+
+function readStudentMajorField(value: unknown): StudentMajorField {
+  return STUDENT_MAJOR_FIELDS.includes(value as StudentMajorField)
+    ? (value as StudentMajorField)
+    : DEFAULT_OCCUPATION_GENERATION.majorField;
+}
+
+function readStudentFundingType(value: unknown): StudentFundingType {
+  return STUDENT_FUNDING_TYPES.includes(value as StudentFundingType)
+    ? (value as StudentFundingType)
+    : DEFAULT_OCCUPATION_GENERATION.fundingType;
+}
+
+function readRaceMacroGroup(value: unknown): RaceMacroGroup {
+  return RACE_MACRO_GROUPS.includes(value as RaceMacroGroup)
+    ? (value as RaceMacroGroup)
+    : DEFAULT_RACE_GENERATION.macroGroup;
+}
+
+function readKinkPrimaryRole(value: unknown): KinkPrimaryRole {
+  return KINK_PRIMARY_ROLES.includes(value as KinkPrimaryRole)
+    ? (value as KinkPrimaryRole)
+    : DEFAULT_KINK_GENERATION.primaryRole;
+}
+
+function readKinkIntensityLevel(value: unknown): KinkIntensityLevel {
+  return KINK_INTENSITY_LEVELS.includes(value as KinkIntensityLevel)
+    ? (value as KinkIntensityLevel)
+    : DEFAULT_KINK_GENERATION.intensityLevel;
+}
+
+function readFetishAnatomicalFocus(value: unknown): FetishAnatomicalFocus {
+  return FETISH_ANATOMICAL_FOCUSES.includes(value as FetishAnatomicalFocus)
+    ? (value as FetishAnatomicalFocus)
+    : DEFAULT_FETISH_GENERATION.anatomicalFocus;
+}
+
+function readFetishMaterialPreference(
+  value: unknown,
+): FetishMaterialPreference {
+  return FETISH_MATERIAL_PREFERENCES.includes(
+    value as FetishMaterialPreference,
+  )
+    ? (value as FetishMaterialPreference)
+    : DEFAULT_FETISH_GENERATION.materialPreference;
+}
+
+function readFetishSituationalTrigger(
+  value: unknown,
+): FetishSituationalTrigger {
+  return FETISH_SITUATIONAL_TRIGGERS.includes(
+    value as FetishSituationalTrigger,
+  )
+    ? (value as FetishSituationalTrigger)
+    : DEFAULT_FETISH_GENERATION.situationalTrigger;
+}
+
+function readFetishSizeFantasyModifier(
+  value: unknown,
+): FetishSizeFantasyModifier {
+  return FETISH_SIZE_MODIFIERS.includes(value as FetishSizeFantasyModifier)
+    ? (value as FetishSizeFantasyModifier)
+    : DEFAULT_FETISH_GENERATION.sizeFantasyModifier;
+}
+
+function readFirstMessageEntryPoint(value: unknown): FirstMessageEntryPoint {
+  return FIRST_MESSAGE_ENTRY_POINTS.includes(value as FirstMessageEntryPoint)
+    ? (value as FirstMessageEntryPoint)
+    : DEFAULT_FIRST_MESSAGE_GENERATION.entryPoint;
+}
+
+function readFirstMessageLiteraryStyle(
+  value: unknown,
+): FirstMessageLiteraryStyle {
+  return FIRST_MESSAGE_LITERARY_STYLES.includes(
+    value as FirstMessageLiteraryStyle,
+  )
+    ? (value as FirstMessageLiteraryStyle)
+    : DEFAULT_FIRST_MESSAGE_GENERATION.literaryStyle;
+}
+
+function readFirstMessageUserCallToAction(
+  value: unknown,
+): FirstMessageUserCallToAction {
+  return FIRST_MESSAGE_USER_CALLS_TO_ACTION.includes(
+    value as FirstMessageUserCallToAction,
+  )
+    ? (value as FirstMessageUserCallToAction)
+    : DEFAULT_FIRST_MESSAGE_GENERATION.userCallToAction;
+}
+
+function readIntimacyExpressionType(value: unknown): IntimacyExpressionType {
+  return INTIMACY_EXPRESSION_TYPES.includes(value as IntimacyExpressionType)
+    ? (value as IntimacyExpressionType)
+    : DEFAULT_INTIMACY_STYLE_GENERATION.expressionType;
+}
+
+function readIntimacyAftercareStyle(value: unknown): IntimacyAftercareStyle {
+  return INTIMACY_AFTERCARE_STYLES.includes(value as IntimacyAftercareStyle)
+    ? (value as IntimacyAftercareStyle)
+    : DEFAULT_INTIMACY_STYLE_GENERATION.aftercareStyle;
+}
+
+function readIntimacyVerbalCadence(value: unknown): IntimacyVerbalCadence {
+  return INTIMACY_VERBAL_CADENCES.includes(value as IntimacyVerbalCadence)
+    ? (value as IntimacyVerbalCadence)
+    : DEFAULT_INTIMACY_STYLE_GENERATION.verbalCadence;
+}
+
+function readIntimacyPhysicalLoveLanguage(
+  value: unknown,
+): IntimacyPhysicalLoveLanguage {
+  return INTIMACY_PHYSICAL_LOVE_LANGUAGES.includes(
+    value as IntimacyPhysicalLoveLanguage,
+  )
+    ? (value as IntimacyPhysicalLoveLanguage)
+    : DEFAULT_INTIMACY_STYLE_GENERATION.physicalLoveLanguage;
+}
+
+function readTurnOffDynamicHardline(value: unknown): TurnOffDynamicHardline {
+  return TURN_OFF_DYNAMIC_HARDLINES.includes(value as TurnOffDynamicHardline)
+    ? (value as TurnOffDynamicHardline)
+    : DEFAULT_TURN_OFF_GENERATION.dynamicHardlines;
+}
+
+function readScenarioSettingType(value: unknown): ScenarioSettingType {
+  return SCENARIO_SETTING_TYPES.includes(value as ScenarioSettingType)
+    ? (value as ScenarioSettingType)
+    : DEFAULT_SCENARIO_GENERATION.settingType;
+}
+
+function readScenarioPlotHook(value: unknown): ScenarioPlotHook {
+  return SCENARIO_PLOT_HOOKS.includes(value as ScenarioPlotHook)
+    ? (value as ScenarioPlotHook)
+    : DEFAULT_SCENARIO_GENERATION.plotHook;
+}
+
+function readScenarioStartingTension(
+  value: unknown,
+): ScenarioStartingTension {
+  return SCENARIO_STARTING_TENSIONS.includes(value as ScenarioStartingTension)
+    ? (value as ScenarioStartingTension)
+    : DEFAULT_SCENARIO_GENERATION.startingTension;
+}
+
+function readScenarioOpeningPairClassificationType(
+  value: unknown,
+): ScenarioOpeningPairClassificationType {
+  return SCENARIO_OPENING_PAIR_CLASSIFICATIONS.includes(
+    value as ScenarioOpeningPairClassificationType,
+  )
+    ? (value as ScenarioOpeningPairClassificationType)
+    : DEFAULT_SCENARIO_OPENING_PAIR_GENERATION[0].classificationType;
+}
+
+function readCreatorsNotesContentRating(
+  value: unknown,
+): CreatorsNotesContentRating {
+  return CREATORS_NOTES_CONTENT_RATINGS.includes(
+    value as CreatorsNotesContentRating,
+  )
+    ? (value as CreatorsNotesContentRating)
+    : DEFAULT_CREATORS_NOTES_GENERATION.contentRating;
+}
+
+function readWorldLorePlaceholderMacroType(
+  value: unknown,
+): WorldLorePlaceholderGenerationExtension["macroType"] {
+  return WORLD_LORE_PLACEHOLDER_MACRO_TYPES.includes(
+    value as WorldLorePlaceholderGenerationExtension["macroType"],
+  )
+    ? (value as WorldLorePlaceholderGenerationExtension["macroType"])
+    : DEFAULT_WORLD_LORE_PLACEHOLDER_GENERATION[0].macroType;
+}
+
+function readLoreEntryDomainScope(value: unknown): LoreEntryDomainScope {
+  return LORE_ENTRY_DOMAIN_SCOPES.includes(value as LoreEntryDomainScope)
+    ? (value as LoreEntryDomainScope)
+    : DEFAULT_LORE_ENTRY_GENERATION[0].domainScope;
+}
+
+function readLoreEntryInsertionPriority(
+  value: unknown,
+): LoreEntryInsertionPriority {
+  return LORE_ENTRY_INSERTION_PRIORITIES.includes(
+    value as LoreEntryInsertionPriority,
+  )
+    ? (value as LoreEntryInsertionPriority)
+    : DEFAULT_LORE_ENTRY_GENERATION[0].insertionPriority;
+}
+
+function readFrameworkTargetSpecification(
+  value: unknown,
+): FrameworkTargetSpecification {
+  return FRAMEWORK_TARGET_SPECIFICATIONS.includes(
+    value as FrameworkTargetSpecification,
+  )
+    ? (value as FrameworkTargetSpecification)
+    : DEFAULT_FRAMEWORK_CONFIGURATION.targetSpecification;
+}
+
+function readFrameworkMemoryBudgetStrategy(
+  value: unknown,
+): FrameworkMemoryBudgetStrategy {
+  return FRAMEWORK_MEMORY_BUDGET_STRATEGIES.includes(
+    value as FrameworkMemoryBudgetStrategy,
+  )
+    ? (value as FrameworkMemoryBudgetStrategy)
+    : DEFAULT_FRAMEWORK_CONFIGURATION.memoryBudgetStrategy;
+}
+
+function readFrameworkInjectionPipelineRouter(
+  value: unknown,
+): FrameworkInjectionPipelineRouter {
+  return FRAMEWORK_INJECTION_PIPELINE_ROUTERS.includes(
+    value as FrameworkInjectionPipelineRouter,
+  )
+    ? (value as FrameworkInjectionPipelineRouter)
+    : DEFAULT_FRAMEWORK_CONFIGURATION.injectionPipelineRouter;
+}
+
+function readFormattingActionWrappingStandard(
+  value: unknown,
+): FormattingActionWrappingStandard {
+  return FORMATTING_ACTION_WRAPPING_STANDARDS.includes(
+    value as FormattingActionWrappingStandard,
+  )
+    ? (value as FormattingActionWrappingStandard)
+    : DEFAULT_FORMATTING_CONFIGURATION.actionWrappingStandard;
+}
+
+function readFormattingMarkdownEmphasisStyle(
+  value: unknown,
+): FormattingMarkdownEmphasisStyle {
+  return FORMATTING_MARKDOWN_EMPHASIS_STYLES.includes(
+    value as FormattingMarkdownEmphasisStyle,
+  )
+    ? (value as FormattingMarkdownEmphasisStyle)
+    : DEFAULT_FORMATTING_CONFIGURATION.markdownEmphasisStyle;
+}
+
+function readFormattingNarrativePerspective(
+  value: unknown,
+): FormattingNarrativePerspective {
+  return FORMATTING_NARRATIVE_PERSPECTIVES.includes(
+    value as FormattingNarrativePerspective,
+  )
+    ? (value as FormattingNarrativePerspective)
+    : DEFAULT_FORMATTING_CONFIGURATION.narrativePerspective;
+}
+
+function readToneProseTexture(value: unknown): ToneProseTexture {
+  return TONE_PROSE_TEXTURES.includes(value as ToneProseTexture)
+    ? (value as ToneProseTexture)
+    : DEFAULT_TONE_CONFIGURATION.proseTexture;
+}
+
+function readTonePacingVelocity(value: unknown): TonePacingVelocity {
+  return TONE_PACING_VELOCITIES.includes(value as TonePacingVelocity)
+    ? (value as TonePacingVelocity)
+    : DEFAULT_TONE_CONFIGURATION.pacingVelocity;
+}
+
+function readToneWorldviewFilter(value: unknown): ToneWorldviewFilter {
+  return TONE_WORLDVIEW_FILTERS.includes(value as ToneWorldviewFilter)
+    ? (value as ToneWorldviewFilter)
+    : DEFAULT_TONE_CONFIGURATION.worldviewFilter;
+}
+
+function readArchetypePersonaType(value: unknown): ArchetypePersonaType {
+  return ARCHETYPE_PERSONA_TYPES.includes(value as ArchetypePersonaType)
+    ? (value as ArchetypePersonaType)
+    : DEFAULT_ARCHETYPE_CONFIGURATION.personaType;
+}
+
+function readArchetypeDefenseMechanism(
+  value: unknown,
+): ArchetypeDefenseMechanism {
+  return ARCHETYPE_DEFENSE_MECHANISMS.includes(
+    value as ArchetypeDefenseMechanism,
+  )
+    ? (value as ArchetypeDefenseMechanism)
+    : DEFAULT_ARCHETYPE_CONFIGURATION.defenseMechanism;
+}
+
+function readArchetypeCoreMotivation(value: unknown): ArchetypeCoreMotivation {
+  return ARCHETYPE_CORE_MOTIVATIONS.includes(value as ArchetypeCoreMotivation)
+    ? (value as ArchetypeCoreMotivation)
+    : DEFAULT_ARCHETYPE_CONFIGURATION.coreMotivation;
+}
+
+function readNPCConnectionType(value: unknown): NPCConnectionType {
+  return NPC_CONNECTION_TYPES.includes(value as NPCConnectionType)
+    ? (value as NPCConnectionType)
+    : DEFAULT_RELATIONSHIP_GENERATION[0].connectionType;
+}
+
+function readNPCRomanceFunction(value: unknown): NPCRomanceFunction {
+  return NPC_ROMANCE_FUNCTIONS.includes(value as NPCRomanceFunction)
+    ? (value as NPCRomanceFunction)
+    : DEFAULT_RELATIONSHIP_GENERATION[0].romanceFunction;
+}
+
+function readNPCEmotionalStatus(value: unknown): NPCEmotionalStatus {
+  return NPC_EMOTIONAL_STATUSES.includes(value as NPCEmotionalStatus)
+    ? (value as NPCEmotionalStatus)
+    : DEFAULT_RELATIONSHIP_GENERATION[0].emotionalStatus;
+}
+
+function readRelationshipCurrentLabel(value: unknown): RelationshipCurrentLabel {
+  return RELATIONSHIP_CURRENT_LABELS.includes(value as RelationshipCurrentLabel)
+    ? (value as RelationshipCurrentLabel)
+    : DEFAULT_RELATIONSHIP_STATUS_GENERATION.currentLabel;
+}
+
+function readRelationshipEmotionalAvailability(
+  value: unknown,
+): RelationshipEmotionalAvailability {
+  return RELATIONSHIP_EMOTIONAL_AVAILABILITIES.includes(
+    value as RelationshipEmotionalAvailability,
+  )
+    ? (value as RelationshipEmotionalAvailability)
+    : DEFAULT_RELATIONSHIP_STATUS_GENERATION.emotionalAvailability;
+}
+
+function readRelationshipScandalFactor(
+  value: unknown,
+): RelationshipScandalFactor {
+  return RELATIONSHIP_SCANDAL_FACTORS.includes(
+    value as RelationshipScandalFactor,
+  )
+    ? (value as RelationshipScandalFactor)
+    : DEFAULT_RELATIONSHIP_STATUS_GENERATION.scandalFactor;
+}
+
+function speciesTypeToBiologyTag(speciesType: SpeciesType) {
+  if (speciesType === "Vampire") {
+    return "Undead / Sanguine";
+  }
+
+  if (speciesType === "Werewolf") {
+    return "Therianthrope / Shifter";
+  }
+
+  if (speciesType === "Fae") {
+    return "Fae / Immortal Folk";
+  }
+
+  if (speciesType === "Demon") {
+    return "Celestial / Abyssal";
+  }
+
+  if (speciesType === "Angel" || speciesType === "Siren") {
+    return "Celestial / Abyssal";
+  }
+
+  if (speciesType === "Wraith") {
+    return "Undead / Sanguine";
+  }
+
+  return "Mortal / Baseline";
+}
+
+function readStringArray(value: unknown) {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string")
+    : [];
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function activeMacroClassName(tone: "emerald" | "sky" | "violet") {
+  if (tone === "emerald") {
+    return "border-emerald-500 bg-emerald-500/10 text-emerald-300 ring-1 ring-emerald-500/30";
+  }
+
+  if (tone === "sky") {
+    return "border-sky-500 bg-sky-500/10 text-sky-300 ring-1 ring-sky-500/30";
+  }
+
+  return "border-violet-500 bg-violet-500/10 text-violet-300 ring-1 ring-violet-500/30";
 }
