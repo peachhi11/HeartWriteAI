@@ -1,17 +1,17 @@
 [package]
-name = "amourai"
+name = "heartwriteai"
 version = "0.1.0"
-description = "Local-first character, persona, lorebook, and chat studio."
+description = "Local-first romance character, persona, lorebook, image, and chat studio."
 authors = ["peachhi11"]
 license = "MIT"
-repository = "https://github.com/peachhi11/amourai"
+repository = "https://github.com/peachhi11/HeartWriteAI"
 edition = "2021"
 rust-version = "1.77.2"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [lib]
-name = "amourai_lib"
+name = "heartwriteai_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
 [build-dependencies]

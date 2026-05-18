@@ -14,7 +14,7 @@ pub struct CharacterCardV3 {
 }
 
 impl CharacterCardV3 {
-    /// Returns AmourAI's macro metadata from `data.extensions.amourai`.
+    /// Returns HeartWriteAI's macro metadata from `data.extensions.amourai`.
     ///
     /// The app currently accepts either a direct macro payload at
     /// `extensions.amourai` or a nested payload at `extensions.amourai.macro`

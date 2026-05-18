@@ -14,9 +14,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AmourAI",
+  title: "HeartWriteAI",
   description:
-    "A local-first character, persona, lorebook, and chat studio built with Next.js, Tailwind, shadcn/ui, and Tauri.",
+    "A local-first romance character, persona, lorebook, image, and chat studio built with Next.js, Tailwind, shadcn/ui, and Tauri.",
 };
 
 export default function RootLayout({

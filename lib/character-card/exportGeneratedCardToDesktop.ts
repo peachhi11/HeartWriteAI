@@ -51,7 +51,7 @@ export function createGeneratedCharacterCardPayload(
         .filter(Boolean)
         .slice(0, 5) ?? [],
       character_version: "1.0.0",
-      creator: "AmourAI",
+      creator: "HeartWriteAI",
       creator_notes: createCreatorsNotesText(cardData),
       description: resolveWorldPlaceholders(cardData, createMasterDescription(cardData)),
       character_book: cardData.loreEntries?.length
@@ -309,7 +309,7 @@ function createLorebookPayload(cardData: CharacterCardData) {
 
   return {
     description:
-      "Generated granular lore entries keyed for reactive AmourAI runtime insertion.",
+      "Generated granular lore entries keyed for reactive HeartWriteAI runtime insertion.",
     entries: entries.map((entry, index) => ({
       constant: entry.insertionPriority === "Constant_Anchor",
       content: entry.entryContent,

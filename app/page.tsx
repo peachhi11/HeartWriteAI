@@ -67,7 +67,7 @@ export default function Home() {
 
   async function checkNativeBridge() {
     try {
-      const response = await greetNative("AmourAI");
+      const response = await greetNative("HeartWriteAI");
       const version = await getNativeAppVersion();
 
       setNativeStatus(response);
@@ -89,7 +89,9 @@ export default function Home() {
             <Badge variant="secondary" className="w-fit">
               Working title
             </Badge>
-            <h1 className="text-3xl font-semibold tracking-tight">AmourAI</h1>
+            <h1 className="text-3xl font-semibold tracking-tight">
+              HeartWriteAI
+            </h1>
             <p className="max-w-3xl text-sm text-muted-foreground">
               A local-first studio for character cards, persona matching, lorebooks,
               scenario arcs, and eventually a fully integrated desktop chat runtime.

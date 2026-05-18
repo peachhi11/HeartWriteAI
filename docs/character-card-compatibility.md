@@ -1,6 +1,6 @@
 # Character Card Compatibility Notes
 
-AmourAI is CCV3-first. The implementation reference for card import/export is the Character Card V3 specification, not the older concepts overview.
+HeartWriteAI is CCV3-first. The implementation reference for card import/export is the Character Card V3 specification, not the older concepts overview.
 
 ## Current Scope
 
@@ -15,7 +15,7 @@ AmourAI is CCV3-first. The implementation reference for card import/export is th
 
 Reference: [Tydorius/JanitorAI_Scripts](https://github.com/Tydorius/JanitorAI_Scripts)
 
-These templates are a useful reference for users who want to create a single card that manages multiple characters. They target JanitorAI's Scripts runtime rather than the CCV3 file format directly, so they should inform AmourAI's future multi-character card authoring model instead of being treated as card metadata.
+These templates are a useful reference for users who want to create a single card that manages multiple characters. They target JanitorAI's Scripts runtime rather than the CCV3 file format directly, so they should inform HeartWriteAI's future multi-character card authoring model instead of being treated as card metadata.
 
 Useful patterns to study:
 
@@ -27,7 +27,7 @@ Useful patterns to study:
 - Runtime mutation of `context.character.personality`, `context.character.scenario`, and `context.character.example_dialogs`.
 - JanitorAI `context.chat` / `context.character` object shape discovery for script-backed multi-character cards.
 
-Do not mix these runtime scripts into the PNG card codec. For AmourAI, this reference belongs with future multi-character single-card tooling: character rosters, per-character context blocks, activation rules, and previewable compiled prompt output.
+Do not mix these runtime scripts into the PNG card codec. For HeartWriteAI, this reference belongs with future multi-character single-card tooling: character rosters, per-character context blocks, activation rules, and previewable compiled prompt output.
 
 ## Later Compatibility Work
 

@@ -1,6 +1,6 @@
 # Auto-Update Security Plan
 
-AmourAI should not enable automatic updates until the signing, release, and rollback path is real. Auto-update can ship executable code to every user, so a placeholder key or HTTP endpoint is worse than no updater.
+HeartWriteAI should not enable automatic updates until the signing, release, and rollback path is real. Auto-update can ship executable code to every user, so a placeholder key or HTTP endpoint is worse than no updater.
 
 ## Current Decision
 
@@ -21,7 +21,7 @@ Required before enabling:
 Generate keys locally only when the release process is ready:
 
 ```bash
-npm run tauri signer generate -- -w ~/.tauri/amourai.key
+npm run tauri signer generate -- -w ~/.tauri/heartwriteai.key
 ```
 
 The generated private key and key password must be moved into CI secrets:
@@ -41,7 +41,7 @@ When update infrastructure exists, add updater config similar to this with the r
     "updater": {
       "pubkey": "REAL_PUBLIC_KEY_HERE",
       "endpoints": [
-        "https://releases.example.com/amourai/{{target}}/{{arch}}/{{current_version}}"
+        "https://releases.example.com/heartwriteai/{{target}}/{{arch}}/{{current_version}}"
       ]
     }
   },
@@ -96,7 +96,7 @@ Manual/security checks:
 - Confirm missing signatures are rejected.
 - Confirm older versions are not offered as updates.
 - Confirm app still launches when update checks fail.
-- Confirm private key is absent from `git grep -n "TAURI_PRIVATE_KEY\\|TAURI_KEY_PASSWORD\\|amourai.key"`.
+- Confirm private key is absent from `git grep -n "TAURI_PRIVATE_KEY\\|TAURI_KEY_PASSWORD\\|heartwriteai.key"`.
 
 ## Future UI
 

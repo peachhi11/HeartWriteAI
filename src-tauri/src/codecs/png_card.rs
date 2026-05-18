@@ -208,7 +208,7 @@ mod tests {
 
         let macro_extensions: AppMacroExtensions = extracted_card
             .get_macro_extensions()
-            .expect("AmourAI macro extensions should survive PNG round trip");
+            .expect("HeartWriteAI macro extensions should survive PNG round trip");
 
         assert_eq!(macro_extensions.framework, "Narrative RPG");
         assert_eq!(macro_extensions.formatting, "W++");

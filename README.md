@@ -1,10 +1,10 @@
-# AmourAI
+# HeartWriteAI
 
-AmourAI is the working-title rebuild of CharacterGen as a local-first roleplay asset studio. The goal is to make character creation the main intake point: paste or import messy source material once, then route it into editable character card, persona, scenario, and lorebook outputs.
+HeartWriteAI is a local-first romance roleplay creation suite. It is designed to generate and edit character cards, craft standalone or matched user personas, convert V1/V2 cards to Character Card V3, build lorebooks, generate images, and support character chat and group chat workflows.
 
 The app is being built CCV3-first. New cards should be authored as Character Card V3, while V1/V2 support exists for import, conversion, and sanity checks rather than as the main creation format.
 
-## What AmourAI Is For
+## What HeartWriteAI Is For
 
 - CCV3-first character card creation, editing, conversion, and PNG export.
 - Editable persona profiles and persona matching.
@@ -56,11 +56,12 @@ npm run tauri:build
 
 The Tauri commands require Rust/Cargo.
 
-Optional AI-assisted macro classification uses the Vercel AI SDK with Google
-Gemini. To enable `/api/character-card/classify`, set:
+Optional AI-assisted generation and chat are provider-generic until a runtime endpoint is supplied. Use `YOUR_API_*` environment values when wiring a provider:
 
 ```bash
-GOOGLE_GENERATIVE_AI_API_KEY=...
+YOUR_API_KEY=...
+YOUR_API_CHAT_ENDPOINT=...
+YOUR_API_CHAT_MODEL=...
 ```
 
 ## Current Status
@@ -68,11 +69,10 @@ GOOGLE_GENERATIVE_AI_API_KEY=...
 Implemented in the current scaffold:
 
 - Next.js + Tailwind + shadcn app shell.
-- Tauri v2 desktop wrapper renamed and configured for AmourAI.
+- Tauri v2 desktop wrapper renamed and configured for HeartWriteAI.
 - Starter landing/workspace page for the intake-first workflow.
 - Temporary `/chat` preview route for Ollama streaming shape tests.
-- Optional `/api/character-card/classify` route for schema-bound macro and
-  library-tag classification with Gemini.
+- `/api/character-card/classify` and `/api/character-card/build` routes for schema-bound macro routing and generated card previews.
 - Tauri Store plugin registration and typed desktop-library helper for local
   character-card persistence.
 - Browser-side image intake pipeline for validation, compression, blurhash, and EXIF date extraction.
@@ -124,8 +124,8 @@ CCV3 and JanitorAI compatibility research is tracked in [`docs/character-card-co
 
 ## Attribution
 
-AmourAI is a rebuild descended from the local CharacterGen project. CharacterGen is the original application lineage for the roleplay asset workflow, character-generation concepts, and user goals being carried forward here.
+HeartWriteAI is a rebuild descended from the local CharacterGen project. CharacterGen is the original application lineage for the roleplay asset workflow, character-generation concepts, and user goals being carried forward here.
 
-The initial Tauri + Next.js + shadcn scaffold used for this rebuild was also adapted from the local checkout of [`nomandhoni-cs/tauri-nextjs-shadcn-boilerplate`](https://github.com/nomandhoni-cs/tauri-nextjs-shadcn-boilerplate), then renamed and adjusted for AmourAI.
+The initial Tauri + Next.js + shadcn scaffold used for this rebuild was also adapted from the local checkout of [`nomandhoni-cs/tauri-nextjs-shadcn-boilerplate`](https://github.com/nomandhoni-cs/tauri-nextjs-shadcn-boilerplate), then renamed and adjusted for HeartWriteAI.
 
 Character Card V3 compatibility follows the upstream [`kwaroran/character-card-spec-v3`](https://github.com/kwaroran/character-card-spec-v3) specification, especially `SPEC_V3.md`.
