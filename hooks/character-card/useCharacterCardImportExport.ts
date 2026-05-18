@@ -6,7 +6,10 @@ import { downloadUint8Array } from "@/lib/browser/downloadUint8Array";
 import { createCharacterCardExportFileName } from "@/lib/character-card/createCharacterCardExportFileName";
 import { createEmptyCharacterCardFormValues } from "@/lib/character-card/createEmptyCharacterCardFormValues";
 import { exportCharacterCardPngData } from "@/lib/character-card/exportCharacterCardPngData";
+import { createNativeCharacterCardImportData } from "@/lib/character-card/createNativeCharacterCardImportData";
 import { importCharacterCardPngData } from "@/lib/character-card/importCharacterCardPngData";
+import { mergeCharacterCardIntakeValues } from "@/lib/character-card/mergeCharacterCardIntakeValues";
+import { parseMessyCharacterIntake } from "@/lib/character-card/parseMessyCharacterIntake";
 import { readFileAsUint8Array } from "@/lib/character-card/readFileAsUint8Array";
 import { CharacterCardFormValues } from "@/types/character-card/CharacterCardFormValues";
 import { CharacterCardImportSummary } from "@/types/character-card/CharacterCardImportSummary";
@@ -18,11 +21,32 @@ export function useCharacterCardImportExport(): UseCharacterCardImportExportResu
     createEmptyCharacterCardFormValues,
   );
   const [error, setError] = useState<string | null>(null);
+  const [intakeText, setIntakeText] = useState("");
   const [importSummary, setImportSummary] =
     useState<CharacterCardImportSummary | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [sourceCard, setSourceCard] = useState<CharacterCardPayload | null>(null);
   const [sourcePngData, setSourcePngData] = useState<Uint8Array | null>(null);
+
+  function updateIntakeText(value: string) {
+    setIntakeText(value);
+  }
+
+  function routeIntakeText() {
+    const routeResult = parseMessyCharacterIntake(intakeText);
+
+    if (!routeResult.fieldNames.length) {
+      setError("Paste character material before routing intake.");
+      return routeResult;
+    }
+
+    setError(null);
+    setCardValues((currentValues) =>
+      mergeCharacterCardIntakeValues(currentValues, routeResult.values),
+    );
+
+    return routeResult;
+  }
 
   function updateCardField(field: keyof CharacterCardFormValues, value: string) {
     setCardValues((currentValues) => ({
@@ -121,6 +145,16 @@ export function useCharacterCardImportExport(): UseCharacterCardImportExportResu
     }
   }
 
+  function importNativeCard(card: CharacterCardPayload, fileName: string) {
+    const importedCard = createNativeCharacterCardImportData(fileName, card);
+
+    setError(null);
+    setSourcePngData(null);
+    setSourceCard(importedCard.card);
+    setCardValues(importedCard.formValues);
+    setImportSummary(importedCard.summary);
+  }
+
   function exportPngFile() {
     if (!sourceCard || !sourcePngData) {
       setError("Import a PNG character card before exporting.");
@@ -144,8 +178,11 @@ export function useCharacterCardImportExport(): UseCharacterCardImportExportResu
     cardValues,
     error,
     importSummary,
+    intakeText,
     isExportDisabled: !sourceCard || !sourcePngData,
     isProcessing,
+    updateIntakeText,
+    routeIntakeText,
     updateCardField,
     addAlternateOpening,
     deleteAlternateOpening,
@@ -153,6 +190,7 @@ export function useCharacterCardImportExport(): UseCharacterCardImportExportResu
     addGroupGreeting,
     deleteGroupGreeting,
     updateGroupGreeting,
+    importNativeCard,
     importPngFile,
     exportPngFile,
   };

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   BookOpenText,
   Download,
@@ -8,10 +9,12 @@ import {
   MessageSquareText,
   Plus,
   RefreshCw,
+  Sparkles,
   Tags,
   Trash2,
 } from "lucide-react";
 
+import { CharacterCardDropZoneOverlay } from "@/components/character-card-drop-zone-overlay";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,12 +28,39 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useCharacterCardImportExport } from "@/hooks/character-card/useCharacterCardImportExport";
+import { CharacterCardFormValues } from "@/types/character-card/CharacterCardFormValues";
+
+const simulationFrameworks = [
+  "Sandbox",
+  "Narrative RPG",
+  "Text Adventure",
+  "Scene-Locked",
+] as const;
+
+const promptFormats = ["W++", "JSON", "Boostyle", "Natural Language"] as const;
+
+const relationshipModes = [
+  "Symmetric",
+  "Asymmetric (Bot Dominant)",
+  "Asymmetric (User Dominant)",
+  "Antagonistic",
+] as const;
+
+const macroToneTags = [
+  "sweet & wholesome",
+  "angsty",
+  "cozy romance",
+  "slow burn",
+  "dead dove",
+  "dark rp",
+] as const;
 
 export function CharacterCardImportExport() {
   const {
     cardValues,
     error,
     importSummary,
+    intakeText,
     isExportDisabled,
     isProcessing,
     addAlternateOpening,
@@ -40,12 +70,48 @@ export function CharacterCardImportExport() {
     updateCardField,
     updateAlternateOpening,
     updateGroupGreeting,
+    updateIntakeText,
+    routeIntakeText,
     importPngFile,
+    importNativeCard,
     exportPngFile,
   } = useCharacterCardImportExport();
+  const [intakeRouteMessage, setIntakeRouteMessage] = useState<string | null>(null);
+  const [dropMessage, setDropMessage] = useState<string | null>(null);
+
+  function handleRouteIntake() {
+    const result = routeIntakeText();
+
+    setIntakeRouteMessage(
+      result.fieldNames.length
+        ? `Routed ${result.fieldNames.length} structured fields.`
+        : null,
+    );
+  }
+
+  function updateMacroClassification(label: string, value: string) {
+    updateCardField(
+      "system_prompt",
+      upsertLabeledLine(cardValues.system_prompt, label, value),
+    );
+  }
+
+  function toggleTag(tag: string) {
+    updateCardField("tagsText", toggleCommaSeparatedValue(cardValues.tagsText, tag));
+  }
 
   return (
     <Card className="border bg-card/85 shadow-2xl backdrop-blur">
+      <CharacterCardDropZoneOverlay
+        onAssetTranscoded={(filePath) =>
+          setDropMessage(`Converted image asset to ${filePath}.`)
+        }
+        onCardParsed={(card, filePath) => {
+          importNativeCard(card, filePath);
+          setDropMessage(`Imported ${filePath}.`);
+        }}
+        onDropError={setDropMessage}
+      />
       <CardHeader>
         <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
           <div className="space-y-2">
@@ -87,6 +153,12 @@ export function CharacterCardImportExport() {
         {error ? (
           <p className="rounded-xl border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
             {error}
+          </p>
+        ) : null}
+
+        {dropMessage ? (
+          <p className="rounded-xl border bg-muted/45 px-3 py-2 text-sm text-muted-foreground">
+            {dropMessage}
           </p>
         ) : null}
 
@@ -149,6 +221,34 @@ export function CharacterCardImportExport() {
             </div>
           </div>
         ) : null}
+
+        <div className="grid gap-3 rounded-lg border bg-background/60 p-3">
+          <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+            <div className="space-y-1">
+              <p className="flex items-center gap-2 text-sm font-medium">
+                <Sparkles className="size-4 text-muted-foreground" />
+                Messy Intake
+              </p>
+              <p className="max-w-3xl text-xs text-muted-foreground">
+                Paste notes, scraped card text, friction riffs, or rough character
+                ideas, then route them into the editor fields below.
+              </p>
+            </div>
+            <Button type="button" variant="secondary" onClick={handleRouteIntake}>
+              <Sparkles />
+              Route Intake
+            </Button>
+          </div>
+          <Textarea
+            value={intakeText}
+            placeholder="Paste rough material here: Name, age, appearance, wants, fears, background, relationships, kinks, scenario, first message..."
+            className="min-h-40 resize-y"
+            onChange={(event) => updateIntakeText(event.currentTarget.value)}
+          />
+          {intakeRouteMessage ? (
+            <p className="text-xs text-muted-foreground">{intakeRouteMessage}</p>
+          ) : null}
+        </div>
 
         <Tabs defaultValue="profile" className="grid gap-4">
           <TabsList className="w-fit flex-wrap">
@@ -362,6 +462,12 @@ export function CharacterCardImportExport() {
           </TabsContent>
 
           <TabsContent value="openings" className="grid gap-4">
+            <MacroClassificationSelector
+              values={cardValues}
+              onSelect={updateMacroClassification}
+              onToggleTag={toggleTag}
+            />
+
             <div className="grid gap-3 lg:grid-cols-2">
               <label className="grid gap-2 text-sm font-medium">
                 Default Scenario
@@ -587,4 +693,172 @@ export function CharacterCardImportExport() {
       </CardContent>
     </Card>
   );
+}
+
+function MacroClassificationSelector({
+  values,
+  onSelect,
+  onToggleTag,
+}: {
+  readonly values: CharacterCardFormValues;
+  readonly onSelect: (label: string, value: string) => void;
+  readonly onToggleTag: (tag: string) => void;
+}) {
+  const frameworkValue = readLabeledLine(values.system_prompt, "Framework");
+  const formattingValue = readLabeledLine(values.system_prompt, "Formatting");
+  const relationshipValue = readLabeledLine(values.system_prompt, "Relationship");
+
+  return (
+    <div className="grid gap-4 rounded-lg border bg-background/60 p-4">
+      <div className="space-y-1">
+        <p className="text-sm font-medium">AI Macro Classifications</p>
+        <p className="text-xs text-muted-foreground">
+          Select high-level roleplay constraints. These write readable labeled
+          lines into the system prompt for export.
+        </p>
+      </div>
+
+      <div className="grid gap-4 lg:grid-cols-3">
+        <SegmentedButtonGroup
+          label="Simulation Framework"
+          options={simulationFrameworks}
+          value={frameworkValue}
+          tone="violet"
+          onSelect={(value) => onSelect("Framework", value)}
+        />
+        <SegmentedButtonGroup
+          label="Formatting"
+          options={promptFormats}
+          value={formattingValue}
+          tone="cyan"
+          onSelect={(value) => onSelect("Formatting", value)}
+        />
+        <SegmentedButtonGroup
+          label="Starting Relationship"
+          options={relationshipModes}
+          value={relationshipValue}
+          tone="emerald"
+          onSelect={(value) => onSelect("Relationship", value)}
+        />
+      </div>
+
+      <div className="grid gap-2">
+        <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+          Tone Tags
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {macroToneTags.map((tag) => {
+            const isActive = hasCommaSeparatedValue(values.tagsText, tag);
+
+            return (
+              <Button
+                key={tag}
+                type="button"
+                variant={isActive ? "secondary" : "outline"}
+                size="sm"
+                onClick={() => onToggleTag(tag)}
+              >
+                {tag}
+              </Button>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SegmentedButtonGroup<TOption extends string>({
+  label,
+  options,
+  value,
+  tone,
+  onSelect,
+}: {
+  readonly label: string;
+  readonly options: readonly TOption[];
+  readonly value: string | undefined;
+  readonly tone: "cyan" | "emerald" | "violet";
+  readonly onSelect: (value: TOption) => void;
+}) {
+  return (
+    <div className="grid gap-2">
+      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+        {label}
+      </p>
+      <div className="grid grid-cols-2 gap-2">
+        {options.map((option) => {
+          const isActive = value === option;
+
+          return (
+            <button
+              key={option}
+              type="button"
+              className={[
+                "min-h-11 rounded-md border px-3 py-2 text-left text-sm transition",
+                isActive
+                  ? activeToneClassNames[tone]
+                  : "border-border bg-background text-muted-foreground hover:border-foreground/30 hover:text-foreground",
+              ].join(" ")}
+              onClick={() => onSelect(option)}
+            >
+              {option}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+const activeToneClassNames = {
+  cyan: "border-cyan-500/70 bg-cyan-500/10 text-cyan-700 ring-2 ring-cyan-500/20 dark:text-cyan-300",
+  emerald:
+    "border-emerald-500/70 bg-emerald-500/10 text-emerald-700 ring-2 ring-emerald-500/20 dark:text-emerald-300",
+  violet:
+    "border-violet-500/70 bg-violet-500/10 text-violet-700 ring-2 ring-violet-500/20 dark:text-violet-300",
+};
+
+function readLabeledLine(text: string, label: string): string | undefined {
+  const match = text.match(new RegExp(`^${escapeRegExp(label)}:\\s*(.+)$`, "im"));
+
+  return match?.[1]?.trim();
+}
+
+function upsertLabeledLine(text: string, label: string, value: string): string {
+  const line = `${label}: ${value}`;
+  const labelPattern = new RegExp(`^${escapeRegExp(label)}:\\s*.*$`, "im");
+
+  if (labelPattern.test(text)) {
+    return text.replace(labelPattern, line);
+  }
+
+  return [line, text.trim()].filter(Boolean).join("\n");
+}
+
+function hasCommaSeparatedValue(text: string, value: string): boolean {
+  return text
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .includes(value.toLowerCase());
+}
+
+function toggleCommaSeparatedValue(text: string, value: string): string {
+  const values = text
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  const valueIndex = values.findIndex(
+    (item) => item.toLowerCase() === value.toLowerCase(),
+  );
+
+  if (valueIndex >= 0) {
+    return values.filter((_, index) => index !== valueIndex).join(", ");
+  }
+
+  return [...values, value].join(", ");
+}
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 }

@@ -56,6 +56,13 @@ npm run tauri:build
 
 The Tauri commands require Rust/Cargo.
 
+Optional AI-assisted macro classification uses the Vercel AI SDK with Google
+Gemini. To enable `/api/character-card/classify`, set:
+
+```bash
+GOOGLE_GENERATIVE_AI_API_KEY=...
+```
+
 ## Current Status
 
 Implemented in the current scaffold:
@@ -64,6 +71,10 @@ Implemented in the current scaffold:
 - Tauri v2 desktop wrapper renamed and configured for AmourAI.
 - Starter landing/workspace page for the intake-first workflow.
 - Temporary `/chat` preview route for Ollama streaming shape tests.
+- Optional `/api/character-card/classify` route for schema-bound macro and
+  library-tag classification with Gemini.
+- Tauri Store plugin registration and typed desktop-library helper for local
+  character-card persistence.
 - Browser-side image intake pipeline for validation, compression, blurhash, and EXIF date extraction.
 - CCV3 PNG metadata read/write layer with V1/V2 conversion support through `@risuai/ccardlib`.
 - Tauri bridge helper for frontend/native command calls.

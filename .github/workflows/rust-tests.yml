@@ -1,0 +1,33 @@
+name: Rust Test Verification Suite
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-rust:
+    name: Execute Backend Engine Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code Repository
+        uses: actions/checkout@v4
+
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Setup Rust Toolchain Runtime
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Populate Rust Dependency Caches
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: "./src-tauri -> target"
+
+      - name: Execute Cargo Test Routine
+        run: |
+          cd src-tauri
+          cargo test --verbose

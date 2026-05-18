@@ -11,7 +11,6 @@ import {
   Feather,
   LibraryBig,
   MessageSquareText,
-  Sparkles,
 } from "lucide-react";
 
 import { CharacterCardImportExport } from "@/components/character-card-import-export";
@@ -28,7 +27,6 @@ import {
 import { ImageIntakePreview } from "@/components/image-pipeline/image-intake-preview";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Textarea } from "@/components/ui/textarea";
 import { getNativeAppVersion, greetNative } from "@/lib/tauri/native";
 
 const workflowCards = [
@@ -64,9 +62,6 @@ const migrationLanes = [
 ];
 
 export default function Home() {
-  const [rawIntake, setRawIntake] = useState(
-    "Paste a messy character idea here. AmourAI will eventually split it into character card fields, persona notes, scenario hooks, and lorebook entries.",
-  );
   const [nativeStatus, setNativeStatus] = useState("Tauri bridge not checked yet.");
   const [nativeVersion, setNativeVersion] = useState<string | null>(null);
 
@@ -109,33 +104,7 @@ export default function Home() {
 
         <CharacterCardImportExport />
 
-        <section className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
-          <Card className="border bg-card/85 shadow-2xl backdrop-blur">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-2xl">
-                <Sparkles data-icon="inline-start" />
-                One intake, many outputs
-              </CardTitle>
-              <CardDescription>
-                The first page should become the dumping ground: paste raw material
-                once, then let the app route it into editable card, persona, scenario,
-                and lorebook modules.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-4">
-              <Textarea
-                value={rawIntake}
-                onChange={(event) => setRawIntake(event.currentTarget.value)}
-                className="min-h-48 resize-none"
-              />
-              <div className="flex flex-wrap gap-2">
-                <Button>Route Intake</Button>
-                <Button variant="outline">Preview CCV3</Button>
-                <Button variant="secondary">Create Lorebook Draft</Button>
-              </div>
-            </CardContent>
-          </Card>
-
+        <section className="grid gap-6">
           <Card className="border bg-card/85 shadow-2xl backdrop-blur">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">

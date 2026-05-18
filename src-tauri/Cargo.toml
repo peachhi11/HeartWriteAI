@@ -24,3 +24,10 @@ log = "0.4"
 tauri = { version = "2.6.2", features = [] }
 tauri-plugin-log = "2"
 tauri-plugin-core = "2.0.0-beta.0"
+tauri-plugin-store = "2.4.3"
+png = "0.17"
+zip = { version = "2.4.2", features = ["deflate"] }
+base64 = "0.22"
+image = "0.25"
+rusqlite = { version = "0.32", features = ["bundled"] }
+rand = "0.8"
