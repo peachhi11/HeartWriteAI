@@ -70,13 +70,16 @@ Implemented in the current scaffold:
 
 - Next.js + Tailwind + shadcn app shell.
 - Tauri v2 desktop wrapper renamed and configured for HeartWriteAI.
-- Starter landing/workspace page for the intake-first workflow.
+- Persistent HeartWriteAI Studio shell with navigation for the major creation areas.
 - Temporary `/chat` preview route for Ollama streaming shape tests.
 - `/api/character-card/classify` and `/api/character-card/build` routes for schema-bound macro routing and generated card previews.
 - Tauri Store plugin registration and typed desktop-library helper for local
   character-card persistence.
 - Browser-side image intake pipeline for validation, compression, blurhash, and EXIF date extraction.
 - CCV3 PNG metadata read/write layer with V1/V2 conversion support through `@risuai/ccardlib`.
+- Character-card import/export UI with editable structured fields and CCV3 PNG export.
+- HeartWriteAI brand SVG assets for app icons, section icons, lockups, and watermark/export branding.
+- Romance runtime prompt constraints for prose style, POV, speech examples, dialogue do/don't arrays, post-history rules, consent/power-dynamics handling, and no-user-control boundaries.
 - Tauri bridge helper for frontend/native command calls.
 - PNG text-chunk dependencies for CCV3 card import/export:
   - `png-chunks-extract`
@@ -86,7 +89,7 @@ Implemented in the current scaffold:
 
 Immediate next milestone:
 
-- Build the import/export UI so character-card PNGs can be read, edited through user-facing fields, and exported with embedded `ccv3` metadata.
+- Turn the persistent Studio navigation into real workspaces for Character Cards, Persona Studio, Persona Matching, Lorebooks, Image Generation, Card Conversion, Character Chat, Group Chat, and Settings.
 
 ## Project Shape
 
@@ -105,12 +108,13 @@ The phased implementation plan lives in [`PLAN.md`](PLAN.md).
 
 The current priority order is:
 
-1. Stabilize the scaffold and documentation checkpoint.
-2. Add CCV3 PNG import/export.
-3. Turn the character page into the editable intake hub.
-4. Add editable lorebook/persona/scenario asset editors and attachments.
-5. Add Tauri local file/library management.
-6. Build the context compiler and production chat runtime.
+1. Keep repo hygiene, docs, and HeartWriteAI branding current.
+2. Turn the Studio shell/sidebar into real section routes.
+3. Build Persona Studio and Persona Matching as first-class workflows.
+4. Add editable lorebook/scenario asset editors and attachments.
+5. Add image generation and card-art asset flows.
+6. Harden Tauri local library management.
+7. Build the context compiler and production character/group chat runtime.
 
 ## Auto-Update Safety
 
