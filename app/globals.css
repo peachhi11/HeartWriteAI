@@ -124,7 +124,7 @@
 }
 
 @layer components {
-  .amour-studio-ambient {
+  .heartwrite-studio-ambient {
     background:
       radial-gradient(circle at top left, var(--muted), transparent 34%),
       radial-gradient(circle at bottom right, var(--secondary), transparent 30%);

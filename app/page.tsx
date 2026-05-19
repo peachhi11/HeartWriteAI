@@ -5,12 +5,8 @@ import Link from "next/link";
 import {
   BadgeCheck,
   BookOpenText,
-  Bot,
   Boxes,
   Braces,
-  Feather,
-  LibraryBig,
-  MessageSquareText,
 } from "lucide-react";
 
 import { CharacterCardImportExport } from "@/components/character-card-import-export";
@@ -25,32 +21,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ImageIntakePreview } from "@/components/image-pipeline/image-intake-preview";
+import { dashboardHighlights } from "@/lib/studio/sections";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { getNativeAppVersion, greetNative } from "@/lib/tauri/native";
-
-const workflowCards = [
-  {
-    title: "Character Cards",
-    description: "CCV3-first creation, editing, conversion, and PNG export.",
-    icon: Bot,
-  },
-  {
-    title: "Persona Matching",
-    description: "Playable user personas matched to route energy and card tone.",
-    icon: Feather,
-  },
-  {
-    title: "Lorebooks",
-    description: "Scoped world, character, persona, and scenario lore assets.",
-    icon: LibraryBig,
-  },
-  {
-    title: "Chat Runtime",
-    description: "Context compilation, active lore, summaries, and local models.",
-    icon: MessageSquareText,
-  },
-];
 
 const migrationLanes = [
   "Next.js app router shell",
@@ -145,11 +119,13 @@ export default function Home() {
             <TabsTrigger value="lore">Lore</TabsTrigger>
           </TabsList>
           <TabsContent value="workspace" className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {workflowCards.map((card) => (
+            {dashboardHighlights.map((card) => (
               <Card key={card.title} className="bg-background/70">
                 <CardHeader>
                   <card.icon className="size-5 text-muted-foreground" />
-                  <CardTitle>{card.title}</CardTitle>
+                  <CardTitle>
+                    <Link href={card.href}>{card.title}</Link>
+                  </CardTitle>
                   <CardDescription>{card.description}</CardDescription>
                 </CardHeader>
               </Card>
@@ -169,7 +145,7 @@ export default function Home() {
               </CardHeader>
               <CardContent>
                 <Button asChild variant="outline">
-                  <Link href="/chat">Open chat preview</Link>
+                  <Link href="/chat">Open Character Chat</Link>
                 </Button>
               </CardContent>
             </Card>

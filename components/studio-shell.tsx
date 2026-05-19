@@ -9,6 +9,10 @@ import { ArrowRight } from "lucide-react";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import {
+  primaryStudioSections,
+  utilityStudioSections,
+} from "@/lib/studio/sections";
 
 interface StudioShellProps {
   actions?: ReactNode;
@@ -18,64 +22,6 @@ interface StudioShellProps {
   subtitle?: string;
 }
 
-const primarySections = [
-  {
-    description: "Overview, imports, native bridge, and workflow status.",
-    href: "/",
-    icon: "/brand/favicon.svg",
-    label: "Dashboard",
-  },
-  {
-    description: "Generate, import, edit, convert, and export CCV3 cards.",
-    href: "/workspace",
-    icon: "/brand/icons/character-cards.svg",
-    label: "Character Cards",
-  },
-  {
-    description: "Craft standalone personas or match them to generated cards.",
-    href: "/?section=personas",
-    icon: "/brand/icons/persona-matching.svg",
-    label: "Persona Matching",
-  },
-  {
-    description: "Build scoped world, character, and scenario lorebooks.",
-    href: "/?section=lorebooks",
-    icon: "/brand/icons/lorebooks.svg",
-    label: "Lorebooks",
-  },
-  {
-    description: "Generate and process card art and visual assets.",
-    href: "/?section=images",
-    icon: "/brand/icons/image-generation.svg",
-    label: "Image Generation",
-  },
-  {
-    description: "Run private one-on-one romance roleplay previews.",
-    href: "/chat",
-    icon: "/brand/icons/character-chat.svg",
-    label: "Character Chat",
-  },
-  {
-    description: "Stage multi-character room and ensemble openings.",
-    href: "/?section=group-chat",
-    icon: "/brand/icons/group-chat.svg",
-    label: "Group Chat",
-  },
-];
-
-const utilitySections = [
-  {
-    href: "/?section=conversion",
-    icon: "/brand/icons/card-conversion.svg",
-    label: "V1/V2 to V3",
-  },
-  {
-    href: "/?section=settings",
-    icon: "/brand/icons/settings.svg",
-    label: "Settings",
-  },
-];
-
 export function StudioShell({
   actions,
   children,
@@ -84,10 +30,12 @@ export function StudioShell({
   subtitle,
 }: StudioShellProps) {
   const pathname = usePathname();
+  const isActivePath = (href: string) =>
+    href === pathname || (href === "/characters" && pathname === "/workspace");
 
   return (
     <main className="min-h-screen overflow-hidden bg-background text-foreground">
-      <div className="amour-studio-ambient pointer-events-none fixed inset-0 -z-10" />
+      <div className="heartwrite-studio-ambient pointer-events-none fixed inset-0 -z-10" />
       <div className="grid min-h-screen lg:grid-cols-[18rem_minmax(0,1fr)]">
         <aside className="hidden border-r bg-card/90 shadow-2xl backdrop-blur-xl lg:flex lg:flex-col">
           <div className="flex items-center gap-3 border-b px-5 py-5">
@@ -112,10 +60,10 @@ export function StudioShell({
 
           <nav className="flex flex-1 flex-col gap-6 overflow-y-auto px-3 py-5">
             <div className="space-y-1">
-              {primarySections.map((section) => (
+              {primaryStudioSections.map((section) => (
                 <StudioNavLink
                   key={section.label}
-                  active={section.href === pathname}
+                  active={isActivePath(section.href)}
                   description={section.description}
                   href={section.href}
                   icon={section.icon}
@@ -129,10 +77,11 @@ export function StudioShell({
                 Tools
               </p>
               <div className="space-y-1">
-                {utilitySections.map((section) => (
+                {utilityStudioSections.map((section) => (
                   <StudioNavLink
                     key={section.label}
-                    active={false}
+                    active={isActivePath(section.href)}
+                    description={section.description}
                     href={section.href}
                     icon={section.icon}
                     label={section.label}
@@ -178,13 +127,13 @@ export function StudioShell({
               </div>
             </div>
             <nav className="mt-3 flex gap-2 overflow-x-auto pb-1 lg:hidden">
-              {[...primarySections, ...utilitySections].map((section) => (
+              {[...primaryStudioSections, ...utilityStudioSections].map((section) => (
                 <Link
                   key={section.label}
                   href={section.href}
                   className={cn(
                     "flex shrink-0 items-center gap-2 rounded-full border bg-card px-3 py-2 text-xs font-medium text-muted-foreground",
-                    section.href === pathname &&
+                    isActivePath(section.href) &&
                       "border-rose-200 bg-rose-50 text-rose-950 dark:border-rose-900 dark:bg-rose-950/35 dark:text-rose-100",
                   )}
                 >
