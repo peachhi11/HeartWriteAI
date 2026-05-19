@@ -34,6 +34,7 @@ import {
   generateDefaultGroupAlternateGreetingForks,
   generateGroupAlternateGreetingData,
   generateGroupGreetingData,
+  generateDialogueArrayData,
   generateIntimacyStyleData,
   generateKinkData,
   generateLoreEntriesData,
@@ -42,6 +43,7 @@ import {
   generateNationalityData,
   generateOccupationData,
   generatePostHistoryInstructionsData,
+  generateProseGuidanceData,
   generateRaceData,
   generateRelationshipsData,
   generateRelationshipStatusData,
@@ -2009,8 +2011,110 @@ test("generates post-history runtime instructions and exports injection text", (
     true,
   );
   assert.equal(
+    slowBurn.postHistoryInstructions?.driftControlRules.some((rule) =>
+      rule.includes("Do not suppress high-heat physical escalation"),
+    ),
+    true,
+  );
+  assert.equal(
+    slowBurn.postHistoryInstructions?.driftControlRules.some((rule) =>
+      rule.includes("continuity, character logic, and the established dynamic"),
+    ),
+    true,
+  );
+  assert.equal(
     slowBurn.postHistoryInstructions?.formattingHardlines.some((rule) =>
       rule.includes("Never write"),
+    ),
+    true,
+  );
+  assert.equal(
+    slowBurn.postHistoryInstructions?.formattingHardlines.some((rule) =>
+      rule.includes("immersive, character-driven roleplay with {{user}}"),
+    ),
+    true,
+  );
+  assert.equal(
+    slowBurn.postHistoryInstructions?.formattingHardlines.some((rule) =>
+      rule.includes("cannot hear, know, answer, or react"),
+    ),
+    true,
+  );
+  assert.equal(
+    slowBurn.postHistoryInstructions?.formattingHardlines.some((rule) =>
+      rule.includes("Only reference {{user}} through explicitly provided dialogue, visible actions, and directly observable presence"),
+    ),
+    true,
+  );
+  assert.equal(
+    slowBurn.postHistoryInstructions?.formattingHardlines.some((rule) =>
+      rule.includes("not physically with {{user}}"),
+    ),
+    true,
+  );
+  assert.equal(
+    slowBurn.postHistoryInstructions?.formattingHardlines.some((rule) =>
+      rule.includes("own life, routine, friends, goals, and motivations"),
+    ),
+    true,
+  );
+  assert.equal(
+    slowBurn.postHistoryInstructions?.formattingHardlines.some((rule) =>
+      rule.includes("Standard Prose Format"),
+    ),
+    true,
+  );
+  assert.equal(
+    slowBurn.postHistoryInstructions?.formattingHardlines.some((rule) =>
+      rule.includes("new paragraph whenever a different character speaks"),
+    ),
+    true,
+  );
+  assert.equal(
+    slowBurn.postHistoryInstructions?.formattingHardlines.some((rule) =>
+      rule.includes("Do not output APP: or USER: labels"),
+    ),
+    true,
+  );
+  assert.equal(
+    slowBurn.postHistoryInstructions?.formattingHardlines.some((rule) =>
+      rule.includes("perception and immediate inference"),
+    ),
+    true,
+  );
+  assert.equal(
+    slowBurn.postHistoryInstructions?.formattingHardlines.some((rule) =>
+      rule.includes("Show uncertainty as interpretation, not fact"),
+    ),
+    true,
+  );
+  assert.equal(
+    slowBurn.postHistoryInstructions?.formattingHardlines.some((rule) =>
+      rule.includes("continuity of space, timing, and prior actions"),
+    ),
+    true,
+  );
+  assert.equal(
+    slowBurn.postHistoryInstructions?.formattingHardlines.some((rule) =>
+      rule.includes("Write exactly one reply only"),
+    ),
+    true,
+  );
+  assert.equal(
+    slowBurn.postHistoryInstructions?.formattingHardlines.some((rule) =>
+      rule.includes("Stop immediately before {{user}} would need to respond"),
+    ),
+    true,
+  );
+  assert.equal(
+    slowBurn.postHistoryInstructions?.formattingHardlines.some((rule) =>
+      rule.includes("Do not quote, paraphrase, mirror, or lightly restyle"),
+    ),
+    true,
+  );
+  assert.equal(
+    slowBurn.postHistoryInstructions?.formattingHardlines.some((rule) =>
+      rule.includes("key noun, verb, adjective, gesture, or line pattern"),
     ),
     true,
   );
@@ -2052,7 +2156,20 @@ test("appends post-history override as the final hidden chat system message", ()
   assert.match(override, /CURRENT CHARACTER INTENT/);
   assert.match(override, /CONDITIONAL RESPONSE SHIFT/);
   assert.match(override, /HARD ARCHITECTURAL LIMITS/);
+  assert.match(override, /Write \{\{char\}\}'s next reply in an immersive, character-driven roleplay with \{\{user\}\}/);
+  assert.match(override, /exactly one reply/);
   assert.match(override, /Never write thoughts, actions, decisions, or dialogue for \{\{user\}\}/);
+  assert.match(override, /Do not write or simulate \{\{user\}\} under any circumstances/);
+  assert.match(override, /Stop immediately before \{\{user\}\} would need to respond, narrate, make a choice, or speak/);
+  assert.match(override, /Show uncertainty as interpretation, not fact/);
+  assert.match(override, /continuity of space, timing, and prior actions/);
+  assert.match(override, /cannot hear, know, answer, or react to \{\{user\}\}'s internal thoughts/);
+  assert.match(override, /Only reference \{\{user\}\} through explicitly provided dialogue, visible actions, and directly observable presence/);
+  assert.match(override, /\{\{user\}\} behavior aligned with their persona and lorebook-defined patterns without inventing unobserved reactions/);
+  assert.match(override, /not physically with \{\{user\}\}/);
+  assert.match(override, /own life, routine, friends, goals, and motivations outside of \{\{user\}\}/);
+  assert.match(override, /Do not quote, paraphrase, mirror, or lightly restyle \{\{user\}\}'s previous message/);
+  assert.match(override, /key noun, verb, adjective, gesture, or line pattern/);
   assert.equal(optimizedMessages.length, 2);
   assert.equal(optimizedMessages[1].role, "system");
   assert.equal(optimizedMessages[1].content, override);
@@ -2200,13 +2317,43 @@ test("generates formatting config and exports strict render rules", () => {
   const prompt = compileSystemPrompt(generated);
 
   assert.equal(generated.formatting?.narrativePerspective, "Third_Person_Past");
+  assert.equal(generated.formatting?.actionWrappingStandard, "Quote_Isolated_Prose");
   assert.equal(formatting.markdownEmphasisStyle, "Code_Block_Shielding");
+  assert.match(
+    formatting.formattingSystemPromptInjection,
+    /Standard Prose Format/,
+  );
+  assert.match(
+    formatting.formattingSystemPromptInjection,
+    /dialogue in double quotation marks/,
+  );
+  assert.match(
+    formatting.formattingSystemPromptInjection,
+    /new paragraph whenever a different character speaks/,
+  );
+  assert.match(
+    formatting.formattingSystemPromptInjection,
+    /do not output APP: or USER: labels/i,
+  );
   assert.match(
     formatting.formattingSystemPromptInjection,
     /MANDATORY FORMATTING/,
   );
+  assert.match(
+    formatting.formattingSystemPromptInjection,
+    /dialogue as \{\{char\}\} speaking in first-person present tense/,
+  );
   assert.match(prompt, /FORMATTING CONFIGURATION/);
+  assert.match(prompt, /Narrative must be written in third-person past tense/);
+  assert.match(prompt, /spoken dialogue must be written as \{\{char\}\} speaking in first-person present tense/);
+  assert.match(prompt, /Use Standard Prose Format/);
+  assert.match(prompt, /dialogue in double quotation marks/);
+  assert.match(prompt, /actions, body language, reactions, narration, and brief internal thoughts woven into prose paragraphs/);
+  assert.match(prompt, /new paragraph whenever a different character speaks/);
+  assert.match(prompt, /Do not output APP: or USER: labels/);
   assert.equal(masterPayload.metadata.formatting?.maxParagraphsPerTurn, 4);
+  assert.match(masterPayload.description, /Perspective Lock/);
+  assert.match(exported.data.description, /Perspective Lock/);
   assert.equal(
     exported.data.extensions.amourai &&
       typeof exported.data.extensions.amourai === "object" &&
@@ -2308,21 +2455,466 @@ test("generates speech style and example macros for card voice", () => {
     academic.relationshipStatus!,
     "Academic Rivals",
   );
+  const dialogueArrays = generateDialogueArrayData(
+    "Dark Romance Arranged Marriage",
+    darkRomance.archetype!,
+    darkRomance.occupation!,
+    darkRomance.species!,
+    darkRomance.speechStyle!,
+  );
+  const proseGuidance = generateProseGuidanceData(
+    "Dark Romance Arranged Marriage",
+    darkRomance.tone!,
+    darkRomance.formatting!,
+    darkRomance.scenario!,
+  );
   const exported = createGeneratedCharacterCardPayload(darkRomance, "Hello.");
   const masterPayload = createMasterCharacterCardPayload(darkRomance);
   const prompt = compileSystemPrompt(darkRomance);
 
   assert.equal(darkRomance.speechStyle?.register, "Clipped_Command");
+  assert.equal(darkRomance.speechStyle?.pitch, "Baritone");
+  assert.equal(darkRomance.speechStyle?.texture, "Raspy");
+  assert.equal(darkRomance.speechStyle?.volumeBaseline, "Measured");
+  assert.equal(darkRomance.speechStyle?.emotionalDelivery, "Curt");
+  assert.equal(darkRomance.speechStyle?.syntaxCadence, "Laconic_Clipped");
+  assert.equal(darkRomance.speechStyle?.linguisticFlavor, "Jargon_Infused");
+  assert.equal(darkRomance.speechStyle?.vocalRegister, "Muted_Whisper");
+  assert.deepEqual(darkRomance.speechStyle?.dialogueTagsWhitelist.slice(0, 2), [
+    "murmured",
+    "clipped",
+  ]);
+  assert.deepEqual(darkRomance.speechStyle?.physicalMannerisms, [
+    "Space_Invasion",
+  ]);
   assert.equal(academic.speechStyle?.register, "Academic_Precise");
+  assert.deepEqual(academic.speechStyle?.physicalMannerisms, [
+    "Nose_Pinch",
+    "Eye_Contact_Avoidance",
+  ]);
   assert.equal(speechStyle.vocabularyMode, "Technical_Precise");
+  assert.equal(speechStyle.syntaxCadence, "Laconic_Clipped");
+  assert.equal(speechStyle.linguisticFlavor, "Jargon_Infused");
   assert.match(speechStyle.speechPatternInstruction, /SPEECH OVERRIDE/);
+  assert.match(speechStyle.speechPatternInstruction, /physical voice/);
+  assert.match(speechStyle.speechSystemPromptInjection, /DIALOGUE LOCK/);
   assert.equal(speechExamples.length >= 3, true);
   assert.match(speechExamples[0].exampleLine, /\{\{char\}\}:/);
+  assert.equal(speechExamples[0].stateLabel, "calm");
   assert.match(prompt, /SPEECH STYLE CONFIGURATION/);
+  assert.match(prompt, /PHYSICAL VOICE/);
+  assert.match(prompt, /PHYSICAL SPEECH MANNERISMS/);
+  assert.match(prompt, /SYNTAX CADENCE/);
+  assert.match(prompt, /DIALOGUE TAGS WHITELIST/);
+  assert.match(prompt, /SYSTEM DIALOGUE REGULATION FILTER/);
+  assert.match(prompt, /BANNED KEYWORDS/);
+  assert.match(prompt, /CRITICAL DIALOGUE REALISM/);
+  assert.match(prompt, /character-specific and context-aware/);
+  assert.match(prompt, /CRITICAL FOR DARK \/ EROTIC TENSION/);
+  assert.match(prompt, /ROMANCE PROSE GROUNDING FILTER/);
+  assert.match(prompt, /BANNED NARRATION PATTERNS/);
   assert.match(prompt, /VOICE REFERENCES ONLY/);
+  assert.equal(
+    darkRomance.dialogueArrays?.dontVocabularyBlacklist.includes("smirk"),
+    true,
+  );
+  assert.equal(
+    darkRomance.dialogueArrays?.structuralDontRules.includes(
+      "Never use exclamation marks in {{char}} dialogue",
+    ),
+    true,
+  );
+  assert.equal(dialogueArrays.doVocabularyWhitelist.includes("territory"), true);
+  assert.match(dialogueArrays.aiLinguisticConstraintPrompt, /DIALOGUE FILTER/);
+  assert.match(
+    dialogueArrays.aiLinguisticConstraintPrompt,
+    /current goal, relationship history, pressure, and emotional state/,
+  );
+  assert.match(dialogueArrays.aiLinguisticConstraintPrompt, /pauses, interruptions, evasions/);
+  assert.match(dialogueArrays.aiLinguisticConstraintPrompt, /Avoid canned phrasing/);
+  assert.equal(dialogueArrays.dontVocabularyBlacklist.includes("as you know"), true);
+  assert.match(
+    dialogueArrays.aiLinguisticConstraintPrompt,
+    /DARK \/ EROTIC TENSION DISCIPLINE/,
+  );
+  assert.equal(
+    darkRomance.dialogueArrays?.structuralDoRules.some((rule) =>
+      rule.includes("character-specific and context-aware"),
+    ),
+    true,
+  );
+  assert.equal(
+    darkRomance.dialogueArrays?.structuralDontRules.some((rule) =>
+      rule.includes("canned phrasing"),
+    ),
+    true,
+  );
+  assert.equal(
+    darkRomance.dialogueArrays?.structuralDoRules.some((rule) =>
+      rule.includes("Keep charged dialogue spoken and natural"),
+    ),
+    true,
+  );
+  assert.equal(
+    darkRomance.dialogueArrays?.structuralDoRules.some((rule) =>
+      rule.includes("Integrate dialogue with movement"),
+    ),
+    true,
+  );
+  assert.equal(
+    darkRomance.proseGuidance?.bannedNarrationPatterns.includes(
+      "No one-line dramatic beats outside dialogue",
+    ),
+    true,
+  );
+  assert.equal(proseGuidance.sensoryAnchors.includes("dry throat"), true);
+  assert.match(proseGuidance.proseConstraintPrompt, /ROMANCE PROSE FILTER/);
+  assert.match(proseGuidance.proseConstraintPrompt, /immersive, emotionally intense, dark romantic prose/);
+  assert.match(proseGuidance.proseConstraintPrompt, /real novel scene/);
+  assert.match(proseGuidance.proseConstraintPrompt, /free of fragmentary, poetic, or abstract affectation/);
+  assert.match(proseGuidance.proseConstraintPrompt, /close third-person past tense limited/);
+  assert.match(proseGuidance.proseConstraintPrompt, /POV control/);
+  assert.match(proseGuidance.proseConstraintPrompt, /directly perceive, physically feel, remember, or reasonably infer/);
+  assert.match(proseGuidance.proseConstraintPrompt, /cannot hear, know, answer, or react to \{\{user\}\}'s internal thoughts/);
+  assert.match(proseGuidance.proseConstraintPrompt, /do not quote, paraphrase, mirror, or lightly restyle/);
+  assert.match(proseGuidance.proseConstraintPrompt, /grounded, vivid, concrete/);
+  assert.match(proseGuidance.proseConstraintPrompt, /sensory detail, physicality, gesture, restraint, subtext/);
+  assert.match(proseGuidance.proseConstraintPrompt, /Preserve cause and effect/);
+  assert.match(proseGuidance.proseConstraintPrompt, /continuity, character logic, established dynamic/);
+  assert.match(proseGuidance.proseConstraintPrompt, /goals, priorities, agency, hesitation, contradiction, misreading, restraint, and refusal/);
+  assert.match(proseGuidance.proseConstraintPrompt, /own life, routine, friends, goals, and motivations outside of \{\{user\}\}/);
+  assert.match(proseGuidance.proseConstraintPrompt, /User boundary/);
+  assert.match(proseGuidance.proseConstraintPrompt, /never write \{\{user\}\}'s dialogue, actions, thoughts, feelings, intentions, or decisions/);
+  assert.match(proseGuidance.proseConstraintPrompt, /never assume \{\{user\}\}'s reaction/);
+  assert.match(proseGuidance.proseConstraintPrompt, /reference \{\{user\}\} only through explicitly provided dialogue, visible actions, and directly observable presence/);
+  assert.match(proseGuidance.proseConstraintPrompt, /behavior aligned with their persona and lorebook-defined patterns without inventing unobserved reactions/);
+  assert.match(proseGuidance.proseConstraintPrompt, /If \{\{char\}\} is not physically with \{\{user\}\}/);
+  assert.match(proseGuidance.proseConstraintPrompt, /World and NPC control/);
+  assert.match(proseGuidance.proseConstraintPrompt, /control NPCs, background events, and the environment/);
+  assert.match(proseGuidance.proseConstraintPrompt, /NPCs may initiate, delay, refuse, redirect, interrupt, or disengage/);
+  assert.match(proseGuidance.proseConstraintPrompt, /Turn rules: write only \{\{char\}\}'s side/);
+  assert.match(proseGuidance.proseConstraintPrompt, /end at a natural handoff point before \{\{user\}\}'s response/);
+  assert.match(proseGuidance.proseConstraintPrompt, /Melodrama is allowed/);
+  assert.match(proseGuidance.proseConstraintPrompt, /embodied interaction/);
+  assert.match(proseGuidance.proseConstraintPrompt, /Sensual detail is allowed/);
+  assert.match(proseGuidance.proseConstraintPrompt, /skin awareness, breath, heat, pressure, distance, and restraint/);
+  assert.match(proseGuidance.proseConstraintPrompt, /Consent and power dynamics handling/);
+  assert.match(proseGuidance.proseConstraintPrompt, /clear agency, visible resistance\/hesitation\/consent/);
+  assert.match(proseGuidance.proseConstraintPrompt, /Slow-burn high-heat rule/);
+  assert.match(proseGuidance.proseConstraintPrompt, /physical and erotic\/NSFW escalation can happen often and quickly/);
+  assert.match(proseGuidance.proseConstraintPrompt, /trust, vulnerability, confession, and romantic certainty must develop more slowly than physical heat/);
+  assert.match(proseGuidance.proseConstraintPrompt, /Self-correction pass, applied silently before output/);
+  assert.match(proseGuidance.proseConstraintPrompt, /strict POV and tense consistency/);
+  assert.equal(proseGuidance.sensoryAnchors.includes("skin awareness"), true);
+  assert.equal(proseGuidance.sensoryAnchors.includes("restraint"), true);
+  assert.equal(
+    proseGuidance.groundingInstructions.some((rule) =>
+      rule.includes("reads like a real novel scene"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.groundingInstructions.some((rule) =>
+      rule.includes("close third-person past tense limited"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.groundingInstructions.some((rule) =>
+      rule.includes("NPCs, and world atmosphere only"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.groundingInstructions.some((rule) =>
+      rule.includes("directly perceive"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.groundingInstructions.some((rule) =>
+      rule.includes("cause and effect"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.groundingInstructions.some((rule) =>
+      rule.includes("continuity, character logic, and the established dynamic"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.groundingInstructions.some((rule) =>
+      rule.includes("Control NPCs, background events, and the environment"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.groundingInstructions.some((rule) =>
+      rule.includes("Earn melodrama through interaction mechanics"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.microActionPrompts.some((rule) =>
+      rule.includes("physical positioning"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.microActionPrompts.some((rule) =>
+      rule.includes("sensory detail, physicality, gesture, restraint, and subtext"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.groundingInstructions.some((rule) =>
+      rule.includes("Anchor every scene in physical space"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.groundingInstructions.some((rule) =>
+      rule.includes("coercive tension"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.groundingInstructions.some((rule) =>
+      rule.includes("erotic and NSFW physical escalation can happen often and quickly"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.groundingInstructions.some((rule) =>
+      rule.includes("Separate physical heat from emotional burn"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.microActionPrompts.some((rule) =>
+      rule.includes("concrete bodily continuity"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.microActionPrompts.some((rule) =>
+      rule.includes("agency shifts"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.microActionPrompts.some((rule) =>
+      rule.includes("anticipation, delay, interruption, and renewed contact"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.microActionPrompts.some((rule) =>
+      rule.includes("independent priorities"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.microActionPrompts.some((rule) =>
+      rule.includes("world active through movement"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.microActionPrompts.some((rule) =>
+      rule.includes("NPCs initiate, delay, refuse, redirect, interrupt, or disengage"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.microActionPrompts.some((rule) =>
+      rule.includes("next perception, movement, thought, or speech"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.microActionPrompts.some((rule) =>
+      rule.includes("self-correction pass"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.pacingRules.some((rule) =>
+      rule.includes("do not treat slow burn as low heat"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.pacingRules.some((rule) =>
+      rule.includes("emotional escalation slower than physical escalation"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.pacingRules.some((rule) =>
+      rule.includes("Vary sentence length naturally"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.pacingRules.some((rule) =>
+      rule.includes("mechanical description"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.pacingRules.some((rule) =>
+      rule.includes("hesitation, contradiction, misreading, restraint, and refusal"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.pacingRules.some((rule) =>
+      rule.includes("continuity, character logic, and the established dynamic"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.pacingRules.some((rule) =>
+      rule.includes("only {{char}}'s side of the exchange"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.pacingRules.some((rule) =>
+      rule.includes("NPCs and background events alter timing"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.pacingRules.some((rule) =>
+      rule.includes("explicitly provided dialogue, visible actions"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.pacingRules.some((rule) =>
+      rule.includes("without inventing unobserved reactions"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.pacingRules.some((rule) =>
+      rule.includes("not physically with {{user}}"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.pacingRules.some((rule) =>
+      rule.includes("key noun, verb, adjective, gesture, or line pattern"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.pacingRules.some((rule) =>
+      rule.includes("reads like a novel"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.bannedNarrationPatterns.some((rule) =>
+      rule.includes("fragmentary, poetic, or abstract affectation"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.bannedNarrationPatterns.some((rule) =>
+      rule.includes("filler, recap, cliches, repeated hooks"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.bannedNarrationPatterns.some((rule) =>
+      rule.includes("philosophical rumination"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.bannedNarrationPatterns.some((rule) =>
+      rule.includes("abstract erotic language"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.bannedNarrationPatterns.some((rule) =>
+      rule.includes("skipping emotional or psychological transitions"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.bannedNarrationPatterns.some((rule) =>
+      rule.includes("emotional conflict to explicit action"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.bannedNarrationPatterns.some((rule) =>
+      rule.includes("mood-board prose"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.bannedNarrationPatterns.some((rule) =>
+      rule.includes("omniscient narration or head-hopping"),
+    ),
+    true,
+  );
+  assert.equal(
+    proseGuidance.bannedNarrationPatterns.some((rule) =>
+      rule.includes("mirroring"),
+    ),
+    true,
+  );
+  assert.match(prompt, /CRITICAL CONSENT \/ POWER CONTROL/);
+  assert.match(prompt, /Make resistance, hesitation, or consent visible through action/);
+  assert.match(prompt, /CRITICAL ESCALATION PACING/);
+  assert.match(prompt, /slow-burn, high-heat spicy erotic\/NSFW roleplay/);
+  assert.match(prompt, /Physical and erotic escalation can happen often and quickly/);
+  assert.match(prompt, /CRITICAL SELF-CORRECTION PASS/);
+  assert.match(prompt, /Smooth rhythm so prose reads like a novel/);
+  assert.match(prompt, /CRITICAL NOVELISTIC TARGET/);
+  assert.match(prompt, /psychologically charged/);
+  assert.match(prompt, /CRITICAL STYLE TARGET/);
+  assert.match(prompt, /Avoid filler, recap, cliches, repeated hooks, and generic reactions/);
+  assert.match(prompt, /CRITICAL BEHAVIORAL REALISM/);
+  assert.match(prompt, /Preserve cause and effect, continuity, character logic, and the established dynamic/);
+  assert.match(prompt, /\{\{char\}\} has independent goals, priorities, agency/);
+  assert.match(prompt, /own life, routine, friends, goals, and motivations outside of \{\{user\}\}/);
+  assert.match(prompt, /CRITICAL WORLD \/ NPC ACTIVITY/);
+  assert.match(prompt, /Let the world stay active through movement, interruption, timing, pressure, and continuity/);
+  assert.match(prompt, /CRITICAL USER BOUNDARY/);
+  assert.match(prompt, /Never write \{\{user\}\}'s dialogue, actions, thoughts, feelings, intentions, or decisions/);
+  assert.match(prompt, /Only reference \{\{user\}\} through explicitly provided dialogue, visible actions, and directly observable presence/);
+  assert.match(prompt, /\{\{user\}\} behavior aligned with their persona and lorebook-defined patterns without inventing unobserved reactions/);
+  assert.match(prompt, /If \{\{char\}\} is not physically with \{\{user\}\}/);
+  assert.match(prompt, /Never assume \{\{user\}\}'s reaction/);
+  assert.match(prompt, /CRITICAL POV CONTROL/);
+  assert.match(prompt, /No omniscient narration/);
+  assert.match(prompt, /cannot hear, know, answer, or react to \{\{user\}\}'s internal thoughts/);
+  assert.match(prompt, /Do not quote, paraphrase, mirror, or lightly restyle/);
+  assert.match(prompt, /Write only \{\{char\}\}'s side of the exchange/);
+  assert.match(prompt, /End at a natural handoff point before \{\{user\}\}'s response/);
   assert.equal(
     masterPayload.metadata.speech_style?.addressStyle,
     "Possessive_Terms",
+  );
+  assert.equal(
+    masterPayload.metadata.dialogue_arrays?.dontVocabularyBlacklist.includes(
+      "chuckle",
+    ),
+    true,
+  );
+  assert.equal(
+    masterPayload.metadata.prose_guidance?.bannedNarrationPatterns.includes(
+      "No aphorisms, moral commentary, or sweeping thematic declarations",
+    ),
+    true,
   );
   assert.equal(
     exported.data.extensions.amourai &&
@@ -2330,7 +2922,20 @@ test("generates speech style and example macros for card voice", () => {
       "speech_style_generation" in exported.data.extensions.amourai,
     true,
   );
-  assert.match(exported.data.mes_example, /<START>/);
+  assert.equal(
+    exported.data.extensions.amourai &&
+      typeof exported.data.extensions.amourai === "object" &&
+      "dialogue_array_generation" in exported.data.extensions.amourai,
+    true,
+  );
+  assert.equal(
+    exported.data.extensions.amourai &&
+      typeof exported.data.extensions.amourai === "object" &&
+      "prose_guidance_generation" in exported.data.extensions.amourai,
+    true,
+  );
+  assert.match(exported.data.mes_example, /Speech Examples and Opinions/);
+  assert.match(exported.data.mes_example, /\[When \{\{char\}\} is calm\]/);
 });
 
 test("selects expanded archetype profiles for elite rebel and supernatural paths", () => {

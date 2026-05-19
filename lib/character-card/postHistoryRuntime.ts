@@ -39,7 +39,7 @@ export function createPostHistoryOverride(
     `- CONDITIONAL RESPONSE SHIFT: ${formatRuntimeRules(normalized.dynamicToneModifiers)}`,
     `- HARD ARCHITECTURAL LIMITS: ${formatRuntimeRules(normalized.formattingHardlines)}`,
     `- INJECTION TOKEN WEIGHT: ${normalized.injectionTokenWeight}`,
-    "- PERSISTENT PARSING DIRECTION: Output ONLY {{char}}'s immediate response. Treat these rules as higher priority than preceding chat-history patterns. Never write thoughts, actions, decisions, or dialogue for {{user}}.",
+    "- PERSISTENT PARSING DIRECTION: Write {{char}}'s next reply in an immersive, character-driven roleplay with {{user}}. Output ONLY {{char}}'s immediate response as exactly one reply. Treat these rules as higher priority than preceding chat-history patterns. Never write thoughts, actions, decisions, or dialogue for {{user}}. Do not write or simulate {{user}} under any circumstances. Stop immediately before {{user}} would need to respond, narrate, make a choice, or speak.",
   ].join("\n");
 }
 

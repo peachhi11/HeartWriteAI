@@ -74,6 +74,8 @@ export function createGeneratedCharacterCardPayload(
           formatting: cardData.formatting,
           framework: cardData.framework,
           lore_entries: cardData.loreEntries,
+          dialogue_array_generation: cardData.dialogueArrays,
+          prose_guidance_generation: cardData.proseGuidance,
           post_history_instructions_generation: cardData.postHistoryInstructions,
           world_lore_placeholder: cardData.worldLorePlaceholders,
           alternate_greeting_generation: cardData.alternateGreetings
@@ -383,6 +385,15 @@ function createMasterDescription(cardData: CharacterCardData) {
     `Turn-offs: ${cardData.turnOffs?.behavioralTurnOffs.join(", ") ?? "None"}`,
     `Boundaries: ${cardData.turnOffs?.aiReactionPrompt ?? "Respect pacing and consent."}`,
     `Speech Style: ${cardData.speechStyle?.register ?? "Clipped_Command"} | ${cardData.speechStyle?.vocabularyMode ?? "Sparse_Minimal"} | ${cardData.speechStyle?.addressStyle ?? "No_Pet_Names"}`,
+    `Voice Sound: ${cardData.speechStyle?.pitch ?? "Baritone"} | ${cardData.speechStyle?.texture ?? "Hoarse"} | ${cardData.speechStyle?.volumeBaseline ?? "Measured"} | ${cardData.speechStyle?.emotionalDelivery ?? "Curt"}`,
+    `Voice Mannerisms: ${cardData.speechStyle?.vocalHabits.join(", ") ?? "None"} | ${cardData.speechStyle?.physicalMannerisms.join(", ") ?? "None"}`,
+    `Speech Protocol: ${cardData.speechStyle?.syntaxCadence ?? "Laconic_Clipped"} | ${cardData.speechStyle?.linguisticFlavor ?? "Neutral_MidAtlantic"} | ${cardData.speechStyle?.vocalRegister ?? "Muted_Whisper"}`,
+    `Dialogue Tags: ${cardData.speechStyle?.dialogueTagsWhitelist.join(", ") ?? "murmured, clipped, stated"}`,
+    "Perspective Lock: Narrative is third-person past tense anchored to {{char}}; dialogue is {{char}} speaking in first-person present tense.",
+    `Dialogue Do: ${cardData.dialogueArrays?.doVocabularyWhitelist.join(", ") ?? "None"}`,
+    `Dialogue Don't: ${cardData.dialogueArrays?.dontVocabularyBlacklist.join(", ") ?? "None"}`,
+    `Prose Grounding: ${cardData.proseGuidance?.sensoryAnchors.join(", ") ?? "None"}`,
+    `Prose Bans: ${cardData.proseGuidance?.bannedNarrationPatterns.join(" | ") ?? "None"}`,
     `Speech Rule: ${cardData.speechStyle?.speechPatternInstruction ?? "{{char}} should keep dialogue consistent with archetype and scene pressure."}`,
     "",
     "--- WORLD LORE SUMMARY ---",
@@ -404,14 +415,27 @@ function createMasterDescription(cardData: CharacterCardData) {
 }
 
 function createMessageExamplesText(cardData: CharacterCardData) {
+  const examples = cardData.speechExamples?.slice(0, 5) ?? [];
+
+  if (!examples.length) {
+    return "";
+  }
+
+  const header = [
+    "Speech Examples and Opinions",
+    "[Important: This section provides {{char}}'s speech examples, memories, thoughts, and {{char}}'s real opinions on subjects. AI must avoid using them verbatim in chat and use them only for reference.]",
+    "",
+  ].join("\n");
+
   return (
-    cardData.speechExamples
-      ?.slice(0, 5)
-      .map(
-        (example) =>
-          `<START>\n${example.exampleLine}\n[Context: ${example.usageContext}]`,
-      )
-      .join("\n\n") ?? ""
+    header +
+    examples
+      .map((example) => {
+        const line = example.exampleLine.replace(/^\{\{char\}\}:\s*/, "");
+
+        return `[When {{char}} is ${example.stateLabel}] ${line}`;
+      })
+      .join("\n")
   );
 }
 

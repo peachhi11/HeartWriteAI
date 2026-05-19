@@ -662,7 +662,6 @@ const FRAMEWORK_INJECTION_PIPELINE_ROUTERS: FrameworkInjectionPipelineRouter[] =
   ];
 const FORMATTING_ACTION_WRAPPING_STANDARDS: FormattingActionWrappingStandard[] =
   [
-    "Asterisk_Standard_RP",
     "Quote_Isolated_Prose",
     "Bracket_Monologue",
     "Raw_Script",
@@ -739,10 +738,10 @@ const DEFAULT_FRAMEWORK_CONFIGURATION: FrameworkConfigurationExtension = {
   targetSpecification: "V3_Card_Layout",
 };
 const DEFAULT_FORMATTING_CONFIGURATION: FormattingConfigurationExtension = {
-  actionWrappingStandard: "Asterisk_Standard_RP",
+  actionWrappingStandard: "Quote_Isolated_Prose",
   formattingId: "11111111-7777-4000-8000-000000000000",
   formattingSystemPromptInjection:
-    "MANDATORY: Format using standard asterisk RP. Keep actions in single asterisks, speech in quotation marks, and never write for {{user}}.",
+    "MANDATORY: Use Standard Prose Format. Dialogue in double quotation marks. Weave actions, body language, reactions, narration, and brief internal thoughts into prose paragraphs. Start a new paragraph whenever a different character speaks. Do not output APP: or USER: labels. Never write for {{user}}.",
   markdownEmphasisStyle: "Clean_Prose",
   maxParagraphsPerTurn: 3,
   narrativePerspective: "Third_Person_Past",
@@ -805,7 +804,7 @@ const DEFAULT_POST_HISTORY_INSTRUCTIONS_GENERATION: PostHistoryInstructionsGener
     formattingHardlines: [
       "CRITICAL: Never write thoughts, actions, decisions, or dialogue for {{user}}.",
       "Do not conclude the scene, skip time, or resolve conflict unless {{user}} has explicitly moved there.",
-      "Use standard roleplay prose with concise dialogue in quotation marks.",
+      "Use Standard Prose Format with dialogue in double quotation marks, actions/body language/reactions woven into prose paragraphs, and a new paragraph whenever a different character speaks. Do not output APP: or USER: labels.",
     ],
     injectionTokenWeight: 50,
   };

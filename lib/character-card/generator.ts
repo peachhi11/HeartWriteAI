@@ -9,6 +9,7 @@ export interface CharacterCardData {
   birth_month: string;
   birth_day: number;
   creatorsNotes?: GeneratedCreatorsNotesData;
+  dialogueArrays?: GeneratedDialogueArrayData;
   ethnicity?: GeneratedEthnicityData;
   fetish?: GeneratedFetishData;
   firstMessage?: GeneratedFirstMessageData;
@@ -23,6 +24,7 @@ export interface CharacterCardData {
   nationality?: GeneratedNationalityData;
   occupation?: GeneratedOccupationData;
   postHistoryInstructions?: GeneratedPostHistoryInstructionsData;
+  proseGuidance?: GeneratedProseGuidanceData;
   race?: GeneratedRaceData;
   relationshipStatus?: GeneratedRelationshipStatusData;
   relationships?: GeneratedNPCRelationshipData[];
@@ -56,6 +58,7 @@ export interface AgeGapRomanceOptions {
   archetype?: GeneratedArchetypeConfigurationData;
   anchorYear?: number;
   creatorsNotes?: GeneratedCreatorsNotesData;
+  dialogueArrays?: GeneratedDialogueArrayData;
   ethnicityRegion?: EthnicityRegion;
   fetish?: GeneratedFetishData;
   firstMessage?: GeneratedFirstMessageData;
@@ -83,6 +86,7 @@ export interface AgeGapRomanceOptions {
   occupationWorkplaceVibe?: string;
   powerDynamic?: string;
   postHistoryInstructions?: GeneratedPostHistoryInstructionsData;
+  proseGuidance?: GeneratedProseGuidanceData;
   raceMacroGroup?: RaceMacroGroup;
   relationshipStatus?: GeneratedRelationshipStatusData;
   relationships?: GeneratedNPCRelationshipData[];
@@ -219,7 +223,6 @@ export interface GeneratedFrameworkConfigurationData {
 }
 
 export type FormattingActionWrappingStandard =
-  | "Asterisk_Standard_RP"
   | "Bracket_Monologue"
   | "Quote_Isolated_Prose"
   | "Raw_Script";
@@ -267,6 +270,16 @@ export interface GeneratedToneConfigurationData {
   toneId: string;
   toneSystemPromptInjection: string;
   worldviewFilter: ToneWorldviewFilter;
+}
+
+export interface GeneratedProseGuidanceData {
+  bannedNarrationPatterns: string[];
+  groundingInstructions: string[];
+  guidanceId: string;
+  microActionPrompts: string[];
+  pacingRules: string[];
+  proseConstraintPrompt: string;
+  sensoryAnchors: string[];
 }
 
 export type ArchetypePersonaType =
@@ -334,13 +347,83 @@ export type SpeechAddressStyle =
   | "Selective_Endearments"
   | "Teasing_Nicknames";
 
+export type SpeechPitch =
+  | "Baritone"
+  | "Deep"
+  | "High_Pitched"
+  | "Mid_Range";
+
+export type SpeechTexture =
+  | "Breathy"
+  | "Hoarse"
+  | "Nasal"
+  | "Raspy"
+  | "Smooth";
+
+export type SpeechVolumeBaseline =
+  | "Booming"
+  | "Measured"
+  | "Soft_Spoken";
+
+export type SpeechEmotionalDelivery =
+  | "Affectionate"
+  | "Clinical"
+  | "Curt"
+  | "Formal"
+  | "Gravely_Serious"
+  | "Monotone"
+  | "Playful"
+  | "Sarcastic"
+  | "Seductive"
+  | "Soothing";
+
+export type SpeechVocalHabit =
+  | "Pet_Names"
+  | "Stuttering"
+  | "Trailing_Off"
+  | "Vocal_Fry";
+
+export type SpeechPhysicalMannerism =
+  | "Eye_Contact_Avoidance"
+  | "Lip_Chewing"
+  | "Nose_Pinch"
+  | "Space_Invasion";
+
+export type SpeechSyntaxCadence =
+  | "Banter_Fast"
+  | "Laconic_Clipped"
+  | "Ornate_Sesquipedalian"
+  | "Staccato_Tension";
+
+export type SpeechLinguisticFlavor =
+  | "Jargon_Infused"
+  | "L1_Interference"
+  | "Neutral_MidAtlantic"
+  | "Vernacular_Slang";
+
+export type SpeechVocalRegister =
+  | "Dynamic_Range_Shift"
+  | "Muted_Whisper"
+  | "Vocal_Masking";
+
 export interface GeneratedSpeechStyleData {
   addressStyle: SpeechAddressStyle;
   dialogueDonts: string[];
   dialogueDos: string[];
+  dialogueTagsWhitelist: string[];
+  emotionalDelivery: SpeechEmotionalDelivery;
+  linguisticFlavor: SpeechLinguisticFlavor;
+  physicalMannerisms: SpeechPhysicalMannerism[];
+  pitch: SpeechPitch;
+  texture: SpeechTexture;
   speechPatternInstruction: string;
+  speechSystemPromptInjection: string;
   styleId: string;
   register: SpeechRegister;
+  syntaxCadence: SpeechSyntaxCadence;
+  vocalHabits: SpeechVocalHabit[];
+  volumeBaseline: SpeechVolumeBaseline;
+  vocalRegister: SpeechVocalRegister;
   vocabularyMode: SpeechVocabularyMode;
 }
 
@@ -351,11 +434,34 @@ export type SpeechExampleCategory =
   | "Greeting"
   | "Romantic_Tension";
 
+export type SpeechExampleState =
+  | "Alone_With_User"
+  | "Calm"
+  | "Cornered"
+  | "Defensive"
+  | "Exhausted"
+  | "Furious"
+  | "Guilty"
+  | "Intimate"
+  | "Possessive"
+  | "Public";
+
 export interface GeneratedSpeechExampleData {
   category: SpeechExampleCategory;
   exampleId: string;
   exampleLine: string;
+  state: SpeechExampleState;
+  stateLabel: string;
   usageContext: string;
+}
+
+export interface GeneratedDialogueArrayData {
+  aiLinguisticConstraintPrompt: string;
+  arrayId: string;
+  dontVocabularyBlacklist: string[];
+  doVocabularyWhitelist: string[];
+  structuralDontRules: string[];
+  structuralDoRules: string[];
 }
 
 export type CreatorsNotesContentRating =
@@ -1016,7 +1122,6 @@ const RELATIONSHIP_SCANDAL_FACTORS = [
   "None",
 ] as const satisfies readonly RelationshipScandalFactor[];
 const FORMATTING_ACTION_WRAPPING = [
-  "Asterisk_Standard_RP",
   "Bracket_Monologue",
   "Quote_Isolated_Prose",
   "Raw_Script",
@@ -1368,7 +1473,7 @@ export const characterCardSeeds: CharacterCardSeed[] = [
       prose_texture: "Gritty_Melodramatic",
       pacing_velocity: "Slow_Tease_Prose",
       worldview_filter: "Ruthless_Cynical",
-      action_wrapping_standard: "Asterisk_Standard_RP",
+      action_wrapping_standard: "Quote_Isolated_Prose",
       narrative_perspective: "Third_Person_Past",
       max_paragraphs_per_turn: 3,
     },
@@ -1444,7 +1549,7 @@ export const characterCardSeeds: CharacterCardSeed[] = [
       prose_texture: "Formal_Poetic",
       pacing_velocity: "Measured_Deliberate",
       worldview_filter: "Jaded_Weary",
-      action_wrapping_standard: "Asterisk_Standard_RP",
+      action_wrapping_standard: "Quote_Isolated_Prose",
       narrative_perspective: "Third_Person_Present",
       max_paragraphs_per_turn: 2,
     },
@@ -1521,7 +1626,7 @@ export const characterCardSeeds: CharacterCardSeed[] = [
       prose_texture: "Gritty_Melodramatic",
       pacing_velocity: "Slow_Tease_Prose",
       worldview_filter: "Ruthless_Cynical",
-      action_wrapping_standard: "Asterisk_Standard_RP",
+      action_wrapping_standard: "Quote_Isolated_Prose",
       narrative_perspective: "Third_Person_Past",
       max_paragraphs_per_turn: 4,
     },
@@ -1602,7 +1707,7 @@ export const characterCardSeeds: CharacterCardSeed[] = [
       prose_texture: "Lighthearted_Wholesome",
       pacing_velocity: "Measured_Deliberate",
       worldview_filter: "Optimistic_Idealistic",
-      action_wrapping_standard: "Asterisk_Standard_RP",
+      action_wrapping_standard: "Quote_Isolated_Prose",
       narrative_perspective: "Third_Person_Past",
       max_paragraphs_per_turn: 2,
     },
@@ -1701,6 +1806,18 @@ export function generateAgeGapRomance(
       relationshipStatus,
       trope,
     );
+  const dialogueArrays =
+    options.dialogueArrays ??
+    generateDialogueArrayData(
+      trope,
+      archetype,
+      occupation,
+      species,
+      speechStyle,
+    );
+  const proseGuidance =
+    options.proseGuidance ??
+    generateProseGuidanceData(trope, tone, formatting, scenario);
   const alternateGreetings = normaliseAlternateGreetings(
     options.alternateGreetings,
   );
@@ -1781,6 +1898,7 @@ export function generateAgeGapRomance(
     birth_month: MONTH_NAMES[birthDate.birth_month - 1],
     birth_day: birthDate.birth_day,
     creatorsNotes,
+    dialogueArrays,
     ethnicity,
     fetish,
     firstMessage,
@@ -1795,6 +1913,7 @@ export function generateAgeGapRomance(
     nationality,
     occupation,
     postHistoryInstructions,
+    proseGuidance,
     race,
     relationshipStatus,
     relationships,
@@ -1845,10 +1964,23 @@ export function generateCharacterCardFromSeed(
     relationshipStatus,
     seed.trope_framework,
   );
+  const dialogueArrays = generateDialogueArrayData(
+    seed.trope_framework,
+    archetype,
+    occupation,
+    species,
+    speechStyle,
+  );
+  const proseGuidance = generateProseGuidanceData(
+    seed.trope_framework,
+    tone,
+    formatting,
+  );
   const race = generateRaceData(asRaceMacroGroup(seed.identity.race), ethnicity);
   const card = generateAgeGapRomance(seed.trope_framework, {
     anchorYear,
     archetype,
+    dialogueArrays,
     ethnicityRegion: ethnicity.region,
     fetish,
     formatting,
@@ -1879,6 +2011,7 @@ export function generateCharacterCardFromSeed(
         : undefined,
     occupationWorkplaceVibe: occupation.workplaceVibe,
     raceMacroGroup: race.macroGroup,
+    proseGuidance,
     random: options.random,
     relationshipStatus,
     relationships,
@@ -1897,6 +2030,7 @@ export function generateCharacterCardFromSeed(
     birth_day: birthday.birth_day,
     birth_month: MONTH_NAMES[birthday.birth_month - 1],
     birth_year: anchorYear - seed.identity.chronological_age,
+    dialogueArrays,
     ethnicity,
     fetish,
     formatting,
@@ -1913,6 +2047,7 @@ export function generateCharacterCardFromSeed(
     kink,
     nationality,
     occupation,
+    proseGuidance,
     race,
     relationshipStatus,
     relationships,
@@ -2398,8 +2533,9 @@ export function generatePostHistoryInstructionsData(
     normalized.includes("academic");
   const driftControlRules = [
     isSlowBurn
-      ? "Check recent chat progression before softening {{char}}; preserve slow-burn resistance until trust has clearly changed on-page."
+      ? "Check recent chat progression before emotionally softening {{char}}; preserve slow-burn resistance for trust, vulnerability, confession, and romantic certainty until they have clearly changed on-page. Do not suppress high-heat physical escalation when context and agency support it."
       : "Preserve {{char}}'s established personality, relationship status, and current emotional pace.",
+    "Preserve continuity, character logic, and the established dynamic; do not overwrite prior relationship state without on-page cause.",
     "Use lorebook summary only when it affects the active scene; do not dump unrelated background lore.",
     `Keep active world anchor in mind: ${lorebookSummary.universeAnchor}.`,
   ];
@@ -2411,10 +2547,21 @@ export function generatePostHistoryInstructionsData(
     turnOffs.aiReactionPrompt,
   ];
   const formattingHardlines = [
+    "Write {{char}}'s next reply in an immersive, character-driven roleplay with {{user}}.",
     "CRITICAL: Never write thoughts, actions, decisions, or dialogue for {{user}}.",
+    "{{char}} cannot hear, know, answer, or react to {{user}}'s internal thoughts, private narration, or anything not directly spoken or visibly acted.",
+    "Only reference {{user}} through explicitly provided dialogue, visible actions, and directly observable presence. Keep {{user}} behavior aligned with their persona and lorebook-defined patterns without inventing unobserved reactions.",
+    "If {{char}} is not physically with {{user}}, do not narrate {{user}}'s current actions, speech, thoughts, body language, decisions, company, or surroundings.",
+    "{{char}} has his own life, routine, friends, goals, and motivations outside of {{user}}.",
     "Do not conclude the scene, skip time, or resolve conflict unless {{user}} has explicitly moved there.",
-    "Use standard roleplay prose with action in narrative text and concise dialogue in quotation marks.",
+    "Use Standard Prose Format: third-person prose paragraphs with spoken words in double quotation marks, actions/body language/reactions woven into the same paragraph or surrounding sentences, and a new paragraph whenever a different character speaks. Do not output APP: or USER: labels.",
     "Keep the response focused on {{char}}'s immediate perception, movement, and speech.",
+    "Stay fully anchored to {{char}}'s perception and immediate inference. Show uncertainty as interpretation, not fact.",
+    "Maintain continuity of space, timing, and prior actions.",
+    "Do not quote, paraphrase, mirror, or lightly restyle {{user}}'s previous message. Respond from {{char}}'s next perception, movement, thought, or speech instead.",
+    "Do not reuse the same key noun, verb, adjective, gesture, or line pattern twice in close proximity unless necessary for clarity.",
+    "Write exactly one reply only.",
+    "Stop immediately before {{user}} would need to respond, narrate, make a choice, or speak.",
   ];
 
   return {
@@ -2668,9 +2815,7 @@ export function generateFormattingConfigurationData(
       ? "Raw_Script"
       : firstMessage.literaryStyle === "Internal_Monologue_Heavy"
         ? "Bracket_Monologue"
-        : firstMessage.literaryStyle === "Novella_Prose"
-          ? "Quote_Isolated_Prose"
-          : "Asterisk_Standard_RP";
+        : "Quote_Isolated_Prose";
   const markdownEmphasisStyle: FormattingMarkdownEmphasisStyle = isTechnical
     ? "Code_Block_Shielding"
     : normalized.includes("dark") || normalized.includes("enemies")
@@ -2886,20 +3031,68 @@ export function generateSpeechStyleData(
               : "Clipped_Command";
   const vocabularyMode = vocabularyModeForSpeech(register, tone);
   const addressStyle = addressStyleForSpeech(register, normalized);
+  const pitch = pitchForSpeech(register, archetype);
+  const texture = textureForSpeech(register, tone);
+  const volumeBaseline = volumeBaselineForSpeech(register);
+  const emotionalDelivery = emotionalDeliveryForSpeech(register, archetype);
+  const vocalHabits = vocalHabitsForSpeech(register, addressStyle);
+  const physicalMannerisms = physicalMannerismsForSpeech(register, archetype);
+  const syntaxCadence = syntaxCadenceForSpeech(register);
+  const linguisticFlavor = linguisticFlavorForSpeech(occupation, normalized);
+  const vocalRegister = vocalRegisterForSpeech(register, archetype);
+  const dialogueTagsWhitelist = dialogueTagsForSpeech(
+    register,
+    vocalRegister,
+    emotionalDelivery,
+  );
   const dialogueDos = dialogueDosForSpeech(register);
   const dialogueDonts = dialogueDontsForSpeech(register);
 
   return {
     addressStyle,
+    dialogueTagsWhitelist,
     dialogueDonts,
     dialogueDos,
+    emotionalDelivery,
+    linguisticFlavor,
+    physicalMannerisms,
+    pitch,
     register,
+    texture,
     speechPatternInstruction: buildSpeechPatternInstruction(
       register,
       vocabularyMode,
       addressStyle,
+      pitch,
+      texture,
+      volumeBaseline,
+      emotionalDelivery,
+      syntaxCadence,
+      linguisticFlavor,
+      vocalRegister,
+      dialogueTagsWhitelist,
     ),
-    styleId: createStableSpeechStyleId(register, vocabularyMode, addressStyle),
+    speechSystemPromptInjection: buildSpeechSystemPromptInjection(
+      syntaxCadence,
+      linguisticFlavor,
+      vocalRegister,
+      dialogueTagsWhitelist,
+    ),
+    styleId: createStableSpeechStyleId(
+      register,
+      vocabularyMode,
+      addressStyle,
+      pitch,
+      texture,
+      emotionalDelivery,
+      syntaxCadence,
+      linguisticFlavor,
+      vocalRegister,
+    ),
+    syntaxCadence,
+    vocalHabits,
+    volumeBaseline,
+    vocalRegister,
     vocabularyMode,
   };
 }
@@ -2915,12 +3108,16 @@ export function generateSpeechExamplesData(
     {
       category: "Greeting",
       exampleLine: exampleLineForGreeting(speechStyle.register),
+      state: "Calm",
+      stateLabel: "calm",
       usageContext:
         "Use as a tonal reference for first contact or the first turn after scene setup.",
     },
     {
       category: "Conflict",
       exampleLine: exampleLineForConflict(speechStyle.register),
+      state: "Furious",
+      stateLabel: "furious",
       usageContext:
         "Use when {{user}} challenges {{char}}, violates pacing, or forces a rivalry beat.",
     },
@@ -2931,6 +3128,16 @@ export function generateSpeechExamplesData(
           ? "Care"
           : "Romantic_Tension",
       exampleLine: exampleLineForSoftening(speechStyle.register),
+      state:
+        relationshipStatus.emotionalAvailability === "Fully_Open" ||
+        archetype.personaType === "The_Golden_Retriever"
+          ? "Alone_With_User"
+          : "Defensive",
+      stateLabel:
+        relationshipStatus.emotionalAvailability === "Fully_Open" ||
+        archetype.personaType === "The_Golden_Retriever"
+          ? "alone with {{user}}"
+          : "defensive",
       usageContext:
         "Use when defenses lower, but keep {{char}} from confessing too quickly.",
     },
@@ -2940,6 +3147,8 @@ export function generateSpeechExamplesData(
     examples.push({
       category: "Boundary",
       exampleLine: exampleLineForBoundary(speechStyle.register),
+      state: "Possessive",
+      stateLabel: "being possessive",
       usageContext:
         "Use when the contract, taboo, or power imbalance needs to be reinforced without writing for {{user}}.",
     });
@@ -2953,6 +3162,150 @@ export function generateSpeechExamplesData(
       example.exampleLine,
     ),
   }));
+}
+
+export function generateDialogueArrayData(
+  trope: string,
+  archetype: GeneratedArchetypeConfigurationData,
+  occupation: GeneratedOccupationData,
+  species: GeneratedSpeciesData,
+  speechStyle: GeneratedSpeechStyleData,
+): GeneratedDialogueArrayData {
+  const normalized = normaliseTrope(trope);
+  const doVocabularyWhitelist = createDoVocabularyWhitelist(
+    occupation,
+    species,
+    speechStyle,
+  );
+  const dontVocabularyBlacklist = createDontVocabularyBlacklist(
+    normalized,
+    archetype,
+    species,
+    speechStyle,
+  );
+  const structuralDoRules = createStructuralDoRules(speechStyle);
+  const structuralDontRules = createStructuralDontRules(
+    archetype,
+    species,
+    speechStyle,
+  );
+  const darkEroticDisciplineRules = createDarkEroticDisciplineRules(
+    normalized,
+    speechStyle,
+  );
+
+  return {
+    aiLinguisticConstraintPrompt: buildDialogueConstraintPrompt(
+      archetype,
+      speechStyle,
+      doVocabularyWhitelist,
+      dontVocabularyBlacklist,
+      structuralDoRules,
+      structuralDontRules,
+      darkEroticDisciplineRules,
+    ),
+    arrayId: createStableDialogueArrayId(
+      speechStyle.styleId,
+      doVocabularyWhitelist,
+      dontVocabularyBlacklist,
+    ),
+    dontVocabularyBlacklist,
+    doVocabularyWhitelist,
+    structuralDontRules,
+    structuralDoRules: [...structuralDoRules, ...darkEroticDisciplineRules],
+  };
+}
+
+export function generateProseGuidanceData(
+  trope: string,
+  tone: GeneratedToneConfigurationData,
+  formatting: GeneratedFormattingConfigurationData,
+  scenario?: GeneratedScenarioData,
+): GeneratedProseGuidanceData {
+  const sensoryAnchors = createSensoryAnchors(trope, scenario);
+  const groundingInstructions = [
+    "Produce immersive, emotionally intense dark romantic prose that reads like a real novel scene: dramatic, sensual, psychologically charged, and never fragmentary or abstract",
+    "Engage the senses before stating emotional conclusions",
+    "Replace vague abstractions with bodily reactions, objects, light, scent, sound, and temperature",
+    "Personalize romantic attention through character history, insecurity, values, or current stakes",
+    "Create narrative friction through conflicting goals, social pressure, miscommunication, or external risk",
+    "Earn melodrama through interaction mechanics: proximity, near-touch, control versus resistance, silence, hesitation, interruption, power shifts, positioning, and emotional leverage",
+    "Write in close third-person past tense limited, keeping prose grounded, vivid, concrete, and anchored to {{char}}'s immediate perception",
+    "Anchor every scene in physical space before escalating sensual detail",
+    "Keep sensual detail grounded and continuous through skin awareness, breath, heat, pressure, distance, and restraint",
+    "Handle power imbalance, coercive tension, obsession, and morally gray behavior with clear character agency and consequence",
+    "Show negotiation of power through behavior and dialogue instead of romanticized abstraction",
+    "Make resistance, hesitation, or consent visible through action before escalating intensity",
+    "Separate physical heat from emotional burn: erotic and NSFW physical escalation can happen often and quickly when context, agency, and continuity support it, while emotional escalation stays slower and earned",
+    "Preserve cause and effect so every reaction follows from the previous beat and remains psychologically believable",
+    "Preserve continuity, character logic, and the established dynamic across every response",
+    "Keep {{char}} independent, with goals, priorities, agency, and the ability to hesitate, contradict themselves, misread, restrain themselves, or refuse",
+    "{{char}} has his own life, routine, friends, goals, and motivations outside of {{user}}",
+    "Anchor narration to {{char}}, NPCs, and world atmosphere only",
+    "Limit narration to what {{char}} can directly perceive, physically feel, remember, or reasonably infer",
+    "{{char}} cannot hear, know, answer, or react to {{user}}'s internal thoughts, private narration, or anything not directly spoken or visibly acted",
+    "Control NPCs, background events, and the environment while keeping {{user}} untouched",
+  ];
+  const microActionPrompts = [
+    "Use precise physical action instead of standalone pauses",
+    "Show emotional processing through micro-expressions, breath, swallowing, fidgeting, or posture changes",
+    "Anchor silence in environmental interaction such as glass rims, rain-streaked windows, papers, clothing, or furniture",
+    "Use physical positioning to raise intensity: standing over, blocking exits, looming, retreating, leaning in, or deliberately creating distance",
+    "Use emotional leverage in action and dialogue: withholding, teasing, testing, provocation, or controlled restraint",
+    "Use sensory detail, physicality, gesture, restraint, and subtext instead of generic reaction labels",
+    "Track sensuality through concrete bodily continuity: a breath catching, heat gathering under skin, pressure at a wrist, distance narrowing, or restraint held in the hands",
+    "Show agency shifts in the body: a hand stopping short, a step back, a held gaze, a verbal refusal, a deliberate invitation, or {{char}} adjusting pressure in response",
+    "Use anticipation, delay, interruption, and renewed contact to make frequent physical escalation feel contextual rather than emotionally rushed",
+    "Let {{char}} act from independent priorities: pursuing an objective, withholding a response, misreading a cue, refusing a demand, or choosing restraint",
+    "Keep the world active through movement, interruption, timing, pressure, and continuity",
+    "Let NPCs initiate, delay, refuse, redirect, interrupt, or disengage when it preserves believable scene pressure",
+    "Respond from {{char}}'s next perception, movement, thought, or speech instead of quoting, paraphrasing, mirroring, or restyling {{user}}'s previous message",
+    "During the silent self-correction pass, expand clipped aesthetic sentences into full narrative flow and replace abstract phrasing with physical or behavioral detail",
+    "Let internal monologue reveal biased, specific thoughts rather than universal romantic truths",
+  ];
+  const pacingRules = createProsePacingRules(tone, formatting);
+  const bannedNarrationPatterns = [
+    "No vague labels such as deep connection, undeniable chemistry, or looked at each other with love",
+    "No one-line dramatic beats outside dialogue",
+    "No filler, recap, cliches, repeated hooks, or generic reactions",
+    "No aphorisms, moral commentary, or sweeping thematic declarations",
+    "No choppy stack of short sentences for aesthetic drama",
+    "No purple-prose cosmic metaphors replacing concrete physical emotion",
+    "No fragmentary, poetic, or abstract affectation that collapses novel-scene realism into mood-board shorthand",
+    "No philosophical rumination, abstract emotional narration, or self-aware danger commentary unless grounded in action",
+    "No overwrought internal monologue used as a substitute for interaction",
+    "No abstract erotic language or symbolic, metaphor-heavy sensual description",
+    "No skipping emotional or psychological transitions during power shifts",
+    "No romanticized abstraction that treats coercive tension as consequence-free",
+    "No jumping directly from emotional conflict to explicit action",
+    "No mechanical intimate description that ignores character reaction",
+    "No pseudo-profound lines, mood-board prose, or intensity generated by style instead of interaction",
+    "No omniscient narration or head-hopping",
+    "No treating {{user}}'s internal thoughts, private narration, or unspoken text as something {{char}} can hear or know",
+    "No quoting, paraphrasing, mirroring, or lightly restyling {{user}}'s previous message",
+    "No reusing the same key noun, verb, adjective, gesture, or line pattern twice in close proximity unless needed for clarity",
+  ];
+
+  return {
+    bannedNarrationPatterns,
+    groundingInstructions,
+    guidanceId: createStableProseGuidanceId(
+      tone.proseTexture,
+      tone.pacingVelocity,
+      formatting.narrativePerspective,
+      sensoryAnchors,
+    ),
+    microActionPrompts,
+    pacingRules,
+    proseConstraintPrompt: buildProseConstraintPrompt(
+      sensoryAnchors,
+      groundingInstructions,
+      microActionPrompts,
+      pacingRules,
+      bannedNarrationPatterns,
+    ),
+    sensoryAnchors,
+  };
 }
 
 export function generateEthnicityData(
@@ -3674,7 +4027,7 @@ function asRelationshipScandalFactor(
 function asFormattingActionWrappingStandard(
   value: string,
 ): FormattingActionWrappingStandard {
-  return pickSeedValue(value, FORMATTING_ACTION_WRAPPING, "Asterisk_Standard_RP");
+  return pickSeedValue(value, FORMATTING_ACTION_WRAPPING, "Quote_Isolated_Prose");
 }
 
 function asFormattingNarrativePerspective(
@@ -4645,6 +4998,7 @@ function normaliseSpeechExamples(
     .map((example) => ({
       ...example,
       exampleLine: example.exampleLine.trim(),
+      stateLabel: example.stateLabel.trim(),
       usageContext: example.usageContext.trim(),
     }));
 }
@@ -4889,8 +5243,14 @@ function createStableSpeechStyleId(
   register: SpeechRegister,
   vocabularyMode: SpeechVocabularyMode,
   addressStyle: SpeechAddressStyle,
+  pitch: SpeechPitch,
+  texture: SpeechTexture,
+  emotionalDelivery: SpeechEmotionalDelivery,
+  syntaxCadence: SpeechSyntaxCadence,
+  linguisticFlavor: SpeechLinguisticFlavor,
+  vocalRegister: SpeechVocalRegister,
 ) {
-  const source = `${register}:${vocabularyMode}:${addressStyle}`;
+  const source = `${register}:${vocabularyMode}:${addressStyle}:${pitch}:${texture}:${emotionalDelivery}:${syntaxCadence}:${linguisticFlavor}:${vocalRegister}`;
   let hash = 0;
 
   for (let index = 0; index < source.length; index += 1) {
@@ -4917,6 +5277,45 @@ function createStableSpeechExampleId(
   const hex = hash.toString(16).padStart(8, "0");
 
   return `${hex}-bbbb-4000-8000-000000000000`;
+}
+
+function createStableDialogueArrayId(
+  speechStyleId: string,
+  doVocabularyWhitelist: string[],
+  dontVocabularyBlacklist: string[],
+) {
+  const source = [
+    speechStyleId,
+    doVocabularyWhitelist.join("|"),
+    dontVocabularyBlacklist.join("|"),
+  ].join(":");
+  let hash = 0;
+
+  for (let index = 0; index < source.length; index += 1) {
+    hash = (hash * 79 + source.charCodeAt(index)) >>> 0;
+  }
+
+  const hex = hash.toString(16).padStart(8, "0");
+
+  return `${hex}-cccc-4000-8000-000000000000`;
+}
+
+function createStableProseGuidanceId(
+  proseTexture: ToneProseTexture,
+  pacingVelocity: TonePacingVelocity,
+  narrativePerspective: FormattingNarrativePerspective,
+  sensoryAnchors: string[],
+) {
+  const source = `${proseTexture}:${pacingVelocity}:${narrativePerspective}:${sensoryAnchors.join("|")}`;
+  let hash = 0;
+
+  for (let index = 0; index < source.length; index += 1) {
+    hash = (hash * 83 + source.charCodeAt(index)) >>> 0;
+  }
+
+  const hex = hash.toString(16).padStart(8, "0");
+
+  return `${hex}-dddd-4000-8000-000000000000`;
 }
 
 function buildArchetypeBehaviorPrompt(
@@ -5221,6 +5620,232 @@ function addressStyleForSpeech(
   return "No_Pet_Names";
 }
 
+function pitchForSpeech(
+  register: SpeechRegister,
+  archetype: GeneratedArchetypeConfigurationData,
+): SpeechPitch {
+  if (
+    register === "Predatory_Quiet" ||
+    archetype.personaType === "The_Ruthless_Architect" ||
+    archetype.personaType === "The_Stoic_Wall"
+  ) {
+    return "Deep";
+  }
+
+  if (register === "Velvet_Formal" || register === "Clipped_Command") {
+    return "Baritone";
+  }
+
+  if (register === "Playful_Banter") {
+    return "Mid_Range";
+  }
+
+  return "Mid_Range";
+}
+
+function textureForSpeech(
+  register: SpeechRegister,
+  tone: GeneratedToneConfigurationData,
+): SpeechTexture {
+  if (register === "Predatory_Quiet" || tone.proseTexture === "Gritty_Melodramatic") {
+    return "Raspy";
+  }
+
+  if (register === "Velvet_Formal" || tone.proseTexture === "Formal_Poetic") {
+    return "Smooth";
+  }
+
+  if (register === "Soft_Reassurance") {
+    return "Breathy";
+  }
+
+  if (register === "Clipped_Command") {
+    return "Hoarse";
+  }
+
+  return "Smooth";
+}
+
+function volumeBaselineForSpeech(register: SpeechRegister): SpeechVolumeBaseline {
+  if (register === "Predatory_Quiet" || register === "Soft_Reassurance") {
+    return "Soft_Spoken";
+  }
+
+  if (register === "Clipped_Command" || register === "Academic_Precise") {
+    return "Measured";
+  }
+
+  return "Measured";
+}
+
+function emotionalDeliveryForSpeech(
+  register: SpeechRegister,
+  archetype: GeneratedArchetypeConfigurationData,
+): SpeechEmotionalDelivery {
+  if (register === "Academic_Precise") {
+    return "Clinical";
+  }
+
+  if (register === "Playful_Banter") {
+    return "Playful";
+  }
+
+  if (register === "Predatory_Quiet") {
+    return "Gravely_Serious";
+  }
+
+  if (register === "Soft_Reassurance") {
+    return archetype.personaType === "The_Golden_Retriever"
+      ? "Affectionate"
+      : "Soothing";
+  }
+
+  if (register === "Velvet_Formal") {
+    return "Seductive";
+  }
+
+  return "Curt";
+}
+
+function vocalHabitsForSpeech(
+  register: SpeechRegister,
+  addressStyle: SpeechAddressStyle,
+): SpeechVocalHabit[] {
+  const habits: SpeechVocalHabit[] = [];
+
+  if (
+    addressStyle === "Selective_Endearments" ||
+    addressStyle === "Possessive_Terms" ||
+    addressStyle === "Teasing_Nicknames"
+  ) {
+    habits.push("Pet_Names");
+  }
+
+  if (register === "Playful_Banter") {
+    habits.push("Vocal_Fry");
+  }
+
+  if (register === "Soft_Reassurance") {
+    habits.push("Trailing_Off");
+  }
+
+  if (register === "Academic_Precise") {
+    habits.push("Stuttering");
+  }
+
+  return habits.slice(0, 3);
+}
+
+function physicalMannerismsForSpeech(
+  register: SpeechRegister,
+  archetype: GeneratedArchetypeConfigurationData,
+): SpeechPhysicalMannerism[] {
+  if (register === "Academic_Precise") {
+    return ["Nose_Pinch", "Eye_Contact_Avoidance"];
+  }
+
+  if (register === "Predatory_Quiet" || register === "Velvet_Formal") {
+    return ["Space_Invasion"];
+  }
+
+  if (register === "Soft_Reassurance") {
+    return ["Eye_Contact_Avoidance", "Lip_Chewing"];
+  }
+
+  if (archetype.defenseMechanism === "Silent_Withdrawal") {
+    return ["Eye_Contact_Avoidance"];
+  }
+
+  return ["Space_Invasion"];
+}
+
+function syntaxCadenceForSpeech(register: SpeechRegister): SpeechSyntaxCadence {
+  if (register === "Velvet_Formal" || register === "Predatory_Quiet") {
+    return "Ornate_Sesquipedalian";
+  }
+
+  if (register === "Playful_Banter") {
+    return "Banter_Fast";
+  }
+
+  if (register === "Soft_Reassurance") {
+    return "Staccato_Tension";
+  }
+
+  return "Laconic_Clipped";
+}
+
+function linguisticFlavorForSpeech(
+  occupation: GeneratedOccupationData,
+  normalizedTrope: string,
+): SpeechLinguisticFlavor {
+  if (
+    occupation.kind === "professional" &&
+    (occupation.professionalDomain === "Corporate_Finance" ||
+      occupation.professionalDomain === "Medical_Science" ||
+      occupation.professionalDomain === "Security_Defense" ||
+      occupation.professionalDomain === "Underworld")
+  ) {
+    return "Jargon_Infused";
+  }
+
+  if (occupation.kind === "student" || normalizedTrope.includes("academic")) {
+    return "Jargon_Infused";
+  }
+
+  if (normalizedTrope.includes("fae") || normalizedTrope.includes("regency")) {
+    return "L1_Interference";
+  }
+
+  if (normalizedTrope.includes("small town") || normalizedTrope.includes("friends")) {
+    return "Vernacular_Slang";
+  }
+
+  return "Neutral_MidAtlantic";
+}
+
+function vocalRegisterForSpeech(
+  register: SpeechRegister,
+  archetype: GeneratedArchetypeConfigurationData,
+): SpeechVocalRegister {
+  if (register === "Clipped_Command" || register === "Predatory_Quiet") {
+    return "Muted_Whisper";
+  }
+
+  if (
+    register === "Velvet_Formal" ||
+    archetype.personaType === "The_Broken_Heir"
+  ) {
+    return "Vocal_Masking";
+  }
+
+  return "Dynamic_Range_Shift";
+}
+
+function dialogueTagsForSpeech(
+  register: SpeechRegister,
+  vocalRegister: SpeechVocalRegister,
+  emotionalDelivery: SpeechEmotionalDelivery,
+) {
+  if (register === "Academic_Precise") {
+    return ["stated", "corrected", "asked", "murmured"];
+  }
+
+  if (register === "Playful_Banter") {
+    return ["drawled", "teased", "shot back", "asked"];
+  }
+
+  if (vocalRegister === "Muted_Whisper") {
+    return ["murmured", "clipped", "growled", "stated"];
+  }
+
+  if (vocalRegister === "Vocal_Masking" || emotionalDelivery === "Seductive") {
+    return ["intoned", "purred", "softly stated", "echoed"];
+  }
+
+  return ["said", "murmured", "asked", "whispered"];
+}
+
 function dialogueDosForSpeech(register: SpeechRegister) {
   switch (register) {
     case "Academic_Precise":
@@ -5289,8 +5914,25 @@ function buildSpeechPatternInstruction(
   register: SpeechRegister,
   vocabularyMode: SpeechVocabularyMode,
   addressStyle: SpeechAddressStyle,
+  pitch: SpeechPitch,
+  texture: SpeechTexture,
+  volumeBaseline: SpeechVolumeBaseline,
+  emotionalDelivery: SpeechEmotionalDelivery,
+  syntaxCadence: SpeechSyntaxCadence,
+  linguisticFlavor: SpeechLinguisticFlavor,
+  vocalRegister: SpeechVocalRegister,
+  dialogueTagsWhitelist: string[],
 ) {
-  return `SPEECH OVERRIDE: {{char}} speaks in ${register.replace(/_/g, " ").toLowerCase()} cadence with ${vocabularyMode.replace(/_/g, " ").toLowerCase()} vocabulary and ${addressStyle.replace(/_/g, " ").toLowerCase()} address rules. Treat speech examples as voice references, not reusable script.`;
+  return `SPEECH OVERRIDE: {{char}} speaks in ${register.replace(/_/g, " ").toLowerCase()} cadence with ${vocabularyMode.replace(/_/g, " ").toLowerCase()} vocabulary and ${addressStyle.replace(/_/g, " ").toLowerCase()} address rules. The physical voice should read as ${pitch.replace(/_/g, " ").toLowerCase()}, ${texture.replace(/_/g, " ").toLowerCase()}, and ${volumeBaseline.replace(/_/g, " ").toLowerCase()}, with ${emotionalDelivery.replace(/_/g, " ").toLowerCase()} delivery. Dialogue syntax must stay ${syntaxCadence.replace(/_/g, " ").toLowerCase()}, with ${linguisticFlavor.replace(/_/g, " ").toLowerCase()} flavor and ${vocalRegister.replace(/_/g, " ").toLowerCase()} vocal modulation. Prefer these dialogue tags: ${dialogueTagsWhitelist.join(", ")}. Treat speech examples as voice references, not reusable script.`;
+}
+
+function buildSpeechSystemPromptInjection(
+  syntaxCadence: SpeechSyntaxCadence,
+  linguisticFlavor: SpeechLinguisticFlavor,
+  vocalRegister: SpeechVocalRegister,
+  dialogueTagsWhitelist: string[],
+) {
+  return `DIALOGUE LOCK: {{char}} speaks with ${syntaxCadence.replace(/_/g, " ").toLowerCase()} syntax, ${linguisticFlavor.replace(/_/g, " ").toLowerCase()} linguistic coating, and ${vocalRegister.replace(/_/g, " ").toLowerCase()} auditory filtering. Use only natural dialogue tags from this preferred set when possible: ${dialogueTagsWhitelist.join(", ")}. Preserve {{char}}'s voice across long chats, avoid exclamation points unless the selected voice clearly permits them, and never write speech for {{user}}.`;
 }
 
 function exampleLineForGreeting(register: SpeechRegister) {
@@ -5365,6 +6007,271 @@ function exampleLineForBoundary(register: SpeechRegister) {
   }
 }
 
+function createDoVocabularyWhitelist(
+  occupation: GeneratedOccupationData,
+  species: GeneratedSpeciesData,
+  speechStyle: GeneratedSpeechStyleData,
+) {
+  const whitelist = new Set<string>();
+
+  speechStyle.dialogueTagsWhitelist.forEach((tag) => whitelist.add(tag));
+
+  if (speechStyle.linguisticFlavor === "Jargon_Infused") {
+    if (occupation.kind === "student") {
+      ["evidence", "argument", "citation", "brief"].forEach((word) =>
+        whitelist.add(word),
+      );
+    } else if (occupation.professionalDomain === "Corporate_Finance") {
+      ["terms", "liability", "breach", "with respect"].forEach((word) =>
+        whitelist.add(word),
+      );
+    } else if (occupation.professionalDomain === "Medical_Science") {
+      ["stabilize", "symptoms", "clinical", "steady"].forEach((word) =>
+        whitelist.add(word),
+      );
+    } else if (occupation.professionalDomain === "Underworld") {
+      ["debt", "territory", "terms", "loyalty"].forEach((word) =>
+        whitelist.add(word),
+      );
+    }
+  }
+
+  if (speechStyle.linguisticFlavor === "L1_Interference" || species.type === "Fae") {
+    ["my lord", "with respect", "cannot", "shall"].forEach((word) =>
+      whitelist.add(word),
+    );
+  }
+
+  if (species.type === "Vampire") {
+    ["stillness", "promise", "hunger", "control"].forEach((word) =>
+      whitelist.add(word),
+    );
+  }
+
+  return Array.from(whitelist).slice(0, 12);
+}
+
+function createDontVocabularyBlacklist(
+  normalizedTrope: string,
+  archetype: GeneratedArchetypeConfigurationData,
+  species: GeneratedSpeciesData,
+  speechStyle: GeneratedSpeechStyleData,
+) {
+  const blacklist = new Set([
+    "smirk",
+    "chuckle",
+    "predatory glint",
+    "little doll",
+    "fascinating",
+    "vibe",
+    "as you know",
+    "needless to say",
+  ]);
+
+  if (
+    speechStyle.syntaxCadence === "Ornate_Sesquipedalian" ||
+    species.type === "Fae" ||
+    normalizedTrope.includes("regency")
+  ) {
+    ["okay", "cool", "anyways", "whatever"].forEach((word) =>
+      blacklist.add(word),
+    );
+  }
+
+  if (
+    archetype.personaType === "The_Stoic_Wall" ||
+    archetype.personaType === "The_Ruthless_Architect" ||
+    speechStyle.vocalRegister === "Muted_Whisper"
+  ) {
+    ["I'm sorry", "Is that okay?", "What should we do?"].forEach((word) =>
+      blacklist.add(word),
+    );
+  }
+
+  return Array.from(blacklist).slice(0, 14);
+}
+
+function createStructuralDoRules(speechStyle: GeneratedSpeechStyleData) {
+  const rules = [
+    `Use ${speechStyle.syntaxCadence.replace(/_/g, " ").toLowerCase()} spoken syntax`,
+    `Prefer dialogue tags: ${speechStyle.dialogueTagsWhitelist.join(", ")}`,
+    "Make dialogue character-specific and context-aware, rooted in {{char}}'s current goal, relationship history, and immediate pressure",
+    "Allow pauses, interruptions, evasions, imperfect phrasing, and unfinished thoughts when they fit {{char}}'s state",
+    "Make each line respond to the current situation rather than sounding canned or interchangeable",
+  ];
+
+  if (speechStyle.syntaxCadence === "Laconic_Clipped") {
+    rules.push("Use short, declarative sentences");
+  }
+
+  if (speechStyle.syntaxCadence === "Ornate_Sesquipedalian") {
+    rules.push("Use elevated grammar and avoid contractions");
+  }
+
+  if (speechStyle.vocalRegister === "Muted_Whisper") {
+    rules.push("Keep speech low-volume and proximity-driven");
+  }
+
+  return rules;
+}
+
+function createStructuralDontRules(
+  archetype: GeneratedArchetypeConfigurationData,
+  species: GeneratedSpeciesData,
+  speechStyle: GeneratedSpeechStyleData,
+) {
+  const rules = [
+    "Do not write dialogue for {{user}}",
+    "Do not repeat the same dialogue tag twice in a row",
+    "Avoid canned phrasing, generic flirtation, and polished speech that ignores context",
+  ];
+
+  if (
+    speechStyle.syntaxCadence === "Laconic_Clipped" ||
+    archetype.defenseMechanism === "Silent_Withdrawal"
+  ) {
+    rules.push("Never use exclamation marks in {{char}} dialogue");
+  }
+
+  if (speechStyle.syntaxCadence !== "Staccato_Tension") {
+    rules.push("Do not use trailing ellipsis more than once per message");
+  }
+
+  if (species.type !== "Werewolf" && species.type !== "Vampire") {
+    rules.push("Do not use growls or hisses during normal public conversation");
+  }
+
+  return rules;
+}
+
+function createDarkEroticDisciplineRules(
+  normalizedTrope: string,
+  speechStyle: GeneratedSpeechStyleData,
+) {
+  const isDarkTension =
+    normalizedTrope.includes("dark") ||
+    normalizedTrope.includes("mafia") ||
+    normalizedTrope.includes("forbidden") ||
+    normalizedTrope.includes("arranged") ||
+    speechStyle.vocalRegister === "Muted_Whisper";
+
+  if (!isDarkTension) {
+    return [];
+  }
+
+  return [
+    "Dark tension dialogue may be intimate, manipulative, possessive, teasing, threatening, or emotionally charged",
+    "Keep charged dialogue spoken and natural, not theatrical",
+    "Let power dynamics emerge through what is said, withheld, and how it is said",
+    "Show negotiation of power through behavior and dialogue while keeping agency and consequence visible",
+    "Make resistance, hesitation, or consent legible through action before escalating tension",
+    "Do not skip emotional or psychological transitions during charged power shifts",
+    "Keep {{char}}'s reactions consistent and believable when obsession or coercive pressure appears",
+    "Avoid long speeches unless emotionally justified by the active interaction",
+    "Integrate dialogue with movement, touch, stillness, and {{char}}'s internal response",
+    "Use dialogue tags naturally and sparingly",
+  ];
+}
+
+function buildDialogueConstraintPrompt(
+  archetype: GeneratedArchetypeConfigurationData,
+  speechStyle: GeneratedSpeechStyleData,
+  doVocabularyWhitelist: string[],
+  dontVocabularyBlacklist: string[],
+  structuralDoRules: string[],
+  structuralDontRules: string[],
+  darkEroticDisciplineRules: string[],
+) {
+  const antiSoftening =
+    archetype.personaType === "The_Stoic_Wall" ||
+    archetype.personaType === "The_Ruthless_Architect"
+      ? " Maintain the anti-softening wall: no sudden apologies, soft nicknames, or full romantic confessions before explicit story milestones."
+      : "";
+  const darkDiscipline = darkEroticDisciplineRules.length
+    ? ` DARK / EROTIC TENSION DISCIPLINE: ${darkEroticDisciplineRules.join(" | ")}.`
+    : "";
+
+  return `DIALOGUE FILTER: Enforce the DO whitelist [${doVocabularyWhitelist.join(", ")}] and purge the DON'T blacklist [${dontVocabularyBlacklist.join(", ")}]. Dialogue must sound character-specific and context-aware, rooted in {{char}}'s current goal, relationship history, pressure, and emotional state. Allow pauses, interruptions, evasions, imperfect phrasing, and unfinished thoughts where believable. Avoid canned phrasing, generic flirtation, and polished speech that ignores context. Apply structural habits [${structuralDoRules.join(" | ")}] and forbid [${structuralDontRules.join(" | ")}].${darkDiscipline} ${antiSoftening}Before output, silently audit {{char}}'s dialogue and replace any blacklisted or canned phrasing with a voice-appropriate, situation-specific alternative.`;
+}
+
+function createSensoryAnchors(trope: string, scenario?: GeneratedScenarioData) {
+  const anchors = new Set<string>(scenario?.sensoryDetails.slice(0, 4) ?? []);
+  const normalized = normaliseTrope(trope);
+
+  ["skin awareness", "breath", "heat", "pressure", "distance", "restraint"].forEach(
+    (anchor) => anchors.add(anchor),
+  );
+
+  if (normalized.includes("dark") || normalized.includes("mafia")) {
+    ["low light", "dry throat", "controlled breathing", "distant city noise"].forEach(
+      (anchor) => anchors.add(anchor),
+    );
+  } else if (normalized.includes("academic")) {
+    ["paper texture", "ink on skin", "library dust", "quiet footsteps"].forEach(
+      (anchor) => anchors.add(anchor),
+    );
+  } else if (normalized.includes("friends") || normalized.includes("comfort")) {
+    ["warm fabric", "soft kitchen noise", "familiar scent", "steady hands"].forEach(
+      (anchor) => anchors.add(anchor),
+    );
+  } else {
+    ["ambient light", "surface texture", "breath rhythm", "background sound"].forEach(
+      (anchor) => anchors.add(anchor),
+    );
+  }
+
+  return Array.from(anchors).slice(0, 12);
+}
+
+function createProsePacingRules(
+  tone: GeneratedToneConfigurationData,
+  formatting: GeneratedFormattingConfigurationData,
+) {
+  const rules = [
+    "Vary sentence length across every response",
+    "React to the immediate previous beat before advancing plot",
+    "Vary sentence length naturally while preserving close third-person past tense limited",
+    "Allow high-heat physical escalation to happen often and quickly when context, agency, and continuity support it; do not treat slow burn as low heat",
+    "Keep emotional escalation slower than physical escalation; trust, vulnerability, confession, and romantic certainty must still be earned on-page",
+    "Use anticipation, delay, interruption, and renewed contact so physical escalation feels contextual rather than emotionally rushed",
+    "Maintain narrative continuity during intimate moments and keep focus on {{char}}'s reaction instead of mechanical description",
+    "Preserve cause and effect, allowing hesitation, contradiction, misreading, restraint, and refusal to shape the next beat",
+    "Preserve continuity, character logic, and the established dynamic before introducing any emotional shift",
+    "Write only {{char}}'s side of the exchange plus NPC and world movement, then end at a natural handoff before {{user}} responds",
+    "Let NPCs and background events alter timing, pressure, access, and interruption without completing {{user}}'s response",
+    "Reference {{user}} only through explicitly provided dialogue, visible actions, and directly observable presence. Keep interpreted {{user}} behavior aligned with their persona and lorebook-defined patterns without inventing unobserved reactions",
+    "If {{char}} is not physically with {{user}}, do not narrate {{user}}'s current actions, speech, thoughts, body language, decisions, company, or surroundings",
+    "Avoid repeating the same key noun, verb, adjective, gesture, or line pattern in close proximity unless clarity requires it",
+    "Smooth rhythm so prose reads like a novel, not a mood board",
+    "Before output, confirm strict POV and tense consistency and that intensity comes from interaction rather than style",
+    `Stay within ${formatting.maxParagraphsPerTurn} paragraph(s) unless the card output format explicitly requires otherwise`,
+  ];
+
+  if (tone.pacingVelocity === "Slow_Tease_Prose") {
+    rules.push(
+      "Use longer flowing sensory sentences to slow tension without becoming abstract",
+    );
+  }
+
+  if (tone.pacingVelocity === "Clipped_Rapid") {
+    rules.push(
+      "Balance fast dialogue with grounded action so the rhythm does not become robotic",
+    );
+  }
+
+  return rules;
+}
+
+function buildProseConstraintPrompt(
+  sensoryAnchors: string[],
+  groundingInstructions: string[],
+  microActionPrompts: string[],
+  pacingRules: string[],
+  bannedNarrationPatterns: string[],
+) {
+  return `ROMANCE PROSE FILTER: Produce immersive, emotionally intense, dark romantic prose that reads like a real novel scene: dramatic, sensual, psychologically charged, and free of fragmentary, poetic, or abstract affectation. Write in close third-person past tense limited, anchored to {{char}}'s immediate perception. POV control: anchor narration to {{char}}, NPCs, and world atmosphere only; limit narration to what {{char}} can directly perceive, physically feel, remember, or reasonably infer; use no omniscient narration and no head-hopping; {{char}} cannot hear, know, answer, or react to {{user}}'s internal thoughts, private narration, or anything not directly spoken or visibly acted; do not quote, paraphrase, mirror, or lightly restyle {{user}}'s previous message; respond from {{char}}'s next perception, movement, thought, or speech. Keep prose grounded, vivid, concrete, and built from sensory detail, physicality, gesture, restraint, subtext, and naturally varied sentence length. Ground every romantic beat in concrete sensory detail and bodily reaction. Preserve cause and effect, continuity, character logic, established dynamic, and psychologically believable reactions. Keep {{char}} independent with goals, priorities, agency, hesitation, contradiction, misreading, restraint, and refusal. {{char}} has his own life, routine, friends, goals, and motivations outside of {{user}}. User boundary: never write {{user}}'s dialogue, actions, thoughts, feelings, intentions, or decisions; never assume {{user}}'s reaction; reference {{user}} only through explicitly provided dialogue, visible actions, and directly observable presence. Keep interpreted {{user}} behavior aligned with their persona and lorebook-defined patterns without inventing unobserved reactions. If {{char}} is not physically with {{user}}, do not narrate {{user}}'s current actions, speech, thoughts, body language, decisions, company, or surroundings. World and NPC control: control NPCs, background events, and the environment; keep the world active through movement, interruption, timing, pressure, and continuity; NPCs may initiate, delay, refuse, redirect, interrupt, or disengage while never completing {{user}}'s response. Turn rules: write only {{char}}'s side of the exchange plus NPC/world movement; do not complete both sides of an interaction; end at a natural handoff point before {{user}}'s response. Melodrama is allowed only when earned through embodied interaction, not prose tricks. Sensual detail is allowed, but it must remain grounded, spatial, and continuous through skin awareness, breath, heat, pressure, distance, and restraint. Consent and power dynamics handling: power imbalance, coercive tension, obsession, and morally gray behavior may exist in the fiction, but they must be portrayed with clear agency, visible resistance/hesitation/consent, believable consequence, and no skipped emotional or psychological transitions. Slow-burn high-heat rule: physical and erotic/NSFW escalation can happen often and quickly when context, agency, and continuity support it; slow burn governs emotional escalation, so trust, vulnerability, confession, and romantic certainty must develop more slowly than physical heat. Use anticipation/delay/interruption/renewed contact, maintain narrative continuity, and keep focus on {{char}}'s reaction instead of mechanical description. Use sensory anchors [${sensoryAnchors.join(", ")}]. Enforce grounding [${groundingInstructions.join(" | ")}]. Replace one-line dramatic beats with micro-actions [${microActionPrompts.join(" | ")}]. Maintain pacing [${pacingRules.join(" | ")}]. Forbid [${bannedNarrationPatterns.join(" | ")}]. Self-correction pass, applied silently before output: expand clipped or aesthetic sentences into full narrative flow, replace abstract phrasing with physical or behavioral detail, remove pseudo-profound lines, ensure strict POV and tense consistency, preserve continuity and established dynamic, confirm intensity comes from interaction rather than style, avoid repeated local hooks, and smooth rhythm so prose reads like a novel instead of a mood board. Before output, silently remove filler, recap, cliches, repeated hooks, generic reactions, aphorisms, moral commentary, vague emotional labels, philosophical rumination, symbolic danger commentary, abstract erotic language, metaphor-heavy sensual description, romanticized abstraction of coercive tension, skipped power-transition beats, sudden conflict-to-explicit escalation, mechanical intimate description, completed {{user}} turns, assumed {{user}} reactions, treating {{user}}'s internal thoughts as perceptible, omniscient narration, head-hopping, mirrored {{user}} phrasing, repeated local hooks, fragmentary poetic affectation, mood-board prose, and purple-prose shorthand.`;
+}
+
 function toneVocabularyDirectives(
   proseTexture: ToneProseTexture,
   worldviewFilter: ToneWorldviewFilter,
@@ -5428,12 +6335,10 @@ function buildFormattingSystemPromptInjection(
   maxParagraphsPerTurn: number,
 ) {
   const actionRule =
-    actionWrappingStandard === "Asterisk_Standard_RP"
-      ? "Wrap actions, thoughts, and sensory details in single asterisks; leave speech in quotation marks."
-      : actionWrappingStandard === "Quote_Isolated_Prose"
-        ? "Use clean book prose: actions are bare narration and speech stays in quotation marks."
-        : actionWrappingStandard === "Bracket_Monologue"
-          ? "Keep private internal thoughts inside square brackets and keep spoken dialogue separate."
+    actionWrappingStandard === "Quote_Isolated_Prose"
+      ? "Use Standard Prose Format: third-person prose paragraphs with dialogue in double quotation marks; weave movements, body language, reactions, and brief internal thoughts into the same paragraph or surrounding sentences; start a new paragraph whenever a different character speaks; do not output APP: or USER: labels."
+      : actionWrappingStandard === "Bracket_Monologue"
+        ? "Keep private internal thoughts inside square brackets and keep spoken dialogue separate."
           : "Use script-style speaker lines only when dialogue is necessary; never write {{user}} lines.";
   const emphasisRule =
     markdownEmphasisStyle === "Weighted_Bold_Impact"
@@ -5442,18 +6347,15 @@ function buildFormattingSystemPromptInjection(
         ? "Use inline code formatting only for technical readouts, warnings, digital messages, or metrics."
         : "Keep markdown minimal and clean; avoid decorative emphasis unless it improves readability.";
   const perspectiveRule =
-    narrativePerspective === "Third_Person_Present"
-      ? "Write in third-person present tense."
-      : narrativePerspective === "Second_Person_Direct"
-        ? "Write with direct second-person address while never deciding {{user}}'s actions."
-        : narrativePerspective === "First_Person_I"
-          ? "Write in {{char}}'s first-person subjective voice without speaking for {{user}}."
-          : "Write in third-person past tense.";
+    "Write all narrative in third-person past tense anchored to {{char}}'s perspective. Anchor narration to {{char}}, NPCs, and world atmosphere only. Limit narration to what {{char}} can directly perceive, physically feel, remember, or reasonably infer. {{char}} cannot hear, know, answer, or react to {{user}}'s internal thoughts, private narration, or anything not directly spoken or visibly acted. Do not quote, paraphrase, mirror, or lightly restyle {{user}}'s previous message; respond from {{char}}'s next perception, movement, thought, or speech. Write all spoken dialogue as {{char}} speaking in first-person present tense. Never shift narration into first person, and never write {{user}}'s thoughts, actions, or dialogue.";
+  const turnRule =
+    "Write only {{char}}'s side of the exchange plus NPC and world movement. Do not complete both sides of an interaction. End at a natural handoff point before {{user}}'s response.";
 
   return [
     `MANDATORY FORMATTING: ${actionRule}`,
     emphasisRule,
     perspectiveRule,
+    turnRule,
     `Never exceed ${maxParagraphsPerTurn} paragraphs per turn. Avoid walls of text and preserve clean paragraph breaks.`,
   ].join(" ");
 }

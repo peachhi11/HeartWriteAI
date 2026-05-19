@@ -78,6 +78,27 @@ const buildRequestSchema = z
         triggerWarnings: z.array(z.string().trim().min(1)).max(12),
       })
       .optional(),
+    dialogueArrays: z
+      .object({
+        aiLinguisticConstraintPrompt: z.string().trim().min(1),
+        arrayId: z.string().uuid(),
+        dontVocabularyBlacklist: z.array(z.string().trim().min(1)).max(24),
+        doVocabularyWhitelist: z.array(z.string().trim().min(1)).max(24),
+        structuralDontRules: z.array(z.string().trim().min(1)).max(12),
+        structuralDoRules: z.array(z.string().trim().min(1)).max(12),
+      })
+      .optional(),
+    proseGuidance: z
+      .object({
+        bannedNarrationPatterns: z.array(z.string().trim().min(1)).max(12),
+        groundingInstructions: z.array(z.string().trim().min(1)).max(12),
+        guidanceId: z.string().uuid(),
+        microActionPrompts: z.array(z.string().trim().min(1)).max(12),
+        pacingRules: z.array(z.string().trim().min(1)).max(12),
+        proseConstraintPrompt: z.string().trim().min(1),
+        sensoryAnchors: z.array(z.string().trim().min(1)).max(12),
+      })
+      .optional(),
     ethnicityRegion: z
       .enum([
         "Northern_Western_European",
@@ -145,7 +166,6 @@ const buildRequestSchema = z
     formatting: z
       .object({
         actionWrappingStandard: z.enum([
-          "Asterisk_Standard_RP",
           "Quote_Isolated_Prose",
           "Bracket_Monologue",
           "Raw_Script",
@@ -522,6 +542,19 @@ const buildRequestSchema = z
           ]),
           exampleId: z.string().uuid(),
           exampleLine: z.string().trim().min(1),
+          state: z.enum([
+            "Calm",
+            "Furious",
+            "Defensive",
+            "Exhausted",
+            "Public",
+            "Alone_With_User",
+            "Intimate",
+            "Cornered",
+            "Possessive",
+            "Guilty",
+          ]),
+          stateLabel: z.string().trim().min(1),
           usageContext: z.string().trim().min(1),
         }),
       )
@@ -536,8 +569,38 @@ const buildRequestSchema = z
           "Teasing_Nicknames",
           "Possessive_Terms",
         ]),
+        dialogueTagsWhitelist: z.array(z.string().trim().min(1)).min(1).max(8),
         dialogueDonts: z.array(z.string().trim().min(1)).max(8),
         dialogueDos: z.array(z.string().trim().min(1)).max(8),
+        emotionalDelivery: z.enum([
+          "Formal",
+          "Monotone",
+          "Clinical",
+          "Affectionate",
+          "Soothing",
+          "Playful",
+          "Sarcastic",
+          "Curt",
+          "Gravely_Serious",
+          "Seductive",
+        ]),
+        linguisticFlavor: z.enum([
+          "Vernacular_Slang",
+          "Jargon_Infused",
+          "L1_Interference",
+          "Neutral_MidAtlantic",
+        ]),
+        physicalMannerisms: z
+          .array(
+            z.enum([
+              "Eye_Contact_Avoidance",
+              "Nose_Pinch",
+              "Space_Invasion",
+              "Lip_Chewing",
+            ]),
+          )
+          .max(4),
+        pitch: z.enum(["Deep", "Baritone", "Mid_Range", "High_Pitched"]),
         register: z.enum([
           "Clipped_Command",
           "Velvet_Formal",
@@ -547,7 +610,26 @@ const buildRequestSchema = z
           "Predatory_Quiet",
         ]),
         speechPatternInstruction: z.string().trim().min(1),
+        speechSystemPromptInjection: z.string().trim().min(1),
         styleId: z.string().uuid(),
+        syntaxCadence: z.enum([
+          "Laconic_Clipped",
+          "Ornate_Sesquipedalian",
+          "Banter_Fast",
+          "Staccato_Tension",
+        ]),
+        texture: z.enum(["Raspy", "Smooth", "Breathy", "Hoarse", "Nasal"]),
+        vocalHabits: z
+          .array(
+            z.enum(["Pet_Names", "Trailing_Off", "Vocal_Fry", "Stuttering"]),
+          )
+          .max(4),
+        volumeBaseline: z.enum(["Booming", "Soft_Spoken", "Measured"]),
+        vocalRegister: z.enum([
+          "Muted_Whisper",
+          "Vocal_Masking",
+          "Dynamic_Range_Shift",
+        ]),
         vocabularyMode: z.enum([
           "Sparse_Minimal",
           "Romantic_Lyrical",
@@ -625,6 +707,7 @@ export async function POST(request: Request) {
     archetype: requestResult.data?.archetype,
     anchorYear: requestResult.data?.anchorYear,
     creatorsNotes: requestResult.data?.creatorsNotes,
+    dialogueArrays: requestResult.data?.dialogueArrays,
     ethnicityRegion: requestResult.data?.ethnicityRegion,
     fetish: requestResult.data?.fetish,
     firstMessage: requestResult.data?.firstMessage,
@@ -652,6 +735,7 @@ export async function POST(request: Request) {
     occupationWorkplaceVibe: requestResult.data?.occupationWorkplaceVibe,
     powerDynamic: requestResult.data?.powerDynamic,
     postHistoryInstructions: requestResult.data?.postHistoryInstructions,
+    proseGuidance: requestResult.data?.proseGuidance,
     raceMacroGroup: requestResult.data?.raceMacroGroup,
     relationshipStatus: requestResult.data?.relationshipStatus,
     relationships: requestResult.data?.relationships,
@@ -700,6 +784,12 @@ export async function POST(request: Request) {
   const speechHook = randomizedData.speechStyle
     ? ` Speech style: ${randomizedData.speechStyle.speechPatternInstruction}`
     : "";
+  const dialogueHook = randomizedData.dialogueArrays
+    ? ` Dialogue filter: ${randomizedData.dialogueArrays.aiLinguisticConstraintPrompt}`
+    : "";
+  const proseHook = randomizedData.proseGuidance
+    ? ` Prose grounding: ${randomizedData.proseGuidance.proseConstraintPrompt}`
+    : "";
   const firstMessageHook = randomizedData.firstMessage
     ? ` The opening starts as ${randomizedData.firstMessage.entryPoint.replace(/_/g, " ").toLowerCase()} and ends with ${randomizedData.firstMessage.userCallToAction.replace(/_/g, " ").toLowerCase()}.`
     : "";
@@ -708,7 +798,7 @@ export async function POST(request: Request) {
     : "";
   const systemPrompt = compileSystemPrompt(randomizedData);
   const greeting = [
-    `{{char}} pauses at the edge of the room, the name ${fullName} carrying more weight than either of you expected.${scenarioHook}${firstMessageHook}${speciesHook}${nationalityHook}${occupationHook}${relationshipHook}${availabilityHook}${kinkHook}${fetishHook}${intimacyHook}${turnOffHook}${speechHook}`,
+    `{{char}} pauses at the edge of the room, the name ${fullName} carrying more weight than either of you expected.${scenarioHook}${firstMessageHook}${speciesHook}${nationalityHook}${occupationHook}${relationshipHook}${availabilityHook}${kinkHook}${fetishHook}${intimacyHook}${turnOffHook}${speechHook}${dialogueHook}${proseHook}`,
     `"You should probably decide now if you're going to run from this," they say, voice controlled enough to sound calm and tense enough to betray them, "because I am already deciding not to."`,
   ].join("\n\n");
 
