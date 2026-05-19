@@ -1,6 +1,5 @@
-import { StudioSectionPage } from "@/components/studio-section-page";
-import { sectionBlueprints } from "@/lib/studio/sections";
+import { PersonaStudioWorkspace } from "@/components/persona-studio-workspace";
 
 export default function PersonasPage() {
-  return <StudioSectionPage {...sectionBlueprints.personas} />;
+  return <PersonaStudioWorkspace />;
 }
