@@ -3,6 +3,7 @@
 import { ChangeEvent, useMemo, useState } from "react";
 import {
   BadgeCheck,
+  Blend,
   Download,
   HeartHandshake,
   ImagePlus,
@@ -25,12 +26,18 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
-import { compilePersonaPostHistoryInstruction, compilePersonaPromptBlock } from "@/lib/persona/compilePersonaPromptBlock";
+import { blendFashionAesthetics } from "@/lib/persona/blendFashionAesthetics";
+import {
+  compilePersonaPostHistoryInstruction,
+  compilePersonaPromptBlock,
+} from "@/lib/persona/compilePersonaPromptBlock";
 import { createEmptyPersonaCardFormValues } from "@/lib/persona/createEmptyPersonaCardFormValues";
 import { createPersonaCardExportFileName } from "@/lib/persona/createPersonaCardExportFileName";
 import { createPersonaCardFromFormValues } from "@/lib/persona/createPersonaCardFromFormValues";
+import { fashionAesthetics } from "@/lib/persona/fashionAesthetics";
 import { personaSelectionPriority } from "@/lib/persona/personaSelectionPriority";
 import { PersonaCardFormValues } from "@/types/persona/PersonaCardFormValues";
+import { FashionSeasonContext } from "@/types/persona/FashionAesthetic";
 
 const personaExamples = [
   {
@@ -90,9 +97,22 @@ export function PersonaStudioWorkspace() {
   const [values, setValues] = useState<PersonaCardFormValues>(
     createEmptyPersonaCardFormValues,
   );
+  const [dominantAestheticId, setDominantAestheticId] = useState("coquette");
+  const [secondaryAestheticId, setSecondaryAestheticId] = useState("grunge");
+  const [fashionSeason, setFashionSeason] =
+    useState<FashionSeasonContext>("autumn");
   const personaCard = useMemo(
     () => createPersonaCardFromFormValues(values),
     [values],
+  );
+  const fashionBlend = useMemo(
+    () =>
+      blendFashionAesthetics({
+        dominantAestheticId,
+        secondaryAestheticId,
+        season: fashionSeason,
+      }),
+    [dominantAestheticId, fashionSeason, secondaryAestheticId],
   );
   const promptPreview = useMemo(
     () => compilePersonaPromptBlock(personaCard),
@@ -123,6 +143,25 @@ export function PersonaStudioWorkspace() {
     setValues((current) => ({
       ...current,
       ...personaExamples[index].values,
+    }));
+  }
+
+  function applyFashionBlend() {
+    setValues((current) => ({
+      ...current,
+      aesthetic: fashionBlend.personaAestheticLine,
+      outfit: current.outfit
+        ? `${current.outfit}\n\n${fashionBlend.personaOutfitLine}`
+        : fashionBlend.personaOutfitLine,
+      tagsText: mergeCommaText(current.tagsText, [
+        fashionBlend.hybridName.toLowerCase(),
+        dominantAestheticId,
+        secondaryAestheticId,
+      ]),
+      vibeTagsText: mergeCommaText(current.vibeTagsText, [
+        fashionBlend.hybridName,
+        "fashion-blend",
+      ]),
     }));
   }
 
@@ -200,6 +239,7 @@ export function PersonaStudioWorkspace() {
           <Tabs defaultValue="identity">
             <TabsList className="flex-wrap">
               <TabsTrigger value="identity">Identity</TabsTrigger>
+              <TabsTrigger value="aesthetic">Aesthetic</TabsTrigger>
               <TabsTrigger value="voice">Voice</TabsTrigger>
               <TabsTrigger value="links">Links</TabsTrigger>
               <TabsTrigger value="notes">PHI Notes</TabsTrigger>
@@ -259,6 +299,85 @@ export function PersonaStudioWorkspace() {
                     value={values.boundaries}
                     onChange={handleInputChange("boundaries")}
                   />
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="aesthetic" className="mt-4 space-y-5">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Blend data-icon="inline-start" />
+                    Fashion Aesthetic Builder
+                  </CardTitle>
+                  <CardDescription>
+                    Blend a primary style with a secondary accent, then apply it
+                    to the persona&apos;s aesthetic and outfit fields.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-5">
+                  <div className="grid gap-3 md:grid-cols-3">
+                    <FashionSelect
+                      label="Primary Style"
+                      value={dominantAestheticId}
+                      onChange={setDominantAestheticId}
+                    />
+                    <FashionSelect
+                      label="Secondary Accent"
+                      value={secondaryAestheticId}
+                      onChange={setSecondaryAestheticId}
+                    />
+                    <label className="grid gap-1.5 text-sm">
+                      <span className="font-medium">Season / Context</span>
+                      <select
+                        value={fashionSeason}
+                        onChange={(event) =>
+                          setFashionSeason(
+                            event.currentTarget.value as FashionSeasonContext,
+                          )
+                        }
+                        className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
+                      >
+                        <option value="spring">Spring</option>
+                        <option value="summer">Summer</option>
+                        <option value="autumn">Autumn</option>
+                        <option value="winter">Winter</option>
+                        <option value="night_out">Night Out</option>
+                        <option value="festival">Festival</option>
+                        <option value="beach">Beach</option>
+                      </select>
+                    </label>
+                  </div>
+
+                  <div className="grid gap-3 rounded-lg border bg-background/70 p-4 text-sm">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Badge variant="secondary">{fashionBlend.hybridName}</Badge>
+                      <Badge variant="outline">
+                        {Math.round(fashionBlend.dominantWeight * 100)} /{" "}
+                        {Math.round(fashionBlend.secondaryWeight * 100)}
+                      </Badge>
+                    </div>
+                    <p>
+                      <span className="font-medium">Silhouette:</span>{" "}
+                      {fashionBlend.silhouette}
+                    </p>
+                    <p>
+                      <span className="font-medium">Fabrics:</span>{" "}
+                      {fashionBlend.fabrics}
+                    </p>
+                    <p>
+                      <span className="font-medium">Palette:</span>{" "}
+                      {fashionBlend.palette}
+                    </p>
+                    <p>
+                      <span className="font-medium">Street-style prompt:</span>{" "}
+                      {fashionBlend.streetStylePrompt}
+                    </p>
+                  </div>
+
+                  <Button onClick={applyFashionBlend}>
+                    Apply Blend to Persona
+                  </Button>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -477,6 +596,50 @@ export function PersonaStudioWorkspace() {
         </aside>
       </div>
     </StudioShell>
+  );
+}
+
+function mergeCommaText(current: string, nextValues: string[]): string {
+  const merged = new Set(
+    current
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean),
+  );
+
+  nextValues.forEach((value) => {
+    if (value.trim()) {
+      merged.add(value.trim());
+    }
+  });
+
+  return [...merged].join(", ");
+}
+
+function FashionSelect({
+  label,
+  onChange,
+  value,
+}: {
+  label: string;
+  onChange: (value: string) => void;
+  value: string;
+}) {
+  return (
+    <label className="grid gap-1.5 text-sm">
+      <span className="font-medium">{label}</span>
+      <select
+        value={value}
+        onChange={(event) => onChange(event.currentTarget.value)}
+        className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
+      >
+        {fashionAesthetics.map((aesthetic) => (
+          <option key={aesthetic.id} value={aesthetic.id}>
+            {aesthetic.name}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
 

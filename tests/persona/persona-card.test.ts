@@ -2,9 +2,11 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import { compilePersonaPostHistoryInstruction, compilePersonaPromptBlock } from "../../lib/persona/compilePersonaPromptBlock";
+import { blendFashionAesthetics } from "../../lib/persona/blendFashionAesthetics";
 import { createEmptyPersonaCardFormValues } from "../../lib/persona/createEmptyPersonaCardFormValues";
 import { createPersonaCardFromFormValues } from "../../lib/persona/createPersonaCardFromFormValues";
 import { createPersonaCardExportFileName } from "../../lib/persona/createPersonaCardExportFileName";
+import { fashionAesthetics, fashionMacroClassifiers } from "../../lib/persona/fashionAesthetics";
 
 test("compiles only the playable persona block for normal AI context", () => {
   const values = createEmptyPersonaCardFormValues();
@@ -65,4 +67,33 @@ test("creates a stable persona card export filename", () => {
     createPersonaCardExportFileName(persona),
     "soft-dollcore-persona.heartpersona.json",
   );
+});
+
+test("ships fashion macro classifiers and aesthetic prompt data", () => {
+  assert.ok(fashionMacroClassifiers.length >= 6);
+  assert.ok(fashionAesthetics.length >= 10);
+  assert.ok(
+    fashionAesthetics.some(
+      (aesthetic) =>
+        aesthetic.id === "coastal_cowgirl" &&
+        aesthetic.visualWeights.includes("turquoise"),
+    ),
+  );
+});
+
+test("blends two fashion aesthetics into a reusable persona style prompt", () => {
+  const blend = blendFashionAesthetics({
+    dominantAestheticId: "coquette",
+    secondaryAestheticId: "grunge",
+    season: "autumn",
+  });
+
+  assert.equal(blend.hybridName, "Dark Coquette");
+  assert.equal(blend.dominantWeight, 0.65);
+  assert.equal(blend.secondaryWeight, 0.35);
+  assert.match(blend.silhouette, /Coquette/);
+  assert.match(blend.fabrics, /lace/i);
+  assert.match(blend.personaAestheticLine, /65%/);
+  assert.match(blend.personaOutfitLine, /Dark Coquette outfit direction/);
+  assert.match(blend.streetStylePrompt, /autumn street style/);
 });
