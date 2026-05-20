@@ -6,6 +6,7 @@ pub struct SearchFilters {
     pub framework: Option<String>,
     pub relationship: Option<String>,
     pub tag: Option<String>,
+    pub tags: Option<Vec<String>>,
     pub page: i32,
     pub limit: i32,
 }

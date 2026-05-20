@@ -188,7 +188,13 @@ export function StudioShell({
                       "border-rose-200 bg-rose-50 text-rose-950 dark:border-rose-900 dark:bg-rose-950/35 dark:text-rose-100",
                   )}
                 >
-                  <Image src={section.icon} alt="" width={16} height={16} />
+                  <Image
+                    src={section.icon}
+                    alt=""
+                    width={16}
+                    height={16}
+                    className="opacity-75 dark:brightness-0 dark:invert"
+                  />
                   {section.label}
                 </Link>
               ))}
@@ -237,7 +243,13 @@ function StudioNavLink({
           active && "border-rose-200 bg-rose-50 dark:border-rose-900 dark:bg-rose-950/40",
         )}
       >
-        <Image src={icon} alt="" width={22} height={22} />
+        <Image
+          src={icon}
+          alt=""
+          width={22}
+          height={22}
+          className="opacity-75 transition group-hover:opacity-100 dark:brightness-0 dark:invert"
+        />
       </span>
       <span className="min-w-0 flex-1">
         <span className="block truncate font-medium">{label}</span>

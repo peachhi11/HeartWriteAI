@@ -22,18 +22,111 @@ export interface CardLibraryPanelProps {
   onCardSelect: (filePath: string) => void;
 }
 
-const frameworks = [
-  "Sandbox",
-  "Narrative RPG",
-  "Text Adventure",
-  "Scene-Locked",
+const playStyleOptions = [
+  {
+    label: "Open-ended chat",
+    value: "Sandbox",
+  },
+  {
+    label: "Story roleplay",
+    value: "Narrative RPG",
+  },
+  {
+    label: "Choice adventure",
+    value: "Text Adventure",
+  },
+  {
+    label: "Single scene",
+    value: "Scene-Locked",
+  },
 ] as const;
 
-const relationships = [
-  "Symmetric",
-  "Asymmetric (Bot Dominant)",
-  "Asymmetric (User Dominant)",
-  "Antagonistic",
+const povOptions = [
+  {
+    label: "Any POV",
+    tag: "ALL",
+  },
+  {
+    label: "FemPOV",
+    tag: "fempov",
+  },
+  {
+    label: "MalePOV",
+    tag: "malepov",
+  },
+  {
+    label: "AnyPOV",
+    tag: "anypov",
+  },
+  {
+    label: "NBPOV",
+    tag: "nbpov",
+  },
+] as const;
+
+const characterRoleOptions = [
+  {
+    label: "Any character role",
+    tag: "ALL",
+  },
+  {
+    label: "Dom",
+    tag: "dom",
+  },
+  {
+    label: "Domme",
+    tag: "domme",
+  },
+  {
+    label: "Sub",
+    tag: "sub",
+  },
+  {
+    label: "Switch",
+    tag: "switch",
+  },
+] as const;
+
+const userRoleOptions = [
+  {
+    label: "Any user role",
+    tag: "ALL",
+  },
+  {
+    label: "User follows",
+    tag: "user follows",
+  },
+  {
+    label: "User leads",
+    tag: "user leads",
+  },
+  {
+    label: "User switches",
+    tag: "user switches",
+  },
+] as const;
+
+const tropeOptions = [
+  {
+    label: "Any trope",
+    tag: "ALL",
+  },
+  {
+    label: "Enemies to lovers",
+    tag: "enemies to lovers",
+  },
+  {
+    label: "Slow burn",
+    tag: "slow burn",
+  },
+  {
+    label: "Only one bed",
+    tag: "only one bed",
+  },
+  {
+    label: "Forbidden",
+    tag: "forbidden",
+  },
 ] as const;
 
 export default function CardLibraryPanel({
@@ -45,6 +138,10 @@ export default function CardLibraryPanel({
     library;
   const [searchTerm, setSearchTerm] = useState(filters.query ?? "");
   const [tagSearchTerm, setTagSearchTerm] = useState(filters.tag ?? "");
+  const [selectedPovTag, setSelectedPovTag] = useState("ALL");
+  const [selectedCharacterRoleTag, setSelectedCharacterRoleTag] = useState("ALL");
+  const [selectedUserRoleTag, setSelectedUserRoleTag] = useState("ALL");
+  const [selectedTropeTag, setSelectedTropeTag] = useState("ALL");
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -60,18 +157,34 @@ export default function CardLibraryPanel({
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
+      const selectedTags = [
+        selectedPovTag,
+        selectedCharacterRoleTag,
+        selectedUserRoleTag,
+        selectedTropeTag,
+        tagSearchTerm.trim(),
+      ].filter((tag) => tag && tag !== "ALL");
+
       setFilters((previous) => ({
         ...previous,
-        tag: tagSearchTerm.trim() || undefined,
+        tag: undefined,
+        tags: selectedTags.length > 0 ? selectedTags : undefined,
         page: 1,
       }));
     }, 300);
 
     return () => window.clearTimeout(timeoutId);
-  }, [tagSearchTerm, setFilters]);
+  }, [
+    selectedCharacterRoleTag,
+    selectedPovTag,
+    selectedTropeTag,
+    selectedUserRoleTag,
+    tagSearchTerm,
+    setFilters,
+  ]);
 
   function handleDropdownChange(
-    key: Extract<keyof SearchFilters, "framework" | "relationship">,
+    key: Extract<keyof SearchFilters, "framework">,
     value: string,
   ) {
     setFilters((previous) => ({
@@ -91,19 +204,19 @@ export default function CardLibraryPanel({
       <div className="shrink-0 space-y-3 border-b border-zinc-800 p-4">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-            Card Index Cache
+            Character Library
           </h2>
-          <span className="rounded bg-zinc-900 px-2 py-0.5 font-mono text-[10px] text-zinc-500">
-            {metadata.totalCount} active
+          <span className="rounded bg-zinc-900 px-2 py-0.5 text-[10px] font-medium text-zinc-500">
+            {metadata.totalCount} saved
           </span>
         </div>
 
         <label className="relative block">
-          <span className="sr-only">Search character name or tags</span>
+          <span className="sr-only">Search character name</span>
           <Search className="absolute left-2.5 top-2.5 size-3.5 text-zinc-500" />
           <input
             type="text"
-            placeholder="Search character name..."
+            placeholder="Find a character..."
             value={searchTerm}
             onChange={(event) => setSearchTerm(event.currentTarget.value)}
             className="w-full rounded-lg border border-zinc-800 bg-zinc-900 py-1.5 pl-8 pr-3 text-xs text-zinc-200 outline-none transition placeholder:text-zinc-500 focus:border-violet-500 focus:ring-1 focus:ring-violet-500/20"
@@ -111,11 +224,11 @@ export default function CardLibraryPanel({
         </label>
 
         <label className="relative block">
-          <span className="sr-only">Filter by explicit tag</span>
+          <span className="sr-only">Search by tag</span>
           <Tags className="absolute left-2.5 top-2.5 size-3.5 text-zinc-500" />
           <input
             type="text"
-            placeholder="Filter by explicit tag..."
+            placeholder="Search tags, like vampire or professor..."
             value={tagSearchTerm}
             onChange={(event) => setTagSearchTerm(event.currentTarget.value)}
             className="w-full rounded-lg border border-zinc-800 bg-zinc-900 py-1.5 pl-8 pr-3 text-xs text-zinc-200 outline-none transition placeholder:text-zinc-500 focus:border-violet-500 focus:ring-1 focus:ring-violet-500/20"
@@ -130,25 +243,60 @@ export default function CardLibraryPanel({
             }
             className="cursor-pointer rounded border border-zinc-800 bg-zinc-900 p-1.5 text-[10px] font-medium text-zinc-400 outline-none focus:border-zinc-700"
           >
-            <option value="ALL">All Frameworks</option>
-            {frameworks.map((framework) => (
-              <option key={framework} value={framework}>
-                {framework}
+            <option value="ALL">Any chat style</option>
+            {playStyleOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
               </option>
             ))}
           </select>
 
           <select
-            value={filters.relationship ?? "ALL"}
+            value={selectedPovTag}
+            onChange={(event) => setSelectedPovTag(event.currentTarget.value)}
+            className="cursor-pointer rounded border border-zinc-800 bg-zinc-900 p-1.5 text-[10px] font-medium text-zinc-400 outline-none focus:border-zinc-700"
+          >
+            {povOptions.map((option) => (
+              <option key={option.tag} value={option.tag}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedCharacterRoleTag}
             onChange={(event) =>
-              handleDropdownChange("relationship", event.currentTarget.value)
+              setSelectedCharacterRoleTag(event.currentTarget.value)
             }
             className="cursor-pointer rounded border border-zinc-800 bg-zinc-900 p-1.5 text-[10px] font-medium text-zinc-400 outline-none focus:border-zinc-700"
           >
-            <option value="ALL">All Dynamics</option>
-            {relationships.map((relationship) => (
-              <option key={relationship} value={relationship}>
-                {relationshipLabel(relationship)}
+            {characterRoleOptions.map((option) => (
+              <option key={option.tag} value={option.tag}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedUserRoleTag}
+            onChange={(event) => setSelectedUserRoleTag(event.currentTarget.value)}
+            className="cursor-pointer rounded border border-zinc-800 bg-zinc-900 p-1.5 text-[10px] font-medium text-zinc-400 outline-none focus:border-zinc-700"
+          >
+            {userRoleOptions.map((option) => (
+              <option key={option.tag} value={option.tag}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+
+          <select
+            value={selectedTropeTag}
+            onChange={(event) => setSelectedTropeTag(event.currentTarget.value)}
+            className="col-span-2 cursor-pointer rounded border border-zinc-800 bg-zinc-900 p-1.5 text-[10px] font-medium text-zinc-400 outline-none focus:border-zinc-700"
+          >
+            {tropeOptions.map((option) => (
+              <option key={option.tag} value={option.tag}>
+                {option.label}
               </option>
             ))}
           </select>
@@ -159,9 +307,9 @@ export default function CardLibraryPanel({
         {error ? (
           <div className="flex h-32 flex-col items-center justify-center p-4 text-center">
             <span className="text-xs font-bold text-rose-400">
-              SQLite Backend Exception
+              Library could not load
             </span>
-            <p className="mt-1 break-all font-mono text-[10px] text-zinc-500">
+            <p className="mt-1 break-words text-[11px] text-zinc-500">
               {error}
             </p>
           </div>
@@ -170,14 +318,26 @@ export default function CardLibraryPanel({
         {loading && !error ? (
           <div className="flex h-32 flex-col items-center justify-center gap-2 text-xs text-zinc-500">
             <Loader2 className="size-4 animate-spin text-violet-500" />
-            <span>Scanning local disk storage...</span>
+            <span>Looking through your saved characters...</span>
           </div>
         ) : null}
 
-        {!loading && !error && items.length === 0 ? (
+        {!library.isDesktopRuntime ? (
           <div className="flex h-48 flex-col items-center justify-center p-6 text-center text-xs text-zinc-600">
             <Archive className="mb-2 size-6 text-zinc-700" />
-            <p>No card records match current search filters.</p>
+            <p>
+              Saved characters and tag suggestions appear in the desktop app.
+            </p>
+          </div>
+        ) : null}
+
+        {library.isDesktopRuntime && !loading && !error && items.length === 0 ? (
+          <div className="flex h-48 flex-col items-center justify-center p-6 text-center text-xs text-zinc-600">
+            <Archive className="mb-2 size-6 text-zinc-700" />
+            <p>
+              No saved characters match this search yet. Import a card or clear
+              the filters to see tags.
+            </p>
           </div>
         ) : null}
 
@@ -195,10 +355,10 @@ export default function CardLibraryPanel({
 
                 <div className="mt-0.5 flex flex-wrap gap-1">
                   <span className="rounded bg-violet-500/10 px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-violet-400">
-                    {card.framework}
+                    {playStyleLabel(card.framework)}
                   </span>
                   <span className="rounded bg-zinc-800 px-1.5 py-0.5 text-[9px] font-medium text-zinc-400">
-                    {relationshipLabel(card.relationship)}
+                    {relationshipLabel(card.relationship, card.tags)}
                   </span>
                 </div>
 
@@ -250,9 +410,45 @@ export default function CardLibraryPanel({
   );
 }
 
-function relationshipLabel(relationship: string) {
-  return relationship
-    .replace("Asymmetric ", "")
-    .replace("(", "")
-    .replace(")", "");
+function relationshipLabel(relationship: string, tags: string[]) {
+  const normalizedTags = tags.map((tag) => tag.toLowerCase());
+  const roleLabel = characterRoleOptions.find((option) =>
+    normalizedTags.includes(option.tag),
+  )?.label;
+  const povLabel = povOptions.find((option) =>
+    normalizedTags.includes(option.tag),
+  )?.label;
+
+  if (roleLabel && povLabel && povLabel !== "AnyPOV") {
+    return `${roleLabel} / ${povLabel}`;
+  }
+
+  if (roleLabel) {
+    return roleLabel;
+  }
+
+  if (normalizedTags.includes("enemies to lovers")) {
+    return "Enemies to lovers";
+  }
+
+  if (relationship === "Asymmetric (Bot Dominant)") {
+    return "Dom";
+  }
+
+  if (relationship === "Asymmetric (User Dominant)") {
+    return "User leads";
+  }
+
+  if (relationship === "Antagonistic") {
+    return "Enemies to lovers";
+  }
+
+  return "Balanced";
+}
+
+function playStyleLabel(framework: string) {
+  return (
+    playStyleOptions.find((option) => option.value === framework)?.label ??
+    framework
+  );
 }

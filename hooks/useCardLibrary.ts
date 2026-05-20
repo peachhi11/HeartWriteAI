@@ -3,11 +3,14 @@
 import { useCallback, useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
 
+import { isTauriRuntime } from "@/lib/tauri/native";
+
 export interface SearchFilters {
   query?: string;
   framework?: string;
   relationship?: string;
   tag?: string;
+  tags?: string[];
   page: number;
   limit: number;
 }
@@ -36,6 +39,7 @@ export interface CardLibraryMetadata {
 }
 
 export function useCardLibrary(initialLimit = 12) {
+  const isDesktopRuntime = isTauriRuntime();
   const [items, setItems] = useState<CacheItemSummary[]>([]);
   const [metadata, setMetadata] = useState<CardLibraryMetadata>({
     totalCount: 0,
@@ -50,6 +54,18 @@ export function useCardLibrary(initialLimit = 12) {
   });
 
   const fetchPage = useCallback(async (currentFilters: SearchFilters) => {
+    if (!isDesktopRuntime) {
+      setItems([]);
+      setMetadata({
+        totalCount: 0,
+        totalPages: 1,
+        currentPage: currentFilters.page,
+      });
+      setLoading(false);
+      setError(null);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -70,7 +86,7 @@ export function useCardLibrary(initialLimit = 12) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isDesktopRuntime]);
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -109,5 +125,6 @@ export function useCardLibrary(initialLimit = 12) {
     setPage,
     updateSearchQuery,
     setFilters,
+    isDesktopRuntime,
   };
 }

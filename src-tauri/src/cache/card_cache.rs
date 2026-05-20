@@ -157,12 +157,29 @@ impl CacheDatabase {
             sql_params.push(Box::new(relationship));
         }
 
+        let mut requested_tags = Vec::new();
         if let Some(tag) = normalized_filter_value(filter.tag) {
+            requested_tags.push(tag);
+        }
+        if let Some(tags) = filter.tags {
+            for tag in tags {
+                if let Some(normalized_tag) = normalized_filter_value(Some(tag)) {
+                    if !requested_tags
+                        .iter()
+                        .any(|existing| existing.eq_ignore_ascii_case(&normalized_tag))
+                    {
+                        requested_tags.push(normalized_tag);
+                    }
+                }
+            }
+        }
+
+        for tag in requested_tags {
             conditions.push(
                 "EXISTS (
                     SELECT 1
                     FROM json_each(card_cache.tags_json)
-                    WHERE json_each.value = ?
+                    WHERE LOWER(json_each.value) = LOWER(?)
                 )"
                 .to_string(),
             );
@@ -381,6 +398,7 @@ mod tests {
                 framework: None,
                 relationship: None,
                 tag: None,
+                tags: None,
                 page: 1,
                 limit: 1,
             })
@@ -425,6 +443,7 @@ mod tests {
                 framework: Some("Narrative RPG".to_string()),
                 relationship: Some("Antagonistic".to_string()),
                 tag: Some("dark romance".to_string()),
+                tags: None,
                 page: 1,
                 limit: 12,
             })
@@ -434,6 +453,52 @@ mod tests {
         assert_eq!(page.total_pages, 1);
         assert_eq!(page.items[0].name, "Mara Voss");
         assert_eq!(page.items[0].tags, vec!["dark romance", "spy"]);
+    }
+
+    #[test]
+    fn queries_cache_by_multiple_case_insensitive_tags() {
+        let cache = create_cache("card-cache-multi-tag-filter");
+        cache
+            .upsert_card(
+                "/tmp/dominic.charx",
+                &create_card_with_tags(
+                    "Dominic Hale",
+                    "Narrative RPG",
+                    "Antagonistic",
+                    &["malePOV", "dom", "enemies to lovers"],
+                ),
+            )
+            .expect("first card should upsert");
+        cache
+            .upsert_card(
+                "/tmp/noah.charx",
+                &create_card_with_tags(
+                    "Noah Vale",
+                    "Narrative RPG",
+                    "Symmetric",
+                    &["malePOV", "sub", "slow burn"],
+                ),
+            )
+            .expect("second card should upsert");
+
+        let page = cache
+            .query_library_page(SearchFilters {
+                query: None,
+                framework: Some("Narrative RPG".to_string()),
+                relationship: None,
+                tag: None,
+                tags: Some(vec![
+                    "malepov".to_string(),
+                    "dom".to_string(),
+                    "enemies to lovers".to_string(),
+                ]),
+                page: 1,
+                limit: 12,
+            })
+            .expect("multi-tag search should query");
+
+        assert_eq!(page.total_count, 1);
+        assert_eq!(page.items[0].name, "Dominic Hale");
     }
 
     fn create_cache(name: &str) -> CacheDatabase {
