@@ -56,6 +56,19 @@ const macroToneTags = [
   "dark rp",
 ] as const;
 
+const storyEnginePresets = [
+  { label: "Choose a story engine", tag: "" },
+  { label: "Angst", tag: "angsty" },
+  { label: "Slow burn", tag: "slow burn" },
+  { label: "Comfort", tag: "hurt/comfort" },
+  { label: "Cozy romance", tag: "cozy romance" },
+  { label: "Fluff", tag: "fluff" },
+  { label: "Dark romance", tag: "dark romance" },
+  { label: "Second chance", tag: "second chance" },
+  { label: "High agency", tag: "high agency" },
+  { label: "Curious tension", tag: "curious" },
+] as const;
+
 export function CharacterCardImportExport() {
   const {
     cardValues,
@@ -99,6 +112,10 @@ export function CharacterCardImportExport() {
 
   function toggleTag(tag: string) {
     updateCardField("tagsText", toggleCommaSeparatedValue(cardValues.tagsText, tag));
+  }
+
+  function setStoryEngineTag(tag: string) {
+    updateCardField("tagsText", replaceStoryEngineTag(cardValues.tagsText, tag));
   }
 
   return (
@@ -466,6 +483,7 @@ export function CharacterCardImportExport() {
             <MacroClassificationSelector
               values={cardValues}
               onSelect={updateMacroClassification}
+              onSelectStoryEngine={setStoryEngineTag}
               onToggleTag={toggleTag}
             />
 
@@ -699,36 +717,59 @@ export function CharacterCardImportExport() {
 function MacroClassificationSelector({
   values,
   onSelect,
+  onSelectStoryEngine,
   onToggleTag,
 }: {
   readonly values: CharacterCardFormValues;
   readonly onSelect: (label: string, value: string) => void;
+  readonly onSelectStoryEngine: (tag: string) => void;
   readonly onToggleTag: (tag: string) => void;
 }) {
   const frameworkValue = readLabeledLine(values.system_prompt, "Framework");
   const formattingValue = readLabeledLine(values.system_prompt, "Formatting");
   const relationshipValue = readLabeledLine(values.system_prompt, "Relationship");
+  const activeStoryEngine =
+    storyEnginePresets.find((preset) =>
+      preset.tag ? hasCommaSeparatedValue(values.tagsText, preset.tag) : false,
+    )?.tag ?? "";
 
   return (
     <div className="grid gap-4 rounded-lg border bg-background/60 p-4">
       <div className="space-y-1">
-        <p className="text-sm font-medium">AI Macro Classifications</p>
+        <p className="text-sm font-medium">Story Engine</p>
         <p className="text-xs text-muted-foreground">
-          Select high-level roleplay constraints. These write readable labeled
-          lines into the system prompt for export.
+          Pick the kind of emotional route this card should lean toward. The app
+          handles the deeper routing quietly.
         </p>
       </div>
 
+      <label className="grid gap-2 text-sm font-medium md:max-w-sm">
+        Engine preset
+        <select
+          value={activeStoryEngine}
+          className="h-10 rounded-md border border-input bg-background px-3 text-sm text-foreground shadow-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"
+          onChange={(event) => {
+            onSelectStoryEngine(event.currentTarget.value);
+          }}
+        >
+          {storyEnginePresets.map((preset) => (
+            <option key={preset.label} value={preset.tag}>
+              {preset.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
       <div className="grid gap-4 lg:grid-cols-3">
         <SegmentedButtonGroup
-          label="Simulation Framework"
+          label="Play Style"
           options={simulationFrameworks}
           value={frameworkValue}
           tone="violet"
           onSelect={(value) => onSelect("Framework", value)}
         />
         <SegmentedButtonGroup
-          label="Formatting"
+          label="Writing Format"
           options={promptFormats}
           value={formattingValue}
           tone="cyan"
@@ -861,6 +902,24 @@ function toggleCommaSeparatedValue(text: string, value: string): string {
   }
 
   return [...values, value].join(", ");
+}
+
+function replaceStoryEngineTag(text: string, value: string): string {
+  const engineTags = new Set(
+    storyEnginePresets
+      .map((preset) => preset.tag.toLowerCase())
+      .filter(Boolean),
+  );
+  const values = text
+    .split(",")
+    .map((item) => item.trim())
+    .filter((item) => item && !engineTags.has(item.toLowerCase()));
+
+  if (value) {
+    values.push(value);
+  }
+
+  return values.join(", ");
 }
 
 function escapeRegExp(value: string): string {

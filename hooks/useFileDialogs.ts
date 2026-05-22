@@ -48,6 +48,29 @@ export function useFileDialogs() {
     }
   }
 
+  async function triggerFolderIntakeSelect(): Promise<string | null> {
+    if (!isDesktopRuntime) {
+      return null;
+    }
+
+    try {
+      const selectedPath = await open({
+        directory: true,
+        multiple: false,
+        title: "Choose a Character Card Intake Folder",
+      });
+
+      if (!selectedPath || typeof selectedPath !== "string") {
+        return null;
+      }
+
+      return selectedPath;
+    } catch (error) {
+      console.error("Folder intake selection collapsed:", error);
+      return null;
+    }
+  }
+
   async function triggerCharxExport(
     sourceCardPath: string,
     cardData: ValidatedCharacterCardV3,
@@ -115,6 +138,7 @@ export function useFileDialogs() {
   return {
     isDesktopRuntime,
     triggerCharxExport,
+    triggerFolderIntakeSelect,
     triggerPngMetadataSave,
     triggerUniversalImport,
   };

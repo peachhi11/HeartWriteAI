@@ -141,10 +141,10 @@ export default function ExpressionManager({
         <div className="space-y-1">
           <h2 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-zinc-400">
             <ImageIcon className="size-4" />
-            CCV3 Expression Matrix
+            Expression Images
           </h2>
           <p className="text-[11px] text-zinc-500">
-            Alternate situational emotion sprites synced from local assets.
+            Optional emotion images loaded from this card&apos;s local assets.
           </p>
         </div>
 
@@ -161,7 +161,7 @@ export default function ExpressionManager({
       {loading ? (
         <div className="flex items-center gap-2 text-xs text-zinc-500">
           <Loader2 className="size-4 animate-spin" />
-          Mapping directory buffers...
+          Looking for expression images...
         </div>
       ) : null}
 
@@ -173,11 +173,11 @@ export default function ExpressionManager({
 
       {!loading && !error && sprites.length === 0 ? (
         <div className="rounded-lg border border-dashed border-zinc-800 p-4 text-center text-xs text-zinc-600">
-          No alternate expressions located inside standard{" "}
+          No alternate expressions found in the standard{" "}
           <code className="rounded bg-zinc-950 px-1 py-0.5 text-[10px] text-zinc-500">
             _assets/sprites/
           </code>{" "}
-          structure path.
+          folder.
         </div>
       ) : null}
 

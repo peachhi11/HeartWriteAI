@@ -21,12 +21,8 @@ pub async fn save_ccv3_card(
     std::fs::create_dir_all(&cards_dir).map_err(|error| error.to_string())?;
 
     let safe_filename = create_safe_card_file_name(&card.data.name);
-    let file_path = cards_dir.join(format!("{safe_filename}.json"));
-    let json_string = serde_json::to_string_pretty(&card)
-        .map_err(|error| format!("Failed to compile CCV3 card JSON: {error}"))?;
-
-    std::fs::write(&file_path, json_string)
-        .map_err(|error| format!("Disk IO write failure: {error}"))?;
+    let file_path = cards_dir.join(format!("{safe_filename}.charx"));
+    create_charx_bundle(&file_path, &card, None::<&str>, None::<&str>)?;
 
     let saved_path = file_path.to_string_lossy().into_owned();
     upsert_saved_card_path(&state, &saved_path, &card)?;

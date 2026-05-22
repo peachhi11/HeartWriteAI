@@ -9,6 +9,7 @@ import { CharacterCardPayload } from "../../types/character-card/CharacterCardPa
 import { CharacterCardV3 } from "../../types/character-card/CharacterCardV3";
 import { WriteCharacterCardToPngOptions } from "../../types/character-card/WriteCharacterCardToPngOptions";
 import { currentUnixTimestamp } from "./currentUnixTimestamp";
+import { repairImportedCardLayout } from "./repairImportedCardLayout";
 
 const DEFAULT_CHARACTER_CARD_V3_DATA = {
   name: "",
@@ -32,7 +33,7 @@ export function createCharacterCardV3Export(
   card: CharacterCardPayload,
   options: WriteCharacterCardToPngOptions = {},
 ): CharacterCardV3 {
-  const convertedCard = convertSupportedCardToV3(card);
+  const convertedCard = repairImportedCardLayout(convertSupportedCardToV3(card));
   const data = isRecord(convertedCard.data) ? convertedCard.data : {};
   const modificationDate =
     options.modificationDate ?? currentUnixTimestamp();

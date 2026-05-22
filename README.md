@@ -6,14 +6,14 @@ The app is being built CCV3-first. New cards should be authored as Character Car
 
 ## What HeartWriteAI Is For
 
-- CCV3-first character card creation, editing, conversion, and PNG export.
+- CCV3-first character card creation, editing, conversion, and PNG/CHARX export.
 - Editable persona profiles and persona matching.
 - World, character, persona, scenario, and arc lorebooks.
 - Scenario and trope routing through lorebooks instead of bloating character cards.
 - Local chat runtime with active lorebooks, summaries, shared token budgets, and stop presets.
 - Future local inference through Ollama, llama.cpp-compatible APIs, or proxy/model presets.
 
-JSON is infrastructure, not the primary user interface. Users should edit readable fields and structured controls; JSON should appear mainly as export data or embedded PNG card metadata.
+CHARX is the native master format for saved cards because it can preserve the full card payload and bundled assets. PNG is the compatibility/share format for platforms that still expect image cards. JSON is infrastructure, not the primary user interface: users should edit readable fields and structured controls, while JSON appears mainly as export data, embedded PNG metadata, or advanced debugging.
 
 ## Stack
 
@@ -78,7 +78,10 @@ Implemented in the current scaffold:
 - Browser-side image intake pipeline for validation, compression, blurhash, and EXIF date extraction.
 - CCV3 PNG metadata read/write layer with V1/V2 conversion support through `@risuai/ccardlib`.
 - Browser and desktop import paths for PNG/APNG and JSON character cards, including browser download fallbacks when Tauri APIs are unavailable.
+- CHARX import/export support for full-fidelity card masters.
+- Folder intake review in the desktop app for scanning mixed PNG/JSON/CHARX folders, separating ready cards from image-only, lorebook, skipped, and broken files, and saving selected imports as CHARX masters.
 - Desktop card-library cache with user-facing filters for chat style, POV, character role, user role, tropes, and AU tags.
+- Hidden emotion/feeling lexicon for ForceBary-style tag suggestions, exposed only as friendly story-engine tags rather than classifier internals.
 - Prompt runtime compiler that lets a card override the default app system prompt, or extend it with `{{original}}`.
 - Adult legacy/offspring profile generator for generational series planning, with minor-NPC guardrails for family/slice-of-life scenes.
 - Tauri bridge helper for frontend/native command calls.
@@ -90,7 +93,7 @@ Implemented in the current scaffold:
 
 Immediate next milestone:
 
-- Stabilize the desktop card-library workflow around real imported card folders, then move the same normalized card model into lorebook/persona/chat runtime work.
+- Stabilize the desktop folder-intake and CHARX master workflow around real imported card folders, then move the same normalized card model into lorebook/persona/chat runtime work.
 
 ## Project Shape
 
@@ -114,7 +117,7 @@ The old CharacterGen project is now treated as a reference archive. The active p
 The current priority order is:
 
 1. Stabilize the scaffold and documentation checkpoint.
-2. Complete CCV3 PNG/JSON/CHARX import and export.
+2. Complete CCV3 PNG/JSON/CHARX import and export, with CHARX as the native master.
 3. Maintain the CharacterGen reference port map.
 4. Turn the character page into the editable intake hub.
 5. Add editable lorebook/persona/scenario asset editors and attachments.

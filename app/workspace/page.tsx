@@ -6,6 +6,7 @@ import CardLibraryPanel from "@/components/card-library-panel";
 import { DevToolsPanel } from "@/components/dev-tools-panel";
 import DropZoneOverlay from "@/components/DropZoneOverlay";
 import ExpressionManager from "@/components/expression-manager";
+import { FolderIntakeReview } from "@/components/folder-intake-review";
 import { StudioShell } from "@/components/studio-shell";
 import StructuredCardEditor from "@/components/structured-card-editor";
 import { useCharacterLibrary } from "@/hooks/character-card/useCharacterLibrary";
@@ -28,10 +29,12 @@ export default function WorkspacePage() {
     useState<ExpressionSprite | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const library = useCardLibrary(12);
-  const { importCardFromPath, saveWorkspaceChanges } = useCharacterLibrary();
+  const { importCardFromPath, saveCard, saveWorkspaceChanges } =
+    useCharacterLibrary();
   const {
     isDesktopRuntime,
     triggerCharxExport,
+    triggerFolderIntakeSelect,
     triggerPngMetadataSave,
     triggerUniversalImport,
   } = useFileDialogs();
@@ -93,6 +96,34 @@ export default function WorkspacePage() {
       );
     } else {
       setWorkspaceMessage(result.error ?? "Save failure.");
+    }
+  }
+
+  async function handleSaveMasterCharx() {
+    if (!activeCard) {
+      return;
+    }
+
+    if (!isDesktopRuntime) {
+      setWorkspaceMessage(
+        "Browser preview can download a JSON copy, but saving a CHARX master needs the desktop app.",
+      );
+      return;
+    }
+
+    setIsSaving(true);
+    setWorkspaceMessage("Saving CHARX master to the local card library...");
+
+    const result = await saveCard(activeCard);
+
+    setIsSaving(false);
+
+    if (result.ok && result.filePath) {
+      setCurrentFilePath(result.filePath);
+      library.refresh();
+      setWorkspaceMessage(`Saved CHARX master to ${result.filePath}.`);
+    } else {
+      setWorkspaceMessage(result.error ?? "CHARX master save failed.");
     }
   }
 
@@ -205,8 +236,8 @@ export default function WorkspacePage() {
   return (
     <StudioShell
       eyebrow="Character Cards"
-      title="CCV3 Matrix Architecture Studio"
-      subtitle={currentFilePath ?? "No active tracking file loaded."}
+      title="Character Card Studio"
+      subtitle={currentFilePath ?? "No card loaded yet."}
       actions={
         <div className="flex items-center gap-2">
           {isDesktopRuntime ? (
@@ -235,6 +266,24 @@ export default function WorkspacePage() {
             <>
               <button
                 type="button"
+                onClick={handleSaveMasterCharx}
+                disabled={isSaving}
+                className="rounded-lg bg-rose-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-rose-700 disabled:opacity-50"
+                title="Save this card as a CHARX master in the local card library."
+              >
+                {isSaving ? "Saving..." : "Save Master"}
+              </button>
+              <button
+                type="button"
+                onClick={handlePersistWorkspaceChanges}
+                disabled={isSaving || !currentFilePath}
+                className="rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted disabled:opacity-50"
+                title="Save edited data back to the active source file."
+              >
+                Save Source
+              </button>
+              <button
+                type="button"
                 onClick={handleSaveWorkspacePngAs}
                 disabled={!canSavePngMetadata}
                 className="hidden rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted disabled:opacity-50 md:inline-flex"
@@ -252,16 +301,7 @@ export default function WorkspacePage() {
                 disabled={!currentFilePath}
                 className="hidden rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted disabled:opacity-50 md:inline-flex"
               >
-                Export CHARX
-              </button>
-              <button
-                type="button"
-                onClick={handlePersistWorkspaceChanges}
-                disabled={isSaving || !currentFilePath}
-                className="rounded-lg bg-rose-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-rose-700 disabled:opacity-50"
-                title="Save edited CCV3 data back to the active PNG, JSON, or CHARX source."
-              >
-                {isSaving ? "Saving..." : "Save"}
+                Export CHARX...
               </button>
             </>
           ) : null}
@@ -319,6 +359,12 @@ export default function WorkspacePage() {
             {workspaceMessage}
           </p>
         ) : null}
+
+        <FolderIntakeReview
+          isDesktopRuntime={isDesktopRuntime}
+          onChooseFolder={triggerFolderIntakeSelect}
+          onImported={library.refresh}
+        />
 
         {activeCard ? (
           <StructuredCardEditor

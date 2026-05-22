@@ -439,7 +439,7 @@ const DEFAULT_KINK_GENERATION: KinkGenerationExtension = {
   preferredSensoryTags: [],
   primaryRole: "Switch",
   systemPromptInstruction:
-    "Keep intimacy optional, consent-forward, and emotionally responsive unless the adult module is explicitly enabled.",
+    "Keep intimacy optional, consent-forward, and emotionally responsive unless adult content is switched on.",
 };
 const KINK_PRIMARY_ROLES: KinkPrimaryRole[] = [
   "Dominant",
@@ -503,7 +503,7 @@ const DEFAULT_FIRST_MESSAGE_GENERATION: FirstMessageGenerationExtension = {
     "Render in action dialogue hybrid format.",
     "Target 300-450 tokens.",
     "End with direct question that clearly hands action back to {{user}}.",
-    "Output ONLY the raw character text string.",
+    "Write only the character's first message.",
     "You are strictly forbidden from writing or completing actions for {{user}}. Your output must terminate immediately after {{char}}'s closing action or line of dialogue.",
   ].join("\n"),
   entryPoint: "Active_Collision",
@@ -735,14 +735,14 @@ const DEFAULT_FRAMEWORK_CONFIGURATION: FrameworkConfigurationExtension = {
   injectionPipelineRouter: "Segmented_Placements",
   memoryBudgetStrategy: "Extended_Deep_Lore",
   systemPromptJailbreakOverride:
-    "Output only the requested card text or JSON payload. Preserve {{char}} and {{user}} macros exactly. Never write actions, thoughts, or dialogue for {{user}}.",
+    "Write only the requested card text. Keep {{char}} and {{user}} exactly as written. Never write actions, thoughts, or dialogue for {{user}}.",
   targetSpecification: "V3_Card_Layout",
 };
 const DEFAULT_FORMATTING_CONFIGURATION: FormattingConfigurationExtension = {
   actionWrappingStandard: "Quote_Isolated_Prose",
   formattingId: "11111111-7777-4000-8000-000000000000",
   formattingSystemPromptInjection:
-    "MANDATORY: Use Standard Prose Format. Dialogue in double quotation marks. Weave actions, body language, reactions, narration, and brief internal thoughts into prose paragraphs. Start a new paragraph whenever a different character speaks. Do not output APP: or USER: labels. Never write for {{user}}.",
+    "Use standard prose. Put dialogue in double quotation marks. Weave actions, body language, reactions, narration, and brief internal thoughts into paragraphs. Start a new paragraph when a different character speaks. Do not use APP: or USER: labels. Never write for {{user}}.",
   markdownEmphasisStyle: "Clean_Prose",
   maxParagraphsPerTurn: 3,
   narrativePerspective: "Third_Person_Past",
@@ -753,12 +753,12 @@ const DEFAULT_TONE_CONFIGURATION: ToneConfigurationExtension = {
   proseTexture: "Angsty_Melancholic",
   toneId: "11111111-8888-4000-8000-000000000000",
   toneSystemPromptInjection:
-    "NARRATIVE TONE: Keep the prose emotionally grounded, quietly romantic, and consistent with the active trope.",
+    "Keep the prose emotionally grounded, quietly romantic, and consistent with the active trope.",
   worldviewFilter: "Jaded_Weary",
 };
 const DEFAULT_ARCHETYPE_CONFIGURATION: ArchetypeConfigurationExtension = {
   aiBehaviorPrompt:
-    "CORE PSYCHOLOGY: {{char}} is guarded, emotionally consistent, and slow to reveal vulnerability. Preserve their armor until {{user}} earns a clear shift on-page.",
+    "{{char}} is guarded, emotionally consistent, and slow to reveal vulnerability. Let their defenses soften only when {{user}} earns a clear shift on-page.",
   archetypeId: "11111111-9999-4000-8000-000000000000",
   coreMotivation: "Autonomy_Freedom",
   defenseMechanism: "Silent_Withdrawal",
@@ -863,10 +863,10 @@ const DEFAULT_LORE_ENTRY_GENERATION: LoreEntryGenerationExtension[] = [
     activationKeys: ["family", "barrier", "secret keeper"],
     domainScope: "Biographical_NPC",
     entryContent:
-      "Named NPC pressure, relationship function, and emotional status for reactive cast insertion.",
+      "Supporting characters, relationship pressure, and emotional status that can appear when the scene calls for them.",
     entryId: "22222222-5555-4000-8000-000000000000",
     insertionPriority: "Reactive_Contextual",
-    title: "Relationship Network File",
+    title: "Relationship Network",
     tokenReserveCost: 90,
   },
   {
@@ -2714,7 +2714,7 @@ export default function StructuredCardEditor({
           <div className="space-y-6">
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
               <div className="space-y-4">
-                <Field label="Name Key">
+                <Field label="Character Name">
                   <input
                     type="text"
                     value={activeCard.data.name}
@@ -2725,7 +2725,7 @@ export default function StructuredCardEditor({
                   />
                 </Field>
 
-                <Field label="Card Version">
+                <Field label="Version">
                   <input
                     type="text"
                     value={activeCard.data.character_version}
@@ -2740,7 +2740,7 @@ export default function StructuredCardEditor({
               <div className="grid grid-cols-1 gap-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4 sm:grid-cols-2 lg:col-span-2">
                 <MacroButtonGroup
                   activeValue={macroExtension.framework}
-                  label="Simulation Framework"
+                  label="Chat Style"
                   options={FRAMEWORKS}
                   tone="violet"
                   onSelect={(value) => updateMacroExtension("framework", value)}
@@ -2748,7 +2748,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={macroExtension.relationship}
-                  label="Relationship Matrix"
+                  label="Relationship Dynamic"
                   options={RELATIONSHIPS}
                   tone="emerald"
                   onSelect={(value) => updateMacroExtension("relationship", value)}
@@ -2756,7 +2756,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={macroExtension.formatting}
-                  label="Prompt Formatting"
+                  label="Card Format"
                   options={FORMATTINGS}
                   tone="sky"
                   onSelect={(value) => updateMacroExtension("formatting", value)}
@@ -2767,18 +2767,18 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Formatting Configuration
+                  Writing Style
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Strict typography, markdown, perspective, and paragraph caps
-                  used by the chat stream and generated card prose.
+                  Choose how replies are written: dialogue, emphasis,
+                  perspective, and reply length.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
                 <MacroButtonGroup
                   activeValue={formattingConfiguration.actionWrappingStandard}
-                  label="Render Standard"
+                  label="Dialogue Style"
                   options={FORMATTING_ACTION_WRAPPING_STANDARDS}
                   tone="violet"
                   onSelect={(value) =>
@@ -2791,7 +2791,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={formattingConfiguration.markdownEmphasisStyle}
-                  label="Markup Control"
+                  label="Thoughts and Emphasis"
                   options={FORMATTING_MARKDOWN_EMPHASIS_STYLES}
                   tone="emerald"
                   onSelect={(value) =>
@@ -2801,7 +2801,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={formattingConfiguration.narrativePerspective}
-                  label="Perspective Lock"
+                  label="Point of View"
                   options={FORMATTING_NARRATIVE_PERSPECTIVES}
                   tone="sky"
                   onSelect={(value) =>
@@ -2811,7 +2811,7 @@ export default function StructuredCardEditor({
               </div>
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                <Field label="Formatting ID">
+                <Field label="Style Preset ID">
                   <input
                     type="text"
                     value={formattingConfiguration.formattingId}
@@ -2825,7 +2825,7 @@ export default function StructuredCardEditor({
                   />
                 </Field>
 
-                <Field label="Max Paragraphs Per Turn">
+                <Field label="Max Paragraphs per Reply">
                   <input
                     type="number"
                     min={1}
@@ -2842,7 +2842,7 @@ export default function StructuredCardEditor({
                 </Field>
               </div>
 
-              <Field label="Formatting System Prompt Injection">
+              <Field label="Writing Rules">
                 <textarea
                   value={formattingConfiguration.formattingSystemPromptInjection}
                   onChange={(event) =>
@@ -2859,11 +2859,11 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Lore Entry Trigger Matrix
+                  Lore Entries
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Full granular lore cards keyed by regex-style activation terms
-                  for reactive context injection during chat.
+                  Background details that can appear when a scene mentions the
+                  matching words.
                 </p>
               </div>
 
@@ -2876,7 +2876,7 @@ export default function StructuredCardEditor({
                     <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
                       <MacroButtonGroup
                         activeValue={entry.domainScope}
-                        label={`Lore Entry ${index + 1}`}
+                        label={`Lore item ${index + 1}`}
                         options={LORE_ENTRY_DOMAIN_SCOPES}
                         tone="sky"
                         onSelect={(value) =>
@@ -2888,7 +2888,7 @@ export default function StructuredCardEditor({
 
                       <MacroButtonGroup
                         activeValue={entry.insertionPriority}
-                        label="Insertion Strategy"
+                        label="When to Use It"
                         options={LORE_ENTRY_INSERTION_PRIORITIES}
                         tone="emerald"
                         onSelect={(value) =>
@@ -2913,7 +2913,7 @@ export default function StructuredCardEditor({
                         />
                       </Field>
 
-                      <Field label="Token Reserve">
+                      <Field label="Space Reserved">
                         <input
                           type="number"
                           min={25}
@@ -2942,7 +2942,7 @@ export default function StructuredCardEditor({
                       </Field>
                     </div>
 
-                    <Field label="Activation Keys">
+                    <Field label="Trigger Words">
                       <input
                         type="text"
                         value={entry.activationKeys.join(", ")}
@@ -2959,7 +2959,7 @@ export default function StructuredCardEditor({
                       />
                     </Field>
 
-                    <Field label="Entry Content">
+                    <Field label="Lore Text">
                       <textarea
                         value={entry.entryContent}
                         onChange={(event) =>
@@ -2978,11 +2978,11 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  World Lore Placeholder Matrix
+                  World Details
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Token-saving macro variables that resolve dense world details
-                  only when the card compiles or a matching trigger needs them.
+                  Reusable world facts the card can drop into prompts when they
+                  are needed.
                 </p>
               </div>
 
@@ -2995,7 +2995,7 @@ export default function StructuredCardEditor({
                     <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
                       <MacroButtonGroup
                         activeValue={placeholder.macroType}
-                        label={`Placeholder ${index + 1}`}
+                        label={`World detail ${index + 1}`}
                         options={WORLD_LORE_PLACEHOLDER_MACRO_TYPES}
                         tone="violet"
                         onSelect={(value) =>
@@ -3005,7 +3005,7 @@ export default function StructuredCardEditor({
                         }
                       />
 
-                      <Field label="Variable Key">
+                      <Field label="Shortcut">
                         <input
                           type="text"
                           value={placeholder.variableKey}
@@ -3018,7 +3018,7 @@ export default function StructuredCardEditor({
                         />
                       </Field>
 
-                      <Field label="Placeholder ID">
+                      <Field label="Detail ID">
                         <input
                           type="text"
                           value={placeholder.placeholderId}
@@ -3043,11 +3043,10 @@ export default function StructuredCardEditor({
                         }
                         className="size-3.5 accent-violet-500"
                       />
-                      Dynamic rewrite allowed when chat history triggers this
-                      placeholder
+                      Let this detail update when the chat makes it relevant
                     </label>
 
-                    <Field label="Current Data Payload">
+                    <Field label="Current Text">
                       <textarea
                         value={placeholder.currentDataPayload}
                         onChange={(event) =>
@@ -3066,18 +3065,17 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Intimacy Style Matrix
+                  Intimacy Style
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Emotional tone, aftercare, dialogue cadence, and physical
-                  love language for private romantic moments.
+                  How the character behaves in private romantic moments.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <MacroButtonGroup
                   activeValue={intimacyStyleGeneration.expressionType}
-                  label="Tone Tag"
+                  label="Emotional Style"
                   options={INTIMACY_EXPRESSION_TYPES}
                   tone="violet"
                   onSelect={(value) =>
@@ -3087,7 +3085,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={intimacyStyleGeneration.aftercareStyle}
-                  label="Grounding Tag"
+                  label="Comfort Style"
                   options={INTIMACY_AFTERCARE_STYLES}
                   tone="emerald"
                   onSelect={(value) =>
@@ -3097,7 +3095,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={intimacyStyleGeneration.verbalCadence}
-                  label="Verbal Vibe Tag"
+                  label="How They Talk"
                   options={INTIMACY_VERBAL_CADENCES}
                   tone="sky"
                   onSelect={(value) =>
@@ -3119,7 +3117,7 @@ export default function StructuredCardEditor({
                 />
               </div>
 
-              <Field label="AI Behavior Prompt">
+              <Field label="Private Scene Guidance">
                 <textarea
                   value={intimacyStyleGeneration.aiBehaviorPrompt}
                   onChange={(event) =>
@@ -3136,18 +3134,18 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Turn-Off Boundary Matrix
+                  Turn-Offs and Boundaries
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Attitude, sensory, and role-hardline constraints that make
-                  {" {{char}}"} pause, withdraw, or re-establish boundaries.
+                  Things that should make {"{{char}}"} slow down, pull back, or
+                  set a clear boundary.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                 <MacroButtonGroup
                   activeValue={turnOffGeneration.dynamicHardlines}
-                  label="Power Hardline"
+                  label="Hard Boundary"
                   options={TURN_OFF_DYNAMIC_HARDLINES}
                   tone="violet"
                   onSelect={(value) =>
@@ -3155,7 +3153,7 @@ export default function StructuredCardEditor({
                   }
                 />
 
-                <Field label="Attitude Killers">
+                <Field label="Personality Turn-Offs">
                   <input
                     type="text"
                     value={turnOffGeneration.behavioralTurnOffs.join(", ")}
@@ -3172,7 +3170,7 @@ export default function StructuredCardEditor({
                   />
                 </Field>
 
-                <Field label="Aesthetic Killers">
+                <Field label="Sensory Turn-Offs">
                   <input
                     type="text"
                     value={turnOffGeneration.sensoryTurnOffs.join(", ")}
@@ -3190,7 +3188,7 @@ export default function StructuredCardEditor({
                 </Field>
               </div>
 
-              <Field label="AI Reaction Prompt">
+              <Field label="Boundary Response">
                 <textarea
                   value={turnOffGeneration.aiReactionPrompt}
                   onChange={(event) =>
@@ -3207,18 +3205,18 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Opening Scenario Matrix
+                  Opening Scene
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Location, catalyst, and mood controls that shape the first
-                  message setup without taking over {"{{user}}"}&apos;s turn.
+                  Where the first scene starts, what causes the encounter, and
+                  how tense it feels.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                 <MacroButtonGroup
                   activeValue={scenarioGeneration.settingType}
-                  label="Location Tag"
+                  label="Setting"
                   options={SCENARIO_SETTING_TYPES}
                   tone="violet"
                   onSelect={(value) =>
@@ -3238,7 +3236,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={scenarioGeneration.startingTension}
-                  label="Mood Valve"
+                  label="Starting Mood"
                   options={SCENARIO_STARTING_TENSIONS}
                   tone="sky"
                   onSelect={(value) =>
@@ -3264,7 +3262,7 @@ export default function StructuredCardEditor({
                 />
               </Field>
 
-              <Field label="Scene Premise Description">
+              <Field label="Scene Premise">
                 <textarea
                   value={scenarioGeneration.scenePremiseDescription}
                   onChange={(event) =>
@@ -3281,18 +3279,18 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  First Message Output Matrix
+                  First Message Style
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Presentation rules for the final greeting payload: where it
-                  enters, how it reads, and how it hands action back.
+                  How the opening message should read and how it should leave
+                  room for the user to answer.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                 <MacroButtonGroup
                   activeValue={firstMessageGeneration.entryPoint}
-                  label="Entry Point"
+                  label="Opening Beat"
                   options={FIRST_MESSAGE_ENTRY_POINTS}
                   tone="violet"
                   onSelect={(value) =>
@@ -3302,7 +3300,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={firstMessageGeneration.literaryStyle}
-                  label="Card Presentation"
+                  label="Writing Style"
                   options={FIRST_MESSAGE_LITERARY_STYLES}
                   tone="emerald"
                   onSelect={(value) =>
@@ -3312,7 +3310,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={firstMessageGeneration.userCallToAction}
-                  label="User CTA"
+                  label="How It Invites the User"
                   options={FIRST_MESSAGE_USER_CALLS_TO_ACTION}
                   tone="sky"
                   onSelect={(value) =>
@@ -3321,7 +3319,7 @@ export default function StructuredCardEditor({
                 />
               </div>
 
-              <Field label="Token Length Cap">
+              <Field label="Approximate Length">
                 <input
                   type="number"
                   min={200}
@@ -3337,7 +3335,7 @@ export default function StructuredCardEditor({
                 />
               </Field>
 
-              <Field label="AI Output Constraint">
+              <Field label="First Message Instructions">
                 <textarea
                   value={firstMessageGeneration.aiOutputConstraint}
                   onChange={(event) =>
@@ -3354,18 +3352,18 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Tone Configuration
+                  Tone
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Narrative atmosphere, pacing velocity, worldview framing, and
-                  vocabulary families for the generated prose.
+                  The emotional color, pacing, and word choices used in the
+                  generated prose.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
                 <MacroButtonGroup
                   activeValue={toneConfiguration.proseTexture}
-                  label="Prose Texture"
+                  label="Prose Mood"
                   options={TONE_PROSE_TEXTURES}
                   tone="violet"
                   onSelect={(value) =>
@@ -3375,7 +3373,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={toneConfiguration.pacingVelocity}
-                  label="Pacing Velocity"
+                  label="Pacing"
                   options={TONE_PACING_VELOCITIES}
                   tone="emerald"
                   onSelect={(value) =>
@@ -3385,7 +3383,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={toneConfiguration.worldviewFilter}
-                  label="Worldview Filter"
+                  label="Outlook"
                   options={TONE_WORLDVIEW_FILTERS}
                   tone="sky"
                   onSelect={(value) =>
@@ -3395,7 +3393,7 @@ export default function StructuredCardEditor({
               </div>
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                <Field label="Tone ID">
+                <Field label="Tone Preset ID">
                   <input
                     type="text"
                     value={toneConfiguration.toneId}
@@ -3409,7 +3407,7 @@ export default function StructuredCardEditor({
                   />
                 </Field>
 
-                <Field label="Vocabulary Directives">
+                <Field label="Words to Favor">
                   <input
                     type="text"
                     value={toneConfiguration.aiVocabularyDirectives.join(", ")}
@@ -3428,7 +3426,7 @@ export default function StructuredCardEditor({
                 </Field>
               </div>
 
-              <Field label="Tone System Prompt Injection">
+              <Field label="Tone Instructions">
                 <textarea
                   value={toneConfiguration.toneSystemPromptInjection}
                   onChange={(event) =>
@@ -3445,18 +3443,18 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Archetype Configuration
+                  Character Archetype
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Core psychology, emotional armor, and hidden motivation that
-                  shape behavior before trope dynamics bend the relationship.
+                  The character&apos;s emotional pattern before the romance starts
+                  changing them.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
                 <MacroButtonGroup
                   activeValue={archetypeConfiguration.personaType}
-                  label="Persona Type"
+                  label="Character Type"
                   options={ARCHETYPE_PERSONA_TYPES}
                   tone="violet"
                   onSelect={(value) =>
@@ -3466,7 +3464,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={archetypeConfiguration.defenseMechanism}
-                  label="Defense Mechanism"
+                  label="Defense Style"
                   options={ARCHETYPE_DEFENSE_MECHANISMS}
                   tone="emerald"
                   onSelect={(value) =>
@@ -3485,7 +3483,7 @@ export default function StructuredCardEditor({
                 />
               </div>
 
-              <Field label="Archetype ID">
+                <Field label="Archetype ID">
                 <input
                   type="text"
                   value={archetypeConfiguration.archetypeId}
@@ -3499,7 +3497,7 @@ export default function StructuredCardEditor({
                 />
               </Field>
 
-              <Field label="AI Behavior Prompt">
+              <Field label="Behavior Notes">
                 <textarea
                   value={archetypeConfiguration.aiBehaviorPrompt}
                   onChange={(event) =>
@@ -3517,11 +3515,11 @@ export default function StructuredCardEditor({
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                    Adult Intimacy Layer
+                    Adult Intimacy
                   </h3>
                   <p className="mt-1 text-[11px] text-zinc-500">
-                    Optional private-scene guidance. Disabled exports only keep
-                    the safety switch, not the detailed tags.
+                    Optional private-scene guidance. Leave this off for cards
+                    that should stay non-explicit.
                   </p>
                 </div>
 
@@ -3537,14 +3535,14 @@ export default function StructuredCardEditor({
                     }
                     className="size-3.5 accent-violet-500"
                   />
-                  Enable adult module
+                  Enable adult content
                 </label>
               </div>
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <MacroButtonGroup
                   activeValue={kinkGeneration.primaryRole}
-                  label="Authority Tag"
+                  label="Role"
                   options={KINK_PRIMARY_ROLES}
                   tone="violet"
                   onSelect={(value) =>
@@ -3554,7 +3552,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={kinkGeneration.intensityLevel}
-                  label="Intensity Level"
+                  label="Intensity"
                   options={KINK_INTENSITY_LEVELS}
                   tone="emerald"
                   onSelect={(value) =>
@@ -3565,7 +3563,7 @@ export default function StructuredCardEditor({
 
               <MacroToggleGroup
                 activeValues={kinkGeneration.preferredSensoryTags}
-                label="Boundary / Intent Tags"
+                label="Boundaries and Interests"
                 options={KINK_SENSORY_TAGS}
                 tone="violet"
                 onToggle={(value) => {
@@ -3581,7 +3579,7 @@ export default function StructuredCardEditor({
                 }}
               />
 
-              <Field label="System Prompt Instruction">
+              <Field label="Adult Scene Instructions">
                 <textarea
                   value={kinkGeneration.systemPromptInstruction}
                   onChange={(event) =>
@@ -3599,11 +3597,11 @@ export default function StructuredCardEditor({
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                    Fetish Focus Matrix
+                    Specific Focuses
                   </h3>
                   <p className="mt-1 text-[11px] text-zinc-500">
-                    Optional fixation metadata for anatomy, garments,
-                    body-scale modifiers, and situational triggers.
+                    Optional detail focus for private scenes, clothing,
+                    situation, and scale.
                   </p>
                 </div>
 
@@ -3619,14 +3617,14 @@ export default function StructuredCardEditor({
                     }
                     className="size-3.5 accent-violet-500"
                   />
-                  Enable fetish module
+                  Enable specific focuses
                 </label>
               </div>
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                 <MacroButtonGroup
                   activeValue={fetishGeneration.anatomicalFocus}
-                  label="Anatomical Matrix"
+                  label="Body Focus"
                   options={FETISH_ANATOMICAL_FOCUSES}
                   tone="violet"
                   onSelect={(value) =>
@@ -3636,7 +3634,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={fetishGeneration.materialPreference}
-                  label="Object Classifier"
+                  label="Clothing or Material Focus"
                   options={FETISH_MATERIAL_PREFERENCES}
                   tone="emerald"
                   onSelect={(value) =>
@@ -3646,7 +3644,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={fetishGeneration.situationalTrigger}
-                  label="Environment Tag"
+                  label="Situation"
                   options={FETISH_SITUATIONAL_TRIGGERS}
                   tone="sky"
                   onSelect={(value) =>
@@ -3656,7 +3654,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={fetishGeneration.sizeFantasyModifier}
-                  label="Body Alteration Tag"
+                  label="Scale"
                   options={FETISH_SIZE_MODIFIERS}
                   tone="violet"
                   onSelect={(value) =>
@@ -3665,7 +3663,7 @@ export default function StructuredCardEditor({
                 />
               </div>
 
-              <Field label="AI Descriptive Focus">
+              <Field label="Description Guidance">
                 <textarea
                   value={fetishGeneration.aiDescriptiveFocus}
                   onChange={(event) =>
@@ -3682,16 +3680,16 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Nationality & Civic Router
+                  Nationality and Citizenship
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Legal citizenship, mobility rights, and accent handling stay
+                  Citizenship, travel context, and accent guidance. This stays
                   separate from race and ethnicity.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-                <Field label="Passport Country">
+                <Field label="Country">
                   <input
                     type="text"
                     value={nationalityGeneration.passportCountry}
@@ -3707,7 +3705,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={nationalityGeneration.regionalAlliance}
-                  label="Law & Freedom Tag"
+                  label="Regional Context"
                   options={NATIONALITY_REGIONAL_ALLIANCES}
                   tone="sky"
                   onSelect={(value) =>
@@ -3717,7 +3715,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={nationalityGeneration.legalStatus}
-                  label="Citizenship Tag"
+                  label="Citizenship Status"
                   options={NATIONALITY_LEGAL_STATUSES}
                   tone="emerald"
                   onSelect={(value) =>
@@ -3726,7 +3724,7 @@ export default function StructuredCardEditor({
                 />
               </div>
 
-              <Field label="AI Accent & Slang Modifier">
+              <Field label="Accent and Slang Notes">
                 <textarea
                   value={nationalityGeneration.linguisticVibe}
                   onChange={(event) =>
@@ -3743,16 +3741,16 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Name Variables
+                  Character Name Parts
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Bracketed values are generated character outputs. Heritage,
-                  era, aura, and composition are backend filter tags.
+                  Name pieces and naming style. These help the generator choose
+                  names that fit the character.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-                <Field label="{{char}} full name">
+                <Field label="Full Name">
                   <input
                     type="text"
                     value={activeCard.data.name}
@@ -3763,7 +3761,7 @@ export default function StructuredCardEditor({
                   />
                 </Field>
 
-                <Field label="{{firstname}}">
+                <Field label="First Name">
                   <input
                     type="text"
                     value={nameGeneration.firstname}
@@ -3774,7 +3772,7 @@ export default function StructuredCardEditor({
                   />
                 </Field>
 
-                <Field label="{{surname}}">
+                <Field label="Surname">
                   <input
                     type="text"
                     value={nameGeneration.surname}
@@ -3785,7 +3783,7 @@ export default function StructuredCardEditor({
                   />
                 </Field>
 
-                <Field label="{{title}}">
+                <Field label="Title">
                   <input
                     type="text"
                     value={nameGeneration.title}
@@ -3796,7 +3794,7 @@ export default function StructuredCardEditor({
                   />
                 </Field>
 
-                <Field label="{{alias}}">
+                <Field label="Nickname or Alias">
                   <input
                     type="text"
                     value={nameGeneration.alias}
@@ -3811,7 +3809,7 @@ export default function StructuredCardEditor({
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <MacroButtonGroup
                   activeValue={nameGeneration.heritage}
-                  label="Heritage Tag"
+                  label="Name Heritage"
                   options={HERITAGE_TAGS}
                   tone="sky"
                   onSelect={(value) => updateNameGeneration("heritage", value)}
@@ -3819,7 +3817,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={nameGeneration.era}
-                  label="Era Tag"
+                  label="Era"
                   options={ERA_TAGS}
                   tone="violet"
                   onSelect={(value) => updateNameGeneration("era", value)}
@@ -3827,7 +3825,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={nameGeneration.aura}
-                  label="Aura Tag"
+                  label="Name Feel"
                   options={AURA_TAGS}
                   tone="emerald"
                   onSelect={(value) => updateNameGeneration("aura", value)}
@@ -3835,7 +3833,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={nameGeneration.composition}
-                  label="Composition Slot"
+                  label="Name Format"
                   options={COMPOSITION_TAGS}
                   tone="sky"
                   onSelect={(value) => updateNameGeneration("composition", value)}
@@ -3846,11 +3844,11 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Occupation & Status Matrix
+                  Work and Status
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Work, wealth, hierarchy, and campus roles shape daily routine,
-                  dialogue, and professional romance stakes.
+                  Work, class, hierarchy, and campus roles that shape everyday
+                  life and romance pressure.
                 </p>
               </div>
 
@@ -3871,7 +3869,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={occupationGeneration.authorityDynamic}
-                  label="Hierarchy Tag"
+                  label="Work Relationship"
                   options={OCCUPATION_AUTHORITY_DYNAMICS}
                   tone="emerald"
                   onSelect={(value) =>
@@ -3893,7 +3891,7 @@ export default function StructuredCardEditor({
                     }
                     className="size-3.5 accent-violet-500"
                   />
-                  Use university student schema
+                  Make them a university student
                 </label>
               </div>
 
@@ -3901,7 +3899,7 @@ export default function StructuredCardEditor({
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                   <MacroButtonGroup
                     activeValue={occupationGeneration.academicYear}
-                    label="Academic Hierarchy"
+                    label="Year Level"
                     options={STUDENT_ACADEMIC_YEARS}
                     tone="violet"
                     onSelect={(value) =>
@@ -3911,7 +3909,7 @@ export default function StructuredCardEditor({
 
                   <MacroButtonGroup
                     activeValue={occupationGeneration.majorField}
-                    label="Major & Discipline"
+                    label="Major or Field"
                     options={STUDENT_MAJOR_FIELDS}
                     tone="sky"
                     onSelect={(value) =>
@@ -3947,7 +3945,7 @@ export default function StructuredCardEditor({
                 <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                   <MacroButtonGroup
                     activeValue={occupationGeneration.socioeconomicTier}
-                    label="Wealth & Status Tag"
+                    label="Class and Status"
                     options={OCCUPATION_SOCIOECONOMIC_TIERS}
                     tone="violet"
                     onSelect={(value) =>
@@ -3957,7 +3955,7 @@ export default function StructuredCardEditor({
 
                   <MacroButtonGroup
                     activeValue={occupationGeneration.professionalDomain}
-                    label="Industry Filter"
+                    label="Industry"
                     options={OCCUPATION_PROFESSIONAL_DOMAINS}
                     tone="sky"
                     onSelect={(value) =>
@@ -3967,7 +3965,7 @@ export default function StructuredCardEditor({
                 </div>
               )}
 
-              <Field label="Workplace Vibe">
+              <Field label="Workplace Atmosphere">
                 <textarea
                   value={occupationGeneration.workplaceVibe}
                   onChange={(event) =>
@@ -3984,16 +3982,16 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Age Variables
+                  Age and Life Stage
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Output variables map to card placeholders. Life phase,
-                  context, and power dynamics stay as generator filter tags.
+                  Age, life stage, and whether age changes the relationship
+                  dynamic.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <Field label="{{age}}">
+                <Field label="Age">
                   <input
                     type="text"
                     inputMode="numeric"
@@ -4005,7 +4003,7 @@ export default function StructuredCardEditor({
                   />
                 </Field>
 
-                <Field label="{{apparent_age}}">
+                <Field label="Apparent Age">
                   <input
                     type="text"
                     inputMode="numeric"
@@ -4020,7 +4018,7 @@ export default function StructuredCardEditor({
                   />
                 </Field>
 
-                <Field label="{{birth_year}}">
+                <Field label="Birth Year">
                   <input
                     type="text"
                     inputMode="numeric"
@@ -4034,7 +4032,7 @@ export default function StructuredCardEditor({
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-                <Field label="{{birth_month}}">
+                <Field label="Birth Month">
                   <input
                     type="text"
                     value={ageGeneration.birth_month}
@@ -4045,7 +4043,7 @@ export default function StructuredCardEditor({
                   />
                 </Field>
 
-                <Field label="{{birth_day}}">
+                <Field label="Birth Day">
                   <input
                     type="text"
                     inputMode="numeric"
@@ -4057,7 +4055,7 @@ export default function StructuredCardEditor({
                   />
                 </Field>
 
-                <Field label="{{zodiac}}">
+                <Field label="Zodiac">
                   <select
                     value={ageGeneration.zodiac}
                     onChange={(event) =>
@@ -4078,7 +4076,7 @@ export default function StructuredCardEditor({
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                 <MacroButtonGroup
                   activeValue={ageGeneration.developmental_stage}
-                  label="Life Phase Tag"
+                  label="Life Stage"
                   options={DEVELOPMENTAL_STAGE_TAGS}
                   tone="violet"
                   onSelect={(value) =>
@@ -4088,7 +4086,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={ageGeneration.legal_status}
-                  label="Context Tag"
+                  label="Adult Context"
                   options={LEGAL_STATUS_TAGS}
                   tone="sky"
                   onSelect={(value) => updateAgeGeneration("legal_status", value)}
@@ -4096,7 +4094,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={ageGeneration.power_dynamic}
-                  label="Vibe Tag"
+                  label="Age Dynamic"
                   options={AGE_POWER_DYNAMIC_TAGS}
                   tone="emerald"
                   onSelect={(value) => updateAgeGeneration("power_dynamic", value)}
@@ -4116,7 +4114,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={ageGeneration.zodiac_alignment}
-                  label="Romance Zodiac Tag"
+                  label="Zodiac Element"
                   options={ZODIAC_ALIGNMENT_TAGS}
                   tone="emerald"
                   onSelect={(value) =>
@@ -4126,7 +4124,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={ageGeneration.seasonal_vibe}
-                  label="Seasonal Aesthetic Tag"
+                  label="Seasonal Feel"
                   options={SEASONAL_VIBE_TAGS}
                   tone="sky"
                   onSelect={(value) =>
@@ -4137,7 +4135,7 @@ export default function StructuredCardEditor({
 
               <MacroButtonGroup
                 activeValue={ageGeneration.birthdate_preset}
-                label="Trope-Specific Birth Date Preset"
+                label="Birthdate Trope"
                 options={BIRTHDATE_PRESETS}
                 tone="violet"
                 onSelect={(value) =>
@@ -4149,19 +4147,18 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Relationship Status Availability
+                  Relationship Availability
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Public relationship status, emotional readiness, and scandal
-                  pressure define how hard attraction to {"{{user}}"} should
-                  be resisted.
+                  Whether the character is free to pursue romance, emotionally
+                  available, or under outside pressure.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                 <MacroButtonGroup
                   activeValue={relationshipStatusGeneration.currentLabel}
-                  label="Structural Tag"
+                  label="Current Status"
                   options={RELATIONSHIP_CURRENT_LABELS}
                   tone="violet"
                   onSelect={(value) =>
@@ -4173,7 +4170,7 @@ export default function StructuredCardEditor({
                   activeValue={
                     relationshipStatusGeneration.emotionalAvailability
                   }
-                  label="Availability Tag"
+                  label="Emotional Availability"
                   options={RELATIONSHIP_EMOTIONAL_AVAILABILITIES}
                   tone="emerald"
                   onSelect={(value) =>
@@ -4186,7 +4183,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={relationshipStatusGeneration.scandalFactor}
-                  label="Trope Alignment Tag"
+                  label="Scandal Risk"
                   options={RELATIONSHIP_SCANDAL_FACTORS}
                   tone="sky"
                   onSelect={(value) =>
@@ -4195,7 +4192,7 @@ export default function StructuredCardEditor({
                 />
               </div>
 
-              <Field label="Status Context">
+              <Field label="Relationship Context">
                 <textarea
                   value={relationshipStatusGeneration.statusContext}
                   onChange={(event) =>
@@ -4213,11 +4210,11 @@ export default function StructuredCardEditor({
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                    Relationship NPC Matrix
+                    Supporting Characters
                   </h3>
                   <p className="mt-1 text-[11px] text-zinc-500">
-                    Up to three supporting NPCs who create pressure, comfort,
-                    secrets, or jealousy around the romance.
+                    Up to three people around the character who add comfort,
+                    pressure, secrets, or jealousy.
                   </p>
                 </div>
 
@@ -4253,7 +4250,7 @@ export default function StructuredCardEditor({
                     </div>
 
                     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                      <Field label="NPC Name">
+                      <Field label="Character Name">
                         <input
                           type="text"
                           value={relationship.npcName}
@@ -4269,7 +4266,7 @@ export default function StructuredCardEditor({
 
                       <MacroButtonGroup
                         activeValue={relationship.connectionType}
-                        label="Connection Tag"
+                        label="Connection"
                         options={NPC_CONNECTION_TYPES}
                         tone="violet"
                         onSelect={(value) =>
@@ -4284,7 +4281,7 @@ export default function StructuredCardEditor({
                     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
                       <MacroButtonGroup
                         activeValue={relationship.romanceFunction}
-                        label="Trope Catalyst Tag"
+                        label="Story Role"
                         options={NPC_ROMANCE_FUNCTIONS}
                         tone="emerald"
                         onSelect={(value) =>
@@ -4297,7 +4294,7 @@ export default function StructuredCardEditor({
 
                       <MacroButtonGroup
                         activeValue={relationship.emotionalStatus}
-                        label="Dynamics Tag"
+                        label="Relationship Mood"
                         options={NPC_EMOTIONAL_STATUSES}
                         tone="sky"
                         onSelect={(value) =>
@@ -4309,7 +4306,7 @@ export default function StructuredCardEditor({
                       />
                     </div>
 
-                    <Field label="One-Line Description">
+                    <Field label="Short Description">
                       <textarea
                         value={relationship.oneLineDescription}
                         onChange={(event) =>
@@ -4329,18 +4326,18 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Species Biology Matrix
+                  Species and Biology
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Biology and lifespan tags modify the generator while
-                  instinctual traits shape romance behavior notes.
+                  Species, lifespan, and instincts that shape the character&apos;s
+                  body, needs, and behavior.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                 <MacroButtonGroup
                   activeValue={speciesGeneration.type}
-                  label="Species Type"
+                  label="Species"
                   options={SPECIES_TYPES}
                   tone="violet"
                   onSelect={(value) => updateSpeciesGeneration("type", value)}
@@ -4348,7 +4345,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={speciesGeneration.biologyTag}
-                  label="Biology Tag"
+                  label="Body Type"
                   options={BIOLOGY_TAGS}
                   tone="sky"
                   onSelect={(value) =>
@@ -4358,7 +4355,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={speciesGeneration.lifespanAnchor}
-                  label="Age Modifier"
+                  label="Lifespan"
                   options={LIFESPAN_ANCHORS}
                   tone="emerald"
                   onSelect={(value) =>
@@ -4370,7 +4367,7 @@ export default function StructuredCardEditor({
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                 <MacroButtonGroup
                   activeValue={speciesGeneration.instinctualTrait}
-                  label="Trope Catalyst Tag"
+                  label="Instincts"
                   options={INSTINCTUAL_TRAITS}
                   tone="violet"
                   onSelect={(value) =>
@@ -4427,18 +4424,18 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Ethnicity & Naming Router
+                  Heritage and Naming
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Region, diaspora context, and linguistic matrix route naming
-                  pools without reducing the character to shallow stereotypes.
+                  Cultural background and naming-language cues, kept separate
+                  from physical description.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                 <MacroButtonGroup
                   activeValue={ethnicityGeneration.region}
-                  label="Global Anchor"
+                  label="Broad Region"
                   options={ETHNICITY_REGIONS}
                   tone="violet"
                   onSelect={(value) =>
@@ -4448,7 +4445,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={ethnicityGeneration.societalContext}
-                  label="Integration Tag"
+                  label="Migration Context"
                   options={SOCIETAL_CONTEXTS}
                   tone="sky"
                   onSelect={(value) =>
@@ -4458,7 +4455,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={ethnicityGeneration.linguisticMatrix}
-                  label="Database Router"
+                  label="Naming Language"
                   options={LINGUISTIC_MATRICES}
                   tone="emerald"
                   onSelect={(value) =>
@@ -4509,25 +4506,25 @@ export default function StructuredCardEditor({
                   }
                   className="size-3.5 accent-violet-500"
                 />
-                Diaspora or immigrant identity affects the romance conflict
+                Migration or diaspora identity affects the romance conflict
               </label>
             </div>
 
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Race & Description Router
+                  Appearance and Race Notes
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Race macro groups sync with ethnicity/name routing and guide
-                  descriptive style without using generic labels in prose.
+                  Broad race group and appearance notes for respectful,
+                  specific description.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                 <MacroButtonGroup
                   activeValue={raceGeneration.macroGroup}
-                  label="Macro Group"
+                  label="Broad Race Group"
                   options={RACE_MACRO_GROUPS}
                   tone="violet"
                   onSelect={(value) =>
@@ -4537,7 +4534,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={raceGeneration.syncMode}
-                  label="System Router"
+                  label="Background Match"
                   options={RACE_SYNC_MODES}
                   tone="sky"
                   onSelect={(value) => updateRaceGeneration("syncMode", value)}
@@ -4545,7 +4542,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={raceGeneration.narrativeStyle}
-                  label="AI Vibe Modifier"
+                  label="Description Style"
                   options={RACE_NARRATIVE_STYLES}
                   tone="emerald"
                   onSelect={(value) =>
@@ -4554,7 +4551,7 @@ export default function StructuredCardEditor({
                 />
               </div>
 
-              <Field label="Physical Descriptor Keywords">
+              <Field label="Appearance Keywords">
                 <input
                   type="text"
                   value={raceGeneration.physicalDescriptors.join(", ")}
@@ -4583,14 +4580,14 @@ export default function StructuredCardEditor({
                   }
                   className="size-3.5 accent-violet-500"
                 />
-                Racial identity or social dynamics affect romance conflict
+                Race or social dynamics affect the romance conflict
               </label>
             </div>
 
             <div className="grid grid-cols-1 gap-4 border-t border-zinc-800 pt-4 sm:grid-cols-2">
               <MacroToggleGroup
                 activeValues={macroExtension.tones}
-                label="Story Tone Classifiers"
+                label="Story Tone"
                 options={AVAILABLE_TONES}
                 tone="violet"
                 onToggle={(value) => toggleMacroArrayElement("tones", value)}
@@ -4598,7 +4595,7 @@ export default function StructuredCardEditor({
 
               <MacroToggleGroup
                 activeValues={macroExtension.micro_tropes}
-                label="Active Romantic Micro-Tropes"
+                label="Romance Tropes"
                 options={AVAILABLE_TROPES}
                 tone="emerald"
                 onToggle={(value) => toggleMacroArrayElement("micro_tropes", value)}
@@ -4609,11 +4606,11 @@ export default function StructuredCardEditor({
               <div className="flex items-center justify-between gap-4">
                 <div>
                   <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                    Generated Card Preview
+                    Card Preview
                   </h3>
                   <p className="mt-1 text-[11px] text-zinc-500">
-                    Builds a first-message preview from the current generation
-                    classifiers and writes it into the active card.
+                    Generates a draft opening from the current choices and
+                    writes it into this card.
                   </p>
                 </div>
 
@@ -4629,7 +4626,7 @@ export default function StructuredCardEditor({
 
               {previewError ? (
                 <p className="rounded-lg border border-rose-500/20 bg-rose-500/5 p-3 text-xs text-rose-300">
-                  {previewError}
+                  {formatPreviewError(previewError)}
                 </p>
               ) : null}
 
@@ -4641,7 +4638,7 @@ export default function StructuredCardEditor({
               ) : null}
             </div>
 
-            <Field label="Core Personality Definitions">
+            <Field label="Personality and Behavior">
               <textarea
                 value={activeCard.data.personality}
                 onChange={(event) =>
@@ -4651,7 +4648,7 @@ export default function StructuredCardEditor({
               />
             </Field>
 
-            <Field label="Comprehensive World Description Matrix">
+            <Field label="Character Description">
               <textarea
                 value={activeCard.data.description}
                 onChange={(event) =>
@@ -4675,7 +4672,7 @@ export default function StructuredCardEditor({
 
         {activeTab === "behavior" ? (
           <div className="space-y-4">
-            <Field label="Active Encounter Scenario">
+            <Field label="Current Scene">
               <textarea
                 value={activeCard.data.scenario}
                 onChange={(event) => updateField("scenario", event.currentTarget.value)}
@@ -4686,18 +4683,18 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Framework Configuration
+                  Card Compatibility
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Controls export target, context budgeting, prompt placement,
-                  and global serialization rules before card compilation.
+                  Choose the saved-card format, lore depth, and where extra
+                  instructions should be placed.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
                 <MacroButtonGroup
                   activeValue={frameworkConfiguration.targetSpecification}
-                  label="Target Specification"
+                  label="Saved Card Format"
                   options={FRAMEWORK_TARGET_SPECIFICATIONS}
                   tone="violet"
                   onSelect={(value) =>
@@ -4707,7 +4704,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={frameworkConfiguration.memoryBudgetStrategy}
-                  label="Memory Budget"
+                  label="Lore Depth"
                   options={FRAMEWORK_MEMORY_BUDGET_STRATEGIES}
                   tone="emerald"
                   onSelect={(value) =>
@@ -4717,7 +4714,7 @@ export default function StructuredCardEditor({
 
                 <MacroButtonGroup
                   activeValue={frameworkConfiguration.injectionPipelineRouter}
-                  label="Pipeline Router"
+                  label="Prompt Layout"
                   options={FRAMEWORK_INJECTION_PIPELINE_ROUTERS}
                   tone="sky"
                   onSelect={(value) =>
@@ -4730,7 +4727,7 @@ export default function StructuredCardEditor({
               </div>
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                <Field label="Framework ID">
+                <Field label="Compatibility ID">
                   <input
                     type="text"
                     value={frameworkConfiguration.frameworkId}
@@ -4744,7 +4741,7 @@ export default function StructuredCardEditor({
                   />
                 </Field>
 
-                <Field label="Global Token Safety Buffer">
+                <Field label="Safety Buffer">
                   <input
                     type="number"
                     min={50}
@@ -4761,7 +4758,7 @@ export default function StructuredCardEditor({
                 </Field>
               </div>
 
-              <Field label="System Prompt Override">
+              <Field label="Card-Level System Prompt">
                 <textarea
                   value={frameworkConfiguration.systemPromptJailbreakOverride}
                   onChange={(event) =>
@@ -4778,16 +4775,16 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Lorebook Summary Matrix
+                  Lorebook Summary
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Compresses canon, world rules, species logic, and faction
-                  pressure into the system prompt without flooding the context.
+                  Compact world rules that keep scenes grounded without
+                  flooding the chat.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                <Field label="Universe Anchor">
+                <Field label="World Anchor">
                   <input
                     type="text"
                     value={lorebookSummaryGeneration.universeAnchor}
@@ -4801,7 +4798,7 @@ export default function StructuredCardEditor({
                   />
                 </Field>
 
-                <Field label="Token Optimization Cap">
+                <Field label="Lore Size Limit">
                   <input
                     type="number"
                     min={50}
@@ -4818,7 +4815,7 @@ export default function StructuredCardEditor({
                 </Field>
               </div>
 
-              <Field label="World System Rules">
+              <Field label="World Rules">
                 <textarea
                   value={lorebookSummaryGeneration.worldSystemRules.join("\n")}
                   onChange={(event) =>
@@ -4835,7 +4832,7 @@ export default function StructuredCardEditor({
                 />
               </Field>
 
-              <Field label="Faction / Dynasty Context">
+              <Field label="Faction or Family Pressure">
                 <textarea
                   value={lorebookSummaryGeneration.factionOrDynastyContext}
                   onChange={(event) =>
@@ -4848,7 +4845,7 @@ export default function StructuredCardEditor({
                 />
               </Field>
 
-              <Field label="AI Lore Instruction">
+              <Field label="Lore Instructions">
                 <textarea
                   value={lorebookSummaryGeneration.aiLoreInstruction}
                   onChange={(event) =>
@@ -4958,7 +4955,7 @@ export default function StructuredCardEditor({
               />
             </Field>
 
-            <Field label="Main System Prompt Overrides">
+            <Field label="Main System Prompt">
               <textarea
                 value={activeCard.data.system_prompt}
                 onChange={(event) =>
@@ -4971,15 +4968,15 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Post-History Runtime Matrix
+                  Chat Memory Rules
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  High-priority after-history reminders that control drift,
-                  tone shifts, and response formatting in long chats.
+                  Reminders that help long chats keep personality, pacing, and
+                  formatting steady.
                 </p>
               </div>
 
-              <Field label="Injection Token Weight">
+              <Field label="Memory Strength">
                 <input
                   type="number"
                   min={10}
@@ -4995,7 +4992,7 @@ export default function StructuredCardEditor({
                 />
               </Field>
 
-              <Field label="Drift Control Rules">
+              <Field label="Stay-in-Character Rules">
                 <textarea
                   value={postHistoryInstructionsGeneration.driftControlRules.join(
                     "\n",
@@ -5014,7 +5011,7 @@ export default function StructuredCardEditor({
                 />
               </Field>
 
-              <Field label="Dynamic Tone Modifiers">
+              <Field label="Tone Shift Rules">
                 <textarea
                   value={postHistoryInstructionsGeneration.dynamicToneModifiers.join(
                     "\n",
@@ -5033,7 +5030,7 @@ export default function StructuredCardEditor({
                 />
               </Field>
 
-              <Field label="Formatting Hardlines">
+              <Field label="Formatting Rules">
                 <textarea
                   value={postHistoryInstructionsGeneration.formattingHardlines.join(
                     "\n",
@@ -5053,7 +5050,7 @@ export default function StructuredCardEditor({
               </Field>
             </div>
 
-            <Field label="Post-History Instructions Injection">
+            <Field label="After-Chat Instructions">
               <textarea
                 value={activeCard.data.post_history_instructions}
                 onChange={(event) =>
@@ -5080,11 +5077,11 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Alternate Greeting Fork Matrix
+                  Alternate Greetings
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Fork directives keep identity and boundaries intact while
-                  producing up to five alternate opening strings.
+                  Extra openings that keep the same character but start from a
+                  different angle.
                 </p>
               </div>
 
@@ -5097,7 +5094,7 @@ export default function StructuredCardEditor({
                     <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
                       <MacroButtonGroup
                         activeValue={fork.forkType}
-                        label={`Fork ${index + 1}`}
+                        label={`Alternate ${index + 1}`}
                         options={ALTERNATE_GREETING_FORK_TYPES}
                         tone="violet"
                         onSelect={(value) =>
@@ -5107,7 +5104,7 @@ export default function StructuredCardEditor({
                         }
                       />
 
-                      <Field label="Associated Trope">
+                      <Field label="Trope">
                         <input
                           type="text"
                           value={fork.associatedTrope}
@@ -5134,7 +5131,7 @@ export default function StructuredCardEditor({
                       </Field>
                     </div>
 
-                    <Field label="AI Generation Directive">
+                    <Field label="Generation Notes">
                       <textarea
                         value={fork.aiGenerationDirective}
                         onChange={(event) =>
@@ -5153,11 +5150,11 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Scenario Opening Pair Matrix
+                  Scenario-Based Openings
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Hard-links alternate scenario contexts to matching opening
-                  text so every alternate greeting carries its own world state.
+                  Pair an alternate scene setup with the first message that
+                  belongs to it.
                 </p>
               </div>
 
@@ -5172,7 +5169,7 @@ export default function StructuredCardEditor({
                       <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
                         <MacroButtonGroup
                           activeValue={pair.classificationType}
-                          label={`Pair ${index + 1}`}
+                          label={`Scenario ${index + 1}`}
                           options={SCENARIO_OPENING_PAIR_CLASSIFICATIONS}
                           tone="violet"
                           onSelect={(value) =>
@@ -5182,7 +5179,7 @@ export default function StructuredCardEditor({
                           }
                         />
 
-                        <Field label="Pair Title">
+                        <Field label="Scenario Title">
                           <input
                             type="text"
                             value={pair.pairTitle}
@@ -5195,7 +5192,7 @@ export default function StructuredCardEditor({
                           />
                         </Field>
 
-                        <Field label="Pair ID">
+                        <Field label="Scenario ID">
                           <input
                             type="text"
                             value={pair.pairId}
@@ -5212,7 +5209,7 @@ export default function StructuredCardEditor({
                       <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
                         <MacroButtonGroup
                           activeValue={pair.alternateScenarioContext.settingType}
-                          label="Scenario Setting"
+                          label="Setting"
                           options={SCENARIO_SETTING_TYPES}
                           tone="emerald"
                           onSelect={(value) =>
@@ -5238,7 +5235,7 @@ export default function StructuredCardEditor({
                           activeValue={
                             pair.alternateScenarioContext.startingTension
                           }
-                          label="Tension"
+                          label="Starting Mood"
                           options={SCENARIO_STARTING_TENSIONS}
                           tone="violet"
                           onSelect={(value) =>
@@ -5249,7 +5246,7 @@ export default function StructuredCardEditor({
                         />
                       </div>
 
-                      <Field label="Scenario Sensory Details">
+                      <Field label="Sensory Details">
                         <input
                           type="text"
                           value={pair.alternateScenarioContext.sensoryDetails.join(
@@ -5267,7 +5264,7 @@ export default function StructuredCardEditor({
                         />
                       </Field>
 
-                      <Field label="Alternate Scenario Context">
+                      <Field label="Scene Premise">
                         <textarea
                           value={
                             pair.alternateScenarioContext
@@ -5305,7 +5302,7 @@ export default function StructuredCardEditor({
               emptyLabel="No alternate variations defined for this character."
               greetings={activeCard.data.alternate_greetings}
               inputValue={newAlternateGreeting}
-              label="Alternate Greetings Array"
+              label="Saved Alternate Greetings"
               onAdd={handleAddAlternateGreeting}
               onInputChange={setNewAlternateGreeting}
               onRemove={handleRemoveAlternateGreeting}
@@ -5314,11 +5311,10 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Group Greeting Room Matrix
+                  Group Chat Openings
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Multi-character room setups for group chats, with explicit
-                  cast placement and dialogue segregation rules.
+                  Openings for scenes with more than one character in the room.
                 </p>
               </div>
 
@@ -5331,7 +5327,7 @@ export default function StructuredCardEditor({
                     <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
                       <MacroButtonGroup
                         activeValue={group.spotlightDistribution}
-                        label={`Room ${index + 1}`}
+                        label={`Group scene ${index + 1}`}
                         options={GROUP_GREETING_SPOTLIGHT_DISTRIBUTIONS}
                         tone="violet"
                         onSelect={(value) =>
@@ -5343,7 +5339,7 @@ export default function StructuredCardEditor({
 
                       <MacroButtonGroup
                         activeValue={group.interpersonalDynamic}
-                        label="Friction Valve"
+                        label="Group Dynamic"
                         options={GROUP_GREETING_INTERPERSONAL_DYNAMICS}
                         tone="emerald"
                         onSelect={(value) =>
@@ -5355,7 +5351,7 @@ export default function StructuredCardEditor({
 
                       <MacroButtonGroup
                         activeValue={group.formattingStyle}
-                        label="Syntax Parser"
+                        label="Formatting"
                         options={GROUP_GREETING_FORMATTING_STYLES}
                         tone="sky"
                         onSelect={(value) =>
@@ -5366,7 +5362,7 @@ export default function StructuredCardEditor({
                       />
                     </div>
 
-                    <Field label="Participating Characters">
+                    <Field label="Characters in Scene">
                       <input
                         type="text"
                         value={group.participatingCharacters.join(", ")}
@@ -5383,7 +5379,7 @@ export default function StructuredCardEditor({
                       />
                     </Field>
 
-                    <Field label="AI Group Directive">
+                    <Field label="Group Scene Notes">
                       <textarea
                         value={group.aiGroupDirective}
                         onChange={(event) =>
@@ -5402,11 +5398,11 @@ export default function StructuredCardEditor({
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
                 <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Group Alternate Fork Matrix
+                  Group Alternate Worlds
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Spatial and timeline forks that re-skin the whole cast while
-                  preserving collective relationship traits.
+                  AU versions of the group setup that keep the cast dynamics
+                  intact.
                 </p>
               </div>
 
@@ -5431,7 +5427,7 @@ export default function StructuredCardEditor({
                           }
                         />
 
-                        <Field label="Target Setting Vibe">
+                        <Field label="Target Setting">
                           <input
                             type="text"
                             value={fork.targetSettingVibe}
@@ -5444,7 +5440,7 @@ export default function StructuredCardEditor({
                           />
                         </Field>
 
-                        <Field label="Alt Greeting ID">
+                        <Field label="Alternate ID">
                           <input
                             type="text"
                             value={fork.altGreetingId}
@@ -5458,7 +5454,7 @@ export default function StructuredCardEditor({
                         </Field>
                       </div>
 
-                      <Field label="Included NPC Names">
+                      <Field label="Included Characters">
                         <input
                           type="text"
                           value={fork.includedNpcNames.join(", ")}
@@ -5475,7 +5471,7 @@ export default function StructuredCardEditor({
                         />
                       </Field>
 
-                      <Field label="AI Multi-Character Prompt">
+                      <Field label="Multi-Character Notes">
                         <textarea
                           value={fork.aiMultiCharacterPrompt}
                           onChange={(event) =>
@@ -5496,7 +5492,7 @@ export default function StructuredCardEditor({
               emptyLabel="No group-only openings defined for this character."
               greetings={activeCard.data.group_only_greetings}
               inputValue={newGroupGreeting}
-              label="Group Only Greetings Array"
+              label="Saved Group-Only Greetings"
               onAdd={handleAddGroupGreeting}
               onInputChange={setNewGroupGreeting}
               onRemove={handleRemoveGroupGreeting}
@@ -5546,6 +5542,7 @@ function MacroButtonGroup<Value extends string>({
       <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
         {options.map((option) => {
           const isActive = activeValue === option;
+          const labelText = humanizeOptionLabel(option);
 
           return (
             <button
@@ -5557,10 +5554,10 @@ function MacroButtonGroup<Value extends string>({
                   ? activeMacroClassName(tone)
                   : "border-zinc-800 bg-zinc-950 text-zinc-500 hover:text-zinc-300"
               }`}
-              title={option}
+              title={labelText}
             >
               <span className="block break-words">
-                {humanizeOptionLabel(option)}
+                {labelText}
               </span>
             </button>
           );
@@ -5591,6 +5588,7 @@ function MacroToggleGroup({
       <div className="flex flex-wrap gap-1.5">
         {options.map((option) => {
           const isActive = activeValues.includes(option);
+          const labelText = humanizeOptionLabel(option);
 
           return (
             <button
@@ -5602,9 +5600,9 @@ function MacroToggleGroup({
                   ? activeMacroClassName(tone)
                   : "border-zinc-800 bg-zinc-950 text-zinc-500 hover:text-zinc-300"
               }`}
-              title={option}
+              title={labelText}
             >
-              {humanizeOptionLabel(option)}
+              {labelText}
             </button>
           );
         })}
@@ -5683,6 +5681,19 @@ function GreetingList({
       )}
     </div>
   );
+}
+
+function formatPreviewError(message: string) {
+  const normalizedMessage = message.toLowerCase();
+
+  if (
+    normalizedMessage.includes("string did not match the expected pattern") ||
+    normalizedMessage.includes("invalid character build request")
+  ) {
+    return "Some of the current choices do not fit the preview builder yet. Check IDs, empty fields, and generated shortcuts, then try again.";
+  }
+
+  return message;
 }
 
 function readMacroExtension(

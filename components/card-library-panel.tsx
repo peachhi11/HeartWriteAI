@@ -491,7 +491,7 @@ function relationshipLabel(relationship: string, tags: string[]) {
     return "Enemies to lovers";
   }
 
-  return "Balanced";
+  return "Balanced dynamics";
 }
 
 function playStyleLabel(framework: string) {

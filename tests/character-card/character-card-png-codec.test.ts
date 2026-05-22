@@ -8,10 +8,12 @@ import { readCharacterCardFromPng } from "../../lib/character-card/readCharacter
 import { writeCharacterCardToPng } from "../../lib/character-card/writeCharacterCardToPng";
 import { createCharacterCardFormValues } from "../../lib/character-card/createCharacterCardFormValues";
 import { createCharacterCardFromFormValues } from "../../lib/character-card/createCharacterCardFromFormValues";
+import { createCharacterCardV3Export } from "../../lib/character-card/createCharacterCardV3Export";
 import { exportCharacterCardPngData } from "../../lib/character-card/exportCharacterCardPngData";
 import { importCharacterCardPngData } from "../../lib/character-card/importCharacterCardPngData";
 import { mergeCharacterCardIntakeValues } from "../../lib/character-card/mergeCharacterCardIntakeValues";
 import { parseMessyCharacterIntake } from "../../lib/character-card/parseMessyCharacterIntake";
+import { analyzeEmotionLexicon } from "../../lib/character-card/emotionLexicon";
 import { CharacterCardMacroClassificationSchema } from "../../types/character-card/CharacterCardMacroClassification";
 import { CharacterCardV3Schema } from "../../types/character-card/CharacterCardV3Schema";
 import { CharacterCardPayload } from "../../types/character-card/CharacterCardPayload";
@@ -471,6 +473,53 @@ Other= Keeps old case files in his closet)
   assert.match(values.intimacyProfile, /Always on top/);
 });
 
+test("repairs imported cards that cram profile sections into description", () => {
+  const sourceCard = createCharacterCardV3Export({
+    spec: "chara_card_v3",
+    spec_version: "3.0",
+    data: {
+      name: "Chris Henries",
+      description: `### Chris's Profile
+Surname: Henries
+Age: 24
+Role: Brother's Best Friend
+
+Appearance:
+- Tall, athletic, dyed blonde hair.
+
+Relationships:
+Lucas: {{user}}'s older brother.
+
+Core Personality:
+Cocky, charismatic, and protective.
+
+Dialogue Style:
+Teasing and casual.`,
+      personality: "",
+      scenario: "",
+      first_mes: "Hey.",
+      mes_example: "",
+      creator_notes: "",
+      tags: [],
+      creator: "",
+      character_version: "",
+      extensions: {},
+      alternate_greetings: [],
+      group_only_greetings: [],
+      system_prompt: "",
+      post_history_instructions: "",
+    },
+  });
+
+  assert.match(sourceCard.data.description, /Chris's Profile/);
+  assert.match(sourceCard.data.description, /Age: 24/);
+  assert.doesNotMatch(sourceCard.data.description, /Appearance:/);
+  assert.match(sourceCard.data.personality, /Appearance:/);
+  assert.match(sourceCard.data.personality, /Relationships:/);
+  assert.match(sourceCard.data.personality, /Core Personality:/);
+  assert.match(sourceCard.data.personality, /Dialogue Style:/);
+});
+
 test("routes messy intake into structured character form fields", () => {
   const result = parseMessyCharacterIntake(`Full Name: Mira Vale
 Age & Birthdate: 29 / October 13
@@ -817,6 +866,42 @@ test("validates generated macro classification payloads", () => {
 
   assert.equal(classification.macro.framework, "Narrative RPG");
   assert.deepEqual(classification.tags.micro_tropes, ["hurt/comfort"]);
+});
+
+test("derives friendly tone tags from emotion language", () => {
+  const analysis = analyzeEmotionLexicon(
+    "He is guarded, lonely, tense, and secretly longing for someone kind.",
+  );
+
+  assert.deepEqual(
+    analysis.signals.map((signal) => signal.cluster),
+    ["sadness", "tension", "vulnerability", "yearning"],
+  );
+  assert.deepEqual(analysis.toneTags, ["angsty", "hurt/comfort", "slow burn"]);
+  assert.deepEqual(analysis.microTropes, [
+    "hurt/comfort",
+    "mutual pining",
+    "who hurt you",
+  ]);
+});
+
+test("recognizes curiosity courage disconnection and guilt emotion signals", () => {
+  const analysis = analyzeEmotionLexicon(
+    "She is brave and fascinated, but he has shut down after years of regret.",
+  );
+
+  assert.deepEqual(
+    analysis.signals.map((signal) => signal.cluster),
+    ["courage", "curiosity", "disconnection", "guilt"],
+  );
+  assert.deepEqual(analysis.toneTags, [
+    "angsty",
+    "curious",
+    "high agency",
+    "quiet tension",
+    "second chance",
+  ]);
+  assert.deepEqual(analysis.microTropes, ["hurt/comfort", "who hurt you"]);
 });
 
 test("validates ccv3 cards with tolerant defaults and extension macro data", () => {
@@ -1632,7 +1717,10 @@ test("routes first message presentation metadata from scenario and style", () =>
     true,
   );
   assert.equal(direct.entryPoint, "Active_Collision");
-  assert.equal(direct.aiOutputConstraint.includes("Output ONLY"), true);
+  assert.equal(
+    direct.aiOutputConstraint.includes("Write only the character's first message"),
+    true,
+  );
 });
 
 test("includes first message execution rules in compiled prompts", () => {
@@ -1645,7 +1733,10 @@ test("includes first message execution rules in compiled prompts", () => {
   assert.equal(systemPrompt.includes("FIRST MESSAGE EXECUTION ARRAY"), true);
   assert.equal(systemPrompt.includes("ENTRY POINT: Post Crisis Quiet"), true);
   assert.equal(systemPrompt.includes("TOKEN LENGTH CAP"), true);
-  assert.equal(systemPrompt.includes("Output ONLY the raw character text string"), true);
+  assert.equal(
+    systemPrompt.includes("Write only the character's first message"),
+    true,
+  );
   assert.equal(
     systemPrompt.includes("strictly forbidden from writing or completing actions for {{user}}"),
     true,
@@ -2361,10 +2452,7 @@ test("generates formatting config and exports strict render rules", () => {
     formatting.formattingSystemPromptInjection,
     /do not output APP: or USER: labels/i,
   );
-  assert.match(
-    formatting.formattingSystemPromptInjection,
-    /MANDATORY FORMATTING/,
-  );
+  assert.match(formatting.formattingSystemPromptInjection, /Formatting:/);
   assert.match(
     formatting.formattingSystemPromptInjection,
     /dialogue as \{\{char\}\} speaking in first-person present tense/,
@@ -2414,7 +2502,7 @@ test("generates tone config and exports narrative atmosphere rules", () => {
     "soft",
     "warmth",
   ]);
-  assert.match(tone.toneSystemPromptInjection, /NARRATIVE TONE/);
+  assert.match(tone.toneSystemPromptInjection, /Narrative tone/);
   assert.match(prompt, /TONE CONFIGURATION/);
   assert.equal(masterPayload.metadata.tone?.worldviewFilter, "Ruthless_Cynical");
   assert.equal(

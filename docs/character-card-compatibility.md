@@ -11,7 +11,18 @@ HeartWriteAI is CCV3-first. The implementation reference for card import/export 
 - Preserve unknown/future card fields where possible.
 - Use `@risuai/ccardlib` for V1/V2/V3 card version checks and conversion.
 - Support browser imports for PNG/APNG/JSON without calling Tauri APIs, and desktop imports through native dialogs when available.
+- Import CHARX packages as full-fidelity card masters when available.
 - Treat JSON as an interchange/debug format, not the main editing surface.
+
+## Native Format Policy
+
+HeartWriteAI treats **CHARX as the clean master format**. A saved/imported master should be a `.charx` package whenever the desktop app is available, because CHARX can carry `card.json` plus bundled assets such as icons, backgrounds, expression images, and future card-specific resources.
+
+PNG/APNG remains the **compatibility and sharing copy**. The app should keep importing and exporting PNG metadata cards for platforms that expect image cards, but users should be warned when an export path cannot preserve CHARX-only bundled assets.
+
+JSON remains the **advanced/debug copy**. It is useful for inspection, tests, schema validation, and manual repair, but it should not become the main user-facing save path.
+
+Folder intake follows this policy: scan mixed folders, mark importable card files, identify non-card images/lorebooks/broken files, and save selected ready cards into the local library as CHARX masters.
 
 ## User-Facing Labels and Tags
 
@@ -56,7 +67,7 @@ Do not mix these runtime scripts into the PNG card codec. For HeartWriteAI, this
 
 ## Later Compatibility Work
 
-- Add CHARX support for bundled assets.
+- Expand CHARX asset preservation and manifest preview tooling.
 - Add lorebook decorator parsing and preview tooling.
 - Add multi-character single-card authoring with activation rules and compiled-context preview.
 - Consider JanitorAI script-template import/export as a separate compatibility layer if users need it.

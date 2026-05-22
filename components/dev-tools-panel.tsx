@@ -38,11 +38,11 @@ export function DevToolsPanel({ onSeeded }: DevToolsPanelProps) {
       <div className="space-y-1">
         <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-amber-400">
           <Database className="size-4" />
-          Workspace Mock Simulator Suite
+          Test Library Tools
         </h2>
         <p className="text-xs text-zinc-400">
-          Instantly populates the local SQLite cache with randomized cards to
-          test pagination and library scaling.
+          Adds sample cards to the local library so you can test search,
+          filters, and page navigation.
         </p>
       </div>
 
@@ -54,7 +54,7 @@ export function DevToolsPanel({ onSeeded }: DevToolsPanelProps) {
           onClick={() => handleGenerationTrigger(10)}
         >
           {loadingTarget === 10 ? <Loader2 className="animate-spin" /> : null}
-          {loadingTarget === 10 ? "Populating" : "Seed 10 Cards"}
+          {loadingTarget === 10 ? "Adding cards" : "Add 10 sample cards"}
         </Button>
         <Button
           type="button"
@@ -62,7 +62,7 @@ export function DevToolsPanel({ onSeeded }: DevToolsPanelProps) {
           onClick={() => handleGenerationTrigger(100)}
         >
           {loadingTarget === 100 ? <Loader2 className="animate-spin" /> : null}
-          {loadingTarget === 100 ? "Populating" : "Stress Test 100 Cards"}
+          {loadingTarget === 100 ? "Adding cards" : "Add 100 sample cards"}
         </Button>
       </div>
 

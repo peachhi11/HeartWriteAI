@@ -6,22 +6,20 @@ use base64::{engine::general_purpose, Engine as _};
 use flate2::read::ZlibDecoder;
 use png::{Decoder, Encoder};
 
+use crate::codecs::card_path::normalize_card_to_v3;
 use crate::models::character_card::CharacterCardV3;
 
 pub fn extract_ccv3_from_png<P: AsRef<Path>>(path: P) -> Result<CharacterCardV3, String> {
-    let png_data = std::fs::read(path)
-        .map_err(|error| format!("Failed to open PNG file: {error}"))?;
+    let png_data =
+        std::fs::read(path).map_err(|error| format!("Failed to open PNG file: {error}"))?;
 
     let raw_json_payload = find_character_card_payload(&png_data)?;
     let verified_json = decode_metadata_payload(&raw_json_payload)?;
-    let mut card: CharacterCardV3 = serde_json::from_str(&verified_json).map_err(|error| {
+    let card: CharacterCardV3 = serde_json::from_str(&verified_json).map_err(|error| {
         format!("PNG metadata JSON payload does not conform to the current CCV3 schema: {error}")
     })?;
 
-    card.spec = "chara_card_v3".to_string();
-    card.spec_version = "3.0".to_string();
-
-    Ok(card)
+    Ok(normalize_card_to_v3(card))
 }
 
 pub fn inject_ccv3_into_png<SourcePath, OutputPath>(
@@ -222,9 +220,9 @@ fn decode_international_text_chunk(chunk_data: &[u8]) -> Result<Option<PngTextCh
     let text = if compression_flag == 1 {
         let mut decoder = ZlibDecoder::new(&chunk_data[cursor..]);
         let mut decoded_text = String::new();
-        decoder
-            .read_to_string(&mut decoded_text)
-            .map_err(|error| format!("Failed to decode compressed UTF-8 PNG text chunk: {error}"))?;
+        decoder.read_to_string(&mut decoded_text).map_err(|error| {
+            format!("Failed to decode compressed UTF-8 PNG text chunk: {error}")
+        })?;
         decoded_text
     } else {
         String::from_utf8_lossy(&chunk_data[cursor..]).to_string()

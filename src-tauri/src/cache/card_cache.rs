@@ -174,15 +174,13 @@ impl CacheDatabase {
                 .take(tag_group.len())
                 .collect::<Vec<_>>()
                 .join(", ");
-            conditions.push(
-                format!(
-                    "EXISTS (
+            conditions.push(format!(
+                "EXISTS (
                     SELECT 1
                     FROM json_each(card_cache.tags_json)
                     WHERE LOWER(json_each.value) IN ({placeholders})
                 )"
-                ),
-            );
+            ));
             for tag in tag_group {
                 sql_params.push(Box::new(tag));
             }
@@ -331,9 +329,7 @@ fn tag_aliases(tag: &str) -> Vec<String> {
         "royal au" | "royalau" | "royalty" => &["royal au", "royalau", "royalty", "#royalau"],
         "hurt/comfort" | "hurt comfort" => &["hurt/comfort", "hurt comfort"],
         "who hurt you" | "who hurt you?" => &["who hurt you", "who hurt you?"],
-        "grumpy x sunshine" | "grumpy sunshine" => {
-            &["grumpy x sunshine", "grumpy sunshine"]
-        }
+        "grumpy x sunshine" | "grumpy sunshine" => &["grumpy x sunshine", "grumpy sunshine"],
         "dead dove" | "dead dove do not eat" | "ddne" => {
             &["dead dove", "dead dove do not eat", "ddne"]
         }

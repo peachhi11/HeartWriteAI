@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { analyzeEmotionLexicon } from "@/lib/character-card/emotionLexicon";
 import { CharacterCardMacroClassificationSchema } from "@/types/character-card/CharacterCardMacroClassification";
 
 const classifyRequestSchema = z.object({
@@ -30,17 +31,22 @@ export async function POST(request: Request) {
   const isStructuredScene = ["quest", "campaign", "rpg", "scene"].some(
     (keyword) => characterDescription.includes(keyword),
   );
+  const emotionAnalysis = analyzeEmotionLexicon(characterDescription);
   const classification = CharacterCardMacroClassificationSchema.parse({
     macro: {
       formatting: characterDescription.includes("json") ? "JSON" : "W++",
       framework: isStructuredScene ? "Narrative RPG" : "Sandbox",
       relationship: isAntagonistic ? "Antagonistic" : "Symmetric",
-      tones: extractMatchingTags(characterDescription, [
-        "angsty",
-        "cozy",
-        "dark romance",
-        "fluff",
-        "slow-burn",
+      tones: uniqueTags([
+        ...extractMatchingTags(characterDescription, [
+          "angsty",
+          "cozy",
+          "dark romance",
+          "fluff",
+          "slow-burn",
+          "slow burn",
+        ]),
+        ...emotionAnalysis.toneTags,
       ]),
     },
     tags: {
@@ -53,13 +59,16 @@ export async function POST(request: Request) {
         "mafia",
       ]),
       dynamics: isAntagonistic ? ["antagonistic"] : ["symmetric"],
-      micro_tropes: extractMatchingTags(characterDescription, [
-        "enemies to lovers",
-        "fake dating",
-        "forced proximity",
-        "grumpy sunshine",
-        "only one bed",
-        "who hurt you",
+      micro_tropes: uniqueTags([
+        ...extractMatchingTags(characterDescription, [
+          "enemies to lovers",
+          "fake dating",
+          "forced proximity",
+          "grumpy sunshine",
+          "only one bed",
+          "who hurt you",
+        ]),
+        ...emotionAnalysis.microTropes,
       ]),
     },
   });
@@ -68,5 +77,9 @@ export async function POST(request: Request) {
 }
 
 function extractMatchingTags(source: string, options: string[]) {
-  return options.filter((option) => source.includes(option));
+  return uniqueTags(options.filter((option) => source.includes(option)));
+}
+
+function uniqueTags(tags: string[]) {
+  return Array.from(new Set(tags));
 }

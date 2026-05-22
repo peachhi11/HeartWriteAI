@@ -2794,7 +2794,7 @@ export function generateFrameworkConfigurationData(
     injectionPipelineRouter,
     memoryBudgetStrategy,
     systemPromptJailbreakOverride:
-      "Output only the requested card text or JSON payload. Preserve {{char}} and {{user}} macros exactly. Never write actions, thoughts, or dialogue for {{user}}.",
+      "Write only the requested card text. Keep {{char}} and {{user}} exactly as written. Never write actions, thoughts, or dialogue for {{user}}.",
     targetSpecification: "V3_Card_Layout",
   };
 }
@@ -3400,7 +3400,7 @@ export function generateKinkData(
     preferredSensoryTags: [],
     primaryRole: "Switch",
     systemPromptInstruction:
-      "Keep intimacy optional, consent-forward, and emotionally responsive unless the adult module is explicitly enabled.",
+      "Keep intimacy optional, consent-forward, and emotionally responsive unless adult content is switched on.",
   };
 }
 
@@ -4242,7 +4242,7 @@ function kinkDataFromSeed(seed: CharacterCardSeed): GeneratedKinkData {
     systemPromptInstruction:
       seed.adult_configuration.nsfw_enabled
         ? `When adult content is enabled by the user, keep {{char}} in a ${seed.adult_configuration.kink_power_role} role with ${seed.adult_configuration.sensory_tags.join(", ")} sensory emphasis while preserving consent and boundaries.`
-        : "Keep intimacy optional, consent-forward, and emotionally responsive unless the adult module is explicitly enabled.",
+        : "Keep intimacy optional, consent-forward, and emotionally responsive unless adult content is switched on.",
   };
 }
 
@@ -4870,7 +4870,7 @@ function buildFirstMessageOutputConstraint(
     `Render in ${literaryStyle.replace(/_/g, " ").toLowerCase()} format.`,
     `Target ${Math.max(300, tokenLengthCap - 120)}-${tokenLengthCap} tokens.`,
     `End with ${userCallToAction.replace(/_/g, " ").toLowerCase()} that clearly hands action back to {{user}}.`,
-    "Output ONLY the raw character text string.",
+    "Write only the character's first message.",
     "You are strictly forbidden from writing or completing actions for {{user}}. Your output must terminate immediately after {{char}}'s closing action or line of dialogue.",
   ].join("\n");
 }
@@ -5327,7 +5327,7 @@ function buildArchetypeBehaviorPrompt(
   const defenseRule = archetypeDefensePrompt(defenseMechanism);
   const motivationRule = archetypeMotivationPrompt(coreMotivation);
 
-  return `CORE PSYCHOLOGY: ${personaRule} ${defenseRule} ${motivationRule}`;
+  return `Core psychology: ${personaRule} ${defenseRule} ${motivationRule}`;
 }
 
 function defenseMechanismForArchetype(
@@ -6321,7 +6321,7 @@ function buildToneSystemPromptInjection(
         : "Frame the world through fatigue, guarded hope, and quiet longing.";
 
   return [
-    `NARRATIVE TONE: ${proseRule}`,
+    `Narrative tone: ${proseRule}`,
     pacingRule,
     worldviewRule,
     `Prioritize vocabulary families: ${aiVocabularyDirectives.join(", ")}.`,
@@ -6352,7 +6352,7 @@ function buildFormattingSystemPromptInjection(
     "Write only {{char}}'s side of the exchange plus NPC and world movement. Do not complete both sides of an interaction. End at a natural handoff point before {{user}}'s response.";
 
   return [
-    `MANDATORY FORMATTING: ${actionRule}`,
+    `Formatting: ${actionRule}`,
     emphasisRule,
     perspectiveRule,
     turnRule,

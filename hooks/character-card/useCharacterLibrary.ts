@@ -52,6 +52,38 @@ export interface ConvertImageAssetResult {
   error: string | null;
 }
 
+export interface FolderIntakeItem {
+  file_path: string;
+  file_name: string;
+  status: string;
+  format: string;
+  card_name: string | null;
+  spec: string | null;
+  tags: string[];
+  importable: boolean;
+  reason: string | null;
+}
+
+export interface FolderIntakeScanResult {
+  folder_path: string;
+  items: FolderIntakeItem[];
+  total_count: number;
+  importable_count: number;
+}
+
+export interface FolderIntakeImportResult {
+  imported_count: number;
+  skipped_count: number;
+  output_paths: string[];
+  errors: string[];
+}
+
+export interface FolderImportResult {
+  result: FolderIntakeImportResult | null;
+  ok: boolean;
+  error: string | null;
+}
+
 export function useCharacterLibrary() {
   const saveCard = useCallback(async function saveCard(
     cardData: unknown,
@@ -311,6 +343,35 @@ export function useCharacterLibrary() {
     }
   }, []);
 
+  const scanCharacterCardFolder = useCallback(async function scanCharacterCardFolder(
+    folderPath: string,
+  ): Promise<FolderIntakeScanResult> {
+    return invoke<FolderIntakeScanResult>("scan_character_card_folder", {
+      folderPath,
+    });
+  }, []);
+
+  const importFolderCardsAsCharx = useCallback(async function importFolderCardsAsCharx(
+    filePaths: string[],
+  ): Promise<FolderImportResult> {
+    try {
+      const result = await invoke<FolderIntakeImportResult>(
+        "import_folder_cards_as_charx",
+        {
+          filePaths,
+        },
+      );
+
+      return { result, ok: true, error: null };
+    } catch (error) {
+      return {
+        result: null,
+        ok: false,
+        error: formatCharacterCardBoundaryError(error),
+      };
+    }
+  }, []);
+
   return {
     convertAssetToStandardPng,
     extractCardMacroExtensions,
@@ -319,9 +380,11 @@ export function useCharacterLibrary() {
     importCardFromPath,
     importCardFromCharx,
     importCardFromPng,
+    importFolderCardsAsCharx,
     injectCardIntoPng,
     saveCard,
     saveWorkspaceChanges,
+    scanCharacterCardFolder,
     transcodeAssetToPng,
     writeEditedCardToPng,
   };

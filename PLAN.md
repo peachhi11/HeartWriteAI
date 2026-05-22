@@ -37,7 +37,7 @@ Exit criteria:
 
 ## Phase 2: CCV3 PNG/JSON Import/Export Codec
 
-Goal: make HeartWriteAI capable of reading and writing character-card metadata across browser and desktop runtimes.
+Goal: make HeartWriteAI capable of reading and writing character-card metadata across browser and desktop runtimes, with CHARX as the native master format and PNG/JSON as compatibility/debug paths.
 
 - Add a small app-native character-card codec layer using:
   - `png-chunks-extract`
@@ -49,6 +49,7 @@ Goal: make HeartWriteAI capable of reading and writing character-card metadata a
 - Support browser drag/drop and file-picker imports without requiring Tauri APIs.
 - Support desktop native dialogs and desktop drag/drop when Tauri APIs are available.
 - Write exported PNGs with embedded `ccv3` metadata.
+- Support CHARX import/export as the preferred full-fidelity desktop save format.
 - Keep JSON visible as export/debug infrastructure, not the main editing UI.
 - Add focused tests for:
   - PNG with `ccv3`
@@ -61,6 +62,7 @@ Exit criteria:
 - A dragged-in character PNG can be parsed into app data.
 - A generated or edited CCV3 card can be embedded back into a PNG.
 - Browser mode downloads exported JSON/PNG safely, while desktop mode can use native save dialogs.
+- Desktop mode can save full-fidelity CHARX masters and export PNG copies for wider compatibility.
 
 Reference signals:
 
@@ -157,6 +159,8 @@ Goal: replace raw technical filters with a friendly suggestion layer inspired by
 - Keep tags searchable by aliases such as Dom, Domme, Sub, switch, FemPOV, MalePOV, AnyPOV, enemies to lovers, omegaverse, rockstar AU, esports AU, college AU, mafia AU, and royal AU.
 - Add a ForceBary-style action that can suggest tags from card text, scenario, first message, lorebook entries, and creator notes.
 - Show suggestions as user-reviewable chips, never as silent hidden metadata.
+- Keep emotion/feeling/body-cue analysis hidden inside the suggestion engine. Users should choose or confirm plain route tags such as `angsty`, `slow burn`, `hurt/comfort`, `cozy romance`, or `dark romance`; the internal matrix should only decide which engine/prompt support those tags activate.
+- Present route selection as a simple story-engine dropdown/typeahead and optional tag chips, not as emotion matrices, classifier payloads, model labels, or prompt-routing internals.
 - Keep safety/content-policy tags separate from romance discovery tags so the UI can explain what each tag is for.
 
 Exit criteria:
@@ -164,13 +168,16 @@ Exit criteria:
 - Users can ask the app to suggest tags for imported or generated cards.
 - Suggested tags explain themselves in friendly language.
 - Tags populate the library filters and exported metadata only after user confirmation.
+- The user-facing surface exposes the chosen tag/engine label, while hidden compiler logic handles the detailed emotion, feeling, body-signal, and prose-routing rules.
 
 ## Phase 5: Tauri Local Library and File Bridge
 
 Goal: support real local libraries rather than one-file browser demos.
 
 - Add Tauri commands for native open/save dialogs and safe local file reads/writes.
-- Add a local card-library scanner for folders containing many character PNGs.
+- Add a local folder intake reviewer for mixed card folders containing PNG/APNG, JSON, CHARX, and stray image files.
+- Sort intake results into user-facing states: ready, will convert, image only, lorebook, skipped, and needs review.
+- Save selected ready imports into the local library as CHARX masters.
 - Use lazy card metadata loading and thumbnail caching so large libraries remain responsive.
 - Keep image and card storage local-first.
 - Add settings for library paths, cache behavior, and backup behavior.
@@ -182,6 +189,7 @@ Exit criteria:
 
 - The app can browse and manage a local card library without loading every card fully into memory.
 - Users can import/export card PNGs and JSON through native desktop dialogs.
+- Users can scan an inbox folder, review each file before import, and promote selected cards into CHARX master packages.
 - Desktop-only controls are hidden or clearly downgraded in browser mode.
 
 ## Phase 6: Context Compiler and Chat Runtime
@@ -274,6 +282,8 @@ Exit criteria:
 ## Defaults and Constraints
 
 - New cards are CCV3-first.
+- CHARX is the native master format for saved cards in the desktop app.
+- PNG/APNG is the compatibility/share format for other platforms.
 - V1/V2 support exists for import, conversion, and sanity checks.
 - User-facing editing should be readable fields and controls, not exposed raw JSON.
 - JSON remains necessary for export, embedded PNG metadata, validation, and debugging.
