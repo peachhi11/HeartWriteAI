@@ -159,31 +159,33 @@ impl CacheDatabase {
 
         let mut requested_tags = Vec::new();
         if let Some(tag) = normalized_filter_value(filter.tag) {
-            requested_tags.push(tag);
+            push_requested_tag(&mut requested_tags, tag);
         }
         if let Some(tags) = filter.tags {
             for tag in tags {
                 if let Some(normalized_tag) = normalized_filter_value(Some(tag)) {
-                    if !requested_tags
-                        .iter()
-                        .any(|existing| existing.eq_ignore_ascii_case(&normalized_tag))
-                    {
-                        requested_tags.push(normalized_tag);
-                    }
+                    push_requested_tag(&mut requested_tags, normalized_tag);
                 }
             }
         }
 
-        for tag in requested_tags {
+        for tag_group in requested_tags {
+            let placeholders = std::iter::repeat("LOWER(?)")
+                .take(tag_group.len())
+                .collect::<Vec<_>>()
+                .join(", ");
             conditions.push(
-                "EXISTS (
+                format!(
+                    "EXISTS (
                     SELECT 1
                     FROM json_each(card_cache.tags_json)
-                    WHERE LOWER(json_each.value) = LOWER(?)
+                    WHERE LOWER(json_each.value) IN ({placeholders})
                 )"
-                .to_string(),
+                ),
             );
-            sql_params.push(Box::new(tag));
+            for tag in tag_group {
+                sql_params.push(Box::new(tag));
+            }
         }
 
         let where_clause = if conditions.is_empty() {
@@ -286,6 +288,59 @@ fn sanitize_id_fragment(value: &str) -> String {
 fn deserialize_tags(tags_json: String) -> Result<Vec<String>, String> {
     serde_json::from_str(&tags_json)
         .map_err(|error| format!("Failed deserializing cached card tags: {error}"))
+}
+
+fn push_requested_tag(requested_tags: &mut Vec<Vec<String>>, tag: String) {
+    let aliases = tag_aliases(&tag);
+
+    if requested_tags.iter().any(|existing_group| {
+        existing_group.iter().any(|existing_tag| {
+            aliases
+                .iter()
+                .any(|alias| existing_tag.eq_ignore_ascii_case(alias))
+        })
+    }) {
+        return;
+    }
+
+    requested_tags.push(aliases);
+}
+
+fn tag_aliases(tag: &str) -> Vec<String> {
+    let normalized = tag.trim().trim_start_matches('#').to_ascii_lowercase();
+    let aliases: &[&str] = match normalized.as_str() {
+        "dominant" | "dom" => &["dominant", "dom"],
+        "domme" => &["domme", "dominant"],
+        "submissive" | "sub" => &["submissive", "sub"],
+        "switch" => &["switch"],
+        "fempov" | "female pov" | "femalepov" => &["fempov", "female pov", "femalepov"],
+        "malepov" | "male pov" => &["malepov", "male pov"],
+        "anypov" | "any pov" => &["anypov", "any pov"],
+        "nbpov" | "nonbinary pov" | "non-binary pov" => {
+            &["nbpov", "nonbinary pov", "non-binary pov"]
+        }
+        "omegaverse" => &["omegaverse", "#omegaverse"],
+        "rockstar au" | "rockstarau" => &["rockstar au", "rockstarau", "#rockstarau"],
+        "esports au" | "esportsau" | "e-sports au" => {
+            &["esports au", "esportsau", "e-sports au", "#esportsau"]
+        }
+        "college au" | "collegeau" | "university au" => {
+            &["college au", "collegeau", "university au", "#collegeau"]
+        }
+        "mafia au" | "mafiaau" => &["mafia au", "mafiaau", "#mafiaau"],
+        "royal au" | "royalau" | "royalty" => &["royal au", "royalau", "royalty", "#royalau"],
+        "hurt/comfort" | "hurt comfort" => &["hurt/comfort", "hurt comfort"],
+        "who hurt you" | "who hurt you?" => &["who hurt you", "who hurt you?"],
+        "grumpy x sunshine" | "grumpy sunshine" => {
+            &["grumpy x sunshine", "grumpy sunshine"]
+        }
+        "dead dove" | "dead dove do not eat" | "ddne" => {
+            &["dead dove", "dead dove do not eat", "ddne"]
+        }
+        _ => return vec![normalized],
+    };
+
+    aliases.iter().map(|alias| (*alias).to_string()).collect()
 }
 
 fn normalized_filter_value(value: Option<String>) -> Option<String> {
@@ -499,6 +554,52 @@ mod tests {
 
         assert_eq!(page.total_count, 1);
         assert_eq!(page.items[0].name, "Dominic Hale");
+    }
+
+    #[test]
+    fn queries_cache_by_janitor_and_au_tag_aliases() {
+        let cache = create_cache("card-cache-tag-alias-filter");
+        cache
+            .upsert_card(
+                "/tmp/aria.charx",
+                &create_card_with_tags(
+                    "Aria Stone",
+                    "Narrative RPG",
+                    "Antagonistic",
+                    &["FemalePOV", "Submissive", "#rockstarAU"],
+                ),
+            )
+            .expect("first card should upsert");
+        cache
+            .upsert_card(
+                "/tmp/val.charx",
+                &create_card_with_tags(
+                    "Val Knox",
+                    "Narrative RPG",
+                    "Antagonistic",
+                    &["FemalePOV", "Dominant", "college au"],
+                ),
+            )
+            .expect("second card should upsert");
+
+        let page = cache
+            .query_library_page(SearchFilters {
+                query: None,
+                framework: None,
+                relationship: None,
+                tag: None,
+                tags: Some(vec![
+                    "fempov".to_string(),
+                    "sub".to_string(),
+                    "rockstar au".to_string(),
+                ]),
+                page: 1,
+                limit: 12,
+            })
+            .expect("alias search should query");
+
+        assert_eq!(page.total_count, 1);
+        assert_eq!(page.items[0].name, "Aria Stone");
     }
 
     fn create_cache(name: &str) -> CacheDatabase {

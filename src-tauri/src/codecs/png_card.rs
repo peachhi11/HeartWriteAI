@@ -1,25 +1,27 @@
 use std::fs::File;
-use std::io::{BufReader, BufWriter};
+use std::io::{BufReader, BufWriter, Read};
 use std::path::Path;
 
 use base64::{engine::general_purpose, Engine as _};
+use flate2::read::ZlibDecoder;
 use png::{Decoder, Encoder};
 
 use crate::models::character_card::CharacterCardV3;
 
 pub fn extract_ccv3_from_png<P: AsRef<Path>>(path: P) -> Result<CharacterCardV3, String> {
-    let file = File::open(path).map_err(|error| format!("Failed to open PNG file: {error}"))?;
-    let decoder = Decoder::new(file);
-    let reader = decoder
-        .read_info()
-        .map_err(|error| format!("Invalid PNG format: {error}"))?;
+    let png_data = std::fs::read(path)
+        .map_err(|error| format!("Failed to open PNG file: {error}"))?;
 
-    let raw_json_payload = find_character_card_payload(reader.info())?;
+    let raw_json_payload = find_character_card_payload(&png_data)?;
     let verified_json = decode_metadata_payload(&raw_json_payload)?;
-
-    serde_json::from_str(&verified_json).map_err(|error| {
+    let mut card: CharacterCardV3 = serde_json::from_str(&verified_json).map_err(|error| {
         format!("PNG metadata JSON payload does not conform to the current CCV3 schema: {error}")
-    })
+    })?;
+
+    card.spec = "chara_card_v3".to_string();
+    card.spec_version = "3.0".to_string();
+
+    Ok(card)
 }
 
 pub fn inject_ccv3_into_png<SourcePath, OutputPath>(
@@ -72,49 +74,25 @@ where
         .map_err(|error| format!("Disk IO write failure during PNG encoding: {error}"))
 }
 
-fn find_character_card_payload(info: &png::Info<'_>) -> Result<String, String> {
+fn find_character_card_payload(png_data: &[u8]) -> Result<String, String> {
     let mut chara_payload: Option<String> = None;
 
-    for text_chunk in &info.uncompressed_latin1_text {
-        if text_chunk.keyword == "ccv3" {
-            return Ok(text_chunk.text.clone());
+    for text_chunk in collect_text_chunks(png_data)? {
+        let keyword = text_chunk.keyword.to_ascii_lowercase();
+
+        if keyword == "ccv3" {
+            return Ok(text_chunk.text);
         }
 
-        if text_chunk.keyword == "chara" && chara_payload.is_none() {
-            chara_payload = Some(text_chunk.text.clone());
-        }
-    }
-
-    for text_chunk in &info.compressed_latin1_text {
-        if text_chunk.keyword == "ccv3" {
-            return text_chunk.get_text().map_err(|error| {
-                format!("Failed to decode compressed ccv3 PNG text chunk: {error}")
-            });
-        }
-
-        if text_chunk.keyword == "chara" && chara_payload.is_none() {
-            chara_payload = Some(text_chunk.get_text().map_err(|error| {
-                format!("Failed to decode compressed chara PNG text chunk: {error}")
-            })?);
+        if keyword == "chara" && chara_payload.is_none() {
+            chara_payload = Some(text_chunk.text);
         }
     }
 
-    for text_chunk in &info.utf8_text {
-        if text_chunk.keyword == "ccv3" {
-            return text_chunk
-                .get_text()
-                .map_err(|error| format!("Failed to decode UTF-8 ccv3 PNG text chunk: {error}"));
-        }
-
-        if text_chunk.keyword == "chara" && chara_payload.is_none() {
-            chara_payload = Some(text_chunk.get_text().map_err(|error| {
-                format!("Failed to decode UTF-8 chara PNG text chunk: {error}")
-            })?);
-        }
-    }
-
-    chara_payload
-        .ok_or_else(|| "Target metadata key 'ccv3' not found in PNG text chunks.".to_string())
+    chara_payload.ok_or_else(|| {
+        "No character card metadata was found in this PNG. Expected a 'ccv3' or legacy 'chara' text chunk."
+            .to_string()
+    })
 }
 
 fn decode_metadata_payload(payload: &str) -> Result<String, String> {
@@ -134,6 +112,125 @@ fn decode_metadata_payload(payload: &str) -> Result<String, String> {
 
     String::from_utf8(decoded_bytes)
         .map_err(|error| format!("Invalid UTF-8 string found in PNG metadata block: {error}"))
+}
+
+struct PngTextChunk {
+    keyword: String,
+    text: String,
+}
+
+fn collect_text_chunks(png_data: &[u8]) -> Result<Vec<PngTextChunk>, String> {
+    const PNG_SIGNATURE: &[u8; 8] = b"\x89PNG\r\n\x1a\n";
+
+    if png_data.len() < PNG_SIGNATURE.len() || &png_data[..8] != PNG_SIGNATURE {
+        return Err("Source file is not a PNG image.".to_string());
+    }
+
+    let mut text_chunks = Vec::new();
+    let mut cursor = PNG_SIGNATURE.len();
+
+    while cursor + 12 <= png_data.len() {
+        let length = u32::from_be_bytes([
+            png_data[cursor],
+            png_data[cursor + 1],
+            png_data[cursor + 2],
+            png_data[cursor + 3],
+        ]) as usize;
+        let chunk_type = &png_data[cursor + 4..cursor + 8];
+        let data_start = cursor + 8;
+        let data_end = data_start + length;
+        let next_cursor = data_end + 4;
+
+        if next_cursor > png_data.len() {
+            return Err("PNG chunk table is truncated or corrupt.".to_string());
+        }
+
+        let chunk_data = &png_data[data_start..data_end];
+
+        match chunk_type {
+            b"tEXt" => {
+                if let Some(chunk) = decode_text_chunk(chunk_data) {
+                    text_chunks.push(chunk);
+                }
+            }
+            b"zTXt" => {
+                if let Some(chunk) = decode_compressed_text_chunk(chunk_data)? {
+                    text_chunks.push(chunk);
+                }
+            }
+            b"iTXt" => {
+                if let Some(chunk) = decode_international_text_chunk(chunk_data)? {
+                    text_chunks.push(chunk);
+                }
+            }
+            b"IEND" => break,
+            _ => {}
+        }
+
+        cursor = next_cursor;
+    }
+
+    Ok(text_chunks)
+}
+
+fn decode_text_chunk(chunk_data: &[u8]) -> Option<PngTextChunk> {
+    let separator_index = chunk_data.iter().position(|byte| *byte == 0)?;
+    let keyword = String::from_utf8_lossy(&chunk_data[..separator_index]).to_string();
+    let text = String::from_utf8_lossy(&chunk_data[separator_index + 1..]).to_string();
+
+    Some(PngTextChunk { keyword, text })
+}
+
+fn decode_compressed_text_chunk(chunk_data: &[u8]) -> Result<Option<PngTextChunk>, String> {
+    let separator_index = match chunk_data.iter().position(|byte| *byte == 0) {
+        Some(index) => index,
+        None => return Ok(None),
+    };
+    let keyword = String::from_utf8_lossy(&chunk_data[..separator_index]).to_string();
+    let compressed_data = match chunk_data.get(separator_index + 2..) {
+        Some(data) => data,
+        None => return Ok(None),
+    };
+    let mut decoder = ZlibDecoder::new(compressed_data);
+    let mut text = String::new();
+
+    decoder
+        .read_to_string(&mut text)
+        .map_err(|error| format!("Failed to decode compressed PNG text chunk: {error}"))?;
+
+    Ok(Some(PngTextChunk { keyword, text }))
+}
+
+fn decode_international_text_chunk(chunk_data: &[u8]) -> Result<Option<PngTextChunk>, String> {
+    let Some(keyword_end) = chunk_data.iter().position(|byte| *byte == 0) else {
+        return Ok(None);
+    };
+    let keyword = String::from_utf8_lossy(&chunk_data[..keyword_end]).to_string();
+    let Some(compression_flag) = chunk_data.get(keyword_end + 1).copied() else {
+        return Ok(None);
+    };
+    let mut cursor = keyword_end + 3;
+
+    for _ in 0..2 {
+        let Some(relative_separator) = chunk_data[cursor..].iter().position(|byte| *byte == 0)
+        else {
+            return Ok(None);
+        };
+        cursor += relative_separator + 1;
+    }
+
+    let text = if compression_flag == 1 {
+        let mut decoder = ZlibDecoder::new(&chunk_data[cursor..]);
+        let mut decoded_text = String::new();
+        decoder
+            .read_to_string(&mut decoded_text)
+            .map_err(|error| format!("Failed to decode compressed UTF-8 PNG text chunk: {error}"))?;
+        decoded_text
+    } else {
+        String::from_utf8_lossy(&chunk_data[cursor..]).to_string()
+    };
+
+    Ok(Some(PngTextChunk { keyword, text }))
 }
 
 #[cfg(test)]

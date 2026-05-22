@@ -82,6 +82,10 @@ function encodeCard(card: CharacterCardPayload): string {
   return Buffer.from(JSON.stringify(card), "utf8").toString("base64");
 }
 
+function stringifyCard(card: CharacterCardPayload): string {
+  return JSON.stringify(card);
+}
+
 function createPngWithTextChunks(chunks: Array<{ keyword: string; text: string }>) {
   return encodeChunks([
     {
@@ -114,6 +118,28 @@ test("reads ccv3 metadata before chara metadata", () => {
   const pngData = createPngWithTextChunks([
     { keyword: "chara", text: encodeCard(charaCard) },
     { keyword: "ccv3", text: encodeCard(ccv3Card) },
+  ]);
+
+  const result = readCharacterCardFromPng(pngData);
+
+  assert.equal(result.source, "ccv3");
+  assert.deepEqual(result.card, ccv3Card);
+});
+
+test("reads raw-json ccv3 metadata before legacy chara metadata", () => {
+  const ccv3Card = {
+    spec: "chara_card_v3",
+    spec_version: "3.0",
+    data: { name: "Raw CCV3 Card" },
+  };
+  const charaCard = {
+    spec: "chara_card_v2",
+    spec_version: "2.0",
+    data: { name: "Legacy Card" },
+  };
+  const pngData = createPngWithTextChunks([
+    { keyword: "chara", text: encodeCard(charaCard) },
+    { keyword: "ccv3", text: stringifyCard(ccv3Card) },
   ]);
 
   const result = readCharacterCardFromPng(pngData);

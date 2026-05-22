@@ -7,12 +7,19 @@ import {
   CharacterCardV3Schema,
   ValidatedCharacterCardV3,
 } from "@/types/character-card/CharacterCardV3Schema";
+import { isTauriRuntime } from "@/lib/tauri/native";
 
 export function useFileDialogs() {
+  const isDesktopRuntime = isTauriRuntime();
+
   async function triggerUniversalImport(): Promise<{
     card: ValidatedCharacterCardV3;
     path: string;
   } | null> {
+    if (!isDesktopRuntime) {
+      return null;
+    }
+
     try {
       const selectedPath = await open({
         multiple: false,
@@ -45,6 +52,10 @@ export function useFileDialogs() {
     sourceCardPath: string,
     cardData: ValidatedCharacterCardV3,
   ): Promise<string | null> {
+    if (!isDesktopRuntime) {
+      return null;
+    }
+
     try {
       const saveDestinationPath = await save({
         title: "Export Compressed CHARX Bundle Package",
@@ -73,6 +84,10 @@ export function useFileDialogs() {
     sourceImagePath: string,
     cardData: ValidatedCharacterCardV3,
   ): Promise<string | null> {
+    if (!isDesktopRuntime) {
+      return null;
+    }
+
     try {
       const saveDestinationPath = await save({
         title: "Save Recompiled Metadata Card Image",
@@ -98,6 +113,7 @@ export function useFileDialogs() {
   }
 
   return {
+    isDesktopRuntime,
     triggerCharxExport,
     triggerPngMetadataSave,
     triggerUniversalImport,

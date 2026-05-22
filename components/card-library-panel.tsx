@@ -70,16 +70,16 @@ const characterRoleOptions = [
     tag: "ALL",
   },
   {
-    label: "Dom",
-    tag: "dom",
+    label: "Sub",
+    tag: "submissive",
   },
   {
     label: "Domme",
     tag: "domme",
   },
   {
-    label: "Sub",
-    tag: "sub",
+    label: "Dom",
+    tag: "dominant",
   },
   {
     label: "Switch",
@@ -126,6 +126,54 @@ const tropeOptions = [
   {
     label: "Forbidden",
     tag: "forbidden",
+  },
+  {
+    label: "Grumpy x sunshine",
+    tag: "grumpy x sunshine",
+  },
+  {
+    label: "Hurt/comfort",
+    tag: "hurt/comfort",
+  },
+  {
+    label: "Fake dating",
+    tag: "fake dating",
+  },
+  {
+    label: "Who hurt you?",
+    tag: "who hurt you",
+  },
+  {
+    label: "Dark romance",
+    tag: "dark romance",
+  },
+  {
+    label: "Dead dove",
+    tag: "dead dove",
+  },
+  {
+    label: "Omegaverse",
+    tag: "omegaverse",
+  },
+  {
+    label: "Rockstar AU",
+    tag: "rockstar au",
+  },
+  {
+    label: "Esports AU",
+    tag: "esports au",
+  },
+  {
+    label: "College AU",
+    tag: "college au",
+  },
+  {
+    label: "Mafia AU",
+    tag: "mafia au",
+  },
+  {
+    label: "Royal AU",
+    tag: "royal au",
   },
 ] as const;
 

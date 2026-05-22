@@ -5,6 +5,7 @@ import { open } from "@tauri-apps/plugin-dialog";
 import { ImageIcon, Loader2, Plus, Trash2 } from "lucide-react";
 import { MouseEvent, useCallback, useEffect, useState } from "react";
 
+import { isTauriRuntime } from "@/lib/tauri/native";
 import { ExpressionSprite } from "@/types/character-card/ExpressionSprite";
 
 export interface ExpressionManagerProps {
@@ -20,9 +21,10 @@ export default function ExpressionManager({
   const [activeSpritePath, setActiveSpritePath] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const isDesktopRuntime = isTauriRuntime();
 
   const reloadSpritesFromBackend = useCallback(async function reloadSpritesFromBackend() {
-    if (!activeCardPath) {
+    if (!activeCardPath || !isDesktopRuntime) {
       setSprites([]);
       setActiveSpritePath(null);
       setError(null);
@@ -48,10 +50,10 @@ export default function ExpressionManager({
     } finally {
       setLoading(false);
     }
-  }, [activeCardPath]);
+  }, [activeCardPath, isDesktopRuntime]);
 
   useEffect(() => {
-    if (!activeCardPath) {
+    if (!activeCardPath || !isDesktopRuntime) {
       queueMicrotask(() => {
         setSprites([]);
         setActiveSpritePath(null);
@@ -71,10 +73,10 @@ export default function ExpressionManager({
     return () => {
       isCancelled = true;
     };
-  }, [activeCardPath, reloadSpritesFromBackend]);
+  }, [activeCardPath, isDesktopRuntime, reloadSpritesFromBackend]);
 
   async function handleAttachNewSprite() {
-    if (!activeCardPath) {
+    if (!activeCardPath || !isDesktopRuntime) {
       return;
     }
 
@@ -129,7 +131,7 @@ export default function ExpressionManager({
     }
   }
 
-  if (!activeCardPath) {
+  if (!activeCardPath || !isDesktopRuntime) {
     return null;
   }
 

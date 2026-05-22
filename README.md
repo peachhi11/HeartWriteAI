@@ -70,13 +70,17 @@ Implemented in the current scaffold:
 
 - Next.js + Tailwind + shadcn app shell.
 - Tauri v2 desktop wrapper renamed and configured for HeartWriteAI.
-- Starter landing/workspace page for the intake-first workflow.
+- Workspace-first editor for character card import, editing, and export.
 - Temporary `/chat` preview route for Ollama streaming shape tests.
 - `/api/character-card/classify` and `/api/character-card/build` routes for schema-bound macro routing and generated card previews.
 - Tauri Store plugin registration and typed desktop-library helper for local
   character-card persistence.
 - Browser-side image intake pipeline for validation, compression, blurhash, and EXIF date extraction.
 - CCV3 PNG metadata read/write layer with V1/V2 conversion support through `@risuai/ccardlib`.
+- Browser and desktop import paths for PNG/APNG and JSON character cards, including browser download fallbacks when Tauri APIs are unavailable.
+- Desktop card-library cache with user-facing filters for chat style, POV, character role, user role, tropes, and AU tags.
+- Prompt runtime compiler that lets a card override the default app system prompt, or extend it with `{{original}}`.
+- Adult legacy/offspring profile generator for generational series planning, with minor-NPC guardrails for family/slice-of-life scenes.
 - Tauri bridge helper for frontend/native command calls.
 - PNG text-chunk dependencies for CCV3 card import/export:
   - `png-chunks-extract`
@@ -86,7 +90,7 @@ Implemented in the current scaffold:
 
 Immediate next milestone:
 
-- Build the import/export UI so character-card PNGs can be read, edited through user-facing fields, and exported with embedded `ccv3` metadata.
+- Stabilize the desktop card-library workflow around real imported card folders, then move the same normalized card model into lorebook/persona/chat runtime work.
 
 ## Project Shape
 
@@ -99,6 +103,8 @@ src-tauri/            Tauri Rust shell, capabilities, icons, and native commands
 docs/                 focused engineering notes and safety plans
 ```
 
+Recovered prototype folders, copied reference migrations, loose research PDFs, and other one-off source materials should stay outside normal commits unless they are deliberately promoted into `docs/` or app code.
+
 ## Roadmap
 
 The phased implementation plan lives in [`PLAN.md`](PLAN.md).
@@ -106,11 +112,11 @@ The phased implementation plan lives in [`PLAN.md`](PLAN.md).
 The current priority order is:
 
 1. Stabilize the scaffold and documentation checkpoint.
-2. Add CCV3 PNG import/export.
+2. Complete CCV3 PNG/JSON/CHARX import and export.
 3. Turn the character page into the editable intake hub.
 4. Add editable lorebook/persona/scenario asset editors and attachments.
-5. Add Tauri local file/library management.
-6. Build the context compiler and production chat runtime.
+5. Expand Tauri local file/library management.
+6. Build the production chat runtime around the context compiler.
 
 ## Auto-Update Safety
 

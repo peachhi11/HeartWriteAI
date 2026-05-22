@@ -25,6 +25,12 @@
 .DS_Store
 *.pem
 
+# local reference/recovery drops
+/CharacterGen-chat-ui/
+/migrations/
+/src-tauri/src/MST Orbs.zip
+/*.pdf
+
 # debug
 npm-debug.log*
 yarn-debug.log*

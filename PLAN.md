@@ -1,6 +1,6 @@
-# AmourAI Implementation Plan
+# HeartWriteAI Implementation Plan
 
-AmourAI is the working-title Next.js + Tailwind + shadcn + Tauri rebuild of CharacterGen. The app should become a local-first studio for CCV3 character cards, editable personas, lorebooks, scenario arcs, and eventually chat runtime compilation.
+HeartWriteAI is the Next.js + Tailwind + shadcn + Tauri rebuild of CharacterGen. The app should become a local-first studio for CCV3 character cards, editable personas, lorebooks, scenario arcs, and eventually chat runtime compilation.
 
 ## Phase 1: Stable Scaffold and Docs Checkpoint
 
@@ -21,9 +21,9 @@ Exit criteria:
 - The app builds as a static frontend for Tauri.
 - The desktop shell can be bundled locally.
 
-## Phase 2: CCV3 PNG Import/Export Codec
+## Phase 2: CCV3 PNG/JSON Import/Export Codec
 
-Goal: make AmourAI capable of reading and writing character-card PNG metadata.
+Goal: make HeartWriteAI capable of reading and writing character-card metadata across browser and desktop runtimes.
 
 - Add a small app-native character-card codec layer using:
   - `png-chunks-extract`
@@ -31,6 +31,9 @@ Goal: make AmourAI capable of reading and writing character-card PNG metadata.
   - `png-chunk-text`
 - Read PNG `tEXt` chunks and prefer `ccv3` metadata when present.
 - Fall back to `chara` metadata for V1/V2 imports and conversion checks.
+- Accept raw JSON and base64-encoded JSON metadata.
+- Support browser drag/drop and file-picker imports without requiring Tauri APIs.
+- Support desktop native dialogs and desktop drag/drop when Tauri APIs are available.
 - Write exported PNGs with embedded `ccv3` metadata.
 - Keep JSON visible as export/debug infrastructure, not the main editing UI.
 - Add focused tests for:
@@ -43,6 +46,7 @@ Exit criteria:
 
 - A dragged-in character PNG can be parsed into app data.
 - A generated or edited CCV3 card can be embedded back into a PNG.
+- Browser mode downloads exported JSON/PNG safely, while desktop mode can use native save dialogs.
 
 ## Phase 3: Character Intake Hub
 
@@ -95,6 +99,7 @@ Goal: support real local libraries rather than one-file browser demos.
 - Use lazy card metadata loading and thumbnail caching so large libraries remain responsive.
 - Keep image and card storage local-first.
 - Add settings for library paths, cache behavior, and backup behavior.
+- Keep library filters friendly and romance-platform familiar: chat style, POV, character role, user role, tropes, and AU tags.
 
 Exit criteria:
 
@@ -118,11 +123,28 @@ Goal: integrate chat only after character/persona/scenario/lore data has reliabl
 - Add turn prefixing so the model knows whose turn is expected.
 - Add hierarchical chat summaries before long-running chat becomes core.
 - Keep current scenario override editable so users can load a character into a different trope or setting.
+- Let CCV3 `system_prompt` replace the app default prompt, or extend it with `{{original}}`.
+- Keep `post_history_instructions` as final card-authored steering.
+- Enforce minor-NPC safety in runtime context: minor NPCs may appear in SFW family/slice-of-life scenes, but must not participate in or remain present for sexual/NSFW scenes.
 
 Exit criteria:
 
 - Chat runtime consumes compiled context instead of raw page state.
 - Lorebooks and scenario arcs can influence ongoing chat beyond the opening message.
+
+## Phase 7: Legacy and Generational Series Tools
+
+Goal: support long-running romance series, families, and adult descendant casts without making unsafe user or NPC assumptions.
+
+- Generate adult-only offspring and legacy profile drafts from parent cards.
+- Track inherited names, species/world rules, relationship lineage, and suggested AU/trope tags.
+- Keep children as SFW-only NPC context when needed for family realism.
+- Promote adult descendants into normal editable character cards only after explicit user review.
+
+Exit criteria:
+
+- Users can plan a generational series without manually rebuilding every inherited trait.
+- Generated legacy outputs include safety notes and remain editable before card export.
 
 ## Defaults and Constraints
 

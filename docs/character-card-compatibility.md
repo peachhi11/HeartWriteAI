@@ -5,11 +5,36 @@ HeartWriteAI is CCV3-first. The implementation reference for card import/export 
 ## Current Scope
 
 - Read PNG/APNG `tEXt` metadata from `ccv3` first, then fall back to legacy `chara`.
-- Decode card metadata as UTF-8 JSON encoded with base64.
+- Decode card metadata from either raw JSON or UTF-8 JSON encoded with base64.
 - Export fresh `ccv3` metadata and remove stale `chara` / `ccv3` chunks from the target PNG.
 - Normalize exports to `spec: "chara_card_v3"` and `spec_version: "3.0"`.
 - Preserve unknown/future card fields where possible.
 - Use `@risuai/ccardlib` for V1/V2/V3 card version checks and conversion.
+- Support browser imports for PNG/APNG/JSON without calling Tauri APIs, and desktop imports through native dialogs when available.
+- Treat JSON as an interchange/debug format, not the main editing surface.
+
+## User-Facing Labels and Tags
+
+Card controls should use readable platform-familiar language, not raw schema labels. For relationship and role filters, prefer labels such as:
+
+- Character role: Sub, Domme, Dom, Switch.
+- User role: user follows, user leads, user switches.
+- POV: Any POV, FemPOV, MalePOV.
+- Trope/AU tags: Enemies to lovers, slow burn, hurt/comfort, dark romance, dead dove, omegaverse, rockstar AU, esports AU, college AU, mafia AU, royal AU.
+
+The underlying card metadata can still keep normalized tags and aliases for search, filtering, and export.
+
+## Prompt Runtime
+
+CCV3 `data.system_prompt` is allowed to replace the app's default runtime system prompt. If the card prompt contains `{{original}}`, HeartWriteAI treats that as an explicit extension point and inserts the default app prompt there.
+
+`data.post_history_instructions` remains final-turn steering and should be placed after assembled character, persona, world, lore, memory, and recent-chat context.
+
+## Minor NPC Guardrail
+
+Adult romance cards may mention children or family context in ordinary story narrative. User personas must not be children, and minor NPCs must not be sexualized or participate in NSFW scenes.
+
+When a scene turns sexual or NSFW, minor NPCs should stop being present in the active scene. If a user persistently tries to involve a minor NPC in sexual content, the runtime should refuse briefly and continue without that content.
 
 ## Multi-Character Single Cards
 

@@ -11,6 +11,9 @@ import StructuredCardEditor from "@/components/structured-card-editor";
 import { useCharacterLibrary } from "@/hooks/character-card/useCharacterLibrary";
 import { useFileDialogs } from "@/hooks/useFileDialogs";
 import { useCardLibrary } from "@/hooks/useCardLibrary";
+import { downloadUint8Array } from "@/lib/browser/downloadUint8Array";
+import { importBrowserCharacterCardFile } from "@/lib/character-card/importBrowserCharacterCardFile";
+import { writeCharacterCardToPng } from "@/lib/character-card/writeCharacterCardToPng";
 import { ExpressionSprite } from "@/types/character-card/ExpressionSprite";
 import { ValidatedCharacterCardV3 } from "@/types/ccv3";
 
@@ -19,12 +22,15 @@ export default function WorkspacePage() {
     useState<ValidatedCharacterCardV3 | null>(null);
   const [workspaceMessage, setWorkspaceMessage] = useState<string | null>(null);
   const [currentFilePath, setCurrentFilePath] = useState<string | null>(null);
+  const [browserSourcePngData, setBrowserSourcePngData] =
+    useState<Uint8Array | null>(null);
   const [selectedExpression, setSelectedExpression] =
     useState<ExpressionSprite | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const library = useCardLibrary(12);
   const { importCardFromPath, saveWorkspaceChanges } = useCharacterLibrary();
   const {
+    isDesktopRuntime,
     triggerCharxExport,
     triggerPngMetadataSave,
     triggerUniversalImport,
@@ -33,9 +39,14 @@ export default function WorkspacePage() {
     ? /\.(apng|png)$/i.test(currentFilePath)
     : false;
 
-  function handleCardLoaded(card: ValidatedCharacterCardV3, filePath: string) {
+  function handleCardLoaded(
+    card: ValidatedCharacterCardV3,
+    filePath: string,
+    sourcePngData: Uint8Array | null = null,
+  ) {
     setActiveCard(card);
     setCurrentFilePath(filePath);
+    setBrowserSourcePngData(sourcePngData);
     setSelectedExpression(null);
     library.refresh();
   }
@@ -54,6 +65,13 @@ export default function WorkspacePage() {
 
   async function handlePersistWorkspaceChanges() {
     if (!activeCard || !currentFilePath) {
+      return;
+    }
+
+    if (!isDesktopRuntime) {
+      setWorkspaceMessage(
+        "Browser preview can download a copy, but saving back to the original file needs the desktop app.",
+      );
       return;
     }
 
@@ -79,17 +97,43 @@ export default function WorkspacePage() {
   }
 
   async function handleManualImportClick() {
+    if (!isDesktopRuntime) {
+      setWorkspaceMessage("Use the browser file picker or drag a PNG/JSON card onto the workspace.");
+      return;
+    }
+
     const result = await triggerUniversalImport();
     if (!result) {
       return;
     }
 
-    handleCardLoaded(result.card, result.path);
+    handleCardLoaded(result.card, result.path, null);
     setWorkspaceMessage(`Loaded ${result.card.data.name} from ${result.path}.`);
+  }
+
+  async function handleBrowserImportFile(file: File | null) {
+    if (!file) {
+      return;
+    }
+
+    setWorkspaceMessage(`Loading ${file.name}...`);
+
+    try {
+      const result = await importBrowserCharacterCardFile(file);
+      handleCardLoaded(result.card, result.path, result.sourcePngData);
+      setWorkspaceMessage(`Loaded ${result.card.data.name} from ${result.path}.`);
+    } catch (error) {
+      setWorkspaceMessage(error instanceof Error ? error.message : String(error));
+    }
   }
 
   async function handleExportWorkspaceCharx() {
     if (!activeCard || !currentFilePath) {
+      return;
+    }
+
+    if (!isDesktopRuntime) {
+      setWorkspaceMessage("CHARX export needs the desktop app.");
       return;
     }
 
@@ -108,6 +152,11 @@ export default function WorkspacePage() {
       return;
     }
 
+    if (!isDesktopRuntime) {
+      handleBrowserDownloadPng();
+      return;
+    }
+
     setWorkspaceMessage("Choose a PNG destination...");
 
     const savedPath = await triggerPngMetadataSave(currentFilePath, activeCard);
@@ -118,6 +167,41 @@ export default function WorkspacePage() {
     }
   }
 
+  function handleBrowserDownloadPng() {
+    if (!activeCard || !browserSourcePngData) {
+      setWorkspaceMessage(
+        "Download PNG needs a PNG card source. JSON cards can be downloaded as JSON.",
+      );
+      return;
+    }
+
+    const updatedPngData = writeCharacterCardToPng(browserSourcePngData, activeCard);
+    const fileName = createSafeCharacterFileName(
+      activeCard.data.name || currentFilePath || "character",
+      "_edited.png",
+    );
+
+    downloadUint8Array(updatedPngData, fileName, "image/png");
+    setWorkspaceMessage(`Downloaded ${fileName}.`);
+  }
+
+  function handleBrowserDownloadJson() {
+    if (!activeCard) {
+      return;
+    }
+
+    const encodedCard = new TextEncoder().encode(
+      JSON.stringify(activeCard, null, 2),
+    );
+    const fileName = createSafeCharacterFileName(
+      activeCard.data.name || currentFilePath || "character",
+      ".json",
+    );
+
+    downloadUint8Array(encodedCard, fileName, "application/json");
+    setWorkspaceMessage(`Downloaded ${fileName}.`);
+  }
+
   return (
     <StudioShell
       eyebrow="Character Cards"
@@ -125,14 +209,29 @@ export default function WorkspacePage() {
       subtitle={currentFilePath ?? "No active tracking file loaded."}
       actions={
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={handleManualImportClick}
-            className="rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted"
-          >
-            Import
-          </button>
-          {activeCard ? (
+          {isDesktopRuntime ? (
+            <button
+              type="button"
+              onClick={handleManualImportClick}
+              className="rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted"
+            >
+              Import
+            </button>
+          ) : (
+            <label className="cursor-pointer rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted">
+              Import
+              <input
+                type="file"
+                accept=".png,.apng,.json"
+                className="sr-only"
+                onChange={(event) => {
+                  void handleBrowserImportFile(event.currentTarget.files?.[0] ?? null);
+                  event.currentTarget.value = "";
+                }}
+              />
+            </label>
+          )}
+          {activeCard && isDesktopRuntime ? (
             <>
               <button
                 type="button"
@@ -166,6 +265,31 @@ export default function WorkspacePage() {
               </button>
             </>
           ) : null}
+          {activeCard && !isDesktopRuntime ? (
+            <>
+              <button
+                type="button"
+                onClick={handleBrowserDownloadPng}
+                disabled={!browserSourcePngData}
+                className="hidden rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted disabled:opacity-50 md:inline-flex"
+                title={
+                  browserSourcePngData
+                    ? "Download a PNG copy with the edited CCV3 metadata."
+                    : "PNG download needs a PNG/APNG source card."
+                }
+              >
+                Download PNG
+              </button>
+              <button
+                type="button"
+                onClick={handleBrowserDownloadJson}
+                className="rounded-lg bg-rose-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-rose-700"
+                title="Download the edited CCV3 card as JSON."
+              >
+                Download JSON
+              </button>
+            </>
+          ) : null}
         </div>
       }
     >
@@ -174,8 +298,8 @@ export default function WorkspacePage() {
         onAssetTranscoded={(filePath) =>
           setWorkspaceMessage(`Converted image asset to ${filePath}.`)
         }
-        onCardParsed={(parsed, filePath) => {
-          handleCardLoaded(parsed, filePath);
+        onCardParsed={(parsed, filePath, sourcePngData) => {
+          handleCardLoaded(parsed, filePath, sourcePngData ?? null);
           setWorkspaceMessage(null);
         }}
         onDropError={setWorkspaceMessage}
@@ -209,8 +333,8 @@ export default function WorkspacePage() {
               </p>
             ) : (
               <p className="text-sm text-zinc-500">
-                Click Import File or drop any verified PNG, CHARX, or JSON card
-                onto the window to begin editing.
+                Import or drop a PNG/JSON character card to begin editing.
+                CHARX and image-asset drops are available in the desktop app.
               </p>
             )}
           </div>
@@ -235,4 +359,15 @@ export default function WorkspacePage() {
       </div>
     </StudioShell>
   );
+}
+
+function createSafeCharacterFileName(name: string, suffix: string) {
+  const safeName = name
+    .trim()
+    .replace(/\.[a-z0-9]+$/i, "")
+    .replace(/[^a-z0-9]+/gi, "_")
+    .replace(/^_+|_+$/g, "")
+    .toLowerCase();
+
+  return `${safeName || "character"}${suffix}`;
 }

@@ -28,6 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { useCharacterCardImportExport } from "@/hooks/character-card/useCharacterCardImportExport";
+import { humanizeOptionLabel } from "@/lib/ui/humanizeOptionLabel";
 import { CharacterCardFormValues } from "@/types/character-card/CharacterCardFormValues";
 
 const simulationFrameworks = [
@@ -795,14 +796,17 @@ function SegmentedButtonGroup<TOption extends string>({
               key={option}
               type="button"
               className={[
-                "min-h-11 rounded-md border px-3 py-2 text-left text-sm transition",
+                "min-h-11 min-w-0 rounded-md border px-3 py-2 text-left text-sm leading-snug transition",
                 isActive
                   ? activeToneClassNames[tone]
                   : "border-border bg-background text-muted-foreground hover:border-foreground/30 hover:text-foreground",
               ].join(" ")}
               onClick={() => onSelect(option)}
+              title={option}
             >
-              {option}
+              <span className="block break-words">
+                {humanizeOptionLabel(option)}
+              </span>
             </button>
           );
         })}

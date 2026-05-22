@@ -4,6 +4,7 @@ import { Dispatch, FormEvent, ReactNode, SetStateAction, useState } from "react"
 import { Plus, Trash2 } from "lucide-react";
 
 import CharacterCardPreview from "@/components/character-card-preview";
+import { humanizeOptionLabel } from "@/lib/ui/humanizeOptionLabel";
 import {
   buildCharacterCard,
   BuildCharacterCardResult,
@@ -5551,13 +5552,16 @@ function MacroButtonGroup<Value extends string>({
               key={option}
               type="button"
               onClick={() => onSelect(option)}
-              className={`rounded-md border p-2 text-left text-[11px] font-semibold transition ${
+              className={`min-w-0 rounded-md border px-3 py-2 text-left text-[11px] font-semibold leading-snug transition ${
                 isActive
                   ? activeMacroClassName(tone)
                   : "border-zinc-800 bg-zinc-950 text-zinc-500 hover:text-zinc-300"
               }`}
+              title={option}
             >
-              {option.replace("Asymmetric ", "")}
+              <span className="block break-words">
+                {humanizeOptionLabel(option)}
+              </span>
             </button>
           );
         })}
@@ -5593,13 +5597,14 @@ function MacroToggleGroup({
               key={option}
               type="button"
               onClick={() => onToggle(option)}
-              className={`rounded-full border px-3 py-1 text-[10px] font-medium transition ${
+              className={`min-w-0 rounded-full border px-3 py-1 text-[10px] font-medium leading-snug transition ${
                 isActive
                   ? activeMacroClassName(tone)
                   : "border-zinc-800 bg-zinc-950 text-zinc-500 hover:text-zinc-300"
               }`}
+              title={option}
             >
-              {option}
+              {humanizeOptionLabel(option)}
             </button>
           );
         })}

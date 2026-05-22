@@ -5,6 +5,7 @@ use std::path::Path;
 use crate::codecs::charx_card::extract_ccv3_from_charx;
 use crate::codecs::png_card::extract_ccv3_from_png;
 use crate::models::character_card::CharacterCardV3;
+use serde_json::Value;
 
 pub fn parse_card_by_path<P: AsRef<Path>>(file_path: P) -> Result<CharacterCardV3, String> {
     let path = file_path.as_ref();
@@ -23,13 +24,47 @@ pub fn parse_card_by_path<P: AsRef<Path>>(file_path: P) -> Result<CharacterCardV
         })?;
 
     match extension.as_str() {
-        "png" | "apng" => extract_ccv3_from_png(path),
+        "png" | "apng" => {
+            if let Some(pointer_error) = read_json_pointer_error(path)? {
+                return Err(pointer_error);
+            }
+
+            extract_ccv3_from_png(path)
+        }
         "charx" => extract_ccv3_from_charx(path),
         "json" => parse_card_json_file(path),
         _ => Err(format!(
             "Unsupported file format validation error: '.{extension}'. Only .png, .apng, .charx, and .json files are handled by the CCV3 importer."
         )),
     }
+}
+
+fn read_json_pointer_error(path: &Path) -> Result<Option<String>, String> {
+    let mut file = File::open(path)
+        .map_err(|error| format!("Failed to open targeted file context: {error}"))?;
+    let mut prefix_buffer = [0_u8; 512];
+    let bytes_read = file
+        .read(&mut prefix_buffer)
+        .map_err(|error| format!("Disk IO read failure on file preflight: {error}"))?;
+    let prefix = String::from_utf8_lossy(&prefix_buffer[..bytes_read])
+        .trim_start()
+        .to_string();
+
+    if !prefix.starts_with('{') {
+        return Ok(None);
+    }
+
+    let mut json_buffer = prefix;
+    file.read_to_string(&mut json_buffer)
+        .map_err(|error| format!("Disk IO read failure on JSON pointer preflight: {error}"))?;
+
+    let Ok(parsed_value) = serde_json::from_str::<Value>(&json_buffer) else {
+        return Ok(None);
+    };
+
+    Ok(parsed_value.get("url").and_then(Value::as_str).map(|url| {
+        format!("This file is a download link, not a character card. Download the linked card image first: {url}")
+    }))
 }
 
 fn parse_card_json_file(path: &Path) -> Result<CharacterCardV3, String> {
@@ -39,9 +74,21 @@ fn parse_card_json_file(path: &Path) -> Result<CharacterCardV3, String> {
     file.read_to_string(&mut json_buffer)
         .map_err(|error| format!("Disk IO read failure on plaintext asset: {error}"))?;
 
-    serde_json::from_str(&json_buffer).map_err(|error| {
+    let parsed_value: Value = serde_json::from_str(&json_buffer).map_err(|error| {
         format!(
-            "JSON file context does not match expected CCV3 layout structural specification: {error}"
+            "This file is not readable JSON. It may be an incomplete download or a non-card file: {error}"
+        )
+    })?;
+
+    if let Some(url) = parsed_value.get("url").and_then(Value::as_str) {
+        return Err(format!(
+            "This file is a download link, not a character card. Download the linked card image first: {url}"
+        ));
+    }
+
+    serde_json::from_value(parsed_value).map_err(|error| {
+        format!(
+            "This JSON file is readable, but it does not match a supported character card layout: {error}"
         )
     })
 }
@@ -100,6 +147,22 @@ mod tests {
         let error = parse_card_by_path(&card_path).expect_err("TXT card should reject");
 
         assert!(error.contains("Unsupported file format"));
+    }
+
+    #[test]
+    fn explains_json_pointer_files() {
+        let temp_dir = create_temp_dir("card-path-pointer-json");
+        let card_path = temp_dir.join("emily.png");
+        std::fs::write(
+            &card_path,
+            r#"{"url":"https://img.taverncard.com/cards/example.png","download_count":"2511"}"#,
+        )
+        .expect("fixture should write");
+
+        let error = parse_card_by_path(&card_path).expect_err("pointer file should reject");
+
+        assert!(error.contains("download link"));
+        assert!(error.contains("https://img.taverncard.com/cards/example.png"));
     }
 
     fn fixture_card(name: &str) -> CharacterCardV3 {
