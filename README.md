@@ -109,14 +109,17 @@ Recovered prototype folders, copied reference migrations, loose research PDFs, a
 
 The phased implementation plan lives in [`PLAN.md`](PLAN.md).
 
+The old CharacterGen project is now treated as a reference archive. The active port map lives in [`docs/charactergen-reference-port-map.md`](docs/charactergen-reference-port-map.md), and the implementation target remains Next.js + Tailwind + Tauri v2 rather than Python/PyQt.
+
 The current priority order is:
 
 1. Stabilize the scaffold and documentation checkpoint.
 2. Complete CCV3 PNG/JSON/CHARX import and export.
-3. Turn the character page into the editable intake hub.
-4. Add editable lorebook/persona/scenario asset editors and attachments.
-5. Expand Tauri local file/library management.
-6. Build the production chat runtime around the context compiler.
+3. Maintain the CharacterGen reference port map.
+4. Turn the character page into the editable intake hub.
+5. Add editable lorebook/persona/scenario asset editors and attachments.
+6. Expand Tauri local file/library management.
+7. Build the production chat runtime around the context compiler.
 
 ## Auto-Update Safety
 
