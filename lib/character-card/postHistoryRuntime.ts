@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { RelationshipStateSchema } from "../chat/relationshipState.schema";
 import { loreEntryRuntimeSchema } from "./lorebookParser";
 
 export const postHistoryRuntimeSchema = z.object({
@@ -20,6 +21,7 @@ export const chatRequestSchema = z.object({
       loreEntries: z.array(loreEntryRuntimeSchema).optional(),
       postHistory: postHistoryRuntimeSchema.optional(),
       postHistoryInstructions: postHistoryRuntimeSchema.optional(),
+      relationshipState: RelationshipStateSchema.optional(),
     })
     .optional(),
   messages: z.array(chatMessageSchema),

@@ -59,6 +59,8 @@ For each old module, decide whether to:
    - Route detected emotional language into friendly tone tags such as `angsty`, `hurt/comfort`, `slow burn`, `fluff`, `cozy romance`, `comfort`, `curious`, `high agency`, and `quiet tension`.
    - Keep body-signal, feeling, and classifier analysis hidden. The user should see only friendly story-engine selectors and reviewable tags; the prompt compiler can quietly translate those tags into the deeper route behavior.
 4. Runtime context preview using the current TypeScript prompt compiler.
+   - Include hidden relationship-state and intimacy-gate previews when chat runtime exists.
+   - Use deterministic triggers for pacing; do not rely on the LLM to decide when it is allowed to rush trust, confession, or intimacy.
 5. Session state separation for chat and group chat.
 6. Prompt-pack editor for character and persona generation.
 

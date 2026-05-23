@@ -17,6 +17,7 @@
     ]
   },
   "include": [
+    "lib/chat/**/*.ts",
     "lib/character-card/**/*.ts",
     "tests/character-card/**/*.ts",
     "types/character-card/**/*.ts",

@@ -3,6 +3,7 @@ import {
   chatRequestSchema,
 } from "@/lib/character-card/postHistoryRuntime";
 import { parseActiveLore } from "@/lib/character-card/lorebookParser";
+import { appendRelationshipStateContext } from "@/lib/chat/relationshipStateContext";
 
 export async function POST(request: Request) {
   const requestBody = await request.json().catch(() => undefined);
@@ -23,8 +24,12 @@ export async function POST(request: Request) {
     latestUserMessage,
     requestResult.data.characterConfig?.loreEntries ?? [],
   );
-  const optimizedMessages = appendPostHistoryOverride(
+  const relationshipAwareMessages = appendRelationshipStateContext(
     [...requestResult.data.messages, ...activeLoreMessages],
+    requestResult.data.characterConfig?.relationshipState,
+  );
+  const optimizedMessages = appendPostHistoryOverride(
+    relationshipAwareMessages,
     postHistory,
   );
 
