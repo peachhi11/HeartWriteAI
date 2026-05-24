@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { PanelLeftOpen, X } from "lucide-react";
 
 import CardLibraryPanel from "@/components/card-library-panel";
 import { DevToolsPanel } from "@/components/dev-tools-panel";
@@ -27,6 +28,7 @@ export default function WorkspacePage() {
     useState<Uint8Array | null>(null);
   const [selectedExpression, setSelectedExpression] =
     useState<ExpressionSprite | null>(null);
+  const [libraryOpen, setLibraryOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const library = useCardLibrary(12);
   const { importCardFromPath, saveCard, saveWorkspaceChanges } =
@@ -240,6 +242,14 @@ export default function WorkspacePage() {
       subtitle={currentFilePath ?? "No card loaded yet."}
       actions={
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setLibraryOpen(true)}
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted"
+          >
+            <PanelLeftOpen className="size-3.5" />
+            Library
+          </button>
           {isDesktopRuntime ? (
             <button
               type="button"
@@ -333,75 +343,100 @@ export default function WorkspacePage() {
         </div>
       }
     >
-      <div className="relative grid gap-5 xl:grid-cols-[22rem_minmax(0,1fr)]">
-      <DropZoneOverlay
-        onAssetTranscoded={(filePath) =>
-          setWorkspaceMessage(`Converted image asset to ${filePath}.`)
-        }
-        onCardParsed={(parsed, filePath, sourcePngData) => {
-          handleCardLoaded(parsed, filePath, sourcePngData ?? null);
-          setWorkspaceMessage(null);
-        }}
-        onDropError={setWorkspaceMessage}
-      />
-
-      <CardLibraryPanel
-        className="h-[calc(100vh-9rem)] w-full rounded-xl border border-zinc-800 xl:sticky xl:top-24"
-        library={library}
-        onCardSelect={(filePath) => {
-          void handleCardSelect(filePath);
-        }}
-      />
-
-      <div className="min-w-0 space-y-6">
-        {workspaceMessage ? (
-          <p className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-400">
-            {workspaceMessage}
-          </p>
-        ) : null}
-
-        <FolderIntakeReview
-          isDesktopRuntime={isDesktopRuntime}
-          onChooseFolder={triggerFolderIntakeSelect}
-          onImported={library.refresh}
-        />
-
-        {activeCard ? (
-          <StructuredCardEditor
-            activeCard={activeCard}
-            setActiveCard={setActiveCard}
-          />
-        ) : (
-          <div className="flex min-h-64 flex-col justify-center rounded-lg border border-dashed border-zinc-800 bg-zinc-900/20 p-6 text-center">
-            {currentFilePath ? (
-              <p className="font-mono text-xs text-zinc-400">
-                Cached selection: {currentFilePath}
-              </p>
-            ) : (
-              <p className="text-sm text-zinc-500">
-                Import or drop a PNG/JSON character card to begin editing.
-                CHARX and image-asset drops are available in the desktop app.
-              </p>
-            )}
-          </div>
-        )}
-
-        <ExpressionManager
-          activeCardPath={currentFilePath}
-          onExpressionSelected={(sprite) => {
-            setSelectedExpression(sprite);
-            setWorkspaceMessage(`Selected expression sprite: ${sprite.name}`);
+      <div className="relative grid gap-5">
+        <DropZoneOverlay
+          onAssetTranscoded={(filePath) =>
+            setWorkspaceMessage(`Converted image asset to ${filePath}.`)
+          }
+          onCardParsed={(parsed, filePath, sourcePngData) => {
+            handleCardLoaded(parsed, filePath, sourcePngData ?? null);
+            setWorkspaceMessage(null);
           }}
+          onDropError={setWorkspaceMessage}
         />
 
-        {selectedExpression ? (
-          <p className="truncate rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 font-mono text-[10px] text-zinc-500">
-            Active expression: {selectedExpression.raw_path}
-          </p>
+        {libraryOpen ? (
+          <div className="fixed inset-0 z-50">
+            <button
+              type="button"
+              aria-label="Close character library"
+              className="absolute inset-0 bg-background/70 backdrop-blur-sm"
+              onClick={() => setLibraryOpen(false)}
+            />
+            <div className="absolute inset-y-0 left-0 flex w-[min(24rem,calc(100vw-2rem))] max-w-full flex-col border-r bg-zinc-950 shadow-2xl">
+              <button
+                type="button"
+                aria-label="Close character library"
+                onClick={() => setLibraryOpen(false)}
+                className="absolute right-3 top-3 z-10 rounded-md border border-zinc-800 bg-zinc-950/90 p-2 text-zinc-400 transition hover:bg-zinc-900 hover:text-zinc-100"
+              >
+                <X className="size-4" />
+              </button>
+              <CardLibraryPanel
+                className="h-full w-full border-0"
+                library={library}
+                onCardSelect={(filePath) => {
+                  setLibraryOpen(false);
+                  void handleCardSelect(filePath);
+                }}
+                onPersonaSelect={(persona) => {
+                  setLibraryOpen(false);
+                  setWorkspaceMessage(`Selected persona: ${persona.name}.`);
+                }}
+              />
+            </div>
+          </div>
         ) : null}
 
-        <DevToolsPanel onSeeded={library.refresh} />
-      </div>
+        <div className="min-w-0 space-y-6">
+          {workspaceMessage ? (
+            <p className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-400">
+              {workspaceMessage}
+            </p>
+          ) : null}
+
+          <FolderIntakeReview
+            isDesktopRuntime={isDesktopRuntime}
+            onChooseFolder={triggerFolderIntakeSelect}
+            onImported={library.refresh}
+          />
+
+          {activeCard ? (
+            <StructuredCardEditor
+              activeCard={activeCard}
+              setActiveCard={setActiveCard}
+            />
+          ) : (
+            <div className="flex min-h-64 flex-col justify-center rounded-lg border border-dashed border-zinc-800 bg-zinc-900/20 p-6 text-center">
+              {currentFilePath ? (
+                <p className="font-mono text-xs text-zinc-400">
+                  Cached selection: {currentFilePath}
+                </p>
+              ) : (
+                <p className="text-sm text-zinc-500">
+                  Import or drop a PNG/JSON character card to begin editing.
+                  CHARX and image-asset drops are available in the desktop app.
+                </p>
+              )}
+            </div>
+          )}
+
+          <ExpressionManager
+            activeCardPath={currentFilePath}
+            onExpressionSelected={(sprite) => {
+              setSelectedExpression(sprite);
+              setWorkspaceMessage(`Selected expression sprite: ${sprite.name}`);
+            }}
+          />
+
+          {selectedExpression ? (
+            <p className="truncate rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 font-mono text-[10px] text-zinc-500">
+              Active expression: {selectedExpression.raw_path}
+            </p>
+          ) : null}
+
+          <DevToolsPanel onSeeded={library.refresh} />
+        </div>
       </div>
     </StudioShell>
   );

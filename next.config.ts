@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
   },
   // Configure assetPrefix or else the server won't properly resolve your assets.
   assetPrefix: isProd ? undefined : `http://${internalHost}:3000`,
+  allowedDevOrigins: ["127.0.0.1"],
   /* config options here */
 };
 

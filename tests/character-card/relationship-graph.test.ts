@@ -5,6 +5,7 @@ import {
   createDefaultRelationshipGraph,
   getRelationshipGraphEdge,
   relationshipGraphEdgeId,
+  updateRelationshipGraphFromMeaningfulEvent,
   updateRelationshipGraphFromEvent,
 } from "../../lib/chat/relationshipGraph";
 import {
@@ -21,6 +22,9 @@ test("creates stable graph edge ids and default edges", () => {
   assert.equal(edge.id, "char:user");
   assert.equal(edge.kind, "stranger");
   assert.equal(edge.trust, 30);
+  assert.equal(edge.meaning.emotionalRank.perceivedPriority, "backup");
+  assert.equal(edge.meaning.trustAsymmetry.aTrustsB, 30);
+  assert.equal(edge.pairDynamics.type, "undetermined");
 });
 
 test("updates rival and main edges from a rival comfort event", () => {
@@ -51,10 +55,17 @@ test("updates rival and main edges from a rival comfort event", () => {
   assert.equal(rivalEdge?.trust, 38);
   assert.equal(rivalEdge?.dependency, 6);
   assert.equal(rivalEdge?.memories.includes("evt-1"), true);
+  assert.equal(rivalEdge?.meaning.roleOwnership.comfortPerson, "rival");
+  assert.equal(
+    rivalEdge?.meaning.opportunityLosses[0]?.type,
+    "rival_comforted_first",
+  );
   assert.equal(userEdge?.jealousy, 12);
   assert.equal(userEdge?.dependency, 0);
   assert.equal(userEdge?.flags.rivalThreat, true);
   assert.equal(userEdge?.memories.includes("evt-1"), true);
+  assert.equal(userEdge?.meaning.rivalry.emotionalThreat, 75);
+  assert.equal(userEdge?.meaning.comparison.rivalAdvantages[0], "understands_better");
   assert.equal(next.events.length, 1);
 });
 
@@ -106,6 +117,41 @@ test("marks main edge rupture from rival kiss and lets reassurance reduce jealou
   assert.equal(userEdge?.jealousy, 13);
   assert.equal(userEdge?.flags.rivalThreat, false);
   assert.equal(userEdge?.flags.ruptureActive, true);
+  assert.equal(userEdge?.meaning.patterns.jealousy_reassurance, 80);
+  assert.equal(userEdge?.pairDynamics.dominantLoop, "jealousy_reassurance");
+});
+
+test("applies explicit meaningful events to graph edge systems", () => {
+  const graph = updateRelationshipGraphFromMeaningfulEvent({
+    graph: createDefaultRelationshipGraph("scenario-a"),
+    edgeIdA: "user",
+    edgeIdB: "char",
+    event: {
+      id: "meaning-1",
+      action: "private affection followed by public distance",
+      actorId: "char",
+      targetId: "user",
+      observerIds: ["user"],
+      userId: "user",
+      charId: "char",
+      emotionalRole: "safe_person",
+      witness: "seen_directly",
+      attention: "chosen",
+      publicTreatment: "public_distance",
+      secrecy: "hiddenCrush",
+      consequence: "private softness became public insecurity",
+      impact: 70,
+    },
+  });
+  const edge = graph.edges["char:user"];
+
+  assert.equal(edge?.meaning.roleOwnership.safePerson, "char");
+  assert.equal(edge?.meaning.attention.lastChosenId, "char");
+  assert.equal(edge?.meaning.treatment.publicDistance, 70);
+  assert.equal(edge?.meaning.treatment.insecurityPressure, 39);
+  assert.equal(edge?.meaning.secrecy.hiddenCrush, true);
+  assert.equal(edge?.meaning.meaningfulEvents[0]?.consequence, "private softness became public insecurity");
+  assert.equal(edge?.pairDynamics.attachmentFriction, 8);
 });
 
 test("does not promote low-weight graph events to edge memory", () => {
