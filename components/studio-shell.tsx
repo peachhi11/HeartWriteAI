@@ -32,13 +32,13 @@ const primarySections = [
   },
   {
     description: "Craft standalone personas or match them to generated cards.",
-    href: "/?section=personas",
+    href: "/personas",
     icon: "/brand/icons/persona-matching.svg",
     label: "Persona Matching",
   },
   {
     description: "Build scoped world, character, and scenario lorebooks.",
-    href: "/?section=lorebooks",
+    href: "/lorebooks",
     icon: "/brand/icons/lorebooks.svg",
     label: "Lorebooks",
   },
@@ -63,6 +63,11 @@ const primarySections = [
 ];
 
 const utilitySections = [
+  {
+    href: "/scenarios",
+    icon: "/brand/icons/lorebooks.svg",
+    label: "Scenarios",
+  },
   {
     href: "/?section=conversion",
     icon: "/brand/icons/card-conversion.svg",

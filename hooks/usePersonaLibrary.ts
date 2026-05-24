@@ -11,6 +11,7 @@ const LOCAL_STORAGE_KEY = "heartwriteai:persona-library";
 export interface PersonaLibraryItem {
   id: string;
   name: string;
+  prompt?: string;
   summary?: string;
   tags: string[];
   updatedAt: number;
@@ -173,6 +174,7 @@ function parsePersonaItems(value: unknown): PersonaLibraryItem[] {
       return {
         id,
         name,
+        prompt: readString(record.prompt),
         summary: readString(record.summary),
         tags: normalizeTags(record.tags),
         updatedAt: readNumber(record.updatedAt) ?? Date.now(),

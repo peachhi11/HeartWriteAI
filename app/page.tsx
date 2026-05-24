@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   BadgeCheck,
@@ -14,7 +14,9 @@ import {
 } from "lucide-react";
 
 import { CharacterCardImportExport } from "@/components/character-card-import-export";
-import { RelationshipDashboard } from "@/features/relationship/components/RelationshipDashboard";
+import { RelationshipReadOnlyPanel } from "@/features/relationship/components/RelationshipReadOnlyPanel";
+import { RuntimeEngineDebugPanel } from "@/features/relationship/components/RuntimeEngineDebugPanel";
+import { AdvancedRuntimeSettings } from "@/features/settings/components/AdvancedRuntimeSettings";
 import { StudioShell } from "@/components/studio-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -63,8 +65,25 @@ const migrationLanes = [
 ];
 
 export default function Home() {
+  const [dashboardTab, setDashboardTab] = useState("workspace");
   const [nativeStatus, setNativeStatus] = useState("Tauri bridge not checked yet.");
   const [nativeVersion, setNativeVersion] = useState<string | null>(null);
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      const section = new URLSearchParams(window.location.search).get("section");
+
+      if (section === "settings") {
+        setDashboardTab("settings");
+      } else if (section === "lorebooks") {
+        setDashboardTab("lore");
+      } else if (section === "personas") {
+        setDashboardTab("workspace");
+      } else if (section === "conversion") {
+        setDashboardTab("workspace");
+      }
+    });
+  }, []);
 
   async function checkNativeBridge() {
     try {
@@ -139,11 +158,16 @@ export default function Home() {
 
         <ImageIntakePreview />
 
-        <Tabs defaultValue="workspace" className="rounded-3xl border bg-card/75 p-4 shadow-xl backdrop-blur">
+        <Tabs
+          value={dashboardTab}
+          onValueChange={setDashboardTab}
+          className="rounded-3xl border bg-card/75 p-4 shadow-xl backdrop-blur"
+        >
           <TabsList>
             <TabsTrigger value="workspace">Workspace</TabsTrigger>
             <TabsTrigger value="runtime">Runtime</TabsTrigger>
             <TabsTrigger value="lore">Lore</TabsTrigger>
+            <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
           <TabsContent value="workspace" className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
             {workflowCards.map((card) => (
@@ -157,7 +181,8 @@ export default function Home() {
             ))}
           </TabsContent>
           <TabsContent value="runtime" className="mt-4 grid gap-4">
-            <RelationshipDashboard />
+            <RelationshipReadOnlyPanel />
+            <RuntimeEngineDebugPanel />
             <Card className="bg-background/70">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -181,14 +206,29 @@ export default function Home() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BookOpenText data-icon="inline-start" />
-                  Lorebook assets stay editable
+                  Standard lorebooks stay editable
                 </CardTitle>
                 <CardDescription>
-                  Generated entries should remain modular fields with priority,
-                  probability, trigger, scope, and attachment controls.
+                  Lorebooks remain the user-facing story layer. Relationship,
+                  sensory, memory, and emotional engines interpret lorebook,
+                  character, persona, scenario, and chat signals behind the
+                  scenes.
                 </CardDescription>
               </CardHeader>
+              <CardContent className="grid gap-3 text-sm text-muted-foreground">
+                <p>
+                  Standard users write lore and tags. The runtime engine converts
+                  those signals into hidden relationship and emotional state.
+                </p>
+                <p>
+                  Advanced scripting and raw engine controls stay behind the
+                  Settings toggle.
+                </p>
+              </CardContent>
             </Card>
+          </TabsContent>
+          <TabsContent value="settings" className="mt-4 grid gap-4">
+            <AdvancedRuntimeSettings />
           </TabsContent>
         </Tabs>
       </div>
