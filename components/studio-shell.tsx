@@ -64,6 +64,11 @@ const primarySections = [
 
 const utilitySections = [
   {
+    href: "/bundles",
+    icon: "/brand/icons/card-conversion.svg",
+    label: "Bundles",
+  },
+  {
     href: "/scenarios",
     icon: "/brand/icons/lorebooks.svg",
     label: "Scenarios",

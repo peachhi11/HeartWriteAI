@@ -77,6 +77,54 @@ export type GeneratedLorebookArtifact = {
   updatedAt: number;
 };
 
+export type BundlePersonaSource = {
+  id: string;
+  name: string;
+  prompt?: string;
+  summary?: string;
+  tags?: string[];
+};
+
+export type RuntimeBundleArtifact = {
+  id: string;
+  title: string;
+  persona?: {
+    id: string;
+    name: string;
+    summary: string;
+    prompt: string;
+  };
+  scenario?: {
+    id: string;
+    title: string;
+    summary: string;
+    openingConstraint: string;
+    settingType: string;
+    startingTension: string;
+  };
+  lorebook?: {
+    id: string;
+    title: string;
+    universeAnchor: string;
+    summary: string;
+    entries: {
+      title: string;
+      activationKeys: string[];
+      content: string;
+    }[];
+  };
+  tags: string[];
+  compiledContext: string;
+  updatedAt: number;
+};
+
+export type RuntimeBundleInput = {
+  title: string;
+  persona?: BundlePersonaSource | null;
+  scenario?: GeneratedScenarioArtifact | null;
+  lorebook?: GeneratedLorebookArtifact | null;
+};
+
 export function generatePersonaArtifact(
   input: PersonaGenerationInput,
 ): GeneratedPersonaArtifact {
@@ -185,6 +233,76 @@ export function generateLorebookArtifact(
   };
 }
 
+export function createRuntimeBundleArtifact(
+  input: RuntimeBundleInput,
+): RuntimeBundleArtifact {
+  const persona = input.persona
+    ? {
+        id: input.persona.id,
+        name: input.persona.name,
+        prompt: input.persona.prompt?.trim() ||
+          `USER PERSONA: ${input.persona.name}`,
+        summary: input.persona.summary?.trim() ||
+          `${input.persona.name} is the selected user persona.`,
+      }
+    : undefined;
+  const scenario = input.scenario
+    ? {
+        id: input.scenario.id,
+        openingConstraint: input.scenario.firstMessage.aiOutputConstraint,
+        settingType: input.scenario.scenario.settingType,
+        startingTension: input.scenario.scenario.startingTension,
+        summary: input.scenario.summary,
+        title: input.scenario.title,
+      }
+    : undefined;
+  const lorebook = input.lorebook
+    ? {
+        entries: input.lorebook.entries.map((entry) => ({
+          activationKeys: entry.activationKeys,
+          content: entry.entryContent,
+          title: entry.title,
+        })),
+        id: input.lorebook.id,
+        summary: input.lorebook.summary.aiLoreInstruction,
+        title: input.lorebook.title,
+        universeAnchor: input.lorebook.summary.universeAnchor,
+      }
+    : undefined;
+  const title = input.title.trim() ||
+    [persona?.name, scenario?.title, lorebook?.title]
+      .filter(Boolean)
+      .join(" + ") ||
+    "Untitled Runtime Bundle";
+  const tags = normalizeTags(
+    [
+      "bundle",
+      ...(input.persona?.tags ?? []),
+      ...(input.scenario?.tags ?? []),
+      ...(input.lorebook?.tags ?? []),
+    ].join(", "),
+  );
+
+  return {
+    compiledContext: compileRuntimeBundleContext({
+      lorebook,
+      persona,
+      scenario,
+      title,
+    }),
+    id: createArtifactId(
+      "bundle",
+      `${title}:${persona?.id ?? "no-persona"}:${scenario?.id ?? "no-scenario"}:${lorebook?.id ?? "no-lorebook"}`,
+    ),
+    lorebook,
+    persona,
+    scenario,
+    tags,
+    title,
+    updatedAt: Date.now(),
+  };
+}
+
 export function artifactToJsonBytes(artifact: unknown) {
   return new TextEncoder().encode(JSON.stringify(artifact, null, 2));
 }
@@ -224,4 +342,56 @@ function normalizeTags(value: string) {
 
 function humanize(value: string) {
   return value.replaceAll("_", " ").toLowerCase();
+}
+
+function compileRuntimeBundleContext(input: {
+  lorebook?: RuntimeBundleArtifact["lorebook"];
+  persona?: RuntimeBundleArtifact["persona"];
+  scenario?: RuntimeBundleArtifact["scenario"];
+  title: string;
+}) {
+  const sections = [
+    `RUNTIME BUNDLE: ${input.title}`,
+    "",
+    "[SELECTED PERSONA]",
+    input.persona
+      ? [
+          `Name: ${input.persona.name}`,
+          `Summary: ${input.persona.summary}`,
+          "Prompt:",
+          input.persona.prompt,
+        ].join("\n")
+      : "No persona selected.",
+    "",
+    "[SELECTED SCENARIO]",
+    input.scenario
+      ? [
+          `Title: ${input.scenario.title}`,
+          `Summary: ${input.scenario.summary}`,
+          `Setting: ${input.scenario.settingType}`,
+          `Starting tension: ${input.scenario.startingTension}`,
+          `Opening constraint: ${input.scenario.openingConstraint}`,
+        ].join("\n")
+      : "No scenario selected.",
+    "",
+    "[SELECTED LOREBOOK]",
+    input.lorebook
+      ? [
+          `Title: ${input.lorebook.title}`,
+          `Universe anchor: ${input.lorebook.universeAnchor}`,
+          `Core premise: ${input.lorebook.summary}`,
+          "",
+          "Entries:",
+          ...input.lorebook.entries.map((entry) =>
+            [
+              `- ${entry.title}`,
+              `  Keys: ${entry.activationKeys.join(", ")}`,
+              `  Content: ${entry.content}`,
+            ].join("\n"),
+          ),
+        ].join("\n")
+      : "No lorebook selected.",
+  ];
+
+  return sections.join("\n");
 }
