@@ -20,6 +20,8 @@ export function createRelationshipStateContext(input: RelationshipState) {
     `- TYPE: ${state.type}`,
     `- LIFECYCLE: ${state.lifecycleState}`,
     `- PHASE: ${state.phase.macro} (${state.phase.stage}/100, gate ${state.phase.softGate}/100)`,
+    `- NON-ROMANTIC BOND: ${formatNonRomanticBond(state)}`,
+    `- SEXUAL-ONLY BOND: ${formatSexualOnlyBond(state)}`,
     `- ATTACHMENT: ${state.attachment.aStyle} / ${state.attachment.bStyle}; bond ${state.attachment.bondDepth}; dependency ${state.attachment.dependency}`,
     `- TRUST: emotional ${state.trust.emotional}; vulnerability ${state.trust.vulnerability}; reliability ${state.trust.reliability}; conflict ${state.trust.conflict}`,
     `- INTIMACY: emotional ${state.intimacy.emotional}; physical ${state.intimacy.physical}; sexual ${state.intimacy.sexual}; domestic ${state.intimacy.domestic}; vulnerability ${state.intimacy.vulnerability}`,
@@ -62,6 +64,37 @@ function formatRupture(state: RelationshipState) {
     `severity ${state.rupture.severity}`,
     `repair ${state.rupture.repairArc}`,
     `progress ${state.rupture.repairProgress}`,
+  ].join("; ");
+}
+
+function formatNonRomanticBond(state: RelationshipState) {
+  const axes = state.nonRomantic.axes;
+
+  return [
+    state.nonRomantic.state,
+    `overlap ${state.nonRomantic.romanceOverlap}`,
+    `significant ${state.nonRomantic.emotionallySignificant}`,
+    `platonic ${axes.platonicAttachment}`,
+    `trust ${axes.trust}`,
+    `intimacy ${axes.emotionalIntimacy}`,
+    `rivalry ${axes.rivalry}`,
+    `ambiguity ${axes.ambiguity}`,
+  ].join("; ");
+}
+
+function formatSexualOnlyBond(state: RelationshipState) {
+  const axes = state.sexualOnly.axes;
+
+  return [
+    state.sexualOnly.state,
+    `active ${state.sexualOnly.active}`,
+    `structure ${state.sexualOnly.statedStructure}`,
+    `complicated ${state.sexualOnly.emotionallyComplicated}`,
+    `sexual chemistry ${axes.sexualChemistry}`,
+    `integration ${axes.emotionalIntegration}`,
+    `ambiguity ${axes.exclusivityAmbiguity}`,
+    `drift ${axes.attachmentDriftRisk}`,
+    `definition avoidance ${axes.definitionAvoidance}`,
   ].join("; ");
 }
 

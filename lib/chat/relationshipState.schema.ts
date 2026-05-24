@@ -83,6 +83,43 @@ export const RuptureTypeSchema = z.enum([
   "conflict_spiral",
 ]);
 
+export const NonRomanticRelationshipStateSchema = z.enum([
+  "stranger",
+  "acquaintance",
+  "casual_social_bond",
+  "functional_partnership",
+  "trusted_companion",
+  "deep_friendship",
+  "queerplatonic_bond",
+  "protective_bond",
+  "mentor_student",
+  "rival",
+  "enemy",
+  "obsessive_non_romantic_bond",
+  "trauma_bond_shared_survival",
+  "found_family",
+  "emotional_dependency_friendship",
+  "ambiguous_emotional_bond",
+  "estranged",
+  "repaired_friendship",
+  "public_alliance_private_tension",
+  "emotionally_detached_familiarity",
+]);
+
+export const SexualOnlyRelationshipStateSchema = z.enum([
+  "none",
+  "casual_sexual_relationship",
+  "friends_with_benefits",
+  "hookup_dynamic",
+  "tension_based_sexual_dynamic",
+  "emotionally_avoidant_sexual_relationship",
+  "attachment_denial_sexual_relationship",
+  "obsessive_sexual_relationship",
+  "transactional_sexual_relationship",
+  "secret_sexual_relationship",
+  "domestic_sexual_hybrid",
+]);
+
 export const EventMemorySchema = z.object({
   id: z.string().trim().min(1),
   type: z.enum([
@@ -207,11 +244,74 @@ export const FetishCategorySchema = z.enum([
 
 const optionalTagList = z.array(z.string().trim().min(1)).default([]);
 
+const RivalryStateSchema = z.object({
+  rivalId: z.string().trim().min(1),
+  targetId: z.string().trim().min(1),
+  userId: z.string().trim().min(1),
+  rivalThreatLevel: score.default(0),
+  userInsecurity: score.default(0),
+  targetResponsivenessToRival: score.default(0),
+  targetResponsivenessToUser: score.default(0),
+  publicHumiliation: score.default(0),
+  replacementFear: score.default(0),
+  jealousyMomentum: score.default(0),
+  lastRivalWin: z.string().trim().min(1).optional(),
+  lastUserWin: z.string().trim().min(1).optional(),
+});
+
+const EmotionalRoleOwnershipSchema = defaultObject(
+  z.object({
+    comfortRoleOwner: z.string().trim().min(1).optional(),
+    protectorRoleOwner: z.string().trim().min(1).optional(),
+    flirtationRoleOwner: z.string().trim().min(1).optional(),
+    trustedConfidantOwner: z.string().trim().min(1).optional(),
+    romanticPriorityOwner: z.string().trim().min(1).optional(),
+    sexualTensionOwner: z.string().trim().min(1).optional(),
+  }),
+);
+
+const NonRomanticRelationshipAxesSchema = defaultObject(
+  z.object({
+    platonicAttachment: score.default(0),
+    protectiveness: score.default(0),
+    rivalry: score.default(0),
+    admiration: score.default(0),
+    dependency: score.default(0),
+    emotionalIntimacy: score.default(0),
+    socialCloseness: score.default(0),
+    trust: score.default(0),
+    tension: score.default(0),
+    ambiguity: score.default(0),
+    devotion: score.default(0),
+    emotionalFamiliarity: score.default(0),
+    relationshipFluidity: score.default(50),
+  }),
+);
+
+const SexualOnlyRelationshipAxesSchema = defaultObject(
+  z.object({
+    sexualChemistry: score.default(0),
+    emotionalIntegration: score.default(0),
+    exclusivityAmbiguity: score.default(0),
+    attachmentDriftRisk: score.default(0),
+    vulnerabilityLeakage: score.default(0),
+    jealousyReactivity: score.default(0),
+    definitionAvoidance: score.default(0),
+    dependencyFormation: score.default(0),
+    romanticEscalationProbability: score.default(0),
+    boundaryClarity: score.default(50),
+    secrecy: score.default(0),
+    eroticCentrality: score.default(0),
+  }),
+);
+
 export const RelationshipStateSchema = z
   .object({
     schemaVersion: z.literal(1).default(1),
     id: z.string().trim().min(1),
     scenarioId: z.string().trim().min(1).optional(),
+    createdAt: z.string().datetime().optional(),
+    updatedAt: z.string().datetime().optional(),
 
     characters: z.object({
       aId: z.string().trim().min(1),
@@ -226,6 +326,37 @@ export const RelationshipStateSchema = z
         macro: z.string().default("pre_romance"),
         stage: z.number().int().min(0).max(100).default(0),
         softGate: z.number().int().min(0).max(100).default(0),
+      }),
+    ),
+
+    nonRomantic: defaultObject(
+      z.object({
+        state: NonRomanticRelationshipStateSchema.default("stranger"),
+        axes: NonRomanticRelationshipAxesSchema,
+        romanceOverlap: z
+          .enum(["absent", "ambiguous", "suppressed", "impossible", "emerging"])
+          .default("absent"),
+        emotionallySignificant: z.boolean().default(false),
+      }),
+    ),
+
+    sexualOnly: defaultObject(
+      z.object({
+        state: SexualOnlyRelationshipStateSchema.default("none"),
+        axes: SexualOnlyRelationshipAxesSchema,
+        active: z.boolean().default(false),
+        emotionallyComplicated: z.boolean().default(false),
+        statedStructure: z
+          .enum([
+            "undefined",
+            "casual",
+            "friends_with_benefits",
+            "hookup",
+            "secret",
+            "transactional",
+            "domestic_hybrid",
+          ])
+          .default("undefined"),
       }),
     ),
 
@@ -398,6 +529,13 @@ export const RelationshipStateSchema = z
       }),
     ),
 
+    npcDynamics: defaultObject(
+      z.object({
+        roleOwnership: EmotionalRoleOwnershipSchema,
+        rivalries: z.array(RivalryStateSchema).default([]),
+      }),
+    ),
+
     memories: z.array(EventMemorySchema).default([]),
 
     flags: defaultObject(
@@ -421,12 +559,18 @@ export function createDefaultRelationshipState(input: {
   id: string;
   aId: string;
   bId: string;
+  createdAt?: string;
   scenarioId?: string;
   type?: z.infer<typeof RelationshipTypeSchema>;
+  updatedAt?: string;
 }): RelationshipState {
+  const now = new Date().toISOString();
+
   return RelationshipStateSchema.parse({
+    createdAt: input.createdAt ?? now,
     id: input.id,
     scenarioId: input.scenarioId,
+    updatedAt: input.updatedAt ?? now,
     characters: {
       aId: input.aId,
       bId: input.bId,

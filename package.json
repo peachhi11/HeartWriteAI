@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "test": "tsc -p tsconfig.test.json && node --test .tmp-tests/tests/character-card/*.js",
-    "lint": "eslint app components hooks lib types tests --ext .js,.jsx,.ts,.tsx",
+    "lint": "eslint app components features hooks lib types tests --ext .js,.jsx,.ts,.tsx",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build"
@@ -24,6 +24,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "exifr": "^7.1.3",
+    "immer": "^11.1.8",
     "lucide-react": "^0.525.0",
     "next": "16.2.6",
     "next-themes": "^0.4.6",
@@ -35,7 +36,8 @@
     "react-blurhash": "^0.3.0",
     "react-dom": "19.1.0",
     "tailwind-merge": "^3.3.1",
-    "zod": "^4.4.3"
+    "zod": "^4.4.3",
+    "zustand": "^5.0.13"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import { CharacterCardImportExport } from "@/components/character-card-import-export";
+import { RelationshipDashboard } from "@/features/relationship/components/RelationshipDashboard";
 import { StudioShell } from "@/components/studio-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -155,7 +156,8 @@ export default function Home() {
               </Card>
             ))}
           </TabsContent>
-          <TabsContent value="runtime" className="mt-4">
+          <TabsContent value="runtime" className="mt-4 grid gap-4">
+            <RelationshipDashboard />
             <Card className="bg-background/70">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">

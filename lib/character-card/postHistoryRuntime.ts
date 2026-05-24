@@ -2,6 +2,13 @@ import { z } from "zod";
 
 import { RelationshipStateSchema } from "../chat/relationshipState.schema";
 import { loreEntryRuntimeSchema } from "./lorebookParser";
+import {
+  createSensoryPerceptionContext,
+  resolvePhysicalTellGateMatches,
+  resolveSensoryGateMatches,
+  SensoryEventStateSchema,
+  SensoryPerceptionSchema,
+} from "./sensoryPerception";
 
 export const postHistoryRuntimeSchema = z.object({
   driftControlRules: z.array(z.string().trim().min(1)).default([]),
@@ -15,6 +22,17 @@ export const chatMessageSchema = z.object({
   role: z.enum(["assistant", "system", "user"]),
 });
 
+export const physicalTellRuntimeStateSchema = z
+  .object({
+    currentTurn: z.number().int().min(0).optional(),
+    lastUsedTurns: z.record(z.string(), z.number().int().min(0)).default({}),
+    maxSelected: z.number().int().min(0).max(5).default(2),
+  })
+  .default({
+    lastUsedTurns: {},
+    maxSelected: 2,
+  });
+
 export const chatRequestSchema = z.object({
   characterConfig: z
     .object({
@@ -22,6 +40,9 @@ export const chatRequestSchema = z.object({
       postHistory: postHistoryRuntimeSchema.optional(),
       postHistoryInstructions: postHistoryRuntimeSchema.optional(),
       relationshipState: RelationshipStateSchema.optional(),
+      sensoryEventState: SensoryEventStateSchema.optional(),
+      sensoryPerception: SensoryPerceptionSchema.optional(),
+      physicalTellState: physicalTellRuntimeStateSchema.optional(),
     })
     .optional(),
   messages: z.array(chatMessageSchema),
@@ -29,6 +50,7 @@ export const chatRequestSchema = z.object({
 
 export type ChatMessage = z.infer<typeof chatMessageSchema>;
 export type PostHistoryRuntime = z.infer<typeof postHistoryRuntimeSchema>;
+export type SensoryRuntime = z.infer<typeof SensoryPerceptionSchema>;
 
 export function createPostHistoryOverride(
   postHistory: PostHistoryRuntime | undefined,
@@ -54,6 +76,48 @@ export function appendPostHistoryOverride(
     {
       role: "system",
       content: createPostHistoryOverride(postHistory),
+    },
+  ];
+}
+
+export function appendSensoryPerceptionContext(
+  messages: ChatMessage[],
+  sensoryPerception: SensoryRuntime | undefined,
+  events: z.infer<typeof SensoryEventStateSchema> = {},
+  physicalTellState: z.infer<typeof physicalTellRuntimeStateSchema> = {
+    lastUsedTurns: {},
+    maxSelected: 2,
+  },
+): ChatMessage[] {
+  if (!sensoryPerception) {
+    return messages;
+  }
+
+  const latestUserMessage =
+    [...messages].reverse().find((message) => message.role === "user")
+      ?.content ?? "";
+  const matchedGates = resolveSensoryGateMatches(
+    latestUserMessage,
+    sensoryPerception,
+    events,
+  );
+  const matchedPhysicalTellGates = resolvePhysicalTellGateMatches(
+    latestUserMessage,
+    sensoryPerception,
+    events,
+    physicalTellState,
+  );
+  const content = createSensoryPerceptionContext(
+    sensoryPerception,
+    matchedGates,
+    matchedPhysicalTellGates,
+  );
+
+  return [
+    ...messages,
+    {
+      role: "system",
+      content,
     },
   ];
 }

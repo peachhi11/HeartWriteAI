@@ -1,3 +1,8 @@
+import {
+  createSensoryPerceptionContext,
+  extractCardSensoryPerception,
+} from "./sensoryPerception";
+
 export interface RuntimeLoreEntry {
   name?: string;
   content: string;
@@ -19,7 +24,9 @@ export interface RuntimeCharacterCard {
     mes_example?: string;
     system_prompt?: string;
     post_history_instructions?: string;
+    sensory_perception?: unknown;
     tags?: string[];
+    extensions?: Record<string, unknown>;
   };
 }
 
@@ -53,6 +60,7 @@ export function compileChatPrompt({
 }: CompileChatPromptArgs): CompiledChatPrompt {
   const data = card.data ?? {};
   const characterName = data.nickname?.trim() || data.name?.trim() || "{{char}}";
+  const sensoryPerception = extractCardSensoryPerception(data);
   const cardSystemPrompt = data.system_prompt?.trim() ?? "";
   const systemPromptSource = cardSystemPrompt ? "card" : "app";
   const systemPrompt = cardSystemPrompt
@@ -80,6 +88,7 @@ export function compileChatPrompt({
       ),
     ),
     section("Retrieved Memories", retrievedMemories),
+    createSensoryPerceptionContext(sensoryPerception),
     section(
       "Recent Chat",
       chatHistory.map((message) => `[${message.speaker}]: ${message.content}`),

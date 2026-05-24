@@ -1,4 +1,5 @@
 import {
+  appendSensoryPerceptionContext,
   appendPostHistoryOverride,
   chatRequestSchema,
 } from "@/lib/character-card/postHistoryRuntime";
@@ -28,8 +29,14 @@ export async function POST(request: Request) {
     [...requestResult.data.messages, ...activeLoreMessages],
     requestResult.data.characterConfig?.relationshipState,
   );
-  const optimizedMessages = appendPostHistoryOverride(
+  const sensoryAwareMessages = appendSensoryPerceptionContext(
     relationshipAwareMessages,
+    requestResult.data.characterConfig?.sensoryPerception,
+    requestResult.data.characterConfig?.sensoryEventState,
+    requestResult.data.characterConfig?.physicalTellState,
+  );
+  const optimizedMessages = appendPostHistoryOverride(
+    sensoryAwareMessages,
     postHistory,
   );
 
