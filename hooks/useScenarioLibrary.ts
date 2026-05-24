@@ -77,6 +77,17 @@ export async function saveScenarioLibraryItem(
   return next;
 }
 
+export async function deleteScenarioLibraryItem(
+  scenarioId: string,
+  isDesktopRuntime = isTauriRuntime(),
+) {
+  const current = await loadScenarioLibrary(isDesktopRuntime);
+  const next = current.filter((item) => item.id !== scenarioId);
+
+  await persistScenarioLibrary(next, isDesktopRuntime);
+  return next;
+}
+
 async function loadScenarioLibrary(isDesktopRuntime: boolean) {
   if (typeof window === "undefined") {
     return [];

@@ -9,12 +9,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   artifactToJsonBytes,
+  createDuplicateArtifactId,
   createArtifactFileName,
   generatePersonaArtifact,
   type GeneratedPersonaArtifact,
   type PersonaGenerationInput,
 } from "@/features/generation/workflows";
 import {
+  deletePersonaLibraryItem,
   savePersonaLibraryItem,
   usePersonaLibrary,
 } from "@/hooks/usePersonaLibrary";
@@ -66,6 +68,23 @@ export function PersonaGenerationPage() {
     await savePersonaLibraryItem(activePersona);
     await library.refresh();
     setStatus(`Saved ${activePersona.name} to the persona library.`);
+  }
+
+  async function deleteActive() {
+    await deletePersonaLibraryItem(activePersona.id);
+    await library.refresh();
+    setStatus(`Deleted ${activePersona.name} from the persona library.`);
+  }
+
+  function duplicateActive() {
+    const name = `${activePersona.name} Copy`;
+    setActivePersona({
+      ...activePersona,
+      id: createDuplicateArtifactId("persona", name),
+      name,
+      updatedAt: Date.now(),
+    });
+    setStatus(`Duplicated ${activePersona.name}. Save it when ready.`);
   }
 
   async function copy() {
@@ -166,6 +185,8 @@ export function PersonaGenerationPage() {
           title={activePersona.name}
           description={activePersona.summary}
           onCopy={copy}
+          onDelete={deleteActive}
+          onDuplicate={duplicateActive}
           onExport={exportJson}
           onSave={save}
           saveLabel="Save Persona"

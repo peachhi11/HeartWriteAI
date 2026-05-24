@@ -10,11 +10,13 @@ import { Input } from "@/components/ui/input";
 import {
   artifactToJsonBytes,
   createArtifactFileName,
+  createDuplicateArtifactId,
   generateScenarioArtifact,
   type GeneratedScenarioArtifact,
   type ScenarioGenerationInput,
 } from "@/features/generation/workflows";
 import {
+  deleteScenarioLibraryItem,
   saveScenarioLibraryItem,
   useScenarioLibrary,
 } from "@/hooks/useScenarioLibrary";
@@ -70,6 +72,23 @@ export function ScenarioGenerationPage() {
     await saveScenarioLibraryItem(activeScenario);
     await library.refresh();
     setStatus(`Saved ${activeScenario.title} to the scenario library.`);
+  }
+
+  async function deleteActive() {
+    await deleteScenarioLibraryItem(activeScenario.id);
+    await library.refresh();
+    setStatus(`Deleted ${activeScenario.title} from the scenario library.`);
+  }
+
+  function duplicateActive() {
+    const title = `${activeScenario.title} Copy`;
+    setActiveScenario({
+      ...activeScenario,
+      id: createDuplicateArtifactId("scenario", title),
+      title,
+      updatedAt: Date.now(),
+    });
+    setStatus(`Duplicated ${activeScenario.title}. Save it when ready.`);
   }
 
   async function copy() {
@@ -142,6 +161,8 @@ export function ScenarioGenerationPage() {
           title={activeScenario.title}
           description={activeScenario.summary}
           onCopy={copy}
+          onDelete={deleteActive}
+          onDuplicate={duplicateActive}
           onExport={exportJson}
           onSave={save}
           saveLabel="Save Scenario"

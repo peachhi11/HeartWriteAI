@@ -9,11 +9,13 @@ import { Input } from "@/components/ui/input";
 import {
   artifactToJsonBytes,
   createArtifactFileName,
+  createDuplicateArtifactId,
   generateLorebookArtifact,
   type GeneratedLorebookArtifact,
   type LorebookGenerationInput,
 } from "@/features/generation/workflows";
 import {
+  deleteLorebookLibraryItem,
   saveLorebookLibraryItem,
   useLorebookLibrary,
 } from "@/hooks/useLorebookLibrary";
@@ -84,6 +86,23 @@ export function LorebookGenerationPage() {
     await saveLorebookLibraryItem(activeLorebook);
     await library.refresh();
     setStatus(`Saved ${activeLorebook.title} to the lorebook library.`);
+  }
+
+  async function deleteActive() {
+    await deleteLorebookLibraryItem(activeLorebook.id);
+    await library.refresh();
+    setStatus(`Deleted ${activeLorebook.title} from the lorebook library.`);
+  }
+
+  function duplicateActive() {
+    const title = `${activeLorebook.title} Copy`;
+    setActiveLorebook({
+      ...activeLorebook,
+      id: createDuplicateArtifactId("lorebook", title),
+      title,
+      updatedAt: Date.now(),
+    });
+    setStatus(`Duplicated ${activeLorebook.title}. Save it when ready.`);
   }
 
   async function copy() {
@@ -173,6 +192,8 @@ export function LorebookGenerationPage() {
           title={activeLorebook.title}
           description={activeLorebook.summary.aiLoreInstruction}
           onCopy={copy}
+          onDelete={deleteActive}
+          onDuplicate={duplicateActive}
           onExport={exportJson}
           onSave={save}
           saveLabel="Save Lorebook"

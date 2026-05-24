@@ -199,6 +199,10 @@ export function createArtifactFileName(title: string, suffix: string) {
   return `${safe || "heartwriteai-artifact"}${suffix}`;
 }
 
+export function createDuplicateArtifactId(prefix: string, source: string) {
+  return createArtifactId(prefix, `${source}:copy`);
+}
+
 function createArtifactId(prefix: string, source: string) {
   const slug = source
     .toLowerCase()

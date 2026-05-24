@@ -83,6 +83,17 @@ export async function saveLorebookLibraryItem(
   return next;
 }
 
+export async function deleteLorebookLibraryItem(
+  lorebookId: string,
+  isDesktopRuntime = isTauriRuntime(),
+) {
+  const current = await loadLorebookLibrary(isDesktopRuntime);
+  const next = current.filter((item) => item.id !== lorebookId);
+
+  await persistLorebookLibrary(next, isDesktopRuntime);
+  return next;
+}
+
 async function loadLorebookLibrary(isDesktopRuntime: boolean) {
   if (typeof window === "undefined") {
     return [];

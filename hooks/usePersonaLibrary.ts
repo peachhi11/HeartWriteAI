@@ -100,6 +100,17 @@ export async function savePersonaLibraryItem(
   return next;
 }
 
+export async function deletePersonaLibraryItem(
+  personaId: string,
+  isDesktopRuntime = isTauriRuntime(),
+) {
+  const current = await loadPersonaLibrary(isDesktopRuntime);
+  const next = current.filter((item) => item.id !== personaId);
+
+  await persistPersonaLibrary(next, isDesktopRuntime);
+  return next;
+}
+
 async function loadPersonaLibrary(isDesktopRuntime: boolean) {
   if (typeof window === "undefined") {
     return [];

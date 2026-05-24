@@ -1,7 +1,7 @@
 "use client";
 
 import type * as React from "react";
-import { Download, Save, Clipboard } from "lucide-react";
+import { Clipboard, CopyPlus, Download, Save, Trash2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -36,6 +36,8 @@ export function GeneratorResultCard(props: {
   children: React.ReactNode;
   description: string;
   onCopy: () => void;
+  onDelete?: () => void;
+  onDuplicate?: () => void;
   onExport: () => void;
   onSave: () => void;
   saveLabel?: string;
@@ -53,10 +55,22 @@ export function GeneratorResultCard(props: {
             <Clipboard className="size-4" />
             Copy
           </Button>
+          {props.onDuplicate ? (
+            <Button type="button" variant="outline" onClick={props.onDuplicate}>
+              <CopyPlus className="size-4" />
+              Duplicate
+            </Button>
+          ) : null}
           <Button type="button" variant="outline" onClick={props.onExport}>
             <Download className="size-4" />
             Export
           </Button>
+          {props.onDelete ? (
+            <Button type="button" variant="outline" onClick={props.onDelete}>
+              <Trash2 className="size-4" />
+              Delete
+            </Button>
+          ) : null}
           <Button type="button" onClick={props.onSave}>
             <Save className="size-4" />
             {props.saveLabel ?? "Save"}
