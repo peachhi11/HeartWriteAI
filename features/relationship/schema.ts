@@ -13,3 +13,7 @@ export {
 } from "@/lib/chat/relationshipState.schema";
 
 export type { RelationshipState } from "@/lib/chat/relationshipState.schema";
+export type {
+  SexualOnlyEdge,
+  SexualOnlyEdgeEvent,
+} from "@/lib/chat/relationshipSexualOnlyEdge";

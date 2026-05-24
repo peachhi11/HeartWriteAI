@@ -5,7 +5,12 @@ import { GitFork, RefreshCcw, Sparkles, UserRoundCheck } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  sexualOnlyEdgeId,
+  type SexualOnlyEdgeEventType,
+} from "@/lib/chat/relationshipSexualOnlyEdge";
 import { StatBar } from "./StatBar";
+import { SexualOnlyEdgePanel } from "./SexualOnlyEdgePanel";
 import { useRelationshipGraphStore } from "../graphStore";
 
 const exampleEvents = [
@@ -40,6 +45,9 @@ const exampleEvents = [
 
 export function RelationshipGraphPanel() {
   const addEvent = useRelationshipGraphStore((state) => state.addEvent);
+  const addSexualOnlyEvent = useRelationshipGraphStore(
+    (state) => state.addSexualOnlyEvent,
+  );
   const error = useRelationshipGraphStore((state) => state.error);
   const events = useRelationshipGraphStore((state) => state.events);
   const graph = useRelationshipGraphStore((state) => state.graph);
@@ -51,6 +59,9 @@ export function RelationshipGraphPanel() {
   const reset = useRelationshipGraphStore((state) => state.reset);
   const userId = useRelationshipGraphStore((state) => state.userId);
   const edges = Object.values(graph.edges);
+  const sexualOnlyEdge = graph.sexualOnlyEdges[
+    sexualOnlyEdgeId(userId, mainLoveInterestId)
+  ];
 
   useEffect(() => {
     if (!hydrated) {
@@ -124,6 +135,25 @@ export function RelationshipGraphPanel() {
         ))}
       </div>
 
+      <SexualOnlyEdgePanel
+        edge={sexualOnlyEdge}
+        onEvent={(type) =>
+          void addSexualOnlyEvent({
+            id: `sexual_only_evt_${Date.now()}_${type}`,
+            timestamp: Date.now(),
+            aId: userId,
+            bId: mainLoveInterestId,
+            type,
+            summary: getSexualOnlyEventSummary(type),
+            emotionalWeight:
+              type === "romantic_confession" || type === "sees_char_with_other"
+                ? 85
+                : 60,
+            tags: ["sexual_only", type],
+          })
+        }
+      />
+
       {edges.length ? (
         <div className="grid gap-4 xl:grid-cols-2">
           {edges.map((edge) => (
@@ -167,4 +197,29 @@ export function RelationshipGraphPanel() {
       )}
     </section>
   );
+}
+
+function getSexualOnlyEventSummary(type: SexualOnlyEdgeEventType) {
+  switch (type) {
+    case "hookup":
+      return "A sexual encounter established erotic connection without relationship definition.";
+    case "repeat_intimacy":
+      return "Repeated intimacy began creating attachment leakage.";
+    case "aftercare":
+      return "Aftercare made the sexual-only bond feel safer and more emotionally connected.";
+    case "post_intimacy_withdrawal":
+      return "Someone withdrew after intimacy to preserve emotional distance.";
+    case "jealousy":
+      return "Jealousy revealed emotional significance beyond the stated sexual-only structure.";
+    case "denies_feelings":
+      return "Feelings were denied despite signs of emotional attachment.";
+    case "asks_what_are_we":
+      return "Someone asked what the relationship means.";
+    case "sees_char_with_other":
+      return "Seeing the character with someone else activated ambiguity and jealousy.";
+    case "exclusivity_talk":
+      return "The sexual-only relationship negotiated exclusivity expectations.";
+    case "romantic_confession":
+      return "A romantic confession pushed the sexual-only bond toward relationship escalation.";
+  }
 }

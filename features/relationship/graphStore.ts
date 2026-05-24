@@ -9,10 +9,12 @@ import {
 } from "./defaults";
 import {
   createDefaultRelationshipGraph,
+  updateRelationshipGraphFromSexualOnlyEvent,
   updateRelationshipGraphFromEvent,
   type RelationshipGraph,
   type RelationshipGraphEvent,
 } from "@/lib/chat/relationshipGraph";
+import type { SexualOnlyEdgeEvent } from "@/lib/chat/relationshipSexualOnlyEdge";
 import {
   deleteRelationshipGraph,
   getRelationshipGraph,
@@ -27,6 +29,7 @@ type RelationshipGraphStore = {
   mainLoveInterestId: string;
   userId: string;
   addEvent: (event: RelationshipGraphEvent) => Promise<void>;
+  addSexualOnlyEvent: (event: SexualOnlyEdgeEvent) => Promise<void>;
   hydrate: () => Promise<void>;
   reset: () => Promise<void>;
 };
@@ -56,6 +59,26 @@ export const useRelationshipGraphStore = create<RelationshipGraphStore>()(
       set((draft) => {
         draft.error = null;
         draft.events = events;
+        draft.graph = graph;
+      });
+
+      try {
+        await saveRelationshipGraph(graph);
+      } catch (error) {
+        set((draft) => {
+          draft.error = formatGraphStoreError(error);
+        });
+      }
+    },
+
+    addSexualOnlyEvent: async (event) => {
+      const graph = updateRelationshipGraphFromSexualOnlyEvent({
+        graph: get().graph,
+        event,
+      });
+
+      set((draft) => {
+        draft.error = null;
         draft.graph = graph;
       });
 

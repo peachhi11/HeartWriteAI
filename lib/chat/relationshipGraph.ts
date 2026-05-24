@@ -1,5 +1,15 @@
 import { z } from "zod";
 
+import {
+  SexualOnlyEdgeEventSchema,
+  SexualOnlyEdgeSchema,
+  createDefaultSexualOnlyEdge,
+  sexualOnlyEdgeId,
+  updateSexualOnlyEdgeFromEvent,
+  type SexualOnlyEdge,
+  type SexualOnlyEdgeEvent,
+} from "./relationshipSexualOnlyEdge";
+
 const score = z.coerce.number().min(0).max(100);
 
 export const RelationshipGraphKindSchema = z.enum([
@@ -86,7 +96,9 @@ export const RelationshipGraphEdgeSchema = z.object({
 export const RelationshipGraphSchema = z.object({
   scenarioId: z.string().trim().min(1).default("default"),
   edges: z.record(z.string(), RelationshipGraphEdgeSchema).default({}),
+  sexualOnlyEdges: z.record(z.string(), SexualOnlyEdgeSchema).default({}),
   events: z.array(RelationshipGraphEventSchema).default([]),
+  sexualOnlyEvents: z.array(SexualOnlyEdgeEventSchema).default([]),
   updatedAt: z.string().datetime().optional(),
 });
 
@@ -109,7 +121,9 @@ export function createDefaultRelationshipGraph(scenarioId = "default") {
   return RelationshipGraphSchema.parse({
     scenarioId,
     edges: {},
+    sexualOnlyEdges: {},
     events: [],
+    sexualOnlyEvents: [],
   });
 }
 
@@ -254,6 +268,40 @@ export function getRelationshipGraphEdge(
   }
 
   return graph.edges[id];
+}
+
+export function updateRelationshipGraphFromSexualOnlyEvent(input: {
+  graph: RelationshipGraph;
+  event: SexualOnlyEdgeEvent;
+}) {
+  const event = SexualOnlyEdgeEventSchema.parse(input.event);
+  const next = RelationshipGraphSchema.parse(structuredClone(input.graph));
+  const edge = getSexualOnlyGraphEdge(next, event.aId, event.bId);
+  const updatedEdge = updateSexualOnlyEdgeFromEvent(edge, event);
+
+  next.sexualOnlyEdges[updatedEdge.id] = updatedEdge;
+  next.sexualOnlyEvents = [...next.sexualOnlyEvents, event].slice(-100);
+  next.updatedAt = new Date(event.timestamp || Date.now()).toISOString();
+
+  return RelationshipGraphSchema.parse(next);
+}
+
+export function getSexualOnlyGraphEdge(
+  graph: RelationshipGraph,
+  aId: string,
+  bId: string,
+): SexualOnlyEdge {
+  const id = sexualOnlyEdgeId(aId, bId);
+
+  if (!graph.sexualOnlyEdges[id]) {
+    graph.sexualOnlyEdges[id] = createDefaultSexualOnlyEdge({
+      aId,
+      bId,
+      kind: "casual",
+    });
+  }
+
+  return graph.sexualOnlyEdges[id];
 }
 
 export function resolveRelationshipGraphKind(
