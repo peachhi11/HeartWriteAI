@@ -1,7 +1,8 @@
 "use client";
 
+import type * as React from "react";
 import { useMemo, useState } from "react";
-import { BookOpenText } from "lucide-react";
+import { BookOpenText, Upload } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import {
   createDuplicateArtifactId,
+  createImportedLorebookArtifact,
   generateLorebookArtifact,
   type GeneratedLorebookArtifact,
   type LorebookGenerationInput,
@@ -22,6 +24,7 @@ import {
 import {
   createLorebookV3ExportFileName,
   generatedLorebookArtifactToV3Document,
+  importLorebookV3Json,
   serializeLorebookV3Document,
 } from "@/features/lorebooks/adapters";
 import { LorebookV3Editor } from "@/features/lorebooks/components/LorebookV3Editor";
@@ -147,6 +150,28 @@ export function LorebookGenerationPage() {
     setStatus("Exported lorebook V3 JSON.");
   }
 
+  async function importJsonFile(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    try {
+      const text = await file.text();
+      const document = importLorebookV3Json(text, file.name);
+      const artifact = createImportedLorebookArtifact(document, file.name);
+      setActiveLorebook(artifact);
+      setActiveDocument(document);
+      setStatus(
+        `Imported ${document.data.name ?? file.name} with ${document.data.entries.length} entries. Review and save when ready.`,
+      );
+    } catch (caughtError) {
+      setStatus(`Import failed: ${caughtError instanceof Error ? caughtError.message : String(caughtError)}`);
+    }
+  }
+
   return (
     <div className="grid gap-5 xl:grid-cols-[22rem_minmax(0,1fr)]">
       <aside className="grid h-fit gap-5">
@@ -215,6 +240,16 @@ export function LorebookGenerationPage() {
               <BookOpenText className="size-4" />
               Generate World
             </Button>
+            <label className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground">
+              <Upload className="size-4" />
+              Import JSON
+              <input
+                accept=".json,application/json"
+                className="sr-only"
+                onChange={importJsonFile}
+                type="file"
+              />
+            </label>
             {status ? (
               <p className="text-sm text-muted-foreground">{status}</p>
             ) : null}
@@ -278,58 +313,58 @@ export function LorebookGenerationPage() {
             </div>
           </CardHeader>
           <CardContent className="grid gap-4">
-          <div className="flex flex-wrap gap-2">
-            {activeLorebook.tags.map((tag) => (
-              <Badge key={tag} variant="secondary">
-                {tag}
-              </Badge>
-            ))}
-          </div>
-          <LorebookV3Editor
-            document={v3Document}
-            onChange={(document) => {
-              setActiveDocument(document);
-              setStatus("Edited lorebook V3 draft. Save when ready.");
-            }}
-            serialized={serialized}
-          />
-          <section className="rounded-md border bg-background/70 p-4">
-            <h3 className="mb-2 text-sm font-semibold">
-              {v3Document.data.name ?? activeLorebook.summary.universeAnchor}
-            </h3>
-            <p className="text-sm leading-6 text-muted-foreground">
-              {v3Document.data.description ??
-                activeLorebook.summary.factionOrDynastyContext}
-            </p>
-            <p className="mt-3 text-xs text-muted-foreground">
-              V3 export: scan_depth {v3Document.data.scan_depth ?? "auto"} ·
-              token_budget {v3Document.data.token_budget ?? "auto"} · entries{" "}
-              {v3Document.data.entries.length}
-            </p>
-          </section>
-          <div className="grid gap-3">
-            {v3Document.data.entries.map((entry) => (
-              <section
-                key={String(entry.id ?? entry.insertion_order)}
-                className="rounded-md border bg-background/70 p-4"
-              >
-                <div className="mb-2 flex flex-wrap items-center gap-2">
-                  <h3 className="text-sm font-semibold">
-                    {entry.name ?? `Entry ${entry.insertion_order + 1}`}
-                  </h3>
-                  {entry.constant ? <Badge variant="secondary">constant</Badge> : null}
-                  {!entry.enabled ? <Badge variant="outline">disabled</Badge> : null}
-                  {entry.use_regex ? <Badge variant="outline">regex</Badge> : null}
-                </div>
-                <p className="text-sm leading-6 text-muted-foreground">
-                  {entry.content}
-                </p>
-                <p className="mt-2 text-xs text-muted-foreground">
-                  Keys: {entry.keys.join(", ")}
-                </p>
-              </section>
-            ))}
-          </div>
+            <div className="flex flex-wrap gap-2">
+              {activeLorebook.tags.map((tag) => (
+                <Badge key={tag} variant="secondary">
+                  {tag}
+                </Badge>
+              ))}
+            </div>
+            <LorebookV3Editor
+              document={v3Document}
+              onChange={(document) => {
+                setActiveDocument(document);
+                setStatus("Edited lorebook V3 draft. Save when ready.");
+              }}
+              serialized={serialized}
+            />
+            <section className="rounded-md border bg-background/70 p-4">
+              <h3 className="mb-2 text-sm font-semibold">
+                {v3Document.data.name ?? activeLorebook.summary.universeAnchor}
+              </h3>
+              <p className="text-sm leading-6 text-muted-foreground">
+                {v3Document.data.description ??
+                  activeLorebook.summary.factionOrDynastyContext}
+              </p>
+              <p className="mt-3 text-xs text-muted-foreground">
+                V3 export: scan_depth {v3Document.data.scan_depth ?? "auto"} ·
+                token_budget {v3Document.data.token_budget ?? "auto"} · entries{" "}
+                {v3Document.data.entries.length}
+              </p>
+            </section>
+            <div className="grid gap-3">
+              {v3Document.data.entries.map((entry) => (
+                <section
+                  key={String(entry.id ?? entry.insertion_order)}
+                  className="rounded-md border bg-background/70 p-4"
+                >
+                  <div className="mb-2 flex flex-wrap items-center gap-2">
+                    <h3 className="text-sm font-semibold">
+                      {entry.name ?? `Entry ${entry.insertion_order + 1}`}
+                    </h3>
+                    {entry.constant ? <Badge variant="secondary">constant</Badge> : null}
+                    {!entry.enabled ? <Badge variant="outline">disabled</Badge> : null}
+                    {entry.use_regex ? <Badge variant="outline">regex</Badge> : null}
+                  </div>
+                  <p className="text-sm leading-6 text-muted-foreground">
+                    {entry.content}
+                  </p>
+                  <p className="mt-2 text-xs text-muted-foreground">
+                    Keys: {entry.keys.join(", ")}
+                  </p>
+                </section>
+              ))}
+            </div>
           </CardContent>
         </Card>
       </main>

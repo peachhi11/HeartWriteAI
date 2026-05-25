@@ -110,6 +110,30 @@ export function normalizeLorebookV3Document(input: unknown): LorebookV3Document 
   throw new Error("Unsupported lorebook shape.");
 }
 
+export function importLorebookV3Json(
+  jsonText: string,
+  sourceFileName?: string,
+): LorebookV3Document {
+  const parsed = JSON.parse(jsonText) as unknown;
+  const document = normalizeLorebookV3Document(parsed);
+  const fallbackName = sourceFileName
+    ? sourceFileName.replace(/\.json$/i, "").trim()
+    : undefined;
+
+  return createLorebookV3Document({
+    ...document.data,
+    extensions: {
+      ...document.data.extensions,
+      heartwriteai: {
+        ...(asRecord(document.data.extensions.heartwriteai) ?? {}),
+        importedAt: Date.now(),
+        sourceFileName,
+      },
+    },
+    name: document.data.name ?? fallbackName,
+  });
+}
+
 export function serializeLorebookV3Document(document: LorebookV3Document) {
   return JSON.stringify(LorebookV3DocumentSchema.parse(document), null, 2);
 }
@@ -141,9 +165,9 @@ function normalizeLooseLorebook(value: Record<string, unknown>): LorebookV3 {
 function normalizeSillyTavernWorldInfo(
   value: Record<string, unknown>,
 ): LorebookV3 {
-  const entries = Object.values(value.entries as Record<string, unknown>).map(
-    normalizeLooseEntry,
-  );
+  const entries = Object.values(value.entries as Record<string, unknown>)
+    .map(normalizeLooseEntry)
+    .sort((a, b) => a.insertion_order - b.insertion_order);
 
   return LorebookV3Schema.parse({
     description: value.description,
@@ -162,16 +186,23 @@ function normalizeLooseEntry(input: unknown): LorebookV3Entry {
   const value = (asRecord(input) ?? {}) as LegacySillyTavernEntry;
   const disabled = booleanOrUndefined(value.disable);
   const enabled = booleanOrUndefined(value.enabled);
+  const comment = stringOrUndefined(value.comment);
+  const content = nonEmptyStringOrUndefined(value.content) ??
+    comment ??
+    "Imported empty lore entry.";
 
   return LorebookV3EntrySchema.parse({
     case_sensitive: booleanOrUndefined(
       value.caseSensitive ?? (value as Record<string, unknown>).case_sensitive,
     ),
-    comment: stringOrUndefined(value.comment),
+    comment,
     constant: booleanOrUndefined(value.constant) ?? false,
-    content: stringOrUndefined(value.content) ?? "Imported empty lore entry.",
+    content,
     enabled: enabled ?? (disabled === undefined ? true : !disabled),
-    extensions: normalizeExtensions(value.extensions),
+    extensions: {
+      ...normalizeExtensions(value.extensions),
+      sillytavern: stripKnownSillyTavernEntryFields(value),
+    },
     id: idOrUndefined(value.uid ?? (value as Record<string, unknown>).id),
     insertion_order: numberOrUndefined(value.order) ??
       numberOrUndefined((value as Record<string, unknown>).insertion_order) ??
@@ -231,6 +262,10 @@ function stringOrUndefined(value: unknown) {
   return typeof value === "string" ? value : undefined;
 }
 
+function nonEmptyStringOrUndefined(value: unknown) {
+  return typeof value === "string" && value.trim() ? value : undefined;
+}
+
 function numberOrUndefined(value: unknown) {
   return typeof value === "number" && Number.isFinite(value)
     ? Math.round(value)
@@ -247,4 +282,35 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function asRecord(value: unknown): Record<string, unknown> | undefined {
   return isRecord(value) ? value : undefined;
+}
+
+function stripKnownSillyTavernEntryFields(
+  value: LegacySillyTavernEntry,
+): Record<string, unknown> {
+  const original = asRecord(value) ?? {};
+  const known = new Set([
+    "caseSensitive",
+    "case_sensitive",
+    "comment",
+    "constant",
+    "content",
+    "disable",
+    "enabled",
+    "extensions",
+    "key",
+    "keys",
+    "keysecondary",
+    "name",
+    "order",
+    "position",
+    "priority",
+    "selective",
+    "uid",
+    "useRegex",
+    "use_regex",
+  ]);
+
+  return Object.fromEntries(
+    Object.entries(original).filter(([key]) => !known.has(key)),
+  );
 }

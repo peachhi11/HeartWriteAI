@@ -235,6 +235,67 @@ export function generateLorebookArtifact(
   };
 }
 
+export function createImportedLorebookArtifact(
+  document: LorebookV3Document,
+  sourceFileName?: string,
+): GeneratedLorebookArtifact {
+  const title = document.data.name?.trim() ||
+    sourceFileName?.replace(/\.json$/i, "").trim() ||
+    "Imported Lorebook";
+  const description = document.data.description?.trim() ||
+    `Imported lorebook with ${document.data.entries.length} entries.`;
+  const species = generateSpeciesData("Human");
+  const occupation = generateOccupationData({
+    jobTitle: "Imported Lorebook",
+    professionalDomain: "Arts_Entertainment",
+    trope: "Imported lorebook",
+  });
+  const tags = normalizeTags(
+    [
+      "imported",
+      "lorebook",
+      sourceFileName?.replace(/\.json$/i, ""),
+      ...document.data.entries.flatMap((entry) => entry.keys.slice(0, 2)),
+    ]
+      .filter(Boolean)
+      .join(", "),
+  );
+
+  return {
+    entries: document.data.entries.map((entry, index) => ({
+      activationKeys: entry.keys,
+      domainScope: "Societal_Customs",
+      entryContent: entry.content,
+      entryId: String(entry.id ?? `imported_${index + 1}`),
+      insertionPriority: entry.constant
+        ? "Constant_Anchor"
+        : entry.selective
+          ? "Recursive_Linked"
+          : "Reactive_Contextual",
+      title: entry.name ?? entry.comment ?? `Entry ${index + 1}`,
+      tokenReserveCost: Math.max(25, Math.ceil(entry.content.length / 4)),
+    })),
+    id: createArtifactId("lorebook", `${title}:${sourceFileName ?? "imported"}`),
+    occupation,
+    placeholders: [],
+    species,
+    summary: {
+      aiLoreInstruction: description,
+      factionOrDynastyContext: description,
+      tokenOptimizationCap: document.data.token_budget ?? 1200,
+      universeAnchor: title,
+      worldSystemRules: document.data.entries
+        .slice(0, 4)
+        .map((entry) => entry.name ?? entry.comment ?? String(entry.id ?? "Lore entry")),
+    },
+    tags,
+    title,
+    trope: "Imported lorebook",
+    updatedAt: Date.now(),
+    v3Document: document,
+  };
+}
+
 export function createRuntimeBundleArtifact(
   input: RuntimeBundleInput,
 ): RuntimeBundleArtifact {

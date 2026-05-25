@@ -1,10 +1,14 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { generateLorebookArtifact } from "../../features/generation/workflows";
+import {
+  createImportedLorebookArtifact,
+  generateLorebookArtifact,
+} from "../../features/generation/workflows";
 import {
   createLorebookV3ExportFileName,
   generatedLorebookArtifactToV3Document,
+  importLorebookV3Json,
   normalizeLorebookV3Document,
   serializeLorebookV3Document,
 } from "../../features/lorebooks/adapters";
@@ -58,6 +62,99 @@ test("normalizes sillytavern-style world info entries to v3 names", () => {
   assert.deepEqual(document.data.entries[0]?.secondary_keys, ["campus"]);
   assert.equal(document.data.entries[0]?.insertion_order, 10);
   assert.equal(document.data.entries[0]?.case_sensitive, true);
+});
+
+test("imports sillytavern world info maps with empty headers and preserved settings", () => {
+  const document = importLorebookV3Json(
+    JSON.stringify({
+      entries: {
+        "0": {
+          comment: "*****************  \\ 6_SHARED_CAST_PACK / SX5 ///  ******************",
+          constant: true,
+          content: "",
+          disable: false,
+          displayIndex: 0,
+          key: [],
+          keysecondary: [],
+          order: 100,
+          probability: 0,
+          scanDepth: 12,
+          selective: true,
+          uid: 0,
+        },
+        "1": {
+          caseSensitive: false,
+          comment: "CAST: SEBASTIAN 'BASH' ASTOR",
+          constant: true,
+          content: "cast_bash.type: shared_npc; cast_bash.name: Sebastian 'Bash' Astor;",
+          disable: false,
+          displayIndex: 1,
+          key: ["bash", "sebastian", "astor"],
+          keysecondary: [],
+          matchWholeWords: false,
+          order: 99,
+          probability: 100,
+          scanDepth: 10,
+          selective: true,
+          sticky: 12,
+          uid: 1,
+        },
+      },
+    }),
+    "6_SHARED_CAST_PACK.json",
+  );
+
+  assert.equal(document.data.name, "6_SHARED_CAST_PACK");
+  assert.equal(document.data.entries.length, 2);
+  assert.equal(
+    document.data.entries[0]?.content,
+    "cast_bash.type: shared_npc; cast_bash.name: Sebastian 'Bash' Astor;",
+  );
+  assert.deepEqual(document.data.entries[0]?.keys, ["bash", "sebastian", "astor"]);
+  assert.equal(
+    document.data.entries[1]?.content,
+    "*****************  \\ 6_SHARED_CAST_PACK / SX5 ///  ******************",
+  );
+  assert.equal(
+    document.data.entries[0]?.extensions.sillytavern &&
+      typeof document.data.entries[0].extensions.sillytavern,
+    "object",
+  );
+  assert.equal(
+    (document.data.extensions.heartwriteai as { sourceFileName?: string })
+      .sourceFileName,
+    "6_SHARED_CAST_PACK.json",
+  );
+});
+
+test("creates saveable lorebook artifacts from imported v3 documents", () => {
+  const document = normalizeLorebookV3Document({
+    data: {
+      entries: [
+        {
+          constant: true,
+          content: "Always remember the public reputation rules.",
+          keys: ["reputation"],
+          name: "Reputation Rules",
+        },
+      ],
+      name: "Imported Reputation Pack",
+      token_budget: 400,
+    },
+    spec: "lorebook_v3",
+  });
+
+  const artifact = createImportedLorebookArtifact(
+    document,
+    "reputation_pack.json",
+  );
+
+  assert.match(artifact.id, /^lorebook_/);
+  assert.equal(artifact.title, "Imported Reputation Pack");
+  assert.equal(artifact.v3Document?.data.name, "Imported Reputation Pack");
+  assert.equal(artifact.entries[0]?.title, "Reputation Rules");
+  assert.equal(artifact.entries[0]?.insertionPriority, "Constant_Anchor");
+  assert.ok(artifact.tags.includes("imported"));
 });
 
 test("activates v3 lorebook entries by constants, keywords, regex, and budget", () => {
@@ -120,4 +217,3 @@ test("serializes canonical v3 exports and safe filenames", () => {
     "campus-canon.lorebook-v3.json",
   );
 });
-
