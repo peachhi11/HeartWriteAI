@@ -17,6 +17,8 @@ import {
   generatedLorebookArtifactToV3Document,
   serializeLorebookV3Document,
 } from "@/features/lorebooks/adapters";
+import { LorebookV3Editor } from "@/features/lorebooks/components/LorebookV3Editor";
+import type { LorebookV3Document } from "@/features/lorebooks/schema";
 import {
   deleteLorebookLibraryItem,
   saveLorebookLibraryItem,
@@ -66,12 +68,12 @@ export function LorebookGenerationPage() {
   const [input, setInput] = useState(defaultInput);
   const [activeLorebook, setActiveLorebook] =
     useState<GeneratedLorebookArtifact>(() => generateLorebookArtifact(defaultInput));
+  const [activeDocument, setActiveDocument] = useState<LorebookV3Document>(() =>
+    generatedLorebookArtifactToV3Document(generateLorebookArtifact(defaultInput)),
+  );
   const [status, setStatus] = useState<string | null>(null);
   const library = useLorebookLibrary();
-  const v3Document = useMemo(
-    () => generatedLorebookArtifactToV3Document(activeLorebook),
-    [activeLorebook],
-  );
+  const v3Document = activeDocument;
   const serialized = useMemo(
     () => serializeLorebookV3Document(v3Document),
     [v3Document],
@@ -85,14 +87,22 @@ export function LorebookGenerationPage() {
   }
 
   function generate() {
-    setActiveLorebook(generateLorebookArtifact(input));
+    const nextLorebook = generateLorebookArtifact(input);
+    const nextDocument = generatedLorebookArtifactToV3Document(nextLorebook);
+    setActiveLorebook(nextLorebook);
+    setActiveDocument(nextDocument);
     setStatus("Generated lorebook draft.");
   }
 
   async function save() {
-    await saveLorebookLibraryItem(activeLorebook);
+    await saveLorebookLibraryItem({
+      ...activeLorebook,
+      title: v3Document.data.name ?? activeLorebook.title,
+      updatedAt: Date.now(),
+      v3Document,
+    });
     await library.refresh();
-    setStatus(`Saved ${activeLorebook.title} to the lorebook library.`);
+    setStatus(`Saved ${v3Document.data.name ?? activeLorebook.title} to the lorebook library.`);
   }
 
   async function deleteActive() {
@@ -108,6 +118,13 @@ export function LorebookGenerationPage() {
       id: createDuplicateArtifactId("lorebook", title),
       title,
       updatedAt: Date.now(),
+    });
+    setActiveDocument({
+      ...v3Document,
+      data: {
+        ...v3Document.data,
+        name: title,
+      },
     });
     setStatus(`Duplicated ${activeLorebook.title}. Save it when ready.`);
   }
@@ -196,8 +213,10 @@ export function LorebookGenerationPage() {
 
       <div className="grid gap-5">
         <GeneratorResultCard
-          title={activeLorebook.title}
-          description={activeLorebook.summary.aiLoreInstruction}
+          title={v3Document.data.name ?? activeLorebook.title}
+          description={
+            v3Document.data.description ?? activeLorebook.summary.aiLoreInstruction
+          }
           onCopy={copy}
           onDelete={deleteActive}
           onDuplicate={duplicateActive}
@@ -212,12 +231,21 @@ export function LorebookGenerationPage() {
               </Badge>
             ))}
           </div>
+          <LorebookV3Editor
+            document={v3Document}
+            onChange={(document) => {
+              setActiveDocument(document);
+              setStatus("Edited lorebook V3 draft. Save when ready.");
+            }}
+            serialized={serialized}
+          />
           <section className="rounded-md border bg-background/70 p-4">
             <h3 className="mb-2 text-sm font-semibold">
-              {activeLorebook.summary.universeAnchor}
+              {v3Document.data.name ?? activeLorebook.summary.universeAnchor}
             </h3>
             <p className="text-sm leading-6 text-muted-foreground">
-              {activeLorebook.summary.factionOrDynastyContext}
+              {v3Document.data.description ??
+                activeLorebook.summary.factionOrDynastyContext}
             </p>
             <p className="mt-3 text-xs text-muted-foreground">
               V3 export: scan_depth {v3Document.data.scan_depth ?? "auto"} ·
@@ -226,21 +254,24 @@ export function LorebookGenerationPage() {
             </p>
           </section>
           <div className="grid gap-3">
-            {activeLorebook.entries.map((entry) => (
+            {v3Document.data.entries.map((entry) => (
               <section
-                key={entry.entryId}
+                key={String(entry.id ?? entry.insertion_order)}
                 className="rounded-md border bg-background/70 p-4"
               >
                 <div className="mb-2 flex flex-wrap items-center gap-2">
-                  <h3 className="text-sm font-semibold">{entry.title}</h3>
-                  <Badge variant="outline">{entry.domainScope}</Badge>
-                  <Badge variant="secondary">{entry.insertionPriority}</Badge>
+                  <h3 className="text-sm font-semibold">
+                    {entry.name ?? `Entry ${entry.insertion_order + 1}`}
+                  </h3>
+                  {entry.constant ? <Badge variant="secondary">constant</Badge> : null}
+                  {!entry.enabled ? <Badge variant="outline">disabled</Badge> : null}
+                  {entry.use_regex ? <Badge variant="outline">regex</Badge> : null}
                 </div>
                 <p className="text-sm leading-6 text-muted-foreground">
-                  {entry.entryContent}
+                  {entry.content}
                 </p>
                 <p className="mt-2 text-xs text-muted-foreground">
-                  Keys: {entry.activationKeys.join(", ")}
+                  Keys: {entry.keys.join(", ")}
                 </p>
               </section>
             ))}
@@ -261,6 +292,9 @@ export function LorebookGenerationPage() {
             items={library.items}
             onSelect={(item) => {
               setActiveLorebook(item);
+              setActiveDocument(
+                item.v3Document ?? generatedLorebookArtifactToV3Document(item),
+              );
               setStatus(`Loaded ${item.title}.`);
             }}
           />

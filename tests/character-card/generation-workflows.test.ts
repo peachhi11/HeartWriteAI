@@ -7,6 +7,7 @@ import {
   generatePersonaArtifact,
   generateScenarioArtifact,
 } from "../../features/generation/workflows";
+import { generatedLorebookArtifactToV3Document } from "../../features/lorebooks/adapters";
 
 test("generates persona artifact with prompt and normalized tags", () => {
   const persona = generatePersonaArtifact({
@@ -106,6 +107,38 @@ test("creates runtime bundle context from saved generation artifacts", () => {
   assert.match(bundle.compiledContext, /\[SELECTED SCENARIO\]/);
   assert.match(bundle.compiledContext, /\[SELECTED LOREBOOK\]/);
   assert.match(bundle.compiledContext, /Opening constraint:/);
+});
+
+test("runtime bundles prefer edited lorebook v3 documents when present", () => {
+  const lorebook = generateLorebookArtifact({
+    jobTitle: "University Student",
+    professionalDomain: "Corporate_Finance",
+    speciesType: "Human",
+    title: "Campus Canon",
+    trope: "Academic rivals forced proximity",
+  });
+  const v3Document = generatedLorebookArtifactToV3Document(lorebook);
+
+  v3Document.data.name = "Edited Campus Canon";
+  v3Document.data.entries[0] = {
+    ...v3Document.data.entries[0]!,
+    content: "Edited archive rule.",
+    keys: ["edited archive"],
+    name: "Edited Rule",
+  };
+
+  const bundle = createRuntimeBundleArtifact({
+    lorebook: {
+      ...lorebook,
+      v3Document,
+    },
+    title: "Edited Runtime",
+  });
+
+  assert.equal(bundle.lorebook?.title, "Edited Campus Canon");
+  assert.match(bundle.compiledContext, /Edited Rule/);
+  assert.match(bundle.compiledContext, /edited archive/);
+  assert.match(bundle.compiledContext, /Edited archive rule/);
 });
 
 test("creates partial runtime bundle context with explicit missing slots", () => {

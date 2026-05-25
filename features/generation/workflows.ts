@@ -17,6 +17,7 @@ import {
   type OccupationProfessionalDomain,
   type SpeciesType,
 } from "../../lib/character-card/generator";
+import type { LorebookV3Document } from "../lorebooks/schema";
 
 export type PersonaGenerationInput = {
   name: string;
@@ -75,6 +76,7 @@ export type GeneratedLorebookArtifact = {
   occupation: GeneratedOccupationData;
   tags: string[];
   updatedAt: number;
+  v3Document?: LorebookV3Document;
 };
 
 export type BundlePersonaSource = {
@@ -258,15 +260,25 @@ export function createRuntimeBundleArtifact(
     : undefined;
   const lorebook = input.lorebook
     ? {
-        entries: input.lorebook.entries.map((entry) => ({
-          activationKeys: entry.activationKeys,
-          content: entry.entryContent,
-          title: entry.title,
-        })),
+        entries: input.lorebook.v3Document
+          ? input.lorebook.v3Document.data.entries.map((entry) => ({
+              activationKeys: entry.keys,
+              content: entry.content,
+              title: entry.name ?? String(entry.id ?? "Untitled entry"),
+            }))
+          : input.lorebook.entries.map((entry) => ({
+              activationKeys: entry.activationKeys,
+              content: entry.entryContent,
+              title: entry.title,
+            })),
         id: input.lorebook.id,
-        summary: input.lorebook.summary.aiLoreInstruction,
-        title: input.lorebook.title,
-        universeAnchor: input.lorebook.summary.universeAnchor,
+        summary:
+          input.lorebook.v3Document?.data.description ??
+          input.lorebook.summary.aiLoreInstruction,
+        title: input.lorebook.v3Document?.data.name ?? input.lorebook.title,
+        universeAnchor:
+          input.lorebook.v3Document?.data.name ??
+          input.lorebook.summary.universeAnchor,
       }
     : undefined;
   const title = input.title.trim() ||
