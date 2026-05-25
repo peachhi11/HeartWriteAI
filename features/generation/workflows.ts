@@ -40,6 +40,7 @@ export type GeneratedPersonaArtifact = {
   prompt: string;
   tags: string[];
   updatedAt: number;
+  source?: "blank" | "generated" | "imported";
 };
 
 export type ScenarioGenerationInput = {
@@ -164,6 +165,84 @@ export function generatePersonaArtifact(
     summary,
     tags,
     updatedAt: Date.now(),
+    source: "generated",
+  };
+}
+
+export function createBlankPersonaArtifact(
+  name = "Untitled Persona",
+): GeneratedPersonaArtifact {
+  return createPersonaArtifactFromEditable({
+    id: createArtifactId("persona", `${name}:blank`),
+    name,
+    prompt: [
+      `USER PERSONA: ${name}`,
+      "POV: AnyPOV",
+      "Play style: Story roleplay",
+      "Boundaries: Do not write this persona's thoughts, dialogue, decisions, consent, or hidden feelings.",
+      "Runtime rule: treat this persona as user-controlled. Never narrate their private thoughts, unstated feelings, dialogue, choices, or consent.",
+    ].join("\n"),
+    source: "blank",
+    summary: "A blank editable user persona draft.",
+    tags: ["blank", "persona"],
+  });
+}
+
+export function createImportedPersonaArtifact(
+  value: unknown,
+  sourceFileName?: string,
+): GeneratedPersonaArtifact {
+  if (!isRecord(value)) {
+    throw new Error("Persona JSON must be an object.");
+  }
+
+  const fileNameTitle = sourceFileName?.replace(/\.json$/i, "").trim();
+  const name = readUnknownString(value.name) ||
+    readUnknownString(value.title) ||
+    fileNameTitle ||
+    "Imported Persona";
+  const prompt = readUnknownString(value.prompt) ||
+    readUnknownString(value.content) ||
+    `USER PERSONA: ${name}`;
+  const summary = readUnknownString(value.summary) ||
+    readUnknownString(value.description) ||
+    `${name} is an imported user persona.`;
+
+  return createPersonaArtifactFromEditable({
+    id: readUnknownString(value.id) ||
+      createArtifactId("persona", `${name}:${sourceFileName ?? "imported"}`),
+    name,
+    prompt,
+    source: "imported",
+    summary,
+    tags: normalizeTagsFromUnknown(value.tags),
+    updatedAt: readUnknownNumber(value.updatedAt) ?? Date.now(),
+  });
+}
+
+export function createPersonaArtifactFromEditable(input: {
+  id: string;
+  name: string;
+  prompt: string;
+  source?: GeneratedPersonaArtifact["source"];
+  summary: string;
+  tags: string[] | string;
+  updatedAt?: number;
+}): GeneratedPersonaArtifact {
+  const name = input.name.trim() || "Untitled Persona";
+  const prompt = input.prompt.trim() || `USER PERSONA: ${name}`;
+  const summary = input.summary.trim() || `${name} is a saved user persona.`;
+
+  return {
+    id: input.id,
+    name,
+    prompt,
+    source: input.source,
+    summary,
+    tags: Array.isArray(input.tags)
+      ? normalizeTags(input.tags.join(", "))
+      : normalizeTags(input.tags),
+    updatedAt: input.updatedAt ?? Date.now(),
   };
 }
 
@@ -472,8 +551,33 @@ function normalizeTags(value: string) {
     .slice(0, 12);
 }
 
+function normalizeTagsFromUnknown(value: unknown) {
+  if (Array.isArray(value)) {
+    return normalizeTags(
+      value
+        .map((tag) => readUnknownString(tag))
+        .filter(Boolean)
+        .join(", "),
+    );
+  }
+
+  return normalizeTags(readUnknownString(value));
+}
+
 function humanize(value: string) {
   return value.replaceAll("_", " ").toLowerCase();
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === "object" && !Array.isArray(value));
+}
+
+function readUnknownString(value: unknown) {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function readUnknownNumber(value: unknown) {
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
 function compileRuntimeBundleContext(input: {

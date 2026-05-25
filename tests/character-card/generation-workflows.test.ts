@@ -2,8 +2,11 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  createBlankPersonaArtifact,
+  createImportedPersonaArtifact,
   createBlankLorebookArtifact,
   createLorebookArtifactFromV3Document,
+  createPersonaArtifactFromEditable,
   createRuntimeBundleArtifact,
   generateLorebookArtifact,
   generatePersonaArtifact,
@@ -29,6 +32,45 @@ test("generates persona artifact with prompt and normalized tags", () => {
     persona.tags.filter((tag) => tag === "slow burn").length,
     1,
   );
+  assert.equal(persona.source, "generated");
+});
+
+test("creates blank persona artifacts as editable drafts", () => {
+  const persona = createBlankPersonaArtifact("Blank Reader");
+
+  assert.equal(persona.source, "blank");
+  assert.equal(persona.name, "Blank Reader");
+  assert.match(persona.prompt, /USER PERSONA: Blank Reader/);
+  assert.ok(persona.tags.includes("blank"));
+});
+
+test("imports and syncs persona artifacts from editable JSON", () => {
+  const imported = createImportedPersonaArtifact({
+    id: "persona_custom",
+    name: "Rae",
+    prompt: "USER PERSONA: Rae",
+    summary: "A guarded user persona.",
+    tags: ["Guarded", "guarded", "AnyPOV"],
+    updatedAt: 123,
+  });
+
+  assert.equal(imported.id, "persona_custom");
+  assert.equal(imported.source, "imported");
+  assert.equal(imported.updatedAt, 123);
+  assert.equal(
+    imported.tags.filter((tag) => tag === "guarded").length,
+    1,
+  );
+
+  const synced = createPersonaArtifactFromEditable({
+    ...imported,
+    name: "Rae Edited",
+    summary: "Edited summary.",
+  });
+
+  assert.equal(synced.id, imported.id);
+  assert.equal(synced.name, "Rae Edited");
+  assert.equal(synced.summary, "Edited summary.");
 });
 
 test("generates scenario artifact with premise and first message constraints", () => {

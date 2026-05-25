@@ -12,6 +12,7 @@ export interface PersonaLibraryItem {
   id: string;
   name: string;
   prompt?: string;
+  source?: "blank" | "generated" | "imported";
   summary?: string;
   tags: string[];
   updatedAt: number;
@@ -186,6 +187,7 @@ function parsePersonaItems(value: unknown): PersonaLibraryItem[] {
         id,
         name,
         prompt: readString(record.prompt),
+        source: readPersonaSource(record.source),
         summary: readString(record.summary),
         tags: normalizeTags(record.tags),
         updatedAt: readNumber(record.updatedAt) ?? Date.now(),
@@ -210,6 +212,12 @@ function readString(value: unknown) {
 
 function readNumber(value: unknown) {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function readPersonaSource(value: unknown): PersonaLibraryItem["source"] {
+  return value === "blank" || value === "generated" || value === "imported"
+    ? value
+    : undefined;
 }
 
 function getLocalStorage() {
