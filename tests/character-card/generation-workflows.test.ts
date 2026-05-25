@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  createBlankLorebookArtifact,
+  createLorebookArtifactFromV3Document,
   createRuntimeBundleArtifact,
   generateLorebookArtifact,
   generatePersonaArtifact,
@@ -66,6 +68,41 @@ test("generates lorebook artifact with scoped entries and placeholders", () => {
       (placeholder) => placeholder.variableKey === "{{world_setting}}",
     ),
   );
+});
+
+test("creates blank lorebook artifacts as editable v3 drafts", () => {
+  const lorebook = createBlankLorebookArtifact("Blank Campus Notes");
+
+  assert.equal(lorebook.source, "blank");
+  assert.equal(lorebook.title, "Blank Campus Notes");
+  assert.equal(lorebook.v3Document?.data.name, "Blank Campus Notes");
+  assert.equal(lorebook.v3Document?.data.entries.length, 1);
+  assert.ok(lorebook.tags.includes("blank"));
+});
+
+test("syncs lorebook artifact metadata from edited v3 documents", () => {
+  const lorebook = generateLorebookArtifact({
+    jobTitle: "University Student",
+    professionalDomain: "Corporate_Finance",
+    speciesType: "Human",
+    title: "Campus Canon",
+    trope: "Academic rivals forced proximity",
+  });
+  const document = generatedLorebookArtifactToV3Document(lorebook);
+
+  document.data.name = "Renamed Canon";
+  document.data.description = "Edited description.";
+
+  const synced = createLorebookArtifactFromV3Document({
+    document,
+    id: lorebook.id,
+    source: "generated",
+  });
+
+  assert.equal(synced.id, lorebook.id);
+  assert.equal(synced.title, "Renamed Canon");
+  assert.equal(synced.summary.aiLoreInstruction, "Edited description.");
+  assert.equal(synced.v3Document?.data.name, "Renamed Canon");
 });
 
 test("creates runtime bundle context from saved generation artifacts", () => {

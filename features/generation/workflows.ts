@@ -17,7 +17,11 @@ import {
   type OccupationProfessionalDomain,
   type SpeciesType,
 } from "../../lib/character-card/generator";
-import type { LorebookV3Document } from "../lorebooks/schema";
+import {
+  createLorebookV3Document,
+  LorebookV3EntrySchema,
+  type LorebookV3Document,
+} from "../lorebooks/schema";
 
 export type PersonaGenerationInput = {
   name: string;
@@ -76,6 +80,7 @@ export type GeneratedLorebookArtifact = {
   occupation: GeneratedOccupationData;
   tags: string[];
   updatedAt: number;
+  source?: "blank" | "generated" | "imported";
   v3Document?: LorebookV3Document;
 };
 
@@ -232,29 +237,82 @@ export function generateLorebookArtifact(
     title,
     trope,
     updatedAt: Date.now(),
+    source: "generated",
   };
+}
+
+export function createBlankLorebookArtifact(
+  title = "Untitled Lorebook",
+): GeneratedLorebookArtifact {
+  const document = createLorebookV3Document({
+    description: "A small modular lorebook draft.",
+    entries: [
+      LorebookV3EntrySchema.parse({
+        content: "Write one focused lore rule, fact, relationship, location, or runtime cue here.",
+        enabled: true,
+        id: `entry_${Date.now().toString(36)}`,
+        insertion_order: 0,
+        keys: ["new trigger"],
+        name: "New lore entry",
+        use_regex: false,
+      }),
+    ],
+    extensions: {
+      heartwriteai: {
+        source: "blank_lorebook",
+      },
+    },
+    name: title,
+    recursive_scanning: false,
+    scan_depth: 3,
+    token_budget: 600,
+  });
+
+  return createLorebookArtifactFromV3Document({
+    document,
+    id: createArtifactId("lorebook", `${title}:blank`),
+    source: "blank",
+  });
 }
 
 export function createImportedLorebookArtifact(
   document: LorebookV3Document,
   sourceFileName?: string,
 ): GeneratedLorebookArtifact {
+  return createLorebookArtifactFromV3Document({
+    document,
+    id: createArtifactId(
+      "lorebook",
+      `${document.data.name ?? sourceFileName ?? "imported"}:${sourceFileName ?? "imported"}`,
+    ),
+    source: "imported",
+    sourceFileName,
+  });
+}
+
+export function createLorebookArtifactFromV3Document(input: {
+  document: LorebookV3Document;
+  id: string;
+  source: NonNullable<GeneratedLorebookArtifact["source"]>;
+  sourceFileName?: string;
+}): GeneratedLorebookArtifact {
+  const { document } = input;
   const title = document.data.name?.trim() ||
-    sourceFileName?.replace(/\.json$/i, "").trim() ||
-    "Imported Lorebook";
+    input.sourceFileName?.replace(/\.json$/i, "").trim() ||
+    "Untitled Lorebook";
   const description = document.data.description?.trim() ||
     `Imported lorebook with ${document.data.entries.length} entries.`;
   const species = generateSpeciesData("Human");
   const occupation = generateOccupationData({
-    jobTitle: "Imported Lorebook",
+    jobTitle: "Lorebook",
     professionalDomain: "Arts_Entertainment",
-    trope: "Imported lorebook",
+    trope: `${input.source} lorebook`,
   });
   const tags = normalizeTags(
     [
-      "imported",
+      input.source,
       "lorebook",
-      sourceFileName?.replace(/\.json$/i, ""),
+      input.sourceFileName?.replace(/\.json$/i, ""),
       ...document.data.entries.flatMap((entry) => entry.keys.slice(0, 2)),
     ]
       .filter(Boolean)
@@ -275,7 +333,7 @@ export function createImportedLorebookArtifact(
       title: entry.name ?? entry.comment ?? `Entry ${index + 1}`,
       tokenReserveCost: Math.max(25, Math.ceil(entry.content.length / 4)),
     })),
-    id: createArtifactId("lorebook", `${title}:${sourceFileName ?? "imported"}`),
+    id: input.id,
     occupation,
     placeholders: [],
     species,
@@ -290,8 +348,9 @@ export function createImportedLorebookArtifact(
     },
     tags,
     title,
-    trope: "Imported lorebook",
+    trope: `${input.source} lorebook`,
     updatedAt: Date.now(),
+    source: input.source,
     v3Document: document,
   };
 }
