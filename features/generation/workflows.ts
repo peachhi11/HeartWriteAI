@@ -26,8 +26,12 @@ import {
 export type PersonaGenerationInput = {
   name: string;
   archetype: string;
+  characteristics: string;
+  constructionPrompt?: string;
   pointOfView: string;
   playStyle: string;
+  referenceCharacter: string;
+  relationshipToCharacter: string;
   emotionalNeed: string;
   boundaries: string;
   tags: string;
@@ -133,19 +137,32 @@ export type RuntimeBundleInput = {
   lorebook?: GeneratedLorebookArtifact | null;
 };
 
+export const DEFAULT_PERSONA_CONSTRUCTION_PROMPT = [
+  "Build a playable user persona for romance roleplay.",
+  "Keep the persona lean, user-controlled, emotionally specific, and compatible with the selected character or scenario.",
+  "Do not overwrite the user's agency. Do not write their private thoughts, dialogue, consent, or decisions.",
+  "Prioritize POV, boundaries, relationship role, emotional pressure points, speech posture, and post-history instructions.",
+].join("\n");
+
 export function generatePersonaArtifact(
   input: PersonaGenerationInput,
 ): GeneratedPersonaArtifact {
   const name = input.name.trim() || "New Persona";
   const tags = normalizeTags(
-    `${input.tags}, ${input.pointOfView}, ${input.playStyle}, ${input.archetype}`,
+    `${input.tags}, ${input.pointOfView}, ${input.playStyle}, ${input.archetype}, ${input.relationshipToCharacter}`,
   );
+  const characteristics = input.characteristics.trim() ||
+    "emotionally observant, consent-aware, and responsive to character tone";
+  const referenceCharacter = input.referenceCharacter.trim();
+  const relationshipToCharacter = input.relationshipToCharacter.trim() ||
+    "romantic lead / user-controlled counterpart";
   const emotionalNeed = input.emotionalNeed.trim() ||
     "to feel emotionally respected without having their agency overwritten";
   const boundaries = input.boundaries.trim() ||
     "Do not write this persona's thoughts, dialogue, or decisions for them.";
   const summary = [
     `${name} is a ${input.pointOfView} persona built for ${input.playStyle.toLowerCase()}.`,
+    `They are shaped as ${relationshipToCharacter.toLowerCase()}.`,
     `Their roleplay pressure point is ${emotionalNeed}.`,
   ].join(" ");
   const prompt = [
@@ -153,10 +170,13 @@ export function generatePersonaArtifact(
     `Archetype: ${input.archetype}`,
     `POV: ${input.pointOfView}`,
     `Play style: ${input.playStyle}`,
+    `Desired characteristics: ${characteristics}`,
+    `Relationship role: ${relationshipToCharacter}`,
+    referenceCharacter ? `Matched character/context: ${referenceCharacter}` : "",
     `Core emotional need: ${emotionalNeed}`,
     `Boundaries: ${boundaries}`,
     "Runtime rule: treat this persona as user-controlled. Never narrate their private thoughts, unstated feelings, dialogue, choices, or consent.",
-  ].join("\n");
+  ].filter(Boolean).join("\n");
 
   return {
     id: createArtifactId("persona", name),
@@ -167,6 +187,30 @@ export function generatePersonaArtifact(
     updatedAt: Date.now(),
     source: "generated",
   };
+}
+
+export function compilePersonaConstructionPrompt(input: PersonaGenerationInput) {
+  const constructionPrompt = input.constructionPrompt?.trim() ||
+    DEFAULT_PERSONA_CONSTRUCTION_PROMPT;
+
+  return [
+    constructionPrompt,
+    "",
+    "[PERSONA INGREDIENTS]",
+    `Name: ${input.name.trim() || "New Persona"}`,
+    `Archetype: ${input.archetype.trim() || "Unspecified"}`,
+    `POV: ${input.pointOfView}`,
+    `Play style: ${input.playStyle}`,
+    `Desired characteristics: ${input.characteristics.trim() || "Unspecified"}`,
+    `Relationship role: ${input.relationshipToCharacter.trim() || "Unspecified"}`,
+    `Matched character/context: ${input.referenceCharacter.trim() || "None provided"}`,
+    `Core emotional need: ${input.emotionalNeed.trim() || "Unspecified"}`,
+    `Boundaries: ${input.boundaries.trim() || "Use default agency-safe boundaries"}`,
+    `Tags: ${input.tags.trim() || "None"}`,
+    "",
+    "[OUTPUT REQUIREMENTS]",
+    "Return a concise editable persona artifact with summary, tags, and runtime prompt text.",
+  ].join("\n");
 }
 
 export function createBlankPersonaArtifact(

@@ -26,15 +26,18 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   artifactToJsonBytes,
+  compilePersonaConstructionPrompt,
   createBlankPersonaArtifact,
   createDuplicateArtifactId,
   createArtifactFileName,
   createImportedPersonaArtifact,
   createPersonaArtifactFromEditable,
+  DEFAULT_PERSONA_CONSTRUCTION_PROMPT,
   generatePersonaArtifact,
   type GeneratedPersonaArtifact,
   type PersonaGenerationInput,
 } from "@/features/generation/workflows";
+import { useRuntimeEngineSettings } from "@/features/settings/runtimeModeStore";
 import {
   deletePersonaLibraryItem,
   savePersonaLibraryItem,
@@ -51,10 +54,14 @@ import {
 const defaultInput: PersonaGenerationInput = {
   archetype: "Guarded romantic lead",
   boundaries: "Do not speak, decide, consent, or narrate internal thoughts for {{user}}.",
+  characteristics: "emotionally observant, quietly stubborn, slow to trust but loyal once chosen",
+  constructionPrompt: DEFAULT_PERSONA_CONSTRUCTION_PROMPT,
   emotionalNeed: "to feel chosen without losing independence",
   name: "Megan",
   playStyle: "Story roleplay",
   pointOfView: "FemPOV",
+  referenceCharacter: "",
+  relationshipToCharacter: "slow-burn romantic counterpart",
   tags: "slow burn, emotionally observant, consent-aware",
 };
 
@@ -67,10 +74,15 @@ export function PersonaGenerationPage() {
   const [deleteArmed, setDeleteArmed] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const library = usePersonaLibrary();
+  const { advancedControlsEnabled, hydrated } = useRuntimeEngineSettings();
 
   const serialized = useMemo(
     () => JSON.stringify(activePersona, null, 2),
     [activePersona],
+  );
+  const constructionPreview = useMemo(
+    () => compilePersonaConstructionPrompt(input),
+    [input],
   );
   const isDirty = savedSnapshot !== serialized;
 
@@ -238,6 +250,32 @@ export function PersonaGenerationPage() {
               }
             />
           </Field>
+          <Field label="Match target / character context">
+            <Input
+              placeholder="Optional: character name, card tone, or relationship premise"
+              value={input.referenceCharacter}
+              onChange={(event) =>
+                updateInput("referenceCharacter", event.currentTarget.value)
+              }
+            />
+          </Field>
+          <Field label="Relationship role">
+            <select
+              value={input.relationshipToCharacter}
+              onChange={(event) =>
+                updateInput("relationshipToCharacter", event.currentTarget.value)
+              }
+              className="h-10 rounded-md border bg-background px-3 text-sm"
+            >
+              <option>slow-burn romantic counterpart</option>
+              <option>guarded rival with romantic tension</option>
+              <option>trusted friend with hidden longing</option>
+              <option>established partner</option>
+              <option>forbidden attraction</option>
+              <option>casual intimacy with attachment risk</option>
+              <option>custom / undefined</option>
+            </select>
+          </Field>
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="POV">
               <select
@@ -268,6 +306,14 @@ export function PersonaGenerationPage() {
               </select>
             </Field>
           </div>
+          <Field label="Characteristics you want">
+            <Textarea
+              value={input.characteristics}
+              onChange={(event) =>
+                updateInput("characteristics", event.currentTarget.value)
+              }
+            />
+          </Field>
           <Field label="Core emotional need">
             <Textarea
               value={input.emotionalNeed}
@@ -308,6 +354,13 @@ export function PersonaGenerationPage() {
               type="file"
             />
           </label>
+          {hydrated && advancedControlsEnabled ? (
+            <AdvancedPersonaPromptPanel
+              constructionPrompt={input.constructionPrompt ?? ""}
+              preview={constructionPreview}
+              onChange={(value) => updateInput("constructionPrompt", value)}
+            />
+          ) : null}
           {status ? <p className="text-sm text-muted-foreground">{status}</p> : null}
         </GeneratorFormCard>
 
@@ -430,6 +483,39 @@ export function PersonaGenerationPage() {
         </Card>
       </div>
     </GeneratorGrid>
+  );
+}
+
+function AdvancedPersonaPromptPanel(props: {
+  constructionPrompt: string;
+  onChange: (value: string) => void;
+  preview: string;
+}) {
+  return (
+    <details className="rounded-md border bg-background/70 p-4">
+      <summary className="cursor-pointer text-sm font-semibold">
+        Prompt Construction
+      </summary>
+      <div className="mt-4 grid gap-4">
+        <p className="text-xs leading-5 text-muted-foreground">
+          Power-user controls for changing how the persona draft is constructed.
+          Standard users never need this section.
+        </p>
+        <Field label="Construction prompt">
+          <Textarea
+            className="min-h-40 font-mono text-xs leading-5"
+            value={props.constructionPrompt}
+            onChange={(event) => props.onChange(event.currentTarget.value)}
+          />
+        </Field>
+        <section className="rounded-md border bg-muted p-3">
+          <h3 className="mb-2 text-xs font-semibold">Compiled Preview</h3>
+          <pre className="max-h-56 overflow-auto whitespace-pre-wrap text-xs leading-5 text-muted-foreground">
+            {props.preview}
+          </pre>
+        </section>
+      </div>
+    </details>
   );
 }
 

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  compilePersonaConstructionPrompt,
   createBlankPersonaArtifact,
   createImportedPersonaArtifact,
   createBlankLorebookArtifact,
@@ -18,21 +19,47 @@ test("generates persona artifact with prompt and normalized tags", () => {
   const persona = generatePersonaArtifact({
     archetype: "Protective realist",
     boundaries: "No user dialogue.",
+    characteristics: "observant, careful",
     emotionalNeed: "to feel trusted",
     name: "Ari",
     playStyle: "Story roleplay",
     pointOfView: "AnyPOV",
+    referenceCharacter: "Riven, a guarded rival",
+    relationshipToCharacter: "guarded rival with romantic tension",
     tags: "Slow Burn, slow burn, guarded",
   });
 
   assert.equal(persona.name, "Ari");
   assert.match(persona.prompt, /USER PERSONA: Ari/);
+  assert.match(persona.prompt, /Matched character\/context: Riven/);
+  assert.match(persona.prompt, /Relationship role: guarded rival/);
   assert.ok(persona.tags.includes("slow burn"));
   assert.equal(
     persona.tags.filter((tag) => tag === "slow burn").length,
     1,
   );
   assert.equal(persona.source, "generated");
+});
+
+test("compiles hidden persona construction prompts for advanced controls", () => {
+  const prompt = compilePersonaConstructionPrompt({
+    archetype: "Protective realist",
+    boundaries: "No user dialogue.",
+    characteristics: "observant, careful",
+    constructionPrompt: "Custom persona construction rule.",
+    emotionalNeed: "to feel trusted",
+    name: "Ari",
+    playStyle: "Story roleplay",
+    pointOfView: "AnyPOV",
+    referenceCharacter: "Riven, a guarded rival",
+    relationshipToCharacter: "guarded rival with romantic tension",
+    tags: "guarded",
+  });
+
+  assert.match(prompt, /Custom persona construction rule/);
+  assert.match(prompt, /Matched character\/context: Riven/);
+  assert.match(prompt, /Relationship role: guarded rival/);
+  assert.match(prompt, /OUTPUT REQUIREMENTS/);
 });
 
 test("creates blank persona artifacts as editable drafts", () => {
@@ -151,10 +178,13 @@ test("creates runtime bundle context from saved generation artifacts", () => {
   const persona = generatePersonaArtifact({
     archetype: "Protective realist",
     boundaries: "No user dialogue.",
+    characteristics: "observant, careful",
     emotionalNeed: "to feel trusted",
     name: "Ari",
     playStyle: "Story roleplay",
     pointOfView: "AnyPOV",
+    referenceCharacter: "",
+    relationshipToCharacter: "slow-burn romantic counterpart",
     tags: "guarded",
   });
   const scenario = generateScenarioArtifact({
