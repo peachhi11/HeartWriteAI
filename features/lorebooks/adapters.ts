@@ -119,16 +119,22 @@ export function importLorebookV3Json(
   const fallbackName = sourceFileName
     ? sourceFileName.replace(/\.json$/i, "").trim()
     : undefined;
+  const attribution = getKnownLorebookAttribution(
+    document.data.name ?? fallbackName,
+    sourceFileName,
+  );
+  const heartwriteai = {
+    ...(asRecord(document.data.extensions.heartwriteai) ?? {}),
+    importedAt: Date.now(),
+    sourceFileName,
+    ...(attribution ? { attribution } : {}),
+  };
 
   return createLorebookV3Document({
     ...document.data,
     extensions: {
       ...document.data.extensions,
-      heartwriteai: {
-        ...(asRecord(document.data.extensions.heartwriteai) ?? {}),
-        importedAt: Date.now(),
-        sourceFileName,
-      },
+      heartwriteai,
     },
     name: document.data.name ?? fallbackName,
   });
@@ -282,6 +288,29 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function asRecord(value: unknown): Record<string, unknown> | undefined {
   return isRecord(value) ? value : undefined;
+}
+
+function getKnownLorebookAttribution(
+  lorebookName: string | undefined,
+  sourceFileName: string | undefined,
+) {
+  const normalized = `${lorebookName ?? ""} ${sourceFileName ?? ""}`
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+
+  if (normalized.includes("kappa eta nu")) {
+    return {
+      authorName: "aewin",
+      authorProfileUrl:
+        "https://janitorai.com/profiles/1e621c4d-8400-4659-aafc-250ad326c940_profile-of-aewin",
+      note: "Original Kappa Eta Nu lorebook author credit.",
+      source: "janitorai",
+      title: "Kappa Eta Nu",
+    };
+  }
+
+  return undefined;
 }
 
 function stripKnownSillyTavernEntryFields(

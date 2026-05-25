@@ -157,6 +157,42 @@ test("creates saveable lorebook artifacts from imported v3 documents", () => {
   assert.ok(artifact.tags.includes("imported"));
 });
 
+test("credits the known Kappa Eta Nu lorebook author on import", () => {
+  const document = importLorebookV3Json(
+    JSON.stringify({
+      entries: {
+        "0": {
+          comment: "Haverford, Setting",
+          content: "<setting>Modern Day</setting>",
+          key: [],
+          order: 100,
+          uid: 0,
+        },
+      },
+    }),
+    "Kappa Eta Nu.json",
+  );
+
+  const attribution = (
+    document.data.extensions.heartwriteai as {
+      attribution?: {
+        authorName?: string;
+        authorProfileUrl?: string;
+        source?: string;
+        title?: string;
+      };
+    }
+  ).attribution;
+
+  assert.equal(attribution?.title, "Kappa Eta Nu");
+  assert.equal(attribution?.authorName, "aewin");
+  assert.equal(attribution?.source, "janitorai");
+  assert.equal(
+    attribution?.authorProfileUrl,
+    "https://janitorai.com/profiles/1e621c4d-8400-4659-aafc-250ad326c940_profile-of-aewin",
+  );
+});
+
 test("activates v3 lorebook entries by constants, keywords, regex, and budget", () => {
   const document = normalizeLorebookV3Document({
     data: {

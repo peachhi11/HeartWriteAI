@@ -85,6 +85,7 @@ export function LorebookGenerationPage() {
     () => serializeLorebookV3Document(v3Document),
     [v3Document],
   );
+  const attribution = readLorebookAttribution(v3Document);
 
   function updateInput<K extends keyof LorebookGenerationInput>(
     key: K,
@@ -293,6 +294,19 @@ export function LorebookGenerationPage() {
                 {v3Document.data.description ??
                   activeLorebook.summary.aiLoreInstruction}
               </CardDescription>
+              {attribution ? (
+                <p className="text-xs text-muted-foreground">
+                  Credit: {attribution.title ? `${attribution.title} by ` : ""}
+                  <a
+                    className="font-medium underline underline-offset-4"
+                    href={attribution.authorProfileUrl}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    {attribution.authorName}
+                  </a>
+                </p>
+              ) : null}
             </div>
             <div className="flex shrink-0 flex-wrap gap-2">
               <Button type="button" variant="outline" onClick={copy}>
@@ -370,4 +384,36 @@ export function LorebookGenerationPage() {
       </main>
     </div>
   );
+}
+
+function readLorebookAttribution(document: LorebookV3Document) {
+  const heartwriteai = document.data.extensions.heartwriteai;
+  if (!isRecord(heartwriteai)) {
+    return null;
+  }
+
+  const attribution = heartwriteai.attribution;
+  if (!isRecord(attribution)) {
+    return null;
+  }
+
+  const authorName = readString(attribution.authorName);
+  const authorProfileUrl = readString(attribution.authorProfileUrl);
+  if (!authorName || !authorProfileUrl) {
+    return null;
+  }
+
+  return {
+    authorName,
+    authorProfileUrl,
+    title: readString(attribution.title),
+  };
+}
+
+function readString(value: unknown) {
+  return typeof value === "string" && value.trim() ? value : undefined;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return Boolean(value && typeof value === "object" && !Array.isArray(value));
 }
