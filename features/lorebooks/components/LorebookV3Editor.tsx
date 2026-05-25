@@ -2,7 +2,7 @@
 
 import type * as React from "react";
 import { useMemo, useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Search, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,9 +25,30 @@ export function LorebookV3Editor(props: {
   onChange: (document: LorebookV3Document) => void;
   serialized: string;
 }) {
+  const [entryQuery, setEntryQuery] = useState("");
   const [selectedEntryId, setSelectedEntryId] = useState<string | number | null>(
     () => props.document.data.entries[0]?.id ?? null,
   );
+  const filteredEntries = useMemo(() => {
+    const query = entryQuery.trim().toLowerCase();
+    if (!query) {
+      return props.document.data.entries;
+    }
+
+    return props.document.data.entries.filter((entry) =>
+      [
+        entry.name,
+        entry.comment,
+        entry.content,
+        ...entry.keys,
+        ...(entry.secondary_keys ?? []),
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .includes(query),
+    );
+  }, [entryQuery, props.document.data.entries]);
   const selectedEntry =
     props.document.data.entries.find((entry) => entry.id === selectedEntryId) ??
     props.document.data.entries[0] ??
@@ -103,63 +124,8 @@ export function LorebookV3Editor(props: {
   }
 
   return (
-    <div className="grid gap-4">
-      <section className="grid gap-4 rounded-md border bg-background/70 p-4">
-        <div className="grid gap-4 md:grid-cols-[1fr_10rem_10rem]">
-          <Field label="Lorebook name">
-            <Input
-              value={props.document.data.name ?? ""}
-              onChange={(event) => updateDocument({ name: event.currentTarget.value })}
-            />
-          </Field>
-          <Field label="Scan depth">
-            <Input
-              min={0}
-              type="number"
-              value={props.document.data.scan_depth ?? 0}
-              onChange={(event) =>
-                updateDocument({
-                  scan_depth: numberFromInput(event.currentTarget.value),
-                })
-              }
-            />
-          </Field>
-          <Field label="Token budget">
-            <Input
-              min={0}
-              type="number"
-              value={props.document.data.token_budget ?? 0}
-              onChange={(event) =>
-                updateDocument({
-                  token_budget: numberFromInput(event.currentTarget.value),
-                })
-              }
-            />
-          </Field>
-        </div>
-        <Field label="Description">
-          <Textarea
-            rows={3}
-            value={props.document.data.description ?? ""}
-            onChange={(event) =>
-              updateDocument({ description: event.currentTarget.value })
-            }
-          />
-        </Field>
-        <label className="flex items-center gap-2 text-sm text-muted-foreground">
-          <input
-            checked={props.document.data.recursive_scanning ?? false}
-            onChange={(event) =>
-              updateDocument({ recursive_scanning: event.currentTarget.checked })
-            }
-            type="checkbox"
-          />
-          Recursive scanning
-        </label>
-      </section>
-
-      <section className="grid gap-4 lg:grid-cols-[18rem_1fr]">
-        <div className="grid h-fit gap-3 rounded-md border bg-background/70 p-3">
+    <div className="grid gap-4 2xl:grid-cols-[20rem_minmax(0,1fr)_22rem]">
+      <section className="grid h-fit gap-3 rounded-md border bg-background/70 p-3">
           <div className="flex items-center justify-between gap-2">
             <h3 className="text-sm font-semibold">
               Entries ({props.document.data.entries.length})
@@ -169,8 +135,17 @@ export function LorebookV3Editor(props: {
               Add
             </Button>
           </div>
+          <div className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              value={entryQuery}
+              onChange={(event) => setEntryQuery(event.currentTarget.value)}
+              placeholder="Search entries"
+              className="pl-9"
+            />
+          </div>
           <div className="grid gap-2">
-            {props.document.data.entries.map((entry) => (
+            {filteredEntries.map((entry) => (
               <button
                 key={String(entry.id ?? entry.insertion_order)}
                 type="button"
@@ -192,18 +167,22 @@ export function LorebookV3Editor(props: {
                 </div>
               </button>
             ))}
+            {filteredEntries.length === 0 ? (
+              <p className="rounded-md border bg-card/60 p-3 text-sm text-muted-foreground">
+                No entries match this search.
+              </p>
+            ) : null}
           </div>
-        </div>
+        </section>
 
         {selectedEntry ? (
-          <div className="grid gap-4 rounded-md border bg-background/70 p-4">
+          <section className="grid gap-4 rounded-md border bg-background/70 p-4">
             <div className="flex flex-wrap items-start justify-between gap-3">
               <div>
-                <h3 className="text-sm font-semibold">
-                  {selectedEntry.name ?? "Untitled entry"}
-                </h3>
+                <h3 className="text-xl font-semibold">Entry Editor</h3>
                 <p className="text-xs text-muted-foreground">
-                  ~{estimateTokens(selectedEntry.content)} tokens ·{" "}
+                  {selectedEntry.name ?? "Untitled entry"} · ~
+                  {estimateTokens(selectedEntry.content)} tokens ·{" "}
                   {selectedEntry.content.length} chars
                 </p>
               </div>
@@ -218,7 +197,17 @@ export function LorebookV3Editor(props: {
               </Button>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-[10rem_1fr]">
+              <Field label="UID">
+                <Input
+                  value={String(selectedEntry.id ?? "")}
+                  onChange={(event) =>
+                    updateSelectedEntry({
+                      id: event.currentTarget.value || undefined,
+                    })
+                  }
+                />
+              </Field>
               <Field label="Entry name">
                 <Input
                   value={selectedEntry.name ?? ""}
@@ -247,36 +236,11 @@ export function LorebookV3Editor(props: {
                   }
                 />
               </Field>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Order">
-                  <Input
-                    type="number"
-                    value={selectedEntry.insertion_order}
-                    onChange={(event) =>
-                      updateSelectedEntry({
-                        insertion_order:
-                          numberFromInput(event.currentTarget.value) ?? 0,
-                      })
-                    }
-                  />
-                </Field>
-                <Field label="Priority">
-                  <Input
-                    type="number"
-                    value={selectedEntry.priority ?? 0}
-                    onChange={(event) =>
-                      updateSelectedEntry({
-                        priority: numberFromInput(event.currentTarget.value),
-                      })
-                    }
-                  />
-                </Field>
-              </div>
             </div>
 
             <Field label="Content">
               <Textarea
-                rows={7}
+                rows={12}
                 value={selectedEntry.content}
                 onChange={(event) =>
                   updateSelectedEntry({ content: event.currentTarget.value })
@@ -284,56 +248,143 @@ export function LorebookV3Editor(props: {
               />
             </Field>
 
-            <div className="flex flex-wrap gap-4 rounded-md border bg-card/60 p-3 text-sm text-muted-foreground">
-              <Toggle
-                checked={selectedEntry.enabled}
-                label="Enabled"
-                onChange={(checked) => updateSelectedEntry({ enabled: checked })}
-              />
-              <Toggle
-                checked={selectedEntry.constant}
-                label="Always active"
-                onChange={(checked) => updateSelectedEntry({ constant: checked })}
-              />
-              <Toggle
-                checked={selectedEntry.use_regex}
-                label="Use regex"
-                onChange={(checked) => updateSelectedEntry({ use_regex: checked })}
-              />
-              <Toggle
-                checked={selectedEntry.case_sensitive ?? false}
-                label="Case sensitive"
-                onChange={(checked) =>
-                  updateSelectedEntry({ case_sensitive: checked })
-                }
-              />
-              <Toggle
-                checked={selectedEntry.selective ?? false}
-                label="Require secondary key"
-                onChange={(checked) => updateSelectedEntry({ selective: checked })}
-              />
-            </div>
-
             <EntryWarnings
               entry={selectedEntry}
               totalEstimatedTokens={totalEstimatedTokens}
             />
-          </div>
+          </section>
         ) : (
-          <div className="rounded-md border bg-background/70 p-4 text-sm text-muted-foreground">
+          <section className="rounded-md border bg-background/70 p-4 text-sm text-muted-foreground">
             No entries yet. Add one to start building this lorebook.
-          </div>
+          </section>
         )}
-      </section>
 
-      <details className="rounded-md border bg-background/70 p-4">
-        <summary className="cursor-pointer text-sm font-semibold">
-          V3 JSON preview
-        </summary>
-        <pre className="mt-3 max-h-80 overflow-auto rounded-md bg-muted p-3 text-xs">
-          {props.serialized}
-        </pre>
-      </details>
+      <section className="grid h-fit gap-4 rounded-md border bg-background/70 p-4">
+        <div>
+          <h3 className="text-xl font-semibold">Scanning & Injection</h3>
+          <p className="mt-1 text-xs text-muted-foreground">
+            Controls how this lorebook activates inside chat context.
+          </p>
+        </div>
+
+        <Field label="Lorebook name">
+          <Input
+            value={props.document.data.name ?? ""}
+            onChange={(event) => updateDocument({ name: event.currentTarget.value })}
+          />
+        </Field>
+        <Field label="Description">
+          <Textarea
+            rows={4}
+            value={props.document.data.description ?? ""}
+            onChange={(event) =>
+              updateDocument({ description: event.currentTarget.value })
+            }
+          />
+        </Field>
+
+        <div className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-1">
+          <Field label="Scan depth">
+            <Input
+              min={0}
+              type="number"
+              value={props.document.data.scan_depth ?? 0}
+              onChange={(event) =>
+                updateDocument({
+                  scan_depth: numberFromInput(event.currentTarget.value),
+                })
+              }
+            />
+          </Field>
+          <Field label="Token budget">
+            <Input
+              min={0}
+              type="number"
+              value={props.document.data.token_budget ?? 0}
+              onChange={(event) =>
+                updateDocument({
+                  token_budget: numberFromInput(event.currentTarget.value),
+                })
+              }
+            />
+          </Field>
+          <Field label="Entry order">
+            <Input
+              type="number"
+              value={selectedEntry?.insertion_order ?? 0}
+              onChange={(event) =>
+                updateSelectedEntry({
+                  insertion_order:
+                    numberFromInput(event.currentTarget.value) ?? 0,
+                })
+              }
+              disabled={!selectedEntry}
+            />
+          </Field>
+          <Field label="Entry priority">
+            <Input
+              type="number"
+              value={selectedEntry?.priority ?? 0}
+              onChange={(event) =>
+                updateSelectedEntry({
+                  priority: numberFromInput(event.currentTarget.value),
+                })
+              }
+              disabled={!selectedEntry}
+            />
+          </Field>
+        </div>
+
+        <div className="grid gap-2 rounded-md border bg-card/60 p-3 text-sm text-muted-foreground">
+          <Toggle
+            checked={props.document.data.recursive_scanning ?? false}
+            label="Recursive scanning"
+            onChange={(checked) => updateDocument({ recursive_scanning: checked })}
+          />
+          <Toggle
+            checked={selectedEntry?.enabled ?? false}
+            label="Entry active"
+            onChange={(checked) => updateSelectedEntry({ enabled: checked })}
+          />
+          <Toggle
+            checked={selectedEntry?.constant ?? false}
+            label="Always active"
+            onChange={(checked) => updateSelectedEntry({ constant: checked })}
+          />
+          <Toggle
+            checked={selectedEntry?.use_regex ?? false}
+            label="Use regex"
+            onChange={(checked) => updateSelectedEntry({ use_regex: checked })}
+          />
+          <Toggle
+            checked={selectedEntry?.case_sensitive ?? false}
+            label="Case sensitive"
+            onChange={(checked) =>
+              updateSelectedEntry({ case_sensitive: checked })
+            }
+          />
+          <Toggle
+            checked={selectedEntry?.selective ?? false}
+            label="Require secondary key"
+            onChange={(checked) => updateSelectedEntry({ selective: checked })}
+          />
+        </div>
+
+        <div className="rounded-md border bg-card/60 p-3 text-sm text-muted-foreground">
+          <p>Total estimated tokens: {totalEstimatedTokens}</p>
+          <p>Entries: {props.document.data.entries.length}</p>
+          <p>Active entries: {props.document.data.entries.filter((entry) => entry.enabled).length}</p>
+        </div>
+
+        <details className="rounded-md border bg-card/60 p-3">
+          <summary className="cursor-pointer text-sm font-semibold">
+            V3 JSON preview
+          </summary>
+          <pre className="mt-3 max-h-80 overflow-auto rounded-md bg-muted p-3 text-xs">
+            {props.serialized}
+          </pre>
+        </details>
+      </section>
     </div>
   );
 }

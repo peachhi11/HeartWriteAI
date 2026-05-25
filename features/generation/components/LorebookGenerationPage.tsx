@@ -5,6 +5,13 @@ import { BookOpenText } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   createDuplicateArtifactId,
@@ -32,9 +39,6 @@ import type {
 import {
   ArtifactLibraryList,
   Field,
-  GeneratorFormCard,
-  GeneratorGrid,
-  GeneratorResultCard,
 } from "./GenerationShell";
 
 const speciesOptions: SpeciesType[] = [
@@ -144,86 +148,136 @@ export function LorebookGenerationPage() {
   }
 
   return (
-    <GeneratorGrid>
-      <GeneratorFormCard
-        title="Lorebook Generator"
-        description="Generate scoped world rules, activation keys, placeholders, and lore entries for character/scenario runtime."
-      >
-        <Field label="Lorebook title">
-          <Input
-            value={input.title}
-            onChange={(event) => updateInput("title", event.currentTarget.value)}
-          />
-        </Field>
-        <Field label="Trope / world pressure">
-          <Input
-            value={input.trope}
-            onChange={(event) => updateInput("trope", event.currentTarget.value)}
-          />
-        </Field>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Species baseline">
-            <select
-              value={input.speciesType}
-              onChange={(event) =>
-                updateInput("speciesType", event.currentTarget.value as SpeciesType)
-              }
-              className="h-10 rounded-md border bg-background px-3 text-sm"
-            >
-              {speciesOptions.map((species) => (
-                <option key={species} value={species}>
-                  {species}
-                </option>
-              ))}
-            </select>
-          </Field>
-          <Field label="Professional domain">
-            <select
-              value={input.professionalDomain}
-              onChange={(event) =>
-                updateInput(
-                  "professionalDomain",
-                  event.currentTarget.value as OccupationProfessionalDomain,
-                )
-              }
-              className="h-10 rounded-md border bg-background px-3 text-sm"
-            >
-              {professionalDomains.map((domain) => (
-                <option key={domain} value={domain}>
-                  {domain.replaceAll("_", " ")}
-                </option>
-              ))}
-            </select>
-          </Field>
-        </div>
-        <Field label="Occupation / role">
-          <Input
-            value={input.jobTitle}
-            onChange={(event) =>
-              updateInput("jobTitle", event.currentTarget.value)
-            }
-          />
-        </Field>
-        <Button type="button" onClick={generate}>
-          <BookOpenText className="size-4" />
-          Generate Lorebook
-        </Button>
-        {status ? <p className="text-sm text-muted-foreground">{status}</p> : null}
-      </GeneratorFormCard>
+    <div className="grid gap-5 xl:grid-cols-[22rem_minmax(0,1fr)]">
+      <aside className="grid h-fit gap-5">
+        <Card className="bg-card/85">
+          <CardHeader>
+            <CardTitle>World Generation</CardTitle>
+            <CardDescription>
+              Generate a modular draft, then edit every field before saving.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <Field label="Lorebook title">
+              <Input
+                value={input.title}
+                onChange={(event) => updateInput("title", event.currentTarget.value)}
+              />
+            </Field>
+            <Field label="Trope / world pressure">
+              <Input
+                value={input.trope}
+                onChange={(event) => updateInput("trope", event.currentTarget.value)}
+              />
+            </Field>
+            <Field label="Species baseline">
+              <select
+                value={input.speciesType}
+                onChange={(event) =>
+                  updateInput("speciesType", event.currentTarget.value as SpeciesType)
+                }
+                className="h-10 rounded-md border bg-background px-3 text-sm"
+              >
+                {speciesOptions.map((species) => (
+                  <option key={species} value={species}>
+                    {species}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Professional domain">
+              <select
+                value={input.professionalDomain}
+                onChange={(event) =>
+                  updateInput(
+                    "professionalDomain",
+                    event.currentTarget.value as OccupationProfessionalDomain,
+                  )
+                }
+                className="h-10 rounded-md border bg-background px-3 text-sm"
+              >
+                {professionalDomains.map((domain) => (
+                  <option key={domain} value={domain}>
+                    {domain.replaceAll("_", " ")}
+                  </option>
+                ))}
+              </select>
+            </Field>
+            <Field label="Occupation / role">
+              <Input
+                value={input.jobTitle}
+                onChange={(event) =>
+                  updateInput("jobTitle", event.currentTarget.value)
+                }
+              />
+            </Field>
+            <Button type="button" onClick={generate}>
+              <BookOpenText className="size-4" />
+              Generate World
+            </Button>
+            {status ? (
+              <p className="text-sm text-muted-foreground">{status}</p>
+            ) : null}
+          </CardContent>
+        </Card>
 
-      <div className="grid gap-5">
-        <GeneratorResultCard
-          title={v3Document.data.name ?? activeLorebook.title}
-          description={
-            v3Document.data.description ?? activeLorebook.summary.aiLoreInstruction
-          }
-          onCopy={copy}
-          onDelete={deleteActive}
-          onDuplicate={duplicateActive}
-          onExport={exportJson}
-          onSave={save}
-          saveLabel="Save Lorebook"
-        >
+        <Card className="bg-card/85">
+          <CardHeader>
+            <CardTitle>Saved Lorebooks ({library.totalCount})</CardTitle>
+            <CardDescription>
+              Load a saved lorebook into the editor.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4">
+            <Input
+              placeholder="Search saved lorebooks..."
+              value={library.query}
+              onChange={(event) => library.setQuery(event.currentTarget.value)}
+            />
+            <ArtifactLibraryList
+              empty={library.loading ? "Loading lorebooks..." : "No saved lorebooks yet."}
+              items={library.items}
+              onSelect={(item) => {
+                setActiveLorebook(item);
+                setActiveDocument(
+                  item.v3Document ?? generatedLorebookArtifactToV3Document(item),
+                );
+                setStatus(`Loaded ${item.title}.`);
+              }}
+            />
+          </CardContent>
+        </Card>
+      </aside>
+
+      <main className="grid gap-5">
+        <Card className="bg-card/85">
+          <CardHeader className="gap-3 md:flex-row md:items-start md:justify-between">
+            <div className="space-y-1.5">
+              <CardTitle>{v3Document.data.name ?? activeLorebook.title}</CardTitle>
+              <CardDescription>
+                {v3Document.data.description ??
+                  activeLorebook.summary.aiLoreInstruction}
+              </CardDescription>
+            </div>
+            <div className="flex shrink-0 flex-wrap gap-2">
+              <Button type="button" variant="outline" onClick={copy}>
+                Copy
+              </Button>
+              <Button type="button" variant="outline" onClick={duplicateActive}>
+                Duplicate
+              </Button>
+              <Button type="button" variant="outline" onClick={exportJson}>
+                Export
+              </Button>
+              <Button type="button" variant="outline" onClick={deleteActive}>
+                Delete
+              </Button>
+              <Button type="button" onClick={save}>
+                Save
+              </Button>
+            </div>
+          </CardHeader>
+          <CardContent className="grid gap-4">
           <div className="flex flex-wrap gap-2">
             {activeLorebook.tags.map((tag) => (
               <Badge key={tag} variant="secondary">
@@ -276,30 +330,9 @@ export function LorebookGenerationPage() {
               </section>
             ))}
           </div>
-        </GeneratorResultCard>
-
-        <GeneratorFormCard
-          title={`Saved Lorebooks (${library.totalCount})`}
-          description="Load a saved lorebook back into the preview."
-        >
-          <Input
-            placeholder="Search saved lorebooks..."
-            value={library.query}
-            onChange={(event) => library.setQuery(event.currentTarget.value)}
-          />
-          <ArtifactLibraryList
-            empty={library.loading ? "Loading lorebooks..." : "No saved lorebooks yet."}
-            items={library.items}
-            onSelect={(item) => {
-              setActiveLorebook(item);
-              setActiveDocument(
-                item.v3Document ?? generatedLorebookArtifactToV3Document(item),
-              );
-              setStatus(`Loaded ${item.title}.`);
-            }}
-          />
-        </GeneratorFormCard>
-      </div>
-    </GeneratorGrid>
+          </CardContent>
+        </Card>
+      </main>
+    </div>
   );
 }
