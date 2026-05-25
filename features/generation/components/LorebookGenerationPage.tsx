@@ -7,13 +7,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
-  artifactToJsonBytes,
-  createArtifactFileName,
   createDuplicateArtifactId,
   generateLorebookArtifact,
   type GeneratedLorebookArtifact,
   type LorebookGenerationInput,
 } from "@/features/generation/workflows";
+import {
+  createLorebookV3ExportFileName,
+  generatedLorebookArtifactToV3Document,
+  serializeLorebookV3Document,
+} from "@/features/lorebooks/adapters";
 import {
   deleteLorebookLibraryItem,
   saveLorebookLibraryItem,
@@ -65,9 +68,13 @@ export function LorebookGenerationPage() {
     useState<GeneratedLorebookArtifact>(() => generateLorebookArtifact(defaultInput));
   const [status, setStatus] = useState<string | null>(null);
   const library = useLorebookLibrary();
-  const serialized = useMemo(
-    () => JSON.stringify(activeLorebook, null, 2),
+  const v3Document = useMemo(
+    () => generatedLorebookArtifactToV3Document(activeLorebook),
     [activeLorebook],
+  );
+  const serialized = useMemo(
+    () => serializeLorebookV3Document(v3Document),
+    [v3Document],
   );
 
   function updateInput<K extends keyof LorebookGenerationInput>(
@@ -107,16 +114,16 @@ export function LorebookGenerationPage() {
 
   async function copy() {
     await navigator.clipboard.writeText(serialized);
-    setStatus("Copied lorebook JSON.");
+    setStatus("Copied lorebook V3 JSON.");
   }
 
   function exportJson() {
     downloadUint8Array(
-      artifactToJsonBytes(activeLorebook),
-      createArtifactFileName(activeLorebook.title, ".lorebook.json"),
+      new TextEncoder().encode(serialized),
+      createLorebookV3ExportFileName(v3Document.data.name),
       "application/json",
     );
-    setStatus("Exported lorebook JSON.");
+    setStatus("Exported lorebook V3 JSON.");
   }
 
   return (
@@ -211,6 +218,11 @@ export function LorebookGenerationPage() {
             </h3>
             <p className="text-sm leading-6 text-muted-foreground">
               {activeLorebook.summary.factionOrDynastyContext}
+            </p>
+            <p className="mt-3 text-xs text-muted-foreground">
+              V3 export: scan_depth {v3Document.data.scan_depth ?? "auto"} ·
+              token_budget {v3Document.data.token_budget ?? "auto"} · entries{" "}
+              {v3Document.data.entries.length}
             </p>
           </section>
           <div className="grid gap-3">
