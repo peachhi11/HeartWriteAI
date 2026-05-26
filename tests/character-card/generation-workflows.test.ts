@@ -9,6 +9,7 @@ import {
   createImportedRuntimeBundleArtifact,
   createBlankScenarioArtifact,
   createImportedScenarioArtifact,
+  createScenarioInputFromTemplate,
   createBlankLorebookArtifact,
   createLorebookArtifactFromV3Document,
   createPersonaArtifactFromEditable,
@@ -18,6 +19,9 @@ import {
   generateLorebookArtifact,
   generatePersonaArtifact,
   generateScenarioArtifact,
+  generateSuggestedLorebookFromScenario,
+  getScenarioTemplateCategories,
+  SCENARIO_TEMPLATES,
 } from "../../features/generation/workflows";
 import { generatedLorebookArtifactToV3Document } from "../../features/lorebooks/adapters";
 
@@ -125,6 +129,41 @@ test("generates scenario artifact with premise and first message constraints", (
   assert.match(scenario.summary, /rain-dark archive room/);
   assert.match(scenario.firstMessage.aiOutputConstraint, /archive lights fail/);
   assert.ok(scenario.firstMessage.aiOutputConstraint.length > 40);
+});
+
+test("provides guided scenario templates as editable generation inputs", () => {
+  assert.equal(SCENARIO_TEMPLATES.length, 20);
+  assert.ok(getScenarioTemplateCategories().includes("University rivalry"));
+  assert.ok(getScenarioTemplateCategories().includes("Meet ugly"));
+
+  const input = createScenarioInputFromTemplate(
+    "mafia_protection_witness",
+    { constructionPrompt: "Keep this template agency-safe." },
+  );
+  const scenario = generateScenarioArtifact(input);
+
+  assert.equal(input.title, "Witness Under Guard");
+  assert.equal(input.professionalDomain, "Underworld");
+  assert.equal(input.constructionPrompt, "Keep this template agency-safe.");
+  assert.match(scenario.summary, /safehouse door|Protected Witness|protection/i);
+  assert.match(scenario.firstMessage.aiOutputConstraint, /mob heir/i);
+  assert.ok(scenario.tags.includes("mafia protection forced proximity"));
+});
+
+test("generates optional suggested lore from an active scenario", () => {
+  const scenario = generateScenarioArtifact(
+    createScenarioInputFromTemplate("workplace_taboo_coverup"),
+  );
+  const lorebook = generateSuggestedLorebookFromScenario(scenario, {
+    professionalDomain: "Corporate_Finance",
+  });
+
+  assert.equal(lorebook.title, "Ethics Breach Lore");
+  assert.ok(lorebook.tags.includes("suggested lore"));
+  assert.ok(lorebook.tags.includes("scenario bridge"));
+  assert.match(lorebook.summary.aiLoreInstruction, /Scenario bridge:/);
+  assert.match(lorebook.summary.aiLoreInstruction, /Opening constraint:/);
+  assert.ok(lorebook.entries.length >= 4);
 });
 
 test("compiles hidden scenario construction prompts for advanced controls", () => {

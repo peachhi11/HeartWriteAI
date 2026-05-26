@@ -58,6 +58,26 @@ export type ScenarioGenerationInput = {
   professionalDomain: OccupationProfessionalDomain;
 };
 
+export type ScenarioTemplateCategory =
+  | "University rivalry"
+  | "Arranged marriage"
+  | "Mafia protection"
+  | "Workplace taboo"
+  | "Friends to lovers"
+  | "Enemies to lovers"
+  | "Roommates to lovers"
+  | "Meet cute"
+  | "Meet crazy"
+  | "Meet ugly";
+
+export type ScenarioTemplate = {
+  id: string;
+  category: ScenarioTemplateCategory;
+  title: string;
+  premise: string;
+  input: Omit<ScenarioGenerationInput, "constructionPrompt">;
+};
+
 export type GeneratedScenarioArtifact = {
   id: string;
   title: string;
@@ -156,6 +176,389 @@ export const DEFAULT_SCENARIO_CONSTRUCTION_PROMPT = [
   "Do not write the user's reply, private thoughts, consent, or choices.",
   "Prioritize scene premise, relationship pressure, opening constraint, sensory anchors, and the first turn's call-to-action.",
 ].join("\n");
+
+export const SCENARIO_TEMPLATES: ScenarioTemplate[] = [
+  {
+    category: "University rivalry",
+    id: "university_rivalry_scholarship_event",
+    input: {
+      jobTitle: "University Student",
+      openingBeat:
+        "Start as the campus event visibly begins falling apart and neither rival can leave without losing the scholarship committee's attention.",
+      professionalDomain: "Corporate_Finance",
+      relationshipPressure:
+        "academic rivalry, forced leadership, public embarrassment, and unwanted mutual competence",
+      settingNotes:
+        "campus event venue, scholarship committee nearby, broken schedule, rain-soaked arrivals, students watching",
+      title: "Scholarship Rivals",
+      trope: "University rivalry forced co-leadership",
+    },
+    premise:
+      "Two top students competing for the same scholarship are forced to co-lead a disastrous campus event.",
+    title: "Scholarship Rivals",
+  },
+  {
+    category: "University rivalry",
+    id: "university_rivalry_scandal",
+    input: {
+      jobTitle: "University Student",
+      openingBeat:
+        "Begin just after the cheating accusation goes public, while both characters realize the scandal has been staged to ruin them.",
+      professionalDomain: "Arts_Entertainment",
+      relationshipPressure:
+        "public humiliation, reputation warfare, reluctant alliance, and competitive attraction",
+      settingNotes:
+        "campus athletic building, debate trophy case, phones buzzing with rumors, witnesses pretending not to stare",
+      title: "Scandal Rivals",
+      trope: "University rivalry scandal alliance",
+    },
+    premise:
+      "A star athlete and the debate-team president keep humiliating each other publicly until a cheating scandal threatens them both.",
+    title: "Scandal Rivals",
+  },
+  {
+    category: "Arranged marriage",
+    id: "arranged_marriage_shared_enemy",
+    input: {
+      jobTitle: "Political Heir",
+      openingBeat:
+        "Open during the private contract signing, when both realize their separate sabotage plans point toward the same hidden enemy.",
+      professionalDomain: "Corporate_Finance",
+      relationshipPressure:
+        "political obligation, mutual sabotage, dynastic pressure, and dangerous private recognition",
+      settingNotes:
+        "ancestral estate, contract table, family envoys outside the door, expensive silence, concealed documents",
+      title: "Sabotage Vows",
+      trope: "Arranged marriage with shared enemy",
+    },
+    premise:
+      "Two heirs agree to a political marriage, each secretly planning to sabotage it, until they discover a shared enemy.",
+    title: "Sabotage Vows",
+  },
+  {
+    category: "Arranged marriage",
+    id: "arranged_marriage_falling_kingdom",
+    input: {
+      jobTitle: "Royal Consort",
+      openingBeat:
+        "Begin after the wedding procession, when the first sign arrives that the kingdom is already collapsing.",
+      professionalDomain: "Security_Defense",
+      relationshipPressure:
+        "alliance marriage, concealed catastrophe, duty, distrust, and battlefield intimacy",
+      settingNotes:
+        "cold palace chapel, armored guards, war maps hidden beneath ceremonial fabric, bells sounding too early",
+      title: "Kingdom in Ruin",
+      trope: "Arranged royal marriage under collapse",
+    },
+    premise:
+      "A reluctant royal bride and a disgraced general marry for alliance, but only one knows the kingdom is already falling.",
+    title: "Kingdom in Ruin",
+  },
+  {
+    category: "Mafia protection",
+    id: "mafia_protection_witness",
+    input: {
+      jobTitle: "Protected Witness",
+      openingBeat:
+        "Start when the safehouse door closes and the witness realizes their protector is the mob heir they testified against.",
+      professionalDomain: "Underworld",
+      relationshipPressure:
+        "protection, betrayal history, fear, proximity, debt, and dangerous reluctant trust",
+      settingNotes:
+        "secure apartment above a closed restaurant, covered windows, burner phones, rain on fire escapes",
+      title: "Witness Under Guard",
+      trope: "Mafia protection forced proximity",
+    },
+    premise:
+      "A civilian witness is placed under the protection of the mob heir they testified against.",
+    title: "Witness Under Guard",
+  },
+  {
+    category: "Mafia protection",
+    id: "mafia_protection_nightclub_singer",
+    input: {
+      jobTitle: "Nightclub Singer",
+      openingBeat:
+        "Open backstage after the singer recognizes the assassin in the crowd and the crime family has seconds to hide them.",
+      professionalDomain: "Underworld",
+      relationshipPressure:
+        "dangerous concealment, criminal loyalty, performance masks, and intimate survival pressure",
+      settingNotes:
+        "velvet nightclub, backstage mirror lights, bass through the walls, hidden exits, armed family members",
+      title: "Hidden in Plain Sight",
+      trope: "Mafia protection nightclub witness",
+    },
+    premise:
+      "A nightclub singer becomes the only person who can identify an assassin, and a crime family hides them in plain sight.",
+    title: "Hidden in Plain Sight",
+  },
+  {
+    category: "Workplace taboo",
+    id: "workplace_taboo_coverup",
+    input: {
+      jobTitle: "Ethics Officer",
+      openingBeat:
+        "Begin when the executive and ethics officer discover the same locked file and realize exposing it would destroy them both.",
+      professionalDomain: "Corporate_Finance",
+      relationshipPressure:
+        "authority tension, moral compromise, corporate danger, and forced confidentiality",
+      settingNotes:
+        "glass boardroom after hours, locked compliance server, city lights, shredded memos, silent elevators",
+      title: "Ethics Breach",
+      trope: "Workplace taboo corporate cover-up",
+    },
+    premise:
+      "A ruthless executive and their new ethics officer are trapped in a corporate cover-up neither can expose alone.",
+    title: "Ethics Breach",
+  },
+  {
+    category: "Workplace taboo",
+    id: "workplace_taboo_merger_sabotage",
+    input: {
+      jobTitle: "Corporate Strategist",
+      openingBeat:
+        "Start during the merger presentation when their fake cooperation becomes the only cover for investigating sabotage from above.",
+      professionalDomain: "Corporate_Finance",
+      relationshipPressure:
+        "promotion rivalry, public cooperation, private suspicion, and career-threatening attraction",
+      settingNotes:
+        "merger war room, executive observers, shared laptop, hostile smiles, documents changing overnight",
+      title: "Merger Sabotage",
+      trope: "Workplace rivals fake cooperation",
+    },
+    premise:
+      "Two rivals up for the same promotion fake cooperation during a merger, only to uncover sabotage from above.",
+    title: "Merger Sabotage",
+  },
+  {
+    category: "Friends to lovers",
+    id: "friends_to_lovers_backup_wedding",
+    input: {
+      jobTitle: "Childhood Friend",
+      openingBeat:
+        "Open after the engagement announcement, when the old backup pact is mentioned too casually to be harmless.",
+      professionalDomain: "Arts_Entertainment",
+      relationshipPressure:
+        "old promises, jealousy, emotional denial, loyalty, and fear of being too late",
+      settingNotes:
+        "engagement party kitchen, half-finished toast, familiar family photos, private hallway away from guests",
+      title: "The Backup Pact",
+      trope: "Friends to lovers wedding pact",
+    },
+    premise:
+      "Two childhood friends make a pact to be each other's wedding backup, then one gets engaged.",
+    title: "The Backup Pact",
+  },
+  {
+    category: "Friends to lovers",
+    id: "friends_to_lovers_flirting_lesson",
+    input: {
+      jobTitle: "Best Friend",
+      openingBeat:
+        "Begin at the first flirting lesson, when the practice suddenly stops feeling like practice.",
+      professionalDomain: "Arts_Entertainment",
+      relationshipPressure:
+        "friendship intimacy, playful teaching, hidden longing, and accidental emotional exposure",
+      settingNotes:
+        "quiet apartment, couch cushions, mock date setup, takeout containers, too much eye contact",
+      title: "Practice Date",
+      trope: "Friends to lovers flirting lesson",
+    },
+    premise:
+      "A best friend agrees to teach the other how to flirt, not realizing they are the real object of affection.",
+    title: "Practice Date",
+  },
+  {
+    category: "Enemies to lovers",
+    id: "enemies_to_lovers_chained_escape",
+    input: {
+      jobTitle: "Bounty Hunter",
+      openingBeat:
+        "Start immediately after the prison break, with the chain still locked and pursuit closing in.",
+      professionalDomain: "Security_Defense",
+      relationshipPressure:
+        "physical tethering, distrust, survival, mutual competence, and forced bodily coordination",
+      settingNotes:
+        "storm drain outside a prison, alarms, mud, bruised wrists, searchlights sweeping closer",
+      title: "Chained Escape",
+      trope: "Enemies to lovers chained together",
+    },
+    premise:
+      "A bounty hunter and a fugitive are chained together after a prison break.",
+    title: "Chained Escape",
+  },
+  {
+    category: "Enemies to lovers",
+    id: "enemies_to_lovers_spy_marriage",
+    input: {
+      jobTitle: "Field Spy",
+      openingBeat:
+        "Open as their fake marriage papers are approved at the border and the enemy checkpoint asks them to prove the act.",
+      professionalDomain: "Security_Defense",
+      relationshipPressure:
+        "assassination orders, false intimacy, enemy territory, performance pressure, and lethal attraction",
+      settingNotes:
+        "foreign checkpoint, forged rings, cold passports, listening devices, one shared hotel room ahead",
+      title: "Married to the Target",
+      trope: "Enemy spies fake marriage",
+    },
+    premise:
+      "Two rival spies assigned to kill each other must pretend to be married to survive enemy territory.",
+    title: "Married to the Target",
+  },
+  {
+    category: "Roommates to lovers",
+    id: "roommates_to_lovers_novelist",
+    input: {
+      jobTitle: "Graduate Student",
+      openingBeat:
+        "Begin when the student finds a draft scene that is unmistakably about them, written by the reclusive novelist downstairs.",
+      professionalDomain: "Arts_Entertainment",
+      relationshipPressure:
+        "domestic proximity, creative obsession, privacy boundaries, and being seen too accurately",
+      settingNotes:
+        "old rental house, thin walls, manuscript pages, midnight kettle, rain at the windows",
+      title: "The Draft Upstairs",
+      trope: "Roommates to lovers novelist muse",
+    },
+    premise:
+      "A broke grad student rents a room from a reclusive novelist and starts appearing in their drafts.",
+    title: "The Draft Upstairs",
+  },
+  {
+    category: "Roommates to lovers",
+    id: "roommates_to_lovers_exes_lease",
+    input: {
+      jobTitle: "Reluctant Roommate",
+      openingBeat:
+        "Open on move-in day, when both exes realize the lease is legally airtight and neither will surrender first.",
+      professionalDomain: "Arts_Entertainment",
+      relationshipPressure:
+        "unfinished history, domestic warfare, pride, shared space, and unwanted familiarity",
+      settingNotes:
+        "small apartment, stacked boxes, one broken elevator, duplicate keys, old arguments in every room",
+      title: "Same Lease",
+      trope: "Roommates to lovers exes forced proximity",
+    },
+    premise:
+      "Two exes accidentally sign the same lease and refuse to move out first.",
+    title: "Same Lease",
+  },
+  {
+    category: "Meet cute",
+    id: "meet_cute_obscure_book",
+    input: {
+      jobTitle: "Bookstore Regular",
+      openingBeat:
+        "Start with both hands landing on the last copy and neither person letting go.",
+      professionalDomain: "Arts_Entertainment",
+      relationshipPressure:
+        "instant banter, intellectual rivalry, curiosity, and playful refusal to yield",
+      settingNotes:
+        "independent bookshop, narrow aisle, rain outside, rare edition shelf, amused cashier nearby",
+      title: "The Last Copy",
+      trope: "Meet cute bookshop rivalry",
+    },
+    premise:
+      "They both reach for the last copy of the same obscure book and spend the day arguing over who needs it more.",
+    title: "The Last Copy",
+  },
+  {
+    category: "Meet cute",
+    id: "meet_cute_lost_dog",
+    input: {
+      jobTitle: "Neighbor",
+      openingBeat:
+        "Begin with the runaway dog proudly arriving again, forcing the owner and stranger into another doorstep conversation.",
+      professionalDomain: "Arts_Entertainment",
+      relationshipPressure:
+        "gentle repetition, neighborly curiosity, accidental routine, and low-stakes vulnerability",
+      settingNotes:
+        "apartment doorway, muddy pawprints, dog leash, sunset hallway light, familiar embarrassed apology",
+      title: "Runaway Matchmaker",
+      trope: "Meet cute runaway dog",
+    },
+    premise:
+      "A lost dog keeps escaping one owner's yard and showing up at the same stranger's apartment.",
+    title: "Runaway Matchmaker",
+  },
+  {
+    category: "Meet crazy",
+    id: "meet_crazy_bank_robbery",
+    input: {
+      jobTitle: "Dangerous Stranger",
+      openingBeat:
+        "Open during the robbery, when both characters clock each other as far more dangerous than the robbers.",
+      professionalDomain: "Underworld",
+      relationshipPressure:
+        "concealed competence, adrenaline, mutual suspicion, and attraction under threat",
+      settingNotes:
+        "bank lobby, alarms, dropped cash, masked robbers shouting, two strangers staying too calm",
+      title: "Wrong Hostage",
+      trope: "Meet crazy bank robbery",
+    },
+    premise:
+      "They meet during a bank robbery, both pretending not to be the most dangerous person in the room.",
+    title: "Wrong Hostage",
+  },
+  {
+    category: "Meet crazy",
+    id: "meet_crazy_trunk",
+    input: {
+      jobTitle: "Kidnapping Victim",
+      openingBeat:
+        "Start in the trunk, with both strangers tied up and accusing each other before the car stops.",
+      professionalDomain: "Underworld",
+      relationshipPressure:
+        "panic, suspicion, absurd intimacy, survival strategy, and immediate forced trust",
+      settingNotes:
+        "dark car trunk, muffled road noise, zip ties, stale carpet, brake lights through metal seams",
+      title: "Same Trunk",
+      trope: "Meet crazy mistaken kidnapping",
+    },
+    premise:
+      "A mistaken kidnapping puts two strangers in the same trunk, each convinced the other is involved.",
+    title: "Same Trunk",
+  },
+  {
+    category: "Meet ugly",
+    id: "meet_ugly_prototype_coffee",
+    input: {
+      jobTitle: "Product Designer",
+      openingBeat:
+        "Begin seconds after the coffee hits the prototype, with the presentation room already filling outside.",
+      professionalDomain: "Corporate_Finance",
+      relationshipPressure:
+        "career damage, outrage, forced repair, public stakes, and unwilling dependence",
+      settingNotes:
+        "conference prep room, ruined prototype, coffee smell, countdown timer, executives outside",
+      title: "Prototype Disaster",
+      trope: "Meet ugly career sabotage accident",
+    },
+    premise:
+      "One ruins the other's career-making presentation by spilling coffee on the only prototype.",
+    title: "Prototype Disaster",
+  },
+  {
+    category: "Meet ugly",
+    id: "meet_ugly_parking_wedding",
+    input: {
+      jobTitle: "Wedding Guest",
+      openingBeat:
+        "Open at the reception table assignment, moments after the parking-lot screaming match.",
+      professionalDomain: "Arts_Entertainment",
+      relationshipPressure:
+        "bad first impression, social confinement, public politeness, and escalating irritation",
+      settingNotes:
+        "wedding reception, assigned seats, champagne flutes, family watching, one empty chair between them",
+      title: "Parking Spot Wedding",
+      trope: "Meet ugly wedding seating disaster",
+    },
+    premise:
+      "They get into a screaming match over a parking spot, then discover they are seated together at a wedding.",
+    title: "Parking Spot Wedding",
+  },
+];
 
 export function generatePersonaArtifact(
   input: PersonaGenerationInput,
@@ -346,6 +749,32 @@ export function generateScenarioArtifact(
     updatedAt: Date.now(),
     source: "generated",
   };
+}
+
+export function createScenarioInputFromTemplate(
+  templateId: string,
+  previousInput?: Partial<ScenarioGenerationInput>,
+): ScenarioGenerationInput {
+  const template = getScenarioTemplate(templateId);
+  if (!template) {
+    throw new Error(`Scenario template "${templateId}" was not found.`);
+  }
+
+  return {
+    ...template.input,
+    constructionPrompt: previousInput?.constructionPrompt ??
+      DEFAULT_SCENARIO_CONSTRUCTION_PROMPT,
+  };
+}
+
+export function getScenarioTemplate(templateId: string) {
+  return SCENARIO_TEMPLATES.find((template) => template.id === templateId);
+}
+
+export function getScenarioTemplateCategories(): ScenarioTemplateCategory[] {
+  return Array.from(
+    new Set(SCENARIO_TEMPLATES.map((template) => template.category)),
+  );
 }
 
 export function createBlankScenarioArtifact(
@@ -584,6 +1013,45 @@ export function generateLorebookArtifact(
     trope,
     updatedAt: Date.now(),
     source: "generated",
+  };
+}
+
+export function generateSuggestedLorebookFromScenario(
+  scenario: GeneratedScenarioArtifact,
+  options: Partial<Pick<LorebookGenerationInput, "professionalDomain" | "speciesType">> = {},
+): GeneratedLorebookArtifact {
+  const professionalDomain = options.professionalDomain ??
+    readProfessionalDomainFromOccupation(scenario.occupation);
+  const speciesType = options.speciesType ?? "Human";
+  const lorebook = generateLorebookArtifact({
+    jobTitle: scenario.occupation.jobTitle,
+    professionalDomain,
+    speciesType,
+    title: `${scenario.title} Lore`,
+    trope: scenario.trope,
+  });
+
+  return {
+    ...lorebook,
+    summary: {
+      ...lorebook.summary,
+      aiLoreInstruction: [
+        lorebook.summary.aiLoreInstruction,
+        `Scenario bridge: ${scenario.summary}`,
+        `Opening constraint: ${scenario.firstMessage.aiOutputConstraint}`,
+      ].join("\n"),
+      universeAnchor: `${scenario.title} Lore`,
+    },
+    tags: normalizeTags(
+      [
+        ...lorebook.tags,
+        "suggested lore",
+        "scenario bridge",
+        scenario.title,
+      ].join(", "),
+    ),
+    title: `${scenario.title} Lore`,
+    updatedAt: Date.now(),
   };
 }
 
@@ -903,6 +1371,16 @@ function readUnknownString(value: unknown) {
 
 function readUnknownNumber(value: unknown) {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function readProfessionalDomainFromOccupation(
+  occupation: GeneratedOccupationData,
+): OccupationProfessionalDomain {
+  if (occupation.kind === "professional") {
+    return occupation.professionalDomain;
+  }
+
+  return "Arts_Entertainment";
 }
 
 function readKnownValue<const T extends readonly string[]>(

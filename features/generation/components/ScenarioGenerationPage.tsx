@@ -8,6 +8,7 @@ import {
   CopyPlus,
   Download,
   FilePlus2,
+  LibraryBig,
   Save,
   Trash2,
   Upload,
@@ -31,13 +32,25 @@ import {
   createBlankScenarioArtifact,
   createDuplicateArtifactId,
   createImportedScenarioArtifact,
+  createScenarioInputFromTemplate,
   createScenarioArtifactFromEditable,
   DEFAULT_SCENARIO_CONSTRUCTION_PROMPT,
   generateScenarioArtifact,
+  generateSuggestedLorebookFromScenario,
+  getScenarioTemplateCategories,
+  SCENARIO_TEMPLATES,
   type GeneratedScenarioArtifact,
+  type GeneratedLorebookArtifact,
   type ScenarioGenerationInput,
+  type ScenarioTemplateCategory,
 } from "@/features/generation/workflows";
+import {
+  createLorebookV3ExportFileName,
+  generatedLorebookArtifactToV3Document,
+  serializeLorebookV3Document,
+} from "@/features/lorebooks/adapters";
 import { useRuntimeEngineSettings } from "@/features/settings/runtimeModeStore";
+import { saveLorebookLibraryItem } from "@/hooks/useLorebookLibrary";
 import {
   deleteScenarioLibraryItem,
   saveScenarioLibraryItem,
@@ -108,10 +121,19 @@ const defaultInput: ScenarioGenerationInput = {
   trope: "Academic rivals forced proximity",
 };
 
+const scenarioCategories = getScenarioTemplateCategories();
+const defaultTemplateId = "university_rivalry_scholarship_event";
+
 export function ScenarioGenerationPage() {
   const [input, setInput] = useState(defaultInput);
+  const [selectedCategory, setSelectedCategory] =
+    useState<ScenarioTemplateCategory>("University rivalry");
+  const [selectedTemplateId, setSelectedTemplateId] =
+    useState(defaultTemplateId);
   const [activeScenario, setActiveScenario] =
     useState<GeneratedScenarioArtifact>(() => generateScenarioArtifact(defaultInput));
+  const [suggestedLorebook, setSuggestedLorebook] =
+    useState<GeneratedLorebookArtifact | null>(null);
   const [savedSnapshot, setSavedSnapshot] = useState<string | null>(null);
   const [deleteArmed, setDeleteArmed] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
@@ -125,6 +147,19 @@ export function ScenarioGenerationPage() {
     () => compileScenarioConstructionPrompt(input),
     [input],
   );
+  const visibleTemplates = useMemo(
+    () =>
+      SCENARIO_TEMPLATES.filter(
+        (template) => template.category === selectedCategory,
+      ),
+    [selectedCategory],
+  );
+  const selectedTemplate = useMemo(
+    () =>
+      SCENARIO_TEMPLATES.find((template) => template.id === selectedTemplateId) ??
+      SCENARIO_TEMPLATES[0],
+    [selectedTemplateId],
+  );
   const isDirty = savedSnapshot !== serialized;
 
   function updateInput<K extends keyof ScenarioGenerationInput>(
@@ -134,8 +169,32 @@ export function ScenarioGenerationPage() {
     setInput((current) => ({ ...current, [key]: value }));
   }
 
+  function applyTemplate(templateId: string) {
+    const template = SCENARIO_TEMPLATES.find((item) => item.id === templateId);
+    if (!template) {
+      return;
+    }
+
+    setSelectedCategory(template.category);
+    setSelectedTemplateId(template.id);
+    setInput((current) => createScenarioInputFromTemplate(template.id, current));
+    setStatus(`Loaded template: ${template.title}. Adjust details, then generate.`);
+  }
+
+  function changeCategory(category: ScenarioTemplateCategory) {
+    const firstTemplate = SCENARIO_TEMPLATES.find(
+      (template) => template.category === category,
+    );
+
+    setSelectedCategory(category);
+    if (firstTemplate) {
+      applyTemplate(firstTemplate.id);
+    }
+  }
+
   function generate() {
     setActiveScenario(generateScenarioArtifact(input));
+    setSuggestedLorebook(null);
     setSavedSnapshot(null);
     setDeleteArmed(false);
     setStatus("Generated scenario draft.");
@@ -143,6 +202,7 @@ export function ScenarioGenerationPage() {
 
   function newBlankScenario() {
     setActiveScenario(createBlankScenarioArtifact());
+    setSuggestedLorebook(null);
     setSavedSnapshot(null);
     setDeleteArmed(false);
     setStatus("Started a blank scenario draft. Save when ready.");
@@ -171,6 +231,7 @@ export function ScenarioGenerationPage() {
     });
     await saveScenarioLibraryItem(copied);
     setActiveScenario(copied);
+    setSuggestedLorebook(null);
     await library.refresh();
     setSavedSnapshot(JSON.stringify(copied, null, 2));
     setDeleteArmed(false);
@@ -188,6 +249,7 @@ export function ScenarioGenerationPage() {
     await library.refresh();
     const blank = createBlankScenarioArtifact();
     setActiveScenario(blank);
+    setSuggestedLorebook(null);
     setSavedSnapshot(null);
     setDeleteArmed(false);
     setStatus(`Deleted ${activeScenario.title} from the scenario library.`);
@@ -201,6 +263,7 @@ export function ScenarioGenerationPage() {
       title,
       updatedAt: Date.now(),
     }));
+    setSuggestedLorebook(null);
     setSavedSnapshot(null);
     setDeleteArmed(false);
     setStatus(`Duplicated ${activeScenario.title}. Save it when ready.`);
@@ -209,6 +272,7 @@ export function ScenarioGenerationPage() {
   function loadScenario(item: GeneratedScenarioArtifact) {
     const normalized = createScenarioArtifactFromEditable(item);
     setActiveScenario(normalized);
+    setSuggestedLorebook(null);
     setSavedSnapshot(JSON.stringify(normalized, null, 2));
     setDeleteArmed(false);
     setStatus(`Loaded ${item.title}.`);
@@ -224,6 +288,7 @@ export function ScenarioGenerationPage() {
         updatedAt: current.updatedAt,
       }),
     );
+    setSuggestedLorebook(null);
     setDeleteArmed(false);
     setStatus("Edited scenario draft. Save when ready.");
   }
@@ -293,12 +358,52 @@ export function ScenarioGenerationPage() {
         file.name,
       );
       setActiveScenario(imported);
+      setSuggestedLorebook(null);
       setSavedSnapshot(null);
       setDeleteArmed(false);
       setStatus(`Imported ${imported.title}. Review and save when ready.`);
     } catch (caughtError) {
       setStatus(`Import failed: ${caughtError instanceof Error ? caughtError.message : String(caughtError)}`);
     }
+  }
+
+  function generateSuggestedLore() {
+    const lorebook = generateSuggestedLorebookFromScenario(activeScenario, {
+      professionalDomain: input.professionalDomain,
+      speciesType: "Human",
+    });
+    const v3Document = generatedLorebookArtifactToV3Document(lorebook);
+
+    setSuggestedLorebook({
+      ...lorebook,
+      v3Document,
+    });
+    setStatus("Generated optional suggested lore from the active scenario.");
+  }
+
+  async function saveSuggestedLore() {
+    if (!suggestedLorebook) {
+      return;
+    }
+
+    await saveLorebookLibraryItem(suggestedLorebook);
+    setStatus(`Saved ${suggestedLorebook.title} to the lorebook library.`);
+  }
+
+  function exportSuggestedLore() {
+    if (!suggestedLorebook) {
+      return;
+    }
+
+    const document =
+      suggestedLorebook.v3Document ??
+      generatedLorebookArtifactToV3Document(suggestedLorebook);
+    downloadUint8Array(
+      new TextEncoder().encode(serializeLorebookV3Document(document)),
+      createLorebookV3ExportFileName(document.data.name),
+      "application/json",
+    );
+    setStatus("Exported suggested lorebook V3 JSON.");
   }
 
   return (
@@ -308,6 +413,39 @@ export function ScenarioGenerationPage() {
           title="Scenario Generator"
           description="Pick the ingredients, generate a playable scene setup, then edit every field before saving."
         >
+          <Field label="Scenario route">
+            <select
+              value={selectedCategory}
+              onChange={(event) =>
+                changeCategory(event.currentTarget.value as ScenarioTemplateCategory)
+              }
+              className="h-10 rounded-md border bg-background px-3 text-sm"
+            >
+              {scenarioCategories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Story seed">
+            <select
+              value={selectedTemplateId}
+              onChange={(event) => applyTemplate(event.currentTarget.value)}
+              className="h-10 rounded-md border bg-background px-3 text-sm"
+            >
+              {visibleTemplates.map((template) => (
+                <option key={template.id} value={template.id}>
+                  {template.title}
+                </option>
+              ))}
+            </select>
+          </Field>
+          {selectedTemplate ? (
+            <section className="rounded-md border bg-background/70 p-3 text-sm leading-6 text-muted-foreground">
+              {selectedTemplate.premise}
+            </section>
+          ) : null}
           <Field label="Scenario title">
             <Input
               value={input.title}
@@ -443,6 +581,10 @@ export function ScenarioGenerationPage() {
               <Button type="button" variant="outline" onClick={saveAsCopy}>
                 <Save className="size-4" />
                 Save As
+              </Button>
+              <Button type="button" variant="outline" onClick={generateSuggestedLore}>
+                <LibraryBig className="size-4" />
+                Generate Suggested Lore
               </Button>
               <Button type="button" variant="outline" onClick={exportJson}>
                 <Download className="size-4" />
@@ -695,6 +837,52 @@ export function ScenarioGenerationPage() {
                 </ResultBlock>
               </div>
             </section>
+            {suggestedLorebook ? (
+              <section className="rounded-md border bg-background/70 p-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <h3 className="text-sm font-semibold">
+                      Suggested Lore Draft
+                    </h3>
+                    <p className="mt-1 text-sm leading-6 text-muted-foreground">
+                      {suggestedLorebook.title} ·{" "}
+                      {suggestedLorebook.entries.length} modular entries
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onClick={exportSuggestedLore}
+                    >
+                      <Download className="size-4" />
+                      Export Lore
+                    </Button>
+                    <Button type="button" size="sm" onClick={saveSuggestedLore}>
+                      <Save className="size-4" />
+                      Save Lore
+                    </Button>
+                  </div>
+                </div>
+                <div className="mt-3 grid gap-3 md:grid-cols-2">
+                  {suggestedLorebook.entries.slice(0, 4).map((entry) => (
+                    <section
+                      key={entry.entryId}
+                      className="rounded-md border bg-card/60 p-3"
+                    >
+                      <h4 className="text-sm font-medium">{entry.title}</h4>
+                      <p className="mt-1 line-clamp-3 text-xs leading-5 text-muted-foreground">
+                        {entry.entryContent}
+                      </p>
+                      <p className="mt-2 truncate text-xs text-muted-foreground">
+                        Keys: {entry.activationKeys.join(", ")}
+                      </p>
+                    </section>
+                  ))}
+                </div>
+              </section>
+            ) : null}
           </CardContent>
         </Card>
       </div>
