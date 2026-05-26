@@ -55,6 +55,48 @@ const professionalDomains: OccupationProfessionalDomain[] = [
   "Underworld",
 ];
 
+const plotHooks: GeneratedScenarioArtifact["scenario"]["plotHook"][] = [
+  "The_Chance_Encounter",
+  "The_Crisis",
+  "The_Mandate",
+  "The_Secret_Transaction",
+];
+
+const settingTypes: GeneratedScenarioArtifact["scenario"]["settingType"][] = [
+  "Atmospheric_Wilderness",
+  "Contained_Insular",
+  "Corporate_Institutional",
+  "Public_HighExposure",
+];
+
+const startingTensions: GeneratedScenarioArtifact["scenario"]["startingTension"][] = [
+  "Charged_Electric",
+  "Combative_Friction",
+  "Formal_Chilling",
+  "Vulnerable_Exhausted",
+];
+
+const entryPoints: GeneratedScenarioArtifact["firstMessage"]["entryPoint"][] = [
+  "Active_Collision",
+  "Mid_Action_Dialogue",
+  "Post_Crisis_Quiet",
+  "The_Approach",
+];
+
+const literaryStyles: GeneratedScenarioArtifact["firstMessage"]["literaryStyle"][] = [
+  "Action_Dialogue_Hybrid",
+  "Chat_Symphonic",
+  "Internal_Monologue_Heavy",
+  "Novella_Prose",
+];
+
+const userCallsToAction: GeneratedScenarioArtifact["firstMessage"]["userCallToAction"][] = [
+  "Direct_Question",
+  "Physical_Gesture",
+  "Vulnerable_Slip",
+  "Weighted_StandOff",
+];
+
 const defaultInput: ScenarioGenerationInput = {
   constructionPrompt: DEFAULT_SCENARIO_CONSTRUCTION_PROMPT,
   jobTitle: "University Student",
@@ -184,6 +226,43 @@ export function ScenarioGenerationPage() {
     );
     setDeleteArmed(false);
     setStatus("Edited scenario draft. Save when ready.");
+  }
+
+  function editScenarioData(
+    patch: Partial<GeneratedScenarioArtifact["scenario"]>,
+  ) {
+    editScenario({
+      scenario: {
+        ...activeScenario.scenario,
+        ...patch,
+      },
+      summary:
+        typeof patch.scenePremiseDescription === "string"
+          ? patch.scenePremiseDescription
+          : activeScenario.summary,
+    });
+  }
+
+  function editFirstMessage(
+    patch: Partial<GeneratedScenarioArtifact["firstMessage"]>,
+  ) {
+    editScenario({
+      firstMessage: {
+        ...activeScenario.firstMessage,
+        ...patch,
+      },
+    });
+  }
+
+  function editOccupation(
+    patch: Partial<GeneratedScenarioArtifact["occupation"]>,
+  ) {
+    editScenario({
+      occupation: {
+        ...activeScenario.occupation,
+        ...patch,
+      } as GeneratedScenarioArtifact["occupation"],
+    });
   }
 
   async function copy() {
@@ -419,12 +498,8 @@ export function ScenarioGenerationPage() {
                 className="min-h-32"
                 value={activeScenario.summary}
                 onChange={(event) =>
-                  editScenario({
-                    scenario: {
-                      ...activeScenario.scenario,
-                      scenePremiseDescription: event.currentTarget.value,
-                    },
-                    summary: event.currentTarget.value,
+                  editScenarioData({
+                    scenePremiseDescription: event.currentTarget.value,
                   })
                 }
               />
@@ -434,58 +509,164 @@ export function ScenarioGenerationPage() {
                 className="min-h-32"
                 value={activeScenario.firstMessage.aiOutputConstraint}
                 onChange={(event) =>
-                  editScenario({
-                    firstMessage: {
-                      ...activeScenario.firstMessage,
-                      aiOutputConstraint: event.currentTarget.value,
-                    },
+                  editFirstMessage({
+                    aiOutputConstraint: event.currentTarget.value,
                   })
                 }
               />
             </Field>
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="grid gap-4 md:grid-cols-3">
+              <Field label="Plot hook">
+                <select
+                  value={activeScenario.scenario.plotHook}
+                  onChange={(event) =>
+                    editScenarioData({
+                      plotHook: event.currentTarget.value as GeneratedScenarioArtifact["scenario"]["plotHook"],
+                    })
+                  }
+                  className="h-10 rounded-md border bg-background px-3 text-sm"
+                >
+                  {plotHooks.map((plotHook) => (
+                    <option key={plotHook} value={plotHook}>
+                      {formatOption(plotHook)}
+                    </option>
+                  ))}
+                </select>
+              </Field>
               <Field label="Setting type">
-                <Input
+                <select
                   value={activeScenario.scenario.settingType}
                   onChange={(event) =>
-                    editScenario({
-                      scenario: {
-                        ...activeScenario.scenario,
-                        settingType: event.currentTarget.value as GeneratedScenarioArtifact["scenario"]["settingType"],
-                      },
+                    editScenarioData({
+                      settingType: event.currentTarget.value as GeneratedScenarioArtifact["scenario"]["settingType"],
                     })
                   }
-                />
+                  className="h-10 rounded-md border bg-background px-3 text-sm"
+                >
+                  {settingTypes.map((settingType) => (
+                    <option key={settingType} value={settingType}>
+                      {formatOption(settingType)}
+                    </option>
+                  ))}
+                </select>
               </Field>
               <Field label="Starting tension">
-                <Input
+                <select
                   value={activeScenario.scenario.startingTension}
                   onChange={(event) =>
-                    editScenario({
-                      scenario: {
-                        ...activeScenario.scenario,
-                        startingTension: event.currentTarget.value as GeneratedScenarioArtifact["scenario"]["startingTension"],
-                      },
+                    editScenarioData({
+                      startingTension: event.currentTarget.value as GeneratedScenarioArtifact["scenario"]["startingTension"],
                     })
                   }
-                />
+                  className="h-10 rounded-md border bg-background px-3 text-sm"
+                >
+                  {startingTensions.map((startingTension) => (
+                    <option key={startingTension} value={startingTension}>
+                      {formatOption(startingTension)}
+                    </option>
+                  ))}
+                </select>
               </Field>
             </div>
             <Field label="Sensory anchors">
               <Input
                 value={activeScenario.scenario.sensoryDetails.join(", ")}
                 onChange={(event) =>
-                  editScenario({
-                    scenario: {
-                      ...activeScenario.scenario,
-                      sensoryDetails: event.currentTarget.value
-                        .split(",")
-                        .map((detail) => detail.trim()),
-                    },
+                  editScenarioData({
+                    sensoryDetails: event.currentTarget.value
+                      .split(",")
+                      .map((detail) => detail.trim()),
                   })
                 }
               />
             </Field>
+            <div className="grid gap-4 md:grid-cols-3">
+              <Field label="Entry point">
+                <select
+                  value={activeScenario.firstMessage.entryPoint}
+                  onChange={(event) =>
+                    editFirstMessage({
+                      entryPoint: event.currentTarget.value as GeneratedScenarioArtifact["firstMessage"]["entryPoint"],
+                    })
+                  }
+                  className="h-10 rounded-md border bg-background px-3 text-sm"
+                >
+                  {entryPoints.map((entryPoint) => (
+                    <option key={entryPoint} value={entryPoint}>
+                      {formatOption(entryPoint)}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="Writing style">
+                <select
+                  value={activeScenario.firstMessage.literaryStyle}
+                  onChange={(event) =>
+                    editFirstMessage({
+                      literaryStyle: event.currentTarget.value as GeneratedScenarioArtifact["firstMessage"]["literaryStyle"],
+                    })
+                  }
+                  className="h-10 rounded-md border bg-background px-3 text-sm"
+                >
+                  {literaryStyles.map((literaryStyle) => (
+                    <option key={literaryStyle} value={literaryStyle}>
+                      {formatOption(literaryStyle)}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              <Field label="User handoff">
+                <select
+                  value={activeScenario.firstMessage.userCallToAction}
+                  onChange={(event) =>
+                    editFirstMessage({
+                      userCallToAction: event.currentTarget.value as GeneratedScenarioArtifact["firstMessage"]["userCallToAction"],
+                    })
+                  }
+                  className="h-10 rounded-md border bg-background px-3 text-sm"
+                >
+                  {userCallsToAction.map((userCallToAction) => (
+                    <option key={userCallToAction} value={userCallToAction}>
+                      {formatOption(userCallToAction)}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              <Field label="Opening token cap">
+                <Input
+                  min={120}
+                  max={1200}
+                  type="number"
+                  value={activeScenario.firstMessage.tokenLengthCap}
+                  onChange={(event) =>
+                    editFirstMessage({
+                      tokenLengthCap: numberFromInput(
+                        event.currentTarget.value,
+                        activeScenario.firstMessage.tokenLengthCap,
+                      ),
+                    })
+                  }
+                />
+              </Field>
+              <Field label="Occupation / role">
+                <Input
+                  value={activeScenario.occupation.jobTitle}
+                  onChange={(event) =>
+                    editOccupation({ jobTitle: event.currentTarget.value })
+                  }
+                />
+              </Field>
+              <Field label="Workplace / social vibe">
+                <Input
+                  value={activeScenario.occupation.workplaceVibe}
+                  onChange={(event) =>
+                    editOccupation({ workplaceVibe: event.currentTarget.value })
+                  }
+                />
+              </Field>
+            </div>
             <section className="rounded-md border bg-background/70 p-4">
               <div className="mb-3 flex flex-wrap gap-2">
                 {activeScenario.tags.map((tag) => (
@@ -600,6 +781,15 @@ function ResultBlock(props: { children: React.ReactNode; title: string }) {
       <p className="text-sm leading-6 text-muted-foreground">{props.children}</p>
     </section>
   );
+}
+
+function formatOption(value: string) {
+  return value.replaceAll("_", " ");
+}
+
+function numberFromInput(value: string, fallback: number) {
+  const parsed = Number.parseInt(value, 10);
+  return Number.isFinite(parsed) ? parsed : fallback;
 }
 
 function formatSourceLabel(item: Pick<GeneratedScenarioArtifact, "source">) {

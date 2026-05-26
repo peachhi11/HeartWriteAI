@@ -274,6 +274,8 @@ export function LorebookGenerationPage() {
       const artifact = createImportedLorebookArtifact(document, file.name);
       setActiveLorebook(artifact);
       setActiveDocument(document);
+      setSavedSnapshot(null);
+      setDeleteArmed(false);
       setStatus(
         `Imported ${document.data.name ?? file.name} with ${document.data.entries.length} entries. Review and save when ready.`,
       );
