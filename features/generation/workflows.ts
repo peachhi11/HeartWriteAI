@@ -105,6 +105,7 @@ export type BundlePersonaSource = {
 export type RuntimeBundleArtifact = {
   id: string;
   title: string;
+  source?: "created" | "imported";
   persona?: {
     id: string;
     name: string;
@@ -774,10 +775,68 @@ export function createRuntimeBundleArtifact(
     lorebook,
     persona,
     scenario,
+    source: "created",
     tags,
     title,
     updatedAt: Date.now(),
   };
+}
+
+export function createRuntimeBundleArtifactFromEditable(
+  input: RuntimeBundleArtifact,
+): RuntimeBundleArtifact {
+  const title = input.title.trim() || "Untitled Runtime Bundle";
+  const tags = normalizeTags(
+    [
+      "bundle",
+      ...(input.tags ?? []),
+      input.persona?.name,
+      input.scenario?.title,
+      input.lorebook?.title,
+    ].filter(Boolean).join(", "),
+  );
+
+  return {
+    ...input,
+    compiledContext: compileRuntimeBundleContext({
+      lorebook: input.lorebook,
+      persona: input.persona,
+      scenario: input.scenario,
+      title,
+    }),
+    tags,
+    title,
+    updatedAt: input.updatedAt ?? Date.now(),
+  };
+}
+
+export function createImportedRuntimeBundleArtifact(
+  value: unknown,
+  sourceFileName?: string,
+): RuntimeBundleArtifact {
+  if (!isRecord(value)) {
+    throw new Error("Runtime bundle JSON must be an object.");
+  }
+
+  const title = readUnknownString(value.title) ||
+    sourceFileName?.replace(/\.json$/i, "").trim() ||
+    "Imported Runtime Bundle";
+  const persona = readBundlePersona(value.persona);
+  const scenario = readBundleScenario(value.scenario);
+  const lorebook = readBundleLorebook(value.lorebook);
+
+  return createRuntimeBundleArtifactFromEditable({
+    compiledContext: readUnknownString(value.compiledContext),
+    id: readUnknownString(value.id) ||
+      createArtifactId("bundle", `${title}:${sourceFileName ?? "imported"}`),
+    lorebook,
+    persona,
+    scenario,
+    source: "imported",
+    tags: normalizeTagsFromUnknown(value.tags),
+    title,
+    updatedAt: readUnknownNumber(value.updatedAt) ?? Date.now(),
+  });
 }
 
 export function artifactToJsonBytes(artifact: unknown) {
@@ -854,6 +913,94 @@ function readKnownValue<const T extends readonly string[]>(
   return typeof value === "string" && allowed.includes(value as T[number])
     ? value as T[number]
     : fallback;
+}
+
+function readBundlePersona(
+  value: unknown,
+): RuntimeBundleArtifact["persona"] | undefined {
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  const name = readUnknownString(value.name);
+  const id = readUnknownString(value.id);
+
+  if (!name || !id) {
+    return undefined;
+  }
+
+  return {
+    id,
+    name,
+    prompt: readUnknownString(value.prompt) || `USER PERSONA: ${name}`,
+    summary: readUnknownString(value.summary) ||
+      `${name} is the selected user persona.`,
+  };
+}
+
+function readBundleScenario(
+  value: unknown,
+): RuntimeBundleArtifact["scenario"] | undefined {
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  const title = readUnknownString(value.title);
+  const id = readUnknownString(value.id);
+
+  if (!title || !id) {
+    return undefined;
+  }
+
+  return {
+    id,
+    openingConstraint: readUnknownString(value.openingConstraint) ||
+      "Open the scene without writing {{user}}'s reply, choices, or internal state.",
+    settingType: readUnknownString(value.settingType) || "Unspecified",
+    startingTension: readUnknownString(value.startingTension) || "Unspecified",
+    summary: readUnknownString(value.summary) ||
+      `${title} is the selected roleplay scenario.`,
+    title,
+  };
+}
+
+function readBundleLorebook(
+  value: unknown,
+): RuntimeBundleArtifact["lorebook"] | undefined {
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  const title = readUnknownString(value.title);
+  const id = readUnknownString(value.id);
+
+  if (!title || !id) {
+    return undefined;
+  }
+
+  return {
+    entries: Array.isArray(value.entries)
+      ? value.entries
+          .filter(isRecord)
+          .map((entry) => ({
+            activationKeys: Array.isArray(entry.activationKeys)
+              ? entry.activationKeys
+                  .map((key) => readUnknownString(key))
+                  .filter(Boolean)
+                  .slice(0, 12)
+              : [],
+            content: readUnknownString(entry.content),
+            title: readUnknownString(entry.title) || "Untitled entry",
+          }))
+          .filter((entry) => entry.content)
+          .slice(0, 80)
+      : [],
+    id,
+    summary: readUnknownString(value.summary) ||
+      `${title} is the selected lorebook.`,
+    title,
+    universeAnchor: readUnknownString(value.universeAnchor) || title,
+  };
 }
 
 function compileRuntimeBundleContext(input: {

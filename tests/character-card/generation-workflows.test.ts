@@ -6,11 +6,13 @@ import {
   compileScenarioConstructionPrompt,
   createBlankPersonaArtifact,
   createImportedPersonaArtifact,
+  createImportedRuntimeBundleArtifact,
   createBlankScenarioArtifact,
   createImportedScenarioArtifact,
   createBlankLorebookArtifact,
   createLorebookArtifactFromV3Document,
   createPersonaArtifactFromEditable,
+  createRuntimeBundleArtifactFromEditable,
   createScenarioArtifactFromEditable,
   createRuntimeBundleArtifact,
   generateLorebookArtifact,
@@ -318,6 +320,65 @@ test("runtime bundles prefer edited lorebook v3 documents when present", () => {
   assert.match(bundle.compiledContext, /Edited Rule/);
   assert.match(bundle.compiledContext, /edited archive/);
   assert.match(bundle.compiledContext, /Edited archive rule/);
+});
+
+test("imports and syncs runtime bundle artifacts from editable JSON", () => {
+  const imported = createImportedRuntimeBundleArtifact({
+    id: "bundle_custom",
+    lorebook: {
+      entries: [
+        {
+          activationKeys: ["archive"],
+          content: "The archive is watched after midnight.",
+          title: "Archive Rule",
+        },
+      ],
+      id: "lore_custom",
+      summary: "A campus lorebook.",
+      title: "Campus Canon",
+      universeAnchor: "Campus Canon",
+    },
+    persona: {
+      id: "persona_custom",
+      name: "Ari",
+      prompt: "USER PERSONA: Ari",
+      summary: "A guarded persona.",
+    },
+    scenario: {
+      id: "scenario_custom",
+      openingConstraint: "Open at the locked archive door.",
+      settingType: "Contained_Insular",
+      startingTension: "Charged_Electric",
+      summary: "A rainy archive confrontation.",
+      title: "Archive Night",
+    },
+    source: "created",
+    tags: ["Bundle", "bundle", "Archive"],
+    title: "Imported Runtime",
+    updatedAt: 123,
+  });
+
+  assert.equal(imported.id, "bundle_custom");
+  assert.equal(imported.source, "imported");
+  assert.equal(imported.updatedAt, 123);
+  assert.equal(imported.persona?.name, "Ari");
+  assert.equal(imported.scenario?.title, "Archive Night");
+  assert.equal(imported.lorebook?.entries.length, 1);
+  assert.match(imported.compiledContext, /RUNTIME BUNDLE: Imported Runtime/);
+  assert.match(imported.compiledContext, /Archive Rule/);
+  assert.equal(
+    imported.tags.filter((tag) => tag === "bundle").length,
+    1,
+  );
+
+  const synced = createRuntimeBundleArtifactFromEditable({
+    ...imported,
+    title: "Edited Runtime",
+  });
+
+  assert.equal(synced.id, imported.id);
+  assert.equal(synced.title, "Edited Runtime");
+  assert.match(synced.compiledContext, /RUNTIME BUNDLE: Edited Runtime/);
 });
 
 test("creates partial runtime bundle context with explicit missing slots", () => {
