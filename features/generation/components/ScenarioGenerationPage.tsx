@@ -2,6 +2,7 @@
 
 import type * as React from "react";
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import {
   Clapperboard,
   Clipboard,
@@ -50,7 +51,9 @@ import {
   serializeLorebookV3Document,
 } from "@/features/lorebooks/adapters";
 import { useRuntimeEngineSettings } from "@/features/settings/runtimeModeStore";
-import { saveLorebookLibraryItem } from "@/hooks/useLorebookLibrary";
+import { useCardLibrary } from "@/hooks/useCardLibrary";
+import { saveLorebookLibraryItem, useLorebookLibrary } from "@/hooks/useLorebookLibrary";
+import { usePersonaLibrary } from "@/hooks/usePersonaLibrary";
 import {
   deleteScenarioLibraryItem,
   saveScenarioLibraryItem,
@@ -125,7 +128,13 @@ const scenarioCategories = getScenarioTemplateCategories();
 const defaultTemplateId = "university_rivalry_scholarship_event";
 
 export function ScenarioGenerationPage() {
+  const characters = useCardLibrary(30);
+  const personas = usePersonaLibrary();
+  const lorebooks = useLorebookLibrary();
   const [input, setInput] = useState(defaultInput);
+  const [characterId, setCharacterId] = useState("");
+  const [personaId, setPersonaId] = useState("");
+  const [lorebookId, setLorebookId] = useState("");
   const [selectedCategory, setSelectedCategory] =
     useState<ScenarioTemplateCategory>("University rivalry");
   const [selectedTemplateId, setSelectedTemplateId] =
@@ -134,6 +143,8 @@ export function ScenarioGenerationPage() {
     useState<GeneratedScenarioArtifact>(() => generateScenarioArtifact(defaultInput));
   const [suggestedLorebook, setSuggestedLorebook] =
     useState<GeneratedLorebookArtifact | null>(null);
+  const [savedSuggestedLorebookId, setSavedSuggestedLorebookId] =
+    useState<string | null>(null);
   const [savedSnapshot, setSavedSnapshot] = useState<string | null>(null);
   const [deleteArmed, setDeleteArmed] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
@@ -160,6 +171,18 @@ export function ScenarioGenerationPage() {
       SCENARIO_TEMPLATES[0],
     [selectedTemplateId],
   );
+  const selectedCharacter = useMemo(
+    () => characters.items.find((item) => item.id === characterId) ?? null,
+    [characterId, characters.items],
+  );
+  const selectedPersona = useMemo(
+    () => personas.items.find((item) => item.id === personaId) ?? null,
+    [personaId, personas.items],
+  );
+  const selectedLorebook = useMemo(
+    () => lorebooks.items.find((item) => item.id === lorebookId) ?? null,
+    [lorebookId, lorebooks.items],
+  );
   const isDirty = savedSnapshot !== serialized;
 
   function updateInput<K extends keyof ScenarioGenerationInput>(
@@ -167,6 +190,57 @@ export function ScenarioGenerationPage() {
     value: ScenarioGenerationInput[K],
   ) {
     setInput((current) => ({ ...current, [key]: value }));
+  }
+
+  function syncWorkbenchContext(next: {
+    characterId?: string;
+    lorebookId?: string;
+    personaId?: string;
+  }) {
+    const nextCharacterId = next.characterId ?? characterId;
+    const nextPersonaId = next.personaId ?? personaId;
+    const nextLorebookId = next.lorebookId ?? lorebookId;
+    const character =
+      characters.items.find((item) => item.id === nextCharacterId) ?? null;
+    const persona =
+      personas.items.find((item) => item.id === nextPersonaId) ?? null;
+    const lorebook =
+      lorebooks.items.find((item) => item.id === nextLorebookId) ?? null;
+
+    if (typeof next.characterId === "string") {
+      setCharacterId(next.characterId);
+    }
+    if (typeof next.personaId === "string") {
+      setPersonaId(next.personaId);
+    }
+    if (typeof next.lorebookId === "string") {
+      setLorebookId(next.lorebookId);
+    }
+
+    setInput((current) => ({
+      ...current,
+      referenceCharacter: character
+        ? [
+            character.name,
+            character.relationship,
+            character.framework,
+            character.tags.slice(0, 5).join(", "),
+          ].filter(Boolean).join(" · ")
+        : "",
+      referenceLorebook: lorebook
+        ? [
+            lorebook.title,
+            typeof lorebook.summary === "object"
+              ? lorebook.summary.aiLoreInstruction
+              : lorebook.summary,
+          ].filter(Boolean).join(" · ")
+        : "",
+      referencePersona: persona
+        ? [persona.name, persona.summary, persona.tags.slice(0, 5).join(", ")]
+            .filter(Boolean)
+            .join(" · ")
+        : "",
+    }));
   }
 
   function applyTemplate(templateId: string) {
@@ -195,6 +269,7 @@ export function ScenarioGenerationPage() {
   function generate() {
     setActiveScenario(generateScenarioArtifact(input));
     setSuggestedLorebook(null);
+    setSavedSuggestedLorebookId(null);
     setSavedSnapshot(null);
     setDeleteArmed(false);
     setStatus("Generated scenario draft.");
@@ -203,6 +278,7 @@ export function ScenarioGenerationPage() {
   function newBlankScenario() {
     setActiveScenario(createBlankScenarioArtifact());
     setSuggestedLorebook(null);
+    setSavedSuggestedLorebookId(null);
     setSavedSnapshot(null);
     setDeleteArmed(false);
     setStatus("Started a blank scenario draft. Save when ready.");
@@ -232,6 +308,7 @@ export function ScenarioGenerationPage() {
     await saveScenarioLibraryItem(copied);
     setActiveScenario(copied);
     setSuggestedLorebook(null);
+    setSavedSuggestedLorebookId(null);
     await library.refresh();
     setSavedSnapshot(JSON.stringify(copied, null, 2));
     setDeleteArmed(false);
@@ -250,6 +327,7 @@ export function ScenarioGenerationPage() {
     const blank = createBlankScenarioArtifact();
     setActiveScenario(blank);
     setSuggestedLorebook(null);
+    setSavedSuggestedLorebookId(null);
     setSavedSnapshot(null);
     setDeleteArmed(false);
     setStatus(`Deleted ${activeScenario.title} from the scenario library.`);
@@ -264,6 +342,7 @@ export function ScenarioGenerationPage() {
       updatedAt: Date.now(),
     }));
     setSuggestedLorebook(null);
+    setSavedSuggestedLorebookId(null);
     setSavedSnapshot(null);
     setDeleteArmed(false);
     setStatus(`Duplicated ${activeScenario.title}. Save it when ready.`);
@@ -273,6 +352,7 @@ export function ScenarioGenerationPage() {
     const normalized = createScenarioArtifactFromEditable(item);
     setActiveScenario(normalized);
     setSuggestedLorebook(null);
+    setSavedSuggestedLorebookId(null);
     setSavedSnapshot(JSON.stringify(normalized, null, 2));
     setDeleteArmed(false);
     setStatus(`Loaded ${item.title}.`);
@@ -289,6 +369,7 @@ export function ScenarioGenerationPage() {
       }),
     );
     setSuggestedLorebook(null);
+    setSavedSuggestedLorebookId(null);
     setDeleteArmed(false);
     setStatus("Edited scenario draft. Save when ready.");
   }
@@ -359,6 +440,7 @@ export function ScenarioGenerationPage() {
       );
       setActiveScenario(imported);
       setSuggestedLorebook(null);
+      setSavedSuggestedLorebookId(null);
       setSavedSnapshot(null);
       setDeleteArmed(false);
       setStatus(`Imported ${imported.title}. Review and save when ready.`);
@@ -378,6 +460,7 @@ export function ScenarioGenerationPage() {
       ...lorebook,
       v3Document,
     });
+    setSavedSuggestedLorebookId(null);
     setStatus("Generated optional suggested lore from the active scenario.");
   }
 
@@ -387,6 +470,7 @@ export function ScenarioGenerationPage() {
     }
 
     await saveLorebookLibraryItem(suggestedLorebook);
+    setSavedSuggestedLorebookId(suggestedLorebook.id);
     setStatus(`Saved ${suggestedLorebook.title} to the lorebook library.`);
   }
 
@@ -408,7 +492,7 @@ export function ScenarioGenerationPage() {
 
   return (
     <GeneratorGrid>
-      <aside className="grid h-fit gap-5">
+      <aside className="grid max-h-[calc(100vh-8rem)] gap-5 overflow-y-auto pr-1 lg:sticky lg:top-24">
         <GeneratorFormCard
           title="Scenario Generator"
           description="Pick the ingredients, generate a playable scene setup, then edit every field before saving."
@@ -446,6 +530,54 @@ export function ScenarioGenerationPage() {
               {selectedTemplate.premise}
             </section>
           ) : null}
+          <section className="grid gap-3 rounded-md border bg-background/70 p-3">
+            <div>
+              <h3 className="text-sm font-semibold">Optional Workbench Context</h3>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                Use saved pieces if you already have them, or leave these blank
+                and generate from the route and story seed alone.
+              </p>
+            </div>
+            <Field label={`Saved character (${characters.metadata.totalCount})`}>
+              <ArtifactSelect
+                emptyLabel="No character selected"
+                items={characters.items}
+                labelForItem={(item) => item.name}
+                value={characterId}
+                onChange={(value) => syncWorkbenchContext({ characterId: value })}
+              />
+            </Field>
+            <Field label={`Saved persona (${personas.metadata.totalCount})`}>
+              <ArtifactSelect
+                emptyLabel="No persona selected"
+                items={personas.items}
+                labelForItem={(item) => item.name}
+                value={personaId}
+                onChange={(value) => syncWorkbenchContext({ personaId: value })}
+              />
+            </Field>
+            <Field label={`Saved lorebook (${lorebooks.totalCount})`}>
+              <ArtifactSelect
+                emptyLabel="No lorebook selected"
+                items={lorebooks.items}
+                labelForItem={(item) => item.title}
+                value={lorebookId}
+                onChange={(value) => syncWorkbenchContext({ lorebookId: value })}
+              />
+            </Field>
+            {[characters.error, personas.error, lorebooks.error].filter(Boolean).length > 0 ? (
+              <p className="text-sm text-destructive">
+                {[characters.error, personas.error, lorebooks.error].filter(Boolean).join(" ")}
+              </p>
+            ) : characters.loading || personas.loading || lorebooks.loading ? (
+              <p className="text-sm text-muted-foreground">Loading saved context...</p>
+            ) : selectedCharacter || selectedPersona || selectedLorebook ? (
+              <p className="text-xs leading-5 text-muted-foreground">
+                Selected context will softly guide the generated scenario; it
+                will not make character, persona, or lore selection mandatory.
+              </p>
+            ) : null}
+          </section>
           <Field label="Scenario title">
             <Input
               value={input.title}
@@ -863,6 +995,14 @@ export function ScenarioGenerationPage() {
                       <Save className="size-4" />
                       Save Lore
                     </Button>
+                    {savedSuggestedLorebookId ? (
+                      <Button asChild size="sm" variant="outline">
+                        <Link href="/lorebooks">
+                          <LibraryBig className="size-4" />
+                          Open in Lorebook Studio
+                        </Link>
+                      </Button>
+                    ) : null}
                   </div>
                 </div>
                 <div className="mt-3 grid gap-3 md:grid-cols-2">
@@ -959,6 +1099,29 @@ function ScenarioLibraryList(props: {
         </button>
       ))}
     </div>
+  );
+}
+
+function ArtifactSelect<T extends { id: string }>(props: {
+  emptyLabel: string;
+  items: T[];
+  labelForItem: (item: T) => string;
+  onChange: (value: string) => void;
+  value: string;
+}) {
+  return (
+    <select
+      value={props.value}
+      onChange={(event) => props.onChange(event.currentTarget.value)}
+      className="h-10 rounded-md border bg-background px-3 text-sm"
+    >
+      <option value="">{props.emptyLabel}</option>
+      {props.items.map((item) => (
+        <option key={item.id} value={item.id}>
+          {props.labelForItem(item)}
+        </option>
+      ))}
+    </select>
   );
 }
 

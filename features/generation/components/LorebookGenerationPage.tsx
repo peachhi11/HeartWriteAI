@@ -286,7 +286,7 @@ export function LorebookGenerationPage() {
 
   return (
     <div className="grid gap-5 xl:grid-cols-[22rem_minmax(0,1fr)]">
-      <aside className="grid h-fit gap-5">
+      <aside className="grid max-h-[calc(100vh-8rem)] gap-5 overflow-y-auto pr-1 xl:sticky xl:top-24">
         <Card className="bg-card/85">
           <CardHeader>
             <CardTitle>World Generation</CardTitle>

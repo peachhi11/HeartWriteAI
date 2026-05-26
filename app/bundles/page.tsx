@@ -6,7 +6,7 @@ export default function BundlesPage() {
     <StudioShell
       eyebrow="Runtime Bundles"
       title="Bundle Selection"
-      subtitle="Select saved personas, scenarios, and lorebooks into a prepared runtime context."
+      subtitle="Pair a character card with a user persona, then optionally add scenario overrides and lorebook context."
     >
       <BundleSelectionPage />
     </StudioShell>

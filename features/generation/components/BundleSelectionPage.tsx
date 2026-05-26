@@ -22,6 +22,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import {
   artifactToJsonBytes,
   createArtifactFileName,
@@ -41,16 +42,25 @@ import {
 import { useScenarioLibrary } from "@/hooks/useScenarioLibrary";
 import { downloadUint8Array } from "@/lib/browser/downloadUint8Array";
 import { Field, GeneratorFormCard, GeneratorGrid } from "./GenerationShell";
+import { useCardLibrary } from "@/hooks/useCardLibrary";
 
 export function BundleSelectionPage() {
+  const characters = useCardLibrary(30);
   const personas = usePersonaLibrary();
   const scenarios = useScenarioLibrary();
   const lorebooks = useLorebookLibrary();
   const bundles = useRuntimeBundleLibrary();
   const [title, setTitle] = useState("Current Story Runtime");
+  const [characterId, setCharacterId] = useState("");
   const [personaId, setPersonaId] = useState("");
   const [scenarioId, setScenarioId] = useState("");
   const [lorebookId, setLorebookId] = useState("");
+  const [scenarioOverride, setScenarioOverride] = useState({
+    context: "",
+    dynamic: "",
+    scene: "",
+    setting: "",
+  });
   const [activeBundle, setActiveBundle] = useState<RuntimeBundleArtifact | null>(
     null,
   );
@@ -58,6 +68,10 @@ export function BundleSelectionPage() {
   const [deleteArmed, setDeleteArmed] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
 
+  const selectedCharacter = useMemo(
+    () => characters.items.find((item) => item.id === characterId) ?? null,
+    [characterId, characters.items],
+  );
   const selectedPersona = useMemo(
     () => personas.items.find((item) => item.id === personaId) ?? null,
     [personaId, personas.items],
@@ -70,9 +84,7 @@ export function BundleSelectionPage() {
     () => lorebooks.items.find((item) => item.id === lorebookId) ?? null,
     [lorebookId, lorebooks.items],
   );
-  const canCreateBundle = Boolean(
-    selectedPersona || selectedScenario || selectedLorebook,
-  );
+  const canCreateBundle = Boolean(selectedCharacter && selectedPersona);
   const serialized = useMemo(
     () => JSON.stringify(activeBundle, null, 2),
     [activeBundle],
@@ -81,14 +93,16 @@ export function BundleSelectionPage() {
 
   function createBundle() {
     if (!canCreateBundle) {
-      setStatus("Choose at least one saved artifact before creating a bundle.");
+      setStatus("Choose a saved character and user persona. Scenario and lorebook are optional.");
       return;
     }
 
     const bundle = createRuntimeBundleArtifact({
+      character: selectedCharacter,
       lorebook: selectedLorebook,
       persona: selectedPersona,
       scenario: selectedScenario,
+      scenarioOverride,
       title,
     });
 
@@ -178,9 +192,16 @@ export function BundleSelectionPage() {
     const normalized = createRuntimeBundleArtifactFromEditable(item);
     setActiveBundle(normalized);
     setTitle(normalized.title);
+    setCharacterId(normalized.character?.id ?? "");
     setPersonaId(normalized.persona?.id ?? "");
     setScenarioId(normalized.scenario?.id ?? "");
     setLorebookId(normalized.lorebook?.id ?? "");
+    setScenarioOverride({
+      context: normalized.scenarioOverride?.context ?? "",
+      dynamic: normalized.scenarioOverride?.dynamic ?? "",
+      scene: normalized.scenarioOverride?.scene ?? "",
+      setting: normalized.scenarioOverride?.setting ?? "",
+    });
     setSavedSnapshot(JSON.stringify(normalized, null, 2));
     setDeleteArmed(false);
     setStatus(`Loaded ${normalized.title}.`);
@@ -238,9 +259,16 @@ export function BundleSelectionPage() {
       );
       setActiveBundle(imported);
       setTitle(imported.title);
+      setCharacterId(imported.character?.id ?? "");
       setPersonaId(imported.persona?.id ?? "");
       setScenarioId(imported.scenario?.id ?? "");
       setLorebookId(imported.lorebook?.id ?? "");
+      setScenarioOverride({
+        context: imported.scenarioOverride?.context ?? "",
+        dynamic: imported.scenarioOverride?.dynamic ?? "",
+        scene: imported.scenarioOverride?.scene ?? "",
+        setting: imported.scenarioOverride?.setting ?? "",
+      });
       setSavedSnapshot(null);
       setDeleteArmed(false);
       setStatus(`Imported ${imported.title}. Review and save when ready.`);
@@ -251,10 +279,10 @@ export function BundleSelectionPage() {
 
   return (
     <GeneratorGrid>
-      <aside className="grid h-fit gap-5">
+      <aside className="grid max-h-[calc(100vh-8rem)] gap-5 overflow-y-auto pr-1 lg:sticky lg:top-24">
         <GeneratorFormCard
           title="Bundle Selection"
-          description="Choose saved persona, scenario, and lorebook records before the chat runtime consumes them."
+          description="Choose the required character + user persona pair, then optionally add scenario overrides and lore."
         >
           <Field label="Bundle title">
             <Input
@@ -267,6 +295,15 @@ export function BundleSelectionPage() {
 
                 setTitle(event.currentTarget.value);
               }}
+            />
+          </Field>
+          <Field label={`Saved character (${characters.metadata.totalCount})`}>
+            <ArtifactSelect
+              emptyLabel="No character selected"
+              items={characters.items}
+              labelForItem={(item) => item.name}
+              value={characterId}
+              onChange={setCharacterId}
             />
           </Field>
           <Field label={`Saved persona (${personas.metadata.totalCount})`}>
@@ -296,6 +333,33 @@ export function BundleSelectionPage() {
               onChange={setLorebookId}
             />
           </Field>
+          <section className="grid gap-3 rounded-md border bg-background/70 p-3">
+            <div>
+              <h3 className="text-sm font-semibold">Scenario Override</h3>
+              <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                Optional. Leave blank to use the character card&apos;s built-in
+                scenario, or choose a saved scenario above.
+              </p>
+            </div>
+            <ScenarioOverrideFields
+              value={scenarioOverride}
+              onChange={(next) => {
+                setScenarioOverride(next);
+                setActiveBundle((current) =>
+                  current
+                    ? createRuntimeBundleArtifactFromEditable({
+                        ...current,
+                        scenarioOverride: next,
+                        updatedAt: current.updatedAt,
+                      })
+                    : current,
+                );
+                if (activeBundle) {
+                  setStatus("Edited scenario override. Save when ready.");
+                }
+              }}
+            />
+          </section>
           <Button type="button" disabled={!canCreateBundle} onClick={createBundle}>
             <PackageCheck className="size-4" />
             Create Bundle
@@ -311,16 +375,17 @@ export function BundleSelectionPage() {
             />
           </label>
           <LibraryStatus
-            errors={[personas.error, scenarios.error, lorebooks.error].filter(Boolean)}
-            loading={personas.loading || scenarios.loading || lorebooks.loading}
+            errors={[characters.error, personas.error, scenarios.error, lorebooks.error].filter(Boolean)}
+            loading={characters.loading || personas.loading || scenarios.loading || lorebooks.loading}
             status={status}
           />
         </GeneratorFormCard>
 
         <GeneratorFormCard
           title="Current Selections"
-          description="Bundles package selected records; they do not expose the hidden runtime engine."
+          description="Character and persona are required for chat. Scenario and lorebook remain optional."
         >
+          <SelectionSummary label="Character" item={selectedCharacter} type="character" />
           <SelectionSummary label="Persona" item={selectedPersona} type="persona" />
           <SelectionSummary label="Scenario" item={selectedScenario} type="scenario" />
           <SelectionSummary label="Lorebook" item={selectedLorebook} type="lorebook" />
@@ -378,7 +443,8 @@ export function BundleSelectionPage() {
               </div>
             </CardHeader>
             <CardContent className="grid gap-4">
-              <div className="grid gap-3 md:grid-cols-3">
+              <div className="grid gap-3 md:grid-cols-4">
+                <BundleSlot label="Character" value={activeBundle.character?.name} />
                 <BundleSlot label="Persona" value={activeBundle.persona?.name} />
                 <BundleSlot label="Scenario" value={activeBundle.scenario?.title} />
                 <BundleSlot label="Lorebook" value={activeBundle.lorebook?.title} />
@@ -404,8 +470,9 @@ export function BundleSelectionPage() {
             description="Create or import a bundle to preview the compiled context that future chat sessions will receive."
           >
             <p className="text-sm text-muted-foreground">
-              Bundles are saved selections, not editable engines. They package
-              generated libraries into a readable runtime context.
+              Bundles are saved selections, not editable engines. Chat can run
+              with a character and persona only; scenario and lorebook records
+              add optional context when you want them.
             </p>
           </GeneratorFormCard>
         )}
@@ -427,6 +494,64 @@ export function BundleSelectionPage() {
         </GeneratorFormCard>
       </div>
     </GeneratorGrid>
+  );
+}
+
+function ScenarioOverrideFields(props: {
+  onChange: (value: {
+    context: string;
+    dynamic: string;
+    scene: string;
+    setting: string;
+  }) => void;
+  value: {
+    context: string;
+    dynamic: string;
+    scene: string;
+    setting: string;
+  };
+}) {
+  function update(
+    key: keyof typeof props.value,
+    value: string,
+  ) {
+    props.onChange({
+      ...props.value,
+      [key]: value,
+    });
+  }
+
+  return (
+    <div className="grid gap-3">
+      <Field label="Context">
+        <Textarea
+          value={props.value.context}
+          onChange={(event) => update("context", event.currentTarget.value)}
+          placeholder="What the chat should know before the scene begins."
+        />
+      </Field>
+      <Field label="Setting">
+        <Textarea
+          value={props.value.setting}
+          onChange={(event) => update("setting", event.currentTarget.value)}
+          placeholder="Where the scene is, what the space feels like, and what is present."
+        />
+      </Field>
+      <Field label="Scene">
+        <Textarea
+          value={props.value.scene}
+          onChange={(event) => update("scene", event.currentTarget.value)}
+          placeholder="The immediate opening situation or pressure."
+        />
+      </Field>
+      <Field label="Dynamic">
+        <Textarea
+          value={props.value.dynamic}
+          onChange={(event) => update("dynamic", event.currentTarget.value)}
+          placeholder="The emotional relationship pressure between {{char}} and {{user}}."
+        />
+      </Field>
+    </div>
   );
 }
 
@@ -479,7 +604,7 @@ function BundleLibraryList(props: {
             updated {formatDate(item.updatedAt)}
           </p>
           <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
-            {[item.persona?.name, item.scenario?.title, item.lorebook?.title]
+            {[item.character?.name, item.persona?.name, item.scenario?.title, item.lorebook?.title]
               .filter(Boolean)
               .join(" + ") || "Partial runtime bundle"}
           </p>
@@ -505,7 +630,7 @@ function BundleSlot(props: { label: string; value?: string }) {
 function SelectionSummary(props: {
   item: SelectionSummaryItem | null;
   label: string;
-  type: "persona" | "scenario" | "lorebook";
+  type: "character" | "persona" | "scenario" | "lorebook";
 }) {
   if (!props.item) {
     return (
@@ -539,7 +664,9 @@ function SelectionSummary(props: {
 }
 
 type SelectionSummaryItem = {
+  framework?: string;
   name?: string;
+  relationship?: string;
   title?: string;
   summary?: string | {
     aiLoreInstruction?: string;
@@ -589,8 +716,12 @@ function formatDate(timestamp: number) {
 
 function getSelectionTitle(
   item: SelectionSummaryItem,
-  type: "persona" | "scenario" | "lorebook",
+  type: "character" | "persona" | "scenario" | "lorebook",
 ) {
+  if (type === "character") {
+    return item.name ?? "Untitled character";
+  }
+
   if (type === "persona") {
     return item.name ?? "Untitled persona";
   }
@@ -600,8 +731,14 @@ function getSelectionTitle(
 
 function getSelectionSummary(
   item: SelectionSummaryItem,
-  type: "persona" | "scenario" | "lorebook",
+  type: "character" | "persona" | "scenario" | "lorebook",
 ) {
+  if (type === "character") {
+    return [item.relationship, item.framework]
+      .filter(Boolean)
+      .join(" · ") || "Selected character card.";
+  }
+
   if (type === "lorebook") {
     return typeof item.summary === "object"
       ? item.summary.aiLoreInstruction ?? "Selected lorebook."

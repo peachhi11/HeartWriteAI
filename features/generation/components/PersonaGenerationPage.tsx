@@ -231,7 +231,7 @@ export function PersonaGenerationPage() {
 
   return (
     <GeneratorGrid>
-      <aside className="grid h-fit gap-5">
+      <aside className="grid max-h-[calc(100vh-8rem)] gap-5 overflow-y-auto pr-1 lg:sticky lg:top-24">
         <GeneratorFormCard
           title="Persona Generator"
           description="Create saved user personas that drive chat POV, boundaries, and relationship interpretation."

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   BookOpen,
   Heart,
@@ -193,14 +194,14 @@ function FeaturedCharacterProfile({
             <LibraryBig className="size-4" />
             Switch Character
           </button>
-          <button
-            type="button"
-            className="inline-flex cursor-not-allowed items-center justify-center gap-2 rounded-md bg-foreground px-4 py-2 text-sm font-semibold text-background opacity-60"
-            title="Chat handoff will use the selected character, persona, scenario, and bundle once chat integration resumes."
+          <Link
+            href="/chat"
+            className="inline-flex items-center justify-center gap-2 rounded-md bg-foreground px-4 py-2 text-sm font-semibold text-background transition hover:opacity-90"
+            title="Open chat. Scenario override remains optional because character cards include their own scenario."
           >
             <MessageCircle className="size-4" />
             Chat
-          </button>
+          </Link>
         </div>
       </div>
     </section>

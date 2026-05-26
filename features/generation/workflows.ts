@@ -51,6 +51,9 @@ export type ScenarioGenerationInput = {
   constructionPrompt?: string;
   openingBeat?: string;
   relationshipPressure?: string;
+  referenceCharacter?: string;
+  referenceLorebook?: string;
+  referencePersona?: string;
   settingNotes?: string;
   title: string;
   trope: string;
@@ -122,10 +125,37 @@ export type BundlePersonaSource = {
   tags?: string[];
 };
 
+export type BundleCharacterSource = {
+  file_path?: string;
+  filePath?: string;
+  framework?: string;
+  id: string;
+  name: string;
+  relationship?: string;
+  summary?: string;
+  tags?: string[];
+};
+
+export type RuntimeScenarioOverride = {
+  context: string;
+  setting: string;
+  scene: string;
+  dynamic: string;
+};
+
 export type RuntimeBundleArtifact = {
   id: string;
   title: string;
   source?: "created" | "imported";
+  character?: {
+    filePath: string;
+    framework: string;
+    id: string;
+    name: string;
+    relationship: string;
+    summary: string;
+    tags: string[];
+  };
   persona?: {
     id: string;
     name: string;
@@ -151,22 +181,26 @@ export type RuntimeBundleArtifact = {
       content: string;
     }[];
   };
+  scenarioOverride?: RuntimeScenarioOverride;
   tags: string[];
   compiledContext: string;
   updatedAt: number;
 };
 
 export type RuntimeBundleInput = {
+  character?: BundleCharacterSource | null;
   title: string;
   persona?: BundlePersonaSource | null;
   scenario?: GeneratedScenarioArtifact | null;
   lorebook?: GeneratedLorebookArtifact | null;
+  scenarioOverride?: Partial<RuntimeScenarioOverride> | null;
 };
 
 export const DEFAULT_PERSONA_CONSTRUCTION_PROMPT = [
-  "Build a playable user persona for romance roleplay.",
+  "Build a playable {{user}} POV persona for romance roleplay.",
   "Keep the persona lean, user-controlled, emotionally specific, and compatible with the selected character or scenario.",
   "Do not overwrite the user's agency. Do not write their private thoughts, dialogue, consent, or decisions.",
+  "Support femPOV, malePOV, anyPOV, and player-character/reader-style persona use without forcing one interpretation.",
   "Prioritize POV, boundaries, relationship role, emotional pressure points, speech posture, and post-history instructions.",
 ].join("\n");
 
@@ -721,10 +755,12 @@ export function generateScenarioArtifact(
   const settingNotes = input.settingNotes?.trim();
   const relationshipPressure = input.relationshipPressure?.trim();
   const openingBeat = input.openingBeat?.trim();
+  const referenceContext = buildScenarioReferenceContext(input);
   const scenePremiseDescription = [
     scenario.scenePremiseDescription,
     settingNotes ? `Setting notes: ${settingNotes}` : "",
     relationshipPressure ? `Relationship pressure: ${relationshipPressure}` : "",
+    referenceContext ? `Workbench context: ${referenceContext}` : "",
   ].filter(Boolean).join(" ");
   const aiOutputConstraint = [
     firstMessage.aiOutputConstraint,
@@ -764,6 +800,9 @@ export function createScenarioInputFromTemplate(
     ...template.input,
     constructionPrompt: previousInput?.constructionPrompt ??
       DEFAULT_SCENARIO_CONSTRUCTION_PROMPT,
+    referenceCharacter: previousInput?.referenceCharacter,
+    referenceLorebook: previousInput?.referenceLorebook,
+    referencePersona: previousInput?.referencePersona,
   };
 }
 
@@ -961,6 +1000,9 @@ export function compileScenarioConstructionPrompt(input: ScenarioGenerationInput
     `Setting notes: ${input.settingNotes?.trim() || "Unspecified"}`,
     `Relationship pressure: ${input.relationshipPressure?.trim() || "Unspecified"}`,
     `Opening beat: ${input.openingBeat?.trim() || "Unspecified"}`,
+    `Saved character context: ${input.referenceCharacter?.trim() || "None selected"}`,
+    `Saved persona context: ${input.referencePersona?.trim() || "None selected"}`,
+    `Saved lorebook context: ${input.referenceLorebook?.trim() || "None selected"}`,
     "",
     "[OUTPUT REQUIREMENTS]",
     "Return a concise editable scenario artifact with scene premise, sensory anchors, opening constraint, tags, and runtime shape.",
@@ -1172,6 +1214,19 @@ export function createLorebookArtifactFromV3Document(input: {
 export function createRuntimeBundleArtifact(
   input: RuntimeBundleInput,
 ): RuntimeBundleArtifact {
+  const character = input.character
+    ? {
+        filePath: input.character.filePath ?? input.character.file_path ?? "",
+        framework: input.character.framework?.trim() || "Character card",
+        id: input.character.id,
+        name: input.character.name.trim() || "Untitled character",
+        relationship:
+          input.character.relationship?.trim() || "Unspecified dynamic",
+        summary: input.character.summary?.trim() ||
+          `${input.character.name} is the selected character card.`,
+        tags: normalizeTagList(input.character.tags ?? []),
+      }
+    : undefined;
   const persona = input.persona
     ? {
         id: input.persona.id,
@@ -1216,13 +1271,15 @@ export function createRuntimeBundleArtifact(
       }
     : undefined;
   const title = input.title.trim() ||
-    [persona?.name, scenario?.title, lorebook?.title]
+    [character?.name, persona?.name, scenario?.title, lorebook?.title]
       .filter(Boolean)
       .join(" + ") ||
     "Untitled Runtime Bundle";
+  const scenarioOverride = normalizeScenarioOverride(input.scenarioOverride);
   const tags = normalizeTags(
     [
       "bundle",
+      ...(character?.tags ?? []),
       ...(input.persona?.tags ?? []),
       ...(input.scenario?.tags ?? []),
       ...(input.lorebook?.tags ?? []),
@@ -1231,18 +1288,22 @@ export function createRuntimeBundleArtifact(
 
   return {
     compiledContext: compileRuntimeBundleContext({
+      character,
       lorebook,
       persona,
       scenario,
+      scenarioOverride,
       title,
     }),
     id: createArtifactId(
       "bundle",
-      `${title}:${persona?.id ?? "no-persona"}:${scenario?.id ?? "no-scenario"}:${lorebook?.id ?? "no-lorebook"}`,
+      `${title}:${character?.id ?? "no-character"}:${persona?.id ?? "no-persona"}:${scenario?.id ?? "no-scenario"}:${lorebook?.id ?? "no-lorebook"}`,
     ),
+    character,
     lorebook,
     persona,
     scenario,
+    scenarioOverride,
     source: "created",
     tags,
     title,
@@ -1258,6 +1319,7 @@ export function createRuntimeBundleArtifactFromEditable(
     [
       "bundle",
       ...(input.tags ?? []),
+      input.character?.name,
       input.persona?.name,
       input.scenario?.title,
       input.lorebook?.title,
@@ -1267,11 +1329,14 @@ export function createRuntimeBundleArtifactFromEditable(
   return {
     ...input,
     compiledContext: compileRuntimeBundleContext({
+      character: input.character,
       lorebook: input.lorebook,
       persona: input.persona,
       scenario: input.scenario,
+      scenarioOverride: normalizeScenarioOverride(input.scenarioOverride),
       title,
     }),
+    scenarioOverride: normalizeScenarioOverride(input.scenarioOverride),
     tags,
     title,
     updatedAt: input.updatedAt ?? Date.now(),
@@ -1289,17 +1354,21 @@ export function createImportedRuntimeBundleArtifact(
   const title = readUnknownString(value.title) ||
     sourceFileName?.replace(/\.json$/i, "").trim() ||
     "Imported Runtime Bundle";
+  const character = readBundleCharacter(value.character);
   const persona = readBundlePersona(value.persona);
   const scenario = readBundleScenario(value.scenario);
   const lorebook = readBundleLorebook(value.lorebook);
+  const scenarioOverride = readScenarioOverride(value.scenarioOverride);
 
   return createRuntimeBundleArtifactFromEditable({
+    character,
     compiledContext: readUnknownString(value.compiledContext),
     id: readUnknownString(value.id) ||
       createArtifactId("bundle", `${title}:${sourceFileName ?? "imported"}`),
     lorebook,
     persona,
     scenario,
+    scenarioOverride,
     source: "imported",
     tags: normalizeTagsFromUnknown(value.tags),
     title,
@@ -1357,6 +1426,37 @@ function normalizeTagsFromUnknown(value: unknown) {
   return normalizeTags(readUnknownString(value));
 }
 
+function normalizeTagList(tags: string[]) {
+  return normalizeTags(tags.join(", "));
+}
+
+function buildScenarioReferenceContext(input: ScenarioGenerationInput) {
+  return [
+    input.referenceCharacter?.trim()
+      ? `Character: ${input.referenceCharacter.trim()}`
+      : "",
+    input.referencePersona?.trim()
+      ? `Persona: ${input.referencePersona.trim()}`
+      : "",
+    input.referenceLorebook?.trim()
+      ? `Lorebook: ${input.referenceLorebook.trim()}`
+      : "",
+  ].filter(Boolean).join(" ");
+}
+
+function normalizeScenarioOverride(
+  value: Partial<RuntimeScenarioOverride> | null | undefined,
+): RuntimeScenarioOverride | undefined {
+  const override = {
+    context: value?.context?.trim() ?? "",
+    dynamic: value?.dynamic?.trim() ?? "",
+    scene: value?.scene?.trim() ?? "",
+    setting: value?.setting?.trim() ?? "",
+  };
+
+  return Object.values(override).some(Boolean) ? override : undefined;
+}
+
 function humanize(value: string) {
   return value.replaceAll("_", " ").toLowerCase();
 }
@@ -1391,6 +1491,35 @@ function readKnownValue<const T extends readonly string[]>(
   return typeof value === "string" && allowed.includes(value as T[number])
     ? value as T[number]
     : fallback;
+}
+
+function readBundleCharacter(
+  value: unknown,
+): RuntimeBundleArtifact["character"] | undefined {
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  const name = readUnknownString(value.name);
+  const id = readUnknownString(value.id);
+
+  if (!name || !id) {
+    return undefined;
+  }
+
+  return {
+    filePath:
+      readUnknownString(value.filePath) ||
+      readUnknownString(value.file_path),
+    framework: readUnknownString(value.framework) || "Character card",
+    id,
+    name,
+    relationship:
+      readUnknownString(value.relationship) || "Unspecified dynamic",
+    summary: readUnknownString(value.summary) ||
+      `${name} is the selected character card.`,
+    tags: normalizeTagsFromUnknown(value.tags),
+  };
 }
 
 function readBundlePersona(
@@ -1481,14 +1610,43 @@ function readBundleLorebook(
   };
 }
 
+function readScenarioOverride(value: unknown) {
+  if (!isRecord(value)) {
+    return undefined;
+  }
+
+  return normalizeScenarioOverride({
+    context: readUnknownString(value.context),
+    dynamic: readUnknownString(value.dynamic),
+    scene: readUnknownString(value.scene),
+    setting: readUnknownString(value.setting),
+  });
+}
+
 function compileRuntimeBundleContext(input: {
+  character?: RuntimeBundleArtifact["character"];
   lorebook?: RuntimeBundleArtifact["lorebook"];
   persona?: RuntimeBundleArtifact["persona"];
   scenario?: RuntimeBundleArtifact["scenario"];
+  scenarioOverride?: RuntimeBundleArtifact["scenarioOverride"];
   title: string;
 }) {
   const sections = [
     `RUNTIME BUNDLE: ${input.title}`,
+    "",
+    "[SELECTED CHARACTER]",
+    input.character
+      ? [
+          `Name: ${input.character.name}`,
+          `Framework: ${input.character.framework}`,
+          `Relationship shape: ${input.character.relationship}`,
+          `Summary: ${input.character.summary}`,
+          input.character.filePath ? `Source: ${input.character.filePath}` : "",
+          input.character.tags.length
+            ? `Tags: ${input.character.tags.join(", ")}`
+            : "",
+        ].filter(Boolean).join("\n")
+      : "No character selected. Chat creation should require a character card before runtime.",
     "",
     "[SELECTED PERSONA]",
     input.persona
@@ -1509,7 +1667,17 @@ function compileRuntimeBundleContext(input: {
           `Starting tension: ${input.scenario.startingTension}`,
           `Opening constraint: ${input.scenario.openingConstraint}`,
         ].join("\n")
-      : "No scenario selected.",
+      : "No scenario selected. Use the selected character card's built-in scenario unless a structured override is provided.",
+    "",
+    "[SCENARIO OVERRIDE]",
+    input.scenarioOverride
+      ? [
+          `Context: ${input.scenarioOverride.context || "Use character-origin context."}`,
+          `Setting: ${input.scenarioOverride.setting || "Use character-origin setting."}`,
+          `Scene: ${input.scenarioOverride.scene || "Use character-origin scene."}`,
+          `Dynamic: ${input.scenarioOverride.dynamic || "Use character-origin dynamic."}`,
+        ].join("\n")
+      : "No scenario override. Runtime should use the character card's built-in scenario or selected saved scenario.",
     "",
     "[SELECTED LOREBOOK]",
     input.lorebook
