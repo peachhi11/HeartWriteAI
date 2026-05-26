@@ -4,6 +4,7 @@ import { useState } from "react";
 import { PanelLeftOpen, X } from "lucide-react";
 
 import CardLibraryPanel from "@/components/card-library-panel";
+import { CharacterLibraryWorkspace } from "@/components/character-library-workspace";
 import { DevToolsPanel } from "@/components/dev-tools-panel";
 import DropZoneOverlay from "@/components/DropZoneOverlay";
 import ExpressionManager from "@/components/expression-manager";
@@ -399,6 +400,16 @@ export default function WorkspacePage() {
             isDesktopRuntime={isDesktopRuntime}
             onChooseFolder={triggerFolderIntakeSelect}
             onImported={library.refresh}
+          />
+
+          <CharacterLibraryWorkspace
+            activeCard={activeCard}
+            currentFilePath={currentFilePath}
+            library={library}
+            onCardSelect={(filePath) => {
+              void handleCardSelect(filePath);
+            }}
+            onOpenLibraryDrawer={() => setLibraryOpen(true)}
           />
 
           {activeCard ? (
