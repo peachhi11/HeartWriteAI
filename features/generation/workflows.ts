@@ -48,6 +48,10 @@ export type GeneratedPersonaArtifact = {
 };
 
 export type ScenarioGenerationInput = {
+  constructionPrompt?: string;
+  openingBeat?: string;
+  relationshipPressure?: string;
+  settingNotes?: string;
   title: string;
   trope: string;
   jobTitle: string;
@@ -64,6 +68,7 @@ export type GeneratedScenarioArtifact = {
   firstMessage: GeneratedFirstMessageData;
   occupation: GeneratedOccupationData;
   updatedAt: number;
+  source?: "blank" | "generated" | "imported";
 };
 
 export type LorebookGenerationInput = {
@@ -142,6 +147,13 @@ export const DEFAULT_PERSONA_CONSTRUCTION_PROMPT = [
   "Keep the persona lean, user-controlled, emotionally specific, and compatible with the selected character or scenario.",
   "Do not overwrite the user's agency. Do not write their private thoughts, dialogue, consent, or decisions.",
   "Prioritize POV, boundaries, relationship role, emotional pressure points, speech posture, and post-history instructions.",
+].join("\n");
+
+export const DEFAULT_SCENARIO_CONSTRUCTION_PROMPT = [
+  "Build a romance roleplay scenario that gives the selected character and user persona a specific place, pressure, and opening direction.",
+  "Keep it playable, sensory, emotionally directional, and easy to edit.",
+  "Do not write the user's reply, private thoughts, consent, or choices.",
+  "Prioritize scene premise, relationship pressure, opening constraint, sensory anchors, and the first turn's call-to-action.",
 ].join("\n");
 
 export function generatePersonaArtifact(
@@ -302,18 +314,228 @@ export function generateScenarioArtifact(
   const scenario = generateScenarioData(trope, occupation);
   const firstMessage = generateFirstMessageData(trope, scenario);
   const title = input.title.trim() || humanize(scenario.plotHook);
+  const settingNotes = input.settingNotes?.trim();
+  const relationshipPressure = input.relationshipPressure?.trim();
+  const openingBeat = input.openingBeat?.trim();
+  const scenePremiseDescription = [
+    scenario.scenePremiseDescription,
+    settingNotes ? `Setting notes: ${settingNotes}` : "",
+    relationshipPressure ? `Relationship pressure: ${relationshipPressure}` : "",
+  ].filter(Boolean).join(" ");
+  const aiOutputConstraint = [
+    firstMessage.aiOutputConstraint,
+    openingBeat ? `Opening beat: ${openingBeat}` : "",
+  ].filter(Boolean).join(" ");
 
   return {
-    firstMessage,
+    firstMessage: {
+      ...firstMessage,
+      aiOutputConstraint,
+    },
     id: createArtifactId("scenario", `${title}:${trope}`),
     occupation,
-    scenario,
-    summary: scenario.scenePremiseDescription,
-    tags: normalizeTags(`${trope}, ${scenario.settingType}, ${scenario.startingTension}`),
+    scenario: {
+      ...scenario,
+      scenePremiseDescription,
+    },
+    summary: scenePremiseDescription,
+    tags: normalizeTags(`${trope}, ${scenario.settingType}, ${scenario.startingTension}, ${relationshipPressure ?? ""}`),
     title,
     trope,
     updatedAt: Date.now(),
+    source: "generated",
   };
+}
+
+export function createBlankScenarioArtifact(
+  title = "Untitled Scenario",
+): GeneratedScenarioArtifact {
+  const occupation = generateOccupationData({
+    jobTitle: "Roleplay Setting",
+    professionalDomain: "Arts_Entertainment",
+    trope: "blank scenario",
+  });
+
+  return createScenarioArtifactFromEditable({
+    firstMessage: {
+      aiOutputConstraint:
+        "Open with {{char}} reacting to the immediate scene pressure while leaving {{user}} fully free to respond.",
+      entryPoint: "The_Approach",
+      literaryStyle: "Action_Dialogue_Hybrid",
+      tokenLengthCap: 450,
+      userCallToAction: "Direct_Question",
+    },
+    id: createArtifactId("scenario", `${title}:blank`),
+    occupation,
+    scenario: {
+      plotHook: "The_Chance_Encounter",
+      scenePremiseDescription:
+        "Write the core scene premise here, including where {{char}} and {{user}} are, why the moment matters, and what pressure keeps the exchange alive.",
+      sensoryDetails: ["ambient sound", "lighting", "physical distance"],
+      settingType: "Public_HighExposure",
+      startingTension: "Charged_Electric",
+    },
+    source: "blank",
+    summary:
+      "Write the core scene premise here, including where {{char}} and {{user}} are, why the moment matters, and what pressure keeps the exchange alive.",
+    tags: ["blank", "scenario"],
+    title,
+    trope: "Blank scenario",
+  });
+}
+
+export function createImportedScenarioArtifact(
+  value: unknown,
+  sourceFileName?: string,
+): GeneratedScenarioArtifact {
+  if (!isRecord(value)) {
+    throw new Error("Scenario JSON must be an object.");
+  }
+
+  const fallback = createBlankScenarioArtifact(
+    readUnknownString(value.title) ||
+      sourceFileName?.replace(/\.json$/i, "").trim() ||
+      "Imported Scenario",
+  );
+  const scenario = isRecord(value.scenario) ? value.scenario : {};
+  const firstMessage = isRecord(value.firstMessage) ? value.firstMessage : {};
+  const title = readUnknownString(value.title) || fallback.title;
+  const summary = readUnknownString(value.summary) ||
+    readUnknownString(scenario.scenePremiseDescription) ||
+    fallback.summary;
+
+  return createScenarioArtifactFromEditable({
+    firstMessage: {
+      ...fallback.firstMessage,
+      aiOutputConstraint:
+        readUnknownString(firstMessage.aiOutputConstraint) ||
+        fallback.firstMessage.aiOutputConstraint,
+      entryPoint: readKnownValue(
+        firstMessage.entryPoint,
+        ["Active_Collision", "Mid_Action_Dialogue", "Post_Crisis_Quiet", "The_Approach"] as const,
+        fallback.firstMessage.entryPoint,
+      ),
+      literaryStyle: readKnownValue(
+        firstMessage.literaryStyle,
+        ["Action_Dialogue_Hybrid", "Chat_Symphonic", "Internal_Monologue_Heavy", "Novella_Prose"] as const,
+        fallback.firstMessage.literaryStyle,
+      ),
+      tokenLengthCap:
+        readUnknownNumber(firstMessage.tokenLengthCap) ??
+        fallback.firstMessage.tokenLengthCap,
+      userCallToAction: readKnownValue(
+        firstMessage.userCallToAction,
+        ["Direct_Question", "Physical_Gesture", "Vulnerable_Slip", "Weighted_StandOff"] as const,
+        fallback.firstMessage.userCallToAction,
+      ),
+    },
+    id: readUnknownString(value.id) ||
+      createArtifactId("scenario", `${title}:${sourceFileName ?? "imported"}`),
+    occupation: fallback.occupation,
+    scenario: {
+      ...fallback.scenario,
+      plotHook: readKnownValue(
+        scenario.plotHook,
+        ["The_Chance_Encounter", "The_Crisis", "The_Mandate", "The_Secret_Transaction"] as const,
+        fallback.scenario.plotHook,
+      ),
+      scenePremiseDescription: summary,
+      sensoryDetails: Array.isArray(scenario.sensoryDetails)
+        ? scenario.sensoryDetails
+            .map((detail) => readUnknownString(detail))
+            .filter(Boolean)
+            .slice(0, 8)
+        : fallback.scenario.sensoryDetails,
+      settingType: readKnownValue(
+        scenario.settingType,
+        ["Atmospheric_Wilderness", "Contained_Insular", "Corporate_Institutional", "Public_HighExposure"] as const,
+        fallback.scenario.settingType,
+      ),
+      startingTension: readKnownValue(
+        scenario.startingTension,
+        ["Charged_Electric", "Combative_Friction", "Formal_Chilling", "Vulnerable_Exhausted"] as const,
+        fallback.scenario.startingTension,
+      ),
+    },
+    source: "imported",
+    summary,
+    tags: normalizeTagsFromUnknown(value.tags),
+    title,
+    trope: readUnknownString(value.trope) || "Imported scenario",
+    updatedAt: readUnknownNumber(value.updatedAt) ?? Date.now(),
+  });
+}
+
+export function createScenarioArtifactFromEditable(input: {
+  firstMessage: GeneratedFirstMessageData;
+  id: string;
+  occupation: GeneratedOccupationData;
+  scenario: GeneratedScenarioData;
+  source?: GeneratedScenarioArtifact["source"];
+  summary: string;
+  tags: string[] | string;
+  title: string;
+  trope: string;
+  updatedAt?: number;
+}): GeneratedScenarioArtifact {
+  const title = input.title.trim() || "Untitled Scenario";
+  const summary = input.summary.trim() ||
+    input.scenario.scenePremiseDescription.trim() ||
+    "Untitled scenario premise.";
+  const trope = input.trope.trim() || "Custom scenario";
+
+  return {
+    firstMessage: {
+      ...input.firstMessage,
+      aiOutputConstraint:
+        input.firstMessage.aiOutputConstraint.trim() ||
+        "Open the scene without writing {{user}}'s reply, choices, or internal state.",
+      tokenLengthCap: Math.max(
+        120,
+        Math.min(1200, Math.round(input.firstMessage.tokenLengthCap)),
+      ),
+    },
+    id: input.id,
+    occupation: input.occupation,
+    scenario: {
+      ...input.scenario,
+      scenePremiseDescription: summary,
+      sensoryDetails: input.scenario.sensoryDetails
+        .map((detail) => detail.trim())
+        .filter(Boolean)
+        .slice(0, 8),
+    },
+    source: input.source,
+    summary,
+    tags: Array.isArray(input.tags)
+      ? normalizeTags(input.tags.join(", "))
+      : normalizeTags(input.tags),
+    title,
+    trope,
+    updatedAt: input.updatedAt ?? Date.now(),
+  };
+}
+
+export function compileScenarioConstructionPrompt(input: ScenarioGenerationInput) {
+  const constructionPrompt = input.constructionPrompt?.trim() ||
+    DEFAULT_SCENARIO_CONSTRUCTION_PROMPT;
+
+  return [
+    constructionPrompt,
+    "",
+    "[SCENARIO INGREDIENTS]",
+    `Title: ${input.title.trim() || "Untitled Scenario"}`,
+    `Trope / route pressure: ${input.trope.trim() || "Unspecified"}`,
+    `Occupation / role: ${input.jobTitle.trim() || "Unspecified"}`,
+    `Professional domain: ${input.professionalDomain.replaceAll("_", " ")}`,
+    `Setting notes: ${input.settingNotes?.trim() || "Unspecified"}`,
+    `Relationship pressure: ${input.relationshipPressure?.trim() || "Unspecified"}`,
+    `Opening beat: ${input.openingBeat?.trim() || "Unspecified"}`,
+    "",
+    "[OUTPUT REQUIREMENTS]",
+    "Return a concise editable scenario artifact with scene premise, sensory anchors, opening constraint, tags, and runtime shape.",
+    "Never assign {{user}} dialogue, internal thoughts, choices, or consent.",
+  ].join("\n");
 }
 
 export function generateLorebookArtifact(
@@ -622,6 +844,16 @@ function readUnknownString(value: unknown) {
 
 function readUnknownNumber(value: unknown) {
   return typeof value === "number" && Number.isFinite(value) ? value : null;
+}
+
+function readKnownValue<const T extends readonly string[]>(
+  value: unknown,
+  allowed: T,
+  fallback: T[number],
+): T[number] {
+  return typeof value === "string" && allowed.includes(value as T[number])
+    ? value as T[number]
+    : fallback;
 }
 
 function compileRuntimeBundleContext(input: {

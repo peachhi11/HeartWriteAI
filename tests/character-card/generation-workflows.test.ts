@@ -3,11 +3,15 @@ import test from "node:test";
 
 import {
   compilePersonaConstructionPrompt,
+  compileScenarioConstructionPrompt,
   createBlankPersonaArtifact,
   createImportedPersonaArtifact,
+  createBlankScenarioArtifact,
+  createImportedScenarioArtifact,
   createBlankLorebookArtifact,
   createLorebookArtifactFromV3Document,
   createPersonaArtifactFromEditable,
+  createScenarioArtifactFromEditable,
   createRuntimeBundleArtifact,
   generateLorebookArtifact,
   generatePersonaArtifact,
@@ -103,16 +107,82 @@ test("imports and syncs persona artifacts from editable JSON", () => {
 test("generates scenario artifact with premise and first message constraints", () => {
   const scenario = generateScenarioArtifact({
     jobTitle: "University Student",
+    openingBeat: "Begin at the moment the archive lights fail.",
     professionalDomain: "Corporate_Finance",
+    relationshipPressure: "competitive tension under forced cooperation",
+    settingNotes: "rain-dark archive room",
     title: "Archive Night",
     trope: "Academic rivals forced proximity",
   });
 
   assert.equal(scenario.title, "Archive Night");
+  assert.equal(scenario.source, "generated");
   assert.equal(scenario.occupation.kind, "student");
   assert.ok(scenario.summary.includes("{{char}}"));
   assert.ok(scenario.summary.includes("{{user}}"));
+  assert.match(scenario.summary, /rain-dark archive room/);
+  assert.match(scenario.firstMessage.aiOutputConstraint, /archive lights fail/);
   assert.ok(scenario.firstMessage.aiOutputConstraint.length > 40);
+});
+
+test("compiles hidden scenario construction prompts for advanced controls", () => {
+  const prompt = compileScenarioConstructionPrompt({
+    constructionPrompt: "Custom scenario construction rule.",
+    jobTitle: "University Student",
+    openingBeat: "Begin at the moment the archive lights fail.",
+    professionalDomain: "Corporate_Finance",
+    relationshipPressure: "competitive tension under forced cooperation",
+    settingNotes: "rain-dark archive room",
+    title: "Archive Night",
+    trope: "Academic rivals forced proximity",
+  });
+
+  assert.match(prompt, /Custom scenario construction rule/);
+  assert.match(prompt, /rain-dark archive room/);
+  assert.match(prompt, /competitive tension/);
+  assert.match(prompt, /OUTPUT REQUIREMENTS/);
+});
+
+test("creates blank and imported scenario artifacts as editable drafts", () => {
+  const blank = createBlankScenarioArtifact("Blank Scene");
+
+  assert.equal(blank.source, "blank");
+  assert.equal(blank.title, "Blank Scene");
+  assert.ok(blank.tags.includes("blank"));
+
+  const imported = createImportedScenarioArtifact({
+    firstMessage: {
+      aiOutputConstraint: "Open with a careful question.",
+      tokenLengthCap: 350,
+    },
+    scenario: {
+      scenePremiseDescription: "Imported scene premise.",
+      sensoryDetails: ["rain", "old wood"],
+      settingType: "Contained_Insular",
+      startingTension: "Formal_Chilling",
+    },
+    tags: ["Imported", "imported"],
+    title: "Imported Scene",
+    trope: "Secret alliance",
+  });
+
+  assert.equal(imported.source, "imported");
+  assert.equal(imported.title, "Imported Scene");
+  assert.equal(imported.summary, "Imported scene premise.");
+  assert.equal(
+    imported.tags.filter((tag) => tag === "imported").length,
+    1,
+  );
+
+  const edited = createScenarioArtifactFromEditable({
+    ...imported,
+    summary: "Edited scene premise.",
+    title: "Edited Scene",
+  });
+
+  assert.equal(edited.id, imported.id);
+  assert.equal(edited.title, "Edited Scene");
+  assert.equal(edited.scenario.scenePremiseDescription, "Edited scene premise.");
 });
 
 test("generates lorebook artifact with scoped entries and placeholders", () => {
