@@ -1,6 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
+import { convertFileSrc } from "@tauri-apps/api/core";
 import {
   BookOpen,
   Heart,
@@ -19,6 +21,7 @@ interface CharacterLibraryWorkspaceProps {
   currentFilePath: string | null;
   library: ReturnType<typeof useCardLibrary>;
   onCardSelect: (filePath: string) => void;
+  onConvertToPersona?: () => void;
   onOpenLibraryDrawer: () => void;
 }
 
@@ -50,6 +53,7 @@ export function CharacterLibraryWorkspace({
   currentFilePath,
   library,
   onCardSelect,
+  onConvertToPersona,
   onOpenLibraryDrawer,
 }: CharacterLibraryWorkspaceProps) {
   if (activeCard) {
@@ -58,6 +62,7 @@ export function CharacterLibraryWorkspace({
         <FeaturedCharacterProfile
           activeCard={activeCard}
           currentFilePath={currentFilePath}
+          onConvertToPersona={onConvertToPersona}
           onOpenLibraryDrawer={onOpenLibraryDrawer}
         />
         <ProfileAccordion activeCard={activeCard} />
@@ -128,19 +133,23 @@ export function CharacterLibraryWorkspace({
 function FeaturedCharacterProfile({
   activeCard,
   currentFilePath,
+  onConvertToPersona,
   onOpenLibraryDrawer,
 }: {
   activeCard: ValidatedCharacterCardV3;
   currentFilePath: string | null;
+  onConvertToPersona?: () => void;
   onOpenLibraryDrawer: () => void;
 }) {
   const profile = buildCharacterProfile(activeCard);
 
   return (
     <section className="overflow-hidden rounded-lg border bg-card">
-      <div className="flex aspect-[5/3] items-center justify-center border-b bg-muted/40">
-        <UserRound className="size-28 text-muted-foreground/25" />
-      </div>
+      <CardAvatarPreview
+        className="aspect-[5/3] border-b"
+        filePath={currentFilePath}
+        name={activeCard.data.name}
+      />
       <div className="grid gap-5 p-6">
         <div>
           <div className="flex items-center gap-3">
@@ -203,6 +212,16 @@ function FeaturedCharacterProfile({
             Chat
           </Link>
         </div>
+        {onConvertToPersona ? (
+          <button
+            type="button"
+            onClick={onConvertToPersona}
+            className="inline-flex items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm font-semibold transition hover:bg-muted"
+          >
+            <UserRound className="size-4" />
+            Convert to Persona
+          </button>
+        ) : null}
       </div>
     </section>
   );
@@ -291,9 +310,11 @@ function CharacterCardGrid({
           onClick={() => onCardSelect(card.file_path)}
           className="group overflow-hidden rounded-md border bg-background text-left transition hover:border-rose-200 hover:shadow-sm"
         >
-          <div className="flex aspect-[4/3] items-center justify-center border-b bg-muted/40">
-            <UserRound className="size-14 text-muted-foreground/25" />
-          </div>
+          <CardAvatarPreview
+            className="aspect-[4/3] border-b"
+            filePath={card.file_path}
+            name={card.name}
+          />
           <div className="grid gap-3 p-4">
             <div>
               <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
@@ -319,6 +340,35 @@ function CharacterCardGrid({
           </div>
         </button>
       ))}
+    </div>
+  );
+}
+
+function CardAvatarPreview(props: {
+  className?: string;
+  filePath: string | null;
+  name: string;
+}) {
+  const canPreview = props.filePath
+    ? /\.(apng|png)$/i.test(props.filePath)
+    : false;
+  const src = canPreview && props.filePath ? convertFileSrc(props.filePath) : null;
+
+  return (
+    <div className={`relative flex items-center justify-center overflow-hidden bg-muted/40 ${props.className ?? ""}`}>
+      {src ? (
+        <Image
+          alt={`${props.name} avatar preview`}
+          className="object-cover"
+          fill
+          loading="lazy"
+          sizes="(max-width: 768px) 100vw, 50vw"
+          src={src}
+          unoptimized
+        />
+      ) : (
+        <UserRound className="size-14 text-muted-foreground/25" />
+      )}
     </div>
   );
 }

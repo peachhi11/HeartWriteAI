@@ -1,7 +1,8 @@
 "use client";
 
 import { FormEvent, useEffect, useRef, useState } from "react";
-import { SendHorizontal, Sparkles } from "lucide-react";
+import Link from "next/link";
+import { Brain, Route, SendHorizontal, Sparkles } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,10 @@ import {
 } from "@/lib/chat/messages";
 import { cn } from "@/lib/utils";
 import { StudioShell } from "@/components/studio-shell";
+import { useScenarioLibrary } from "@/hooks/useScenarioLibrary";
+import { useRelationshipStore } from "@/features/relationship/store";
+import { StatBar } from "@/features/relationship/components/StatBar";
+import type { RelationshipState } from "@/features/relationship/schema";
 
 const OLLAMA_CHAT_ENDPOINT = "http://localhost:11434/api/chat";
 const DEFAULT_MODEL = "llama3";
@@ -76,10 +81,17 @@ function formatRoleplayText(text: string) {
 }
 
 export default function RoleplayChat() {
+  const scenarioLibrary = useScenarioLibrary();
+  const addRelationshipMessage = useRelationshipStore((state) => state.addMessage);
+  const hydrateRelationship = useRelationshipStore((state) => state.hydrate);
+  const relationshipHydrated = useRelationshipStore((state) => state.hydrated);
+  const relationshipState = useRelationshipStore((state) => state.state);
+  const relationshipTracking = useRelationshipStore((state) => state.tracking);
   const [sessions, setSessions] =
     useState<ChatSession[]>(loadInitialChatSessions);
   const [activeSessionId, setActiveSessionId] = useState(() => sessions[0]!.id);
   const [input, setInput] = useState("");
+  const [scenarioId, setScenarioId] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -90,6 +102,12 @@ export default function RoleplayChat() {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  useEffect(() => {
+    if (!relationshipHydrated) {
+      void hydrateRelationship();
+    }
+  }, [hydrateRelationship, relationshipHydrated]);
 
   useEffect(() => {
     try {
@@ -129,6 +147,30 @@ export default function RoleplayChat() {
     setRuntimeError(null);
   }
 
+  function applySavedScenarioToOverride() {
+    const scenario = scenarioLibrary.items.find((item) => item.id === scenarioId);
+
+    if (!scenario) {
+      return;
+    }
+
+    updateActiveSession({
+      scenarioOverride: {
+        context: scenario.summary,
+        dynamic: [
+          scenario.trope,
+          scenario.scenario.startingTension,
+          scenario.firstMessage.aiOutputConstraint,
+        ].filter(Boolean).join("\n"),
+        scene: scenario.scenario.scenePremiseDescription,
+        setting: [
+          scenario.scenario.settingType.replaceAll("_", " "),
+          scenario.scenario.sensoryDetails.join(", "),
+        ].filter(Boolean).join("\n"),
+      },
+    });
+  }
+
   async function handleSendMessage(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -147,6 +189,11 @@ export default function RoleplayChat() {
     setInput("");
     setIsGenerating(true);
     setRuntimeError(null);
+    await addRelationshipMessage({
+      content: input.trim(),
+      createdAt: Date.now(),
+      role: "user",
+    });
 
     try {
       const response = await fetch(OLLAMA_CHAT_ENDPOINT, {
@@ -301,6 +348,29 @@ export default function RoleplayChat() {
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-3">
+              <div className="grid gap-2">
+                <select
+                  value={scenarioId}
+                  onChange={(event) => setScenarioId(event.currentTarget.value)}
+                  className="h-10 rounded-md border bg-background px-3 text-sm"
+                >
+                  <option value="">No saved scenario selected</option>
+                  {scenarioLibrary.items.map((scenario) => (
+                    <option key={scenario.id} value={scenario.id}>
+                      {scenario.title}
+                    </option>
+                  ))}
+                </select>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={!scenarioId}
+                  onClick={applySavedScenarioToOverride}
+                >
+                  <Route className="size-4" />
+                  Apply to Override
+                </Button>
+              </div>
               <Textarea
                 value={activeSession.scenarioOverride.context}
                 onChange={(event) =>
@@ -329,6 +399,49 @@ export default function RoleplayChat() {
                 }
                 placeholder="Dynamic"
               />
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card/85">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Brain className="size-4 text-muted-foreground" />
+                Emotional Tracker
+              </CardTitle>
+              <CardDescription>
+                Small read-only snapshot of what the current chat is doing
+                emotionally.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-3">
+              <SceneTrackerSummary
+                override={activeSession.scenarioOverride}
+                relationshipState={relationshipState}
+              />
+              <StatBar
+                label="Emotional Trust"
+                value={relationshipState.trust.emotional}
+                tone="good"
+              />
+              <StatBar
+                label="Bond Depth"
+                value={relationshipState.attachment.bondDepth}
+              />
+              <StatBar
+                label="Tension"
+                value={relationshipState.chemistry.tension}
+                tone="warm"
+              />
+              <StatBar
+                label="Rupture Risk"
+                value={relationshipTracking?.trajectory.ruptureRisk ?? 0}
+                tone="risk"
+              />
+              <Button asChild variant="outline">
+                <Link href="/relationship-tracker">
+                  Open Full Relationship Tracker
+                </Link>
+              </Button>
             </CardContent>
           </Card>
         </section>
@@ -468,6 +581,66 @@ function compileScenarioOverrideMessages(override: ScenarioOverride) {
         },
       ]
     : [];
+}
+
+function SceneTrackerSummary(props: {
+  override: ScenarioOverride;
+  relationshipState: RelationshipState;
+}) {
+  const snapshot = {
+    arcScene: props.relationshipState.lifecycleState,
+    boundariesConsent:
+      props.relationshipState.trust.autonomy > 60
+        ? "Boundaries feel respected."
+        : "Boundary comfort is still being established.",
+    charactersPresent: ["{{char}}", "{{user}}"],
+    emotionalProgression:
+      props.relationshipState.intimacy.vulnerability > 40
+        ? "Vulnerability is becoming more emotionally important."
+        : "Emotional progression is still early or guarded.",
+    emotionalUndercurrent:
+      props.relationshipState.attachment.abandonmentSensitivity > 45
+        ? "Abandonment sensitivity is shaping subtext."
+        : "Attachment signal is present but not highly activated.",
+    importantRomanticMemory:
+      props.relationshipState.memories[0]?.summary ?? "No major romantic memory yet.",
+    physicalIntimacyProgression:
+      props.relationshipState.intimacy.physical > 40
+        ? "Physical closeness has become meaningful."
+        : "Physical intimacy is not a major driver yet.",
+    relationshipDynamic: props.relationshipState.type,
+    scenario: props.override.scene || "Using character card scenario.",
+    sceneAtmosphere: props.override.setting || "Atmosphere is forming from chat.",
+    tensionConflict:
+      props.relationshipState.rupture.active
+        ? props.relationshipState.rupture.type ?? "Active rupture"
+        : props.relationshipState.chemistry.tension > 45
+          ? "Romantic tension is active."
+          : "No major unresolved conflict detected.",
+  };
+
+  return (
+    <dl className="grid gap-2 text-xs">
+      {[
+        ["Scene Atmosphere", snapshot.sceneAtmosphere],
+        ["Arc Scene", snapshot.arcScene],
+        ["Scenario", snapshot.scenario],
+        ["Characters Present", snapshot.charactersPresent.join(", ")],
+        ["Relationship Dynamic", snapshot.relationshipDynamic],
+        ["Emotional Undercurrent", snapshot.emotionalUndercurrent],
+        ["Physical Intimacy", snapshot.physicalIntimacyProgression],
+        ["Emotional Progression", snapshot.emotionalProgression],
+        ["Tension / Conflict", snapshot.tensionConflict],
+        ["Boundaries / Consent", snapshot.boundariesConsent],
+        ["Important Memory", snapshot.importantRomanticMemory],
+      ].map(([label, value]) => (
+        <div key={label} className="rounded-md border bg-background/60 p-2">
+          <dt className="font-medium text-foreground">{label}</dt>
+          <dd className="mt-1 line-clamp-2 text-muted-foreground">{value}</dd>
+        </div>
+      ))}
+    </dl>
+  );
 }
 
 function readChatSession(value: unknown): ChatSession | null {

@@ -7,6 +7,7 @@ import {
   CopyPlus,
   Download,
   PackageCheck,
+  Sparkles,
   Save,
   Trash2,
   Upload,
@@ -28,18 +29,24 @@ import {
   createArtifactFileName,
   createDuplicateArtifactId,
   createImportedRuntimeBundleArtifact,
+  createPersonaArtifactFromCharacterSummary,
   createRuntimeBundleArtifact,
   createRuntimeBundleArtifactFromEditable,
+  generateLorebookArtifact,
+  generateScenarioArtifact,
   type RuntimeBundleArtifact,
 } from "@/features/generation/workflows";
-import { useLorebookLibrary } from "@/hooks/useLorebookLibrary";
-import { usePersonaLibrary } from "@/hooks/usePersonaLibrary";
+import { saveLorebookLibraryItem, useLorebookLibrary } from "@/hooks/useLorebookLibrary";
+import { savePersonaLibraryItem, usePersonaLibrary } from "@/hooks/usePersonaLibrary";
 import {
   deleteRuntimeBundleLibraryItem,
   saveRuntimeBundleLibraryItem,
   useRuntimeBundleLibrary,
 } from "@/hooks/useRuntimeBundleLibrary";
-import { useScenarioLibrary } from "@/hooks/useScenarioLibrary";
+import {
+  saveScenarioLibraryItem,
+  useScenarioLibrary,
+} from "@/hooks/useScenarioLibrary";
 import { downloadUint8Array } from "@/lib/browser/downloadUint8Array";
 import { Field, GeneratorFormCard, GeneratorGrid } from "./GenerationShell";
 import { useCardLibrary } from "@/hooks/useCardLibrary";
@@ -110,6 +117,82 @@ export function BundleSelectionPage() {
     setSavedSnapshot(null);
     setDeleteArmed(false);
     setStatus("Created runtime bundle preview.");
+  }
+
+  async function suggestMissingPieces() {
+    if (!selectedCharacter) {
+      setStatus("Choose a character first, then I can suggest missing pieces.");
+      return;
+    }
+
+    let nextPersona = selectedPersona;
+    let nextScenario = selectedScenario;
+    let nextLorebook = selectedLorebook;
+
+    if (!nextPersona) {
+      nextPersona = createPersonaArtifactFromCharacterSummary(selectedCharacter);
+      await savePersonaLibraryItem(nextPersona);
+      setPersonaId(nextPersona.id);
+    }
+
+    if (!nextScenario) {
+      nextScenario = generateScenarioArtifact({
+        jobTitle: selectedCharacter.framework || "Roleplay Lead",
+        professionalDomain: "Arts_Entertainment",
+        referenceCharacter: [
+          selectedCharacter.name,
+          selectedCharacter.relationship,
+          selectedCharacter.tags.slice(0, 5).join(", "),
+        ].filter(Boolean).join(" · "),
+        referencePersona: nextPersona.summary,
+        relationshipPressure:
+          selectedCharacter.relationship || "character-driven romantic tension",
+        settingNotes:
+          "Use the selected character card's built-in scenario as the baseline unless the user overrides it.",
+        title: `${selectedCharacter.name} Scenario`,
+        trope:
+          selectedCharacter.tags.find((tag) => /lover|romance|rival|slow|enemy/i.test(tag)) ??
+          selectedCharacter.relationship ??
+          "Character card scenario extension",
+      });
+      await saveScenarioLibraryItem(nextScenario);
+      setScenarioId(nextScenario.id);
+    }
+
+    if (!nextLorebook) {
+      nextLorebook = generateLorebookArtifact({
+        jobTitle: selectedCharacter.framework || "Roleplay Lead",
+        professionalDomain: "Arts_Entertainment",
+        speciesType: "Human",
+        title: `${selectedCharacter.name} Lore`,
+        trope:
+          selectedCharacter.tags.slice(0, 3).join(", ") ||
+          selectedCharacter.relationship ||
+          "Character-linked lore",
+      });
+      await saveLorebookLibraryItem(nextLorebook);
+      setLorebookId(nextLorebook.id);
+    }
+
+    await Promise.all([
+      personas.refresh(),
+      scenarios.refresh(),
+      lorebooks.refresh(),
+    ]);
+
+    const bundle = createRuntimeBundleArtifact({
+      character: selectedCharacter,
+      lorebook: nextLorebook,
+      persona: nextPersona,
+      scenario: nextScenario,
+      scenarioOverride,
+      title,
+    });
+
+    setActiveBundle(bundle);
+    setSavedSnapshot(null);
+    setDeleteArmed(false);
+    setStatus("Suggested missing persona, scenario, and lore drafts from the selected character.");
   }
 
   async function save() {
@@ -363,6 +446,15 @@ export function BundleSelectionPage() {
           <Button type="button" disabled={!canCreateBundle} onClick={createBundle}>
             <PackageCheck className="size-4" />
             Create Bundle
+          </Button>
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!selectedCharacter}
+            onClick={suggestMissingPieces}
+          >
+            <Sparkles className="size-4" />
+            Suggest Missing Pieces
           </Button>
           <label className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground">
             <Upload className="size-4" />

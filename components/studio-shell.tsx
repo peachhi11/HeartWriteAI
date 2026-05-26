@@ -74,6 +74,11 @@ const utilitySections = [
     label: "Scenarios",
   },
   {
+    href: "/relationship-tracker",
+    icon: "/brand/icons/character-chat.svg",
+    label: "Tracker",
+  },
+  {
     href: "/?section=conversion",
     icon: "/brand/icons/card-conversion.svg",
     label: "V1/V2 to V3",

@@ -22,6 +22,7 @@ import {
   LorebookV3EntrySchema,
   type LorebookV3Document,
 } from "../lorebooks/schema";
+import type { ValidatedCharacterCardV3 } from "@/types/ccv3";
 
 export type PersonaGenerationInput = {
   name: string;
@@ -637,6 +638,55 @@ export function generatePersonaArtifact(
     updatedAt: Date.now(),
     source: "generated",
   };
+}
+
+export function createPersonaArtifactFromCharacterCard(
+  card: ValidatedCharacterCardV3,
+): GeneratedPersonaArtifact {
+  return createPersonaArtifactFromCharacterSummary({
+    id: `character:${card.data.name}`,
+    name: card.data.name,
+    relationship: card.data.scenario,
+    summary: card.data.description,
+    tags: card.data.tags,
+  });
+}
+
+export function createPersonaArtifactFromCharacterSummary(
+  character: BundleCharacterSource,
+): GeneratedPersonaArtifact {
+  const name = `${character.name} Persona`;
+  const usefulProfile = [
+    character.summary,
+    character.relationship,
+    character.framework,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+  const tags = normalizeTags([
+    "converted persona",
+    "character-derived",
+    ...(character.tags ?? []),
+  ].join(", "));
+
+  return createPersonaArtifactFromEditable({
+    id: createArtifactId("persona", `${character.id}:converted`),
+    name,
+    prompt: [
+      `USER PERSONA: ${name}`,
+      `Based on character reference: ${character.name}`,
+      "Use this as a playable {{user}} POV persona, not as an autonomous NPC.",
+      "Carry over broad style, values, boundaries, and relationship-relevant traits only.",
+      "Strip out character-only details that would force narration, hidden thoughts, fixed dialogue, or non-user agency.",
+      usefulProfile ? `Reference traits:\n${usefulProfile}` : "",
+      "Runtime rule: treat this persona as user-controlled. Never narrate their private thoughts, unstated feelings, dialogue, choices, or consent.",
+    ].filter(Boolean).join("\n"),
+    source: "generated",
+    summary:
+      `${name} is a user-controlled persona draft converted from ${character.name}.`,
+    tags,
+    updatedAt: Date.now(),
+  });
 }
 
 export function compilePersonaConstructionPrompt(input: PersonaGenerationInput) {

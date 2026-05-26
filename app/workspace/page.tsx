@@ -14,6 +14,8 @@ import StructuredCardEditor from "@/components/structured-card-editor";
 import { useCharacterLibrary } from "@/hooks/character-card/useCharacterLibrary";
 import { useFileDialogs } from "@/hooks/useFileDialogs";
 import { useCardLibrary } from "@/hooks/useCardLibrary";
+import { savePersonaLibraryItem } from "@/hooks/usePersonaLibrary";
+import { createPersonaArtifactFromCharacterCard } from "@/features/generation/workflows";
 import { downloadUint8Array } from "@/lib/browser/downloadUint8Array";
 import { importBrowserCharacterCardFile } from "@/lib/character-card/importBrowserCharacterCardFile";
 import { writeCharacterCardToPng } from "@/lib/character-card/writeCharacterCardToPng";
@@ -236,6 +238,18 @@ export default function WorkspacePage() {
     setWorkspaceMessage(`Downloaded ${fileName}.`);
   }
 
+  async function handleConvertActiveCardToPersona() {
+    if (!activeCard) {
+      return;
+    }
+
+    const persona = createPersonaArtifactFromCharacterCard(activeCard);
+    await savePersonaLibraryItem(persona);
+    setWorkspaceMessage(
+      `Converted ${activeCard.data.name} into ${persona.name} and saved it to the persona library.`,
+    );
+  }
+
   return (
     <StudioShell
       eyebrow="Character Cards"
@@ -408,6 +422,9 @@ export default function WorkspacePage() {
             library={library}
             onCardSelect={(filePath) => {
               void handleCardSelect(filePath);
+            }}
+            onConvertToPersona={() => {
+              void handleConvertActiveCardToPersona();
             }}
             onOpenLibraryDrawer={() => setLibraryOpen(true)}
           />
