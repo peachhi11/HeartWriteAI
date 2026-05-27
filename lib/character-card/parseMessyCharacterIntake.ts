@@ -387,9 +387,10 @@ export function parseMessyCharacterIntake(
     return { values: {}, fieldNames: [] };
   }
 
-  const importFields = parseCharacterCardImportText(trimmedText, "", "");
-  const labelBlocks = parseIntakeLabelBlocks(trimmedText);
-  const heuristicFields = parseHeuristicParagraphs(trimmedText);
+  const normalizedText = normalizeInlineIntakeLabels(trimmedText);
+  const importFields = parseCharacterCardImportText(normalizedText, "", "");
+  const labelBlocks = parseIntakeLabelBlocks(normalizedText);
+  const heuristicFields = parseHeuristicParagraphs(normalizedText);
   const values: Partial<CharacterCardFormValues> = {
     ...heuristicFields,
     ...importFields,
@@ -411,9 +412,10 @@ function createValuesFromLabelBlocks(
     "group only greeting",
     "group greeting",
   ]);
+  const nameBlock = splitNameBlock(readFirstBlock(blocks, ["full name", "name"]));
 
   return {
-    fullName: readFirstBlock(blocks, ["full name", "name"]),
+    fullName: nameBlock.name,
     aliasesNicknames: readFirstBlock(blocks, [
       "aliases/nicknames",
       "aliases / nicknames",
@@ -449,6 +451,7 @@ function createValuesFromLabelBlocks(
       ]),
     ),
     description: joinDefined([
+      nameBlock.remainder,
       readFirstBlock(blocks, ["description"]),
       joinLabeledBlocks(blocks, [
         "biological sex & gender",
@@ -680,6 +683,62 @@ function parseHeuristicParagraphs(text: string): Partial<CharacterCardFormValues
   }
 
   return blocks;
+}
+
+function normalizeInlineIntakeLabels(text: string): string {
+  const inlineLabels = [
+    "scenario",
+    "first message",
+    "description",
+    "personality",
+    "appearance",
+    "physical appearance",
+    "background",
+    "backstory",
+    "speech style",
+    "creator notes",
+    "system prompt",
+    "tags",
+  ];
+
+  const labelPattern = inlineLabels
+    .map((label) => label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .sort((left, right) => right.length - left.length)
+    .join("|");
+
+  return text.replace(
+    new RegExp(`([.!?;])\\s+(${labelPattern})\\s*:`, "gi"),
+    (_match, previous: string, label: string) => `${previous}\n${label}:`,
+  );
+}
+
+function splitNameBlock(nameBlock?: string) {
+  if (!nameBlock?.trim()) {
+    return { name: undefined, remainder: undefined };
+  }
+
+  const trimmedNameBlock = nameBlock.trim();
+  const firstSentence = trimmedNameBlock.match(/^([^.!?\n]{2,80})[.!?]\s+([\s\S]+)$/);
+
+  if (!firstSentence) {
+    return { name: trimmedNameBlock, remainder: undefined };
+  }
+
+  const candidateName = firstSentence[1].trim();
+  const remainder = firstSentence[2].trim();
+  const looksLikeName =
+    candidateName.split(/\s+/).length <= 5 &&
+    !matchesAny(candidateName.toLowerCase(), [
+      "scenario",
+      "personality",
+      "appearance",
+      "relationship",
+      "character",
+    ]);
+
+  return looksLikeName
+    ? { name: candidateName, remainder }
+    : { name: trimmedNameBlock, remainder: undefined };
 }
 
 function createAlternateOpenings(blocks: IntakeLabelBlock[]) {

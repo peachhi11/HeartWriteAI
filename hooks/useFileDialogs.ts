@@ -7,6 +7,7 @@ import {
   CharacterCardV3Schema,
   ValidatedCharacterCardV3,
 } from "@/types/character-card/CharacterCardV3Schema";
+import { createBlankDraftCharacterCard } from "@/lib/character-card/createDraftCharacterCard";
 import { isTauriRuntime } from "@/lib/tauri/native";
 
 export function useFileDialogs() {
@@ -20,8 +21,10 @@ export function useFileDialogs() {
       return null;
     }
 
+    let selectedPath: string | null = null;
+
     try {
-      const selectedPath = await open({
+      const openedPath = await open({
         multiple: false,
         title: "Import CCV3 Character Card Package",
         filters: [
@@ -32,10 +35,11 @@ export function useFileDialogs() {
         ],
       });
 
-      if (!selectedPath || typeof selectedPath !== "string") {
+      if (!openedPath || typeof openedPath !== "string") {
         return null;
       }
 
+      selectedPath = openedPath;
       const cardData = await invoke<unknown>("import_card_from_path", {
         filePath: selectedPath,
       });
@@ -44,6 +48,17 @@ export function useFileDialogs() {
       return { card, path: selectedPath };
     } catch (error) {
       console.error("Native load interface pipeline collapsed:", error);
+      if (
+        selectedPath &&
+        /\.(apng|png)$/i.test(selectedPath) &&
+        isMissingCardMetadataError(error)
+      ) {
+        return {
+          card: createBlankDraftCharacterCard(selectedPath),
+          path: selectedPath,
+        };
+      }
+
       return null;
     }
   }
@@ -142,6 +157,10 @@ export function useFileDialogs() {
     triggerPngMetadataSave,
     triggerUniversalImport,
   };
+}
+
+function isMissingCardMetadataError(error: unknown) {
+  return String(error).includes("No character card metadata");
 }
 
 function createSafeCharacterFileName(name: string, suffix: string) {

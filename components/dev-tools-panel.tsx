@@ -5,16 +5,25 @@ import { Database, Loader2 } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 
 import { Button } from "@/components/ui/button";
+import { isTauriRuntime } from "@/lib/tauri/native";
 
 export interface DevToolsPanelProps {
   onSeeded?: () => void;
 }
 
 export function DevToolsPanel({ onSeeded }: DevToolsPanelProps) {
+  const isDesktopRuntime = isTauriRuntime();
   const [loadingTarget, setLoadingTarget] = useState<number | null>(null);
   const [message, setMessage] = useState("");
 
   async function handleGenerationTrigger(targetSize: number) {
+    if (!isDesktopRuntime) {
+      setMessage(
+        "Sample card seeding is available inside the Tauri desktop app.",
+      );
+      return;
+    }
+
     setLoadingTarget(targetSize);
     setMessage("");
 
@@ -50,7 +59,7 @@ export function DevToolsPanel({ onSeeded }: DevToolsPanelProps) {
         <Button
           type="button"
           variant="outline"
-          disabled={isLoading}
+          disabled={isLoading || !isDesktopRuntime}
           onClick={() => handleGenerationTrigger(10)}
         >
           {loadingTarget === 10 ? <Loader2 className="animate-spin" /> : null}
@@ -58,7 +67,7 @@ export function DevToolsPanel({ onSeeded }: DevToolsPanelProps) {
         </Button>
         <Button
           type="button"
-          disabled={isLoading}
+          disabled={isLoading || !isDesktopRuntime}
           onClick={() => handleGenerationTrigger(100)}
         >
           {loadingTarget === 100 ? <Loader2 className="animate-spin" /> : null}

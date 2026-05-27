@@ -4,6 +4,7 @@ import {
 } from "@/types/character-card/CharacterCardV3Schema";
 import { CharacterCardPayload } from "@/types/character-card/CharacterCardPayload";
 import { createCharacterCardV3Export } from "./createCharacterCardV3Export";
+import { createBlankDraftCharacterCard } from "./createDraftCharacterCard";
 import { importCharacterCardPngData } from "./importCharacterCardPngData";
 
 export interface BrowserCharacterCardImportResult {
@@ -37,6 +38,14 @@ export async function importBrowserCharacterCardFile(
         throw new Error(pointerMessage);
       }
 
+      if (isMissingCardMetadataError(error)) {
+        return {
+          card: createBlankDraftCharacterCard(fileName),
+          path: fileName,
+          sourcePngData: pngData,
+        };
+      }
+
       throw error;
     }
   }
@@ -60,6 +69,13 @@ export async function importBrowserCharacterCardFile(
   }
 
   throw new Error("Drop a PNG or JSON character card.");
+}
+
+function isMissingCardMetadataError(error: unknown) {
+  return (
+    error instanceof Error &&
+    error.message.includes("supported character card metadata")
+  );
 }
 
 async function readPointerFileMessage(file: File) {

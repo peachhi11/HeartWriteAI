@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { PanelLeftOpen, X } from "lucide-react";
+import { PanelLeftOpen, Sparkles, X } from "lucide-react";
 
 import CardLibraryPanel from "@/components/card-library-panel";
 import { CharacterLibraryWorkspace } from "@/components/character-library-workspace";
@@ -11,6 +11,7 @@ import ExpressionManager from "@/components/expression-manager";
 import { FolderIntakeReview } from "@/components/folder-intake-review";
 import { StudioShell } from "@/components/studio-shell";
 import StructuredCardEditor from "@/components/structured-card-editor";
+import { Textarea } from "@/components/ui/textarea";
 import { useCharacterLibrary } from "@/hooks/character-card/useCharacterLibrary";
 import { useFileDialogs } from "@/hooks/useFileDialogs";
 import { useCardLibrary } from "@/hooks/useCardLibrary";
@@ -18,6 +19,7 @@ import { savePersonaLibraryItem } from "@/hooks/usePersonaLibrary";
 import { createPersonaArtifactFromCharacterCard } from "@/features/generation/workflows";
 import { downloadUint8Array } from "@/lib/browser/downloadUint8Array";
 import { importBrowserCharacterCardFile } from "@/lib/character-card/importBrowserCharacterCardFile";
+import { createDraftCharacterCardFromIntake } from "@/lib/character-card/createDraftCharacterCard";
 import { writeCharacterCardToPng } from "@/lib/character-card/writeCharacterCardToPng";
 import { ExpressionSprite } from "@/types/character-card/ExpressionSprite";
 import { ValidatedCharacterCardV3 } from "@/types/ccv3";
@@ -29,6 +31,10 @@ export default function WorkspacePage() {
   const [currentFilePath, setCurrentFilePath] = useState<string | null>(null);
   const [browserSourcePngData, setBrowserSourcePngData] =
     useState<Uint8Array | null>(null);
+  const [messyIntakeText, setMessyIntakeText] = useState("");
+  const [messyIntakeMessage, setMessyIntakeMessage] = useState<string | null>(
+    null,
+  );
   const [selectedExpression, setSelectedExpression] =
     useState<ExpressionSprite | null>(null);
   const [libraryOpen, setLibraryOpen] = useState(false);
@@ -250,6 +256,34 @@ export default function WorkspacePage() {
     );
   }
 
+  function handleRouteMessyIntake() {
+    if (!messyIntakeText.trim() && !activeCard) {
+      setMessyIntakeMessage(
+        "Paste rough character notes first, or import a blank PNG to start from an image shell.",
+      );
+      return;
+    }
+
+    const result = createDraftCharacterCardFromIntake({
+      currentCard: activeCard,
+      intakeText: messyIntakeText,
+      sourceName: currentFilePath,
+    });
+
+    setActiveCard(result.card);
+    setSelectedExpression(null);
+    setMessyIntakeMessage(
+      result.routedFieldNames.length
+        ? `Routed ${result.routedFieldNames.length} fields into the character draft.`
+        : "Started an editable blank character draft.",
+    );
+    setWorkspaceMessage(
+      activeCard
+        ? "Merged messy intake into the active character card."
+        : "Created an editable character card draft from messy intake.",
+    );
+  }
+
   return (
     <StudioShell
       eyebrow="Character Cards"
@@ -415,6 +449,42 @@ export default function WorkspacePage() {
             onChooseFolder={triggerFolderIntakeSelect}
             onImported={library.refresh}
           />
+
+          <section className="grid gap-3 rounded-lg border bg-card/85 p-5">
+            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <div className="space-y-1">
+                <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
+                  <Sparkles className="size-4" />
+                  Messy Character Intake
+                </h2>
+                <p className="max-w-3xl text-sm text-muted-foreground">
+                  Paste rough notes, fragments, or early character ideas. This
+                  can create a new editable draft or merge into the active card.
+                  A blank PNG can be imported first and saved back as the
+                  finished metadata card later.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleRouteMessyIntake}
+                className="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700"
+              >
+                <Sparkles className="size-4" />
+                {activeCard ? "Route Into Card" : "Create Draft"}
+              </button>
+            </div>
+            <Textarea
+              value={messyIntakeText}
+              placeholder="Example: Name: Mara Vale. Looks exhausted but elegant. Rival academic. Terrified of being ordinary. Speaks with dry restraint. Scenario: {{user}} catches her hiding scholarship sabotage evidence..."
+              className="min-h-36 resize-y"
+              onChange={(event) => setMessyIntakeText(event.currentTarget.value)}
+            />
+            {messyIntakeMessage ? (
+              <p className="text-xs text-muted-foreground">
+                {messyIntakeMessage}
+              </p>
+            ) : null}
+          </section>
 
           <CharacterLibraryWorkspace
             activeCard={activeCard}

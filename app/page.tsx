@@ -9,8 +9,13 @@ import {
   Boxes,
   Braces,
   Feather,
+  ImageIcon,
   LibraryBig,
   MessageSquareText,
+  PencilRuler,
+  Settings2,
+  UserRoundPlus,
+  WandSparkles,
 } from "lucide-react";
 
 import { CharacterCardImportExport } from "@/components/character-card-import-export";
@@ -34,24 +39,58 @@ import { getNativeAppVersion, greetNative } from "@/lib/tauri/native";
 
 const workflowCards = [
   {
-    title: "Character Cards",
-    description: "CCV3-first creation, editing, conversion, and PNG export.",
-    icon: Bot,
+    title: "Create Character",
+    description: "Generate a new CCV3-ready character from guided inputs.",
+    href: "/workspace",
+    icon: UserRoundPlus,
   },
   {
-    title: "Persona Matching",
-    description: "Playable user personas matched to route energy and card tone.",
+    title: "Edit Character",
+    description: "Import, refine, convert, and export editable card drafts.",
+    href: "/workspace",
+    icon: PencilRuler,
+  },
+  {
+    title: "Create Persona",
+    description: "Build playable {{user}} POV personas for roleplay bundles.",
+    href: "/personas",
     icon: Feather,
   },
   {
+    title: "Persona Match",
+    description: "Match persona energy to characters, scenarios, and tone.",
+    href: "/personas",
+    icon: WandSparkles,
+  },
+  {
     title: "Lorebooks",
-    description: "Scoped world, character, persona, and scenario lore assets.",
+    description: "Create modular V3 lorebooks and runtime-ready entries.",
+    href: "/lorebooks",
     icon: LibraryBig,
   },
   {
-    title: "Chat Runtime",
-    description: "Context compilation, active lore, summaries, and local models.",
+    title: "Image Generation",
+    description: "Prepare visual assets, avatars, and card art workflows.",
+    href: "/?section=images",
+    icon: ImageIcon,
+  },
+  {
+    title: "Chat",
+    description: "Preview one-on-one character chat with runtime context.",
+    href: "/chat",
     icon: MessageSquareText,
+  },
+  {
+    title: "Library",
+    description: "Browse saved characters, personas, lore, and bundles.",
+    href: "/bundles",
+    icon: Bot,
+  },
+  {
+    title: "Settings",
+    description: "Toggle advanced runtime controls and desktop preferences.",
+    href: "/?section=settings",
+    icon: Settings2,
   },
 ];
 
@@ -120,7 +159,7 @@ export default function Home() {
         <CharacterCardImportExport />
 
         <section className="grid gap-6">
-          <Card className="border bg-card/85 shadow-2xl backdrop-blur">
+          <Card className="liquid-glass-strong rounded-[2rem]">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Braces data-icon="inline-start" />
@@ -135,7 +174,7 @@ export default function Home() {
               <Button variant="outline" onClick={checkNativeBridge}>
                 Check native command
               </Button>
-              <p className="rounded-2xl border bg-muted/45 p-4 text-sm text-muted-foreground">
+              <p className="liquid-glass rounded-2xl p-4 text-sm text-muted-foreground">
                 {nativeStatus}
               </p>
               {nativeVersion ? (
@@ -161,29 +200,33 @@ export default function Home() {
         <Tabs
           value={dashboardTab}
           onValueChange={setDashboardTab}
-          className="rounded-3xl border bg-card/75 p-4 shadow-xl backdrop-blur"
+          className="liquid-glass-strong rounded-[2rem] p-4"
         >
-          <TabsList>
+          <TabsList className="liquid-glass rounded-2xl p-1">
             <TabsTrigger value="workspace">Workspace</TabsTrigger>
             <TabsTrigger value="runtime">Runtime</TabsTrigger>
             <TabsTrigger value="lore">Lore</TabsTrigger>
             <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
-          <TabsContent value="workspace" className="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+          <TabsContent value="workspace" className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {workflowCards.map((card) => (
-              <Card key={card.title} className="bg-background/70">
-                <CardHeader>
-                  <card.icon className="size-5 text-muted-foreground" />
-                  <CardTitle>{card.title}</CardTitle>
-                  <CardDescription>{card.description}</CardDescription>
-                </CardHeader>
-              </Card>
+              <Link key={card.title} href={card.href} className="group block">
+                <Card className="liquid-glass h-full rounded-[1.75rem] transition duration-200 group-hover:-translate-y-1 group-hover:shadow-2xl">
+                  <CardHeader>
+                    <div className="liquid-icon mb-2 flex size-12 items-center justify-center rounded-2xl text-muted-foreground transition group-hover:text-foreground">
+                      <card.icon className="size-5" />
+                    </div>
+                    <CardTitle>{card.title}</CardTitle>
+                    <CardDescription>{card.description}</CardDescription>
+                  </CardHeader>
+                </Card>
+              </Link>
             ))}
           </TabsContent>
           <TabsContent value="runtime" className="mt-4 grid gap-4">
             <RelationshipReadOnlyPanel />
             <RuntimeEngineDebugPanel />
-            <Card className="bg-background/70">
+            <Card className="liquid-glass rounded-[1.75rem]">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Boxes data-icon="inline-start" />
@@ -202,7 +245,7 @@ export default function Home() {
             </Card>
           </TabsContent>
           <TabsContent value="lore" className="mt-4">
-            <Card className="bg-background/70">
+            <Card className="liquid-glass rounded-[1.75rem]">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BookOpenText data-icon="inline-start" />

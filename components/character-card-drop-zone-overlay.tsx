@@ -7,6 +7,7 @@ import { z } from "zod";
 
 import { useCharacterLibrary } from "@/hooks/character-card/useCharacterLibrary";
 import { createStandardPngDestinationPath } from "@/lib/character-card/createStandardPngDestinationPath";
+import { createBlankDraftCharacterCard } from "@/lib/character-card/createDraftCharacterCard";
 import { getDroppedCharacterCardAssetKind } from "@/lib/character-card/getDroppedCharacterCardAssetKind";
 import { importBrowserCharacterCardFile } from "@/lib/character-card/importBrowserCharacterCardFile";
 import { isTauriRuntime } from "@/lib/tauri/native";
@@ -131,6 +132,12 @@ export function CharacterCardDropZoneOverlay({
         const result = await importCardFromPath(targetFile);
         if (result.card) {
           onCardParsed(result.card, targetFile, null);
+        } else if (
+          result.error &&
+          assetKind === "png-card" &&
+          result.error.includes("No character card metadata")
+        ) {
+          onCardParsed(createBlankDraftCharacterCard(targetFile), targetFile, null);
         } else if (result.error) {
           onDropError?.(result.error);
         }

@@ -5,8 +5,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 
+import { LiquidThemePicker } from "@/components/liquid-theme-picker";
 import { ModeToggle } from "@/components/mode-toggle";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 interface StudioShellProps {
@@ -90,6 +90,8 @@ const utilitySections = [
   },
 ];
 
+const navigationSections = [...primarySections, ...utilitySections];
+
 export function StudioShell({
   actions,
   children,
@@ -112,27 +114,64 @@ export function StudioShell({
   }, [pathname]);
 
   return (
-    <main className="min-h-screen overflow-hidden bg-background text-foreground">
+    <main className="min-h-screen overflow-hidden text-foreground">
       <div className="amour-studio-ambient pointer-events-none fixed inset-0 -z-10" />
-      <div className="flex min-h-screen min-w-0 flex-col">
-        <section className="flex min-w-0 flex-col">
-          <header className="sticky top-0 z-30 border-b bg-background/90 px-4 py-3 backdrop-blur-xl md:px-6">
-            <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
+      <div className="flex min-h-screen min-w-0">
+        <aside className="liquid-glass sticky top-0 z-40 hidden h-screen w-20 shrink-0 rounded-none border-y-0 border-l-0 px-3 py-4 md:flex md:flex-col md:items-center">
+          <Link
+            href="/"
+            className="mb-5 rounded-2xl transition hover:scale-[1.03]"
+            aria-label="HeartWriteAI dashboard"
+            title="HeartWriteAI"
+          >
+            <Image
+              src="/brand/brand-mark.svg"
+              alt=""
+              width={48}
+              height={48}
+              className="liquid-icon rounded-2xl p-1.5"
+              priority
+            />
+          </Link>
+
+          <nav className="flex min-h-0 flex-1 flex-col items-center gap-2 overflow-y-auto py-1">
+            {navigationSections.map((section, index) => (
+              <NavIconLink
+                key={`${section.href}-${section.label}`}
+                active={isSectionActive(section.href, pathname, activeSection)}
+                href={section.href}
+                icon={section.icon}
+                label={section.label}
+                onNavigate={() => setActiveSection(getSectionFromHref(section.href))}
+                separated={index === primarySections.length}
+              />
+            ))}
+          </nav>
+
+          <div className="mt-4">
+            <div className="flex flex-col gap-2">
+              <LiquidThemePicker />
+              <ModeToggle />
+            </div>
+          </div>
+        </aside>
+
+        <section className="flex min-w-0 flex-1 flex-col">
+          <header className="liquid-glass sticky top-0 z-30 rounded-none border-x-0 border-t-0 px-4 py-3 md:mx-4 md:mt-4 md:rounded-[2rem] md:border md:px-6">
+            <div className="flex items-center justify-between gap-4">
               <div className="flex min-w-0 items-center gap-3">
                 <Image
                   src="/brand/brand-mark.svg"
                   alt=""
                   width={44}
                   height={44}
-                  className="shrink-0 rounded-2xl bg-rose-50 p-1.5 shadow-inner dark:bg-rose-950/30"
+                  className="liquid-icon shrink-0 rounded-2xl p-1.5 md:hidden"
                   priority
                 />
                 <div className="min-w-0">
-                  <div className="mb-1 flex items-center gap-2">
-                    <Badge variant="secondary" className="hidden sm:inline-flex">
-                      {eyebrow}
-                    </Badge>
-                  </div>
+                  <p className="mb-1 hidden truncate text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground sm:block">
+                    {eyebrow}
+                  </p>
                   <h1 className="truncate text-xl font-semibold tracking-tight md:text-2xl">
                     {title}
                   </h1>
@@ -145,14 +184,19 @@ export function StudioShell({
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 {actions}
-                <ModeToggle />
+                <div className="md:hidden">
+                  <div className="flex items-center gap-2">
+                    <LiquidThemePicker />
+                    <ModeToggle />
+                  </div>
+                </div>
               </div>
             </div>
 
-            <nav className="mt-4 flex gap-2 overflow-x-auto pb-1 xl:grid xl:grid-cols-7 xl:overflow-visible">
-              {primarySections.map((section) => (
-                <TopNavLink
-                  key={section.label}
+            <nav className="mt-3 flex gap-2 overflow-x-auto pb-1 md:hidden">
+              {navigationSections.map((section) => (
+                <MobileNavIconLink
+                  key={`${section.href}-${section.label}`}
                   active={isSectionActive(section.href, pathname, activeSection)}
                   href={section.href}
                   icon={section.icon}
@@ -161,34 +205,10 @@ export function StudioShell({
                 />
               ))}
             </nav>
-
-            <nav className="mt-2 flex gap-2 overflow-x-auto pb-1">
-              {utilitySections.map((section) => (
-                <Link
-                  key={section.label}
-                  href={section.href}
-                  onClick={() => setActiveSection(getSectionFromHref(section.href))}
-                  className={cn(
-                    "inline-flex shrink-0 items-center gap-2 rounded-md border bg-card/70 px-3 py-1.5 text-xs font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground",
-                    isSectionActive(section.href, pathname, activeSection) &&
-                      "border-rose-200 bg-rose-50 text-rose-950 dark:border-rose-900 dark:bg-rose-950/35 dark:text-rose-100",
-                  )}
-                >
-                  <Image
-                    src={section.icon}
-                    alt=""
-                    width={14}
-                    height={14}
-                    className="opacity-75 dark:brightness-0 dark:invert"
-                  />
-                  {section.label}
-                </Link>
-              ))}
-            </nav>
           </header>
 
           <div className="flex-1 overflow-y-auto">
-            <div className="mx-auto w-full max-w-[92rem] px-4 py-5 md:px-6">
+            <div className="mx-auto w-full max-w-[92rem] px-4 py-5 md:px-6 md:pt-6">
               {children}
             </div>
           </div>
@@ -198,7 +218,51 @@ export function StudioShell({
   );
 }
 
-function TopNavLink({
+function NavIconLink({
+  active,
+  href,
+  icon,
+  label,
+  onNavigate,
+  separated,
+}: {
+  active: boolean;
+  href: string;
+  icon: string;
+  label: string;
+  onNavigate: () => void;
+  separated?: boolean;
+}) {
+  return (
+    <div className={cn("relative group", separated && "mt-4 pt-4 before:absolute before:left-2 before:right-2 before:top-0 before:h-px before:bg-border/70")}>
+      <Link
+        href={href}
+        onClick={onNavigate}
+        aria-label={label}
+        title={label}
+        className={cn(
+          "liquid-icon flex size-12 items-center justify-center rounded-2xl text-muted-foreground transition duration-200 hover:-translate-y-0.5 hover:text-foreground hover:shadow-lg",
+          active
+            ? "scale-[1.03] text-rose-950 shadow-lg ring-1 ring-rose-200/70 dark:text-rose-100 dark:ring-rose-300/20"
+            : "",
+        )}
+      >
+        <Image
+          src={icon}
+          alt=""
+          width={22}
+          height={22}
+          className="shrink-0 opacity-80 transition group-hover:opacity-100 dark:brightness-0 dark:invert"
+        />
+      </Link>
+      <span className="liquid-glass pointer-events-none absolute left-full top-1/2 z-50 ml-3 -translate-y-1/2 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium text-popover-foreground opacity-0 shadow-md transition group-hover:opacity-100">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function MobileNavIconLink({
   active,
   href,
   icon,
@@ -215,21 +279,23 @@ function TopNavLink({
     <Link
       href={href}
       onClick={onNavigate}
+      aria-label={label}
+      title={label}
       className={cn(
-        "group flex h-12 shrink-0 items-center justify-center gap-2 rounded-md border bg-card/80 px-3 text-sm font-medium text-muted-foreground transition hover:bg-muted hover:text-foreground xl:shrink",
+        "liquid-icon inline-flex size-11 shrink-0 items-center justify-center rounded-2xl transition",
         active
-          ? "border-rose-200 bg-rose-50 text-rose-950 shadow-sm dark:border-rose-900 dark:bg-rose-950/35 dark:text-rose-100"
-          : "border-border",
+          ? "scale-[1.03] text-rose-950 ring-1 ring-rose-200/70 dark:text-rose-100 dark:ring-rose-300/20"
+          : "",
       )}
     >
       <Image
         src={icon}
         alt=""
-        width={18}
-        height={18}
-        className="shrink-0 opacity-75 transition group-hover:opacity-100 dark:brightness-0 dark:invert"
+        width={20}
+        height={20}
+        className="opacity-80 dark:brightness-0 dark:invert"
       />
-      <span className="truncate">{label}</span>
+      <span className="sr-only">{label}</span>
     </Link>
   );
 }

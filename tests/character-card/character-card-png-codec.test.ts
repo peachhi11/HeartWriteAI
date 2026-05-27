@@ -9,6 +9,7 @@ import { writeCharacterCardToPng } from "../../lib/character-card/writeCharacter
 import { createCharacterCardFormValues } from "../../lib/character-card/createCharacterCardFormValues";
 import { createCharacterCardFromFormValues } from "../../lib/character-card/createCharacterCardFromFormValues";
 import { createCharacterCardV3Export } from "../../lib/character-card/createCharacterCardV3Export";
+import { createDraftCharacterCardFromIntake } from "../../lib/character-card/createDraftCharacterCard";
 import { exportCharacterCardPngData } from "../../lib/character-card/exportCharacterCardPngData";
 import { importCharacterCardPngData } from "../../lib/character-card/importCharacterCardPngData";
 import { mergeCharacterCardIntakeValues } from "../../lib/character-card/mergeCharacterCardIntakeValues";
@@ -564,6 +565,41 @@ Group Greeting: Mira shuts the office blinds before anyone can ask why.`);
   assert.deepEqual(result.values.groupOnlyGreetings, [
     "Mira shuts the office blinds before anyone can ask why.",
   ]);
+});
+
+test("routes inline messy intake labels without swallowing the whole note as a name", () => {
+  const result = parseMessyCharacterIntake(
+    "Name: Mara Vale. Rival academic. Tired eyes, elegant posture, dry restraint. She is terrified of being ordinary. Scenario: {{user}} catches her hiding scholarship sabotage evidence.",
+  );
+
+  assert.equal(result.values.fullName, "Mara Vale");
+  assert.match(result.values.description ?? "", /Rival academic/);
+  assert.equal(
+    result.values.scenario,
+    "{{user}} catches her hiding scholarship sabotage evidence.",
+  );
+});
+
+test("creates an editable ccv3 draft from messy intake without an imported card", () => {
+  const result = createDraftCharacterCardFromIntake({
+    intakeText: `Full Name: Mara Vale
+Description: A scholarship finalist hiding how badly she needs to win.
+Physical Appearance: Tall, severe posture, tired eyes, careful black blazer.
+Motivations: She wants security but fears being pitied.
+Scenario: {{user}} finds her alone in the locked auditorium after the campus event collapses.
+First Message: "You weren't supposed to see this."`,
+    sourceName: "blank-avatar.png",
+  });
+
+  assert.equal(result.card.spec, "chara_card_v3");
+  assert.equal(result.card.data.name, "Mara Vale");
+  assert.match(result.card.data.description, /scholarship finalist/);
+  assert.match(result.card.data.personality, /Physical Appearance:/);
+  assert.match(result.card.data.personality, /tired eyes/);
+  assert.match(result.card.data.personality, /fears being pitied/);
+  assert.match(result.card.data.scenario, /locked auditorium/);
+  assert.match(result.card.data.first_mes, /supposed to see this/);
+  assert.ok(result.routedFieldNames.length >= 5);
 });
 
 test("routes basic information and appearance classifier labels", () => {
