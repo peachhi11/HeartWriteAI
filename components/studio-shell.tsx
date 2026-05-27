@@ -26,7 +26,7 @@ const primarySections = [
   },
   {
     description: "Generate, import, edit, convert, and export CCV3 cards.",
-    href: "/workspace",
+    href: "/workspace?mode=edit",
     icon: "/brand/icons/character-cards.svg",
     label: "Character Cards",
   },
@@ -44,7 +44,7 @@ const primarySections = [
   },
   {
     description: "Generate and process card art and visual assets.",
-    href: "/?section=images",
+    href: "/images",
     icon: "/brand/icons/image-generation.svg",
     label: "Image Generation",
   },
@@ -64,9 +64,9 @@ const primarySections = [
 
 const utilitySections = [
   {
-    href: "/bundles",
+    href: "/libraries",
     icon: "/brand/icons/card-conversion.svg",
-    label: "Bundles",
+    label: "Libraries",
   },
   {
     href: "/scenarios",
@@ -241,18 +241,18 @@ function NavIconLink({
         aria-label={label}
         title={label}
         className={cn(
-          "liquid-icon flex size-12 items-center justify-center rounded-2xl text-muted-foreground transition duration-200 hover:-translate-y-0.5 hover:text-foreground hover:shadow-lg",
-          active
-            ? "scale-[1.03] text-rose-950 shadow-lg ring-1 ring-rose-200/70 dark:text-rose-100 dark:ring-rose-300/20"
-            : "",
+          "liquid-icon liquid-nav-icon flex size-12 items-center justify-center rounded-2xl transition duration-200 hover:-translate-y-0.5 hover:shadow-lg",
+          active ? "scale-[1.03] ring-1 ring-[color:var(--liquid-accent)]" : "",
         )}
+        data-active={active}
       >
-        <Image
-          src={icon}
-          alt=""
-          width={22}
-          height={22}
-          className="shrink-0 opacity-80 transition group-hover:opacity-100 dark:brightness-0 dark:invert"
+        <span
+          aria-hidden="true"
+          className="liquid-nav-mask size-[22px] shrink-0 opacity-85 transition group-hover:opacity-100"
+          style={{
+            WebkitMaskImage: `url(${icon})`,
+            maskImage: `url(${icon})`,
+          }}
         />
       </Link>
       <span className="liquid-glass pointer-events-none absolute left-full top-1/2 z-50 ml-3 -translate-y-1/2 whitespace-nowrap rounded-full px-3 py-1.5 text-xs font-medium text-popover-foreground opacity-0 shadow-md transition group-hover:opacity-100">
@@ -282,18 +282,18 @@ function MobileNavIconLink({
       aria-label={label}
       title={label}
       className={cn(
-        "liquid-icon inline-flex size-11 shrink-0 items-center justify-center rounded-2xl transition",
-        active
-          ? "scale-[1.03] text-rose-950 ring-1 ring-rose-200/70 dark:text-rose-100 dark:ring-rose-300/20"
-          : "",
+        "liquid-icon liquid-nav-icon inline-flex size-11 shrink-0 items-center justify-center rounded-2xl transition",
+        active ? "scale-[1.03] ring-1 ring-[color:var(--liquid-accent)]" : "",
       )}
+      data-active={active}
     >
-      <Image
-        src={icon}
-        alt=""
-        width={20}
-        height={20}
-        className="opacity-80 dark:brightness-0 dark:invert"
+      <span
+        aria-hidden="true"
+        className="liquid-nav-mask size-5 opacity-85"
+        style={{
+          WebkitMaskImage: `url(${icon})`,
+          maskImage: `url(${icon})`,
+        }}
       />
       <span className="sr-only">{label}</span>
     </Link>

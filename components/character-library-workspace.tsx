@@ -1,7 +1,7 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import {
   BookOpen,
@@ -353,21 +353,27 @@ function CardAvatarPreview(props: {
     ? /\.(apng|png)$/i.test(props.filePath)
     : false;
   const src = canPreview && props.filePath ? convertFileSrc(props.filePath) : null;
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
+  const canRenderImage = src && failedSrc !== src;
 
   return (
     <div className={`relative flex items-center justify-center overflow-hidden bg-muted/40 ${props.className ?? ""}`}>
-      {src ? (
-        <Image
+      {canRenderImage ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
           alt={`${props.name} avatar preview`}
-          className="object-cover"
-          fill
+          className="absolute inset-0 size-full object-cover"
           loading="lazy"
-          sizes="(max-width: 768px) 100vw, 50vw"
+          onError={() => setFailedSrc(src)}
           src={src}
-          unoptimized
         />
       ) : (
-        <UserRound className="size-14 text-muted-foreground/25" />
+        <div className="flex size-full flex-col items-center justify-center gap-3 bg-[radial-gradient(circle_at_top,var(--liquid-tint),transparent_55%)] text-center">
+          <UserRound className="size-14 text-muted-foreground/25" />
+          <p className="max-w-56 px-4 text-xs font-medium text-muted-foreground/70">
+            Avatar preview unavailable
+          </p>
+        </div>
       )}
     </div>
   );

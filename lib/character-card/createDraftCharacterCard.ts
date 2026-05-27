@@ -17,17 +17,20 @@ export interface DraftCharacterCardResult {
 export function createDraftCharacterCardFromIntake(input: {
   currentCard?: ValidatedCharacterCardV3 | null;
   intakeText?: string;
+  overwriteExistingFields?: boolean;
   sourceName?: string | null;
 }): DraftCharacterCardResult {
   const routeResult = parseMessyCharacterIntake(input.intakeText ?? "");
   const sourceCard = input.currentCard ?? createBlankCharacterCardPayload(input.sourceName);
-  const currentValues = input.currentCard
+  const currentValues = input.currentCard && !isDraftShellCard(input.currentCard)
     ? createCharacterCardFormValues(input.currentCard)
     : createEmptyCharacterCardFormValues();
-  const mergedValues = withFallbackName(mergeCharacterCardIntakeValues(
-    currentValues,
-    routeResult.values,
-  ), input.sourceName);
+  const mergedValues = withFallbackName(
+    mergeCharacterCardIntakeValues(currentValues, routeResult.values, {
+      overwrite: input.overwriteExistingFields,
+    }),
+    input.sourceName,
+  );
 
   return {
     card: CharacterCardV3Schema.parse(
@@ -35,6 +38,21 @@ export function createDraftCharacterCardFromIntake(input: {
     ),
     routedFieldNames: routeResult.fieldNames,
   };
+}
+
+function isDraftShellCard(card: ValidatedCharacterCardV3) {
+  const tags = new Set(card.data.tags?.map((tag) => tag.toLowerCase()) ?? []);
+  const description = card.data.description?.trim() ?? "";
+  const nameOnlyDescription = description === `Full Name: ${card.data.name}`;
+  const isOtherwiseEmpty =
+    !card.data.personality?.trim() &&
+    !card.data.scenario?.trim() &&
+    !card.data.first_mes?.trim();
+
+  return (
+    (tags.has("draft") && tags.has("messy intake")) ||
+    (isOtherwiseEmpty && nameOnlyDescription)
+  );
 }
 
 function withFallbackName(

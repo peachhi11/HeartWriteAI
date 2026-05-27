@@ -9,7 +9,10 @@ import { writeCharacterCardToPng } from "../../lib/character-card/writeCharacter
 import { createCharacterCardFormValues } from "../../lib/character-card/createCharacterCardFormValues";
 import { createCharacterCardFromFormValues } from "../../lib/character-card/createCharacterCardFromFormValues";
 import { createCharacterCardV3Export } from "../../lib/character-card/createCharacterCardV3Export";
-import { createDraftCharacterCardFromIntake } from "../../lib/character-card/createDraftCharacterCard";
+import {
+  createBlankDraftCharacterCard,
+  createDraftCharacterCardFromIntake,
+} from "../../lib/character-card/createDraftCharacterCard";
 import { exportCharacterCardPngData } from "../../lib/character-card/exportCharacterCardPngData";
 import { importCharacterCardPngData } from "../../lib/character-card/importCharacterCardPngData";
 import { mergeCharacterCardIntakeValues } from "../../lib/character-card/mergeCharacterCardIntakeValues";
@@ -602,6 +605,48 @@ First Message: "You weren't supposed to see this."`,
   assert.ok(result.routedFieldNames.length >= 5);
 });
 
+test("routes bulleted messy intake into a blank PNG draft shell", () => {
+  const blankDraft = createBlankDraftCharacterCard(
+    "/Users/mmdev/characterhub/personas/magnus vanderbilt yikes Daddy.standard avatar preview.png",
+  );
+  const result = createDraftCharacterCardFromIntake({
+    currentCard: blankDraft,
+    intakeText: `Setting: Chicago
+
+- Lincoln Park: Where Magnus lives with his wife in a large modern house, quiet street, enough space for the family they're building.
+- The Loop: Home to MV Construction, a high-rise in the heart of Chicago's business district.
+
+APPEARANCE DETAILS
+
+• Full Name: Magnus Vanderbilt
+• Sex/Gender: Male
+• Height: 6'4
+• Age: 32
+• Hair: dark blond, neatly styled
+• Eyes: blue-gray
+
+PERSONALITY & BEHAVIOR
+
+Disciplined, protective, controlled, quietly possessive, and deeply private.
+
+BACKGROUND
+
+Magnus built MV Construction after leaving his family's money behind.
+
+Scenario: {{user}} walks into his office after everyone else has gone home.`,
+  });
+
+  assert.equal(result.card.data.name, "Magnus Vanderbilt");
+  assert.doesNotMatch(result.card.data.name, /avatar preview/i);
+  assert.match(result.card.data.description, /Age & Birthdate: 32/);
+  assert.match(result.card.data.description, /Height: 6'4/);
+  assert.match(result.card.data.personality, /Hair: dark blond/);
+  assert.match(result.card.data.personality, /Disciplined, protective/);
+  assert.match(result.card.data.personality, /MV Construction/);
+  assert.match(result.card.data.scenario, /Chicago/);
+  assert.match(result.card.data.scenario, /walks into his office/);
+});
+
 test("routes basic information and appearance classifier labels", () => {
   const result = parseMessyCharacterIntake(`SECTION CLASSIFIER: BASIC INFORMATION
 Full Name: Seraphina Vale
@@ -1012,6 +1057,32 @@ test("merges routed intake without clobbering edited fields", () => {
       firstMessage: "New opening.",
     },
   ]);
+});
+
+test("can apply edit notes by overwriting populated character fields", () => {
+  const currentValues = createCharacterCardFormValues({
+    data: {
+      name: "Existing Name",
+      description: "Old overview.",
+      scenario: "Old scenario.",
+      tags: ["slow burn"],
+    },
+  });
+  const mergedValues = mergeCharacterCardIntakeValues(
+    currentValues,
+    {
+      fullName: "Edited Name",
+      description: "Updated overview.",
+      scenario: "Updated scenario.",
+      tagsText: "noir, slow burn",
+    },
+    { overwrite: true },
+  );
+
+  assert.equal(mergedValues.fullName, "Edited Name");
+  assert.equal(mergedValues.description, "Updated overview.");
+  assert.equal(mergedValues.scenario, "Updated scenario.");
+  assert.equal(mergedValues.tagsText, "slow burn, noir");
 });
 
 test("imports fixture png values and exports edited ccv3 metadata", () => {

@@ -19,6 +19,7 @@ const intakeLabelNames = [
   "Physical Description",
   "Apparent Age vs. Actual Age",
   "Biological Sex & Gender",
+  "Sex/Gender",
   "Sexual Orientation",
   "Romantic Orientation",
   "Relationship Status",
@@ -183,6 +184,7 @@ const intakeLabelNames = [
   "Undertone",
   "Skin Type",
   "Hair",
+  "Eyes",
   "Hair Type",
   "Hair Texture",
   "Hair Style",
@@ -267,6 +269,16 @@ const intakeLabelNames = [
   "Sexual Behavior",
   "Sexual Skills",
   "Creator Note",
+  "Setting",
+  "Location",
+  "Locations",
+  "Appearance Details",
+  "Personality & Behavior",
+  "Personality & Behaviour",
+  "Behaviour",
+  "Behavior",
+  "Dynamic With User",
+  "Dynamic With {{user}}",
 ];
 
 const romanceTropeLabels = [
@@ -388,8 +400,14 @@ export function parseMessyCharacterIntake(
   }
 
   const normalizedText = normalizeInlineIntakeLabels(trimmedText);
-  const importFields = parseCharacterCardImportText(normalizedText, "", "");
-  const labelBlocks = parseIntakeLabelBlocks(normalizedText);
+  const importFields = discardWholeTextDescription(
+    parseCharacterCardImportText(normalizedText, "", ""),
+    normalizedText,
+  );
+  const labelBlocks = [
+    ...parseHeadingBlocks(normalizedText),
+    ...parseIntakeLabelBlocks(normalizedText),
+  ];
   const heuristicFields = parseHeuristicParagraphs(normalizedText);
   const values: Partial<CharacterCardFormValues> = {
     ...heuristicFields,
@@ -425,8 +443,8 @@ function createValuesFromLabelBlocks(
     ]),
     ageBirthdate:
       readFirstBlock(blocks, ["age & birthdate"]) ??
+      readFirstBlock(blocks, ["age"]) ??
       joinLabeledBlocks(blocks, [
-        "age",
         "apparent age vs. actual age",
         "date of birth",
       ]),
@@ -489,6 +507,9 @@ function createValuesFromLabelBlocks(
         "occupation",
         "{{occupation}}",
         "{{education major}}",
+        "setting",
+        "location",
+        "locations",
         ...cardFormatLabels,
       ]),
     ]),
@@ -496,6 +517,7 @@ function createValuesFromLabelBlocks(
       "physical appearance",
         "physical description",
         "appearance",
+        "appearance details",
         "{{height}}",
         "build",
         "{{build}}",
@@ -554,8 +576,12 @@ function createValuesFromLabelBlocks(
     ]),
     personalityPsychology: joinLabeledBlocks(blocks, [
       "personality & psychology",
+      "personality & behavior",
+      "personality & behaviour",
       "personality",
       "psychology",
+      "behaviour",
+      "behavior",
       "motivations",
       "fears",
       "contradictions",
@@ -583,6 +609,8 @@ function createValuesFromLabelBlocks(
       "relationships / connections",
       "relationships",
       "connections",
+      "dynamic with user",
+      "dynamic with {{user}}",
       "npcs",
       "family",
       "factions",
@@ -598,6 +626,7 @@ function createValuesFromLabelBlocks(
     ]),
     scenario: joinDefined([
       readFirstBlock(blocks, ["scenario"]),
+      joinLabeledBlocks(blocks, ["setting", "location", "locations"]),
       joinLabeledBlocks(blocks, romanceTropeLabels),
       joinLabeledBlocks(blocks, romanceToneLabels),
       joinLabeledBlocks(blocks, userDynamicLabels),
@@ -633,13 +662,24 @@ function parseIntakeLabelBlocks(text: string): IntakeLabelBlock[] {
     .sort((left, right) => right.length - left.length)
     .join("|");
   const matches = Array.from(
-    text.matchAll(new RegExp(`(^|\\n)\\s*(${labelPattern})(?:\\s+\\d+)?\\s*:\\s*`, "gi")),
+    text.matchAll(
+      new RegExp(
+        `(^|\\n)\\s*(?:[-*•]\\s*)?(${labelPattern})(?:\\s+\\d+)?\\s*:\\s*`,
+        "gi",
+      ),
+    ),
   );
+  const boundaries = [
+    ...matches.map((match) => match.index),
+    ...findHeadingBoundaries(text).map((boundary) => boundary.index),
+  ].sort((left, right) => left - right);
 
   return matches
-    .map((match, index) => {
+    .map((match) => {
       const contentStart = match.index + match[0].length;
-      const contentEnd = matches[index + 1]?.index ?? text.length;
+      const contentEnd =
+        boundaries.find((boundaryIndex) => boundaryIndex > match.index) ??
+        text.length;
 
       return {
         label: normalizeLabel(match[2]),
@@ -647,6 +687,81 @@ function parseIntakeLabelBlocks(text: string): IntakeLabelBlock[] {
       };
     })
     .filter((block) => block.content);
+}
+
+function findHeadingBoundaries(text: string) {
+  const boundaries: Array<{ index: number; length: number }> = [];
+  let index = 0;
+
+  for (const line of text.split("\n")) {
+    if (normalizeHeadingLine(line)) {
+      boundaries.push({ index, length: line.length });
+    }
+
+    index += line.length + 1;
+  }
+
+  return boundaries;
+}
+
+function parseHeadingBlocks(text: string): IntakeLabelBlock[] {
+  const headingAliases = new Map<string, string>([
+    ["appearance details", "appearance details"],
+    ["appearance", "appearance"],
+    ["physical appearance", "physical appearance"],
+    ["personality & behavior", "personality & behavior"],
+    ["personality & behaviour", "personality & behaviour"],
+    ["personality", "personality"],
+    ["behaviour", "behaviour"],
+    ["behavior", "behavior"],
+    ["background", "background"],
+    ["backstory", "backstory"],
+    ["relationships", "relationships"],
+    ["connections", "connections"],
+    ["dynamic with user", "dynamic with user"],
+    ["dynamic with {{user}}", "dynamic with {{user}}"],
+    ["scenario", "scenario"],
+    ["setting", "setting"],
+    ["locations", "locations"],
+    ["location", "location"],
+    ["sexuality", "sexuality"],
+    ["intimacy", "intimacy"],
+    ["creator notes", "creator notes"],
+  ]);
+  const lines = text.split("\n");
+  const blocks: IntakeLabelBlock[] = [];
+  let currentLabel: string | null = null;
+  let currentLines: string[] = [];
+
+  for (const line of lines) {
+    const normalizedHeading = normalizeHeadingLine(line);
+    const label = normalizedHeading
+      ? headingAliases.get(normalizedHeading)
+      : undefined;
+
+    if (label) {
+      pushHeadingBlock();
+      currentLabel = label;
+      currentLines = [];
+      continue;
+    }
+
+    if (currentLabel) {
+      currentLines.push(line);
+    }
+  }
+
+  pushHeadingBlock();
+
+  return blocks;
+
+  function pushHeadingBlock() {
+    const content = currentLines.join("\n").trim();
+
+    if (currentLabel && content) {
+      blocks.push({ label: currentLabel, content });
+    }
+  }
 }
 
 function parseHeuristicParagraphs(text: string): Partial<CharacterCardFormValues> {
@@ -661,6 +776,8 @@ function parseHeuristicParagraphs(text: string): Partial<CharacterCardFormValues
 
     if (matchesAny(lowerParagraph, ["look", "hair", "eyes", "height", "wear", "scar", "tattoo", "body", "posture"])) {
       blocks.physicalAppearance = joinDefined([blocks.physicalAppearance, paragraph]);
+    } else if (/^(setting|location|locations)\s*:/i.test(paragraph)) {
+      blocks.scenario = joinDefined([blocks.scenario, paragraph]);
     } else if (matchesAny(lowerParagraph, ["want", "fear", "mask", "truth", "personality", "motivat", "dislike", "like", "habit", "quirk", "contradict"])) {
       blocks.personalityPsychology = joinDefined([
         blocks.personalityPsychology,
@@ -683,6 +800,23 @@ function parseHeuristicParagraphs(text: string): Partial<CharacterCardFormValues
   }
 
   return blocks;
+}
+
+function discardWholeTextDescription(
+  values: Partial<CharacterCardFormValues>,
+  sourceText: string,
+): Partial<CharacterCardFormValues> {
+  if (
+    values.description?.trim() === sourceText.trim() &&
+    Object.keys(values).length === 1
+  ) {
+    const rest = { ...values };
+    delete rest.description;
+
+    return rest;
+  }
+
+  return values;
 }
 
 function normalizeInlineIntakeLabels(text: string): string {
@@ -717,7 +851,11 @@ function splitNameBlock(nameBlock?: string) {
     return { name: undefined, remainder: undefined };
   }
 
-  const trimmedNameBlock = nameBlock.trim();
+  const trimmedNameBlock = nameBlock
+    .trim()
+    .split("\n")[0]
+    .replace(/^[-*•]\s*/, "")
+    .trim();
   const firstSentence = trimmedNameBlock.match(/^([^.!?\n]{2,80})[.!?]\s+([\s\S]+)$/);
 
   if (!firstSentence) {
@@ -791,6 +929,33 @@ function matchesAny(value: string, needles: string[]): boolean {
 
 function normalizeLabel(label: string): string {
   return label.trim().toLowerCase();
+}
+
+function normalizeHeadingLine(line: string): string | undefined {
+  const trimmedLine = line
+    .replace(/^[-*•—–\s]+/g, "")
+    .replace(/[:：]\s*$/g, "")
+    .trim();
+
+  if (!trimmedLine || trimmedLine.length > 60) {
+    return undefined;
+  }
+
+  const letterCount = (trimmedLine.match(/[a-z]/gi) ?? []).length;
+
+  if (!letterCount) {
+    return undefined;
+  }
+
+  const uppercaseCount = (trimmedLine.match(/[A-Z]/g) ?? []).length;
+  const isMostlyUppercase = uppercaseCount / letterCount > 0.7;
+  const isTitleLike =
+    /^[A-Z][A-Za-z{}&/\s]+$/.test(trimmedLine) &&
+    !/[.!?]$/.test(trimmedLine);
+
+  return isMostlyUppercase || isTitleLike
+    ? trimmedLine.toLowerCase()
+    : undefined;
 }
 
 function toTitleLabel(label: string): string {

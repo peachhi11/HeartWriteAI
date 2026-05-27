@@ -1,7 +1,16 @@
 "use client";
 
-import { useState } from "react";
-import { PanelLeftOpen, Sparkles, X } from "lucide-react";
+import Link from "next/link";
+import { type ReactNode, useState, useSyncExternalStore } from "react";
+import {
+  Download,
+  FileUp,
+  PanelLeftOpen,
+  Save,
+  Sparkles,
+  UserRoundPlus,
+  X,
+} from "lucide-react";
 
 import CardLibraryPanel from "@/components/card-library-panel";
 import { CharacterLibraryWorkspace } from "@/components/character-library-workspace";
@@ -19,12 +28,52 @@ import { savePersonaLibraryItem } from "@/hooks/usePersonaLibrary";
 import { createPersonaArtifactFromCharacterCard } from "@/features/generation/workflows";
 import { downloadUint8Array } from "@/lib/browser/downloadUint8Array";
 import { importBrowserCharacterCardFile } from "@/lib/character-card/importBrowserCharacterCardFile";
-import { createDraftCharacterCardFromIntake } from "@/lib/character-card/createDraftCharacterCard";
+import {
+  createBlankDraftCharacterCard,
+  createDraftCharacterCardFromIntake,
+} from "@/lib/character-card/createDraftCharacterCard";
 import { writeCharacterCardToPng } from "@/lib/character-card/writeCharacterCardToPng";
 import { ExpressionSprite } from "@/types/character-card/ExpressionSprite";
 import { ValidatedCharacterCardV3 } from "@/types/ccv3";
 
+type CharacterWorkflowMode = "edit" | "intake" | "create";
+
+const characterWorkflowSteps: Array<{
+  description: string;
+  href: string;
+  icon: typeof FileUp;
+  mode: CharacterWorkflowMode;
+  title: string;
+}> = [
+  {
+    title: "Create / Intake",
+    description: "Import, start blank, or route messy notes to a profile.",
+    href: "/workspace?mode=create",
+    icon: UserRoundPlus,
+    mode: "create",
+  },
+  {
+    title: "Edit / Review",
+    description: "Apply change notes and review the active character card.",
+    href: "/workspace?mode=intake",
+    icon: Sparkles,
+    mode: "intake",
+  },
+  {
+    title: "Finalize / Export",
+    description: "Review final card state and choose save/export format.",
+    href: "/workspace?mode=edit",
+    icon: FileUp,
+    mode: "edit",
+  },
+];
+
 export default function WorkspacePage() {
+  const workflowMode = useSyncExternalStore(
+    subscribeToWorkflowModeChanges,
+    readWorkflowMode,
+    () => "edit" as CharacterWorkflowMode,
+  );
   const [activeCard, setActiveCard] =
     useState<ValidatedCharacterCardV3 | null>(null);
   const [workspaceMessage, setWorkspaceMessage] = useState<string | null>(null);
@@ -35,6 +84,8 @@ export default function WorkspacePage() {
   const [messyIntakeMessage, setMessyIntakeMessage] = useState<string | null>(
     null,
   );
+  const [editNotesText, setEditNotesText] = useState("");
+  const [editNotesMessage, setEditNotesMessage] = useState<string | null>(null);
   const [selectedExpression, setSelectedExpression] =
     useState<ExpressionSprite | null>(null);
   const [libraryOpen, setLibraryOpen] = useState(false);
@@ -257,9 +308,9 @@ export default function WorkspacePage() {
   }
 
   function handleRouteMessyIntake() {
-    if (!messyIntakeText.trim() && !activeCard) {
+    if (!messyIntakeText.trim()) {
       setMessyIntakeMessage(
-        "Paste rough character notes first, or import a blank PNG to start from an image shell.",
+        "Paste rough character notes before creating a character profile.",
       );
       return;
     }
@@ -281,6 +332,50 @@ export default function WorkspacePage() {
       activeCard
         ? "Merged messy intake into the active character card."
         : "Created an editable character card draft from messy intake.",
+    );
+  }
+
+  function handleApplyEditNotes() {
+    if (!activeCard) {
+      setEditNotesMessage(
+        "Import, select, or create a character card before applying edit notes.",
+      );
+      return;
+    }
+
+    if (!editNotesText.trim()) {
+      setEditNotesMessage(
+        "Paste edit notes before applying changes to the active character card.",
+      );
+      return;
+    }
+
+    const result = createDraftCharacterCardFromIntake({
+      currentCard: activeCard,
+      intakeText: editNotesText,
+      overwriteExistingFields: true,
+      sourceName: currentFilePath,
+    });
+
+    setActiveCard(result.card);
+    setSelectedExpression(null);
+    setEditNotesMessage(
+      result.routedFieldNames.length
+        ? `Applied notes to ${result.routedFieldNames.length} character fields.`
+        : "No structured card fields were found in those edit notes.",
+    );
+    setWorkspaceMessage("Applied edit notes to the active character card.");
+  }
+
+  function handleStartBlankDraft() {
+    const draft = createBlankDraftCharacterCard("Untitled Character");
+
+    setActiveCard(draft);
+    setCurrentFilePath(null);
+    setBrowserSourcePngData(null);
+    setSelectedExpression(null);
+    setWorkspaceMessage(
+      "Started a blank editable character draft. Use the editor below or generate guided sections.",
     );
   }
 
@@ -444,46 +539,279 @@ export default function WorkspacePage() {
             </p>
           ) : null}
 
-          <FolderIntakeReview
-            isDesktopRuntime={isDesktopRuntime}
-            onChooseFolder={triggerFolderIntakeSelect}
-            onImported={library.refresh}
-          />
-
-          <section className="grid gap-3 rounded-lg border bg-card/85 p-5">
-            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
-              <div className="space-y-1">
-                <h2 className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-muted-foreground">
-                  <Sparkles className="size-4" />
-                  Messy Character Intake
-                </h2>
-                <p className="max-w-3xl text-sm text-muted-foreground">
-                  Paste rough notes, fragments, or early character ideas. This
-                  can create a new editable draft or merge into the active card.
-                  A blank PNG can be imported first and saved back as the
-                  finished metadata card later.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={handleRouteMessyIntake}
-                className="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700"
+          <section className="grid gap-3 lg:grid-cols-3">
+            {characterWorkflowSteps.map((step, index) => (
+              <Link
+                key={step.mode}
+                href={step.href}
+                onClick={() => {
+                  window.setTimeout(() => {
+                    window.dispatchEvent(new Event("heartwriteai:workflow-mode"));
+                  }, 0);
+                }}
+                className="group block"
+                aria-current={workflowMode === step.mode ? "page" : undefined}
               >
-                <Sparkles className="size-4" />
-                {activeCard ? "Route Into Card" : "Create Draft"}
-              </button>
-            </div>
-            <Textarea
-              value={messyIntakeText}
-              placeholder="Example: Name: Mara Vale. Looks exhausted but elegant. Rival academic. Terrified of being ordinary. Speaks with dry restraint. Scenario: {{user}} catches her hiding scholarship sabotage evidence..."
-              className="min-h-36 resize-y"
-              onChange={(event) => setMessyIntakeText(event.currentTarget.value)}
-            />
-            {messyIntakeMessage ? (
-              <p className="text-xs text-muted-foreground">
-                {messyIntakeMessage}
-              </p>
-            ) : null}
+                <div
+                  className={[
+                    "liquid-glass h-full rounded-[1.5rem] border p-4 transition duration-200 group-hover:-translate-y-0.5 group-hover:shadow-xl",
+                    workflowMode === step.mode
+                      ? "ring-1 ring-[color:var(--liquid-accent)]"
+                      : "",
+                  ].join(" ")}
+                >
+                  <div className="mb-4 flex items-center gap-3">
+                    <span className="liquid-icon flex size-11 items-center justify-center rounded-2xl text-muted-foreground">
+                      <step.icon className="size-5" />
+                    </span>
+                    <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                      Step {index + 1}
+                    </span>
+                  </div>
+                  <h2 className="text-lg font-semibold">{step.title}</h2>
+                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                    {step.description}
+                  </p>
+                </div>
+              </Link>
+            ))}
+          </section>
+
+          <section className="grid items-start gap-5 lg:grid-cols-3">
+            <WorkflowPanel
+              active={workflowMode === "create"}
+              eyebrow="Step 1"
+              icon={<UserRoundPlus className="size-4" />}
+              title="Create / Intake"
+            >
+              <div className="grid gap-4">
+                <div className="grid gap-2 text-sm text-muted-foreground">
+                  <p>
+                    Import a blank PNG or existing card, paste messy character
+                    material, or start with a blank draft.
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {isDesktopRuntime ? (
+                      <button
+                        type="button"
+                        onClick={handleManualImportClick}
+                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted"
+                      >
+                        <FileUp className="size-3.5" />
+                        Import Card
+                      </button>
+                    ) : (
+                      <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted">
+                        <FileUp className="size-3.5" />
+                        Import Card
+                        <input
+                          type="file"
+                          accept=".png,.apng,.json"
+                          className="sr-only"
+                          onChange={(event) => {
+                            void handleBrowserImportFile(
+                              event.currentTarget.files?.[0] ?? null,
+                            );
+                            event.currentTarget.value = "";
+                          }}
+                        />
+                      </label>
+                    )}
+                    <button
+                      type="button"
+                      onClick={handleStartBlankDraft}
+                      className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted"
+                    >
+                      <UserRoundPlus className="size-3.5" />
+                      Blank Draft
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <label className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    Messy intake notes
+                  </label>
+                  <Textarea
+                    value={messyIntakeText}
+                    placeholder="Name, age, appearance, wants, fears, background, relationships, scenario, first message..."
+                    className="min-h-48 resize-y"
+                    onChange={(event) =>
+                      setMessyIntakeText(event.currentTarget.value)
+                    }
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRouteMessyIntake}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700"
+                  >
+                    <Sparkles className="size-4" />
+                    Route to Profile
+                  </button>
+                  {messyIntakeMessage ? (
+                    <p className="text-xs text-muted-foreground">
+                      {messyIntakeMessage}
+                    </p>
+                  ) : null}
+                </div>
+
+                <details className="rounded-xl border bg-background/45 p-3">
+                  <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    Batch folder intake
+                  </summary>
+                  <div className="mt-3">
+                    <FolderIntakeReview
+                      isDesktopRuntime={isDesktopRuntime}
+                      onChooseFolder={triggerFolderIntakeSelect}
+                      onImported={library.refresh}
+                    />
+                  </div>
+                </details>
+              </div>
+            </WorkflowPanel>
+
+            <WorkflowPanel
+              active={workflowMode === "intake"}
+              eyebrow="Step 2"
+              icon={<Sparkles className="size-4" />}
+              title="Edit / Review"
+            >
+              <div className="grid gap-4">
+                <div className="grid gap-2">
+                  <label className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    Edit notes for active card
+                  </label>
+                  <Textarea
+                    value={editNotesText}
+                    placeholder="Change age to 29. Update scenario. Add creator notes. Rewrite personality as..."
+                    className="min-h-36 resize-y"
+                    onChange={(event) =>
+                      setEditNotesText(event.currentTarget.value)
+                    }
+                  />
+                  <button
+                    type="button"
+                    onClick={handleApplyEditNotes}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700"
+                  >
+                    <Sparkles className="size-4" />
+                    Apply Edit Notes
+                  </button>
+                  {editNotesMessage ? (
+                    <p className="text-xs text-muted-foreground">
+                      {editNotesMessage}
+                    </p>
+                  ) : null}
+                </div>
+
+                <div className="rounded-xl border bg-background/55 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                    Active review
+                  </p>
+                  <h3 className="mt-2 text-xl font-semibold">
+                    {activeCard?.data.name ?? "No character loaded"}
+                  </h3>
+                  <p className="mt-2 line-clamp-6 text-sm leading-6 text-muted-foreground">
+                    {activeCard?.data.description?.trim() ||
+                      activeCard?.data.personality?.trim() ||
+                      "Import, create, or select a card to review the generated profile."}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setLibraryOpen(true)}
+                    className="mt-4 inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted"
+                  >
+                    <PanelLeftOpen className="size-3.5" />
+                    Open Libraries
+                  </button>
+                </div>
+              </div>
+            </WorkflowPanel>
+
+            <WorkflowPanel
+              active={workflowMode === "edit"}
+              eyebrow="Step 3"
+              icon={<Save className="size-4" />}
+              title="Finalize / Export"
+            >
+              <div className="grid gap-4">
+                <div className="rounded-xl border bg-background/55 p-4 text-sm text-muted-foreground">
+                  <p className="text-xs font-semibold uppercase tracking-[0.16em]">
+                    Final card
+                  </p>
+                  <h3 className="mt-2 text-xl font-semibold text-foreground">
+                    {activeCard?.data.name ?? "No final card yet"}
+                  </h3>
+                  <p className="mt-2">
+                    {currentFilePath ?? "Unsaved draft. Save a master or export a copy when ready."}
+                  </p>
+                </div>
+
+                <div className="grid gap-2">
+                  {isDesktopRuntime ? (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleSaveMasterCharx}
+                        disabled={!activeCard || isSaving}
+                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:opacity-50"
+                      >
+                        <Save className="size-4" />
+                        {isSaving ? "Saving..." : "Save Master"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handlePersistWorkspaceChanges}
+                        disabled={!activeCard || isSaving || !currentFilePath}
+                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted disabled:opacity-50"
+                      >
+                        <Save className="size-4" />
+                        Save Source
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleSaveWorkspacePngAs}
+                        disabled={!activeCard || !canSavePngMetadata}
+                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted disabled:opacity-50"
+                      >
+                        <Download className="size-4" />
+                        Save PNG
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleExportWorkspaceCharx}
+                        disabled={!activeCard || !currentFilePath}
+                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted disabled:opacity-50"
+                      >
+                        <Download className="size-4" />
+                        Export CHARX
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        type="button"
+                        onClick={handleBrowserDownloadJson}
+                        disabled={!activeCard}
+                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:opacity-50"
+                      >
+                        <Download className="size-4" />
+                        Download JSON
+                      </button>
+                      <button
+                        type="button"
+                        onClick={handleBrowserDownloadPng}
+                        disabled={!activeCard || !browserSourcePngData}
+                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted disabled:opacity-50"
+                      >
+                        <Download className="size-4" />
+                        Download PNG
+                      </button>
+                    </>
+                  )}
+                </div>
+              </div>
+            </WorkflowPanel>
           </section>
 
           <CharacterLibraryWorkspace
@@ -549,4 +877,58 @@ function createSafeCharacterFileName(name: string, suffix: string) {
     .toLowerCase();
 
   return `${safeName || "character"}${suffix}`;
+}
+
+function WorkflowPanel(props: {
+  active: boolean;
+  children: ReactNode;
+  eyebrow: string;
+  icon: ReactNode;
+  title: string;
+}) {
+  return (
+    <section
+      className={[
+        "liquid-glass-strong grid gap-4 rounded-[1.75rem] border p-5",
+        props.active ? "ring-1 ring-[color:var(--liquid-accent)]" : "",
+      ].join(" ")}
+    >
+      <header className="flex items-start gap-3">
+        <span className="liquid-icon flex size-11 shrink-0 items-center justify-center rounded-2xl text-muted-foreground">
+          {props.icon}
+        </span>
+        <div className="min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+            {props.eyebrow}
+          </p>
+          <h2 className="mt-1 text-xl font-semibold tracking-tight">
+            {props.title}
+          </h2>
+        </div>
+      </header>
+      {props.children}
+    </section>
+  );
+}
+
+function readWorkflowMode(): CharacterWorkflowMode {
+  if (typeof window === "undefined") {
+    return "edit";
+  }
+
+  const mode = new URLSearchParams(window.location.search).get("mode");
+
+  return mode === "intake" || mode === "create" || mode === "edit"
+    ? mode
+    : "edit";
+}
+
+function subscribeToWorkflowModeChanges(onStoreChange: () => void) {
+  window.addEventListener("popstate", onStoreChange);
+  window.addEventListener("heartwriteai:workflow-mode", onStoreChange);
+
+  return () => {
+    window.removeEventListener("popstate", onStoreChange);
+    window.removeEventListener("heartwriteai:workflow-mode", onStoreChange);
+  };
 }

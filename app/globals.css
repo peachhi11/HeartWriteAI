@@ -51,6 +51,9 @@
   --liquid-accent-soft: rgb(231 154 162 / 24%);
   --liquid-accent-glow: rgb(212 31 68 / 22%);
   --liquid-accent-ribbon: rgb(231 154 162 / 18%);
+  --liquid-icon-fg: #8b0b28;
+  --liquid-icon-active: #d41f44;
+  --liquid-icon-glow: rgb(212 31 68 / 28%);
   --liquid-specular: rgb(255 255 255 / 34%);
   --liquid-page-bg:
     radial-gradient(900px 760px at 8% 9%, rgb(139 11 40 / 18%), transparent 40%),
@@ -95,6 +98,9 @@
     radial-gradient(1200px 900px at 5% 5%, var(--liquid-accent-glow), transparent 46%),
     radial-gradient(900px 700px at 88% 22%, var(--liquid-specular), transparent 38%),
     linear-gradient(135deg, oklch(0.055 0.01 330), oklch(0.13 0.04 342) 50%, oklch(0.055 0.015 330));
+  --liquid-icon-fg: #e79aa2;
+  --liquid-icon-active: #fae4ea;
+  --liquid-icon-glow: rgb(231 154 162 / 30%);
   --background: oklch(0.12 0.022 340);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.26 0.04 342 / 62%);
@@ -133,6 +139,9 @@
   --liquid-accent-soft: rgb(193 151 210 / 24%);
   --liquid-accent-glow: rgb(167 139 190 / 34%);
   --liquid-accent-ribbon: rgb(211 177 194 / 18%);
+  --liquid-icon-fg: #613659;
+  --liquid-icon-active: #a78bbe;
+  --liquid-icon-glow: rgb(167 139 190 / 30%);
   --liquid-specular: rgb(255 255 255 / 34%);
   --liquid-page-bg:
     radial-gradient(1120px 820px at 8% 8%, rgb(167 139 190 / 30%), transparent 44%),
@@ -158,6 +167,9 @@
   --liquid-accent-soft: rgb(193 151 210 / 20%);
   --liquid-accent-glow: rgb(97 54 89 / 42%);
   --liquid-accent-ribbon: rgb(167 139 190 / 13%);
+  --liquid-icon-fg: #d3b1c2;
+  --liquid-icon-active: #c197d2;
+  --liquid-icon-glow: rgb(193 151 210 / 32%);
   --liquid-specular: rgb(255 255 255 / 15%);
   --liquid-page-bg:
     radial-gradient(1200px 900px at 7% 8%, rgb(97 54 89 / 42%), transparent 44%),
@@ -177,6 +189,9 @@
   --liquid-accent-soft: rgb(197 226 247 / 26%);
   --liquid-accent-glow: rgb(111 165 201 / 28%);
   --liquid-accent-ribbon: rgb(163 185 206 / 18%);
+  --liquid-icon-fg: #1c4e75;
+  --liquid-icon-active: #6fa5c9;
+  --liquid-icon-glow: rgb(111 165 201 / 28%);
   --liquid-specular: rgb(255 255 255 / 42%);
   --liquid-page-bg:
     radial-gradient(1100px 820px at 8% 8%, rgb(197 226 247 / 38%), transparent 44%),
@@ -202,6 +217,9 @@
   --liquid-accent-soft: rgb(47 160 198 / 20%);
   --liquid-accent-glow: rgb(47 160 198 / 34%);
   --liquid-accent-ribbon: rgb(88 201 243 / 15%);
+  --liquid-icon-fg: #58c9f3;
+  --liquid-icon-active: #bde5ff;
+  --liquid-icon-glow: rgb(88 201 243 / 30%);
   --liquid-specular: rgb(189 229 255 / 18%);
   --liquid-page-bg:
     radial-gradient(1150px 880px at 8% 8%, rgb(47 160 198 / 22%), transparent 42%),
@@ -221,6 +239,9 @@
   --liquid-accent-soft: rgb(174 219 184 / 24%);
   --liquid-accent-glow: rgb(143 202 151 / 34%);
   --liquid-accent-ribbon: rgb(174 219 184 / 18%);
+  --liquid-icon-fg: #45834d;
+  --liquid-icon-active: #68a877;
+  --liquid-icon-glow: rgb(104 168 119 / 28%);
   --liquid-specular: rgb(255 255 255 / 32%);
   --liquid-page-bg:
     radial-gradient(1100px 820px at 8% 8%, rgb(174 219 184 / 34%), transparent 44%),
@@ -246,6 +267,9 @@
   --liquid-accent-soft: rgb(0 215 159 / 20%);
   --liquid-accent-glow: rgb(0 180 150 / 34%);
   --liquid-accent-ribbon: rgb(17 222 212 / 15%);
+  --liquid-icon-fg: #00d79f;
+  --liquid-icon-active: #37aaff;
+  --liquid-icon-glow: rgb(0 215 159 / 32%);
   --liquid-specular: rgb(55 170 255 / 20%);
   --liquid-page-bg:
     radial-gradient(1150px 880px at 8% 8%, rgb(0 215 159 / 20%), transparent 42%),
@@ -265,6 +289,9 @@
   --liquid-accent-soft: rgb(239 231 222 / 28%);
   --liquid-accent-glow: rgb(189 149 106 / 30%);
   --liquid-accent-ribbon: rgb(142 98 59 / 14%);
+  --liquid-icon-fg: #8e623b;
+  --liquid-icon-active: #bd956a;
+  --liquid-icon-glow: rgb(189 149 106 / 28%);
   --liquid-specular: rgb(237 242 245 / 34%);
   --liquid-page-bg:
     radial-gradient(1100px 820px at 8% 8%, rgb(239 231 222 / 36%), transparent 44%),
@@ -290,6 +317,9 @@
   --liquid-accent-soft: rgb(212 165 105 / 22%);
   --liquid-accent-glow: rgb(148 110 75 / 36%);
   --liquid-accent-ribbon: rgb(249 240 214 / 12%);
+  --liquid-icon-fg: #d4a569;
+  --liquid-icon-active: #f9f0d6;
+  --liquid-icon-glow: rgb(212 165 105 / 30%);
   --liquid-specular: rgb(249 240 214 / 20%);
   --liquid-page-bg:
     radial-gradient(1150px 880px at 8% 8%, rgb(212 165 105 / 18%), transparent 42%),
@@ -401,5 +431,27 @@
       linear-gradient(145deg, oklch(1 0 0 / 12%), oklch(1 0 0 / 5%)),
       radial-gradient(circle at 25% 0%, var(--liquid-accent-soft), transparent 42%),
       color-mix(in oklch, var(--card), transparent 18%);
+  }
+
+  .liquid-nav-icon {
+    color: var(--liquid-icon-fg);
+  }
+
+  .liquid-nav-icon[data-active="true"] {
+    color: var(--liquid-icon-active);
+    box-shadow:
+      inset 0 1px 0 oklch(1 0 0 / 24%),
+      0 14px 32px var(--liquid-icon-glow);
+  }
+
+  .liquid-nav-mask {
+    display: block;
+    background: currentColor;
+    mask-position: center;
+    mask-repeat: no-repeat;
+    mask-size: contain;
+    -webkit-mask-position: center;
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-size: contain;
   }
 }

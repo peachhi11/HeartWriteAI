@@ -3,10 +3,11 @@ import { CharacterCardFormValues } from "../../types/character-card/CharacterCar
 export function mergeCharacterCardIntakeValues(
   currentValues: CharacterCardFormValues,
   routedValues: Partial<CharacterCardFormValues>,
+  options: { overwrite?: boolean } = {},
 ): CharacterCardFormValues {
   return {
     ...currentValues,
-    ...mergeStringFields(currentValues, routedValues),
+    ...mergeStringFields(currentValues, routedValues, options),
     tagsText: mergeTags(currentValues.tagsText, routedValues.tagsText),
     alternateOpenings: routedValues.alternateOpenings?.length
       ? routedValues.alternateOpenings
@@ -20,13 +21,16 @@ export function mergeCharacterCardIntakeValues(
 function mergeStringFields(
   currentValues: CharacterCardFormValues,
   routedValues: Partial<CharacterCardFormValues>,
+  options: { overwrite?: boolean },
 ): Partial<CharacterCardFormValues> {
   return Object.fromEntries(
     Object.entries(routedValues)
       .filter(([, value]) => typeof value === "string" && value.trim())
       .map(([field, value]) => [
         field,
-        currentValues[field as keyof CharacterCardFormValues] || value,
+        options.overwrite
+          ? value
+          : currentValues[field as keyof CharacterCardFormValues] || value,
       ]),
   ) as Partial<CharacterCardFormValues>;
 }
