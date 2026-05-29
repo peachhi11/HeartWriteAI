@@ -131,6 +131,7 @@ export function RelationshipTreeGraph({
                 top: `${node.gridPosition.y}%`,
               }}
               type="button"
+              aria-label={`${node.name}: ${node.relationshipStatus}, ${node.affinityScore}% bond`}
             >
               <span
                 className={cn(

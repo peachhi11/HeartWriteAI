@@ -1,4 +1,4 @@
-use regex::Regex;
+use regex::{Regex, RegexBuilder};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::fs::File;
@@ -163,7 +163,10 @@ fn activation_key_matches(player_text: &str, key: &str, use_regex: bool) -> bool
     }
 
     if use_regex {
-        if let Ok(pattern) = Regex::new(trimmed_key) {
+        if let Ok(pattern) = RegexBuilder::new(trimmed_key)
+            .case_insensitive(true)
+            .build()
+        {
             return pattern.is_match(player_text);
         }
     }
@@ -283,6 +286,29 @@ mod tests {
 
         assert_eq!(payload.matches.len(), 1);
         assert_eq!(payload.matches[0].matched_keys, vec!["Cael(um|ian)"]);
+    }
+
+    #[test]
+    fn regex_keys_match_case_insensitively() {
+        let payload = scan_lorebook_value(
+            &json!({
+                "data": {
+                    "entries": [
+                        {
+                            "keys": ["caelum"],
+                            "content": "Caelum rules are active.",
+                            "enabled": true,
+                            "use_regex": true
+                        }
+                    ]
+                }
+            }),
+            "What does CAELUM law say?",
+        )
+        .expect("scan should work");
+
+        assert_eq!(payload.matches.len(), 1);
+        assert_eq!(payload.matches[0].matched_keys, vec!["caelum"]);
     }
 
     #[test]

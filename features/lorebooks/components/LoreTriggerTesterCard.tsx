@@ -163,8 +163,7 @@ function findLoreTriggerMatches(
         return [];
       }
 
-      const keys = [...entry.keys, ...(entry.secondary_keys ?? [])];
-      const matchedKeywords = keys.filter((key) =>
+      const matchedKeywords = entry.keys.filter((key) =>
         doesLoreActivationKeyMatch(trimmedInput, key, Boolean(entry.use_regex)),
       );
 
