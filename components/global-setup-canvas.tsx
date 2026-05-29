@@ -459,6 +459,10 @@ function LegibilityWorkspace({
           ))}
         </div>
       </div>
+
+      <div className="rounded-2xl border border-border/70 bg-background/45 p-3 text-xs leading-relaxed text-muted-foreground">
+        Headings use Aboreto. Body text, dialogue, and controls use Figtree.
+      </div>
     </div>
   );
 }

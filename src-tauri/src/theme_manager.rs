@@ -12,7 +12,7 @@ const HEX_COLOR_LENGTH: usize = 7;
 const MAX_ID_LENGTH: usize = 64;
 const MAX_NAME_LENGTH: usize = 48;
 const ALLOWED_DIM_COLORS: [&str; 3] = ["zinc", "rose", "indigo"];
-const ALLOWED_FONT_FAMILIES: [&str; 3] = ["serif", "sans", "mono"];
+const ALLOWED_FONT_FAMILIES: [&str; 4] = ["default", "serif", "sans", "mono"];
 const ALLOWED_BG_VIGNETTES: [&str; 4] = [
     "from-rose-950/40 via-transparent",
     "from-cyan-950/40 via-transparent",
@@ -97,7 +97,7 @@ impl Default for UserThemeConfig {
             name: "Crimson Velvet".to_string(),
             primary_glow: "#e11d48".to_string(),
             bg_vignette: "from-rose-950/40 via-transparent".to_string(),
-            font_family: "serif".to_string(),
+            font_family: "default".to_string(),
             card_opacity: 40,
             sidebar_width: default_sidebar_width(),
             custom_wallpaper: None,
@@ -242,11 +242,7 @@ fn normalize_theme_config(theme: UserThemeConfig) -> UserThemeConfig {
         } else {
             fallback.bg_vignette
         },
-        font_family: if ALLOWED_FONT_FAMILIES.contains(&theme.font_family.as_str()) {
-            theme.font_family
-        } else {
-            fallback.font_family
-        },
+        font_family: normalize_font_family(&theme.font_family, &fallback.font_family),
         card_opacity: theme.card_opacity.clamp(10, 90),
         sidebar_width: theme.sidebar_width.clamp(240, 480),
         custom_wallpaper: normalize_wallpaper_preference(theme.custom_wallpaper),
@@ -319,6 +315,14 @@ fn normalize_theme_name(name: &str, fallback: &str) -> String {
     candidate.chars().take(MAX_NAME_LENGTH).collect()
 }
 
+fn normalize_font_family(font_family: &str, fallback: &str) -> String {
+    if !ALLOWED_FONT_FAMILIES.contains(&font_family) {
+        return fallback.to_string();
+    }
+
+    "default".to_string()
+}
+
 fn is_hex_color(value: &str) -> bool {
     value.len() == HEX_COLOR_LENGTH
         && value.starts_with('#')
@@ -340,7 +344,7 @@ mod tests {
         assert_eq!(theme.name, "Crimson Velvet");
         assert_eq!(theme.primary_glow, "#e11d48");
         assert_eq!(theme.bg_vignette, "from-rose-950/40 via-transparent");
-        assert_eq!(theme.font_family, "serif");
+        assert_eq!(theme.font_family, "default");
         assert_eq!(theme.card_opacity, 40);
         assert_eq!(theme.sidebar_width, 280);
     }
@@ -416,7 +420,7 @@ mod tests {
         assert_eq!(theme.name, "Custom Setup");
         assert_eq!(theme.primary_glow, "#06b6d4");
         assert_eq!(theme.bg_vignette, "from-cyan-950/40 via-transparent");
-        assert_eq!(theme.font_family, "mono");
+        assert_eq!(theme.font_family, "default");
         assert_eq!(theme.card_opacity, 10);
         assert_eq!(theme.sidebar_width, 240);
     }
@@ -429,7 +433,7 @@ mod tests {
             name: "Moonlit Console".to_string(),
             primary_glow: "#71717a".to_string(),
             bg_vignette: "from-zinc-900/60 via-transparent".to_string(),
-            font_family: "sans".to_string(),
+            font_family: "default".to_string(),
             card_opacity: 15,
             sidebar_width: 376,
             custom_wallpaper: None,

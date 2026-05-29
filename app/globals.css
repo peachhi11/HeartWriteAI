@@ -46,6 +46,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-figtree), Arial, Helvetica, sans-serif;
+  --font-serif: var(--font-figtree), Arial, Helvetica, sans-serif;
   --font-heading: var(--font-aboreto), Georgia, serif;
   --font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
   --color-sidebar-ring: var(--sidebar-ring);
@@ -144,18 +145,6 @@
   --sidebar-accent-foreground: oklch(0.16 0.018 340);
   --sidebar-border: oklch(1 0 0 / 14%);
   --sidebar-ring: oklch(0.78 0.18 350);
-}
-
-:root[data-user-font="serif"] body {
-  font-family: var(--font-figtree), Arial, Helvetica, sans-serif;
-}
-
-:root[data-user-font="sans"] body {
-  font-family: var(--font-figtree), Arial, Helvetica, sans-serif;
-}
-
-:root[data-user-font="mono"] body {
-  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
 body {

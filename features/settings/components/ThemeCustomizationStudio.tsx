@@ -29,12 +29,10 @@ import { pickCustomWallpaperAsset } from "@/lib/tauri/wallpaper";
 import {
   BUILTIN_THEMES,
   DEFAULT_USER_THEME,
-  type FontPreset,
   type UserThemeConfig,
   type WallpaperPreference,
 } from "@/types/theme";
 
-const fontPresets: FontPreset[] = ["serif", "sans", "mono"];
 const dimColorOptions: DimColor[] = ["zinc", "rose", "indigo"];
 
 export function ThemeCustomizationStudio() {
@@ -103,15 +101,6 @@ export function ThemeCustomizationStudio() {
       id: "custom",
       name: "Custom Setup",
       primaryGlow: value,
-    }));
-  }
-
-  function updateFont(fontFamily: FontPreset) {
-    setCurrentTheme((current) => ({
-      ...current,
-      fontFamily,
-      id: "custom",
-      name: current.id === "custom" ? current.name : "Custom Setup",
     }));
   }
 
@@ -199,8 +188,8 @@ export function ThemeCustomizationStudio() {
             </h2>
           </div>
           <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Adjust your reading screen with saved preferences for accent glow,
-            background tone, typography, and card opacity.
+            Adjust your reading screen with saved preferences for accent color,
+            background tone, and card opacity.
           </p>
         </header>
 
@@ -241,7 +230,7 @@ export function ThemeCustomizationStudio() {
             className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground"
             htmlFor="theme-glow"
           >
-            Accent Focus Glow Vector
+            Accent Color
           </label>
           <div className="flex gap-2">
             <input
@@ -263,30 +252,16 @@ export function ThemeCustomizationStudio() {
         <div className="grid gap-2">
           <span className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
             <Type className="size-3.5" />
-            Typography Schema
+            Typography
           </span>
-          <div className="grid grid-cols-3 gap-2">
-            {fontPresets.map((fontFamily) => (
-              <button
-                className={cn(
-                  "rounded-xl border px-3 py-2 text-xs font-bold uppercase tracking-wide transition",
-                  currentTheme.fontFamily === fontFamily
-                    ? "border-user-primary bg-background/80 text-foreground"
-                    : "border-border bg-background/40 text-muted-foreground hover:text-foreground",
-                )}
-                key={fontFamily}
-                onClick={() => updateFont(fontFamily)}
-                type="button"
-              >
-                {fontFamily}
-              </button>
-            ))}
+          <div className="rounded-xl border border-border bg-background/45 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
+            Headings use Aboreto. Body text, dialogue, and controls use Figtree.
           </div>
         </div>
 
         <div className="grid gap-2">
           <div className="flex items-center justify-between gap-3 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-            <span>Container Card Opacity</span>
+            <span>Theme Card Opacity</span>
             <span className="font-mono text-user-primary">
               {currentTheme.cardOpacity}%
             </span>
@@ -407,7 +382,7 @@ export function ThemeCustomizationStudio() {
 
           <div className="grid gap-2">
             <div className="flex items-center justify-between gap-3 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-              <span>Ambient Brightness Dimmer</span>
+              <span>Background Brightness</span>
               <span className="font-mono text-user-primary">
                 {currentTheme.legibility.brightnessLevel}%
               </span>
@@ -428,7 +403,7 @@ export function ThemeCustomizationStudio() {
 
           <div className="grid gap-2">
             <div className="flex items-center justify-between gap-3 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-              <span>Diffusion Blur Radius</span>
+              <span>Background Blur</span>
               <span className="font-mono text-user-primary">
                 {currentTheme.legibility.blurRadius}px
               </span>
@@ -447,7 +422,7 @@ export function ThemeCustomizationStudio() {
 
           <div className="grid gap-2">
             <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-              Ambient Underlay Tint Profile
+              Background Tint
             </span>
             <div className="grid grid-cols-3 gap-2">
               {dimColorOptions.map((dimColor) => {
@@ -482,7 +457,7 @@ export function ThemeCustomizationStudio() {
         <div className="grid gap-4 rounded-2xl border border-border bg-background/35 p-4">
           <div>
             <span className="block text-[10px] font-bold uppercase tracking-wide text-user-primary">
-              Interface Opacity Studio
+              Interface Opacity
             </span>
             <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
               Balance panel density, border visibility, and text glow across the interface.
@@ -491,7 +466,7 @@ export function ThemeCustomizationStudio() {
 
           <div className="grid gap-2">
             <div className="flex items-center justify-between gap-3 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-              <span>Dialogue Panel Alpha Density</span>
+              <span>Dialogue Panel Opacity</span>
               <span className="font-mono text-user-primary">
                 {currentTheme.transparency.panelOpacity}%
               </span>
@@ -512,7 +487,7 @@ export function ThemeCustomizationStudio() {
 
           <div className="grid gap-2">
             <div className="flex items-center justify-between gap-3 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-              <span>Structural Border Alpha</span>
+              <span>Border Visibility</span>
               <span className="font-mono text-user-primary">
                 {currentTheme.transparency.borderOpacity}%
               </span>
@@ -533,7 +508,7 @@ export function ThemeCustomizationStudio() {
 
           <div className="grid gap-2">
             <div className="flex items-center justify-between gap-3 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">
-              <span>Text Glow Anchor</span>
+              <span>Text Glow</span>
               <span className="font-mono text-user-primary">
                 {currentTheme.transparency.textGlowAlpha}%
               </span>
@@ -574,12 +549,7 @@ export function ThemeCustomizationStudio() {
           </div>
 
           <p
-            className={cn(
-              "text-sm leading-relaxed text-zinc-100",
-              currentTheme.fontFamily === "serif" && "font-serif",
-              currentTheme.fontFamily === "mono" && "font-mono",
-              currentTheme.fontFamily === "sans" && "font-sans",
-            )}
+            className="text-sm leading-relaxed text-zinc-100"
           >
             “I [step closer, looking away reluctantly]. If you truly mean what
             you say, don&apos;t move a single muscle.”

@@ -1958,40 +1958,6 @@ export default function StructuredCardEditor({
     });
   }
 
-  function updateWorldLorePlaceholderGeneration(
-    index: number,
-    patch: Partial<WorldLorePlaceholderGenerationExtension>,
-  ) {
-    setActiveCard((currentCard) => {
-      if (!currentCard) {
-        return null;
-      }
-
-      const currentNamespace = readExtensionNamespace(
-        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
-      );
-      const currentPlaceholders =
-        readWorldLorePlaceholderGenerationExtension(currentCard);
-      const nextPlaceholders = currentPlaceholders.map((placeholder, itemIndex) =>
-        itemIndex === index ? { ...placeholder, ...patch } : placeholder,
-      );
-
-      return {
-        ...currentCard,
-        data: {
-          ...currentCard.data,
-          extensions: {
-            ...currentCard.data.extensions,
-            [AMOURAI_EXTENSION_NAMESPACE]: {
-              ...currentNamespace,
-              world_lore_placeholder: nextPlaceholders.slice(0, 12),
-            },
-          },
-        },
-      };
-    });
-  }
-
   function updateFrameworkConfiguration<Key extends keyof FrameworkConfigurationExtension>(
     key: Key,
     value: FrameworkConfigurationExtension[Key],
@@ -2983,90 +2949,28 @@ export default function StructuredCardEditor({
               </Field>
             </div>
 
-            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
-              <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  World Details
-                </h3>
-                <p className="mt-1 text-[11px] text-zinc-500">
-                  Reusable world facts the card can drop into prompts when they
-                  are needed.
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                {worldLorePlaceholderGeneration.slice(0, 12).map((placeholder, index) => (
-                  <div
-                    key={placeholder.placeholderId}
-                    className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-950 p-3"
-                  >
-                    <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-                      <MacroButtonGroup
-                        activeValue={placeholder.macroType}
-                        label={`World detail ${index + 1}`}
-                        options={WORLD_LORE_PLACEHOLDER_MACRO_TYPES}
-                        tone="violet"
-                        onSelect={(value) =>
-                          updateWorldLorePlaceholderGeneration(index, {
-                            macroType: value,
-                          })
-                        }
-                      />
-
-                      <Field label="Shortcut">
-                        <input
-                          type="text"
-                          value={placeholder.variableKey}
-                          onChange={(event) =>
-                            updateWorldLorePlaceholderGeneration(index, {
-                              variableKey: event.currentTarget.value,
-                            })
-                          }
-                          className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 font-mono text-xs text-zinc-200 outline-none focus:border-violet-500"
-                        />
-                      </Field>
-
-                      <Field label="Detail ID">
-                        <input
-                          type="text"
-                          value={placeholder.placeholderId}
-                          onChange={(event) =>
-                            updateWorldLorePlaceholderGeneration(index, {
-                              placeholderId: event.currentTarget.value,
-                            })
-                          }
-                          className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 font-mono text-xs text-zinc-400 outline-none focus:border-violet-500"
-                        />
-                      </Field>
-                    </div>
-
-                    <label className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs font-semibold text-zinc-300">
-                      <input
-                        type="checkbox"
-                        checked={placeholder.isDynamic}
-                        onChange={(event) =>
-                          updateWorldLorePlaceholderGeneration(index, {
-                            isDynamic: event.currentTarget.checked,
-                          })
-                        }
-                        className="size-3.5 accent-violet-500"
-                      />
-                      Let this detail update when the chat makes it relevant
-                    </label>
-
-                    <Field label="Current Text">
-                      <textarea
-                        value={placeholder.currentDataPayload}
-                        onChange={(event) =>
-                          updateWorldLorePlaceholderGeneration(index, {
-                            currentDataPayload: event.currentTarget.value,
-                          })
-                        }
-                        className="h-20 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
-                      />
-                    </Field>
+            <div className="rounded-lg border border-violet-500/25 bg-violet-500/5 p-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <BookOpen className="size-4 shrink-0 text-violet-300" />
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-300">
+                      Need worldbuilding?
+                    </h3>
                   </div>
-                ))}
+                  <p className="mt-2 max-w-2xl text-xs leading-relaxed text-zinc-500">
+                    Keep worldbuilding in Lorebook Studio, then attach it to this
+                    character from the Linked Lorebook controls in the Behavior
+                    tab. You can choose a saved lorebook or upload a JSON file.
+                  </p>
+                </div>
+
+                <a
+                  href="/lorebooks"
+                  className="inline-flex shrink-0 items-center justify-center rounded-lg border border-violet-500/30 bg-zinc-950 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-violet-200 transition hover:border-violet-400 hover:text-white"
+                >
+                  Open Lorebook Studio
+                </a>
               </div>
             </div>
 

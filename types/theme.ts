@@ -7,7 +7,7 @@ import {
   type InterfaceOpacityConfig,
 } from "./transparency";
 
-export type FontPreset = "serif" | "sans" | "mono";
+export type FontPreset = "default";
 
 export interface WallpaperPreference {
   assetProtocolUrl: string;
@@ -33,7 +33,7 @@ export const BUILTIN_THEMES: UserThemeConfig[] = [
     bgVignette: "from-rose-950/40 via-transparent",
     cardOpacity: 40,
     customWallpaper: null,
-    fontFamily: "serif",
+    fontFamily: "default",
     id: "dark-romance",
     legibility: DEFAULT_LEGIBILITY_CONFIG,
     name: "Crimson Velvet",
@@ -45,7 +45,7 @@ export const BUILTIN_THEMES: UserThemeConfig[] = [
     bgVignette: "from-cyan-950/40 via-transparent",
     cardOpacity: 25,
     customWallpaper: null,
-    fontFamily: "mono",
+    fontFamily: "default",
     id: "neon-cyber",
     legibility: DEFAULT_LEGIBILITY_CONFIG,
     name: "Cyber Quartz",
@@ -57,7 +57,7 @@ export const BUILTIN_THEMES: UserThemeConfig[] = [
     bgVignette: "from-amber-950/30 via-transparent",
     cardOpacity: 50,
     customWallpaper: null,
-    fontFamily: "serif",
+    fontFamily: "default",
     id: "cozy-latte",
     legibility: DEFAULT_LEGIBILITY_CONFIG,
     name: "Sepia Vintage",
@@ -69,7 +69,7 @@ export const BUILTIN_THEMES: UserThemeConfig[] = [
     bgVignette: "from-zinc-900/60 via-transparent",
     cardOpacity: 15,
     customWallpaper: null,
-    fontFamily: "sans",
+    fontFamily: "default",
     id: "clean-slate",
     legibility: DEFAULT_LEGIBILITY_CONFIG,
     name: "Terminal Zinc",

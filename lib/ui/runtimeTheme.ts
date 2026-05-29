@@ -25,7 +25,7 @@ import {
 
 const HEX_COLOR_PATTERN = /^#[0-9a-fA-F]{6}$/;
 const WALLPAPER_ASSET_PROTOCOL_PATTERN = /^ccv3-asset:\/\/localhost\/.+/;
-const FONT_PRESETS = new Set<FontPreset>(["serif", "sans", "mono"]);
+const FONT_PRESETS = new Set<FontPreset>(["default"]);
 const DIM_COLOR_PRESETS = new Set<DimColor>(["zinc", "rose", "indigo"]);
 const ALLOWED_VIGNETTES = new Set(BUILTIN_THEMES.map((theme) => theme.bgVignette));
 
@@ -38,7 +38,7 @@ export function applyUserTheme(theme: UserThemeConfig) {
   const root = document.documentElement;
 
   root.dataset.userTheme = safeTheme.id;
-  root.dataset.userFont = safeTheme.fontFamily;
+  root.dataset.userFont = "default";
   root.dataset.userDimColor = safeTheme.legibility.dimColor;
   root.dataset.userWallpaper = safeTheme.customWallpaper ? "active" : "none";
   root.style.setProperty("--user-glow", safeTheme.primaryGlow);
@@ -90,6 +90,9 @@ export async function saveUserTheme(theme: UserThemeConfig) {
         JSON.stringify(normalizedNativeTheme),
       );
       applyUserTheme(normalizedNativeTheme);
+      window.dispatchEvent(
+        new CustomEvent(USER_THEME_EVENT, { detail: normalizedNativeTheme }),
+      );
       return normalizedNativeTheme;
     }
   } catch (error) {
@@ -105,10 +108,19 @@ export function loadUserTheme() {
   }
 
   try {
-    return normalizeUserTheme(
+    const normalizedTheme = normalizeUserTheme(
       JSON.parse(window.localStorage.getItem(USER_THEME_STORAGE_KEY) ?? "null"),
     );
+    window.localStorage.setItem(
+      USER_THEME_STORAGE_KEY,
+      JSON.stringify(normalizedTheme),
+    );
+    return normalizedTheme;
   } catch {
+    window.localStorage.setItem(
+      USER_THEME_STORAGE_KEY,
+      JSON.stringify(DEFAULT_USER_THEME),
+    );
     return DEFAULT_USER_THEME;
   }
 }
