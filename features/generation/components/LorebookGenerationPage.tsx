@@ -38,6 +38,7 @@ import {
   importLorebookV3Json,
   serializeLorebookV3Document,
 } from "@/features/lorebooks/adapters";
+import { LoreTriggerTesterCard } from "@/features/lorebooks/components/LoreTriggerTesterCard";
 import { LorebookV3Editor } from "@/features/lorebooks/components/LorebookV3Editor";
 import type { LorebookV3Document } from "@/features/lorebooks/schema";
 import {
@@ -392,6 +393,8 @@ export function LorebookGenerationPage() {
             />
           </CardContent>
         </Card>
+
+        <LoreTriggerTesterCard lorebooks={[activeLorebook]} />
       </aside>
 
       <main className="grid gap-5">

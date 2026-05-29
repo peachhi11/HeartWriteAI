@@ -21,7 +21,9 @@ import { CenteredIntentModal } from "@/components/centered-intent-modal";
 import { CameraSnapperButton } from "@/components/camera-snapper-button";
 import { ChatExporterButton } from "@/components/chat-exporter-button";
 import { ChatViewport } from "@/components/chat-viewport";
+import { ContextRecallInspector } from "@/components/context-recall-inspector";
 import { GlowingConnectionNode } from "@/components/glowing-connection-node";
+import { LoreActivationBadge } from "@/components/lore-activation-badge";
 import { LorebookControlPanel } from "@/components/lorebook-control-panel";
 import { SaveSlotModal } from "@/components/save-slot-modal";
 import { Badge } from "@/components/ui/badge";
@@ -41,9 +43,13 @@ import {
   RoleplayMessage,
   toOllamaMessages,
 } from "@/lib/chat/messages";
-import { parseActiveLore } from "@/lib/character-card/lorebookParser";
 import { classifyTropeInput } from "@/lib/character-card/tropeMatcher";
 import { fetchContextualNpcDialogue } from "@/lib/tauri/contextualDialogue";
+import {
+  buildLoreRecallMessages,
+  createLoreRecallAuditLogs,
+  scanActiveLorebookForChatTurn,
+} from "@/lib/tauri/loreActivation";
 import { streamLocalLlmResponse } from "@/lib/tauri/localLlm";
 import { appendMessageToHistory } from "@/lib/tauri/tropeInteraction";
 import {
@@ -65,6 +71,7 @@ import type { ActionCardVariant } from "@/types/cards";
 import type { SystemSyncStatus } from "@/types/diagnostics";
 import type { DockingState, SidePanelType } from "@/types/dock";
 import type { GeneratedLorebookArtifact } from "@/features/generation/workflows";
+import type { LoreRecallAuditLog } from "@/types/lorebook";
 
 const OLLAMA_CHAT_ENDPOINT = "http://localhost:11434/api/chat";
 const DEFAULT_MODEL = "llama3";
@@ -192,6 +199,8 @@ export default function RoleplayChat() {
   const [sidebarWidth, setSidebarWidth] = useState(280);
   const [activeLorebook, setActiveLorebook] =
     useState<GeneratedLorebookArtifact | null>(null);
+  const [activeLoreFeed, setActiveLoreFeed] = useState("");
+  const [loreRecallLogs, setLoreRecallLogs] = useState<LoreRecallAuditLog[]>([]);
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
   const activeThemeRef = useRef<Awaited<ReturnType<typeof loadUserThemePreference>> | null>(
     null,
@@ -426,12 +435,14 @@ export default function RoleplayChat() {
   async function handleSendMessage(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!input.trim() || isGenerating) {
+    const playerInput = input.trim();
+
+    if (!playerInput || isGenerating) {
       return;
     }
 
-    const detectedTrope = classifyTropeInput(input.trim());
-    const userMessage = createRoleplayMessage("user", input.trim(), detectedTrope);
+    const detectedTrope = classifyTropeInput(playerInput);
+    const userMessage = createRoleplayMessage("user", playerInput, detectedTrope);
     const updatedMessages = [...messages, userMessage];
     const assistantMessage = createRoleplayMessage(
       "assistant",
@@ -441,13 +452,13 @@ export default function RoleplayChat() {
 
     updateActiveSession({
       messages: [...updatedMessages, assistantMessage],
-      title: buildSessionTitle(activeSession.title, input.trim()),
+      title: buildSessionTitle(activeSession.title, playerInput),
     });
     setInput("");
     setIsGenerating(true);
     setRuntimeError(null);
     await addRelationshipMessage({
-      content: input.trim(),
+      content: playerInput,
       createdAt: Date.now(),
       role: "user",
     });
@@ -457,7 +468,22 @@ export default function RoleplayChat() {
       const scenarioMessages = compileScenarioOverrideMessages(
         activeSession.scenarioOverride,
       );
-      const loreMessages = compileActiveLoreMessages(activeLorebook, input.trim());
+      const loreActivation = await scanActiveLorebookForChatTurn(
+        activeLorebook,
+        playerInput,
+      );
+      const loreMessages = buildLoreRecallMessages(loreActivation);
+      setActiveLoreFeed(loreActivation.loreInjectionChunk);
+
+      if (loreActivation.hasMatches) {
+        const recallLogs = createLoreRecallAuditLogs(
+          loreActivation,
+          activeLorebook,
+          userMessage.id,
+        );
+        setLoreRecallLogs((current) => [...recallLogs, ...current].slice(0, 40));
+      }
+
       const contextMessages = [
         ...scenarioMessages,
         ...loreMessages,
@@ -467,7 +493,7 @@ export default function RoleplayChat() {
       const didUseNativeStream = await streamLocalLlmResponse(
         {
           contextMessages,
-          promptText: input.trim(),
+          promptText: playerInput,
           storyNodeId: "scene_01_alley_encounter",
         },
         {
@@ -684,7 +710,7 @@ export default function RoleplayChat() {
               </CardTitle>
               <CardDescription>
                 {activeLorebook
-                  ? `${activeLorebook.title} is available for key-triggered context.`
+                  ? `${activeLorebook.title} can be recalled when matching story words appear.`
                   : "No lorebook is active for this chat."}
               </CardDescription>
             </CardHeader>
@@ -945,6 +971,7 @@ export default function RoleplayChat() {
         />
 
         <div className="border-t bg-card/80 p-5 backdrop-blur">
+          <LoreActivationBadge activeLoreSnippet={activeLoreFeed} />
           <form
             onSubmit={handleSendMessage}
             className="mx-auto flex max-w-3xl items-center gap-3 rounded-2xl border bg-background/80 p-2 shadow-lg"
@@ -974,18 +1001,26 @@ export default function RoleplayChat() {
             >
               <span className="my-3 w-px rounded-full bg-muted-foreground/35 transition group-hover:bg-primary" />
             </button>
-            <LorebookControlPanel
-              activeLorebookId={activeLorebook?.id}
-              isOpen
-              onActivateLorebook={(lorebook) => setActiveLorebook(lorebook)}
-              onClose={() => toggleDockPanel("Lorebook")}
-              onDeactivateLorebook={(lorebookId) =>
-                setActiveLorebook((current) =>
-                  current?.id === lorebookId ? null : current,
-                )
-              }
-              variant="dock"
-            />
+            <div className="flex min-h-0 w-full flex-col gap-3 border-l border-border/60 bg-card/45 p-3 text-foreground backdrop-blur">
+              <div className="min-h-0 flex-1">
+                <LorebookControlPanel
+                  activeLorebookId={activeLorebook?.id}
+                  isOpen
+                  onActivateLorebook={(lorebook) => setActiveLorebook(lorebook)}
+                  onClose={() => toggleDockPanel("Lorebook")}
+                  onDeactivateLorebook={(lorebookId) =>
+                    setActiveLorebook((current) =>
+                      current?.id === lorebookId ? null : current,
+                    )
+                  }
+                  variant="dock"
+                />
+              </div>
+              <ContextRecallInspector
+                onClearAuditLog={() => setLoreRecallLogs([])}
+                recallLogs={loreRecallLogs}
+              />
+            </div>
           </aside>
         ) : null}
         <CenteredIntentModal
@@ -1142,17 +1177,6 @@ function compileScenarioOverrideMessages(override: ScenarioOverride) {
         },
       ]
     : [];
-}
-
-function compileActiveLoreMessages(
-  lorebook: GeneratedLorebookArtifact | null,
-  latestUserMessage: string,
-) {
-  if (!lorebook) {
-    return [];
-  }
-
-  return parseActiveLore(latestUserMessage, lorebook.entries);
 }
 
 function getLorebookDiagnostic(

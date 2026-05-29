@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 import type { LorebookConfig } from "@/types/lorebook";
 
 type LoreControlSurfaceProps = {
+  attachDisabledLabel?: string;
+  attachLabel?: string;
   installedBooks: LorebookConfig[];
   isImporting?: boolean;
   isLoading?: boolean;
@@ -18,6 +20,8 @@ type LoreControlSurfaceProps = {
 };
 
 export function LoreControlSurface({
+  attachDisabledLabel = "Attach in Chat",
+  attachLabel = "Attach to Chat",
   installedBooks,
   isImporting = false,
   isLoading = false,
@@ -76,6 +80,7 @@ export function LoreControlSurface({
           installedBooks.map((book) => {
             const isCompiled = book.enabled && book.status === "compiled";
             const isFocused = focusedBookId === book.id;
+            const canAttachBook = Boolean(onAttachBook);
 
             return (
               <article
@@ -172,12 +177,16 @@ export function LoreControlSurface({
                     ) : null}
                     <button
                       className="inline-flex w-full items-center justify-center gap-1 rounded-md border border-border/70 bg-card/70 py-1 text-[9px] font-black uppercase tracking-wide text-foreground transition hover:border-primary/50 disabled:cursor-not-allowed disabled:opacity-45"
-                      disabled={!book.enabled}
+                      disabled={!book.enabled || !canAttachBook}
                       onClick={() => onAttachBook?.(book.id)}
                       type="button"
                     >
                       <Link2 className="size-3" />
-                      {isCompiled ? "Attached" : "Attach to chat"}
+                      {isCompiled
+                        ? "Attached"
+                        : canAttachBook
+                          ? attachLabel
+                          : attachDisabledLabel}
                     </button>
                   </div>
                 ) : null}

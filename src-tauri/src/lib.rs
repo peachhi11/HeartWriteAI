@@ -5,6 +5,7 @@ mod commands;
 pub mod dialogue;
 pub mod inference_manager;
 pub mod llm_bridge;
+pub mod lore_injector;
 pub mod lore_manager;
 pub mod models;
 pub mod screenshot;
@@ -149,6 +150,7 @@ pub fn run() {
             inference_manager::export_user_inference_settings,
             inference_manager::get_boot_inference_settings,
             llm_bridge::stream_local_llm_response,
+            lore_injector::execute_lore_context_scan,
             lore_manager::import_and_compile_lorebook,
             lore_manager::remove_lorebook_file,
             lore_manager::toggle_lorebook_active_state,

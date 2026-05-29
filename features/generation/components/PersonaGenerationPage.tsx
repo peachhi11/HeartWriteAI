@@ -49,7 +49,6 @@ import { downloadUint8Array } from "@/lib/browser/downloadUint8Array";
 import {
   Field,
   GeneratorFormCard,
-  GeneratorGrid,
 } from "./GenerationShell";
 import { PersonaMatchingStudio } from "./PersonaMatchingStudio";
 
@@ -74,49 +73,6 @@ type PersonaStarterFieldKey =
   | "personality"
   | "scenario"
   | "firstMessage";
-
-const personaStarterFieldDefinitions: Array<{
-  key: PersonaStarterFieldKey;
-  label: string;
-  placeholder: string;
-  rows?: number;
-}> = [
-  {
-    key: "name",
-    label: "Name",
-    placeholder: "Megan",
-  },
-  {
-    key: "basicInfo",
-    label: "Basic info",
-    placeholder: "Age range, gender/pronouns, job, background, social role...",
-    rows: 3,
-  },
-  {
-    key: "appearance",
-    label: "Appearance",
-    placeholder: "Style, body language, presentation, notable details...",
-    rows: 3,
-  },
-  {
-    key: "personality",
-    label: "Personality",
-    placeholder: "Core traits, wounds, wants, fears, habits, boundaries...",
-    rows: 3,
-  },
-  {
-    key: "scenario",
-    label: "Scenario",
-    placeholder: "Optional setup, relationship context, or character they are built to play opposite.",
-    rows: 3,
-  },
-  {
-    key: "firstMessage",
-    label: "First message",
-    placeholder: "Optional opening user line, vibe, or first-scene intention.",
-    rows: 3,
-  },
-];
 
 const emptyPersonaStarterFields: Record<PersonaStarterFieldKey, string> = {
   appearance: "",
@@ -342,210 +298,8 @@ export function PersonaGenerationPage() {
   }
 
   return (
-    <GeneratorGrid>
-      <aside className="grid max-h-[calc(100vh-8rem)] gap-5 overflow-y-auto pr-1 lg:sticky lg:top-24">
-        <GeneratorFormCard
-          title="Persona Generator"
-          description="Create saved user personas that drive chat POV, boundaries, and relationship interpretation."
-        >
-          <Field label="Messy persona notes">
-            <Textarea
-              value={personaIntakeText}
-              placeholder="Paste rough {{user}} POV ideas, profile fragments, traits, boundaries, relationship context, or first-scene notes..."
-              className="min-h-32"
-              onChange={(event) => setPersonaIntakeText(event.currentTarget.value)}
-            />
-          </Field>
-          <details className="rounded-md border bg-background/70 p-4">
-            <summary className="cursor-pointer text-sm font-semibold">
-              Optional structured starter fields
-            </summary>
-            <div className="mt-4 grid gap-4">
-              {personaStarterFieldDefinitions.map((field) => (
-                <Field key={field.key} label={field.label}>
-                  {field.rows ? (
-                    <Textarea
-                      value={personaStarterFields[field.key]}
-                      placeholder={field.placeholder}
-                      className="min-h-20"
-                      onChange={(event) =>
-                        setPersonaStarterFields((current) => ({
-                          ...current,
-                          [field.key]: event.currentTarget.value,
-                        }))
-                      }
-                    />
-                  ) : (
-                    <Input
-                      value={personaStarterFields[field.key]}
-                      placeholder={field.placeholder}
-                      onChange={(event) =>
-                        setPersonaStarterFields((current) => ({
-                          ...current,
-                          [field.key]: event.currentTarget.value,
-                        }))
-                      }
-                    />
-                  )}
-                </Field>
-              ))}
-            </div>
-          </details>
-          <Button type="button" variant="secondary" onClick={routePersonaIntake}>
-            <Sparkles className="size-4" />
-            Route Intake to Persona
-          </Button>
-          {personaIntakeStatus ? (
-            <p className="text-sm text-muted-foreground">{personaIntakeStatus}</p>
-          ) : null}
-          <Field label="Persona name">
-            <Input
-              value={input.name}
-              onChange={(event) => updateInput("name", event.currentTarget.value)}
-            />
-          </Field>
-          <Field label="Archetype">
-            <Input
-              value={input.archetype}
-              onChange={(event) =>
-                updateInput("archetype", event.currentTarget.value)
-              }
-            />
-          </Field>
-          <Field label="Match target / character context">
-            <Input
-              placeholder="Optional: character name, card tone, or relationship premise"
-              value={input.referenceCharacter}
-              onChange={(event) =>
-                updateInput("referenceCharacter", event.currentTarget.value)
-              }
-            />
-          </Field>
-          <Field label="Relationship role">
-            <select
-              value={input.relationshipToCharacter}
-              onChange={(event) =>
-                updateInput("relationshipToCharacter", event.currentTarget.value)
-              }
-              className="h-10 rounded-md border bg-background px-3 text-sm"
-            >
-              <option>slow-burn romantic counterpart</option>
-              <option>guarded rival with romantic tension</option>
-              <option>trusted friend with hidden longing</option>
-              <option>established partner</option>
-              <option>forbidden attraction</option>
-              <option>casual intimacy with attachment risk</option>
-              <option>custom / undefined</option>
-            </select>
-          </Field>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="POV">
-              <select
-                value={input.pointOfView}
-                onChange={(event) =>
-                  updateInput("pointOfView", event.currentTarget.value)
-                }
-                className="h-10 rounded-md border bg-background px-3 text-sm"
-              >
-                <option>FemPOV</option>
-                <option>MalePOV</option>
-                <option>AnyPOV</option>
-                <option>NBPOV</option>
-              </select>
-            </Field>
-            <Field label="Play style">
-              <select
-                value={input.playStyle}
-                onChange={(event) =>
-                  updateInput("playStyle", event.currentTarget.value)
-                }
-                className="h-10 rounded-md border bg-background px-3 text-sm"
-              >
-                <option>Story roleplay</option>
-                <option>Open-ended chat</option>
-                <option>Choice adventure</option>
-                <option>Single scene</option>
-              </select>
-            </Field>
-          </div>
-          <Field label="Characteristics you want">
-            <Textarea
-              value={input.characteristics}
-              onChange={(event) =>
-                updateInput("characteristics", event.currentTarget.value)
-              }
-            />
-          </Field>
-          <Field label="Core emotional need">
-            <Textarea
-              value={input.emotionalNeed}
-              onChange={(event) =>
-                updateInput("emotionalNeed", event.currentTarget.value)
-              }
-            />
-          </Field>
-          <Field label="Boundaries">
-            <Textarea
-              value={input.boundaries}
-              onChange={(event) =>
-                updateInput("boundaries", event.currentTarget.value)
-              }
-            />
-          </Field>
-          <Field label="Tags">
-            <Input
-              value={input.tags}
-              onChange={(event) => updateInput("tags", event.currentTarget.value)}
-            />
-          </Field>
-          <Button type="button" onClick={generate}>
-            <UserRound className="size-4" />
-            Generate Persona
-          </Button>
-          <Button type="button" variant="outline" onClick={newBlankPersona}>
-            <FilePlus2 className="size-4" />
-            New Blank Persona
-          </Button>
-          <label className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground">
-            <Upload className="size-4" />
-            Import JSON
-            <input
-              accept=".json,.persona.json,application/json"
-              className="sr-only"
-              onChange={importJsonFile}
-              type="file"
-            />
-          </label>
-          {hydrated && advancedControlsEnabled ? (
-            <AdvancedPersonaPromptPanel
-              constructionPrompt={input.constructionPrompt ?? ""}
-              preview={constructionPreview}
-              onChange={(value) => updateInput("constructionPrompt", value)}
-            />
-          ) : null}
-          {status ? <p className="text-sm text-muted-foreground">{status}</p> : null}
-        </GeneratorFormCard>
-
-        <GeneratorFormCard
-          title={`Saved Personas (${library.metadata.totalCount})`}
-          description="Load a saved persona into the editor."
-        >
-          <Input
-            placeholder="Search saved personas..."
-            value={library.query}
-            onChange={(event) => library.setQuery(event.currentTarget.value)}
-          />
-          <PersonaLibraryList
-            empty={library.loading ? "Loading personas..." : "No saved personas yet."}
-            items={library.items}
-            onSelect={loadPersona}
-          />
-        </GeneratorFormCard>
-      </aside>
-
-      <div className="grid gap-5">
-        <PersonaMatchingStudio />
-
+    <div className="grid min-w-0 gap-5 xl:grid-cols-[minmax(0,1fr)_22rem] [&>*]:min-w-0">
+      <main className="grid gap-5">
         <Card className="bg-card/85">
           <CardHeader className="gap-3 md:flex-row md:items-start md:justify-between">
             <div className="space-y-1.5">
@@ -556,9 +310,8 @@ export function PersonaGenerationPage() {
                   {isDirty ? "Unsaved changes" : "Saved"}
                 </Badge>
                 <Badge variant="outline">{formatSourceLabel(activePersona)}</Badge>
-                <Badge variant="outline">
-                  Updated {savedSnapshot ? formatDate(activePersona.updatedAt) : "Draft"}
-                </Badge>
+                <Badge variant="outline">{input.pointOfView}</Badge>
+                <Badge variant="outline">{input.playStyle}</Badge>
               </div>
             </div>
             <div className="flex shrink-0 flex-wrap gap-2">
@@ -568,7 +321,7 @@ export function PersonaGenerationPage() {
               </Button>
               <Button type="button" variant="outline" onClick={duplicateActive}>
                 <CopyPlus className="size-4" />
-                Duplicate Draft
+                Duplicate
               </Button>
               <Button type="button" variant="outline" onClick={saveAsCopy}>
                 <Save className="size-4" />
@@ -592,61 +345,399 @@ export function PersonaGenerationPage() {
               </Button>
             </div>
           </CardHeader>
-          <CardContent className="grid gap-4">
-            <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Saved name">
-                <Input
-                  value={activePersona.name}
-                  onChange={(event) => editPersona({ name: event.currentTarget.value })}
-                />
-              </Field>
-              <Field label="Tags">
-                <Input
-                  value={activePersona.tags.join(", ")}
+          <CardContent className="grid gap-5">
+            <section className="grid gap-4 rounded-xl border bg-background/70 p-4">
+              <div className="flex items-center justify-between gap-3 border-b pb-3">
+                <div>
+                  <h2 className="text-sm font-black uppercase tracking-[0.18em] text-primary">
+                    Persona Sheet
+                  </h2>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Build the player persona that chat partners will respond to.
+                  </p>
+                </div>
+                <div className="flex size-16 shrink-0 items-center justify-center rounded-xl border bg-card/70 text-2xl font-black text-muted-foreground">
+                  {activePersona.name.slice(0, 1).toUpperCase() || "P"}
+                </div>
+              </div>
+
+              <PersonaSheetSection title="General" defaultOpen>
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="Persona name">
+                    <Input
+                      value={input.name}
+                      onChange={(event) =>
+                        updateInput("name", event.currentTarget.value)
+                      }
+                    />
+                  </Field>
+                  <Field label="Archetype">
+                    <Input
+                      value={input.archetype}
+                      onChange={(event) =>
+                        updateInput("archetype", event.currentTarget.value)
+                      }
+                    />
+                  </Field>
+                  <Field label="POV">
+                    <select
+                      value={input.pointOfView}
+                      onChange={(event) =>
+                        updateInput("pointOfView", event.currentTarget.value)
+                      }
+                      className="h-10 rounded-md border bg-background px-3 text-sm"
+                    >
+                      <option>FemPOV</option>
+                      <option>MalePOV</option>
+                      <option>AnyPOV</option>
+                      <option>NBPOV</option>
+                    </select>
+                  </Field>
+                  <Field label="Play style">
+                    <select
+                      value={input.playStyle}
+                      onChange={(event) =>
+                        updateInput("playStyle", event.currentTarget.value)
+                      }
+                      className="h-10 rounded-md border bg-background px-3 text-sm"
+                    >
+                      <option>Story roleplay</option>
+                      <option>Open-ended chat</option>
+                      <option>Choice adventure</option>
+                      <option>Single scene</option>
+                    </select>
+                  </Field>
+                </div>
+              </PersonaSheetSection>
+
+              <PersonaSheetSection title="Relationship">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <Field label="Relationship role">
+                    <select
+                      value={input.relationshipToCharacter}
+                      onChange={(event) =>
+                        updateInput(
+                          "relationshipToCharacter",
+                          event.currentTarget.value,
+                        )
+                      }
+                      className="h-10 rounded-md border bg-background px-3 text-sm"
+                    >
+                      <option>slow-burn romantic counterpart</option>
+                      <option>guarded rival with romantic tension</option>
+                      <option>trusted friend with hidden longing</option>
+                      <option>established partner</option>
+                      <option>forbidden attraction</option>
+                      <option>casual intimacy with attachment risk</option>
+                      <option>custom / undefined</option>
+                    </select>
+                  </Field>
+                  <Field label="Match target / character context">
+                    <Input
+                      placeholder="Optional character, card tone, or premise"
+                      value={input.referenceCharacter}
+                      onChange={(event) =>
+                        updateInput("referenceCharacter", event.currentTarget.value)
+                      }
+                    />
+                  </Field>
+                </div>
+              </PersonaSheetSection>
+
+              <PersonaSheetSection title="Physical & Background">
+                <div className="grid gap-4">
+                  <Field label="Basic info">
+                    <Textarea
+                      className="min-h-20"
+                      placeholder="Age range, gender/pronouns, job, background, social role..."
+                      value={personaStarterFields.basicInfo}
+                      onChange={(event) =>
+                        setPersonaStarterFields((current) => ({
+                          ...current,
+                          basicInfo: event.currentTarget.value,
+                        }))
+                      }
+                    />
+                  </Field>
+                  <Field label="Appearance">
+                    <Textarea
+                      className="min-h-20"
+                      placeholder="Style, body language, presentation, notable details..."
+                      value={personaStarterFields.appearance}
+                      onChange={(event) =>
+                        setPersonaStarterFields((current) => ({
+                          ...current,
+                          appearance: event.currentTarget.value,
+                        }))
+                      }
+                    />
+                  </Field>
+                </div>
+              </PersonaSheetSection>
+
+              <PersonaSheetSection title="Personality">
+                <div className="grid gap-4">
+                  <Field label="Characteristics you want">
+                    <Textarea
+                      value={input.characteristics}
+                      onChange={(event) =>
+                        updateInput("characteristics", event.currentTarget.value)
+                      }
+                    />
+                  </Field>
+                  <Field label="Core emotional need">
+                    <Textarea
+                      value={input.emotionalNeed}
+                      onChange={(event) =>
+                        updateInput("emotionalNeed", event.currentTarget.value)
+                      }
+                    />
+                  </Field>
+                  <Field label="Boundaries">
+                    <Textarea
+                      value={input.boundaries}
+                      onChange={(event) =>
+                        updateInput("boundaries", event.currentTarget.value)
+                      }
+                    />
+                  </Field>
+                </div>
+              </PersonaSheetSection>
+
+              <PersonaSheetSection title="Notes">
+                <div className="grid gap-4">
+                  <Field label="Messy persona notes">
+                    <Textarea
+                      value={personaIntakeText}
+                      placeholder="Paste rough {{user}} POV ideas, profile fragments, boundaries, relationship context, or first-scene notes..."
+                      className="min-h-28"
+                      onChange={(event) =>
+                        setPersonaIntakeText(event.currentTarget.value)
+                      }
+                    />
+                  </Field>
+                  <Field label="Tags">
+                    <Input
+                      value={input.tags}
+                      onChange={(event) =>
+                        updateInput("tags", event.currentTarget.value)
+                      }
+                    />
+                  </Field>
+                </div>
+              </PersonaSheetSection>
+
+              <div className="flex flex-wrap gap-2 border-t pt-4">
+                <Button type="button" onClick={generate}>
+                  <UserRound className="size-4" />
+                  Update Draft
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={routePersonaIntake}
+                >
+                  <Sparkles className="size-4" />
+                  Use Notes
+                </Button>
+                <Button type="button" variant="outline" onClick={newBlankPersona}>
+                  <FilePlus2 className="size-4" />
+                  New Blank Persona
+                </Button>
+                <label className="inline-flex h-10 cursor-pointer items-center justify-center gap-2 rounded-md border bg-background px-4 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground">
+                  <Upload className="size-4" />
+                  Import JSON
+                  <input
+                    accept=".json,.persona.json,application/json"
+                    className="sr-only"
+                    onChange={importJsonFile}
+                    type="file"
+                  />
+                </label>
+              </div>
+              {personaIntakeStatus ? (
+                <p className="text-sm text-muted-foreground">
+                  {personaIntakeStatus}
+                </p>
+              ) : null}
+              {status ? (
+                <p className="text-sm text-muted-foreground">{status}</p>
+              ) : null}
+            </section>
+
+            <section className="grid gap-4 rounded-xl border bg-background/70 p-4">
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field label="Saved name">
+                  <Input
+                    value={activePersona.name}
+                    onChange={(event) =>
+                      editPersona({ name: event.currentTarget.value })
+                    }
+                  />
+                </Field>
+                <Field label="Saved tags">
+                  <Input
+                    value={activePersona.tags.join(", ")}
+                    onChange={(event) =>
+                      editPersona({
+                        tags: event.currentTarget.value
+                          .split(",")
+                          .map((tag) => tag.trim()),
+                      })
+                    }
+                  />
+                </Field>
+              </div>
+              <Field label="Summary">
+                <Textarea
+                  value={activePersona.summary}
                   onChange={(event) =>
-                    editPersona({ tags: event.currentTarget.value.split(",").map((tag) => tag.trim()) })
+                    editPersona({ summary: event.currentTarget.value })
                   }
                 />
               </Field>
-            </div>
-            <Field label="Summary">
-              <Textarea
-                value={activePersona.summary}
-                onChange={(event) =>
-                  editPersona({ summary: event.currentTarget.value })
-                }
-              />
-            </Field>
-            <Field label="Persona prompt">
-              <Textarea
-                className="min-h-72 font-mono text-xs leading-5"
-                value={activePersona.prompt}
-                onChange={(event) =>
-                  editPersona({ prompt: event.currentTarget.value })
-                }
-              />
-            </Field>
-            <section className="rounded-md border bg-background/70 p-4">
-              <div className="mb-3 flex flex-wrap gap-2">
-                {activePersona.tags.map((tag) => (
-                  <Badge key={tag} variant="secondary">
-                    {tag}
-                  </Badge>
-                ))}
-              </div>
-              <h3 className="text-sm font-semibold">{activePersona.name}</h3>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                {activePersona.summary}
-              </p>
-              <p className="mt-3 text-xs text-muted-foreground">
-                Source: {formatSourceLabel(activePersona)} · updated{" "}
-                {savedSnapshot ? formatDate(activePersona.updatedAt) : "Draft"}
-              </p>
+              <Field label="Persona prompt">
+                <Textarea
+                  className="min-h-56 font-mono text-xs leading-5"
+                  value={activePersona.prompt}
+                  onChange={(event) =>
+                    editPersona({ prompt: event.currentTarget.value })
+                  }
+                />
+              </Field>
             </section>
           </CardContent>
         </Card>
-      </div>
-    </GeneratorGrid>
+
+        <PersonaMatchingStudio />
+      </main>
+
+      <aside className="grid max-h-[calc(100vh-8rem)] gap-5 overflow-y-auto pr-1 xl:sticky xl:top-24">
+        <PersonaArchetypeGuide input={input} activePersona={activePersona} />
+
+        <GeneratorFormCard
+          title={`Saved Personas (${library.metadata.totalCount})`}
+          description="Load a saved persona into the editor."
+        >
+          <Input
+            placeholder="Search saved personas..."
+            value={library.query}
+            onChange={(event) => library.setQuery(event.currentTarget.value)}
+          />
+          <PersonaLibraryList
+            empty={library.loading ? "Loading personas..." : "No saved personas yet."}
+            items={library.items}
+            onSelect={loadPersona}
+          />
+        </GeneratorFormCard>
+
+        {hydrated && advancedControlsEnabled ? (
+          <AdvancedPersonaPromptPanel
+            constructionPrompt={input.constructionPrompt ?? ""}
+            preview={constructionPreview}
+            onChange={(value) => updateInput("constructionPrompt", value)}
+          />
+        ) : null}
+      </aside>
+    </div>
+  );
+}
+
+function PersonaSheetSection(props: {
+  children: React.ReactNode;
+  defaultOpen?: boolean;
+  title: string;
+}) {
+  return (
+    <details
+      className="rounded-lg border bg-card/45 p-4"
+      open={props.defaultOpen}
+    >
+      <summary className="cursor-pointer text-sm font-black uppercase tracking-[0.16em] text-foreground">
+        {props.title}
+      </summary>
+      <div className="mt-4 grid gap-4">{props.children}</div>
+    </details>
+  );
+}
+
+function PersonaArchetypeGuide(props: {
+  activePersona: GeneratedPersonaArtifact;
+  input: PersonaGenerationInput;
+}) {
+  const tagList = props.input.tags
+    .split(",")
+    .map((tag) => tag.trim())
+    .filter(Boolean)
+    .slice(0, 8);
+  const exampleAngles = buildPersonaExampleAngles(props.input);
+
+  return (
+    <Card className="bg-card/85">
+      <CardHeader>
+        <CardTitle>Archetype Guide</CardTitle>
+        <CardDescription>
+          A quick reference for how this persona should feel in chat.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-4 text-sm">
+        <section className="rounded-md border bg-background/70 p-3">
+          <h3 className="text-xs font-black uppercase tracking-[0.16em] text-primary">
+            Description
+          </h3>
+          <p className="mt-2 leading-6 text-muted-foreground">
+            {props.input.name || props.activePersona.name} is a{" "}
+            {props.input.archetype || "custom persona"} built for{" "}
+            {props.input.playStyle.toLowerCase()} with a{" "}
+            {props.input.relationshipToCharacter.toLowerCase()} role.
+          </p>
+        </section>
+
+        <section className="rounded-md border bg-background/70 p-3">
+          <h3 className="text-xs font-black uppercase tracking-[0.16em] text-primary">
+            Works Best For
+          </h3>
+          <ul className="mt-2 grid gap-2 text-muted-foreground">
+            {[
+              props.input.emotionalNeed,
+              props.input.referenceCharacter ||
+                "Chats where the character reacts to the player persona.",
+              props.input.boundaries,
+            ]
+              .filter(Boolean)
+              .map((item) => (
+                <li className="leading-5" key={item}>
+                  {item}
+                </li>
+              ))}
+          </ul>
+        </section>
+
+        <section className="rounded-md border bg-background/70 p-3">
+          <h3 className="text-xs font-black uppercase tracking-[0.16em] text-primary">
+            Suggested Tags
+          </h3>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {(tagList.length > 0 ? tagList : props.activePersona.tags).map((tag) => (
+              <Badge key={tag} variant="secondary">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-md border bg-background/70 p-3">
+          <h3 className="text-xs font-black uppercase tracking-[0.16em] text-primary">
+            Example Openings
+          </h3>
+          <ul className="mt-2 grid gap-2 text-xs leading-5 text-muted-foreground">
+            {exampleAngles.map((angle) => (
+              <li key={angle}>{angle}</li>
+            ))}
+          </ul>
+        </section>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -681,6 +772,17 @@ function AdvancedPersonaPromptPanel(props: {
       </div>
     </details>
   );
+}
+
+function buildPersonaExampleAngles(input: PersonaGenerationInput) {
+  const name = input.name.trim() || "The persona";
+  const relationship = input.relationshipToCharacter.toLowerCase();
+
+  return [
+    `${name} enters with ${input.characteristics.split(",")[0]?.trim() || "a clear emotional angle"}.`,
+    `Lean into ${relationship} without taking over the character's choices.`,
+    `Let the core need show through behavior: ${input.emotionalNeed}.`,
+  ];
 }
 
 function PersonaLibraryList(props: {

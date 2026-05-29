@@ -15,3 +15,12 @@ export interface LorebookConfig {
   status: "compiled" | "fault" | "idle";
   title: string;
 }
+
+export interface LoreRecallAuditLog {
+  bookTitle: string;
+  id: string;
+  injectedSnippet: string;
+  matchedKeys: string[];
+  messageId: string;
+  timestamp: string;
+}

@@ -68,6 +68,7 @@ export function LorebookControlPanel({
     [activeLorebookId, disabledLorebookIds, library.items],
   );
   const isDocked = variant === "dock";
+  const canAttachToChat = Boolean(onActivateLorebook);
 
   async function importJsonFile(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.currentTarget.files?.[0];
@@ -102,6 +103,11 @@ export function LorebookControlPanel({
   }
 
   function activateLorebook(item: GeneratedLorebookArtifact) {
+    if (!canAttachToChat) {
+      setStatusMessage("Open a chat to attach this lorebook.");
+      return;
+    }
+
     if (disabledLorebookIds.has(item.id)) {
       setStatusMessage(`Turn on ${item.title} before attaching it to this chat.`);
       return;
@@ -256,15 +262,22 @@ export function LorebookControlPanel({
           ) : null}
 
           <LoreControlSurface
+            attachDisabledLabel="Attach in Chat"
             installedBooks={bookConfigs}
             isImporting={isSyncing}
             isLoading={library.loading}
-            onAttachBook={(bookId) => {
-              const item = library.items.find((candidate) => candidate.id === bookId);
-              if (item) {
-                activateLorebook(item);
-              }
-            }}
+            onAttachBook={
+              canAttachToChat
+                ? (bookId) => {
+                    const item = library.items.find(
+                      (candidate) => candidate.id === bookId,
+                    );
+                    if (item) {
+                      activateLorebook(item);
+                    }
+                  }
+                : undefined
+            }
             onImportTrigger={() => fileInputRef.current?.click()}
             onRefresh={() => void library.refresh()}
             onRemoveBook={(bookId) => {
