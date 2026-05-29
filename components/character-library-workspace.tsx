@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import {
   BookOpen,
@@ -23,6 +23,8 @@ interface CharacterLibraryWorkspaceProps {
   onCardSelect: (filePath: string) => void;
   onConvertToPersona?: () => void;
   onOpenLibraryDrawer: () => void;
+  sourcePngData?: Uint8Array | null;
+  variant?: "full" | "compact";
 }
 
 const profileSections = [
@@ -55,17 +57,26 @@ export function CharacterLibraryWorkspace({
   onCardSelect,
   onConvertToPersona,
   onOpenLibraryDrawer,
+  sourcePngData,
+  variant = "full",
 }: CharacterLibraryWorkspaceProps) {
   if (activeCard) {
     return (
-      <section className="grid gap-5 xl:grid-cols-[minmax(22rem,0.82fr)_minmax(0,1fr)]">
+      <section
+        className={
+          variant === "compact"
+            ? "grid gap-5"
+            : "grid gap-5 xl:grid-cols-[minmax(22rem,0.82fr)_minmax(0,1fr)]"
+        }
+      >
         <FeaturedCharacterProfile
           activeCard={activeCard}
           currentFilePath={currentFilePath}
           onConvertToPersona={onConvertToPersona}
           onOpenLibraryDrawer={onOpenLibraryDrawer}
+          sourcePngData={sourcePngData}
         />
-        <ProfileAccordion activeCard={activeCard} />
+        {variant === "compact" ? null : <ProfileAccordion activeCard={activeCard} />}
       </section>
     );
   }
@@ -135,11 +146,13 @@ function FeaturedCharacterProfile({
   currentFilePath,
   onConvertToPersona,
   onOpenLibraryDrawer,
+  sourcePngData,
 }: {
   activeCard: ValidatedCharacterCardV3;
   currentFilePath: string | null;
   onConvertToPersona?: () => void;
   onOpenLibraryDrawer: () => void;
+  sourcePngData?: Uint8Array | null;
 }) {
   const profile = buildCharacterProfile(activeCard);
 
@@ -149,6 +162,7 @@ function FeaturedCharacterProfile({
         className="aspect-[5/3] border-b"
         filePath={currentFilePath}
         name={activeCard.data.name}
+        sourcePngData={sourcePngData}
       />
       <div className="grid gap-5 p-6">
         <div>
@@ -348,13 +362,34 @@ function CardAvatarPreview(props: {
   className?: string;
   filePath: string | null;
   name: string;
+  sourcePngData?: Uint8Array | null;
 }) {
+  const embeddedPngSrc = useMemo(() => {
+    if (!props.sourcePngData) {
+      return null;
+    }
+
+    const pngCopy = new Uint8Array(props.sourcePngData);
+
+    return URL.createObjectURL(
+      new Blob([pngCopy.buffer as ArrayBuffer], { type: "image/png" }),
+    );
+  }, [props.sourcePngData]);
   const canPreview = props.filePath
     ? /\.(apng|png)$/i.test(props.filePath)
     : false;
-  const src = canPreview && props.filePath ? convertFileSrc(props.filePath) : null;
+  const fileSrc = canPreview && props.filePath ? convertFileSrc(props.filePath) : null;
+  const src = embeddedPngSrc ?? fileSrc;
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const canRenderImage = src && failedSrc !== src;
+
+  useEffect(() => {
+    return () => {
+      if (embeddedPngSrc) {
+        URL.revokeObjectURL(embeddedPngSrc);
+      }
+    };
+  }, [embeddedPngSrc]);
 
   return (
     <div className={`relative flex items-center justify-center overflow-hidden bg-muted/40 ${props.className ?? ""}`}>
@@ -371,7 +406,7 @@ function CardAvatarPreview(props: {
         <div className="flex size-full flex-col items-center justify-center gap-3 bg-[radial-gradient(circle_at_top,var(--liquid-tint),transparent_55%)] text-center">
           <UserRound className="size-14 text-muted-foreground/25" />
           <p className="max-w-56 px-4 text-xs font-medium text-muted-foreground/70">
-            Avatar preview unavailable
+            No embedded avatar image yet
           </p>
         </div>
       )}

@@ -13,7 +13,11 @@ import {
 } from "@/components/ui/card";
 
 export function GeneratorGrid(props: { children: React.ReactNode }) {
-  return <div className="grid gap-5 lg:grid-cols-[24rem_1fr]">{props.children}</div>;
+  return (
+    <div className="grid min-w-0 gap-5 lg:grid-cols-[minmax(0,24rem)_minmax(0,1fr)] [&>*]:min-w-0">
+      {props.children}
+    </div>
+  );
 }
 
 export function GeneratorFormCard(props: {

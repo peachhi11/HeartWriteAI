@@ -19,6 +19,7 @@
   "include": [
     "lib/chat/**/*.ts",
     "lib/character-card/**/*.ts",
+    "scripts/**/*.ts",
     "tests/character-card/**/*.ts",
     "types/character-card/**/*.ts",
     "types/vendor/**/*.d.ts"

@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "test": "tsc -p tsconfig.test.json && node --test .tmp-tests/tests/character-card/*.js",
+    "test:trope-macro": "tsc -p tsconfig.test.json && node .tmp-tests/scripts/runTropeMacroEval.js",
     "lint": "eslint app components features hooks lib types tests --ext .js,.jsx,.ts,.tsx",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",

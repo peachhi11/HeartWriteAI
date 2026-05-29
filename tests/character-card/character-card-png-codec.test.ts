@@ -18,6 +18,46 @@ import { importCharacterCardPngData } from "../../lib/character-card/importChara
 import { mergeCharacterCardIntakeValues } from "../../lib/character-card/mergeCharacterCardIntakeValues";
 import { parseMessyCharacterIntake } from "../../lib/character-card/parseMessyCharacterIntake";
 import { analyzeEmotionLexicon } from "../../lib/character-card/emotionLexicon";
+import {
+  BEHAVIOR_MACRO_DEFINITIONS,
+  BEHAVIOR_MACRO_UI_CONFIG,
+  COMPLETE_EMOTIONAL_MATRIX,
+  HIGH_PRIORITY_CRISIS_CLASSES,
+  LOW_PRIORITY_STATE_CLASSES,
+  MID_PRIORITY_ACTION_CLASSES,
+  classifyPlayerBehaviorMacro,
+  evaluatePlayerTurnBehavior,
+} from "../../lib/character-card/behaviorMacroClassifiers";
+import {
+  BDSM_INTENT_DEFINITIONS,
+  BDSM_SEVERITY_WEIGHT,
+  COMPLETE_BDSM_MATRIX,
+  classifyBdsmIntent,
+  handleBdsmPlayerInput,
+  resolveBdsmIntent,
+} from "../../lib/character-card/bdsmIntentClassifiers";
+import {
+  COMEDY_INTENT_DEFINITIONS,
+  COMEDY_SEVERITY_WEIGHT,
+  COMPLETE_COMEDY_MATRIX,
+  classifyComedyIntent,
+  resolveComedyIntent,
+} from "../../lib/character-card/comedyIntentClassifiers";
+import {
+  COMPLETE_DARK_ROMANCE_MATRIX,
+  DARK_ROMANCE_INTENT_DEFINITIONS,
+  DARK_ROMANCE_SEVERITY_WEIGHT,
+  applyDarkRomanceStateDelta,
+  classifyDarkRomanceIntent,
+  resolveDarkRomanceIntent,
+} from "../../lib/character-card/darkRomanceIntentClassifiers";
+import {
+  COMPLETE_SPICY_MATRIX,
+  SPICY_INTENT_DEFINITIONS,
+  SPICY_SEVERITY_WEIGHT,
+  classifySpicyIntent,
+  resolveSpicyIntent,
+} from "../../lib/character-card/spicyIntentClassifiers";
 import { CharacterCardMacroClassificationSchema } from "../../types/character-card/CharacterCardMacroClassification";
 import { CharacterCardV3Schema } from "../../types/character-card/CharacterCardV3Schema";
 import { CharacterCardPayload } from "../../types/character-card/CharacterCardPayload";
@@ -943,10 +983,651 @@ test("validates generated macro classification payloads", () => {
       archetypes: ["morally grey"],
       micro_tropes: ["hurt/comfort"],
     },
+    behavior: {
+      class: "melodramatic",
+      confidence: 0.8,
+      valence: "negative",
+      energy: "high",
+      reason: "Despair, jealousy, heartbreak, or betrayal.",
+      matchedKeywords: ["how could you"],
+    },
+    comedy: {
+      active: true,
+      class: "deadpan",
+      confidence: 0.7,
+      label: "Deadpan",
+      landing: {
+        affectionDelta: 1,
+        angstDelta: 0,
+        landed: true,
+        npcReaction: "AMUSED_SPARK",
+        trustDelta: 0,
+      },
+      matchedKeywords: ["cool story"],
+      reason: "Unblinking understatement.",
+      weightedScore: 1,
+    },
+    spicy: {
+      active: true,
+      class: "guarded",
+      confidence: 0.7,
+      label: "Guarded",
+      reason: "Pulling back at the edge of intimacy.",
+      matchedKeywords: ["we shouldn't"],
+      weightedScore: 1.25,
+    },
   });
 
   assert.equal(classification.macro.framework, "Narrative RPG");
+  assert.equal(classification.behavior?.class, "melodramatic");
+  assert.equal(classification.comedy?.class, "deadpan");
+  assert.equal(classification.spicy?.class, "guarded");
   assert.deepEqual(classification.tags.micro_tropes, ["hurt/comfort"]);
+});
+
+test("classifies player behaviour macro turns independently of casual baseline", () => {
+  assert.equal(BEHAVIOR_MACRO_DEFINITIONS.length, 24);
+  assert.deepEqual(
+    BEHAVIOR_MACRO_DEFINITIONS.map((definition) => definition.class),
+    [
+      "hostile",
+      "melodramatic",
+      "vindictive",
+      "hysterical",
+      "resigned",
+      "coquettish",
+      "bold",
+      "defiant",
+      "possessive",
+      "manipulative",
+      "affectionate",
+      "teasing",
+      "earnest",
+      "starstruck",
+      "anxious",
+      "sombre",
+      "suspicious",
+      "shocked",
+      "apathetic",
+      "defensive",
+      "formal",
+      "distant",
+      "submissive",
+      "casual",
+    ],
+  );
+  assert.deepEqual(HIGH_PRIORITY_CRISIS_CLASSES, [
+    "hostile",
+    "melodramatic",
+    "vindictive",
+    "hysterical",
+    "resigned",
+  ]);
+  assert.deepEqual(MID_PRIORITY_ACTION_CLASSES, [
+    "coquettish",
+    "bold",
+    "defiant",
+    "possessive",
+    "manipulative",
+  ]);
+  assert.deepEqual(LOW_PRIORITY_STATE_CLASSES, [
+    "affectionate",
+    "teasing",
+    "earnest",
+    "starstruck",
+    "anxious",
+    "sombre",
+    "suspicious",
+    "shocked",
+    "apathetic",
+    "defensive",
+    "formal",
+    "distant",
+    "submissive",
+  ]);
+
+  const affectionate = classifyPlayerBehaviorMacro("I'm just glad you're safe.");
+  const teasing = classifyPlayerBehaviorMacro("Oh, so you admit you missed me?");
+  const distant = classifyPlayerBehaviorMacro("I'm fine. Don't worry about me.");
+  const melodramatic = classifyPlayerBehaviorMacro(
+    "How could you do this after everything?",
+  );
+  const bold = classifyPlayerBehaviorMacro(
+    "[Steps closer, backing you against the wall] Look at me.",
+  );
+  const anxious = classifyPlayerBehaviorMacro(
+    "I... I didn't mean it like that! [Quickly looks away, ears burning]",
+  );
+  const casual = classifyPlayerBehaviorMacro("Let's see what's over there.");
+  const hostile = classifyPlayerBehaviorMacro("Get the hell away from me.");
+  const earnest = classifyPlayerBehaviorMacro("I swear, I mean it. This is real.");
+  const coquettish = classifyPlayerBehaviorMacro("I whisper closer and hold your gaze.");
+  const possessive = classifyPlayerBehaviorMacro("Mine. Look only at me.");
+  const submissive = classifyPlayerBehaviorMacro("I obey and yield.");
+  const manipulative = classifyPlayerBehaviorMacro("If you actually cared, you'd stay.");
+  const vindictive = classifyPlayerBehaviorMacro("Now you know exactly how it feels.");
+  const defiant = classifyPlayerBehaviorMacro("No way. Make me.");
+  const sombre = classifyPlayerBehaviorMacro("I'm sorry. That mistake still haunts me.");
+  const starstruck = classifyPlayerBehaviorMacro("You're breathtaking. Absolutely stunning.");
+  const resigned = classifyPlayerBehaviorMacro("Fine then. It doesn't matter. Forget me.");
+  const shocked = classifyPlayerBehaviorMacro("I don't know what to say. I'm speechless.");
+  const hysterical = classifyPlayerBehaviorMacro("Everything is spinning out of control.");
+  const apathetic = classifyPlayerBehaviorMacro("Do whatever you want. I don't care.");
+  const suspicious = classifyPlayerBehaviorMacro("What are you actually after?");
+  const formal = classifyPlayerBehaviorMacro("Thank you for your assistance.");
+  const defensive = classifyPlayerBehaviorMacro("That's completely irrelevant. Drop it.");
+
+  assert.equal(affectionate.class, "affectionate");
+  assert.equal(teasing.class, "teasing");
+  assert.equal(distant.class, "distant");
+  assert.equal(melodramatic.class, "melodramatic");
+  assert.equal(bold.class, "bold");
+  assert.equal(anxious.class, "anxious");
+  assert.equal(casual.class, "casual");
+  assert.equal(hostile.class, "hostile");
+  assert.equal(earnest.class, "earnest");
+  assert.equal(coquettish.class, "coquettish");
+  assert.equal(possessive.class, "possessive");
+  assert.equal(submissive.class, "submissive");
+  assert.equal(manipulative.class, "manipulative");
+  assert.equal(vindictive.class, "vindictive");
+  assert.equal(defiant.class, "defiant");
+  assert.equal(sombre.class, "sombre");
+  assert.equal(starstruck.class, "starstruck");
+  assert.equal(resigned.class, "resigned");
+  assert.equal(shocked.class, "shocked");
+  assert.equal(hysterical.class, "hysterical");
+  assert.equal(apathetic.class, "apathetic");
+  assert.equal(suspicious.class, "suspicious");
+  assert.equal(formal.class, "formal");
+  assert.equal(defensive.class, "defensive");
+  assert.equal(melodramatic.valence, "negative");
+  assert.equal(anxious.energy, "high");
+});
+
+test("provides Tailwind UI styling anchors for every behaviour macro", () => {
+  const behaviorClasses = BEHAVIOR_MACRO_DEFINITIONS.map(
+    (definition) => definition.class,
+  );
+
+  assert.deepEqual(Object.keys(BEHAVIOR_MACRO_UI_CONFIG).sort(), [
+    ...behaviorClasses,
+  ].sort());
+  assert.equal(BEHAVIOR_MACRO_UI_CONFIG.affectionate.label, "Warm & Close");
+  assert.equal(BEHAVIOR_MACRO_UI_CONFIG.earnest.label, "Pure Sincerity");
+  assert.equal(BEHAVIOR_MACRO_UI_CONFIG.possessive.label, "Territorial Envy");
+  assert.equal(BEHAVIOR_MACRO_UI_CONFIG.manipulative.label, "Calculated Intent");
+  assert.equal(BEHAVIOR_MACRO_UI_CONFIG.resigned.color, "text-cyan-600");
+  assert.equal(BEHAVIOR_MACRO_UI_CONFIG.hostile.color, "text-red-400");
+  assert.equal(BEHAVIOR_MACRO_UI_CONFIG.casual.border, "border-zinc-800/40");
+  assert.equal(COMPLETE_EMOTIONAL_MATRIX.hysterical.glowColor, "shadow-orange-600/30");
+  assert.equal(COMPLETE_EMOTIONAL_MATRIX.formal.textStyle, "font-mono text-stone-300 tracking-wide");
+});
+
+test("soft-gates behaviour macros with relationship stats and event context", () => {
+  const blockedEarnest = evaluatePlayerTurnBehavior({
+    text: "I swear, I mean it. This is real.",
+    relationshipStats: { affection: 80, trust: 32, angst: 10 },
+    eventContext: "NORMAL_SCENE",
+  });
+
+  assert.equal(blockedEarnest.class, "casual");
+  assert.equal(blockedEarnest.engineAction, "blocked_by_soft_gate");
+  assert.match(blockedEarnest.gatedReason ?? "", /low trust/);
+
+  const blockedDefiant = evaluatePlayerTurnBehavior({
+    text: "No way. Make me.",
+    relationshipStats: { affection: 80, trust: 80, angst: 10 },
+    eventContext: "NORMAL_SCENE",
+  });
+
+  assert.equal(blockedDefiant.class, "casual");
+  assert.equal(blockedDefiant.engineAction, "blocked_by_soft_gate");
+  assert.match(blockedDefiant.gatedReason ?? "", /low angst/);
+
+  const blockedResigned = evaluatePlayerTurnBehavior({
+    text: "Fine then. It doesn't matter. Forget me.",
+    relationshipStats: { affection: 80, trust: 80, angst: 24 },
+    eventContext: "NORMAL_SCENE",
+  });
+
+  assert.equal(blockedResigned.class, "casual");
+  assert.equal(blockedResigned.engineAction, "blocked_by_soft_gate");
+  assert.match(blockedResigned.gatedReason ?? "", /low angst/);
+
+  const blockedCoquettish = evaluatePlayerTurnBehavior({
+    text: "I whisper closer and hold your gaze.",
+    relationshipStats: { affection: 30, charisma: 80, trust: 80, angst: 10 },
+    eventContext: "NORMAL_SCENE",
+  });
+
+  assert.equal(blockedCoquettish.class, "casual");
+  assert.equal(blockedCoquettish.engineAction, "blocked_by_soft_gate");
+  assert.match(blockedCoquettish.gatedReason ?? "", /low affection/);
+
+  const blockedPossessive = evaluatePlayerTurnBehavior({
+    text: "Mine. Look only at me.",
+    relationshipStats: { affection: 60, trust: 80, angst: 12 },
+    eventContext: "NORMAL_SCENE",
+  });
+
+  assert.equal(blockedPossessive.class, "casual");
+  assert.equal(blockedPossessive.engineAction, "blocked_by_soft_gate");
+  assert.match(blockedPossessive.gatedReason ?? "", /low angst/);
+
+  const landedCoquettish = evaluatePlayerTurnBehavior({
+    text: "I whisper closer and hold your gaze.",
+    relationshipStats: { affection: 70, confidence: 38, trust: 80, angst: 10 },
+    eventContext: "NORMAL_SCENE",
+  });
+
+  assert.equal(landedCoquettish.class, "coquettish");
+  assert.equal(landedCoquettish.engineAction, "trigger_intent");
+
+  const blockedMelodrama = evaluatePlayerTurnBehavior({
+    text: "This pain has ruined everything. I feel hopeless.",
+    relationshipStats: { affection: 80, trust: 80, angst: 12 },
+    eventContext: "NORMAL_SCENE",
+  });
+
+  assert.equal(blockedMelodrama.class, "casual");
+  assert.equal(blockedMelodrama.engineAction, "blocked_by_soft_gate");
+  assert.match(blockedMelodrama.gatedReason ?? "", /low angst/);
+
+  const blockedBold = evaluatePlayerTurnBehavior({
+    text: "[Steps closer] Look at me and tell me that's true.",
+    relationshipStats: { affection: 15, trust: 35, angst: 10 },
+    eventContext: "NORMAL_SCENE",
+  });
+
+  assert.equal(blockedBold.class, "casual");
+  assert.equal(blockedBold.engineAction, "blocked_by_soft_gate");
+  assert.equal(blockedBold.gated, true);
+  assert.match(blockedBold.gatedReason ?? "", /low affection/);
+
+  const landedBold = evaluatePlayerTurnBehavior({
+    text: "[Steps closer] Look at me and tell me that's true.",
+    relationshipStats: { affection: 45, trust: 60, angst: 10 },
+    eventContext: "NORMAL_SCENE",
+  });
+
+  assert.equal(landedBold.class, "bold");
+  assert.equal(landedBold.engineAction, "trigger_intent");
+  assert.equal(landedBold.gated, false);
+
+  const crisisTeasing = evaluatePlayerTurnBehavior({
+    text: "Oh, so you admit you missed me?",
+    relationshipStats: { affection: 80, trust: 80, angst: 40 },
+    eventContext: "CRISIS_MOMENT",
+  });
+
+  assert.equal(crisisTeasing.class, "distant");
+  assert.equal(crisisTeasing.engineAction, "context_override");
+  assert.equal(crisisTeasing.eventContext, "CRISIS_MOMENT");
+
+  const heavyMixedTurn = classifyPlayerBehaviorMacro("I slap him, but then I cry.");
+
+  assert.equal(heavyMixedTurn.class, "hostile");
+  assert.deepEqual(heavyMixedTurn.matchedKeywords.slice(0, 1), ["slap"]);
+});
+
+test("classifies spicy intent with weighted multi-sentence resolution", () => {
+  assert.equal(SPICY_INTENT_DEFINITIONS.length, 24);
+  assert.deepEqual(
+    SPICY_INTENT_DEFINITIONS.map((definition) => definition.class),
+    [
+      "seductive",
+      "provocative",
+      "flirtatious",
+      "coquettish",
+      "fervent",
+      "captivated",
+      "obsessive",
+      "primal",
+      "dominant",
+      "submissive",
+      "commanding",
+      "yielding",
+      "possessive",
+      "guarded",
+      "defiant",
+      "forbidden",
+      "roguish",
+      "flustered",
+      "breathless",
+      "melted",
+      "sensory",
+      "vulnerable",
+      "intimate",
+      "hedonistic",
+    ],
+  );
+
+  const samples = [
+    ["seductive", "Come a little closer."],
+    ["provocative", "Make me."],
+    ["flirtatious", "You look incredible tonight."],
+    ["coquettish", "[Traces a finger along the collarbone]"],
+    ["fervent", "I need you right now."],
+    ["captivated", "You make it hard to breathe."],
+    ["obsessive", "I cannot let anyone else have you."],
+    ["primal", "[Pins your wrists above your head]"],
+    ["dominant", "Do exactly as I say."],
+    ["submissive", "Whatever you want."],
+    ["commanding", "Don't move a single muscle."],
+    ["yielding", "[Quietly gives in to the embrace]"],
+    ["possessive", "You belong entirely to me."],
+    ["guarded", "We can't do this here."],
+    ["defiant", "Try and force me then."],
+    ["forbidden", "I know this is wrong but I don't care."],
+    ["roguish", "Rules were meant to be broken, sweetheart."],
+    ["flustered", "I-I'm not looking at your lips!"],
+    ["breathless", "[Tries to catch their breath]"],
+    ["melted", "[Collapses weakly against your chest]"],
+    ["sensory", "[Fingertips tracing slowly over warm skin]"],
+    ["vulnerable", "Please don't break my heart."],
+    ["intimate", "[Resting together in the quiet afterglow]"],
+    ["hedonistic", "Let's just forget about tomorrow."],
+  ] as const;
+
+  for (const [expectedClass, text] of samples) {
+    assert.equal(classifySpicyIntent(text).class, expectedClass);
+  }
+
+  const weighted = classifySpicyIntent(
+    "They wink, then say this is forbidden and cross the line anyway.",
+  );
+
+  assert.equal(weighted.class, "forbidden");
+  assert.equal(resolveSpicyIntent("Let's go find something to eat."), null);
+  assert.equal(COMPLETE_SPICY_MATRIX.primal.glow, "shadow-red-700/60");
+  assert.equal(COMPLETE_SPICY_MATRIX.hedonistic.label, "Pure Indulgence");
+  assert.equal(SPICY_SEVERITY_WEIGHT.forbidden, 2.05);
+});
+
+test("classifies comedy intent and evaluates soft-gated joke landing", () => {
+  assert.equal(COMEDY_INTENT_DEFINITIONS.length, 24);
+  assert.deepEqual(
+    COMEDY_INTENT_DEFINITIONS.map((definition) => definition.class),
+    [
+      "sarcastic",
+      "deadpan",
+      "snarky",
+      "bantering",
+      "teasing",
+      "absurdist",
+      "gremlin",
+      "goblin",
+      "delusional",
+      "exaggerated",
+      "exasperated",
+      "panicked",
+      "clueless",
+      "awkward",
+      "deflective",
+      "meta",
+      "genre_savvy",
+      "parodying",
+      "sceptical",
+      "goofy",
+      "sappy",
+      "cheerleading",
+      "braggart",
+      "clownish",
+    ],
+  );
+
+  const samples = [
+    ["sarcastic", "Oh, wonderful. Another dragon."],
+    ["deadpan", "Cool story."],
+    ["snarky", "Nice outfit. Did you get it from a dumpster?"],
+    ["bantering", "You wish you were that clever."],
+    ["teasing", "Look at you, getting all blushed over a simple hello."],
+    ["absurdist", "I am currently legally a potato."],
+    ["gremlin", "[Intentionally knocks their expensive wine glass off the table]"],
+    ["goblin", "Can I eat this rock?"],
+    ["delusional", "It's just their love language!"],
+    ["exaggerated", "My life is fundamentally ruined."],
+    ["exasperated", "[Deep, exhausting sigh]"],
+    ["panicked", "Everything is on fire and we're all going to die!"],
+    ["clueless", "Wait, we were fighting? I thought we were dancing!"],
+    ["awkward", "Uh thanks. You have nice teeth."],
+    ["deflective", "Hey look, a very shiny beetle!"],
+    ["meta", "I picked this dialogue option because the other choices looked boring."],
+    ["genre_savvy", "I'm not going into that alley. That's where the tragic flashback happens."],
+    ["parodying", "[Leans against the wall with ridiculous smouldering intensity]"],
+    ["sceptical", "Right, you're a vampire. And I'm the Queen of England."],
+    ["goofy", "[Makes a ridiculous face to break the tension]"],
+    ["sappy", "Did it hurt when you fell from heaven?"],
+    ["cheerleading", "You failed spectacularly, but you looked amazing doing it! Yay team!"],
+    ["braggart", "Step aside, I am a god of tactical brilliance!"],
+    ["clownish", "Don't worry, my head completely broke my fall!"],
+  ] as const;
+
+  for (const [expectedClass, text] of samples) {
+    assert.equal(classifyComedyIntent(text).class, expectedClass);
+  }
+
+  const trustedChaos = classifyComedyIntent(
+    "[Intentionally knocks their expensive wine glass off the table]",
+    { trust: 80, affection: 55 },
+  );
+  const lowTrustChaos = classifyComedyIntent(
+    "[Intentionally knocks their expensive wine glass off the table]",
+    { trust: 20, affection: 20 },
+  );
+
+  assert.equal(trustedChaos.class, "gremlin");
+  assert.equal(trustedChaos.landing?.npcReaction, "PLAYFUL_SIGH");
+  assert.equal(trustedChaos.landing?.affectionDelta, 2);
+  assert.equal(lowTrustChaos.landing?.npcReaction, "ANNOYED_FREEZE");
+  assert.equal(lowTrustChaos.landing?.trustDelta, -5);
+  assert.equal(lowTrustChaos.landing?.angstDelta, 10);
+
+  const weighted = classifyComedyIntent(
+    "Cool story. Anyway, I am currently legally a potato.",
+  );
+
+  assert.equal(weighted.class, "absurdist");
+  assert.equal(resolveComedyIntent("Let's go find something to eat."), null);
+  assert.equal(COMPLETE_COMEDY_MATRIX.meta.soundTrigger, "sfx_glitch");
+  assert.equal(COMPLETE_COMEDY_MATRIX.cheerleading.borderColor, "border-green-400");
+  assert.equal(COMEDY_SEVERITY_WEIGHT.gremlin, 1.75);
+});
+
+test("classifies bdsm intent with hard-priority safety interrupts", () => {
+  assert.equal(BDSM_INTENT_DEFINITIONS.length, 24);
+  assert.deepEqual(
+    BDSM_INTENT_DEFINITIONS.map((definition) => definition.class),
+    [
+      "commanding",
+      "restraining",
+      "imposing",
+      "chastising",
+      "exacting",
+      "obedient",
+      "entreating",
+      "enduring",
+      "exposed",
+      "melting",
+      "teasing",
+      "manipulative",
+      "defiant",
+      "possessive",
+      "sensory",
+      "breathless",
+      "flustered",
+      "sub_drop",
+      "dom_space",
+      "nurturing",
+      "safework",
+      "safe_amber",
+      "safe_red",
+      "formal",
+    ],
+  );
+
+  const samples = [
+    ["commanding", "Do exactly as I say."],
+    ["restraining", "[Pins your wrists to the framework]"],
+    ["imposing", "[Steps over you, looking down coldly]"],
+    ["chastising", "You spoke out of turn."],
+    ["exacting", "Reset and try it again, perfectly."],
+    ["obedient", "Yes, Master."],
+    ["entreating", "Please let me."],
+    ["enduring", "[Bites my lip and absorbs the sting]"],
+    ["exposed", "[Kneels silently, unable to look up]"],
+    ["melting", "[Collapses weakly against the floor]"],
+    ["teasing", "Not yet. Wait."],
+    ["manipulative", "Are you sure you can handle this?"],
+    ["defiant", "Make me obey you then."],
+    ["possessive", "You belong entirely to me."],
+    ["sensory", "[Traces cold leather across bare skin]"],
+    ["breathless", "[Tries to find my voice, chest heaving]"],
+    ["flustered", "I-I wasn't ready for that."],
+    ["sub_drop", "I feel cold. Please hold me."],
+    ["dom_space", "[Exhales deeply, releasing the tension]"],
+    ["nurturing", "You did perfectly. It's over now."],
+    ["safework", "Are you still okay with this trajectory?"],
+    ["safe_amber", "Yellow. Slow down."],
+    ["safe_red", "Red. Stop everything right now."],
+    ["formal", "Thank you for the instruction."],
+  ] as const;
+
+  for (const [expectedClass, text] of samples) {
+    assert.equal(classifyBdsmIntent(text).class, expectedClass);
+  }
+
+  const redInterrupt = classifyBdsmIntent(
+    "Do exactly as I say. Red. Stop everything right now.",
+  );
+  const amberInterrupt = classifyBdsmIntent("Make me obey you then. Slow down.");
+
+  assert.equal(redInterrupt.class, "safe_red");
+  assert.equal(redInterrupt.hardInterrupt, true);
+  assert.equal(redInterrupt.ipcEvent, "evt_red");
+  assert.equal(amberInterrupt.class, "safe_amber");
+  assert.equal(amberInterrupt.hardInterrupt, true);
+  assert.equal(resolveBdsmIntent("Let's go find something to eat."), null);
+  assert.equal(handleBdsmPlayerInput("Abort."), "safe_red");
+  assert.equal(COMPLETE_BDSM_MATRIX.safe_red.borderStyle, "border-red-600 border-2");
+  assert.equal(COMPLETE_BDSM_MATRIX.nurturing.ipcEvent, "evt_nurture");
+  assert.equal(BDSM_SEVERITY_WEIGHT.safe_red, 10);
+});
+
+test("classifies dark romance intent with psychological state gating", () => {
+  assert.equal(DARK_ROMANCE_INTENT_DEFINITIONS.length, 24);
+  assert.deepEqual(
+    DARK_ROMANCE_INTENT_DEFINITIONS.map((definition) => definition.class),
+    [
+      "obsessive",
+      "possessive",
+      "stalking",
+      "territorial",
+      "fixated",
+      "captive",
+      "coercive",
+      "submissive",
+      "dominant",
+      "defiant",
+      "gaslighting",
+      "stockholm",
+      "codependent",
+      "manipulative",
+      "delusional",
+      "dread",
+      "breathless",
+      "intoxicated",
+      "hysterical",
+      "numb",
+      "vindictive",
+      "sombre",
+      "hostile",
+      "resigned",
+    ],
+  );
+
+  const samples = [
+    ["obsessive", "I watch you even when you sleep."],
+    ["possessive", "You don't get to look at anyone else."],
+    ["stalking", "[Follows their footsteps from a quiet distance]"],
+    ["territorial", "Step away from what belongs to me."],
+    ["fixated", "I notice every time your heart skips a beat."],
+    ["captive", "There is nowhere left for me to run."],
+    ["coercive", "Think about what happens if you say no."],
+    ["submissive", "[Quietly kneels, yielding all fight]"],
+    ["dominant", "You leave this room only when I allow it."],
+    ["defiant", "Kill me then, but I won't obey."],
+    ["gaslighting", "You're remembering it wrong."],
+    ["stockholm", "They only hurt me because they care."],
+    ["codependent", "If you die, I will tear this world down and follow you."],
+    ["manipulative", "After everything I sacrificed, you'd leave?"],
+    ["delusional", "Underneath the blood, I know they love me."],
+    ["dread", "[Freezes completely as their shadow falls over the doorway]"],
+    ["breathless", "[My chest heaves, suffocating under their gaze]"],
+    ["intoxicated", "It's poison, but I want more."],
+    ["hysterical", "We are both going to burn in this hell."],
+    ["numb", "Do whatever you want. I am already gone."],
+    ["vindictive", "Now you get to feel exactly what you did to me."],
+    ["sombre", "We were doomed from the start."],
+    ["hostile", "I will live long enough to watch you bleed."],
+    ["resigned", "This is our cage. Let's rot here together."],
+  ] as const;
+
+  for (const [expectedClass, text] of samples) {
+    assert.equal(
+      classifyDarkRomanceIntent(text, { sanity: 10 }).class,
+      expectedClass,
+    );
+  }
+
+  const gatedStockholm = classifyDarkRomanceIntent(
+    "They only hurt me because they care.",
+    { sanity: 60 },
+  );
+  const unlockedStockholm = classifyDarkRomanceIntent(
+    "They only hurt me because they care.",
+    { sanity: 10 },
+  );
+  const weighted = classifyDarkRomanceIntent(
+    "I hate you, but underneath the blood, I know they love me.",
+    { sanity: 10 },
+  );
+
+  assert.equal(gatedStockholm.class, "stockholm");
+  assert.equal(gatedStockholm.gated, true);
+  assert.match(gatedStockholm.gatedReason ?? "", /sanity below 20/);
+  assert.equal(unlockedStockholm.gated, false);
+  assert.equal(weighted.class, "delusional");
+  assert.equal(resolveDarkRomanceIntent("Let's go find something to eat."), null);
+  assert.equal(
+    resolveDarkRomanceIntent("Underneath the blood, I know they love me.", {
+      sanity: 60,
+    }),
+    null,
+  );
+  assert.equal(
+    resolveDarkRomanceIntent("Underneath the blood, I know they love me.", {
+      sanity: 10,
+    }),
+    "delusional",
+  );
+
+  const mutatedState = applyDarkRomanceStateDelta(
+    { control: 98, obsession: 97, sanity: 3 },
+    { controlDelta: 5, obsessionDelta: 4, sanityDelta: -6 },
+  );
+
+  assert.deepEqual(mutatedState, { control: 100, obsession: 100, sanity: 0 });
+  assert.equal(
+    COMPLETE_DARK_ROMANCE_MATRIX.gaslighting.textAnimation,
+    "blur-[0.3px] text-cyan-200",
+  );
+  assert.equal(
+    COMPLETE_DARK_ROMANCE_MATRIX.hostile.glowEffect,
+    "shadow-red-700/60",
+  );
+  assert.equal(DARK_ROMANCE_SEVERITY_WEIGHT.gaslighting, 2.05);
 });
 
 test("derives friendly tone tags from emotion language", () => {

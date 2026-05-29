@@ -5686,10 +5686,11 @@ function GreetingList({
 function formatPreviewError(message: string) {
   const normalizedMessage = message.toLowerCase();
 
-  if (
-    normalizedMessage.includes("string did not match the expected pattern") ||
-    normalizedMessage.includes("invalid character build request")
-  ) {
+  if (normalizedMessage.includes("invalid character build request.")) {
+    return message;
+  }
+
+  if (normalizedMessage.includes("string did not match the expected pattern")) {
     return "Some of the current choices do not fit the preview builder yet. Check IDs, empty fields, and generated shortcuts, then try again.";
   }
 
@@ -5879,7 +5880,7 @@ function readAlternateGreetingGenerationExtension(
       ),
       completedGreeting: readString(alternateGreeting.completedGreeting, ""),
       forkType: readAlternateGreetingForkType(alternateGreeting.forkType),
-      greetingId: readString(
+      greetingId: readUuidString(
         alternateGreeting.greetingId,
         DEFAULT_ALTERNATE_GREETING_GENERATION[index]?.greetingId ??
           DEFAULT_ALTERNATE_GREETING_GENERATION[0].greetingId,
@@ -5914,7 +5915,7 @@ function readGroupGreetingGenerationExtension(
       formattingStyle: readGroupGreetingFormattingStyle(
         groupGreeting.formattingStyle,
       ),
-      greetingId: readString(
+      greetingId: readUuidString(
         groupGreeting.greetingId,
         DEFAULT_GROUP_GREETING_GENERATION[index]?.greetingId ??
           DEFAULT_GROUP_GREETING_GENERATION[0].greetingId,
@@ -5957,7 +5958,7 @@ function readGroupAlternateGreetingGenerationExtension(
           ?.aiMultiCharacterPrompt ??
           DEFAULT_GROUP_ALTERNATE_GREETING_GENERATION[0].aiMultiCharacterPrompt,
       ),
-      altGreetingId: readString(
+      altGreetingId: readUuidString(
         fork.altGreetingId,
         DEFAULT_GROUP_ALTERNATE_GREETING_GENERATION[index]?.altGreetingId ??
           DEFAULT_GROUP_ALTERNATE_GREETING_GENERATION[0].altGreetingId,
@@ -6069,9 +6070,11 @@ function readFirstMessageGenerationExtension(
     literaryStyle: readFirstMessageLiteraryStyle(
       rawFirstMessageGeneration.literaryStyle,
     ),
-    tokenLengthCap: readNumber(
+    tokenLengthCap: readClampedNumber(
       rawFirstMessageGeneration.tokenLengthCap,
       DEFAULT_FIRST_MESSAGE_GENERATION.tokenLengthCap,
+      200,
+      1_200,
     ),
     userCallToAction: readFirstMessageUserCallToAction(
       rawFirstMessageGeneration.userCallToAction,
@@ -6156,7 +6159,7 @@ function readScenarioOpeningPairGenerationExtension(
         classificationType: readScenarioOpeningPairClassificationType(
           pair.classificationType,
         ),
-        pairId: readString(pair.pairId, fallback.pairId),
+        pairId: readUuidString(pair.pairId, fallback.pairId),
         pairTitle: readString(pair.pairTitle, fallback.pairTitle),
       };
     })
@@ -6189,9 +6192,11 @@ function readLorebookSummaryGenerationExtension(
       rawLorebookSummary.factionOrDynastyContext,
       DEFAULT_LOREBOOK_SUMMARY_GENERATION.factionOrDynastyContext,
     ),
-    tokenOptimizationCap: readNumber(
+    tokenOptimizationCap: readClampedNumber(
       rawLorebookSummary.tokenOptimizationCap,
       DEFAULT_LOREBOOK_SUMMARY_GENERATION.tokenOptimizationCap,
+      50,
+      1_000,
     ),
     universeAnchor: readString(
       rawLorebookSummary.universeAnchor,
@@ -6271,9 +6276,11 @@ function readPostHistoryInstructionsGenerationExtension(
     formattingHardlines: formattingHardlines.length
       ? formattingHardlines
       : DEFAULT_POST_HISTORY_INSTRUCTIONS_GENERATION.formattingHardlines,
-    injectionTokenWeight: readNumber(
+    injectionTokenWeight: readClampedNumber(
       rawInstructions.injectionTokenWeight,
       DEFAULT_POST_HISTORY_INSTRUCTIONS_GENERATION.injectionTokenWeight,
+      10,
+      500,
     ),
   };
 }
@@ -6304,11 +6311,11 @@ function readWorldLorePlaceholderGenerationExtension(
         ),
         isDynamic: readBoolean(placeholder.isDynamic, fallback.isDynamic),
         macroType: readWorldLorePlaceholderMacroType(placeholder.macroType),
-        placeholderId: readString(
+        placeholderId: readUuidString(
           placeholder.placeholderId,
           fallback.placeholderId,
         ),
-        variableKey: readString(placeholder.variableKey, fallback.variableKey),
+        variableKey: readVariableKey(placeholder.variableKey, fallback.variableKey),
       };
     })
     .slice(0, 12);
@@ -6340,14 +6347,16 @@ function readLoreEntryGenerationExtension(
           : fallback.activationKeys,
         domainScope: readLoreEntryDomainScope(entry.domainScope),
         entryContent: readString(entry.entryContent, fallback.entryContent),
-        entryId: readString(entry.entryId, fallback.entryId),
+        entryId: readUuidString(entry.entryId, fallback.entryId),
         insertionPriority: readLoreEntryInsertionPriority(
           entry.insertionPriority,
         ),
         title: readString(entry.title, fallback.title),
-        tokenReserveCost: readNumber(
+        tokenReserveCost: readClampedNumber(
           entry.tokenReserveCost,
           fallback.tokenReserveCost,
+          25,
+          1_000,
         ),
       };
     })
@@ -6369,13 +6378,15 @@ function readFrameworkConfigurationExtension(
   }
 
   return {
-    frameworkId: readString(
+    frameworkId: readUuidString(
       rawFramework.frameworkId,
       DEFAULT_FRAMEWORK_CONFIGURATION.frameworkId,
     ),
-    globalTokenSafetyBuffer: readNumber(
+    globalTokenSafetyBuffer: readClampedNumber(
       rawFramework.globalTokenSafetyBuffer,
       DEFAULT_FRAMEWORK_CONFIGURATION.globalTokenSafetyBuffer,
+      50,
+      2_000,
     ),
     injectionPipelineRouter: readFrameworkInjectionPipelineRouter(
       rawFramework.injectionPipelineRouter,
@@ -6409,7 +6420,7 @@ function readFormattingConfigurationExtension(
     actionWrappingStandard: readFormattingActionWrappingStandard(
       rawFormatting.actionWrappingStandard,
     ),
-    formattingId: readString(
+    formattingId: readUuidString(
       rawFormatting.formattingId,
       DEFAULT_FORMATTING_CONFIGURATION.formattingId,
     ),
@@ -6420,9 +6431,11 @@ function readFormattingConfigurationExtension(
     markdownEmphasisStyle: readFormattingMarkdownEmphasisStyle(
       rawFormatting.markdownEmphasisStyle,
     ),
-    maxParagraphsPerTurn: readNumber(
+    maxParagraphsPerTurn: readClampedNumber(
       rawFormatting.maxParagraphsPerTurn,
       DEFAULT_FORMATTING_CONFIGURATION.maxParagraphsPerTurn,
+      1,
+      12,
     ),
     narrativePerspective: readFormattingNarrativePerspective(
       rawFormatting.narrativePerspective,
@@ -6451,7 +6464,7 @@ function readToneConfigurationExtension(
       : DEFAULT_TONE_CONFIGURATION.aiVocabularyDirectives,
     pacingVelocity: readTonePacingVelocity(rawTone.pacingVelocity),
     proseTexture: readToneProseTexture(rawTone.proseTexture),
-    toneId: readString(rawTone.toneId, DEFAULT_TONE_CONFIGURATION.toneId),
+    toneId: readUuidString(rawTone.toneId, DEFAULT_TONE_CONFIGURATION.toneId),
     toneSystemPromptInjection: readString(
       rawTone.toneSystemPromptInjection,
       DEFAULT_TONE_CONFIGURATION.toneSystemPromptInjection,
@@ -6477,7 +6490,7 @@ function readArchetypeConfigurationExtension(
       rawArchetype.aiBehaviorPrompt,
       DEFAULT_ARCHETYPE_CONFIGURATION.aiBehaviorPrompt,
     ),
-    archetypeId: readString(
+    archetypeId: readUuidString(
       rawArchetype.archetypeId,
       DEFAULT_ARCHETYPE_CONFIGURATION.archetypeId,
     ),
@@ -6766,12 +6779,37 @@ function readString(value: unknown, fallback: string) {
   return typeof value === "string" ? value : fallback;
 }
 
+function readUuidString(value: unknown, fallback: string) {
+  return typeof value === "string" && isUuidString(value) ? value : fallback;
+}
+
+function readVariableKey(value: unknown, fallback: string) {
+  return typeof value === "string" && /^\{\{[a-z0-9_]+\}\}$/.test(value)
+    ? value
+    : fallback;
+}
+
 function readBoolean(value: unknown, fallback: boolean) {
   return typeof value === "boolean" ? value : fallback;
 }
 
 function readNumber(value: unknown, fallback: number) {
   return typeof value === "number" && Number.isFinite(value) ? value : fallback;
+}
+
+function readClampedNumber(
+  value: unknown,
+  fallback: number,
+  min: number,
+  max: number,
+) {
+  return Math.max(min, Math.min(max, Math.round(readNumber(value, fallback))));
+}
+
+function isUuidString(value: string) {
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+    value,
+  );
 }
 
 function readSpeciesType(value: unknown): SpeciesType {

@@ -695,8 +695,20 @@ export async function POST(request: Request) {
   const requestResult = buildRequestSchema.safeParse(requestBody);
 
   if (!requestResult.success) {
+    const details = requestResult.error.issues
+      .slice(0, 4)
+      .map((issue) => {
+        const path = issue.path.length ? issue.path.join(".") : "request";
+        return `${path}: ${issue.message}`;
+      })
+      .join("; ");
+
     return Response.json(
-      { error: "Invalid character build request." },
+      {
+        error: details
+          ? `Invalid character build request. ${details}`
+          : "Invalid character build request.",
+      },
       { status: 400 },
     );
   }

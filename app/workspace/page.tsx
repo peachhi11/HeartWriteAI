@@ -1,9 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { type ReactNode, useState, useSyncExternalStore } from "react";
+import { type ReactNode, useRef, useState, useSyncExternalStore } from "react";
 import {
-  Download,
   FileUp,
   PanelLeftOpen,
   Save,
@@ -37,6 +36,65 @@ import { ExpressionSprite } from "@/types/character-card/ExpressionSprite";
 import { ValidatedCharacterCardV3 } from "@/types/ccv3";
 
 type CharacterWorkflowMode = "edit" | "intake" | "create";
+type StarterFieldKey =
+  | "name"
+  | "basicInfo"
+  | "appearance"
+  | "personality"
+  | "scenario"
+  | "firstMessage";
+
+const starterFieldDefinitions: Array<{
+  key: StarterFieldKey;
+  label: string;
+  placeholder: string;
+  rows?: number;
+}> = [
+  {
+    key: "name",
+    label: "Name",
+    placeholder: "Magnus Vanderbilt",
+  },
+  {
+    key: "basicInfo",
+    label: "Basic info",
+    placeholder: "Age, role, gender/pronouns, location, occupation...",
+    rows: 3,
+  },
+  {
+    key: "appearance",
+    label: "Appearance",
+    placeholder: "Height, build, hair, eyes, style, notable physical details...",
+    rows: 3,
+  },
+  {
+    key: "personality",
+    label: "Personality",
+    placeholder: "Core traits, wounds, habits, voice, behavior patterns...",
+    rows: 3,
+  },
+  {
+    key: "scenario",
+    label: "Scenario",
+    placeholder: "{{user}} walks into his office after everyone else has gone home.",
+    rows: 3,
+  },
+  {
+    key: "firstMessage",
+    label: "First message",
+    placeholder: "\"You weren't supposed to see this.\"",
+    rows: 3,
+  },
+];
+
+const emptyStarterFields: Record<StarterFieldKey, string> = {
+  appearance: "",
+  basicInfo: "",
+  firstMessage: "",
+  name: "",
+  personality: "",
+  scenario: "",
+};
 
 const characterWorkflowSteps: Array<{
   description: string;
@@ -84,12 +142,16 @@ export default function WorkspacePage() {
   const [messyIntakeMessage, setMessyIntakeMessage] = useState<string | null>(
     null,
   );
+  const [starterFields, setStarterFields] =
+    useState<Record<StarterFieldKey, string>>(emptyStarterFields);
   const [editNotesText, setEditNotesText] = useState("");
   const [editNotesMessage, setEditNotesMessage] = useState<string | null>(null);
   const [selectedExpression, setSelectedExpression] =
     useState<ExpressionSprite | null>(null);
   const [libraryOpen, setLibraryOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const browserImportInputRef = useRef<HTMLInputElement | null>(null);
+  const browserPngShellInputRef = useRef<HTMLInputElement | null>(null);
   const library = useCardLibrary(12);
   const { importCardFromPath, saveCard, saveWorkspaceChanges } =
     useCharacterLibrary();
@@ -204,6 +266,24 @@ export default function WorkspacePage() {
     setWorkspaceMessage(`Loaded ${result.card.data.name} from ${result.path}.`);
   }
 
+  function handleImportCardClick() {
+    if (isDesktopRuntime) {
+      void handleManualImportClick();
+      return;
+    }
+
+    browserImportInputRef.current?.click();
+  }
+
+  function handleImportPngShellClick() {
+    if (isDesktopRuntime) {
+      void handleManualImportClick();
+      return;
+    }
+
+    browserPngShellInputRef.current?.click();
+  }
+
   async function handleBrowserImportFile(file: File | null) {
     if (!file) {
       return;
@@ -308,16 +388,19 @@ export default function WorkspacePage() {
   }
 
   function handleRouteMessyIntake() {
-    if (!messyIntakeText.trim()) {
+    const starterIntakeText = createStarterIntakeText(starterFields);
+    const combinedIntakeText = joinDefined([messyIntakeText, starterIntakeText]);
+
+    if (!combinedIntakeText.trim()) {
       setMessyIntakeMessage(
-        "Paste rough character notes before creating a character profile.",
+        "Paste rough character notes or fill at least one starter field before creating a character profile.",
       );
       return;
     }
 
     const result = createDraftCharacterCardFromIntake({
       currentCard: activeCard,
-      intakeText: messyIntakeText,
+      intakeText: combinedIntakeText,
       sourceName: currentFilePath,
     });
 
@@ -394,28 +477,13 @@ export default function WorkspacePage() {
             <PanelLeftOpen className="size-3.5" />
             Libraries
           </button>
-          {isDesktopRuntime ? (
-            <button
-              type="button"
-              onClick={handleManualImportClick}
-              className="rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted"
-            >
-              Import
-            </button>
-          ) : (
-            <label className="cursor-pointer rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted">
-              Import
-              <input
-                type="file"
-                accept=".png,.apng,.json"
-                className="sr-only"
-                onChange={(event) => {
-                  void handleBrowserImportFile(event.currentTarget.files?.[0] ?? null);
-                  event.currentTarget.value = "";
-                }}
-              />
-            </label>
-          )}
+          <button
+            type="button"
+            onClick={handleImportCardClick}
+            className="rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted"
+          >
+            Import
+          </button>
           {activeCard && isDesktopRuntime ? (
             <>
               <button
@@ -499,6 +567,28 @@ export default function WorkspacePage() {
           onDropError={setWorkspaceMessage}
         />
 
+        <input
+          ref={browserImportInputRef}
+          type="file"
+          accept=".png,.apng,.json,application/json,image/png,image/apng"
+          className="sr-only"
+          onChange={(event) => {
+            void handleBrowserImportFile(event.currentTarget.files?.[0] ?? null);
+            event.currentTarget.value = "";
+          }}
+        />
+
+        <input
+          ref={browserPngShellInputRef}
+          type="file"
+          accept=".png,.apng,image/png,image/apng"
+          className="sr-only"
+          onChange={(event) => {
+            void handleBrowserImportFile(event.currentTarget.files?.[0] ?? null);
+            event.currentTarget.value = "";
+          }}
+        />
+
         {libraryOpen ? (
           <div className="fixed inset-0 z-50">
             <button
@@ -577,46 +667,30 @@ export default function WorkspacePage() {
             ))}
           </section>
 
-          <section className="grid items-start gap-5 lg:grid-cols-3">
+          <section className="grid items-stretch gap-5 lg:grid-cols-3">
             <WorkflowPanel
               active={workflowMode === "create"}
               eyebrow="Step 1"
               icon={<UserRoundPlus className="size-4" />}
               title="Create / Intake"
             >
-              <div className="grid gap-4">
+              <div className="flex h-full flex-col gap-4">
                 <div className="grid gap-2 text-sm text-muted-foreground">
                   <p>
-                    Import a blank PNG or existing card, paste messy character
-                    material, or start with a blank draft.
+                    Paste messy character material or start with a blank draft.
+                    Import a PNG shell when you want an empty card image to
+                    become the finished character card.
                   </p>
                   <div className="flex flex-wrap gap-2">
-                    {isDesktopRuntime ? (
-                      <button
-                        type="button"
-                        onClick={handleManualImportClick}
-                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted"
-                      >
-                        <FileUp className="size-3.5" />
-                        Import Card
-                      </button>
-                    ) : (
-                      <label className="inline-flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted">
-                        <FileUp className="size-3.5" />
-                        Import Card
-                        <input
-                          type="file"
-                          accept=".png,.apng,.json"
-                          className="sr-only"
-                          onChange={(event) => {
-                            void handleBrowserImportFile(
-                              event.currentTarget.files?.[0] ?? null,
-                            );
-                            event.currentTarget.value = "";
-                          }}
-                        />
-                      </label>
-                    )}
+                    <button
+                      type="button"
+                      onClick={handleImportPngShellClick}
+                      className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted"
+                      title="Import a PNG or APNG image as the shell for a new editable character card."
+                    >
+                      <FileUp className="size-3.5" />
+                      Import PNG Shell
+                    </button>
                     <button
                       type="button"
                       onClick={handleStartBlankDraft}
@@ -635,11 +709,50 @@ export default function WorkspacePage() {
                   <Textarea
                     value={messyIntakeText}
                     placeholder="Name, age, appearance, wants, fears, background, relationships, scenario, first message..."
-                    className="min-h-48 resize-y"
+                    className="min-h-44 resize-y"
                     onChange={(event) =>
                       setMessyIntakeText(event.currentTarget.value)
                     }
                   />
+                  <details className="rounded-xl border bg-background/45 p-3">
+                    <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                      Optional structured starter fields
+                    </summary>
+                    <div className="mt-3 grid gap-3">
+                      {starterFieldDefinitions.map((field) => (
+                        <label key={field.key} className="grid gap-1.5">
+                          <span className="text-xs font-semibold text-muted-foreground">
+                            {field.label}
+                          </span>
+                          {field.rows ? (
+                            <Textarea
+                              value={starterFields[field.key]}
+                              placeholder={field.placeholder}
+                              className="min-h-20 resize-y text-sm"
+                              onChange={(event) =>
+                                setStarterFields((current) => ({
+                                  ...current,
+                                  [field.key]: event.currentTarget.value,
+                                }))
+                              }
+                            />
+                          ) : (
+                            <input
+                              value={starterFields[field.key]}
+                              placeholder={field.placeholder}
+                              className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none transition focus:border-[color:var(--liquid-accent)]"
+                              onChange={(event) =>
+                                setStarterFields((current) => ({
+                                  ...current,
+                                  [field.key]: event.currentTarget.value,
+                                }))
+                              }
+                            />
+                          )}
+                        </label>
+                      ))}
+                    </div>
+                  </details>
                   <button
                     type="button"
                     onClick={handleRouteMessyIntake}
@@ -655,7 +768,7 @@ export default function WorkspacePage() {
                   ) : null}
                 </div>
 
-                <details className="rounded-xl border bg-background/45 p-3">
+                <details className="mt-auto rounded-xl border bg-background/45 p-3">
                   <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                     Batch folder intake
                   </summary>
@@ -676,7 +789,7 @@ export default function WorkspacePage() {
               icon={<Sparkles className="size-4" />}
               title="Edit / Review"
             >
-              <div className="grid gap-4">
+              <div className="flex h-full flex-col gap-4">
                 <div className="grid gap-2">
                   <label className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
                     Edit notes for active card
@@ -716,14 +829,9 @@ export default function WorkspacePage() {
                       activeCard?.data.personality?.trim() ||
                       "Import, create, or select a card to review the generated profile."}
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => setLibraryOpen(true)}
-                    className="mt-4 inline-flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted"
-                  >
-                    <PanelLeftOpen className="size-3.5" />
-                    Open Libraries
-                  </button>
+                  <p className="mt-4 text-xs text-muted-foreground">
+                    The full profile editor opens directly below this workflow.
+                  </p>
                 </div>
               </div>
             </WorkflowPanel>
@@ -734,7 +842,7 @@ export default function WorkspacePage() {
               icon={<Save className="size-4" />}
               title="Finalize / Export"
             >
-              <div className="grid gap-4">
+              <div className="flex h-full flex-col gap-4">
                 <div className="rounded-xl border bg-background/55 p-4 text-sm text-muted-foreground">
                   <p className="text-xs font-semibold uppercase tracking-[0.16em]">
                     Final card
@@ -747,105 +855,89 @@ export default function WorkspacePage() {
                   </p>
                 </div>
 
-                <div className="grid gap-2">
-                  {isDesktopRuntime ? (
-                    <>
-                      <button
-                        type="button"
-                        onClick={handleSaveMasterCharx}
-                        disabled={!activeCard || isSaving}
-                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:opacity-50"
-                      >
-                        <Save className="size-4" />
-                        {isSaving ? "Saving..." : "Save Master"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handlePersistWorkspaceChanges}
-                        disabled={!activeCard || isSaving || !currentFilePath}
-                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted disabled:opacity-50"
-                      >
-                        <Save className="size-4" />
-                        Save Source
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleSaveWorkspacePngAs}
-                        disabled={!activeCard || !canSavePngMetadata}
-                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted disabled:opacity-50"
-                      >
-                        <Download className="size-4" />
-                        Save PNG
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleExportWorkspaceCharx}
-                        disabled={!activeCard || !currentFilePath}
-                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted disabled:opacity-50"
-                      >
-                        <Download className="size-4" />
-                        Export CHARX
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        type="button"
-                        onClick={handleBrowserDownloadJson}
-                        disabled={!activeCard}
-                        className="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700 disabled:opacity-50"
-                      >
-                        <Download className="size-4" />
-                        Download JSON
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleBrowserDownloadPng}
-                        disabled={!activeCard || !browserSourcePngData}
-                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted disabled:opacity-50"
-                      >
-                        <Download className="size-4" />
-                        Download PNG
-                      </button>
-                    </>
-                  )}
+                <div className="mt-auto grid gap-2 rounded-xl border bg-background/45 p-4 text-sm">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-muted-foreground">Card data</span>
+                    <span className={activeCard ? "font-semibold text-emerald-400" : "font-semibold text-muted-foreground"}>
+                      {activeCard ? "Ready" : "Missing"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-muted-foreground">PNG source</span>
+                    <span className={canSavePngMetadata || browserSourcePngData ? "font-semibold text-emerald-400" : "font-semibold text-muted-foreground"}>
+                      {canSavePngMetadata || browserSourcePngData ? "Available" : "Optional"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-muted-foreground">Export actions</span>
+                    <span className="font-semibold text-muted-foreground">
+                      Top row
+                    </span>
+                  </div>
                 </div>
               </div>
             </WorkflowPanel>
           </section>
 
-          <CharacterLibraryWorkspace
-            activeCard={activeCard}
-            currentFilePath={currentFilePath}
-            library={library}
-            onCardSelect={(filePath) => {
-              void handleCardSelect(filePath);
-            }}
-            onConvertToPersona={() => {
-              void handleConvertActiveCardToPersona();
-            }}
-            onOpenLibraryDrawer={() => setLibraryOpen(true)}
-          />
-
-          {activeCard ? (
-            <StructuredCardEditor
+          <section
+            className={
+              activeCard
+                ? "grid gap-5 xl:grid-cols-[minmax(22rem,0.82fr)_minmax(0,1fr)]"
+                : "grid gap-5"
+            }
+          >
+            <CharacterLibraryWorkspace
               activeCard={activeCard}
-              setActiveCard={setActiveCard}
+              currentFilePath={currentFilePath}
+              library={library}
+              onCardSelect={(filePath) => {
+                void handleCardSelect(filePath);
+              }}
+              onConvertToPersona={() => {
+                void handleConvertActiveCardToPersona();
+              }}
+              onOpenLibraryDrawer={() => setLibraryOpen(true)}
+              sourcePngData={browserSourcePngData}
+              variant="compact"
             />
-          ) : (
-            <div className="flex min-h-64 flex-col justify-center rounded-lg border border-dashed border-zinc-800 bg-zinc-900/20 p-6 text-center">
-              {currentFilePath ? (
-                <p className="font-mono text-xs text-zinc-400">
-                  Cached selection: {currentFilePath}
-                </p>
+
+            <div className="min-w-0 rounded-[1.75rem] border bg-card/65 p-4">
+              <div className="mb-4 flex items-center gap-3">
+                <span className="liquid-icon flex size-10 items-center justify-center rounded-2xl text-muted-foreground">
+                  <Sparkles className="size-4" />
+                </span>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                    Step 2 Workspace
+                  </p>
+                  <h2 className="text-xl font-semibold tracking-tight">
+                    Profile Editor
+                  </h2>
+                </div>
+              </div>
+
+              {activeCard ? (
+                <StructuredCardEditor
+                  activeCard={activeCard}
+                  setActiveCard={setActiveCard}
+                />
               ) : (
-                <p className="text-sm text-zinc-500">
-                  Import or drop a PNG/JSON character card to begin editing.
-                  CHARX and image-asset drops are available in the desktop app.
-                </p>
+                <div className="flex min-h-64 flex-col justify-center rounded-lg border border-dashed border-zinc-800 bg-zinc-900/20 p-6 text-center">
+                  {currentFilePath ? (
+                    <p className="font-mono text-xs text-zinc-400">
+                      Cached selection: {currentFilePath}
+                    </p>
+                  ) : (
+                    <p className="text-sm text-zinc-500">
+                      Import, create, or select a PNG/JSON character card to
+                      begin editing. CHARX and image-asset drops are available
+                      in the desktop app.
+                    </p>
+                  )}
+                </div>
               )}
             </div>
-          )}
+          </section>
 
           <ExpressionManager
             activeCardPath={currentFilePath}
@@ -877,6 +969,32 @@ function createSafeCharacterFileName(name: string, suffix: string) {
     .toLowerCase();
 
   return `${safeName || "character"}${suffix}`;
+}
+
+function createStarterIntakeText(fields: Record<StarterFieldKey, string>) {
+  return joinDefined([
+    fields.name.trim() ? `Full Name: ${fields.name.trim()}` : "",
+    fields.basicInfo.trim()
+      ? `Basic Information:\n${fields.basicInfo.trim()}`
+      : "",
+    fields.appearance.trim()
+      ? `Physical Appearance:\n${fields.appearance.trim()}`
+      : "",
+    fields.personality.trim()
+      ? `Personality:\n${fields.personality.trim()}`
+      : "",
+    fields.scenario.trim() ? `Scenario:\n${fields.scenario.trim()}` : "",
+    fields.firstMessage.trim()
+      ? `First Message:\n${fields.firstMessage.trim()}`
+      : "",
+  ]);
+}
+
+function joinDefined(values: string[]) {
+  return values
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .join("\n\n");
 }
 
 function WorkflowPanel(props: {

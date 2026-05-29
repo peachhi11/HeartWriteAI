@@ -8,6 +8,7 @@ import {
   Download,
   FilePlus2,
   Save,
+  Sparkles,
   Trash2,
   Upload,
   UserRound,
@@ -50,6 +51,7 @@ import {
   GeneratorFormCard,
   GeneratorGrid,
 } from "./GenerationShell";
+import { PersonaMatchingStudio } from "./PersonaMatchingStudio";
 
 const defaultInput: PersonaGenerationInput = {
   archetype: "Guarded romantic lead",
@@ -65,8 +67,74 @@ const defaultInput: PersonaGenerationInput = {
   tags: "slow burn, emotionally observant, consent-aware",
 };
 
+type PersonaStarterFieldKey =
+  | "name"
+  | "basicInfo"
+  | "appearance"
+  | "personality"
+  | "scenario"
+  | "firstMessage";
+
+const personaStarterFieldDefinitions: Array<{
+  key: PersonaStarterFieldKey;
+  label: string;
+  placeholder: string;
+  rows?: number;
+}> = [
+  {
+    key: "name",
+    label: "Name",
+    placeholder: "Megan",
+  },
+  {
+    key: "basicInfo",
+    label: "Basic info",
+    placeholder: "Age range, gender/pronouns, job, background, social role...",
+    rows: 3,
+  },
+  {
+    key: "appearance",
+    label: "Appearance",
+    placeholder: "Style, body language, presentation, notable details...",
+    rows: 3,
+  },
+  {
+    key: "personality",
+    label: "Personality",
+    placeholder: "Core traits, wounds, wants, fears, habits, boundaries...",
+    rows: 3,
+  },
+  {
+    key: "scenario",
+    label: "Scenario",
+    placeholder: "Optional setup, relationship context, or character they are built to play opposite.",
+    rows: 3,
+  },
+  {
+    key: "firstMessage",
+    label: "First message",
+    placeholder: "Optional opening user line, vibe, or first-scene intention.",
+    rows: 3,
+  },
+];
+
+const emptyPersonaStarterFields: Record<PersonaStarterFieldKey, string> = {
+  appearance: "",
+  basicInfo: "",
+  firstMessage: "",
+  name: "",
+  personality: "",
+  scenario: "",
+};
+
 export function PersonaGenerationPage() {
   const [input, setInput] = useState(defaultInput);
+  const [personaIntakeText, setPersonaIntakeText] = useState("");
+  const [personaStarterFields, setPersonaStarterFields] =
+    useState<Record<PersonaStarterFieldKey, string>>(emptyPersonaStarterFields);
+  const [personaIntakeStatus, setPersonaIntakeStatus] = useState<string | null>(
+    null,
+  );
   const [activePersona, setActivePersona] = useState<GeneratedPersonaArtifact>(
     () => generatePersonaArtifact(defaultInput),
   );
@@ -98,6 +166,50 @@ export function PersonaGenerationPage() {
     setSavedSnapshot(null);
     setDeleteArmed(false);
     setStatus("Generated persona draft.");
+  }
+
+  function routePersonaIntake() {
+    const starterText = createPersonaStarterIntakeText(personaStarterFields);
+    const combinedIntakeText = joinDefined([personaIntakeText, starterText]);
+
+    if (!combinedIntakeText.trim()) {
+      setPersonaIntakeStatus(
+        "Paste rough persona notes or fill at least one starter field before routing intake.",
+      );
+      return;
+    }
+
+    const profileSections = joinDefined([
+      personaIntakeText.trim() ? `Freeform notes:\n${personaIntakeText.trim()}` : "",
+      personaStarterFields.basicInfo.trim()
+        ? `Basic info:\n${personaStarterFields.basicInfo.trim()}`
+        : "",
+      personaStarterFields.appearance.trim()
+        ? `Appearance:\n${personaStarterFields.appearance.trim()}`
+        : "",
+      personaStarterFields.personality.trim()
+        ? `Personality:\n${personaStarterFields.personality.trim()}`
+        : "",
+      personaStarterFields.firstMessage.trim()
+        ? `Preferred opening / first message:\n${personaStarterFields.firstMessage.trim()}`
+        : "",
+    ]);
+    const scenarioContext = personaStarterFields.scenario.trim()
+      ? `Scenario / context:\n${personaStarterFields.scenario.trim()}`
+      : "";
+    const nextInput: PersonaGenerationInput = {
+      ...input,
+      name: personaStarterFields.name.trim() || input.name,
+      characteristics: joinDefined([input.characteristics, profileSections]),
+      referenceCharacter: joinDefined([input.referenceCharacter, scenarioContext]),
+    };
+
+    setInput(nextInput);
+    setActivePersona(generatePersonaArtifact(nextInput));
+    setSavedSnapshot(null);
+    setDeleteArmed(false);
+    setPersonaIntakeStatus("Routed persona notes into an editable generated draft.");
+    setStatus("Generated persona draft from intake.");
   }
 
   function newBlankPersona() {
@@ -236,6 +348,56 @@ export function PersonaGenerationPage() {
           title="Persona Generator"
           description="Create saved user personas that drive chat POV, boundaries, and relationship interpretation."
         >
+          <Field label="Messy persona notes">
+            <Textarea
+              value={personaIntakeText}
+              placeholder="Paste rough {{user}} POV ideas, profile fragments, traits, boundaries, relationship context, or first-scene notes..."
+              className="min-h-32"
+              onChange={(event) => setPersonaIntakeText(event.currentTarget.value)}
+            />
+          </Field>
+          <details className="rounded-md border bg-background/70 p-4">
+            <summary className="cursor-pointer text-sm font-semibold">
+              Optional structured starter fields
+            </summary>
+            <div className="mt-4 grid gap-4">
+              {personaStarterFieldDefinitions.map((field) => (
+                <Field key={field.key} label={field.label}>
+                  {field.rows ? (
+                    <Textarea
+                      value={personaStarterFields[field.key]}
+                      placeholder={field.placeholder}
+                      className="min-h-20"
+                      onChange={(event) =>
+                        setPersonaStarterFields((current) => ({
+                          ...current,
+                          [field.key]: event.currentTarget.value,
+                        }))
+                      }
+                    />
+                  ) : (
+                    <Input
+                      value={personaStarterFields[field.key]}
+                      placeholder={field.placeholder}
+                      onChange={(event) =>
+                        setPersonaStarterFields((current) => ({
+                          ...current,
+                          [field.key]: event.currentTarget.value,
+                        }))
+                      }
+                    />
+                  )}
+                </Field>
+              ))}
+            </div>
+          </details>
+          <Button type="button" variant="secondary" onClick={routePersonaIntake}>
+            <Sparkles className="size-4" />
+            Route Intake to Persona
+          </Button>
+          {personaIntakeStatus ? (
+            <p className="text-sm text-muted-foreground">{personaIntakeStatus}</p>
+          ) : null}
           <Field label="Persona name">
             <Input
               value={input.name}
@@ -382,6 +544,8 @@ export function PersonaGenerationPage() {
       </aside>
 
       <div className="grid gap-5">
+        <PersonaMatchingStudio />
+
         <Card className="bg-card/85">
           <CardHeader className="gap-3 md:flex-row md:items-start md:justify-between">
             <div className="space-y-1.5">
@@ -574,4 +738,32 @@ function formatSourceLabel(item: Pick<GeneratedPersonaArtifact, "source">) {
 
 function formatDate(timestamp: number) {
   return new Date(timestamp).toISOString().slice(0, 16).replace("T", " ");
+}
+
+function createPersonaStarterIntakeText(
+  fields: Record<PersonaStarterFieldKey, string>,
+) {
+  return joinDefined([
+    fields.name.trim() ? `Persona Name: ${fields.name.trim()}` : "",
+    fields.basicInfo.trim()
+      ? `Basic Information:\n${fields.basicInfo.trim()}`
+      : "",
+    fields.appearance.trim()
+      ? `Appearance:\n${fields.appearance.trim()}`
+      : "",
+    fields.personality.trim()
+      ? `Personality:\n${fields.personality.trim()}`
+      : "",
+    fields.scenario.trim() ? `Scenario:\n${fields.scenario.trim()}` : "",
+    fields.firstMessage.trim()
+      ? `First Message:\n${fields.firstMessage.trim()}`
+      : "",
+  ]);
+}
+
+function joinDefined(values: string[]) {
+  return values
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .join("\n\n");
 }

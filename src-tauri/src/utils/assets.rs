@@ -79,7 +79,7 @@ pub fn scan_expression_directory<P: AsRef<Path>>(
 
         sprites.push(ExpressionSprite {
             name: file_name,
-            local_uri: format!("ccv3-asset://localhost/{}", percent_encode_path(&raw_path)),
+            local_uri: local_asset_uri_for_path(Path::new(&raw_path)),
             raw_path,
         });
     }
@@ -175,6 +175,13 @@ pub fn is_supported_expression_path(path: &Path) -> bool {
         .unwrap_or(false)
 }
 
+pub fn local_asset_uri_for_path(path: &Path) -> String {
+    format!(
+        "ccv3-asset://localhost/{}",
+        percent_encode_path(&path.to_string_lossy())
+    )
+}
+
 pub fn mime_type_for_expression_path(path: &Path) -> &'static str {
     match path
         .extension()
@@ -217,7 +224,7 @@ fn expression_sprite_for_path<P: AsRef<Path>>(path: P) -> Result<ExpressionSprit
 
     Ok(ExpressionSprite {
         name,
-        local_uri: format!("ccv3-asset://localhost/{}", percent_encode_path(&raw_path)),
+        local_uri: local_asset_uri_for_path(Path::new(&raw_path)),
         raw_path,
     })
 }

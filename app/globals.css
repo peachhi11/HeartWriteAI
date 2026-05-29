@@ -5,7 +5,32 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@keyframes launch-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @theme inline {
+  --ease-snappy-slide: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-theatrical: 600ms;
+  --color-user-primary: var(--user-glow);
+  --opacity-user-card: var(--user-card-opacity);
+  --opacity-ui-panel: var(--ui-panel-opacity);
+  --opacity-ui-border: var(--ui-border-opacity);
+  --opacity-ui-glow: var(--ui-glow-alpha);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: Arial, Helvetica, sans-serif;
@@ -45,8 +70,19 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+@utility animate-fade-in {
+  animation: fade-in 450ms cubic-bezier(0.215, 0.61, 0.355, 1) forwards;
+}
+
 :root {
   --radius: 0.875rem;
+  --user-glow: #e11d48;
+  --user-card-opacity: 0.4;
+  --ui-panel-opacity: 0.45;
+  --ui-border-opacity: 0.3;
+  --ui-glow-alpha: 0.2;
+  --wp-brightness: 30%;
+  --wp-blur: 8px;
   --liquid-accent: #d41f44;
   --liquid-accent-soft: rgb(231 154 162 / 24%);
   --liquid-accent-glow: rgb(212 31 68 / 22%);
@@ -91,6 +127,18 @@
   --sidebar-accent-foreground: oklch(0.16 0.018 340);
   --sidebar-border: oklch(1 0 0 / 14%);
   --sidebar-ring: oklch(0.78 0.18 350);
+}
+
+:root[data-user-font="serif"] body {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+:root[data-user-font="sans"] body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+:root[data-user-font="mono"] body {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
 .dark {

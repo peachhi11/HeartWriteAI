@@ -1,9 +1,12 @@
 "use client";
 
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Link from "next/link";
 import { Brain, Route, SendHorizontal, Sparkles } from "lucide-react";
 
+import { ChatExporterButton } from "@/components/chat-exporter-button";
+import { ChatViewport } from "@/components/chat-viewport";
+import { SaveSlotModal } from "@/components/save-slot-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,7 +17,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import {
   createRoleplayMessage,
@@ -22,12 +24,19 @@ import {
   RoleplayMessage,
   toOllamaMessages,
 } from "@/lib/chat/messages";
+import { classifyTropeInput } from "@/lib/character-card/tropeMatcher";
+import { fetchContextualNpcDialogue } from "@/lib/tauri/contextualDialogue";
+import { appendMessageToHistory } from "@/lib/tauri/tropeInteraction";
 import { cn } from "@/lib/utils";
 import { StudioShell } from "@/components/studio-shell";
 import { useScenarioLibrary } from "@/hooks/useScenarioLibrary";
 import { useRelationshipStore } from "@/features/relationship/store";
 import { StatBar } from "@/features/relationship/components/StatBar";
 import type { RelationshipState } from "@/features/relationship/schema";
+import type { ChatMessage } from "@/types/chat";
+import type { RomanceTropeClass } from "@/types/character-card/RomanceTropeClassification";
+import type { DialogueLogEntry } from "@/types/history";
+import { COMPLETE_TROPE_MATRIX } from "@/types/tropes";
 
 const OLLAMA_CHAT_ENDPOINT = "http://localhost:11434/api/chat";
 const DEFAULT_MODEL = "llama3";
@@ -36,6 +45,7 @@ const initialMessages: RoleplayMessage[] = [
   createRoleplayMessage(
     "assistant",
     "*Rain beads against the high-rise windows while {{char}} pauses beside the conference table, one hand still resting on the unsigned contract.* \"You came back after all.\"",
+    "casual",
   ),
 ];
 
@@ -63,23 +73,6 @@ const emptyScenarioOverride: ScenarioOverride = {
   setting: "",
 };
 
-function formatRoleplayText(text: string) {
-  const parts = text.split(/(\*[^*]+\*)/g);
-
-  return parts.map((part, index) => {
-    const isAction = part.startsWith("*") && part.endsWith("*");
-
-    return (
-      <span
-        key={`${part}-${index}`}
-        className={cn(isAction && "font-medium italic text-primary")}
-      >
-        {part}
-      </span>
-    );
-  });
-}
-
 export default function RoleplayChat() {
   const scenarioLibrary = useScenarioLibrary();
   const addRelationshipMessage = useRelationshipStore((state) => state.addMessage);
@@ -94,14 +87,12 @@ export default function RoleplayChat() {
   const [scenarioId, setScenarioId] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
-  const chatEndRef = useRef<HTMLDivElement>(null);
   const activeSession =
     sessions.find((session) => session.id === activeSessionId) ?? sessions[0]!;
   const messages = activeSession.messages;
-
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  const viewportMessages = messages.map(toViewportMessage);
+  const activeTrope = getActiveTrope(messages);
+  const activeTropeStyle = COMPLETE_TROPE_MATRIX[activeTrope];
 
   useEffect(() => {
     if (!relationshipHydrated) {
@@ -147,6 +138,18 @@ export default function RoleplayChat() {
     setRuntimeError(null);
   }
 
+  function hydrateChatFromHistory(history: DialogueLogEntry[]) {
+    const hydratedMessages = history.map(dialogueLogEntryToMessage);
+
+    updateActiveSession({
+      messages: hydratedMessages.length > 0 ? hydratedMessages : initialMessages,
+      title:
+        hydratedMessages.length > 0
+          ? "Loaded Profile Chat"
+          : activeSession.title,
+    });
+  }
+
   function applySavedScenarioToOverride() {
     const scenario = scenarioLibrary.items.find((item) => item.id === scenarioId);
 
@@ -171,6 +174,13 @@ export default function RoleplayChat() {
     });
   }
 
+  function handleLaunchSuccess() {
+    window.location.hash = "gameplay-chat-viewport";
+    document
+      .getElementById("gameplay-chat-viewport")
+      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
   async function handleSendMessage(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -178,9 +188,14 @@ export default function RoleplayChat() {
       return;
     }
 
-    const userMessage = createRoleplayMessage("user", input.trim());
+    const detectedTrope = classifyTropeInput(input.trim());
+    const userMessage = createRoleplayMessage("user", input.trim(), detectedTrope);
     const updatedMessages = [...messages, userMessage];
-    const assistantMessage = createRoleplayMessage("assistant", "");
+    const assistantMessage = createRoleplayMessage(
+      "assistant",
+      "",
+      detectedTrope,
+    );
 
     updateActiveSession({
       messages: [...updatedMessages, assistantMessage],
@@ -194,6 +209,7 @@ export default function RoleplayChat() {
       createdAt: Date.now(),
       role: "user",
     });
+    void persistDialogueLine(userMessage, setRuntimeError);
 
     try {
       const response = await fetch(OLLAMA_CHAT_ENDPOINT, {
@@ -246,6 +262,7 @@ export default function RoleplayChat() {
                 ...updatedMessages,
                 {
                   ...assistantMessage,
+                  detectedTrope,
                   parts: [{ type: "text", text: accumulatedResponse }],
                 },
               ],
@@ -253,14 +270,48 @@ export default function RoleplayChat() {
           }
         }
       }
+
+      if (accumulatedResponse.trim()) {
+        void persistDialogueLine(
+          {
+            ...assistantMessage,
+            detectedTrope,
+            parts: [{ type: "text", text: accumulatedResponse }],
+          },
+          setRuntimeError,
+        );
+      }
     } catch (error) {
       const message =
         error instanceof Error ? error.message : "Unknown inference error.";
 
-      setRuntimeError(
-        `Could not reach local Ollama at ${OLLAMA_CHAT_ENDPOINT}. ${message}`,
-      );
-      updateActiveSession({ messages: updatedMessages });
+      try {
+        const contextualDialogue = await fetchContextualNpcDialogue(
+          "scene_01_alley_encounter",
+        );
+        const contextualMessage = createRoleplayMessage(
+          "assistant",
+          contextualDialogue.transformed_text,
+          detectedTrope,
+        );
+
+        updateActiveSession({
+          messages: [...updatedMessages, contextualMessage],
+        });
+        void persistDialogueLine(contextualMessage, setRuntimeError);
+        setRuntimeError(
+          `Ollama was unavailable (${message}), so Lucas used the native ${contextualDialogue.applied_archetype} dialogue variant.`,
+        );
+      } catch (fallbackError) {
+        const fallbackDetail =
+          fallbackError instanceof Error
+            ? fallbackError.message
+            : String(fallbackError);
+        setRuntimeError(
+          `Could not reach local Ollama at ${OLLAMA_CHAT_ENDPOINT}. ${message} Native dialogue fallback also failed: ${fallbackDetail}`,
+        );
+        updateActiveSession({ messages: updatedMessages });
+      }
     } finally {
       setIsGenerating(false);
     }
@@ -274,7 +325,7 @@ export default function RoleplayChat() {
       actions={<Badge variant="outline">Ollama: {DEFAULT_MODEL}</Badge>}
     >
       <div className="grid min-h-[calc(100vh-9rem)] gap-5 xl:grid-cols-[20rem_minmax(0,1fr)]">
-        <section className="hidden max-h-[calc(100vh-9rem)] flex-col gap-5 overflow-y-auto pr-1 xl:sticky xl:top-24 xl:flex">
+        <section className="flex max-h-none flex-col gap-5 overflow-y-auto pr-1 xl:sticky xl:top-24 xl:max-h-[calc(100vh-9rem)]">
           <Card className="bg-card/85">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
@@ -338,6 +389,13 @@ export default function RoleplayChat() {
               ))}
             </CardContent>
           </Card>
+
+          <SaveSlotModal
+            onLaunchSuccess={handleLaunchSuccess}
+            onSlotLoaded={(_, profile) =>
+              hydrateChatFromHistory(profile?.dialogue_history ?? [])
+            }
+          />
 
           <Card className="bg-card/85">
             <CardHeader>
@@ -446,55 +504,44 @@ export default function RoleplayChat() {
           </Card>
         </section>
 
-        <section className="flex min-h-[calc(100vh-9rem)] min-w-0 flex-col overflow-hidden rounded-xl border bg-card/70 shadow-xl backdrop-blur">
-        <ScrollArea className="flex-1">
-          <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-5 py-8">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={cn(
-                  "flex gap-4",
-                  message.role === "user" && "flex-row-reverse",
-                )}
-              >
-                <div
-                  className={cn(
-                    "flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
-                    message.role === "user"
-                      ? "bg-secondary text-secondary-foreground"
-                      : "bg-primary text-primary-foreground",
-                  )}
-                >
-                  {message.role === "user" ? "You" : "AI"}
-                </div>
-                <div
-                  className={cn(
-                    "max-w-[85%] rounded-2xl border px-4 py-3 text-sm leading-relaxed shadow-sm",
-                    message.role === "user"
-                      ? "bg-secondary/70"
-                      : "bg-card/90 backdrop-blur",
-                  )}
-                >
-                  {getMessageText(message)
-                    ? message.parts.map((part, partIndex) =>
-                        part.type === "text" ? (
-                          <span key={`${message.id}-${partIndex}`}>
-                            {formatRoleplayText(part.text)}
-                          </span>
-                        ) : null,
-                      )
-                    : "Thinking..."}
-                </div>
-              </div>
-            ))}
-            {runtimeError ? (
-              <p className="rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-                {runtimeError}
-              </p>
-            ) : null}
-            <div ref={chatEndRef} />
+        <section
+          className="relative flex min-h-[calc(100vh-9rem)] min-w-0 flex-col overflow-hidden rounded-xl border bg-card/70 shadow-xl backdrop-blur"
+          id="gameplay-chat-viewport"
+        >
+        <div
+          className={cn(
+            "pointer-events-none absolute inset-0 bg-gradient-to-b opacity-50 mix-blend-soft-light transition-all duration-1000",
+            activeTropeStyle.screenVignette,
+          )}
+        />
+        <header className="relative z-10 flex items-center justify-between gap-3 border-b bg-card/70 px-5 py-3 backdrop-blur">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
+              Conversation Viewport
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Dialogue, action beats, and live macro mood are separated visually.
+            </p>
           </div>
-        </ScrollArea>
+          <div className="flex items-center gap-2">
+            <ChatExporterButton currentMessages={viewportMessages} />
+            <Badge
+              className={cn(
+                "shrink-0 border-current/30 bg-background/70",
+                activeTropeStyle.headerText,
+              )}
+              variant="outline"
+            >
+              {activeTropeStyle.label}
+            </Badge>
+          </div>
+        </header>
+
+        <ChatViewport
+          isStreaming={isGenerating}
+          messages={viewportMessages}
+          runtimeError={runtimeError}
+        />
 
         <div className="border-t bg-card/80 p-5 backdrop-blur">
           <form
@@ -559,6 +606,52 @@ function buildSessionTitle(currentTitle: string, firstMessage: string) {
   }
 
   return firstMessage.slice(0, 42) || currentTitle;
+}
+
+function getActiveTrope(messages: RoleplayMessage[]): RomanceTropeClass {
+  return messages.at(-1)?.detectedTrope ?? "casual";
+}
+
+function toViewportMessage(message: RoleplayMessage): ChatMessage {
+  return {
+    detectedTrope: message.detectedTrope ?? "casual",
+    id: message.id,
+    role: message.role === "user" ? "Player" : "NPC",
+    text: getMessageText(message),
+    timestamp: message.timestamp ?? new Date().toISOString(),
+  };
+}
+
+function toDialogueLogEntry(message: RoleplayMessage): DialogueLogEntry {
+  return {
+    detectedTrope: message.detectedTrope ?? "casual",
+    id: message.id,
+    role: message.role === "user" ? "Player" : "NPC",
+    text: getMessageText(message),
+    timestamp: message.timestamp ?? new Date().toISOString(),
+  };
+}
+
+function dialogueLogEntryToMessage(entry: DialogueLogEntry): RoleplayMessage {
+  return {
+    detectedTrope: entry.detectedTrope,
+    id: entry.id,
+    parts: [{ type: "text", text: entry.text }],
+    role: entry.role === "Player" ? "user" : "assistant",
+    timestamp: entry.timestamp,
+  };
+}
+
+async function persistDialogueLine(
+  message: RoleplayMessage,
+  setRuntimeError: (message: string | null) => void,
+) {
+  try {
+    await appendMessageToHistory(toDialogueLogEntry(message));
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    setRuntimeError(`Chat history save failed. ${detail}`);
+  }
 }
 
 function compileScenarioOverrideMessages(override: ScenarioOverride) {

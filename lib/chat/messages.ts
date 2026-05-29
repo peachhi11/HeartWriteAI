@@ -1,3 +1,5 @@
+import type { RomanceTropeClass } from "@/types/character-card/RomanceTropeClassification";
+
 export interface RoleplayTextPart {
   type: "text";
   text: string;
@@ -6,17 +8,22 @@ export interface RoleplayTextPart {
 export interface RoleplayMessage {
   id: string;
   role: "user" | "assistant";
+  detectedTrope?: RomanceTropeClass;
   parts: RoleplayTextPart[];
+  timestamp?: string;
 }
 
 export function createRoleplayMessage(
   role: RoleplayMessage["role"],
   text: string,
+  detectedTrope: RomanceTropeClass = "casual",
 ): RoleplayMessage {
   return {
+    detectedTrope,
     id: crypto.randomUUID(),
     role,
     parts: [{ type: "text", text }],
+    timestamp: new Date().toISOString(),
   };
 }
 
