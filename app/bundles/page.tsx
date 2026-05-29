@@ -4,9 +4,9 @@ import { BundleSelectionPage } from "@/features/generation/components/BundleSele
 export default function BundlesPage() {
   return (
     <StudioShell
-      eyebrow="Runtime Bundles"
-      title="Bundle Selection"
-      subtitle="Pair a character card with a user persona, then optionally add scenario overrides and lorebook context."
+      eyebrow="Chat Setup"
+      title="Roleplay Bundles"
+      subtitle="Pair a character with a persona, then add optional scenario notes and lorebooks."
     >
       <BundleSelectionPage />
     </StudioShell>

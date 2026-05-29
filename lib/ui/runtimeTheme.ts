@@ -167,6 +167,7 @@ export function normalizeUserTheme(value: unknown): UserThemeConfig {
         ? candidate.name.trim().slice(0, 48)
         : fallback?.name ?? DEFAULT_USER_THEME.name,
     primaryGlow,
+    sidebarWidth: clampSidebarWidth(candidate.sidebarWidth),
     transparency: normalizeTransparencyConfig(candidate.transparency),
   };
 }
@@ -266,6 +267,10 @@ export function isHexColor(value: unknown): value is string {
 
 export function clampCardOpacity(value: unknown) {
   return clampNumber(value, 10, 90, DEFAULT_USER_THEME.cardOpacity);
+}
+
+export function clampSidebarWidth(value: unknown) {
+  return clampNumber(value, 240, 480, DEFAULT_USER_THEME.sidebarWidth);
 }
 
 function clampNumber(value: unknown, min: number, max: number, fallback: number) {

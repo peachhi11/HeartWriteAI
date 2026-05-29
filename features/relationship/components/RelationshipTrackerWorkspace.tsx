@@ -40,7 +40,7 @@ export function RelationshipTrackerWorkspace() {
               Emotional Brain Metrics
             </CardTitle>
             <CardDescription>
-              Read-only runtime signals drawn from chat choices, scenario
+              Read-only relationship signals drawn from chat choices, scenario
               pressure, repair, intimacy, and emotional momentum.
             </CardDescription>
           </CardHeader>

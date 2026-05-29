@@ -60,11 +60,10 @@ export function ImageIntakePreview() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <ImagePlus data-icon="inline-start" />
-          Image intake pipeline
+          Image Prep
         </CardTitle>
         <CardDescription>
-          Browser-side validation, compression, blurhash placeholders, and EXIF
-          date extraction for future avatars and embedded character-card PNGs.
+          Check, compress, and prepare images for avatars and character-card PNGs.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">

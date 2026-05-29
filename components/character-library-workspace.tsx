@@ -309,7 +309,7 @@ function CharacterCardGrid({
         <Sparkles className="mb-3 size-8 text-muted-foreground/40" />
         <p className="max-w-sm text-sm text-muted-foreground">
           Saved character cards will appear here after importing or saving them
-          in the desktop workspace.
+          in the desktop app.
         </p>
       </div>
     );
@@ -437,7 +437,7 @@ function buildAccordionContent(card: ValidatedCharacterCardV3) {
     behaviour: joinSections([
       card.data.mes_example ? `Dialogue examples:\n${card.data.mes_example}` : "",
       card.data.post_history_instructions
-        ? `Runtime behaviour:\n${card.data.post_history_instructions}`
+        ? `Chat behavior:\n${card.data.post_history_instructions}`
         : "",
       card.data.system_prompt ? `System posture:\n${card.data.system_prompt}` : "",
     ]),

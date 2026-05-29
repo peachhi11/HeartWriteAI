@@ -6,7 +6,7 @@ export default function LorebooksPage() {
     <StudioShell
       eyebrow="Lorebooks"
       title="Lorebook Studio"
-      subtitle="Generate scoped lorebooks with activation keys, world rules, placeholders, and saved local records."
+      subtitle="Create world info books with keywords, rules, placeholders, and saved local files."
     >
       <LorebookGenerationPage />
     </StudioShell>

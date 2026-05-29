@@ -25,6 +25,7 @@ tauri = { version = "2.6.2", features = [] }
 tauri-plugin-log = "2"
 tauri-plugin-core = "2.0.0-beta.0"
 tauri-plugin-store = "2.4.3"
+tauri-plugin-updater = "2"
 png = "0.17"
 zip = { version = "2.4.2", features = ["deflate"] }
 base64 = "0.22"
@@ -37,3 +38,8 @@ tauri-plugin-fs = "2.5.1"
 chrono = { version = "0.4", default-features = false, features = ["clock", "std"] }
 ammonia = "4.0"
 jsonschema = "0.18"
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+sha2 = "0.10"
+
+[target.'cfg(target_os = "macos")'.dependencies]
+objc2-app-kit = { version = "0.3.2", features = ["NSWindow"] }

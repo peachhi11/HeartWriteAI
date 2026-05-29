@@ -4,9 +4,9 @@ import { StudioShell } from "@/components/studio-shell";
 export default function ScenariosPage() {
   return (
     <StudioShell
-      eyebrow="Scenario Generation"
+      eyebrow="Scenarios"
       title="Scenario Studio"
-      subtitle="Generate scene premises, opening constraints, sensory anchors, and saved local scenario records."
+      subtitle="Create scene premises, opening pressure, sensory details, and saved scenarios."
     >
       <ScenarioGenerationPage />
     </StudioShell>

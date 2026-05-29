@@ -45,15 +45,14 @@ export function RelationshipDashboard() {
             <Badge variant="outline">{state.type}</Badge>
             <Badge variant="secondary">{state.lifecycleState}</Badge>
             <Badge variant="outline">
-              {hydrated ? "Persisted" : "Loading Store"}
+              {hydrated ? "Saved" : "Loading"}
             </Badge>
           </div>
           <div>
-            <h2 className="text-xl font-semibold">Relationship Engine</h2>
+            <h2 className="text-xl font-semibold">Relationship State</h2>
             <p className="max-w-2xl text-sm text-muted-foreground">
-              Deterministic runtime state for scenario plus character-pair
-              continuity. Messages update the pure TypeScript engine, then save
-              through Tauri Store with browser fallback.
+              A read-only view of how the current chat is changing trust,
+              intimacy, conflict, and momentum.
             </p>
           </div>
         </div>

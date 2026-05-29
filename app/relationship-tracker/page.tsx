@@ -6,7 +6,7 @@ export default function RelationshipTrackerPage() {
     <StudioShell
       eyebrow="Relationship Tracking"
       title="Relationship Tracker"
-      subtitle="Read-only emotional brain, trajectory, rupture, memory, and relationship state output for the active chat."
+      subtitle="Review trust, intimacy, tension, memories, and relationship changes for the active chat."
     >
       <RelationshipTrackerWorkspace />
     </StudioShell>

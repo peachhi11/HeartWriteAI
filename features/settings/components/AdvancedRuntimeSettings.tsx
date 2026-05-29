@@ -26,12 +26,12 @@ export function AdvancedRuntimeSettings() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Settings2 data-icon="inline-start" />
-          Runtime Engine Access
+          Advanced Controls
         </CardTitle>
         <CardDescription>
-          Standard mode keeps engines hidden while showing read-only emotional
-          and relationship outcomes. Advanced mode exposes inspection and debug
-          controls for power users.
+          Standard mode keeps extra details hidden while showing emotional and
+          relationship outcomes. Advanced mode shows deeper testing controls for
+          power users.
         </CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4">
@@ -43,8 +43,8 @@ export function AdvancedRuntimeSettings() {
         </div>
 
         <div className="grid gap-2 text-sm text-muted-foreground">
-          <p>Standard users can see relationship tracking and emotional brain output.</p>
-          <p>Only advanced users can expose raw variables, event controls, and runtime engine panels.</p>
+          <p>Standard users can see relationship tracking and emotional summaries.</p>
+          <p>Advanced users can inspect detailed values, events, and tuning panels.</p>
         </div>
 
         <Button

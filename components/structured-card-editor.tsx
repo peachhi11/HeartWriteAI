@@ -1,9 +1,33 @@
 "use client";
 
-import { Dispatch, FormEvent, ReactNode, SetStateAction, useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import {
+  ChangeEvent,
+  Dispatch,
+  FormEvent,
+  ReactNode,
+  SetStateAction,
+  useState,
+} from "react";
+import { BookOpen, Plus, Trash2, Upload, WandSparkles, X } from "lucide-react";
 
 import CharacterCardPreview from "@/components/character-card-preview";
+import ProsePixieModal, {
+  type ProsePixieTarget,
+} from "@/components/prose-pixie-modal";
+import {
+  generatedLorebookArtifactToV3Document,
+  importLorebookV3Json,
+} from "@/features/lorebooks/adapters";
+import {
+  createLorebookV3Document,
+  type LorebookV3,
+  type LorebookV3Document,
+} from "@/features/lorebooks/schema";
+import {
+  createImportedLorebookArtifact,
+  type GeneratedLorebookArtifact,
+} from "@/features/generation/workflows";
+import { useLorebookLibrary } from "@/hooks/useLorebookLibrary";
 import { humanizeOptionLabel } from "@/lib/ui/humanizeOptionLabel";
 import {
   buildCharacterCard,
@@ -83,6 +107,18 @@ interface StructuredCardEditorProps {
 }
 
 type EditorTab = "identity" | "behavior" | "greetings";
+type ProsePixieFieldKey =
+  | "personality"
+  | "description"
+  | "creator_notes"
+  | "scenario"
+  | "mes_example"
+  | "system_prompt"
+  | "post_history_instructions"
+  | "first_mes";
+type ProsePixieEditorTarget = ProsePixieTarget & {
+  fieldKey: ProsePixieFieldKey;
+};
 interface NameGenerationExtension {
   firstname: string;
   surname: string;
@@ -1162,6 +1198,12 @@ export default function StructuredCardEditor({
     useState<BuildCharacterCardResult | null>(null);
   const [previewError, setPreviewError] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
+  const [lorebookImportError, setLorebookImportError] = useState<string | null>(
+    null,
+  );
+  const [prosePixieTarget, setProsePixieTarget] =
+    useState<ProsePixieEditorTarget | null>(null);
+  const lorebookLibrary = useLorebookLibrary();
   const macroExtension = readMacroExtension(activeCard.data.extensions);
   const archetypeConfiguration =
     readArchetypeConfigurationExtension(activeCard);
@@ -1193,9 +1235,14 @@ export default function StructuredCardEditor({
   const scenarioGeneration = readScenarioGenerationExtension(activeCard);
   const scenarioOpeningPairGeneration =
     readScenarioOpeningPairGenerationExtension(activeCard);
-  const lorebookSummaryGeneration =
-    readLorebookSummaryGenerationExtension(activeCard);
-  const loreEntryGeneration = readLoreEntryGenerationExtension(activeCard);
+  const embeddedLorebookDocument = readEmbeddedLorebookDocument(activeCard);
+  const embeddedLorebookSourceId = readEmbeddedLorebookSourceId(activeCard);
+  const lorebookSummaryGeneration = embeddedLorebookDocument
+    ? createLorebookSummaryFromDocument(embeddedLorebookDocument)
+    : createDetachedLorebookSummary();
+  const loreEntryGeneration = embeddedLorebookDocument
+    ? createLoreEntriesFromDocument(embeddedLorebookDocument)
+    : [];
   const creatorsNotesGeneration =
     readCreatorsNotesGenerationExtension(activeCard);
   const postHistoryInstructionsGeneration =
@@ -1204,6 +1251,10 @@ export default function StructuredCardEditor({
     readWorldLorePlaceholderGenerationExtension(activeCard);
   const toneConfiguration = readToneConfigurationExtension(activeCard);
   const turnOffGeneration = readTurnOffGenerationExtension(activeCard);
+  const prosePixieAdultModeEnabled =
+    kinkGeneration.nsfwEnabled ||
+    fetishGeneration.fetishEnabled ||
+    creatorsNotesGeneration.contentRating === "X_Rated_Explicit";
 
   function updateField<Key extends keyof ValidatedCharacterCardV3["data"]>(
     key: Key,
@@ -1222,6 +1273,28 @@ export default function StructuredCardEditor({
         },
       };
     });
+  }
+
+  function openProsePixieForField(
+    fieldKey: ProsePixieFieldKey,
+    fieldLabel: string,
+  ) {
+    const value = activeCard.data[fieldKey];
+
+    setProsePixieTarget({
+      characterName: activeCard.data.name,
+      fieldKey,
+      fieldLabel,
+      value: typeof value === "string" ? value : "",
+    });
+  }
+
+  function applyProsePixieDraft(value: string) {
+    if (!prosePixieTarget) {
+      return;
+    }
+
+    updateField(prosePixieTarget.fieldKey, value);
   }
 
   function handleAddAlternateGreeting(event: FormEvent<HTMLFormElement>) {
@@ -1701,9 +1774,13 @@ export default function StructuredCardEditor({
     });
   }
 
-  function updateLorebookSummaryGeneration<
-    Key extends keyof LorebookSummaryGenerationExtension,
-  >(key: Key, value: LorebookSummaryGenerationExtension[Key]) {
+  function embedLorebookDocument(
+    document: LorebookV3Document,
+    source: { id?: string; label: string; sourceKind: "library" | "json" },
+  ) {
+    const summary = createLorebookSummaryFromDocument(document);
+    const entries = createLoreEntriesFromDocument(document);
+
     setActiveCard((currentCard) => {
       if (!currentCard) {
         return null;
@@ -1712,26 +1789,108 @@ export default function StructuredCardEditor({
       const currentNamespace = readExtensionNamespace(
         currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
       );
-      const currentLorebookSummary =
-        readLorebookSummaryGenerationExtension(currentCard);
 
       return {
         ...currentCard,
         data: {
           ...currentCard.data,
+          character_book: document.data as LorebookV3,
           extensions: {
             ...currentCard.data.extensions,
             [AMOURAI_EXTENSION_NAMESPACE]: {
               ...currentNamespace,
-              lorebook_summary: {
-                ...currentLorebookSummary,
-                [key]: value,
+              embedded_lorebook: {
+                embeddedAt: Date.now(),
+                sourceId: source.id,
+                sourceKind: source.sourceKind,
+                sourceLabel: source.label,
               },
+              lore_entries: entries,
+              lorebook_summary: summary,
             },
           },
         },
       };
     });
+    setLorebookImportError(null);
+  }
+
+  function clearEmbeddedLorebook() {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const currentNamespace = readExtensionNamespace(
+        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+      );
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          character_book: undefined,
+          extensions: {
+            ...currentCard.data.extensions,
+            [AMOURAI_EXTENSION_NAMESPACE]: {
+              ...currentNamespace,
+              embedded_lorebook: null,
+              lore_entries: [],
+              lorebook_summary: createDetachedLorebookSummary(),
+            },
+          },
+        },
+      };
+    });
+    setLorebookImportError(null);
+  }
+
+  function handleSelectSavedLorebook(lorebookId: string) {
+    const selectedLorebook = lorebookLibrary.items.find(
+      (item) => item.id === lorebookId,
+    );
+
+    if (!selectedLorebook) {
+      return;
+    }
+
+    const document =
+      selectedLorebook.v3Document ??
+      generatedLorebookArtifactToV3Document(selectedLorebook);
+
+    embedLorebookDocument(document, {
+      id: selectedLorebook.id,
+      label: selectedLorebook.title,
+      sourceKind: "library",
+    });
+  }
+
+  async function handleImportLorebookJson(
+    event: ChangeEvent<HTMLInputElement>,
+  ) {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+
+    if (!file) {
+      return;
+    }
+
+    try {
+      const document = importLorebookV3Json(await file.text(), file.name);
+      const artifact = createImportedLorebookArtifact(document, file.name);
+
+      embedLorebookDocument(document, {
+        id: artifact.id,
+        label: artifact.title,
+        sourceKind: "json",
+      });
+    } catch (caughtError) {
+      setLorebookImportError(
+        caughtError instanceof Error
+          ? caughtError.message
+          : "Lorebook JSON import failed.",
+      );
+    }
   }
 
   function updateCreatorsNotesGeneration<
@@ -1826,39 +1985,6 @@ export default function StructuredCardEditor({
             [AMOURAI_EXTENSION_NAMESPACE]: {
               ...currentNamespace,
               world_lore_placeholder: nextPlaceholders.slice(0, 12),
-            },
-          },
-        },
-      };
-    });
-  }
-
-  function updateLoreEntryGeneration(
-    index: number,
-    patch: Partial<LoreEntryGenerationExtension>,
-  ) {
-    setActiveCard((currentCard) => {
-      if (!currentCard) {
-        return null;
-      }
-
-      const currentNamespace = readExtensionNamespace(
-        currentCard.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
-      );
-      const currentLoreEntries = readLoreEntryGenerationExtension(currentCard);
-      const nextLoreEntries = currentLoreEntries.map((entry, itemIndex) =>
-        itemIndex === index ? { ...entry, ...patch } : entry,
-      );
-
-      return {
-        ...currentCard,
-        data: {
-          ...currentCard.data,
-          extensions: {
-            ...currentCard.data.extensions,
-            [AMOURAI_EXTENSION_NAMESPACE]: {
-              ...currentNamespace,
-              lore_entries: nextLoreEntries.slice(0, 20),
             },
           },
         },
@@ -2691,6 +2817,7 @@ export default function StructuredCardEditor({
   }
 
   return (
+    <>
     <section className="flex min-h-[520px] flex-1 flex-col overflow-hidden rounded-lg border border-zinc-800 bg-zinc-900/30">
       <div className="flex shrink-0 gap-1 border-b border-zinc-800 bg-zinc-950/60 p-1">
         {EDITOR_TABS.map((tab) => (
@@ -2854,125 +2981,6 @@ export default function StructuredCardEditor({
                   className="h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
                 />
               </Field>
-            </div>
-
-            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
-              <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Lore Entries
-                </h3>
-                <p className="mt-1 text-[11px] text-zinc-500">
-                  Background details that can appear when a scene mentions the
-                  matching words.
-                </p>
-              </div>
-
-              <div className="space-y-3">
-                {loreEntryGeneration.slice(0, 20).map((entry, index) => (
-                  <div
-                    key={entry.entryId}
-                    className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-950 p-3"
-                  >
-                    <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
-                      <MacroButtonGroup
-                        activeValue={entry.domainScope}
-                        label={`Lore item ${index + 1}`}
-                        options={LORE_ENTRY_DOMAIN_SCOPES}
-                        tone="sky"
-                        onSelect={(value) =>
-                          updateLoreEntryGeneration(index, {
-                            domainScope: value,
-                          })
-                        }
-                      />
-
-                      <MacroButtonGroup
-                        activeValue={entry.insertionPriority}
-                        label="When to Use It"
-                        options={LORE_ENTRY_INSERTION_PRIORITIES}
-                        tone="emerald"
-                        onSelect={(value) =>
-                          updateLoreEntryGeneration(index, {
-                            insertionPriority: value,
-                          })
-                        }
-                      />
-                    </div>
-
-                    <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
-                      <Field label="Title">
-                        <input
-                          type="text"
-                          value={entry.title}
-                          onChange={(event) =>
-                            updateLoreEntryGeneration(index, {
-                              title: event.currentTarget.value,
-                            })
-                          }
-                          className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
-                        />
-                      </Field>
-
-                      <Field label="Space Reserved">
-                        <input
-                          type="number"
-                          min={25}
-                          max={1000}
-                          value={entry.tokenReserveCost}
-                          onChange={(event) =>
-                            updateLoreEntryGeneration(index, {
-                              tokenReserveCost: Number(event.currentTarget.value),
-                            })
-                          }
-                          className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
-                        />
-                      </Field>
-
-                      <Field label="Entry ID">
-                        <input
-                          type="text"
-                          value={entry.entryId}
-                          onChange={(event) =>
-                            updateLoreEntryGeneration(index, {
-                              entryId: event.currentTarget.value,
-                            })
-                          }
-                          className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 font-mono text-xs text-zinc-400 outline-none focus:border-violet-500"
-                        />
-                      </Field>
-                    </div>
-
-                    <Field label="Trigger Words">
-                      <input
-                        type="text"
-                        value={entry.activationKeys.join(", ")}
-                        onChange={(event) =>
-                          updateLoreEntryGeneration(index, {
-                            activationKeys: event.currentTarget.value
-                              .split(",")
-                              .map((key) => key.trim())
-                              .filter(Boolean)
-                              .slice(0, 12),
-                          })
-                        }
-                        className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 font-mono text-xs text-zinc-200 outline-none focus:border-violet-500"
-                      />
-                    </Field>
-
-                    <Field label="Lore Text">
-                      <textarea
-                        value={entry.entryContent}
-                        onChange={(event) =>
-                          updateLoreEntryGeneration(index, {
-                            entryContent: event.currentTarget.value,
-                          })
-                        }
-                        className="h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
-                      />
-                    </Field>
-                  </div>
-                ))}
-              </div>
             </div>
 
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
@@ -4638,47 +4646,47 @@ export default function StructuredCardEditor({
               ) : null}
             </div>
 
-            <Field label="Personality and Behavior">
-              <textarea
-                value={activeCard.data.personality}
-                onChange={(event) =>
-                  updateField("personality", event.currentTarget.value)
-                }
-                className="h-28 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
-              />
-            </Field>
+            <PolishableTextareaField
+              label="Personality and Behavior"
+              value={activeCard.data.personality}
+              onChange={(value) => updateField("personality", value)}
+              onPolish={() =>
+                openProsePixieForField("personality", "Personality and Behavior")
+              }
+              className="h-28 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+            />
 
-            <Field label="Character Description">
-              <textarea
-                value={activeCard.data.description}
-                onChange={(event) =>
-                  updateField("description", event.currentTarget.value)
-                }
-                className="h-44 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
-              />
-            </Field>
+            <PolishableTextareaField
+              label="Character Description"
+              value={activeCard.data.description}
+              onChange={(value) => updateField("description", value)}
+              onPolish={() =>
+                openProsePixieForField("description", "Character Description")
+              }
+              className="h-44 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+            />
 
-            <Field label="Creator Notes">
-              <textarea
-                value={activeCard.data.creator_notes}
-                onChange={(event) =>
-                  updateField("creator_notes", event.currentTarget.value)
-                }
-                className="h-28 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
-              />
-            </Field>
+            <PolishableTextareaField
+              label="Creator Notes"
+              value={activeCard.data.creator_notes}
+              onChange={(value) => updateField("creator_notes", value)}
+              onPolish={() =>
+                openProsePixieForField("creator_notes", "Creator Notes")
+              }
+              className="h-28 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+            />
           </div>
         ) : null}
 
         {activeTab === "behavior" ? (
           <div className="space-y-4">
-            <Field label="Current Scene">
-              <textarea
-                value={activeCard.data.scenario}
-                onChange={(event) => updateField("scenario", event.currentTarget.value)}
-                className="h-28 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
-              />
-            </Field>
+            <PolishableTextareaField
+              label="Current Scene"
+              value={activeCard.data.scenario}
+              onChange={(value) => updateField("scenario", value)}
+              onPolish={() => openProsePixieForField("scenario", "Current Scene")}
+              className="h-28 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+            />
 
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
@@ -4772,92 +4780,18 @@ export default function StructuredCardEditor({
               </Field>
             </div>
 
-            <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
-              <div>
-                <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                  Lorebook Summary
-                </h3>
-                <p className="mt-1 text-[11px] text-zinc-500">
-                  Compact world rules that keep scenes grounded without
-                  flooding the chat.
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-                <Field label="World Anchor">
-                  <input
-                    type="text"
-                    value={lorebookSummaryGeneration.universeAnchor}
-                    onChange={(event) =>
-                      updateLorebookSummaryGeneration(
-                        "universeAnchor",
-                        event.currentTarget.value,
-                      )
-                    }
-                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
-                  />
-                </Field>
-
-                <Field label="Lore Size Limit">
-                  <input
-                    type="number"
-                    min={50}
-                    max={1000}
-                    value={lorebookSummaryGeneration.tokenOptimizationCap}
-                    onChange={(event) =>
-                      updateLorebookSummaryGeneration(
-                        "tokenOptimizationCap",
-                        Number(event.currentTarget.value),
-                      )
-                    }
-                    className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500"
-                  />
-                </Field>
-              </div>
-
-              <Field label="World Rules">
-                <textarea
-                  value={lorebookSummaryGeneration.worldSystemRules.join("\n")}
-                  onChange={(event) =>
-                    updateLorebookSummaryGeneration(
-                      "worldSystemRules",
-                      event.currentTarget.value
-                        .split("\n")
-                        .map((rule) => rule.trim())
-                        .filter(Boolean)
-                        .slice(0, 4),
-                    )
-                  }
-                  className="h-24 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
-                />
-              </Field>
-
-              <Field label="Faction or Family Pressure">
-                <textarea
-                  value={lorebookSummaryGeneration.factionOrDynastyContext}
-                  onChange={(event) =>
-                    updateLorebookSummaryGeneration(
-                      "factionOrDynastyContext",
-                      event.currentTarget.value,
-                    )
-                  }
-                  className="h-20 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
-                />
-              </Field>
-
-              <Field label="Lore Instructions">
-                <textarea
-                  value={lorebookSummaryGeneration.aiLoreInstruction}
-                  onChange={(event) =>
-                    updateLorebookSummaryGeneration(
-                      "aiLoreInstruction",
-                      event.currentTarget.value,
-                    )
-                  }
-                  className="h-20 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
-                />
-              </Field>
-            </div>
+            <EmbeddedLorebookPanel
+              document={embeddedLorebookDocument}
+              importError={lorebookImportError}
+              libraryError={lorebookLibrary.error}
+              libraryItems={lorebookLibrary.items}
+              libraryLoading={lorebookLibrary.loading}
+              selectedLibraryId={embeddedLorebookSourceId}
+              onClear={clearEmbeddedLorebook}
+              onImportJson={handleImportLorebookJson}
+              onRefreshLibrary={lorebookLibrary.refresh}
+              onSelectLibraryItem={handleSelectSavedLorebook}
+            />
 
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
@@ -4865,8 +4799,8 @@ export default function StructuredCardEditor({
                   Creator Notes Read Me
                 </h3>
                 <p className="mt-1 text-[11px] text-zinc-500">
-                  Human-facing runtime guidance for model choice, content
-                  rating, trigger warnings, and ideal player setup.
+                  Player-facing guidance for AI choice, content rating, trigger
+                  warnings, and ideal setup.
                 </p>
               </div>
 
@@ -4945,25 +4879,25 @@ export default function StructuredCardEditor({
               </Field>
             </div>
 
-            <Field label="Example Messages">
-              <textarea
-                value={activeCard.data.mes_example}
-                onChange={(event) =>
-                  updateField("mes_example", event.currentTarget.value)
-                }
-                className="h-32 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
-              />
-            </Field>
+            <PolishableTextareaField
+              label="Example Messages"
+              value={activeCard.data.mes_example}
+              onChange={(value) => updateField("mes_example", value)}
+              onPolish={() =>
+                openProsePixieForField("mes_example", "Example Messages")
+              }
+              className="h-32 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+            />
 
-            <Field label="Main System Prompt">
-              <textarea
-                value={activeCard.data.system_prompt}
-                onChange={(event) =>
-                  updateField("system_prompt", event.currentTarget.value)
-                }
-                className="h-32 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
-              />
-            </Field>
+            <PolishableTextareaField
+              label="Main System Prompt"
+              value={activeCard.data.system_prompt}
+              onChange={(value) => updateField("system_prompt", value)}
+              onPolish={() =>
+                openProsePixieForField("system_prompt", "Main System Prompt")
+              }
+              className="h-32 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+            />
 
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
@@ -5050,29 +4984,32 @@ export default function StructuredCardEditor({
               </Field>
             </div>
 
-            <Field label="After-Chat Instructions">
-              <textarea
-                value={activeCard.data.post_history_instructions}
-                onChange={(event) =>
-                  updateField("post_history_instructions", event.currentTarget.value)
-                }
-                className="h-28 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
-              />
-            </Field>
+            <PolishableTextareaField
+              label="After-Chat Instructions"
+              value={activeCard.data.post_history_instructions}
+              onChange={(value) => updateField("post_history_instructions", value)}
+              onPolish={() =>
+                openProsePixieForField(
+                  "post_history_instructions",
+                  "After-Chat Instructions",
+                )
+              }
+              className="h-28 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+            />
           </div>
         ) : null}
 
         {activeTab === "greetings" ? (
           <div className="space-y-5">
-            <Field label="Primary First Message">
-              <textarea
-                value={activeCard.data.first_mes}
-                onChange={(event) =>
-                  updateField("first_mes", event.currentTarget.value)
-                }
-                className="h-32 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
-              />
-            </Field>
+            <PolishableTextareaField
+              label="Primary First Message"
+              value={activeCard.data.first_mes}
+              onChange={(value) => updateField("first_mes", value)}
+              onPolish={() =>
+                openProsePixieForField("first_mes", "Primary First Message")
+              }
+              className="h-32 w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-300 outline-none focus:border-violet-500"
+            />
 
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
@@ -5501,6 +5438,199 @@ export default function StructuredCardEditor({
         ) : null}
       </div>
     </section>
+    <ProsePixieModal
+      adultModeEnabled={prosePixieAdultModeEnabled}
+      target={prosePixieTarget}
+      onApply={applyProsePixieDraft}
+      onClose={() => setProsePixieTarget(null)}
+    />
+    </>
+  );
+}
+
+function EmbeddedLorebookPanel({
+  document,
+  importError,
+  libraryError,
+  libraryItems,
+  libraryLoading,
+  onClear,
+  onImportJson,
+  onRefreshLibrary,
+  onSelectLibraryItem,
+  selectedLibraryId,
+}: {
+  document: LorebookV3Document | null;
+  importError: string | null;
+  libraryError: string | null;
+  libraryItems: GeneratedLorebookArtifact[];
+  libraryLoading: boolean;
+  onClear: () => void;
+  onImportJson: (event: ChangeEvent<HTMLInputElement>) => void;
+  onRefreshLibrary: () => void;
+  onSelectLibraryItem: (lorebookId: string) => void;
+  selectedLibraryId: string;
+}) {
+  const activeEntries = document?.data.entries.filter((entry) => entry.enabled) ?? [];
+  const tokenBudget = document?.data.token_budget ?? estimateLorebookTokenBudget(document);
+
+  return (
+    <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <h3 className="text-xs font-bold uppercase tracking-wider text-zinc-400">
+            Linked Lorebook
+          </h3>
+          <p className="mt-1 text-[11px] text-zinc-500">
+            Attach an existing lorebook JSON to embed as this character card&apos;s
+            lore file. Create or edit entries in Lorebook Studio.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          onClick={onRefreshLibrary}
+          className="inline-flex items-center justify-center rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-zinc-500 transition hover:border-zinc-700 hover:text-zinc-300"
+        >
+          Rescan saved lorebooks
+        </button>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3 lg:grid-cols-[minmax(0,1fr)_auto]">
+        <Field label={`Saved Lorebook (${libraryItems.length})`}>
+          <select
+            value={selectedLibraryId}
+            disabled={libraryLoading || libraryItems.length === 0}
+            onChange={(event) => onSelectLibraryItem(event.currentTarget.value)}
+            className="rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none transition focus:border-violet-500 disabled:cursor-not-allowed disabled:text-zinc-600"
+          >
+            <option value="">
+              {libraryLoading
+                ? "Loading saved lorebooks..."
+                : "Choose a saved lorebook to embed"}
+            </option>
+            {libraryItems.map((item) => (
+              <option key={item.id} value={item.id}>
+                {item.title} ({item.entries.length} entries)
+              </option>
+            ))}
+          </select>
+        </Field>
+
+        <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-4 py-2.5 text-xs font-bold text-zinc-300 transition hover:border-violet-500/40 hover:text-violet-200">
+          <Upload className="size-4" />
+          Upload JSON
+          <input
+            type="file"
+            accept="application/json,.json"
+            className="hidden"
+            onChange={onImportJson}
+          />
+        </label>
+      </div>
+
+      {libraryError ? (
+        <p className="rounded-lg border border-amber-500/20 bg-amber-500/10 p-3 text-[11px] text-amber-200">
+          {libraryError}
+        </p>
+      ) : null}
+
+      {importError ? (
+        <p className="rounded-lg border border-rose-500/20 bg-rose-500/10 p-3 text-[11px] text-rose-200">
+          {importError}
+        </p>
+      ) : null}
+
+      {document ? (
+        <div className="rounded-lg border border-violet-500/30 bg-violet-500/5 p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <div className="flex min-w-0 items-center gap-2">
+                <BookOpen className="size-4 shrink-0 text-violet-300" />
+                <h4 className="truncate text-sm font-bold text-zinc-100">
+                  {document.data.name ?? "Embedded lorebook"}
+                </h4>
+              </div>
+              <p className="mt-1 line-clamp-2 text-xs text-zinc-500">
+                {document.data.description ??
+                  "This lorebook will be written into the exported character card."}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={onClear}
+              className="inline-flex shrink-0 items-center justify-center gap-1 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-zinc-500 transition hover:border-rose-500/30 hover:text-rose-300"
+            >
+              <X className="size-3.5" />
+              Unlink
+            </button>
+          </div>
+
+          <div className="mt-4 grid grid-cols-1 gap-2 text-[11px] sm:grid-cols-3">
+            <LorebookMetric label="Entries" value={document.data.entries.length} />
+            <LorebookMetric label="Active" value={activeEntries.length} />
+            <LorebookMetric label="Token Budget" value={tokenBudget} />
+          </div>
+        </div>
+      ) : (
+        <div className="rounded-lg border border-dashed border-zinc-800 bg-zinc-950/50 p-4 text-xs text-zinc-500">
+          No lorebook linked. The character card will export without embedded
+          lorebook entries unless you select a saved lorebook or upload a JSON file.
+        </div>
+      )}
+    </div>
+  );
+}
+
+function LorebookMetric({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-lg border border-zinc-800 bg-zinc-950 p-3">
+      <div className="text-[9px] font-bold uppercase tracking-widest text-zinc-600">
+        {label}
+      </div>
+      <div className="mt-1 font-mono text-sm font-bold text-zinc-200">
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function PolishableTextareaField({
+  className,
+  label,
+  onChange,
+  onPolish,
+  value,
+}: {
+  className: string;
+  label: string;
+  onChange: (value: string) => void;
+  onPolish: () => void;
+  value: string;
+}) {
+  return (
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-center justify-between gap-3">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+          {label}
+        </span>
+        <button
+          type="button"
+          onClick={onPolish}
+          className="inline-flex items-center gap-1.5 rounded-md border border-violet-500/30 bg-violet-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-violet-200 transition hover:border-violet-400/50 hover:bg-violet-500/20"
+          title={`Open Prose Pixie for ${label}`}
+        >
+          <WandSparkles className="size-3.5" />
+          Rewrite
+        </button>
+      </div>
+      <textarea
+        value={value}
+        onChange={(event) => onChange(event.currentTarget.value)}
+        className={className}
+      />
+    </div>
   );
 }
 
@@ -5695,6 +5825,147 @@ function formatPreviewError(message: string) {
   }
 
   return message;
+}
+
+function readEmbeddedLorebookDocument(
+  card: ValidatedCharacterCardV3,
+): LorebookV3Document | null {
+  if (!card.data.character_book) {
+    return null;
+  }
+
+  try {
+    return createLorebookV3Document(card.data.character_book as LorebookV3);
+  } catch {
+    return null;
+  }
+}
+
+function readEmbeddedLorebookSourceId(card: ValidatedCharacterCardV3) {
+  const namespace = readExtensionNamespace(
+    card.data.extensions[AMOURAI_EXTENSION_NAMESPACE],
+  );
+  const embeddedLorebook = namespace.embedded_lorebook;
+
+  return isRecord(embeddedLorebook) &&
+    typeof embeddedLorebook.sourceId === "string"
+    ? embeddedLorebook.sourceId
+    : "";
+}
+
+function createDetachedLorebookSummary(): LorebookSummaryGenerationExtension {
+  return {
+    aiLoreInstruction:
+      "No embedded lorebook is attached. Do not inject standalone lorebook facts.",
+    factionOrDynastyContext:
+      "No separate lorebook context is linked to this character card.",
+    tokenOptimizationCap: 50,
+    universeAnchor: "No Embedded Lorebook",
+    worldSystemRules: ["Use only the character card fields and active scene."],
+  };
+}
+
+function createLorebookSummaryFromDocument(
+  document: LorebookV3Document,
+): LorebookSummaryGenerationExtension {
+  const enabledEntries = document.data.entries.filter((entry) => entry.enabled);
+  const worldSystemRules = enabledEntries
+    .map((entry) => entry.name ?? entry.comment ?? String(entry.id ?? "Lore entry"))
+    .filter(Boolean)
+    .slice(0, 4);
+  const fallbackDescription =
+    document.data.description ??
+    `Embedded lorebook with ${document.data.entries.length} entries.`;
+
+  return {
+    aiLoreInstruction: fallbackDescription,
+    factionOrDynastyContext: fallbackDescription,
+    tokenOptimizationCap: Math.max(
+      50,
+      Math.min(1_000, document.data.token_budget ?? estimateLorebookTokenBudget(document)),
+    ),
+    universeAnchor: document.data.name ?? "Embedded Lorebook",
+    worldSystemRules: worldSystemRules.length
+      ? worldSystemRules
+      : ["Use the embedded lorebook only when activation keys match."],
+  };
+}
+
+function createLoreEntriesFromDocument(
+  document: LorebookV3Document,
+): LoreEntryGenerationExtension[] {
+  return document.data.entries
+    .filter((entry) => entry.enabled)
+    .map((entry, index) => {
+      const title = entry.name ?? entry.comment ?? `Lore entry ${index + 1}`;
+      const entryId =
+        typeof entry.id === "string" && isUuidString(entry.id)
+          ? entry.id
+          : createStableEmbeddedLoreEntryId(title, entry.content, index);
+      const fallbackKey = title.trim() || `lore ${index + 1}`;
+      const activationKeys = (
+        entry.keys.length ? entry.keys : entry.secondary_keys ?? [fallbackKey]
+      )
+        .map((key) => key.trim())
+        .filter(Boolean)
+        .slice(0, 12);
+      const insertionPriority: LoreEntryInsertionPriority = entry.constant
+        ? "Constant_Anchor"
+        : entry.selective
+          ? "Recursive_Linked"
+          : "Reactive_Contextual";
+
+      return {
+        activationKeys: activationKeys.length ? activationKeys : [fallbackKey],
+        domainScope: readLoreEntryDomainScope(
+          isRecord(entry.extensions.heartwriteai)
+            ? entry.extensions.heartwriteai.entryKind
+            : undefined,
+        ),
+        entryContent: entry.content,
+        entryId,
+        insertionPriority,
+        title,
+        tokenReserveCost: Math.max(
+          25,
+          Math.min(1_000, Math.ceil(entry.content.length / 4)),
+        ),
+      };
+    })
+    .slice(0, 20);
+}
+
+function createStableEmbeddedLoreEntryId(
+  title: string,
+  content: string,
+  index: number,
+) {
+  const source = `${title}:${content}:${index}`;
+  let hash = 0;
+
+  for (let charIndex = 0; charIndex < source.length; charIndex += 1) {
+    hash = (hash * 53 + source.charCodeAt(charIndex)) >>> 0;
+  }
+
+  const hex = hash.toString(16).padStart(8, "0");
+
+  return `${hex}-5555-4000-8000-000000000000`;
+}
+
+function estimateLorebookTokenBudget(document: LorebookV3Document | null) {
+  if (!document) {
+    return 0;
+  }
+
+  return Math.max(
+    50,
+    Math.ceil(
+      document.data.entries.reduce(
+        (total, entry) => total + entry.content.length / 4,
+        0,
+      ),
+    ),
+  );
 }
 
 function readMacroExtension(

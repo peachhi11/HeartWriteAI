@@ -4,9 +4,9 @@ import { StudioShell } from "@/components/studio-shell";
 export default function ImagesPage() {
   return (
     <StudioShell
-      eyebrow="Image Generation"
+      eyebrow="Images"
       title="Image Studio"
-      subtitle="Prepare visual assets, avatars, and card art workflows."
+      subtitle="Prepare avatars, character art, and card images."
     >
       <ImageIntakePreview />
     </StudioShell>

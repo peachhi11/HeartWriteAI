@@ -57,7 +57,7 @@ const macroToneTags = [
 ] as const;
 
 const storyEnginePresets = [
-  { label: "Choose a story engine", tag: "" },
+  { label: "Choose a story route", tag: "" },
   { label: "Angst", tag: "angsty" },
   { label: "Slow burn", tag: "slow burn" },
   { label: "Comfort", tag: "hurt/comfort" },
@@ -736,15 +736,15 @@ function MacroClassificationSelector({
   return (
     <div className="grid gap-4 rounded-lg border bg-background/60 p-4">
       <div className="space-y-1">
-        <p className="text-sm font-medium">Story Engine</p>
+        <p className="text-sm font-medium">Story Route</p>
         <p className="text-xs text-muted-foreground">
           Pick the kind of emotional route this card should lean toward. The app
-          handles the deeper routing quietly.
+          handles the deeper story rules quietly.
         </p>
       </div>
 
       <label className="grid gap-2 text-sm font-medium md:max-w-sm">
-        Engine preset
+        Story route
         <select
           value={activeStoryEngine}
           className="h-10 rounded-md border border-input bg-background px-3 text-sm text-foreground shadow-sm outline-none transition focus-visible:ring-2 focus-visible:ring-ring"

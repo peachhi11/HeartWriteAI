@@ -13,58 +13,56 @@ import {
   WandSparkles,
 } from "lucide-react";
 
-import { LiquidThemePreviewSettings } from "@/components/liquid-theme-picker";
+import { GlobalSetupCanvas } from "@/components/global-setup-canvas";
 import { StudioShell } from "@/components/studio-shell";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AdvancedRuntimeSettings } from "@/features/settings/components/AdvancedRuntimeSettings";
-import { ThemeCustomizationStudio } from "@/features/settings/components/ThemeCustomizationStudio";
 
 const workflowCards = [
   {
     title: "Create Character",
-    description: "Generate a new CCV3-ready character from guided inputs.",
+    description: "Build a new character card from guided prompts.",
     href: "/workspace?mode=create",
     icon: UserRoundPlus,
   },
   {
     title: "Edit Character",
-    description: "Import, refine, convert, and export editable card drafts.",
+    description: "Import, polish, convert, and export character cards.",
     href: "/workspace?mode=edit",
     icon: PencilRuler,
   },
   {
     title: "Create Persona",
-    description: "Build playable {{user}} POV personas for roleplay bundles.",
+    description: "Create a {{user}} persona for your chats.",
     href: "/personas",
     icon: Feather,
   },
   {
     title: "Persona Match",
-    description: "Match persona energy to characters, scenarios, and tone.",
+    description: "Match your persona to characters, scenarios, and tone.",
     href: "/personas?mode=match",
     icon: WandSparkles,
   },
   {
     title: "Lorebooks",
-    description: "Create modular V3 lorebooks and runtime-ready entries.",
+    description: "Create lorebooks with world info, keys, and story rules.",
     href: "/lorebooks",
     icon: LibraryBig,
   },
   {
     title: "Image Generation",
-    description: "Prepare visual assets, avatars, and card art workflows.",
+    description: "Prepare avatars, card art, and visual assets.",
     href: "/images",
     icon: ImageIcon,
   },
   {
     title: "Chat",
-    description: "Preview one-on-one character chat with runtime context.",
+    description: "Test a one-on-one character chat with your selected lore.",
     href: "/chat",
     icon: MessageSquareText,
   },
   {
     title: "Library",
-    description: "Browse saved characters, personas, lore, and bundles.",
+    description: "Browse saved characters, personas, lorebooks, and bundles.",
     href: "/libraries",
     icon: LibraryBig,
   },
@@ -85,22 +83,16 @@ function DashboardHome() {
 
   return (
     <StudioShell
-      eyebrow={isSettings ? "Workspace controls" : "Romance creation suite"}
+      eyebrow={isSettings ? "Game settings" : "Romance creation suite"}
       title={isSettings ? "Settings" : "Studio Dashboard"}
       subtitle={
         isSettings
-          ? "Tune runtime appearance, colorways, and advanced engine visibility."
-          : "Choose a studio tool to open its workspace."
+          ? "Adjust your game's visual settings, color options, and advanced graphics."
+          : "Choose what you want to make or test next."
       }
     >
       {isSettings ? (
-        <section className="grid gap-5">
-          <ThemeCustomizationStudio />
-          <div className="grid gap-5 xl:grid-cols-2">
-            <LiquidThemePreviewSettings />
-            <AdvancedRuntimeSettings />
-          </div>
-        </section>
+        <GlobalSetupCanvas />
       ) : (
         <section className="grid gap-5 sm:grid-cols-2">
           {workflowCards.map((card) => (
@@ -131,7 +123,7 @@ function DashboardFallback() {
     <StudioShell
       eyebrow="Romance creation suite"
       title="Studio Dashboard"
-      subtitle="Choose a studio tool to open its workspace."
+      subtitle="Choose what you want to make or test next."
     >
       <section className="grid gap-5 sm:grid-cols-2">
         {workflowCards.map((card) => (

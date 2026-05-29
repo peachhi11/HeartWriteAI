@@ -673,7 +673,7 @@ function AdvancedPersonaPromptPanel(props: {
           />
         </Field>
         <section className="rounded-md border bg-muted p-3">
-          <h3 className="mb-2 text-xs font-semibold">Compiled Preview</h3>
+          <h3 className="mb-2 text-xs font-semibold">Prompt Preview</h3>
           <pre className="max-h-56 overflow-auto whitespace-pre-wrap text-xs leading-5 text-muted-foreground">
             {props.preview}
           </pre>

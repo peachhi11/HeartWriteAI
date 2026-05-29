@@ -24,6 +24,7 @@ export interface UserThemeConfig {
   legibility: LegibilityEngineConfig;
   name: string;
   primaryGlow: string;
+  sidebarWidth: number;
   transparency: InterfaceOpacityConfig;
 }
 
@@ -37,6 +38,7 @@ export const BUILTIN_THEMES: UserThemeConfig[] = [
     legibility: DEFAULT_LEGIBILITY_CONFIG,
     name: "Crimson Velvet",
     primaryGlow: "#e11d48",
+    sidebarWidth: 280,
     transparency: INITIAL_TRANSPARENCY_STATE,
   },
   {
@@ -48,6 +50,7 @@ export const BUILTIN_THEMES: UserThemeConfig[] = [
     legibility: DEFAULT_LEGIBILITY_CONFIG,
     name: "Cyber Quartz",
     primaryGlow: "#06b6d4",
+    sidebarWidth: 280,
     transparency: INITIAL_TRANSPARENCY_STATE,
   },
   {
@@ -59,6 +62,7 @@ export const BUILTIN_THEMES: UserThemeConfig[] = [
     legibility: DEFAULT_LEGIBILITY_CONFIG,
     name: "Sepia Vintage",
     primaryGlow: "#d97706",
+    sidebarWidth: 280,
     transparency: INITIAL_TRANSPARENCY_STATE,
   },
   {
@@ -70,6 +74,7 @@ export const BUILTIN_THEMES: UserThemeConfig[] = [
     legibility: DEFAULT_LEGIBILITY_CONFIG,
     name: "Terminal Zinc",
     primaryGlow: "#71717a",
+    sidebarWidth: 280,
     transparency: INITIAL_TRANSPARENCY_STATE,
   },
 ] as const satisfies UserThemeConfig[];

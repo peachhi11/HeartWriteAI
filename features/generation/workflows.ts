@@ -709,7 +709,7 @@ export function compilePersonaConstructionPrompt(input: PersonaGenerationInput) 
     `Tags: ${input.tags.trim() || "None"}`,
     "",
     "[OUTPUT REQUIREMENTS]",
-    "Return a concise editable persona artifact with summary, tags, and runtime prompt text.",
+    "Return a concise editable persona artifact with summary, tags, and chat prompt text.",
   ].join("\n");
 }
 
@@ -1055,7 +1055,7 @@ export function compileScenarioConstructionPrompt(input: ScenarioGenerationInput
     `Saved lorebook context: ${input.referenceLorebook?.trim() || "None selected"}`,
     "",
     "[OUTPUT REQUIREMENTS]",
-    "Return a concise editable scenario artifact with scene premise, sensory anchors, opening constraint, tags, and runtime shape.",
+    "Return a concise editable scenario artifact with scene premise, sensory anchors, opening constraint, tags, and chat shape.",
     "Never assign {{user}} dialogue, internal thoughts, choices, or consent.",
   ].join("\n");
 }
@@ -1154,7 +1154,7 @@ export function createBlankLorebookArtifact(
     description: "A small modular lorebook draft.",
     entries: [
       LorebookV3EntrySchema.parse({
-        content: "Write one focused lore rule, fact, relationship, location, or runtime cue here.",
+        content: "Write one focused lore rule, fact, relationship, location, or chat cue here.",
         enabled: true,
         id: `entry_${Date.now().toString(36)}`,
         insertion_order: 0,
@@ -1324,7 +1324,7 @@ export function createRuntimeBundleArtifact(
     [character?.name, persona?.name, scenario?.title, lorebook?.title]
       .filter(Boolean)
       .join(" + ") ||
-    "Untitled Runtime Bundle";
+    "Untitled Chat Setup";
   const scenarioOverride = normalizeScenarioOverride(input.scenarioOverride);
   const tags = normalizeTags(
     [
@@ -1364,7 +1364,7 @@ export function createRuntimeBundleArtifact(
 export function createRuntimeBundleArtifactFromEditable(
   input: RuntimeBundleArtifact,
 ): RuntimeBundleArtifact {
-  const title = input.title.trim() || "Untitled Runtime Bundle";
+  const title = input.title.trim() || "Untitled Chat Setup";
   const tags = normalizeTags(
     [
       "bundle",
@@ -1398,12 +1398,12 @@ export function createImportedRuntimeBundleArtifact(
   sourceFileName?: string,
 ): RuntimeBundleArtifact {
   if (!isRecord(value)) {
-    throw new Error("Runtime bundle JSON must be an object.");
+    throw new Error("Chat setup JSON must be an object.");
   }
 
   const title = readUnknownString(value.title) ||
     sourceFileName?.replace(/\.json$/i, "").trim() ||
-    "Imported Runtime Bundle";
+    "Imported Chat Setup";
   const character = readBundleCharacter(value.character);
   const persona = readBundlePersona(value.persona);
   const scenario = readBundleScenario(value.scenario);
@@ -1696,7 +1696,7 @@ function compileRuntimeBundleContext(input: {
             ? `Tags: ${input.character.tags.join(", ")}`
             : "",
         ].filter(Boolean).join("\n")
-      : "No character selected. Chat creation should require a character card before runtime.",
+      : "No character selected. Chat creation should require a character card before chat.",
     "",
     "[SELECTED PERSONA]",
     input.persona

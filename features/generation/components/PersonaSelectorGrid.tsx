@@ -89,7 +89,7 @@ export function PersonaSelectorGrid(props: PersonaSelectorGridProps) {
   if (isLoading) {
     return (
       <div className="rounded-md border bg-background/70 p-6 text-center text-xs font-mono uppercase tracking-wide text-muted-foreground">
-        Scanning local persona profiles...
+        Loading saved personas...
       </div>
     );
   }
@@ -97,10 +97,10 @@ export function PersonaSelectorGrid(props: PersonaSelectorGridProps) {
   if (personas.length === 0) {
     return (
       <section className="rounded-md border border-dashed bg-background/50 p-6 text-center">
-        <p className="text-sm font-medium">No saved psychological personas yet.</p>
+        <p className="text-sm font-medium">No saved personas yet.</p>
         <p className="mt-1 text-xs text-muted-foreground">
-          Save a persona draft or add JSON summaries to the desktop personas
-          folder, then rescan.
+          Save a persona draft or add JSON summaries to your persona folder,
+          then rescan.
         </p>
         <Button
           className="mt-4"
@@ -122,10 +122,10 @@ export function PersonaSelectorGrid(props: PersonaSelectorGridProps) {
       <div className="flex items-center justify-between gap-3">
         <div>
           <h3 className="text-xs font-black uppercase tracking-wide text-muted-foreground">
-            Synchronized Profiles
+            Saved Personas
           </h3>
           <p className="text-xs text-muted-foreground">
-            Select a saved psychological footprint for the active session.
+            Select a saved persona for this chat.
           </p>
         </div>
         <Button
@@ -228,7 +228,7 @@ export function PersonaSelectorGrid(props: PersonaSelectorGridProps) {
           <div className="rounded-md border border-dashed bg-background/50 p-6 text-center sm:col-span-2">
             <p className="text-sm font-medium">No persona templates match.</p>
             <p className="mt-1 text-xs text-muted-foreground">
-              Adjust the search text or switch the psychological axis filter.
+              Adjust the search text or switch the personality filter.
             </p>
           </div>
         ) : null}

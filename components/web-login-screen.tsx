@@ -94,7 +94,7 @@ export function WebLoginScreen() {
         isProcessing: false,
         tokenPayload: null,
         validationError:
-          caught instanceof Error ? caught.message : "Server handshake failure.",
+          caught instanceof Error ? caught.message : "Could not sign in.",
       }));
     }
   }
@@ -115,7 +115,7 @@ export function WebLoginScreen() {
                 HeartWriteAI Web UI
               </h1>
               <p className="mt-1 text-[11px] leading-5 text-zinc-500">
-                Secure access for synchronized playthrough archives.
+                Secure access for saved playthroughs.
               </p>
             </div>
           </header>
@@ -193,7 +193,7 @@ export function WebLoginScreen() {
               <div className="rounded-xl border border-red-500/30 bg-red-950/20 p-3 text-left text-[11px] leading-normal text-red-300">
                 <strong className="mb-1 flex items-center gap-1.5 font-sans text-[9px] uppercase tracking-wide text-red-300">
                   <AlertTriangle className="size-3.5" />
-                  Auth exception
+                  Sign-in problem
                 </strong>
                 <span className="font-mono">{authState.validationError}</span>
               </div>
@@ -201,7 +201,7 @@ export function WebLoginScreen() {
 
             {authState.mfaRequired ? (
               <div className="rounded-xl border border-amber-500/30 bg-amber-950/20 p-3 text-[11px] text-amber-200">
-                Additional verification is required before archive access.
+                Additional verification is required before opening your saves.
               </div>
             ) : null}
 
@@ -218,12 +218,12 @@ export function WebLoginScreen() {
               {authState.isProcessing ? (
                 <span className="flex items-center justify-center gap-2">
                   <LoaderCircle className="size-4 animate-spin" />
-                  Verifying handshake
+                  Verifying
                 </span>
               ) : (
                 <span className="flex items-center justify-center gap-2">
                   <ShieldCheck className="size-4" />
-                  Authorize Connection
+                  Sign In
                 </span>
               )}
             </button>
@@ -232,7 +232,7 @@ export function WebLoginScreen() {
           <footer className="border-t border-zinc-800/70 pt-4 text-center">
             <span className="inline-flex items-center justify-center gap-1.5 text-[10px] font-medium text-zinc-600">
               <LockKeyhole className="size-3" />
-              Local admin access requires configured server credentials.
+              Access requires your configured account credentials.
             </span>
           </footer>
         </div>

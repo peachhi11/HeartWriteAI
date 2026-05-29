@@ -19,31 +19,31 @@ interface StudioShellProps {
 
 const primarySections = [
   {
-    description: "Overview, imports, native bridge, and workflow status.",
+    description: "Overview, imports, settings, and quick links.",
     href: "/",
     icon: "/brand/favicon.svg",
     label: "Dashboard",
   },
   {
-    description: "Generate, import, edit, convert, and export CCV3 cards.",
+    description: "Create, import, polish, convert, and export character cards.",
     href: "/workspace?mode=edit",
     icon: "/brand/icons/character-cards.svg",
     label: "Character Cards",
   },
   {
-    description: "Craft standalone personas or match them to generated cards.",
+    description: "Create {{user}} personas or match them to characters.",
     href: "/personas",
     icon: "/brand/icons/persona-matching.svg",
     label: "Persona Matching",
   },
   {
-    description: "Build scoped world, character, and scenario lorebooks.",
+    description: "Build world info, character notes, and scenario lorebooks.",
     href: "/lorebooks",
     icon: "/brand/icons/lorebooks.svg",
     label: "Lorebooks",
   },
   {
-    description: "Generate and process card art and visual assets.",
+    description: "Prepare avatars, card art, and other visuals.",
     href: "/images",
     icon: "/brand/icons/image-generation.svg",
     label: "Image Generation",

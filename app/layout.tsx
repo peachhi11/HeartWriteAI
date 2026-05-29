@@ -1,7 +1,21 @@
 import type { Metadata } from "next";
+import { Aboreto, Figtree } from "next/font/google";
 import "./globals.css";
 import { RuntimeThemeProvider } from "@/components/runtime-theme-provider";
 import { ThemeProvider } from "@/components/theme-provider";
+
+const aboreto = Aboreto({
+  display: "swap",
+  subsets: ["latin"],
+  variable: "--font-aboreto",
+  weight: "400",
+});
+
+const figtree = Figtree({
+  display: "swap",
+  subsets: ["latin"],
+  variable: "--font-figtree",
+});
 
 export const metadata: Metadata = {
   title: "HeartWriteAI",
@@ -16,7 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="antialiased">
+      <body className={`${aboreto.variable} ${figtree.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

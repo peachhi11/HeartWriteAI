@@ -253,7 +253,7 @@ export default function WorkspacePage() {
 
   async function handleManualImportClick() {
     if (!isDesktopRuntime) {
-      setWorkspaceMessage("Use the browser file picker or drag a PNG/JSON card onto the workspace.");
+      setWorkspaceMessage("Use the browser file picker or drag a PNG/JSON card onto the page.");
       return;
     }
 

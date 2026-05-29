@@ -57,7 +57,7 @@ export function BundleSelectionPage() {
   const scenarios = useScenarioLibrary();
   const lorebooks = useLorebookLibrary();
   const bundles = useRuntimeBundleLibrary();
-  const [title, setTitle] = useState("Current Story Runtime");
+  const [title, setTitle] = useState("Current Story Setup");
   const [characterId, setCharacterId] = useState("");
   const [personaId, setPersonaId] = useState("");
   const [scenarioId, setScenarioId] = useState("");
@@ -116,7 +116,7 @@ export function BundleSelectionPage() {
     setActiveBundle(bundle);
     setSavedSnapshot(null);
     setDeleteArmed(false);
-    setStatus("Created runtime bundle preview.");
+    setStatus("Created chat setup preview.");
   }
 
   async function suggestMissingPieces() {
@@ -209,7 +209,7 @@ export function BundleSelectionPage() {
     await bundles.refresh();
     setSavedSnapshot(JSON.stringify(saved, null, 2));
     setDeleteArmed(false);
-    setStatus(`Saved ${saved.title} to runtime bundles.`);
+    setStatus(`Saved ${saved.title} to chat setups.`);
   }
 
   async function saveAsCopy() {
@@ -230,7 +230,7 @@ export function BundleSelectionPage() {
     await bundles.refresh();
     setSavedSnapshot(JSON.stringify(copy, null, 2));
     setDeleteArmed(false);
-    setStatus(`Saved ${copyTitle} as a separate runtime bundle.`);
+    setStatus(`Saved ${copyTitle} as a separate chat setup.`);
   }
 
   async function deleteActive() {
@@ -249,7 +249,7 @@ export function BundleSelectionPage() {
     setActiveBundle(null);
     setSavedSnapshot(null);
     setDeleteArmed(false);
-    setStatus(`Deleted ${activeBundle.title} from runtime bundles.`);
+    setStatus(`Deleted ${activeBundle.title} from chat setups.`);
   }
 
   function duplicateActive() {
@@ -302,7 +302,7 @@ export function BundleSelectionPage() {
         : current,
     );
     setDeleteArmed(false);
-    setStatus("Edited runtime bundle draft. Save when ready.");
+    setStatus("Edited chat setup draft. Save when ready.");
   }
 
   async function copy() {
@@ -311,7 +311,7 @@ export function BundleSelectionPage() {
     }
 
     await navigator.clipboard.writeText(serialized);
-    setStatus("Copied runtime bundle JSON.");
+    setStatus("Copied chat setup JSON.");
   }
 
   function exportJson() {
@@ -324,7 +324,7 @@ export function BundleSelectionPage() {
       createArtifactFileName(activeBundle.title, ".bundle.json"),
       "application/json",
     );
-    setStatus("Exported runtime bundle JSON.");
+    setStatus("Exported chat setup JSON.");
   }
 
   async function importJsonFile(event: React.ChangeEvent<HTMLInputElement>) {
@@ -491,7 +491,8 @@ export function BundleSelectionPage() {
               <div className="space-y-1.5">
                 <CardTitle>{activeBundle.title}</CardTitle>
                 <CardDescription>
-                  Prepared runtime context for selected saved artifacts.
+                  Prepared chat setup from your saved character, persona,
+                  scenario, and lorebook.
                 </CardDescription>
                 <div className="flex flex-wrap gap-2">
                   <Badge variant={isDirty ? "secondary" : "outline"}>
@@ -549,7 +550,7 @@ export function BundleSelectionPage() {
                 ))}
               </div>
               <section className="rounded-md border bg-background/70 p-4">
-                <h3 className="mb-2 text-sm font-semibold">Compiled Context</h3>
+                <h3 className="mb-2 text-sm font-semibold">Chat Preview Notes</h3>
                 <pre className="max-h-[32rem] overflow-auto whitespace-pre-wrap text-xs leading-relaxed text-muted-foreground">
                   {activeBundle.compiledContext}
                 </pre>
@@ -558,28 +559,28 @@ export function BundleSelectionPage() {
           </Card>
         ) : (
           <GeneratorFormCard
-            title="Runtime Preview"
-            description="Create or import a bundle to preview the compiled context that future chat sessions will receive."
+            title="Chat Preview"
+            description="Create or import a bundle to preview what future chats will know."
           >
             <p className="text-sm text-muted-foreground">
-              Bundles are saved selections, not editable engines. Chat can run
+              Chat setups are saved selections, not another character card. Chat can run
               with a character and persona only; scenario and lorebook records
-              add optional context when you want them.
+              add optional story details when you want them.
             </p>
           </GeneratorFormCard>
         )}
 
         <GeneratorFormCard
-          title={`Saved Bundles (${bundles.totalCount})`}
-          description="Reload a saved bundle for export, duplication, or future chat handoff."
+          title={`Saved Chat Setups (${bundles.totalCount})`}
+          description="Reload a saved setup for export, duplication, or future chats."
         >
           <Input
-            placeholder="Search saved bundles..."
+            placeholder="Search saved chat setups..."
             value={bundles.query}
             onChange={(event) => bundles.setQuery(event.currentTarget.value)}
           />
           <BundleLibraryList
-            empty={bundles.loading ? "Loading bundles..." : "No saved bundles yet."}
+            empty={bundles.loading ? "Loading chat setups..." : "No saved chat setups yet."}
             items={bundles.items}
             onSelect={loadBundle}
           />
@@ -698,7 +699,7 @@ function BundleLibraryList(props: {
           <p className="mt-1 line-clamp-2 text-xs text-muted-foreground">
             {[item.character?.name, item.persona?.name, item.scenario?.title, item.lorebook?.title]
               .filter(Boolean)
-              .join(" + ") || "Partial runtime bundle"}
+              .join(" + ") || "Partial chat setup"}
           </p>
         </button>
       ))}

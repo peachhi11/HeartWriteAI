@@ -6,7 +6,7 @@ export default function LibrariesPage() {
     <StudioShell
       eyebrow="Libraries"
       title="Library"
-      subtitle="Browse saved characters, personas, lore, and bundle-ready assets."
+      subtitle="Browse saved characters, personas, lorebooks, scenarios, and chat bundles."
     >
       <LibrariesWorkspace />
     </StudioShell>

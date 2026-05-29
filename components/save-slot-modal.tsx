@@ -113,10 +113,10 @@ export function SaveSlotModal({
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
           <h3 className="text-base font-bold text-[var(--foreground)]">
-            Select story profile
+            Select story slot
           </h3>
           <p className="text-xs text-[var(--muted)]">
-            Manage separate playthrough variables without mixing runtime saves.
+            Keep separate playthroughs, characters, and relationship progress.
           </p>
         </div>
 
@@ -135,7 +135,7 @@ export function SaveSlotModal({
 
       {cloningFrom !== null && (
         <div className="mb-3 rounded-2xl border border-[var(--accent)] bg-[var(--panel-strong)] p-3 text-xs text-[var(--muted)]">
-          Choose a target slot to overwrite with Profile Slot {cloningFrom}.
+          Choose a story slot to overwrite with Slot {cloningFrom}.
         </div>
       )}
 
@@ -177,7 +177,7 @@ export function SaveSlotModal({
               >
                 <span className="flex flex-wrap items-center gap-2">
                   <span className="text-xs font-black uppercase tracking-wide text-[var(--muted)]">
-                    Profile Slot {slot.slot_index}
+                    Story Slot {slot.slot_index}
                   </span>
                   {isActive && (
                     <span className="rounded-full bg-[var(--accent)] px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-[var(--accent-contrast)]">
@@ -198,8 +198,8 @@ export function SaveSlotModal({
                 </span>
                 <span className="mt-1 block text-xs text-[var(--muted)]">
                   {slot.exists
-                    ? `Turns executed: ${slot.total_turns_played}`
-                    : "Empty file profile"}
+                    ? `${slot.total_turns_played} chat turns`
+                    : "Empty story slot"}
                 </span>
               </button>
 
@@ -215,7 +215,7 @@ export function SaveSlotModal({
                     onClick={() => void handleCloneToSlot(slot.slot_index)}
                     className="rounded-full bg-[var(--accent)] px-3 py-2 text-xs font-bold text-[var(--accent-contrast)] transition hover:brightness-110"
                   >
-                    Clone here
+                    Copy here
                   </button>
                 ) : (
                   <div className="flex items-center gap-1">
@@ -228,7 +228,7 @@ export function SaveSlotModal({
                       >
                         <Copy className="size-4" />
                         <span className="sr-only">
-                          Copy Profile Slot {slot.slot_index}
+                          Copy Story Slot {slot.slot_index}
                         </span>
                       </button>
                     )}
@@ -245,7 +245,7 @@ export function SaveSlotModal({
                       >
                         <Trash2 className="size-4" />
                         <span className="sr-only">
-                          Erase Profile Slot {slot.slot_index}
+                          Erase Story Slot {slot.slot_index}
                         </span>
                       </button>
                     )}

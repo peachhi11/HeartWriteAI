@@ -32,6 +32,8 @@ pub struct UserThemeConfig {
     pub font_family: String,
     #[serde(rename = "cardOpacity")]
     pub card_opacity: u32,
+    #[serde(rename = "sidebarWidth", default = "default_sidebar_width")]
+    pub sidebar_width: u32,
     #[serde(rename = "customWallpaper", default)]
     pub custom_wallpaper: Option<WallpaperPreference>,
     #[serde(default)]
@@ -97,6 +99,7 @@ impl Default for UserThemeConfig {
             bg_vignette: "from-rose-950/40 via-transparent".to_string(),
             font_family: "serif".to_string(),
             card_opacity: 40,
+            sidebar_width: default_sidebar_width(),
             custom_wallpaper: None,
             legibility: LegibilityEngineConfig::default(),
             transparency: InterfaceOpacityConfig::default(),
@@ -245,6 +248,7 @@ fn normalize_theme_config(theme: UserThemeConfig) -> UserThemeConfig {
             fallback.font_family
         },
         card_opacity: theme.card_opacity.clamp(10, 90),
+        sidebar_width: theme.sidebar_width.clamp(240, 480),
         custom_wallpaper: normalize_wallpaper_preference(theme.custom_wallpaper),
         legibility: normalize_legibility_config(theme.legibility),
         transparency: normalize_transparency_config(theme.transparency),
@@ -284,6 +288,10 @@ fn normalize_wallpaper_preference(
         asset_protocol_url: payload.asset_protocol_url,
         internal_sandbox_path: payload.internal_sandbox_path,
     })
+}
+
+fn default_sidebar_width() -> u32 {
+    280
 }
 
 fn normalize_theme_id(id: &str, fallback: &str) -> String {
@@ -334,6 +342,7 @@ mod tests {
         assert_eq!(theme.bg_vignette, "from-rose-950/40 via-transparent");
         assert_eq!(theme.font_family, "serif");
         assert_eq!(theme.card_opacity, 40);
+        assert_eq!(theme.sidebar_width, 280);
     }
 
     #[test]
@@ -345,6 +354,7 @@ mod tests {
             bg_vignette: "from-red-500".to_string(),
             font_family: "script".to_string(),
             card_opacity: 999,
+            sidebar_width: 999,
             custom_wallpaper: Some(WallpaperPreference {
                 internal_sandbox_path: "/no/such/wallpaper.png".to_string(),
                 asset_protocol_url: "file:///no/such/wallpaper.png".to_string(),
@@ -367,6 +377,7 @@ mod tests {
         assert_eq!(theme.bg_vignette, UserThemeConfig::default().bg_vignette);
         assert_eq!(theme.font_family, UserThemeConfig::default().font_family);
         assert_eq!(theme.card_opacity, 90);
+        assert_eq!(theme.sidebar_width, 480);
         assert_eq!(theme.custom_wallpaper, None);
         assert_eq!(
             theme.legibility,
@@ -395,6 +406,7 @@ mod tests {
             bg_vignette: "from-cyan-950/40 via-transparent".to_string(),
             font_family: "mono".to_string(),
             card_opacity: 3,
+            sidebar_width: 100,
             custom_wallpaper: None,
             legibility: LegibilityEngineConfig::default(),
             transparency: InterfaceOpacityConfig::default(),
@@ -406,6 +418,7 @@ mod tests {
         assert_eq!(theme.bg_vignette, "from-cyan-950/40 via-transparent");
         assert_eq!(theme.font_family, "mono");
         assert_eq!(theme.card_opacity, 10);
+        assert_eq!(theme.sidebar_width, 240);
     }
 
     #[test]
@@ -418,6 +431,7 @@ mod tests {
             bg_vignette: "from-zinc-900/60 via-transparent".to_string(),
             font_family: "sans".to_string(),
             card_opacity: 15,
+            sidebar_width: 376,
             custom_wallpaper: None,
             legibility: LegibilityEngineConfig {
                 brightness_level: 64,

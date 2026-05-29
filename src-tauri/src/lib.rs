@@ -1,18 +1,25 @@
 pub mod cache;
+pub mod cloud_sync;
 mod codecs;
 mod commands;
 pub mod dialogue;
+pub mod inference_manager;
+pub mod llm_bridge;
+pub mod lore_manager;
 pub mod models;
+pub mod screenshot;
 pub mod security;
 pub mod state_manager;
 pub mod studio;
 pub mod synthesis;
 pub mod theme_manager;
+pub mod updater;
 pub mod utils;
 pub mod wallpaper;
 pub mod wallpaper_compiler;
 
 use crate::cache::card_cache::CacheDatabase;
+use crate::inference_manager::AppInferenceSettingsState;
 use crate::state_manager::PersistentEngineStore;
 use crate::theme_manager::AppSettingsState;
 use crate::utils::assets::{
@@ -49,6 +56,7 @@ pub fn run() {
         })
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .register_asynchronous_uri_scheme_protocol("ccv3-asset", |_ctx, request, responder| {
             let native_file_path = decode_asset_uri_path(request.uri().path());
             std::thread::spawn(move || {
@@ -80,6 +88,7 @@ pub fn run() {
             std::fs::create_dir_all(&app_dir)?;
             app.manage(PersistentEngineStore::load_profile_on_boot(app.handle()));
             app.manage(AppSettingsState::load_on_boot(app.handle()));
+            app.manage(AppInferenceSettingsState::load_on_boot(app.handle()));
 
             let database_file_location = app_dir.join("library_cache.db");
             let initialised_db = CacheDatabase::init(database_file_location)
@@ -135,12 +144,21 @@ pub fn run() {
             commands::trope_runtime::load_game_slot,
             commands::trope_runtime::replace_dialogue_history,
             commands::trope_runtime::sync_trope_interaction,
+            cloud_sync::push_save_to_cloud_repository,
             dialogue::fetch_contextual_npc_dialogue,
+            inference_manager::export_user_inference_settings,
+            inference_manager::get_boot_inference_settings,
+            llm_bridge::stream_local_llm_response,
+            lore_manager::import_and_compile_lorebook,
+            lore_manager::remove_lorebook_file,
+            lore_manager::toggle_lorebook_active_state,
+            screenshot::capture_viewport_screenshot,
             security::parse_secured_character_card,
             studio::delete_saved_persona_file,
             studio::fetch_saved_personas_list,
             theme_manager::export_user_theme_preferences,
             theme_manager::get_boot_theme_settings,
+            updater::execute_app_update_check,
             utils::assets::attach_expression_sprite,
             utils::assets::remove_expression_sprite,
             utils::assets::scan_character_expressions,

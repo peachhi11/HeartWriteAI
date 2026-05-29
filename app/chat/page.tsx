@@ -1,11 +1,28 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import {
+  FormEvent,
+  PointerEvent as ReactPointerEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import Link from "next/link";
-import { Brain, Route, SendHorizontal, Sparkles } from "lucide-react";
+import {
+  BookOpenText,
+  Brain,
+  MousePointerClick,
+  Route,
+  SendHorizontal,
+  Sparkles,
+} from "lucide-react";
 
+import { CenteredIntentModal } from "@/components/centered-intent-modal";
+import { CameraSnapperButton } from "@/components/camera-snapper-button";
 import { ChatExporterButton } from "@/components/chat-exporter-button";
 import { ChatViewport } from "@/components/chat-viewport";
+import { GlowingConnectionNode } from "@/components/glowing-connection-node";
+import { LorebookControlPanel } from "@/components/lorebook-control-panel";
 import { SaveSlotModal } from "@/components/save-slot-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,9 +41,16 @@ import {
   RoleplayMessage,
   toOllamaMessages,
 } from "@/lib/chat/messages";
+import { parseActiveLore } from "@/lib/character-card/lorebookParser";
 import { classifyTropeInput } from "@/lib/character-card/tropeMatcher";
 import { fetchContextualNpcDialogue } from "@/lib/tauri/contextualDialogue";
+import { streamLocalLlmResponse } from "@/lib/tauri/localLlm";
 import { appendMessageToHistory } from "@/lib/tauri/tropeInteraction";
+import {
+  clampSidebarWidth,
+  loadUserThemePreference,
+  saveUserTheme,
+} from "@/lib/ui/runtimeTheme";
 import { cn } from "@/lib/utils";
 import { StudioShell } from "@/components/studio-shell";
 import { useScenarioLibrary } from "@/hooks/useScenarioLibrary";
@@ -37,16 +61,86 @@ import type { ChatMessage } from "@/types/chat";
 import type { RomanceTropeClass } from "@/types/character-card/RomanceTropeClassification";
 import type { DialogueLogEntry } from "@/types/history";
 import { COMPLETE_TROPE_MATRIX } from "@/types/tropes";
+import type { ActionCardVariant } from "@/types/cards";
+import type { SystemSyncStatus } from "@/types/diagnostics";
+import type { DockingState, SidePanelType } from "@/types/dock";
+import type { GeneratedLorebookArtifact } from "@/features/generation/workflows";
 
 const OLLAMA_CHAT_ENDPOINT = "http://localhost:11434/api/chat";
 const DEFAULT_MODEL = "llama3";
+const PREVIEW_CHAT_ID = "preview-chat";
+const PREVIEW_CHAT_UPDATED_AT = 0;
 
 const initialMessages: RoleplayMessage[] = [
-  createRoleplayMessage(
-    "assistant",
-    "*Rain beads against the high-rise windows while {{char}} pauses beside the conference table, one hand still resting on the unsigned contract.* \"You came back after all.\"",
-    "casual",
-  ),
+  {
+    detectedTrope: "casual",
+    id: "preview-chat-opening",
+    parts: [
+      {
+        text: '*Rain beads against the high-rise windows while {{char}} pauses beside the conference table, one hand still resting on the unsigned contract.* "You came back after all."',
+        type: "text",
+      },
+    ],
+    role: "assistant",
+    timestamp: "2026-05-29T00:00:00.000Z",
+  },
+];
+
+const checkpointIntentOptions: ActionCardVariant[] = [
+  {
+    actionDescriptor:
+      "steps in front of them, shoulders squared against the pressure in the room",
+    dialoguePreview:
+      "No. If you want to get to them, you go through me first.",
+    id: "checkpoint_protective",
+    intensityModifier: "border-rose-500/30 text-rose-300",
+    intentClass: "protective",
+  },
+  {
+    actionDescriptor:
+      "smirks despite the tension, leaning back like the danger is personally entertaining",
+    dialoguePreview:
+      "That was almost intimidating. Do you practice that glare, or is it a natural gift?",
+    id: "checkpoint_bantering",
+    intensityModifier: "border-amber-500/30 text-amber-300",
+    intentClass: "bantering",
+  },
+  {
+    actionDescriptor:
+      "looks away too quickly, heat rising in their face as the silence stretches",
+    dialoguePreview:
+      "I was not staring. I was just... thinking. Very intensely. In your direction.",
+    id: "checkpoint_flustered",
+    intensityModifier: "border-pink-500/30 text-pink-300",
+    intentClass: "flustered",
+  },
+  {
+    actionDescriptor:
+      "holds their ground, chin lifting as restraint turns into open defiance",
+    dialoguePreview:
+      "You do not get to decide where I belong. Not tonight.",
+    id: "checkpoint_antagonistic",
+    intensityModifier: "border-red-500/30 text-red-300",
+    intentClass: "antagonistic",
+  },
+  {
+    actionDescriptor:
+      "softens by a fraction, voice lowering as if the truth is almost too costly to say",
+    dialoguePreview:
+      "I keep trying to pretend this does not matter. It is starting to feel impossible.",
+    id: "checkpoint_yearning",
+    intensityModifier: "border-fuchsia-500/30 text-fuchsia-300",
+    intentClass: "yearning",
+  },
+  {
+    actionDescriptor:
+      "meets their eyes with sudden, quiet certainty, the rest of the room falling away",
+    dialoguePreview:
+      "I know you. I do not know how yet, but I know you.",
+    id: "checkpoint_recognized",
+    intensityModifier: "border-violet-500/30 text-violet-300",
+    intentClass: "recognized",
+  },
 ];
 
 type ScenarioOverride = {
@@ -80,19 +174,41 @@ export default function RoleplayChat() {
   const relationshipHydrated = useRelationshipStore((state) => state.hydrated);
   const relationshipState = useRelationshipStore((state) => state.state);
   const relationshipTracking = useRelationshipStore((state) => state.tracking);
-  const [sessions, setSessions] =
-    useState<ChatSession[]>(loadInitialChatSessions);
-  const [activeSessionId, setActiveSessionId] = useState(() => sessions[0]!.id);
+  const [sessions, setSessions] = useState<ChatSession[]>(() => [
+    createPreviewChatSession(),
+  ]);
+  const [activeSessionId, setActiveSessionId] = useState(PREVIEW_CHAT_ID);
+  const [chatStorageHydrated, setChatStorageHydrated] = useState(false);
   const [input, setInput] = useState("");
   const [scenarioId, setScenarioId] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [intentModalOpen, setIntentModalOpen] = useState(false);
+  const [lorebookPanelOpen, setLorebookPanelOpen] = useState(false);
+  const [dockingState, setDockingState] = useState<DockingState>({
+    activePanel: "Lorebook",
+    dockPosition: "right",
+    isCollapsed: false,
+  });
+  const [sidebarWidth, setSidebarWidth] = useState(280);
+  const [activeLorebook, setActiveLorebook] =
+    useState<GeneratedLorebookArtifact | null>(null);
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
+  const activeThemeRef = useRef<Awaited<ReturnType<typeof loadUserThemePreference>> | null>(
+    null,
+  );
+  const animationFrameRef = useRef<number | null>(null);
+  const isResizingDockRef = useRef(false);
+  const resizeStartRef = useRef({ pointerX: 0, width: 280 });
+  const sidebarWidthRef = useRef(sidebarWidth);
   const activeSession =
     sessions.find((session) => session.id === activeSessionId) ?? sessions[0]!;
   const messages = activeSession.messages;
   const viewportMessages = messages.map(toViewportMessage);
   const activeTrope = getActiveTrope(messages);
   const activeTropeStyle = COMPLETE_TROPE_MATRIX[activeTrope];
+  const isLorebookDockVisible =
+    dockingState.activePanel === "Lorebook" && !dockingState.isCollapsed;
+  const loreDiagnostic = getLorebookDiagnostic(activeLorebook, runtimeError);
 
   useEffect(() => {
     if (!relationshipHydrated) {
@@ -101,12 +217,115 @@ export default function RoleplayChat() {
   }, [hydrateRelationship, relationshipHydrated]);
 
   useEffect(() => {
+    let cancelled = false;
+
+    window.queueMicrotask(() => {
+      if (cancelled) {
+        return;
+      }
+
+      const loaded = loadInitialChatSessions();
+
+      setSessions(loaded);
+      setActiveSessionId(loaded[0]?.id ?? PREVIEW_CHAT_ID);
+      setChatStorageHydrated(true);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void loadUserThemePreference().then((theme) => {
+      if (cancelled) {
+        return;
+      }
+
+      activeThemeRef.current = theme;
+      const nextWidth = clampSidebarWidth(theme.sidebarWidth);
+      sidebarWidthRef.current = nextWidth;
+      setSidebarWidth(nextWidth);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    sidebarWidthRef.current = sidebarWidth;
+  }, [sidebarWidth]);
+
+  useEffect(() => {
+    function handlePointerMove(event: PointerEvent) {
+      if (!isResizingDockRef.current) {
+        return;
+      }
+
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+
+      animationFrameRef.current = requestAnimationFrame(() => {
+        const delta = resizeStartRef.current.pointerX - event.clientX;
+        const nextWidth = clampSidebarWidth(resizeStartRef.current.width + delta);
+        sidebarWidthRef.current = nextWidth;
+        setSidebarWidth(nextWidth);
+      });
+    }
+
+    function handlePointerUp() {
+      if (!isResizingDockRef.current) {
+        return;
+      }
+
+      isResizingDockRef.current = false;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+
+      if (!activeThemeRef.current) {
+        return;
+      }
+
+      void saveUserTheme({
+        ...activeThemeRef.current,
+        sidebarWidth: sidebarWidthRef.current,
+      }).then((theme) => {
+        activeThemeRef.current = theme;
+        const nextWidth = clampSidebarWidth(theme.sidebarWidth);
+        sidebarWidthRef.current = nextWidth;
+        setSidebarWidth(nextWidth);
+      });
+    }
+
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+
+    return () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+      }
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!chatStorageHydrated) {
+      return;
+    }
+
     try {
       window.localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(sessions));
     } catch {
       // Chat preview can still run without persistence.
     }
-  }, [sessions]);
+  }, [chatStorageHydrated, sessions]);
 
   function updateActiveSession(patch: Partial<ChatSession>) {
     setSessions((current) =>
@@ -181,6 +400,29 @@ export default function RoleplayChat() {
       ?.scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
+  function toggleDockPanel(panel: SidePanelType) {
+    setDockingState((current) => {
+      const isActive = current.activePanel === panel && !current.isCollapsed;
+
+      return {
+        ...current,
+        activePanel: isActive ? "None" : panel,
+        isCollapsed: isActive,
+      };
+    });
+  }
+
+  function startDockResize(event: ReactPointerEvent<HTMLButtonElement>) {
+    event.preventDefault();
+    isResizingDockRef.current = true;
+    resizeStartRef.current = {
+      pointerX: event.clientX,
+      width: sidebarWidthRef.current,
+    };
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  }
+
   async function handleSendMessage(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
@@ -212,13 +454,63 @@ export default function RoleplayChat() {
     void persistDialogueLine(userMessage, setRuntimeError);
 
     try {
+      const scenarioMessages = compileScenarioOverrideMessages(
+        activeSession.scenarioOverride,
+      );
+      const loreMessages = compileActiveLoreMessages(activeLorebook, input.trim());
+      const contextMessages = [
+        ...scenarioMessages,
+        ...loreMessages,
+        ...toOllamaMessages(messages),
+      ];
+      let accumulatedResponse = "";
+      const didUseNativeStream = await streamLocalLlmResponse(
+        {
+          contextMessages,
+          promptText: input.trim(),
+          storyNodeId: "scene_01_alley_encounter",
+        },
+        {
+          onToken: (token) => {
+            accumulatedResponse += token;
+
+            updateActiveSession({
+              messages: [
+                ...updatedMessages,
+                {
+                  ...assistantMessage,
+                  detectedTrope,
+                  parts: [{ type: "text", text: accumulatedResponse }],
+                },
+              ],
+            });
+          },
+        },
+      );
+
+      if (didUseNativeStream) {
+        if (accumulatedResponse.trim()) {
+          void persistDialogueLine(
+            {
+              ...assistantMessage,
+              detectedTrope,
+              parts: [{ type: "text", text: accumulatedResponse }],
+            },
+            setRuntimeError,
+          );
+        }
+
+        return;
+      }
+
       const response = await fetch(OLLAMA_CHAT_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: DEFAULT_MODEL,
           messages: [
-            ...compileScenarioOverrideMessages(activeSession.scenarioOverride),
+            ...scenarioMessages,
+            ...loreMessages,
             ...toOllamaMessages(updatedMessages),
           ],
           stream: true,
@@ -231,7 +523,6 @@ export default function RoleplayChat() {
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
-      let accumulatedResponse = "";
       let bufferedChunk = "";
 
       while (true) {
@@ -317,11 +608,38 @@ export default function RoleplayChat() {
     }
   }
 
+  async function handleIntentSelection(selected: ActionCardVariant) {
+    if (isGenerating) {
+      return;
+    }
+
+    const committedText = formatIntentSelection(selected);
+    const userMessage = createRoleplayMessage(
+      "user",
+      committedText,
+      selected.intentClass,
+    );
+
+    updateActiveSession({
+      messages: [...messages, userMessage],
+      title: buildSessionTitle(activeSession.title, selected.dialoguePreview),
+    });
+    setIntentModalOpen(false);
+    setRuntimeError(null);
+
+    await addRelationshipMessage({
+      content: committedText,
+      createdAt: Date.now(),
+      role: "user",
+    });
+    void persistDialogueLine(userMessage, setRuntimeError);
+  }
+
   return (
     <StudioShell
       eyebrow="Character Chat"
       title="Chat Preview"
-      subtitle="A temporary local-model romance chat surface for testing streaming response shape before the full context compiler lands."
+      subtitle="Test character replies, lorebook links, and relationship tone before starting a full playthrough."
       actions={<Badge variant="outline">Ollama: {DEFAULT_MODEL}</Badge>}
     >
       <div className="grid min-h-[calc(100vh-9rem)] gap-5 xl:grid-cols-[20rem_minmax(0,1fr)]">
@@ -332,7 +650,7 @@ export default function RoleplayChat() {
                 <Sparkles data-icon="inline-start" />
                 Active Persona
               </CardTitle>
-              <CardDescription>Romance runtime sandbox</CardDescription>
+              <CardDescription>Romance chat preview</CardDescription>
             </CardHeader>
             <CardContent className="flex items-center gap-3">
               <div className="flex size-11 items-center justify-center rounded-full bg-primary text-lg text-primary-foreground">
@@ -349,13 +667,50 @@ export default function RoleplayChat() {
 
           <Card className="bg-card/85">
             <CardHeader>
-              <CardTitle className="text-base">Runtime Notes</CardTitle>
+              <CardTitle className="text-base">Chat Notes</CardTitle>
               <CardDescription>
-                Chat requires a character and user persona in the full runtime.
+                Full playthroughs use a character card and a {"{{user}}"} persona.
                 Scenario overrides are optional because character cards can
                 supply their own opening scenario.
               </CardDescription>
             </CardHeader>
+          </Card>
+
+          <Card className="bg-card/85">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <BookOpenText className="size-4 text-muted-foreground" />
+                Active Lorebook
+              </CardTitle>
+              <CardDescription>
+                {activeLorebook
+                  ? `${activeLorebook.title} is available for key-triggered context.`
+                  : "No lorebook is active for this chat."}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-2">
+              {activeLorebook ? (
+                <div className="rounded-md border bg-background/70 p-3 text-xs text-muted-foreground">
+                  <p className="font-medium text-foreground">
+                    {activeLorebook.title}
+                  </p>
+                  <p className="mt-1 line-clamp-2">
+                    {activeLorebook.summary.aiLoreInstruction}
+                  </p>
+                  <p className="mt-2">
+                    {activeLorebook.entries.length} lore entries ready
+                  </p>
+                </div>
+              ) : null}
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setLorebookPanelOpen(true)}
+              >
+                <BookOpenText className="size-4" />
+                Manage Lorebooks
+              </Button>
+            </CardContent>
           </Card>
 
           <Card className="bg-card/85">
@@ -426,7 +781,7 @@ export default function RoleplayChat() {
                   onClick={applySavedScenarioToOverride}
                 >
                   <Route className="size-4" />
-                  Apply to Override
+                  Use This Scenario
                 </Button>
               </div>
               <Textarea
@@ -434,28 +789,28 @@ export default function RoleplayChat() {
                 onChange={(event) =>
                   updateScenarioOverride("context", event.currentTarget.value)
                 }
-                placeholder="Context"
+                placeholder="What the chat should remember"
               />
               <Textarea
                 value={activeSession.scenarioOverride.setting}
                 onChange={(event) =>
                   updateScenarioOverride("setting", event.currentTarget.value)
                 }
-                placeholder="Setting"
+                placeholder="Where the scene takes place"
               />
               <Textarea
                 value={activeSession.scenarioOverride.scene}
                 onChange={(event) =>
                   updateScenarioOverride("scene", event.currentTarget.value)
                 }
-                placeholder="Scene"
+                placeholder="What is happening now"
               />
               <Textarea
                 value={activeSession.scenarioOverride.dynamic}
                 onChange={(event) =>
                   updateScenarioOverride("dynamic", event.currentTarget.value)
                 }
-                placeholder="Dynamic"
+                placeholder="Relationship tension"
               />
             </CardContent>
           </Card>
@@ -504,10 +859,21 @@ export default function RoleplayChat() {
           </Card>
         </section>
 
-        <section
-          className="relative flex min-h-[calc(100vh-9rem)] min-w-0 flex-col overflow-hidden rounded-xl border bg-card/70 shadow-xl backdrop-blur"
+        <div
+          className={cn(
+            "relative grid min-h-[calc(100vh-9rem)] min-w-0 overflow-hidden rounded-xl border bg-card/70 shadow-xl backdrop-blur",
+            !isLorebookDockVisible && "lg:grid-cols-1",
+          )}
           id="gameplay-chat-viewport"
+          style={
+            isLorebookDockVisible
+              ? {
+                  gridTemplateColumns: `minmax(0, 1fr) ${sidebarWidth}px`,
+                }
+              : undefined
+          }
         >
+        <section className="relative flex min-w-0 flex-col overflow-hidden">
         <div
           className={cn(
             "pointer-events-none absolute inset-0 bg-gradient-to-b opacity-50 mix-blend-soft-light transition-all duration-1000",
@@ -517,13 +883,48 @@ export default function RoleplayChat() {
         <header className="relative z-10 flex items-center justify-between gap-3 border-b bg-card/70 px-5 py-3 backdrop-blur">
           <div>
             <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">
-              Conversation Viewport
+              Conversation
             </p>
             <p className="text-xs text-muted-foreground">
-              Dialogue, action beats, and live macro mood are separated visually.
+              Dialogue, action beats, and romance tone are easy to scan.
             </p>
           </div>
           <div className="flex items-center gap-2">
+            <GlowingConnectionNode
+              errorCode={loreDiagnostic.errorCode}
+              status={loreDiagnostic.status}
+            />
+            <Button
+              className="lg:hidden"
+              onClick={() => setLorebookPanelOpen(true)}
+              size="sm"
+              type="button"
+              variant="outline"
+            >
+              <BookOpenText className="size-4" />
+              Lorebooks
+            </Button>
+            <Button
+              className="hidden lg:inline-flex"
+              onClick={() => toggleDockPanel("Lorebook")}
+              size="sm"
+              type="button"
+              variant={isLorebookDockVisible ? "secondary" : "outline"}
+            >
+              <BookOpenText className="size-4" />
+              Lorebook Panel
+            </Button>
+            <Button
+              disabled={isGenerating}
+              onClick={() => setIntentModalOpen(true)}
+              size="sm"
+              type="button"
+              variant="outline"
+            >
+              <MousePointerClick className="size-4" />
+              Story Choice
+            </Button>
+            <CameraSnapperButton />
             <ChatExporterButton currentMessages={viewportMessages} />
             <Badge
               className={cn(
@@ -561,7 +962,51 @@ export default function RoleplayChat() {
             </Button>
           </form>
         </div>
-      </section>
+        </section>
+        {isLorebookDockVisible ? (
+          <aside className="relative z-10 hidden min-h-0 lg:flex">
+            <button
+              aria-label="Resize lorebook panel"
+              className="group relative z-20 flex w-2 shrink-0 cursor-col-resize touch-none items-stretch justify-center bg-border/40 transition hover:bg-primary/35 active:bg-primary/45"
+              onPointerDown={startDockResize}
+              title="Drag to resize lorebook panel"
+              type="button"
+            >
+              <span className="my-3 w-px rounded-full bg-muted-foreground/35 transition group-hover:bg-primary" />
+            </button>
+            <LorebookControlPanel
+              activeLorebookId={activeLorebook?.id}
+              isOpen
+              onActivateLorebook={(lorebook) => setActiveLorebook(lorebook)}
+              onClose={() => toggleDockPanel("Lorebook")}
+              onDeactivateLorebook={(lorebookId) =>
+                setActiveLorebook((current) =>
+                  current?.id === lorebookId ? null : current,
+                )
+              }
+              variant="dock"
+            />
+          </aside>
+        ) : null}
+        <CenteredIntentModal
+          cardOptions={checkpointIntentOptions}
+          isOpen={intentModalOpen}
+          onCloseAbort={() => setIntentModalOpen(false)}
+          onSelectAction={(selected) => void handleIntentSelection(selected)}
+          scenePrompt={getIntentScenePrompt(activeSession.scenarioOverride)}
+        />
+        <LorebookControlPanel
+          activeLorebookId={activeLorebook?.id}
+          isOpen={lorebookPanelOpen}
+          onActivateLorebook={(lorebook) => setActiveLorebook(lorebook)}
+          onClose={() => setLorebookPanelOpen(false)}
+          onDeactivateLorebook={(lorebookId) =>
+            setActiveLorebook((current) =>
+              current?.id === lorebookId ? null : current,
+            )
+          }
+        />
+      </div>
       </div>
     </StudioShell>
   );
@@ -577,10 +1022,20 @@ function createChatSession(title: string): ChatSession {
   };
 }
 
+function createPreviewChatSession(): ChatSession {
+  return {
+    id: PREVIEW_CHAT_ID,
+    messages: initialMessages,
+    scenarioOverride: emptyScenarioOverride,
+    title: "Preview Chat",
+    updatedAt: PREVIEW_CHAT_UPDATED_AT,
+  };
+}
+
 function loadInitialChatSessions() {
   try {
     if (typeof window === "undefined") {
-      return [createChatSession("Preview Chat")];
+      return [createPreviewChatSession()];
     }
 
     const raw = window.localStorage.getItem(CHAT_STORAGE_KEY);
@@ -597,7 +1052,7 @@ function loadInitialChatSessions() {
     // Keep the in-memory preview chat if browser storage is unavailable.
   }
 
-  return [createChatSession("Preview Chat")];
+  return [createPreviewChatSession()];
 }
 
 function buildSessionTitle(currentTitle: string, firstMessage: string) {
@@ -606,6 +1061,19 @@ function buildSessionTitle(currentTitle: string, firstMessage: string) {
   }
 
   return firstMessage.slice(0, 42) || currentTitle;
+}
+
+function formatIntentSelection(selected: ActionCardVariant) {
+  return `[${selected.actionDescriptor}] "${selected.dialoguePreview}"`;
+}
+
+function getIntentScenePrompt(override: ScenarioOverride) {
+  return (
+    override.scene ||
+    override.dynamic ||
+    override.context ||
+    "A charged pause opens in the scene. The next response will define the emotional direction of the exchange."
+  );
 }
 
 function getActiveTrope(messages: RoleplayMessage[]): RomanceTropeClass {
@@ -674,6 +1142,71 @@ function compileScenarioOverrideMessages(override: ScenarioOverride) {
         },
       ]
     : [];
+}
+
+function compileActiveLoreMessages(
+  lorebook: GeneratedLorebookArtifact | null,
+  latestUserMessage: string,
+) {
+  if (!lorebook) {
+    return [];
+  }
+
+  return parseActiveLore(latestUserMessage, lorebook.entries);
+}
+
+function getLorebookDiagnostic(
+  lorebook: GeneratedLorebookArtifact | null,
+  runtimeError: null | string,
+): { errorCode: null | string; status: SystemSyncStatus } {
+  if (runtimeError) {
+    return {
+      errorCode: runtimeError,
+      status: "fault",
+    };
+  }
+
+  if (!lorebook) {
+    return {
+      errorCode: null,
+      status: "idle",
+    };
+  }
+
+  const duplicatedKeys = findDuplicateActivationKeys(lorebook);
+  if (duplicatedKeys.length > 0) {
+    return {
+      errorCode: `Duplicate activation keys: ${duplicatedKeys.slice(0, 6).join(", ")}`,
+      status: "degraded",
+    };
+  }
+
+  return {
+    errorCode: null,
+    status: "connected",
+  };
+}
+
+function findDuplicateActivationKeys(lorebook: GeneratedLorebookArtifact) {
+  const seen = new Set<string>();
+  const duplicates = new Set<string>();
+
+  for (const entry of lorebook.entries) {
+    for (const key of entry.activationKeys) {
+      const normalized = key.trim().toLowerCase();
+      if (!normalized) {
+        continue;
+      }
+
+      if (seen.has(normalized)) {
+        duplicates.add(key.trim());
+      } else {
+        seen.add(normalized);
+      }
+    }
+  }
+
+  return [...duplicates];
 }
 
 function SceneTrackerSummary(props: {

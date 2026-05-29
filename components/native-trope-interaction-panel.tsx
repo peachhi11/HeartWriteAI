@@ -35,7 +35,7 @@ export function NativeTropeInteractionPanel() {
     setNativeNote(
       response.native_available
         ? null
-        : "Browser preview: native Tauri state updates run inside the desktop app.",
+        : "Browser preview: saved story updates run inside the desktop app.",
     );
     setInput("");
   }
@@ -49,10 +49,10 @@ export function NativeTropeInteractionPanel() {
       <div className="relative z-10 space-y-4">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--muted)]">
-            Native Runtime Bridge
+            Desktop Story Tracker
           </p>
           <h2 className="text-xl font-semibold text-[var(--foreground)]">
-            Trope interaction state
+            Story Response Test
           </h2>
         </div>
 
@@ -73,7 +73,7 @@ export function NativeTropeInteractionPanel() {
 
         {detectedTrope && (
           <div className="rounded-2xl border border-[var(--panel-border)] bg-[var(--panel-soft)] px-3 py-2 text-sm text-[var(--foreground)]">
-            Detected trope: <span className="font-semibold">{detectedTrope}</span>
+            Detected mood: <span className="font-semibold">{detectedTrope}</span>
             <span className="ml-2 text-[var(--muted)]">Turn {turnCount}</span>
           </div>
         )}

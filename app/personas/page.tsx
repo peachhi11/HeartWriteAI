@@ -6,7 +6,7 @@ export default function PersonasPage() {
     <StudioShell
       eyebrow="Persona Matching"
       title="Persona Studio"
-      subtitle="Generate, save, export, and reload user personas before chat runtime consumes them."
+      subtitle="Create, save, export, and reuse {{user}} personas for character chats."
     >
       <PersonaGenerationPage />
     </StudioShell>

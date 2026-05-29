@@ -52,7 +52,7 @@ async function streamYourApiChatCompletion(
     return Response.json(
       {
         error:
-          "YOUR_API_CHAT_ENDPOINT is not configured. Chat streaming is provider-generic until a runtime endpoint is supplied.",
+          "Your AI provider is not configured yet. Chat replies need an AI connection before they can stream.",
         messages,
       },
       { status: 501 },
@@ -76,7 +76,7 @@ async function streamYourApiChatCompletion(
 
   if (!upstreamResponse.ok || !upstreamResponse.body) {
     return Response.json(
-      { error: "YOUR_API chat endpoint returned an invalid stream." },
+      { error: "Your AI provider returned an invalid reply stream." },
       { status: upstreamResponse.status || 502 },
     );
   }

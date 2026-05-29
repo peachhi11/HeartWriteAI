@@ -195,12 +195,12 @@ export function ThemeCustomizationStudio() {
           <div className="flex items-center gap-2">
             <Palette className="size-5 text-user-primary" />
             <h2 className="text-sm font-black uppercase tracking-[0.18em] text-user-primary">
-              Interface Workspace Designer
+              Appearance Designer
             </h2>
           </div>
           <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Tune the runtime reading surface with persisted local preferences
-            for accent glow, vignette tone, typography, and card opacity.
+            Adjust your reading screen with saved preferences for accent glow,
+            background tone, typography, and card opacity.
           </p>
         </header>
 
@@ -398,7 +398,7 @@ export function ThemeCustomizationStudio() {
         <div className="grid gap-4 rounded-2xl border border-border bg-background/35 p-4">
           <div>
             <span className="block text-[10px] font-bold uppercase tracking-wide text-user-primary">
-              Backdrop Legibility Engine
+              Reading Comfort
             </span>
             <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
               Tune wallpaper light, blur, and tint for comfortable long-form reading.

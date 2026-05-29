@@ -22,12 +22,12 @@ export function RuntimeEngineDebugPanel() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <LockKeyhole data-icon="inline-start" />
-            Runtime Engine Hidden
+            Advanced Relationship Tools Hidden
           </CardTitle>
           <CardDescription>
-            The engine is powering relationship and emotional tracking, but raw
-            controls are hidden in Standard Mode. Enable advanced controls in
-            Settings to inspect or test the underlying runtime.
+            Relationship and emotion tracking are running, but extra controls are
+            hidden in Standard Mode. Enable advanced controls in Settings to
+            inspect or test them.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -45,11 +45,11 @@ export function RuntimeEngineDebugPanel() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Wrench data-icon="inline-start" />
-            Advanced Runtime Engine
+            Advanced Relationship Tools
           </CardTitle>
           <CardDescription>
-            Power-user surface for inspection, test events, deltas, and engine
-            controls. This is intentionally separate from the standard authoring
+            Power-user tools for inspection, test events, and relationship
+            changes. This is intentionally separate from the standard authoring
             flow.
           </CardDescription>
         </CardHeader>
