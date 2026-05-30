@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import {
+  Clapperboard,
   Feather,
   ImageIcon,
   LibraryBig,
@@ -41,6 +42,12 @@ const workflowCards = [
     description: "Match your persona to characters, scenarios, and tone.",
     href: "/personas?mode=match",
     icon: WandSparkles,
+  },
+  {
+    title: "Create Scenario",
+    description: "Roll scene beats, openings, and lore-ready story context.",
+    href: "/scenarios",
+    icon: Clapperboard,
   },
   {
     title: "Lorebooks",

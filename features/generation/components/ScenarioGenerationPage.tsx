@@ -7,6 +7,7 @@ import {
   Clapperboard,
   Clipboard,
   CopyPlus,
+  Dice5,
   Download,
   FilePlus2,
   LibraryBig,
@@ -62,6 +63,10 @@ import {
 import { downloadUint8Array } from "@/lib/browser/downloadUint8Array";
 import type { OccupationProfessionalDomain } from "@/lib/character-card/generator";
 import { Field, GeneratorFormCard, GeneratorGrid } from "./GenerationShell";
+import {
+  rollScenarioPayload,
+  type RPScenarioPayload,
+} from "@/data/beats";
 
 const professionalDomains: OccupationProfessionalDomain[] = [
   "Arts_Entertainment",
@@ -113,6 +118,8 @@ const userCallsToAction: GeneratedScenarioArtifact["firstMessage"]["userCallToAc
   "Weighted_StandOff",
 ];
 
+type ScenarioPayloadTab = "firstMessage" | "aiContext" | "lore" | "card";
+
 const defaultInput: ScenarioGenerationInput = {
   constructionPrompt: DEFAULT_SCENARIO_CONSTRUCTION_PROMPT,
   jobTitle: "University Student",
@@ -143,6 +150,10 @@ export function ScenarioGenerationPage() {
     useState<GeneratedScenarioArtifact>(() => generateScenarioArtifact(defaultInput));
   const [suggestedLorebook, setSuggestedLorebook] =
     useState<GeneratedLorebookArtifact | null>(null);
+  const [rolledPayload, setRolledPayload] =
+    useState<RPScenarioPayload | null>(null);
+  const [scenarioPayloadTab, setScenarioPayloadTab] =
+    useState<ScenarioPayloadTab>("firstMessage");
   const [savedSuggestedLorebookId, setSavedSuggestedLorebookId] =
     useState<string | null>(null);
   const [savedSnapshot, setSavedSnapshot] = useState<string | null>(null);
@@ -273,6 +284,65 @@ export function ScenarioGenerationPage() {
     setSavedSnapshot(null);
     setDeleteArmed(false);
     setStatus("Generated scenario draft.");
+  }
+
+  function rollSceneBeat() {
+    const nextPayload = rollScenarioPayload();
+    setRolledPayload(nextPayload);
+    setScenarioPayloadTab("firstMessage");
+    setStatus(`Rolled scene beat: ${nextPayload.narrative.title}.`);
+  }
+
+  function applyRolledSceneBeat() {
+    if (!rolledPayload) {
+      return;
+    }
+
+    const title = rolledPayload.narrative.title;
+    const trope = `${rolledPayload.metadata.tone} ${rolledPayload.metadata.phase}`;
+    const summary = [
+      `${title}: ${rolledPayload.narrative.incitingIncident}`,
+      `Setting: ${rolledPayload.narrative.setting}.`,
+      `Sensory anchor: ${rolledPayload.narrative.sensoryAnchor}`,
+    ].join(" ");
+    const updated = createScenarioArtifactFromEditable({
+      ...activeScenario,
+      firstMessage: {
+        ...activeScenario.firstMessage,
+        aiOutputConstraint: rolledPayload.llmContext.startingMessageTemplate,
+        entryPoint: "Active_Collision",
+        userCallToAction: "Physical_Gesture",
+      },
+      id: createDuplicateArtifactId("scenario", `${title}:${rolledPayload.id}`),
+      scenario: {
+        ...activeScenario.scenario,
+        plotHook: "The_Chance_Encounter",
+        scenePremiseDescription: summary,
+        sensoryDetails: [rolledPayload.narrative.sensoryAnchor],
+        settingType: "Contained_Insular",
+        startingTension:
+          rolledPayload.metadata.phase === "Vulnerability"
+            ? "Vulnerable_Exhausted"
+            : "Charged_Electric",
+      },
+      source: "generated",
+      summary,
+      tags: [
+        "scenario roll",
+        rolledPayload.metadata.phase,
+        rolledPayload.metadata.tone,
+      ],
+      title,
+      trope,
+      updatedAt: Date.now(),
+    });
+
+    setActiveScenario(updated);
+    setSuggestedLorebook(null);
+    setSavedSuggestedLorebookId(null);
+    setSavedSnapshot(null);
+    setDeleteArmed(false);
+    setStatus(`Applied ${title} to the editable scenario draft.`);
   }
 
   function newBlankScenario() {
@@ -686,6 +756,14 @@ export function ScenarioGenerationPage() {
       </aside>
 
       <div className="grid gap-5">
+        <ScenarioBeatRoller
+          activeTab={scenarioPayloadTab}
+          payload={rolledPayload}
+          onApply={applyRolledSceneBeat}
+          onRoll={rollSceneBeat}
+          onTabChange={setScenarioPayloadTab}
+        />
+
         <Card className="bg-card/85">
           <CardHeader className="gap-3 md:flex-row md:items-start md:justify-between">
             <div className="space-y-1.5">
@@ -1027,6 +1105,142 @@ export function ScenarioGenerationPage() {
         </Card>
       </div>
     </GeneratorGrid>
+  );
+}
+
+function ScenarioBeatRoller(props: {
+  activeTab: ScenarioPayloadTab;
+  onApply: () => void;
+  onRoll: () => void;
+  onTabChange: (tab: ScenarioPayloadTab) => void;
+  payload: RPScenarioPayload | null;
+}) {
+  const tabs: { id: ScenarioPayloadTab; label: string }[] = [
+    { id: "firstMessage", label: "First Message" },
+    { id: "aiContext", label: "AI Context" },
+    { id: "lore", label: "Lore Hook" },
+    { id: "card", label: "Card Note" },
+  ];
+
+  return (
+    <Card className="liquid-glass-strong overflow-hidden">
+      <CardHeader className="gap-4 md:flex-row md:items-start md:justify-between">
+        <div className="space-y-1.5">
+          <div className="flex flex-wrap items-center gap-2">
+            <CardTitle>Scene Beat Roller</CardTitle>
+            {props.payload ? (
+              <Badge variant="secondary">{props.payload.metadata.phase}</Badge>
+            ) : null}
+          </div>
+          <CardDescription>
+            Roll a focused romance beat, then apply it to the editable scenario
+            draft when it fits.
+          </CardDescription>
+        </div>
+        <div className="flex shrink-0 flex-wrap gap-2">
+          <Button type="button" variant="outline" onClick={props.onRoll}>
+            <Dice5 className="size-4" />
+            Roll Scene Beat
+          </Button>
+          <Button
+            disabled={!props.payload}
+            type="button"
+            onClick={props.onApply}
+          >
+            <Clapperboard className="size-4" />
+            Apply to Draft
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="grid gap-4">
+        {props.payload ? (
+          <>
+            <section className="grid gap-3 rounded-md border bg-background/70 p-4 md:grid-cols-[minmax(0,1fr)_16rem]">
+              <div className="min-w-0">
+                <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">
+                  {props.payload.metadata.tone}
+                </p>
+                <h3 className="mt-1 text-xl font-semibold">
+                  {props.payload.narrative.title}
+                </h3>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  {props.payload.narrative.incitingIncident}
+                </p>
+              </div>
+              <div className="rounded-md border bg-card/70 p-3 text-sm leading-6 text-muted-foreground">
+                <p>
+                  <span className="font-semibold text-foreground">Setting:</span>{" "}
+                  {props.payload.narrative.setting}
+                </p>
+                <p className="mt-2">
+                  <span className="font-semibold text-foreground">Sensory:</span>{" "}
+                  {props.payload.narrative.sensoryAnchor}
+                </p>
+              </div>
+            </section>
+
+            <section className="rounded-md border bg-background/70">
+              <div className="flex flex-wrap border-b">
+                {tabs.map((tab) => (
+                  <button
+                    className={`border-b-2 px-4 py-3 text-xs font-bold uppercase tracking-wide transition ${
+                      props.activeTab === tab.id
+                        ? "border-primary text-foreground"
+                        : "border-transparent text-muted-foreground hover:text-foreground"
+                    }`}
+                    key={tab.id}
+                    onClick={() => props.onTabChange(tab.id)}
+                    type="button"
+                  >
+                    {tab.label}
+                  </button>
+                ))}
+              </div>
+              <div className="p-4">
+                {props.activeTab === "firstMessage" ? (
+                  <ScenarioPayloadBlock title="Generated First Message">
+                    {props.payload.llmContext.startingMessageTemplate}
+                  </ScenarioPayloadBlock>
+                ) : null}
+                {props.activeTab === "aiContext" ? (
+                  <ScenarioPayloadBlock title="AI Context Note">
+                    {props.payload.llmContext.systemPromptOverride}
+                  </ScenarioPayloadBlock>
+                ) : null}
+                {props.activeTab === "lore" ? (
+                  <ScenarioPayloadBlock
+                    title={`Temporary Lore Key: ${props.payload.llmContext.temporaryLorebookEntry.key}`}
+                  >
+                    {props.payload.llmContext.temporaryLorebookEntry.content}
+                  </ScenarioPayloadBlock>
+                ) : null}
+                {props.activeTab === "card" ? (
+                  <ScenarioPayloadBlock title="Character Card Scenario Note">
+                    {props.payload.cardContext.scenarioAppend}
+                  </ScenarioPayloadBlock>
+                ) : null}
+              </div>
+            </section>
+          </>
+        ) : (
+          <section className="rounded-md border border-dashed bg-background/50 p-8 text-center text-sm text-muted-foreground">
+            Roll a scene beat to create a first message, AI context note, lore
+            hook, and character card scenario note.
+          </section>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function ScenarioPayloadBlock(props: { children: React.ReactNode; title: string }) {
+  return (
+    <div className="rounded-md border bg-card/70 p-4">
+      <h3 className="mb-2 text-sm font-semibold">{props.title}</h3>
+      <p className="whitespace-pre-wrap text-sm leading-6 text-muted-foreground">
+        {props.children}
+      </p>
+    </div>
   );
 }
 
