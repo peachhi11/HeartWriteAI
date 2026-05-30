@@ -1,5 +1,7 @@
 "use client";
 
+import { useId } from "react";
+
 import {
   DIAGNOSTIC_NODE_MATRIX,
   type SystemSyncStatus,
@@ -16,12 +18,29 @@ export function GlowingConnectionNode({
   status,
 }: GlowingConnectionNodeProps) {
   const cfg = DIAGNOSTIC_NODE_MATRIX[status];
+  const descriptionId = useId();
 
   return (
-    <div className="group relative inline-flex cursor-help select-none items-center">
+    <div
+      aria-describedby={descriptionId}
+      aria-label={`${cfg.label}. ${cfg.description}${errorCode ? ` Details: ${errorCode}` : ""}`}
+      className="group relative inline-flex shrink-0 cursor-help select-none items-center rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+      data-diagnostic-node
+      role="status"
+      tabIndex={0}
+    >
+      <style>
+        {`
+          [data-diagnostic-node]:focus-within [data-diagnostic-tooltip],
+          [data-diagnostic-node]:hover [data-diagnostic-tooltip] {
+            opacity: 1;
+          }
+        `}
+      </style>
+
       <div
         className={cn(
-          "inline-flex items-center gap-2 rounded-lg border border-border/80 bg-background/70 px-2.5 py-1 shadow-sm backdrop-blur transition duration-500",
+          "inline-flex h-8 items-center gap-2 rounded-lg border border-border/80 bg-background/70 px-2.5 py-1 shadow-sm backdrop-blur transition duration-500",
           cfg.glowPreset,
         )}
       >
@@ -41,7 +60,7 @@ export function GlowingConnectionNode({
         </span>
         <span
           className={cn(
-            "font-mono text-[10px] tracking-tight transition-colors duration-500",
+            "hidden max-w-32 truncate font-mono text-[10px] tracking-tight transition-colors duration-500 sm:inline",
             cfg.textColor,
           )}
         >
@@ -49,7 +68,11 @@ export function GlowingConnectionNode({
         </span>
       </div>
 
-      <div className="pointer-events-none absolute right-0 top-full z-40 mt-2 w-64 space-y-1.5 rounded-xl border border-border/80 bg-popover p-3 text-left opacity-0 shadow-2xl transition-opacity duration-200 group-hover:opacity-100">
+      <div
+        className="pointer-events-none absolute right-0 top-full z-40 mt-2 w-64 max-w-[calc(100vw-2rem)] space-y-1.5 rounded-xl border border-border/80 bg-popover p-3 text-left opacity-0 shadow-2xl transition-opacity duration-200"
+        data-diagnostic-tooltip
+        id={descriptionId}
+      >
         <div className="flex items-center justify-between border-b border-border/70 pb-1">
           <span className="text-[9px] font-black uppercase tracking-wider text-muted-foreground">
             Lorebook Status
