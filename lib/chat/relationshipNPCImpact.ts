@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import {
+  compactRelationshipMemories,
   RelationshipStateSchema,
   type RelationshipState,
 } from "./relationshipState.schema";
@@ -73,6 +74,7 @@ export function relationshipEdgeId(
 
 export function shouldPromoteNPCImpactToMemory(event: NPCImpactEvent) {
   return (
+    event.tags.some((tag) => isPinnedMemoryTag(tag)) ||
     event.emotionalWeight >= 70 ||
     event.romanticThreat >= 70 ||
     event.replacementThreat >= 70 ||
@@ -134,9 +136,7 @@ export function applyNPCImpact(
       tags: Array.from(new Set(["npc_impact", ...event.tags])),
     });
 
-    state.memories = state.memories
-      .sort((first, second) => second.emotionalWeight - first.emotionalWeight)
-      .slice(0, 80);
+    state.memories = compactRelationshipMemories(state.memories);
   }
 
   return RelationshipStateSchema.parse(state);
@@ -524,6 +524,19 @@ function memoryTypeForNPCImpact(
   }
 
   return "jealousy";
+}
+
+function isPinnedMemoryTag(tag: string) {
+  return [
+    "anchor",
+    "anchored",
+    "important",
+    "memory_anchor",
+    "milestone",
+    "permanent",
+    "pinned",
+    "story_beat",
+  ].includes(tag.trim().toLowerCase());
 }
 
 function trustImpactForNPCImpact(event: NPCImpactEvent) {

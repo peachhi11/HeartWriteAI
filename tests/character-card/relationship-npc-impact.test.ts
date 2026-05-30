@@ -198,3 +198,25 @@ test("promotes only meaningful NPC impact events into memory", () => {
   assert.equal(shouldPromoteNPCImpactToMemory(minorEvent), false);
   assert.equal(shouldPromoteNPCImpactToMemory(majorEvent), true);
 });
+
+test("promotes pinned low-weight NPC impact events into memory", () => {
+  const event: NPCImpactEvent = {
+    id: "evt_pinned_low",
+    timestamp: 550,
+    actorId: "rival_npc",
+    targetId: "char",
+    observerIds: ["user"],
+    npcId: "rival_npc",
+    type: "rival_flirt",
+    summary: "A small but story-important public slight happened.",
+    visibility: "seen",
+    emotionalWeight: 30,
+    romanticThreat: 10,
+    humiliationImpact: 10,
+    replacementThreat: 10,
+    affectedEdges: [relationshipEdgeId("user", "char")],
+    tags: ["story_beat"],
+  };
+
+  assert.equal(shouldPromoteNPCImpactToMemory(event), true);
+});

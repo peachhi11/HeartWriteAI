@@ -554,6 +554,47 @@ export const RelationshipStateSchema = z
   .passthrough();
 
 export type RelationshipState = z.infer<typeof RelationshipStateSchema>;
+export type EventMemory = RelationshipState["memories"][number];
+
+const PINNED_MEMORY_TAGS = new Set([
+  "anchor",
+  "anchored",
+  "important",
+  "memory_anchor",
+  "milestone",
+  "permanent",
+  "pinned",
+  "story_beat",
+]);
+
+const INHERENT_MILESTONE_MEMORY_TYPES = new Set<EventMemory["type"]>([
+  "betrayal",
+  "breakup",
+  "confession",
+  "first_kiss",
+  "promise",
+  "traumatic_confession",
+]);
+
+export function isPinnedMilestoneMemory(memory: EventMemory) {
+  return (
+    INHERENT_MILESTONE_MEMORY_TYPES.has(memory.type) ||
+    memory.tags.some((tag) => PINNED_MEMORY_TAGS.has(tag.trim().toLowerCase()))
+  );
+}
+
+export function compactRelationshipMemories(
+  memories: EventMemory[],
+  maxRegularMemories = 80,
+) {
+  const sorted = [...memories].sort(compareMemoriesForRetention);
+  const pinned = sorted.filter(isPinnedMilestoneMemory);
+  const regular = sorted
+    .filter((memory) => !isPinnedMilestoneMemory(memory))
+    .slice(0, Math.max(0, maxRegularMemories - pinned.length));
+
+  return [...pinned, ...regular].sort(compareMemoriesForRetention);
+}
 
 export function createDefaultRelationshipState(input: {
   id: string;
@@ -581,4 +622,12 @@ export function createDefaultRelationshipState(input: {
 
 export function normalizeRelationshipState(input: unknown): RelationshipState {
   return RelationshipStateSchema.parse(input);
+}
+
+function compareMemoriesForRetention(first: EventMemory, second: EventMemory) {
+  return (
+    second.emotionalWeight - first.emotionalWeight ||
+    second.timestamp - first.timestamp ||
+    first.id.localeCompare(second.id)
+  );
 }

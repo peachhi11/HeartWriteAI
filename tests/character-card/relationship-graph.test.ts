@@ -178,6 +178,52 @@ test("does not promote low-weight graph events to edge memory", () => {
   assert.equal(graph.edges["char:user"]?.memories.length, 0);
 });
 
+test("keeps pinned graph event memories when edge cleanup overflows", () => {
+  let graph = updateRelationshipGraphFromEvent({
+    graph: createDefaultRelationshipGraph("scenario-a"),
+    userId: "user",
+    mainLoveInterestId: "char",
+    event: {
+      id: "pinned-confession",
+      timestamp: 1,
+      actorId: "char",
+      targetId: "user",
+      observerIds: ["user"],
+      type: "custom",
+      summary: "The character admitted a quiet truth that should anchor the bond.",
+      visibility: "seen",
+      emotionalWeight: 45,
+      tags: ["milestone"],
+    },
+  });
+
+  for (let index = 0; index < 90; index += 1) {
+    graph = updateRelationshipGraphFromEvent({
+      graph,
+      userId: "user",
+      mainLoveInterestId: "char",
+      event: {
+        id: `ordinary-graph-${index}`,
+        timestamp: index + 2,
+        actorId: "char",
+        targetId: "user",
+        observerIds: ["user"],
+        type: "comfort",
+        summary: `Ordinary graph event ${index}`,
+        visibility: "seen",
+        emotionalWeight: 80,
+        tags: [],
+      },
+    });
+  }
+
+  const edge = graph.edges["char:user"];
+  assert.equal(edge?.memories.includes("pinned-confession"), true);
+  assert.equal(edge?.pinnedMemories.includes("pinned-confession"), true);
+  assert.equal(edge?.memories.length, 80);
+  assert.equal(edge?.memories.includes("ordinary-graph-0"), false);
+});
+
 test("persists relationship graphs through repository storage adapters", async () => {
   const storage = createMemoryRelationshipGraphStorage();
   const repository = createRelationshipGraphRepository(storage);

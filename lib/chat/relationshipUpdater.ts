@@ -1,4 +1,5 @@
 import {
+  compactRelationshipMemories,
   RelationshipStateSchema,
   type RelationshipState,
 } from "./relationshipState.schema";
@@ -840,9 +841,7 @@ function addMemory(
     tags,
   });
 
-  state.memories = state.memories
-    .sort((a, b) => b.emotionalWeight - a.emotionalWeight)
-    .slice(0, 80);
+  state.memories = compactRelationshipMemories(state.memories);
 }
 
 function setRupture(

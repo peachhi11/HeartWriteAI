@@ -117,3 +117,37 @@ test("promotes high-weight sexual-only edge events into memory", () => {
     ["sex-edge-memory"],
   );
 });
+
+test("keeps pinned sexual-only edge memories when cleanup overflows", () => {
+  let edge = updateSexualOnlyEdgeFromEvent(
+    createDefaultSexualOnlyEdge({ aId: "user", bId: "char" }),
+    {
+      id: "pinned-sexual-memory",
+      timestamp: 1,
+      aId: "user",
+      bId: "char",
+      type: "hookup",
+      summary: "A private boundary agreement became important.",
+      emotionalWeight: 40,
+      tags: ["story_beat"],
+    },
+  );
+
+  for (let index = 0; index < 90; index += 1) {
+    edge = updateSexualOnlyEdgeFromEvent(edge, {
+      id: `ordinary-sexual-${index}`,
+      timestamp: index + 2,
+      aId: "user",
+      bId: "char",
+      type: "repeat_intimacy",
+      summary: `Ordinary sexual-only event ${index}`,
+      emotionalWeight: 80,
+      tags: [],
+    });
+  }
+
+  assert.equal(edge.memories.includes("pinned-sexual-memory"), true);
+  assert.equal(edge.pinnedMemories.includes("pinned-sexual-memory"), true);
+  assert.equal(edge.memories.length, 80);
+  assert.equal(edge.memories.includes("ordinary-sexual-0"), false);
+});

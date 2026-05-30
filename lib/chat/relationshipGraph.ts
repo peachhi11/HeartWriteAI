@@ -102,6 +102,7 @@ export const RelationshipGraphEdgeSchema = z.object({
   meaning: RelationshipMeaningSystemsSchema,
   pairDynamics: RelationshipPairDynamicsSchema,
   memories: z.array(z.string().trim().min(1)).default([]),
+  pinnedMemories: z.array(z.string().trim().min(1)).default([]),
   flags: z
     .object({
       firstMet: z.boolean().default(false),
@@ -301,7 +302,7 @@ export function updateRelationshipGraphFromMeaningfulEvent(input: {
   edge.meaning = applyMeaningfulRelationshipEvent(edge.meaning, input.event);
   refreshPairDynamics(edge);
   edge.flags.emotionallySignificant = true;
-  addMemoryId(edge, input.event.id);
+  addMemoryId(edge, input.event.id, isPinnedMeaningfulEvent(input.event));
   next.updatedAt = new Date().toISOString();
 
   return RelationshipGraphSchema.parse(next);
@@ -408,12 +409,14 @@ function promoteGraphEventMemory(
   actorTarget: RelationshipGraphEdge,
   userMain: RelationshipGraphEdge,
 ) {
-  if (event.emotionalWeight < 70) return;
+  const pinned = isPinnedGraphEvent(event);
 
-  addMemoryId(actorTarget, event.id);
+  if (event.emotionalWeight < 70 && !pinned) return;
+
+  addMemoryId(actorTarget, event.id, pinned);
 
   if (actorTarget.id !== userMain.id) {
-    addMemoryId(userMain, event.id);
+    addMemoryId(userMain, event.id, pinned);
   }
 }
 
@@ -617,11 +620,67 @@ function consequenceForGraphEvent(type: RelationshipGraphEvent["type"]) {
   }
 }
 
-function addMemoryId(edge: RelationshipGraphEdge, eventId: string) {
+function addMemoryId(
+  edge: RelationshipGraphEdge,
+  eventId: string,
+  pinned = false,
+) {
   if (edge.memories.includes(eventId)) return;
 
-  edge.memories = [...edge.memories, eventId].slice(-80);
+  if (pinned) {
+    edge.pinnedMemories = unique([...edge.pinnedMemories, eventId]);
+  }
+
+  edge.memories = compactMemoryIds(edge.memories, eventId, edge.pinnedMemories);
   edge.flags.emotionallySignificant = true;
+}
+
+function compactMemoryIds(
+  currentIds: string[],
+  nextId: string,
+  pinnedIds: string[],
+  maxMemories = 80,
+) {
+  const pinned = new Set(pinnedIds);
+  const ids = unique([...currentIds, nextId]);
+  const pinnedCurrent = ids.filter((id) => pinned.has(id));
+  const regular = ids
+    .filter((id) => !pinned.has(id))
+    .slice(-(Math.max(0, maxMemories - pinnedCurrent.length)));
+
+  return unique([...pinnedCurrent, ...regular]);
+}
+
+function isPinnedGraphEvent(event: RelationshipGraphEvent) {
+  return (
+    ["abandonment", "betrayal", "confession", "repair"].includes(event.type) ||
+    event.tags.some((tag) => isPinnedMemoryTag(tag))
+  );
+}
+
+function isPinnedMeaningfulEvent(event: MeaningfulRelationshipEventInput) {
+  return (
+    event.impact >= 85 ||
+    event.secrecy === "secretKiss" ||
+    event.secrecy === "unspokenPromise"
+  );
+}
+
+function isPinnedMemoryTag(tag: string) {
+  return [
+    "anchor",
+    "anchored",
+    "important",
+    "memory_anchor",
+    "milestone",
+    "permanent",
+    "pinned",
+    "story_beat",
+  ].includes(tag.trim().toLowerCase());
+}
+
+function unique(values: string[]) {
+  return Array.from(new Set(values));
 }
 
 function clamp(value: number, min = 0, max = 100) {

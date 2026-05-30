@@ -68,8 +68,9 @@ export const SexualOnlyEdgeSchema = z.object({
       feelingsDenied: false,
       exclusivityTalkNeeded: false,
       romanticLeakageDetected: false,
-    }),
+  }),
   memories: z.array(z.string().trim().min(1)).default([]),
+  pinnedMemories: z.array(z.string().trim().min(1)).default([]),
 });
 
 export const SexualOnlyEdgeEventSchema = z.object({
@@ -185,8 +186,16 @@ export function updateSexualOnlyEdgeFromEvent(
       break;
   }
 
-  if (typeof event !== "string" && event.emotionalWeight >= 70) {
-    edge.memories = [...new Set([...edge.memories, event.id])].slice(-80);
+  if (typeof event !== "string") {
+    const pinned = isPinnedSexualOnlyEvent(event);
+
+    if (event.emotionalWeight >= 70 || pinned) {
+      if (pinned) {
+        edge.pinnedMemories = unique([...edge.pinnedMemories, event.id]);
+      }
+
+      edge.memories = compactMemoryIds(edge.memories, event.id, edge.pinnedMemories);
+    }
   }
 
   edge.attachmentDriftRisk = Math.max(
@@ -273,6 +282,47 @@ function addMomentum(
   delta: number,
 ) {
   edge.momentum[key] = clamp(edge.momentum[key] + delta, -100, 100);
+}
+
+function compactMemoryIds(
+  currentIds: string[],
+  nextId: string,
+  pinnedIds: string[],
+  maxMemories = 80,
+) {
+  const pinned = new Set(pinnedIds);
+  const ids = unique([...currentIds, nextId]);
+  const pinnedCurrent = ids.filter((id) => pinned.has(id));
+  const regular = ids
+    .filter((id) => !pinned.has(id))
+    .slice(-(Math.max(0, maxMemories - pinnedCurrent.length)));
+
+  return unique([...pinnedCurrent, ...regular]);
+}
+
+function isPinnedSexualOnlyEvent(event: SexualOnlyEdgeEvent) {
+  return (
+    event.type === "romantic_confession" ||
+    event.type === "exclusivity_talk" ||
+    event.tags.some((tag) => isPinnedMemoryTag(tag))
+  );
+}
+
+function isPinnedMemoryTag(tag: string) {
+  return [
+    "anchor",
+    "anchored",
+    "important",
+    "memory_anchor",
+    "milestone",
+    "permanent",
+    "pinned",
+    "story_beat",
+  ].includes(tag.trim().toLowerCase());
+}
+
+function unique(values: string[]) {
+  return Array.from(new Set(values));
 }
 
 function clamp(value: number, min = 0, max = 100) {

@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { createDefaultRelationshipState } from "../../lib/chat/relationshipState.schema";
+import {
+  compactRelationshipMemories,
+  createDefaultRelationshipState,
+} from "../../lib/chat/relationshipState.schema";
 import { updateRelationshipFromMessages } from "../../lib/chat/relationshipUpdater";
 
 test("updates affection reassurance and confession deterministically", () => {
@@ -122,4 +125,36 @@ test("sets milestone flags once for first kiss and commitment", () => {
   assert.equal(first.state.intimacy.physical, 15);
   assert.equal(second.state.flags.firstKiss, true);
   assert.equal(second.state.intimacy.physical, 15);
+});
+
+test("pins milestone memories so cleanup does not erase important story beats", () => {
+  const ordinaryMemories = Array.from({ length: 90 }, (_, index) => ({
+    id: `ordinary-${index}`,
+    type: "custom" as const,
+    summary: `Ordinary memory ${index}`,
+    emotionalWeight: 90,
+    trustImpact: 0,
+    intimacyImpact: 0,
+    timestamp: index,
+    tags: [],
+  }));
+  const pinnedMilestone = {
+    id: "first-confession",
+    type: "custom" as const,
+    summary: "The first honest confession happened.",
+    emotionalWeight: 10,
+    trustImpact: 4,
+    intimacyImpact: 6,
+    timestamp: 1,
+    tags: ["milestone"],
+  };
+
+  const compacted = compactRelationshipMemories([
+    ...ordinaryMemories,
+    pinnedMilestone,
+  ]);
+
+  assert.equal(compacted.some((memory) => memory.id === pinnedMilestone.id), true);
+  assert.equal(compacted.length, 80);
+  assert.equal(compacted.some((memory) => memory.id === "ordinary-89"), true);
 });
