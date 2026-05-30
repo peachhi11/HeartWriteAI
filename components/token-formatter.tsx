@@ -39,7 +39,7 @@ export function TokenFormatter({ role, text }: TokenFormatterProps) {
           return (
             <span
               key={key}
-              className="mx-0.5 rounded-md border border-amber-500/20 bg-amber-950/15 px-1.5 py-0.5 font-sans text-xs font-semibold tracking-wide text-amber-300"
+              className="my-1 block max-w-full rounded-xl border border-border/70 bg-background/45 px-2.5 py-1.5 font-sans text-xs font-semibold leading-relaxed tracking-wide text-foreground/80"
             >
               {fragment.slice(1, -1)}
             </span>

@@ -1,5 +1,12 @@
 "use client";
 
+import {
+  type KeyboardEvent,
+  useEffect,
+  useId,
+  useRef,
+} from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -21,25 +28,93 @@ export function CenteredIntentModal({
   onSelectAction,
   scenePrompt,
 }: CenteredIntentModalProps) {
+  const titleId = useId();
+  const sceneId = useId();
+  const modalRef = useRef<HTMLDivElement | null>(null);
+  const closeButtonRef = useRef<HTMLButtonElement | null>(null);
+  const firstActionRef = useRef<HTMLButtonElement | null>(null);
+  const previousActiveElementRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    previousActiveElementRef.current =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const focusTimer = window.setTimeout(() => {
+      (firstActionRef.current ?? closeButtonRef.current)?.focus();
+    }, 0);
+
+    return () => {
+      window.clearTimeout(focusTimer);
+      document.body.style.overflow = previousOverflow;
+      previousActiveElementRef.current?.focus();
+    };
+  }, [isOpen]);
+
   if (!isOpen) {
     return null;
   }
 
-  return (
+  function handleKeyDown(event: KeyboardEvent<HTMLDivElement>) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      onCloseAbort();
+      return;
+    }
+
+    if (event.key !== "Tab" || !modalRef.current) {
+      return;
+    }
+
+    const focusableElements = Array.from(
+      modalRef.current.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ),
+    );
+
+    if (focusableElements.length === 0) {
+      event.preventDefault();
+      return;
+    }
+
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (event.shiftKey && document.activeElement === firstElement) {
+      event.preventDefault();
+      lastElement.focus();
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+      event.preventDefault();
+      firstElement.focus();
+    }
+  }
+
+  const modalContent = (
     <div
-      aria-labelledby="intent-modal-title"
+      aria-describedby={sceneId}
+      aria-labelledby={titleId}
       aria-modal="true"
       className="fixed inset-0 z-50 flex items-center justify-center overflow-hidden p-4"
+      onKeyDown={handleKeyDown}
       role="dialog"
     >
-      <button
-        aria-label="Close intent selection"
+      <div
+        aria-hidden="true"
         className="absolute inset-0 cursor-default bg-background/80 backdrop-blur-md transition-opacity duration-500 animate-fade-in"
-        onClick={onCloseAbort}
-        type="button"
+        onMouseDown={onCloseAbort}
       />
 
-      <div className="relative z-10 flex max-h-[90vh] w-full max-w-2xl flex-col gap-5 overflow-hidden rounded-3xl border border-border/80 bg-card/85 p-5 shadow-2xl backdrop-blur-xl animate-scale-up sm:p-6">
+      <div
+        data-intent-modal-panel
+        className="relative z-10 flex max-h-[90vh] w-full max-w-2xl select-none flex-col gap-5 overflow-hidden rounded-3xl border border-border/80 bg-card/85 p-5 shadow-2xl backdrop-blur-xl animate-scale-up sm:p-6"
+        ref={modalRef}
+      >
         <header className="flex shrink-0 items-start justify-between gap-4 border-b border-border/70 pb-4">
           <div className="space-y-1">
             <span className="inline-flex rounded-md border border-primary/25 bg-primary/10 px-2 py-0.5 text-[9px] font-black uppercase tracking-[0.22em] text-primary">
@@ -47,14 +122,16 @@ export function CenteredIntentModal({
             </span>
             <h2
               className="text-base font-black uppercase tracking-wide text-foreground"
-              id="intent-modal-title"
+              id={titleId}
             >
               Choose Your Response
             </h2>
           </div>
           <button
+            aria-label="Skip story choice"
             className="inline-flex items-center gap-1 rounded-lg border border-border/70 bg-background/70 px-2.5 py-1 text-xs font-bold text-muted-foreground transition hover:border-border hover:text-foreground active:scale-95"
             onClick={onCloseAbort}
+            ref={closeButtonRef}
             type="button"
           >
             Skip
@@ -62,7 +139,10 @@ export function CenteredIntentModal({
           </button>
         </header>
 
-        <section className="shrink-0 rounded-2xl border border-border/60 bg-background/55 p-4">
+        <section
+          className="shrink-0 rounded-2xl border border-border/60 bg-background/55 p-4"
+          id={sceneId}
+        >
           <span className="mb-1 block text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground">
             Scene
           </span>
@@ -72,8 +152,10 @@ export function CenteredIntentModal({
         </section>
 
         <div className="flex-1 space-y-3 overflow-y-auto pr-1">
-          {cardOptions.map((option) => {
-            const tropeConfig = COMPLETE_TROPE_MATRIX[option.intentClass];
+          {cardOptions.map((option, index) => {
+            const tropeConfig =
+              COMPLETE_TROPE_MATRIX[option.intentClass] ??
+              COMPLETE_TROPE_MATRIX.casual;
 
             return (
               <button
@@ -83,6 +165,7 @@ export function CenteredIntentModal({
                 )}
                 key={option.id}
                 onClick={() => onSelectAction(option)}
+                ref={index === 0 ? firstActionRef : undefined}
                 type="button"
               >
                 <div className="flex w-full items-start justify-between gap-3">
@@ -121,4 +204,6 @@ export function CenteredIntentModal({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 }
