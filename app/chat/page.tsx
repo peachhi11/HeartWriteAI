@@ -47,14 +47,22 @@ import {
   toOllamaMessages,
   updateRoleplayMessageText,
 } from "@/lib/chat/messages";
+import {
+  ContextCompiler,
+  estimateContextTokens,
+  type ContextChatMessage,
+  type ContextLorebookEntry,
+} from "@/lib/character-card/contextCompiler";
 import { classifyTropeInput } from "@/lib/character-card/tropeMatcher";
 import { fetchContextualNpcDialogue } from "@/lib/tauri/contextualDialogue";
 import {
-  buildLoreRecallMessages,
   createLoreRecallAuditLogs,
+  type LoreActivationPayload,
   scanActiveLorebookForChatTurn,
 } from "@/lib/tauri/loreActivation";
 import { streamLocalLlmResponse } from "@/lib/tauri/localLlm";
+import { isTauriRuntime } from "@/lib/tauri/native";
+import { countTokensNative } from "@/lib/tauri/tokenCounter";
 import {
   appendMessageToHistory,
   replaceDialogueHistory,
@@ -86,6 +94,7 @@ import type { LoreRecallAuditLog } from "@/types/lorebook";
 
 const PREVIEW_CHAT_ID = "preview-chat";
 const PREVIEW_CHAT_UPDATED_AT = 0;
+const CHAT_CONTEXT_MAX_TOKENS = 8192;
 
 const initialMessages: RoleplayMessage[] = [
   {
@@ -491,14 +500,10 @@ export default function RoleplayChat() {
     void persistDialogueLine(userMessage, setRuntimeError);
 
     try {
-      const scenarioMessages = compileScenarioOverrideMessages(
-        activeSession.scenarioOverride,
-      );
       const loreActivation = await scanActiveLorebookForChatTurn(
         activeLorebook,
         playerInput,
       );
-      const loreMessages = buildLoreRecallMessages(loreActivation);
       setActiveLoreFeed(loreActivation.loreInjectionChunk);
 
       if (loreActivation.hasMatches) {
@@ -510,11 +515,11 @@ export default function RoleplayChat() {
         setLoreRecallLogs((current) => [...recallLogs, ...current].slice(0, 40));
       }
 
-      const contextMessages = [
-        ...scenarioMessages,
-        ...loreMessages,
-        ...toOllamaMessages(messages),
-      ];
+      const contextMessages = await compileLiveChatContextMessages({
+        history: messages,
+        loreActivation,
+        override: activeSession.scenarioOverride,
+      });
       let accumulatedResponse = "";
       const didUseNativeStream = await streamLocalLlmResponse(
         {
@@ -556,16 +561,17 @@ export default function RoleplayChat() {
       }
 
       const latestInferenceConfig = loadInferenceConfig();
+      const compiledMessages = await compileLiveChatContextMessages({
+        history: updatedMessages,
+        loreActivation,
+        override: activeSession.scenarioOverride,
+      });
       const response = await fetch(latestInferenceConfig.localEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: latestInferenceConfig.selectedModel,
-          messages: [
-            ...scenarioMessages,
-            ...loreMessages,
-            ...toOllamaMessages(updatedMessages),
-          ],
+          messages: compiledMessages,
           stream: true,
         }),
       });
@@ -699,14 +705,10 @@ export default function RoleplayChat() {
     setRuntimeError(null);
 
     try {
-      const scenarioMessages = compileScenarioOverrideMessages(
-        activeSession.scenarioOverride,
-      );
       const loreActivation = await scanActiveLorebookForChatTurn(
         activeLorebook,
         parentPrompt,
       );
-      const loreMessages = buildLoreRecallMessages(loreActivation);
       setActiveLoreFeed(loreActivation.loreInjectionChunk);
 
       if (loreActivation.hasMatches) {
@@ -719,13 +721,14 @@ export default function RoleplayChat() {
       }
 
       let accumulatedResponse = "";
+      const contextMessages = await compileLiveChatContextMessages({
+        history: contextBeforeParent,
+        loreActivation,
+        override: activeSession.scenarioOverride,
+      });
       const didUseNativeStream = await streamLocalLlmResponse(
         {
-          contextMessages: [
-            ...scenarioMessages,
-            ...loreMessages,
-            ...toOllamaMessages(contextBeforeParent),
-          ],
+          contextMessages,
           promptText: parentPrompt,
           storyNodeId: "scene_01_alley_encounter",
         },
@@ -745,16 +748,17 @@ export default function RoleplayChat() {
 
       if (!didUseNativeStream) {
         const latestInferenceConfig = loadInferenceConfig();
+        const compiledMessages = await compileLiveChatContextMessages({
+          history: baseMessages,
+          loreActivation,
+          override: activeSession.scenarioOverride,
+        });
         const response = await fetch(latestInferenceConfig.localEndpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             model: latestInferenceConfig.selectedModel,
-            messages: [
-              ...scenarioMessages,
-              ...loreMessages,
-              ...toOllamaMessages(baseMessages),
-            ],
+            messages: compiledMessages,
             stream: true,
           }),
         });
@@ -1443,26 +1447,82 @@ async function persistDialogueHistory(
   }
 }
 
-function compileScenarioOverrideMessages(override: ScenarioOverride) {
-  const content = [
-    override.context ? `Context: ${override.context}` : "",
-    override.setting ? `Setting: ${override.setting}` : "",
-    override.scene ? `Scene: ${override.scene}` : "",
-    override.dynamic ? `Dynamic: ${override.dynamic}` : "",
-  ].filter(Boolean).join("\n");
+async function compileLiveChatContextMessages(input: {
+  history: RoleplayMessage[];
+  loreActivation: LoreActivationPayload;
+  override: ScenarioOverride;
+}): Promise<ContextChatMessage[]> {
+  const compileInput = {
+    activeLorebookEntries: loreActivationToContextEntries(input.loreActivation),
+    chatHistory: toOllamaMessages(input.history).map((message) => ({
+      content: message.content,
+      role: message.role,
+    })),
+    maxTokens: CHAT_CONTEXT_MAX_TOKENS,
+    reserveTokens: 500,
+    systemPrompt: [
+      "Roleplay naturally and preserve user agency.",
+      "Do not write {{user}} decisions, private thoughts, dialogue, consent, or actions.",
+      input.loreActivation.loreInjectionChunk.trim()
+        ? "Use only the remembered lore that directly fits this turn. Do not dump unrelated background."
+        : "",
+    ].filter(Boolean).join("\n"),
+    v3Scenario: scenarioOverrideToContextScenario(input.override),
+  };
 
-  return content
-    ? [
-        {
-          role: "system",
-          content: [
-            "SCENARIO OVERRIDE FOR THIS CHAT:",
-            content,
-            "Use this only as scene setup. Do not write {{user}} decisions, private thoughts, dialogue, consent, or actions.",
-          ].join("\n"),
-        },
-      ]
-    : [];
+  return ContextCompiler.compileDetailedWithTokenCounter(
+    compileInput,
+    countLiveChatTokens,
+  ).then((result) => result.messages);
+}
+
+function scenarioOverrideToContextScenario(override: ScenarioOverride) {
+  const setting = override.setting.trim();
+  const scene = override.scene.trim();
+  const dynamic = override.dynamic.trim();
+  const context = override.context.trim();
+
+  if (!setting && !scene && !dynamic && !context) {
+    return undefined;
+  }
+
+  return {
+    sensoryAnchor: setting || "Use sensory detail from the active chat.",
+    setting: setting || context || "Use the active chat location.",
+    systemPromptOverride: [
+      context ? `Context: ${context}` : "",
+      scene ? `Scene: ${scene}` : "",
+      dynamic ? `Dynamic: ${dynamic}` : "",
+      "Use this only as scene setup.",
+    ].filter(Boolean).join("\n"),
+    title: scene || context || "Scenario Override",
+  };
+}
+
+function loreActivationToContextEntries(
+  loreActivation: LoreActivationPayload,
+): ContextLorebookEntry[] {
+  return loreActivation.matches.map((match, index) => ({
+    content: [
+      `Matched keys: ${match.matchedKeys.join(", ")}`,
+      match.injectedSnippet,
+    ].join("\n"),
+    depth: 4,
+    key: match.entryTitle || match.entryId,
+    priority: 100 - index,
+  }));
+}
+
+async function countLiveChatTokens(text: string) {
+  if (!isTauriRuntime()) {
+    return estimateContextTokens(text);
+  }
+
+  try {
+    return await countTokensNative(text, "gpt-4o");
+  } catch {
+    return estimateContextTokens(text);
+  }
 }
 
 function getLorebookDiagnostic(
