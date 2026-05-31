@@ -50,7 +50,10 @@ Build and verify:
 
 ```bash
 npm run lint
+npm test
 npm run build
+cargo test --manifest-path src-tauri/Cargo.toml
+npm run tauri:build -- --debug --bundles app
 npm run tauri:build
 ```
 
@@ -70,8 +73,11 @@ Implemented in the current scaffold:
 
 - Next.js + Tailwind + shadcn app shell.
 - Tauri v2 desktop wrapper renamed and configured for HeartWriteAI.
+- Desktop debug app bundling verified through `npm run tauri:build -- --debug --bundles app`.
 - Workspace-first editor for character card import, editing, and export.
-- Temporary `/chat` preview route for Ollama streaming shape tests.
+- `/chat` runtime workspace for local roleplay sessions, scenario overrides,
+  lore diagnostics, relationship state, regeneration, swiped variants, and
+  save/load smoke checks.
 - `/api/character-card/classify` and `/api/character-card/build` routes for schema-bound macro routing and generated card previews.
 - Tauri Store plugin registration and typed desktop-library helper for local
   character-card persistence.
@@ -83,17 +89,34 @@ Implemented in the current scaffold:
 - Desktop card-library cache with user-facing filters for chat style, POV, character role, user role, tropes, and AU tags.
 - Hidden emotion/feeling lexicon for ForceBary-style tag suggestions, exposed only as friendly story-engine tags rather than classifier internals.
 - Prompt runtime compiler that lets a card override the default app system prompt, or extend it with `{{original}}`.
+- Context guard logic for trimming oversized chat history while preserving
+  protected milestone memory anchors.
+- Relationship milestone anchoring so important story beats can survive cleanup
+  in long-running sessions.
+- Centered interaction-intent modal for key story moments.
+- Diagnostics/status node coverage for lore/sync style states without treating
+  unrelated runtime errors as lorebook faults.
+- Regeneration and swiped-variant navigation for AI responses without deleting
+  previous responses.
+- Copy actions on chat responses, schema/debug panels, prompt previews, and
+  ordinary text inputs/textareas through a global field-copy overlay.
 - Adult legacy/offspring profile generator for generational series planning, with minor-NPC guardrails for family/slice-of-life scenes.
+- Seed vocabulary ingestion fixes for skinny/thin body-line semantics and wavy
+  hair wording.
 - Tauri bridge helper for frontend/native command calls.
 - PNG text-chunk dependencies for CCV3 card import/export:
   - `png-chunks-extract`
   - `png-chunks-encode`
   - `png-chunk-text`
-- Auto-update security plan documented but intentionally disabled.
+- Auto-update security plan documented; updater artifacts remain disabled until
+  signing, HTTPS endpoints, rollback behavior, and release infrastructure are
+  real.
 
 Immediate next milestone:
 
-- Stabilize the desktop folder-intake and CHARX master workflow around real imported card folders, then move the same normalized card model into lorebook/persona/chat runtime work.
+- Keep hardening the chat runtime with Tauri desktop smoke tests and move the
+  same normalized asset model across persona, scenario, lorebook, and card
+  workflows.
 
 ## Project Shape
 
@@ -110,23 +133,28 @@ Recovered prototype folders, copied reference migrations, loose research PDFs, a
 
 ## Roadmap
 
-The phased implementation plan lives in [`PLAN.md`](PLAN.md).
+The concise product roadmap lives in [`ROADMAP.md`](ROADMAP.md). The detailed
+engineering implementation plan lives in [`PLAN.md`](PLAN.md).
 
 The old CharacterGen project is now treated as a reference archive. The active port map lives in [`docs/charactergen-reference-port-map.md`](docs/charactergen-reference-port-map.md), and the implementation target remains Next.js + Tailwind + Tauri v2 rather than Python/PyQt.
 
 The current priority order is:
 
-1. Stabilize the scaffold and documentation checkpoint.
-2. Complete CCV3 PNG/JSON/CHARX import and export, with CHARX as the native master.
-3. Maintain the CharacterGen reference port map.
-4. Turn the character page into the editable intake hub.
-5. Add editable lorebook/persona/scenario asset editors and attachments.
-6. Expand Tauri local file/library management.
-7. Build the production chat runtime around the context compiler.
+1. Harden desktop runtime smoke tests for save/load, variants, copy actions,
+   lore diagnostics, and Tauri shell parity.
+2. Continue CCV3 PNG/JSON/CHARX import/export stabilization, with CHARX as the
+   native master.
+3. Mature persona, scenario, lorebook, and relationship workflows around the
+   shared normalized asset model.
+4. Expand Tauri local file/library management.
+5. Build the production chat runtime around deterministic context compilation,
+   memory guards, lore injection, relationship state, and provider streaming.
 
 ## Auto-Update Safety
 
-Auto-update is intentionally disabled. Do not add updater config with placeholder keys, unsigned artifacts, or non-HTTPS endpoints.
+Auto-update is intentionally inactive for release purposes. Debug bundles do not
+create updater artifacts, and empty updater endpoint/key values must not be
+treated as production release configuration.
 
 The secure activation plan is tracked in [`docs/auto-update-security.md`](docs/auto-update-security.md).
 

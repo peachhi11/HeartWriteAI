@@ -2,6 +2,31 @@
 
 HeartWriteAI is the Next.js + Tailwind + shadcn + Tauri rebuild of CharacterGen. The app should become a local-first studio for CCV3 character cards, editable personas, lorebooks, scenario arcs, and eventually chat runtime compilation.
 
+## Current Checkpoint
+
+The app has moved beyond the initial scaffold into an integrated local runtime
+prototype. The current branch includes:
+
+- Scenario/persona/lorebook generation surfaces with editable prompt previews
+  and schema/debug copy actions.
+- Chat runtime UI with lore diagnostics, relationship state, interaction intent
+  modal support, response regeneration, and swiped-variant navigation.
+- Context guard work for trimming oversized histories while preserving protected
+  milestone memory anchors.
+- Milestone memory anchoring for important long-running story beats.
+- Diagnostics/status node behavior for lore/sync-style states without
+  conflating unrelated runtime errors with lorebook faults.
+- Global copy affordances for ordinary text inputs/textareas, while excluding
+  passwords, file inputs, sliders, date/color controls, disabled fields, and
+  explicit `data-no-field-copy` opt-outs.
+- Seed vocabulary ingestion fixes for skinny/thin body-line semantics and wavy
+  hair wording.
+- Build/test/QC coverage through lint, Node tests, Next build, Cargo tests, and
+  debug Tauri app bundling.
+
+The concise product roadmap now lives in [`ROADMAP.md`](ROADMAP.md). This file
+remains the detailed engineering plan and rationale.
+
 ## Scope Reset
 
 CharacterGen is now treated as a concept and reference archive, not as code to move wholesale.
@@ -34,6 +59,9 @@ Exit criteria:
 - README and PLAN are current.
 - The app builds as a static frontend for Tauri.
 - The desktop shell can be bundled locally.
+
+Status: complete for the scaffold baseline. Continue updating docs as features
+graduate from prototype to committed runtime surfaces.
 
 ## Phase 2: CCV3 PNG/JSON Import/Export Codec
 
@@ -127,6 +155,11 @@ Exit criteria:
 
 Goal: preserve generated content as user-facing assets, not hidden one-shot generation output.
 
+Current status: partially implemented. Persona, scenario, lorebook, and runtime
+bundle generation surfaces exist with editable previews/import-export flows; the
+remaining work is deeper attachment management, deletion flows, and active
+lorebook visibility across every runtime surface.
+
 - Add editable lorebook output as nested entries with user-facing fields:
   - name
   - keys/triggers
@@ -201,6 +234,12 @@ Exit criteria:
 Goal: integrate chat only after character/persona/scenario/lore data has reliable structure.
 
 Architecture reference: [`docs/chat-runtime-architecture.md`](docs/chat-runtime-architecture.md).
+
+Current status: in active implementation. The chat surface now includes
+save/load, lore diagnostics, relationship state hooks, scenario overrides,
+interaction intent, regeneration, swiped variants, copy actions, and context
+guard/milestone anchoring tests. Keep browser and real Tauri shell behavior in
+lockstep for every runtime addition.
 
 - Add a formal context compiler that assembles:
   - character
