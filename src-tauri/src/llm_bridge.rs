@@ -56,6 +56,12 @@ impl LocalLlmBroker {
         };
 
         let inference_config = inference_settings.snapshot()?;
+        if inference_config.provider != "ollama" {
+            return Err(
+                "Native local LLM bridge is only available for the Ollama provider.".to_string(),
+            );
+        }
+
         let system_prompt =
             build_system_prompt(active_character.as_ref(), &stats, &payload.story_node_id);
         let messages = build_ollama_messages(system_prompt, &payload);

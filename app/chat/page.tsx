@@ -58,7 +58,10 @@ import {
   type ContextLorebookEntry,
 } from "@/lib/character-card/contextCompiler";
 import { classifyTropeInput } from "@/lib/character-card/tropeMatcher";
-import { streamLlmCompletion } from "@/lib/inference/llmConnector";
+import {
+  type LlmProviderConfig,
+  streamLlmCompletion,
+} from "@/lib/inference/llmConnector";
 import { fetchContextualNpcDialogue } from "@/lib/tauri/contextualDialogue";
 import {
   createLoreRecallAuditLogs,
@@ -96,6 +99,7 @@ import type { ActionCardVariant } from "@/types/cards";
 import type { SystemSyncStatus } from "@/types/diagnostics";
 import type { DockingState, SidePanelType } from "@/types/dock";
 import type { GeneratedLorebookArtifact } from "@/features/generation/workflows";
+import type { InferenceConfig } from "@/types/inference";
 import type { LoreRecallAuditLog } from "@/types/lorebook";
 
 const PREVIEW_CHAT_ID = "preview-chat";
@@ -535,35 +539,39 @@ export default function RoleplayChat() {
         setLoreRecallLogs((current) => [...recallLogs, ...current].slice(0, 40));
       }
 
+      const latestInferenceConfig = loadInferenceConfig();
       const contextMessages = await compileLiveChatContextMessages({
         history: messages,
         loreActivation,
         override: activeSession.scenarioOverride,
       });
       let accumulatedResponse = "";
-      const didUseNativeStream = await streamLocalLlmResponse(
-        {
-          contextMessages,
-          promptText: playerInput,
-          storyNodeId: "scene_01_alley_encounter",
-        },
-        {
-          onToken: (token) => {
-            accumulatedResponse += token;
 
-            updateActiveSession({
-              messages: [
-                ...updatedMessages,
-                {
-                  ...assistantMessage,
-                  detectedTrope,
-                  parts: [{ type: "text", text: accumulatedResponse }],
-                },
-              ],
-            });
+      const didUseNativeStream =
+        latestInferenceConfig.provider === "ollama" &&
+        (await streamLocalLlmResponse(
+          {
+            contextMessages,
+            promptText: playerInput,
+            storyNodeId: "scene_01_alley_encounter",
           },
-        },
-      );
+          {
+            onToken: (token) => {
+              accumulatedResponse += token;
+
+              updateActiveSession({
+                messages: [
+                  ...updatedMessages,
+                  {
+                    ...assistantMessage,
+                    detectedTrope,
+                    parts: [{ type: "text", text: accumulatedResponse }],
+                  },
+                ],
+              });
+            },
+          },
+        ));
 
       if (didUseNativeStream) {
         if (accumulatedResponse.trim()) {
@@ -580,7 +588,6 @@ export default function RoleplayChat() {
         return;
       }
 
-      const latestInferenceConfig = loadInferenceConfig();
       const compiledMessages = await compileLiveChatContextMessages({
         history: updatedMessages,
         loreActivation,
@@ -589,14 +596,7 @@ export default function RoleplayChat() {
 
       await streamLlmCompletion(
         toLlmConnectorMessages(compiledMessages),
-        {
-          baseUrl: latestInferenceConfig.localEndpoint,
-          maxTokens: latestInferenceConfig.maxTokens,
-          model: latestInferenceConfig.selectedModel,
-          provider: "ollama",
-          temperature: latestInferenceConfig.temperature,
-          topP: latestInferenceConfig.topP,
-        },
+        createLlmProviderConfig(latestInferenceConfig),
         {
           onToken: (token) => {
             accumulatedResponse += token;
@@ -643,7 +643,7 @@ export default function RoleplayChat() {
         });
         void persistDialogueLine(contextualMessage, setRuntimeError);
         setRuntimeError(
-          `Ollama was unavailable (${message}), so Lucas used the native ${contextualDialogue.applied_archetype} dialogue variant.`,
+          `${formatInferenceProviderLabel(loadInferenceConfig())} was unavailable (${message}), so Lucas used the native ${contextualDialogue.applied_archetype} dialogue variant.`,
         );
       } catch (fallbackError) {
         const fallbackDetail =
@@ -651,7 +651,7 @@ export default function RoleplayChat() {
             ? fallbackError.message
             : String(fallbackError);
         setRuntimeError(
-          `Could not reach local Ollama at ${loadInferenceConfig().localEndpoint}. ${message} Native dialogue fallback also failed: ${fallbackDetail}`,
+          `Could not reach ${formatInferenceProviderTarget(loadInferenceConfig())}. ${message} Native dialogue fallback also failed: ${fallbackDetail}`,
         );
         updateActiveSession({ messages: updatedMessages });
       }
@@ -713,34 +713,37 @@ export default function RoleplayChat() {
         setLoreRecallLogs((current) => [...recallLogs, ...current].slice(0, 40));
       }
 
+      const latestInferenceConfig = loadInferenceConfig();
       let accumulatedResponse = "";
       const contextMessages = await compileLiveChatContextMessages({
         history: contextBeforeParent,
         loreActivation,
         override: activeSession.scenarioOverride,
       });
-      const didUseNativeStream = await streamLocalLlmResponse(
-        {
-          contextMessages,
-          promptText: parentPrompt,
-          storyNodeId: "scene_01_alley_encounter",
-        },
-        {
-          onToken: (token) => {
-            accumulatedResponse += token;
-            updateActiveSession({
-              messages: updateMessageById(
-                rewoundMessages,
-                regeneratingMessage.id,
-                (message) => updateRoleplayMessageText(message, accumulatedResponse),
-              ),
-            });
+      const didUseNativeStream =
+        latestInferenceConfig.provider === "ollama" &&
+        (await streamLocalLlmResponse(
+          {
+            contextMessages,
+            promptText: parentPrompt,
+            storyNodeId: "scene_01_alley_encounter",
           },
-        },
-      );
+          {
+            onToken: (token) => {
+              accumulatedResponse += token;
+              updateActiveSession({
+                messages: updateMessageById(
+                  rewoundMessages,
+                  regeneratingMessage.id,
+                  (message) =>
+                    updateRoleplayMessageText(message, accumulatedResponse),
+                ),
+              });
+            },
+          },
+        ));
 
       if (!didUseNativeStream) {
-        const latestInferenceConfig = loadInferenceConfig();
         const compiledMessages = await compileLiveChatContextMessages({
           history: baseMessages,
           loreActivation,
@@ -749,14 +752,7 @@ export default function RoleplayChat() {
 
         await streamLlmCompletion(
           toLlmConnectorMessages(compiledMessages),
-          {
-            baseUrl: latestInferenceConfig.localEndpoint,
-            maxTokens: latestInferenceConfig.maxTokens,
-            model: latestInferenceConfig.selectedModel,
-            provider: "ollama",
-            temperature: latestInferenceConfig.temperature,
-            topP: latestInferenceConfig.topP,
-          },
+          createLlmProviderConfig(latestInferenceConfig),
           {
             onToken: (token) => {
               accumulatedResponse += token;
@@ -806,7 +802,7 @@ export default function RoleplayChat() {
         });
         void persistDialogueHistory(fallbackMessages, setRuntimeError);
         setRuntimeError(
-          `Ollama was unavailable (${message}), so Lucas used the native ${contextualDialogue.applied_archetype} dialogue variant.`,
+          `${formatInferenceProviderLabel(loadInferenceConfig())} was unavailable (${message}), so Lucas used the native ${contextualDialogue.applied_archetype} dialogue variant.`,
         );
       } catch (fallbackError) {
         const fallbackDetail =
@@ -814,7 +810,7 @@ export default function RoleplayChat() {
             ? fallbackError.message
             : String(fallbackError);
         setRuntimeError(
-          `Could not regenerate from local Ollama at ${loadInferenceConfig().localEndpoint}. ${message} Native dialogue fallback also failed: ${fallbackDetail}`,
+          `Could not regenerate from ${formatInferenceProviderTarget(loadInferenceConfig())}. ${message} Native dialogue fallback also failed: ${fallbackDetail}`,
         );
         updateActiveSession({ messages });
       }
@@ -873,7 +869,12 @@ export default function RoleplayChat() {
       eyebrow="Character Chat"
       title="Chat Preview"
       subtitle="Test character replies, lorebook links, and relationship tone before starting a full playthrough."
-      actions={<Badge variant="outline">Ollama: {inferenceConfig.selectedModel}</Badge>}
+      actions={
+        <Badge variant="outline">
+          {formatInferenceProviderLabel(inferenceConfig)}:{" "}
+          {getInferenceModelLabel(inferenceConfig)}
+        </Badge>
+      }
     >
       <div className="grid min-h-[calc(100vh-9rem)] gap-5 xl:grid-cols-[20rem_minmax(0,1fr)]">
         <section className="flex max-h-none flex-col gap-5 overflow-y-auto pr-1 xl:sticky xl:top-24 xl:max-h-[calc(100vh-9rem)]">
@@ -892,10 +893,11 @@ export default function RoleplayChat() {
               <div>
                 <p className="text-sm font-medium">HeartWrite Preview</p>
                 <p className="text-xs text-muted-foreground">
-                  Local model: {inferenceConfig.selectedModel}
+                  {formatInferenceProviderLabel(inferenceConfig)} model:{" "}
+                  {getInferenceModelLabel(inferenceConfig)}
                 </p>
                 <p className="max-w-56 truncate text-[10px] text-muted-foreground">
-                  {inferenceConfig.localEndpoint}
+                  {formatInferenceProviderTarget(inferenceConfig)}
                 </p>
               </div>
             </CardContent>
@@ -1453,6 +1455,46 @@ function toLlmConnectorMessages(messages: ContextChatMessage[]) {
     content: message.content,
     role: message.role,
   }));
+}
+
+function createLlmProviderConfig(
+  config: InferenceConfig,
+): LlmProviderConfig {
+  if (config.provider === "openrouter") {
+    return {
+      apiKey: config.openRouterApiKey,
+      maxTokens: config.maxTokens,
+      model: config.openRouterModel,
+      provider: "openrouter",
+      temperature: config.temperature,
+      topP: config.topP,
+    };
+  }
+
+  return {
+    baseUrl: config.localEndpoint,
+    maxTokens: config.maxTokens,
+    model: config.selectedModel,
+    provider: "ollama",
+    temperature: config.temperature,
+    topP: config.topP,
+  };
+}
+
+function formatInferenceProviderLabel(config: InferenceConfig) {
+  return config.provider === "openrouter" ? "OpenRouter" : "Ollama";
+}
+
+function getInferenceModelLabel(config: InferenceConfig) {
+  return config.provider === "openrouter"
+    ? config.openRouterModel
+    : config.selectedModel;
+}
+
+function formatInferenceProviderTarget(config: InferenceConfig) {
+  return config.provider === "openrouter"
+    ? "OpenRouter chat completions"
+    : `local Ollama at ${config.localEndpoint}`;
 }
 
 function scenarioOverrideToContextScenario(override: ScenarioOverride) {

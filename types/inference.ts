@@ -1,16 +1,26 @@
+export type InferenceProvider = "ollama" | "openrouter";
+
 export interface InferenceConfig {
   frequencyPenalty: number;
   localEndpoint: string;
   maxTokens: number;
+  openRouterApiKey: string;
+  openRouterModel: string;
+  provider: InferenceProvider;
   selectedModel: string;
   temperature: number;
   topP: number;
 }
 
+export const OPENROUTER_DEFAULT_MODEL = "google/gemini-2.5-flash";
+
 export const INFERENCE_DEFAULT_MATRIX: InferenceConfig = {
   frequencyPenalty: 0,
   localEndpoint: "http://127.0.0.1:11434/api/chat",
   maxTokens: 256,
+  openRouterApiKey: "",
+  openRouterModel: OPENROUTER_DEFAULT_MODEL,
+  provider: "ollama",
   selectedModel: "llama3:8b",
   temperature: 0.7,
   topP: 0.9,
@@ -22,6 +32,13 @@ export const INFERENCE_MODEL_PRESETS = [
   { label: "Llama 3 8B", value: "llama3:8b" },
   { label: "Mistral 7B", value: "mistral:7b" },
   { label: "Phi-3 Mini", value: "phi3:3.8b" },
+] as const;
+
+export const OPENROUTER_MODEL_PRESETS = [
+  { label: "Gemini 2.5 Flash", value: OPENROUTER_DEFAULT_MODEL },
+  { label: "Claude 3.5 Sonnet", value: "anthropic/claude-3.5-sonnet" },
+  { label: "Llama 3.1 70B", value: "meta-llama/llama-3.1-70b-instruct" },
+  { label: "MythoMax L2 13B", value: "gryphe/mythomax-l2-13b" },
 ] as const;
 
 export function normalizeInferenceConfig(value: unknown): InferenceConfig {
@@ -50,10 +67,23 @@ export function normalizeInferenceConfig(value: unknown): InferenceConfig {
       2048,
       INFERENCE_DEFAULT_MATRIX.maxTokens,
     ),
+    openRouterApiKey:
+      typeof candidate.openRouterApiKey === "string"
+        ? normalizeApiKey(candidate.openRouterApiKey)
+        : INFERENCE_DEFAULT_MATRIX.openRouterApiKey,
+    openRouterModel:
+      typeof candidate.openRouterModel === "string" &&
+      isSafeModelTag(candidate.openRouterModel)
+        ? candidate.openRouterModel.trim()
+        : INFERENCE_DEFAULT_MATRIX.openRouterModel,
+    provider:
+      candidate.provider === "openrouter" || candidate.provider === "ollama"
+        ? candidate.provider
+        : INFERENCE_DEFAULT_MATRIX.provider,
     selectedModel:
       typeof candidate.selectedModel === "string" &&
       isSafeModelTag(candidate.selectedModel)
-        ? candidate.selectedModel
+        ? candidate.selectedModel.trim()
         : INFERENCE_DEFAULT_MATRIX.selectedModel,
     temperature: clampFloat(
       candidate.temperature,
@@ -112,6 +142,17 @@ function isSafeModelTag(value: string) {
     trimmed.length <= 96 &&
     /^[a-zA-Z0-9._:/-]+$/.test(trimmed)
   );
+}
+
+function normalizeApiKey(value: string) {
+  const trimmed = value.trim();
+  const hasControlCharacters = /[\u0000-\u001f\u007f]/.test(trimmed);
+
+  if (hasControlCharacters || trimmed.length > 4096) {
+    return "";
+  }
+
+  return trimmed;
 }
 
 function isSafeLocalEndpoint(value: string) {

@@ -13,6 +13,7 @@ import {
 import {
   INFERENCE_DEFAULT_MATRIX,
   INFERENCE_MODEL_PRESETS,
+  OPENROUTER_MODEL_PRESETS,
   type InferenceConfig,
   normalizeInferenceConfig,
 } from "@/types/inference";
@@ -28,6 +29,9 @@ export function InferenceSettingsCard() {
   const [endpointDraft, setEndpointDraft] = useState(
     INFERENCE_DEFAULT_MATRIX.localEndpoint,
   );
+  const [openRouterModelDraft, setOpenRouterModelDraft] = useState(
+    INFERENCE_DEFAULT_MATRIX.openRouterModel,
+  );
   const [hasHydrated, setHasHydrated] = useState(false);
 
   useEffect(() => {
@@ -41,6 +45,7 @@ export function InferenceSettingsCard() {
       const localConfig = loadInferenceConfig();
       setConfig(localConfig);
       setEndpointDraft(localConfig.localEndpoint);
+      setOpenRouterModelDraft(localConfig.openRouterModel);
       setHasHydrated(true);
     });
 
@@ -51,6 +56,7 @@ export function InferenceSettingsCard() {
 
       setConfig(nativeConfig);
       setEndpointDraft(nativeConfig.localEndpoint);
+      setOpenRouterModelDraft(nativeConfig.openRouterModel);
       setHasHydrated(true);
     });
 
@@ -65,6 +71,8 @@ export function InferenceSettingsCard() {
     }
 
     void saveInferenceConfig(config).then((savedConfig) => {
+      setEndpointDraft(savedConfig.localEndpoint);
+      setOpenRouterModelDraft(savedConfig.openRouterModel);
       setConfig((current) =>
         JSON.stringify(current) === JSON.stringify(savedConfig)
           ? current
@@ -87,6 +95,20 @@ export function InferenceSettingsCard() {
     setEndpointDraft(nextConfig.localEndpoint);
   }
 
+  function commitOpenRouterModelDraft() {
+    const nextConfig = normalizeInferenceConfig({
+      ...config,
+      openRouterModel: openRouterModelDraft,
+    });
+
+    setConfig(nextConfig);
+    setOpenRouterModelDraft(nextConfig.openRouterModel);
+  }
+
+  const hasPresetOpenRouterModel = OPENROUTER_MODEL_PRESETS.some(
+    (model) => model.value === config.openRouterModel,
+  );
+
   return (
     <section className="grid gap-4 rounded-2xl border border-border/70 bg-background/60 p-4 shadow-xl backdrop-blur-sm">
       <header className="flex flex-col gap-3 border-b border-border/70 pb-3 sm:flex-row sm:items-center sm:justify-between">
@@ -102,47 +124,136 @@ export function InferenceSettingsCard() {
           </p>
         </div>
 
-        <label className="grid gap-1 sm:w-44">
+        <label className="grid gap-1 sm:w-48">
           <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
-            Local AI Model
+            Reply Engine
           </span>
           <select
             className="h-9 rounded-lg border border-border/70 bg-background px-2 font-mono text-[10px] text-foreground outline-none transition focus:border-user-primary/70"
             onChange={(event) =>
-              updateConfig({ selectedModel: event.currentTarget.value })
+              updateConfig({
+                provider: event.currentTarget.value as InferenceConfig["provider"],
+              })
             }
-            value={config.selectedModel}
+            value={config.provider}
           >
-            {INFERENCE_MODEL_PRESETS.map((model) => (
-              <option key={model.value} value={model.value}>
-                {model.label}
-              </option>
-            ))}
+            <option value="ollama">Ollama Local</option>
+            <option value="openrouter">OpenRouter</option>
           </select>
         </label>
       </header>
 
       <div className="grid gap-4">
-        <label className="grid gap-1">
-          <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
-            Local Endpoint
-          </span>
-          <input
-            className="h-9 rounded-lg border border-border/70 bg-background px-2 font-mono text-[10px] text-foreground outline-none transition focus:border-user-primary/70"
-            onBlur={commitEndpointDraft}
-            onChange={(event) => setEndpointDraft(event.currentTarget.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                event.currentTarget.blur();
+        {config.provider === "ollama" ? (
+          <label className="grid gap-1">
+            <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
+              Local AI Model
+            </span>
+            <select
+              className="h-9 rounded-lg border border-border/70 bg-background px-2 font-mono text-[10px] text-foreground outline-none transition focus:border-user-primary/70"
+              onChange={(event) =>
+                updateConfig({ selectedModel: event.currentTarget.value })
               }
-            }}
-            placeholder="http://127.0.0.1:11434/api/chat"
-            value={endpointDraft}
-          />
-          <span className="text-[10px] text-muted-foreground">
-            Use another local Ollama port if another app is occupying 11434.
-          </span>
-        </label>
+              value={config.selectedModel}
+            >
+              {INFERENCE_MODEL_PRESETS.map((model) => (
+                <option key={model.value} value={model.value}>
+                  {model.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : (
+          <div className="grid gap-3 rounded-xl border border-border/70 bg-background/60 p-3">
+            <label className="grid gap-1">
+              <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
+                OpenRouter API Key
+              </span>
+              <input
+                autoComplete="off"
+                className="h-9 rounded-lg border border-border/70 bg-background px-2 font-mono text-[10px] text-foreground outline-none transition focus:border-user-primary/70"
+                onChange={(event) =>
+                  updateConfig({ openRouterApiKey: event.currentTarget.value })
+                }
+                placeholder="sk-or-v1-..."
+                type="password"
+                value={config.openRouterApiKey}
+              />
+              <span className="text-[10px] text-muted-foreground">
+                Stored locally with your desktop inference settings.
+              </span>
+            </label>
+
+            <label className="grid gap-1">
+              <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
+                OpenRouter Model
+              </span>
+              <select
+                className="h-9 rounded-lg border border-border/70 bg-background px-2 font-mono text-[10px] text-foreground outline-none transition focus:border-user-primary/70"
+                onChange={(event) => {
+                  const openRouterModel = event.currentTarget.value;
+                  setOpenRouterModelDraft(openRouterModel);
+                  updateConfig({ openRouterModel });
+                }}
+                value={config.openRouterModel}
+              >
+                {hasPresetOpenRouterModel ? null : (
+                  <option value={config.openRouterModel}>Custom model</option>
+                )}
+                {OPENROUTER_MODEL_PRESETS.map((model) => (
+                  <option key={model.value} value={model.value}>
+                    {model.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </div>
+        )}
+
+        {config.provider === "ollama" ? (
+          <label className="grid gap-1">
+            <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
+              Local Endpoint
+            </span>
+            <input
+              className="h-9 rounded-lg border border-border/70 bg-background px-2 font-mono text-[10px] text-foreground outline-none transition focus:border-user-primary/70"
+              onBlur={commitEndpointDraft}
+              onChange={(event) => setEndpointDraft(event.currentTarget.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.currentTarget.blur();
+                }
+              }}
+              placeholder="http://127.0.0.1:11434/api/chat"
+              value={endpointDraft}
+            />
+            <span className="text-[10px] text-muted-foreground">
+              Use another local Ollama port if another app is occupying 11434.
+            </span>
+          </label>
+        ) : null}
+
+        {config.provider === "ollama" ? null : (
+          <label className="grid gap-1">
+            <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
+              Custom OpenRouter Model
+            </span>
+            <input
+              className="h-9 rounded-lg border border-border/70 bg-background px-2 font-mono text-[10px] text-foreground outline-none transition focus:border-user-primary/70"
+              onBlur={commitOpenRouterModelDraft}
+              onChange={(event) =>
+                setOpenRouterModelDraft(event.currentTarget.value)
+              }
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.currentTarget.blur();
+                }
+              }}
+              placeholder="provider/model-name"
+              value={openRouterModelDraft}
+            />
+          </label>
+        )}
         <InferenceSlider
           highLabel="Wild"
           icon={Dice5}

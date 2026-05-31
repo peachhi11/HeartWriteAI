@@ -7,6 +7,9 @@ use tauri::{AppHandle, Manager, State};
 
 const INFERENCE_SETTINGS_FILE: &str = "inference-settings.json";
 const DEFAULT_LOCAL_ENDPOINT: &str = "http://127.0.0.1:11434/api/chat";
+const DEFAULT_OPENROUTER_MODEL: &str = "google/gemini-2.5-flash";
+const DEFAULT_PROVIDER: &str = "ollama";
+const MAX_API_KEY_LENGTH: usize = 4096;
 const MAX_MODEL_TAG_LENGTH: usize = 96;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -16,6 +19,12 @@ pub struct InferenceConfig {
     pub top_p: f64,
     #[serde(rename = "maxTokens")]
     pub max_tokens: u32,
+    #[serde(rename = "openRouterApiKey", default)]
+    pub open_router_api_key: String,
+    #[serde(rename = "openRouterModel", default = "default_open_router_model")]
+    pub open_router_model: String,
+    #[serde(default = "default_provider")]
+    pub provider: String,
     #[serde(rename = "frequencyPenalty")]
     pub frequency_penalty: f64,
     #[serde(rename = "localEndpoint", default = "default_local_endpoint")]
@@ -30,6 +39,9 @@ impl Default for InferenceConfig {
             temperature: 0.7,
             top_p: 0.9,
             max_tokens: 256,
+            open_router_api_key: String::new(),
+            open_router_model: DEFAULT_OPENROUTER_MODEL.to_string(),
+            provider: DEFAULT_PROVIDER.to_string(),
             frequency_penalty: 0.0,
             local_endpoint: DEFAULT_LOCAL_ENDPOINT.to_string(),
             selected_model: "llama3:8b".to_string(),
@@ -165,14 +177,28 @@ pub fn normalize_inference_config(config: InferenceConfig) -> InferenceConfig {
         temperature: clamp_f64(config.temperature, 0.0, 2.0, 0.7),
         top_p: clamp_f64(config.top_p, 0.0, 1.0, 0.9),
         max_tokens: config.max_tokens.clamp(16, 2048),
+        open_router_api_key: normalize_api_key(&config.open_router_api_key),
+        open_router_model: normalize_model_tag(&config.open_router_model, DEFAULT_OPENROUTER_MODEL),
+        provider: normalize_provider(&config.provider),
         frequency_penalty: clamp_f64(config.frequency_penalty, 0.0, 2.0, 0.0),
         local_endpoint: normalize_local_endpoint(&config.local_endpoint),
-        selected_model: normalize_model_tag(&config.selected_model),
+        selected_model: normalize_model_tag(
+            &config.selected_model,
+            &InferenceConfig::default().selected_model,
+        ),
     }
 }
 
 fn default_local_endpoint() -> String {
     DEFAULT_LOCAL_ENDPOINT.to_string()
+}
+
+fn default_open_router_model() -> String {
+    DEFAULT_OPENROUTER_MODEL.to_string()
+}
+
+fn default_provider() -> String {
+    DEFAULT_PROVIDER.to_string()
 }
 
 fn clamp_f64(value: f64, min: f64, max: f64, fallback: f64) -> f64 {
@@ -184,7 +210,7 @@ fn clamp_f64(value: f64, min: f64, max: f64, fallback: f64) -> f64 {
     (clamped * 100.0).round() / 100.0
 }
 
-fn normalize_model_tag(value: &str) -> String {
+fn normalize_model_tag(value: &str, fallback: &str) -> String {
     let candidate = value.trim();
     let is_safe = !candidate.is_empty()
         && candidate.len() <= MAX_MODEL_TAG_LENGTH
@@ -195,7 +221,25 @@ fn normalize_model_tag(value: &str) -> String {
     if is_safe {
         candidate.to_string()
     } else {
-        InferenceConfig::default().selected_model
+        fallback.to_string()
+    }
+}
+
+fn normalize_api_key(value: &str) -> String {
+    let candidate = value.trim();
+    let has_control_characters = candidate.chars().any(|character| character.is_control());
+
+    if candidate.len() > MAX_API_KEY_LENGTH || has_control_characters {
+        String::new()
+    } else {
+        candidate.to_string()
+    }
+}
+
+fn normalize_provider(value: &str) -> String {
+    match value {
+        "openrouter" => "openrouter".to_string(),
+        _ => DEFAULT_PROVIDER.to_string(),
     }
 }
 
@@ -235,6 +279,9 @@ mod tests {
         assert_eq!(config.temperature, 0.7);
         assert_eq!(config.top_p, 0.9);
         assert_eq!(config.max_tokens, 256);
+        assert_eq!(config.open_router_api_key, "");
+        assert_eq!(config.open_router_model, DEFAULT_OPENROUTER_MODEL);
+        assert_eq!(config.provider, DEFAULT_PROVIDER);
         assert_eq!(config.frequency_penalty, 0.0);
         assert_eq!(config.local_endpoint, DEFAULT_LOCAL_ENDPOINT);
         assert_eq!(config.selected_model, "llama3:8b");
@@ -246,6 +293,9 @@ mod tests {
             temperature: f64::NAN,
             top_p: 4.0,
             max_tokens: 9000,
+            open_router_api_key: "bad\nkey".to_string(),
+            open_router_model: "../bad model".to_string(),
+            provider: "remote-shell".to_string(),
             frequency_penalty: -3.0,
             local_endpoint: "https://example.com/api/chat".to_string(),
             selected_model: "../bad model".to_string(),
@@ -254,6 +304,9 @@ mod tests {
         assert_eq!(config.temperature, 0.7);
         assert_eq!(config.top_p, 1.0);
         assert_eq!(config.max_tokens, 2048);
+        assert_eq!(config.open_router_api_key, "");
+        assert_eq!(config.open_router_model, DEFAULT_OPENROUTER_MODEL);
+        assert_eq!(config.provider, DEFAULT_PROVIDER);
         assert_eq!(config.frequency_penalty, 0.0);
         assert_eq!(config.local_endpoint, DEFAULT_LOCAL_ENDPOINT);
         assert_eq!(config.selected_model, "llama3:8b");
@@ -265,6 +318,9 @@ mod tests {
             temperature: 1.234,
             top_p: 0.876,
             max_tokens: 511,
+            open_router_api_key: "sk-or-v1-safe".to_string(),
+            open_router_model: "anthropic/claude-3.5-sonnet".to_string(),
+            provider: "openrouter".to_string(),
             frequency_penalty: 1.49,
             local_endpoint: "http://localhost:11435/api/chat".to_string(),
             selected_model: "hf.co/local-author/model-q4_K_M:latest".to_string(),
@@ -273,6 +329,9 @@ mod tests {
         assert_eq!(config.temperature, 1.23);
         assert_eq!(config.top_p, 0.88);
         assert_eq!(config.max_tokens, 511);
+        assert_eq!(config.open_router_api_key, "sk-or-v1-safe");
+        assert_eq!(config.open_router_model, "anthropic/claude-3.5-sonnet");
+        assert_eq!(config.provider, "openrouter");
         assert_eq!(config.frequency_penalty, 1.49);
         assert_eq!(config.local_endpoint, "http://localhost:11435/api/chat");
         assert_eq!(
