@@ -1,3 +1,4 @@
+pub mod avatar_assets;
 pub mod cache;
 pub mod chat_tree;
 pub mod cloud_sync;
@@ -117,6 +118,7 @@ pub fn run() {
             commands::app::greet,
             commands::app::get_app_version,
             commands::app::initialize_profile_with_resonance,
+            avatar_assets::register_user_avatar,
             commands::cache::export_character_to_charx,
             commands::cache::import_folder_cards_as_charx,
             commands::cache::import_card_from_path,
