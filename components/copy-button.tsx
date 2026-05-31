@@ -117,6 +117,7 @@ async function writeClipboardText(text: string) {
 
   const textarea = document.createElement("textarea");
   textarea.value = text;
+  textarea.dataset.noFieldCopy = "true";
   textarea.setAttribute("readonly", "");
   textarea.style.left = "-9999px";
   textarea.style.opacity = "0";

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Aboreto, Figtree } from "next/font/google";
 import "./globals.css";
 import { RuntimeThemeProvider } from "@/components/runtime-theme-provider";
+import { TextFieldCopyActions } from "@/components/text-field-copy-actions";
 import { ThemeProvider } from "@/components/theme-provider";
 
 const aboreto = Aboreto({
@@ -38,6 +39,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <RuntimeThemeProvider />
+          <TextFieldCopyActions />
           {children}
         </ThemeProvider>
       </body>

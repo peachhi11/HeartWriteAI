@@ -5,6 +5,7 @@ import { Database, Loader2 } from "lucide-react";
 import { invoke } from "@tauri-apps/api/core";
 
 import { Button } from "@/components/ui/button";
+import CopyButton from "@/components/copy-button";
 import { isTauriRuntime } from "@/lib/tauri/native";
 
 export interface DevToolsPanelProps {
@@ -76,9 +77,15 @@ export function DevToolsPanel({ onSeeded }: DevToolsPanelProps) {
       </div>
 
       {message ? (
-        <p className="rounded border border-zinc-800 bg-zinc-950/60 p-2 font-mono text-xs text-amber-200/85">
-          {message}
-        </p>
+        <div className="rounded border border-zinc-800 bg-zinc-950/60 p-2">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-200/70">
+              Tool output
+            </span>
+            <CopyButton idleLabel="Copy output" textToCopy={message} />
+          </div>
+          <p className="font-mono text-xs text-amber-200/85">{message}</p>
+        </div>
       ) : null}
     </section>
   );

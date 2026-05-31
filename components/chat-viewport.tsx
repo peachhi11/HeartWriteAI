@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 
+import { CopyButton } from "@/components/copy-button";
 import { StreamingBubble } from "@/components/streaming-bubble";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -100,21 +101,25 @@ export function ChatViewport({
 
               {message.role === "NPC" && !isSystem ? (
                 <div className="mt-2 flex w-full flex-wrap items-center justify-between gap-2 px-1">
-                  <Button
-                    disabled={isStreaming || !hasPriorPlayerTurn}
-                    onClick={() => onRegenerateMessage?.(message.id)}
-                    size="sm"
-                    title={
-                      !hasPriorPlayerTurn
-                        ? "Regeneration needs a parent user message."
-                        : "Regenerate this response"
-                    }
-                    type="button"
-                    variant="outline"
-                  >
-                    <RotateCcw className="size-3.5" />
-                    Regenerate
-                  </Button>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Button
+                      disabled={isStreaming || !hasPriorPlayerTurn}
+                      onClick={() => onRegenerateMessage?.(message.id)}
+                      size="sm"
+                      title={
+                        !hasPriorPlayerTurn
+                          ? "Regeneration needs a parent user message."
+                          : "Regenerate this response"
+                      }
+                      type="button"
+                      variant="outline"
+                    >
+                      <RotateCcw className="size-3.5" />
+                      Regenerate
+                    </Button>
+
+                    <CopyButton textToCopy={message.text} />
+                  </div>
 
                   {hasVariants ? (
                     <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--muted)]">

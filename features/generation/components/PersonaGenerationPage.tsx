@@ -759,7 +759,10 @@ function AdvancedPersonaPromptPanel(props: {
           />
         </Field>
         <section className="rounded-md border bg-muted p-3">
-          <h3 className="mb-2 text-xs font-semibold">Prompt Preview</h3>
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <h3 className="text-xs font-semibold">Prompt Preview</h3>
+            <CopyButton idleLabel="Copy prompt" textToCopy={props.preview} />
+          </div>
           <pre className="max-h-56 overflow-auto whitespace-pre-wrap text-xs leading-5 text-muted-foreground">
             {props.preview}
           </pre>

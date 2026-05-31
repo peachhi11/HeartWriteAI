@@ -1,7 +1,7 @@
 "use client";
 
 import type * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import {
   Activity,
   HeartHandshake,
@@ -13,6 +13,7 @@ import {
   UsersRound,
 } from "lucide-react";
 
+import CopyButton from "@/components/copy-button";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -30,6 +31,20 @@ export function RelationshipDashboard() {
   const reset = useRelationshipStore((state) => state.reset);
   const state = useRelationshipStore((state) => state.state);
   const tracking = useRelationshipStore((state) => state.tracking);
+  const debugPayload = useMemo(
+    () =>
+      JSON.stringify(
+        {
+          messages,
+          reasons,
+          state,
+          tracking,
+        },
+        null,
+        2,
+      ),
+    [messages, reasons, state, tracking],
+  );
 
   useEffect(() => {
     if (!hydrated) {
@@ -338,9 +353,12 @@ export function RelationshipDashboard() {
         </div>
       ) : null}
 
-      <div className="rounded-md border bg-muted/25 p-3 text-xs text-muted-foreground">
-        Stored messages this session: {messages.length}. Persisted state key is
-        scoped to the dashboard scenario and character pair.
+      <div className="flex flex-col gap-3 rounded-md border bg-muted/25 p-3 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+        <p>
+          Stored messages this session: {messages.length}. Persisted state key is
+          scoped to the dashboard scenario and character pair.
+        </p>
+        <CopyButton idleLabel="Copy debug JSON" textToCopy={debugPayload} />
       </div>
     </section>
   );

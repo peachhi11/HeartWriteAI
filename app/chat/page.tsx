@@ -229,7 +229,7 @@ export default function RoleplayChat() {
   const activeTropeStyle = COMPLETE_TROPE_MATRIX[activeTrope];
   const isLorebookDockVisible =
     dockingState.activePanel === "Lorebook" && !dockingState.isCollapsed;
-  const loreDiagnostic = getLorebookDiagnostic(activeLorebook, runtimeError);
+  const loreDiagnostic = getLorebookDiagnostic(activeLorebook);
 
   useEffect(() => {
     if (!relationshipHydrated) {
@@ -1467,15 +1467,7 @@ function compileScenarioOverrideMessages(override: ScenarioOverride) {
 
 function getLorebookDiagnostic(
   lorebook: GeneratedLorebookArtifact | null,
-  runtimeError: null | string,
 ): { errorCode: null | string; status: SystemSyncStatus } {
-  if (runtimeError) {
-    return {
-      errorCode: runtimeError,
-      status: "fault",
-    };
-  }
-
   if (!lorebook) {
     return {
       errorCode: null,

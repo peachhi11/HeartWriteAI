@@ -19,7 +19,9 @@
         "minHeight": 720,
         "center": true,
         "resizable": true,
-        "fullscreen": false
+        "fullscreen": false,
+        "visible": true,
+        "contentProtected": false
       }
     ],
     "security": {
@@ -28,7 +30,7 @@
   },
   "bundle": {
     "active": true,
-    "createUpdaterArtifacts": true,
+    "createUpdaterArtifacts": false,
     "targets": "all",
     "icon": [
       "icons/32x32.png",
@@ -37,5 +39,11 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ]
+  },
+  "plugins": {
+    "updater": {
+      "endpoints": [],
+      "pubkey": ""
+    }
   }
 }
