@@ -229,8 +229,10 @@ mod tests {
             total_turns_played: 7,
             last_updated: "2026-05-29T00:00:00Z".to_string(),
             dialogue_history: vec![RustDialogueEntry {
+                active_variant_index: None,
                 id: "line-1".to_string(),
                 role: "Player".to_string(),
+                swiped_variants: Vec::new(),
                 text: "I choose you.".to_string(),
                 timestamp: "2026-05-29T00:00:00Z".to_string(),
                 detected_trope: "yearning".to_string(),

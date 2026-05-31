@@ -4,6 +4,7 @@ import type * as React from "react";
 import { useMemo, useState } from "react";
 import { Plus, Search, Trash2 } from "lucide-react";
 
+import CopyButton from "@/components/copy-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -380,6 +381,12 @@ export function LorebookV3Editor(props: {
           <summary className="cursor-pointer text-sm font-semibold">
             V3 JSON preview
           </summary>
+          <div className="mt-3 flex justify-end">
+            <CopyButton
+              idleLabel="Copy JSON"
+              textToCopy={props.serialized}
+            />
+          </div>
           <pre className="mt-3 max-h-80 overflow-auto rounded-md bg-muted p-3 text-xs">
             {props.serialized}
           </pre>

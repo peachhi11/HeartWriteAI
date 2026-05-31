@@ -6,10 +6,12 @@ export interface RoleplayTextPart {
 }
 
 export interface RoleplayMessage {
+  activeVariantIndex?: number;
   id: string;
   role: "user" | "assistant";
   detectedTrope?: RomanceTropeClass;
   parts: RoleplayTextPart[];
+  swipedVariants?: string[];
   timestamp?: string;
 }
 
@@ -32,6 +34,101 @@ export function getMessageText(message: RoleplayMessage) {
     .filter((part) => part.type === "text")
     .map((part) => part.text)
     .join("");
+}
+
+export function getMessageVariants(message: RoleplayMessage) {
+  const currentText = getMessageText(message);
+  if (message.swipedVariants?.length) {
+    return [...message.swipedVariants];
+  }
+
+  return currentText ? [currentText] : [];
+}
+
+export function updateRoleplayMessageText(
+  message: RoleplayMessage,
+  text: string,
+): RoleplayMessage {
+  const variants = getMessageVariants(message);
+  const activeVariantIndex = clampVariantIndex(
+    message.activeVariantIndex ?? variants.length - 1,
+    variants.length,
+  );
+
+  if (variants.length > 0) {
+    variants[activeVariantIndex] = text;
+  }
+
+  return {
+    ...message,
+    activeVariantIndex,
+    parts: [{ type: "text", text }],
+    swipedVariants: variants,
+  };
+}
+
+export function createRegenerationVariant(
+  message: RoleplayMessage,
+): RoleplayMessage {
+  const variants = getMessageVariants(message);
+  variants.push("");
+
+  return {
+    ...message,
+    activeVariantIndex: variants.length - 1,
+    parts: [{ type: "text", text: "" }],
+    swipedVariants: variants,
+    timestamp: new Date().toISOString(),
+  };
+}
+
+export function selectRoleplayMessageVariant(
+  message: RoleplayMessage,
+  variantIndex: number,
+): RoleplayMessage {
+  const variants = getMessageVariants(message);
+  const activeVariantIndex = clampVariantIndex(variantIndex, variants.length);
+
+  return {
+    ...message,
+    activeVariantIndex,
+    parts: [{ type: "text", text: variants[activeVariantIndex] ?? "" }],
+    swipedVariants: variants,
+  };
+}
+
+export function navigateRoleplayMessageVariant(
+  message: RoleplayMessage,
+  direction: "next" | "prev",
+): RoleplayMessage {
+  const variants = getMessageVariants(message);
+
+  if (variants.length <= 1) {
+    return message;
+  }
+
+  const currentIndex = clampVariantIndex(
+    message.activeVariantIndex ?? variants.length - 1,
+    variants.length,
+  );
+  const offset = direction === "next" ? 1 : -1;
+  const activeVariantIndex =
+    (currentIndex + offset + variants.length) % variants.length;
+
+  return {
+    ...message,
+    activeVariantIndex,
+    parts: [{ type: "text", text: variants[activeVariantIndex] ?? "" }],
+    swipedVariants: variants,
+  };
+}
+
+function clampVariantIndex(index: number, variantCount: number) {
+  if (variantCount <= 0) {
+    return 0;
+  }
+
+  return Math.min(Math.max(index, 0), variantCount - 1);
 }
 
 export function toOllamaMessages(messages: RoleplayMessage[]) {

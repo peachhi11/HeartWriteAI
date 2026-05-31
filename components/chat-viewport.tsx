@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
+import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 
 import { StreamingBubble } from "@/components/streaming-bubble";
+import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import type { ChatMessage } from "@/types/chat";
 import { COMPLETE_TROPE_MATRIX } from "@/types/tropes";
@@ -11,11 +13,18 @@ type ChatViewportProps = {
   messages: ChatMessage[];
   isStreaming: boolean;
   runtimeError?: string | null;
+  onRegenerateMessage?: (messageId: string) => void;
+  onNavigateMessageVariant?: (
+    messageId: string,
+    direction: "next" | "prev",
+  ) => void;
 };
 
 export function ChatViewport({
   isStreaming,
   messages,
+  onNavigateMessageVariant,
+  onRegenerateMessage,
   runtimeError = null,
 }: ChatViewportProps) {
   const scrollAnchor = useRef<HTMLDivElement>(null);
@@ -23,6 +32,11 @@ export function ChatViewport({
   useEffect(() => {
     scrollAnchor.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isStreaming]);
+
+  const firstPlayerTurnIndex = useMemo(
+    () => messages.findIndex((message) => message.role === "Player"),
+    [messages],
+  );
 
   return (
     <div className="relative flex-1 overflow-y-auto px-4 py-6">
@@ -33,6 +47,12 @@ export function ChatViewport({
           const isSystem =
             message.role === "System" || message.role === "Narration";
           const isLatestMessage = index === messages.length - 1;
+          const variants = message.swipedVariants ?? [];
+          const hasVariants = variants.length > 1;
+          const hasPriorPlayerTurn =
+            firstPlayerTurnIndex >= 0 && index > firstPlayerTurnIndex;
+          const activeVariantIndex =
+            message.activeVariantIndex ?? Math.max(variants.length - 1, 0);
 
           return (
             <article
@@ -77,6 +97,60 @@ export function ChatViewport({
                     "rounded-3xl border-[var(--panel-border)] bg-[var(--panel-soft)]",
                 )}
               />
+
+              {message.role === "NPC" && !isSystem ? (
+                <div className="mt-2 flex w-full flex-wrap items-center justify-between gap-2 px-1">
+                  <Button
+                    disabled={isStreaming || !hasPriorPlayerTurn}
+                    onClick={() => onRegenerateMessage?.(message.id)}
+                    size="sm"
+                    title={
+                      !hasPriorPlayerTurn
+                        ? "Regeneration needs a parent user message."
+                        : "Regenerate this response"
+                    }
+                    type="button"
+                    variant="outline"
+                  >
+                    <RotateCcw className="size-3.5" />
+                    Regenerate
+                  </Button>
+
+                  {hasVariants ? (
+                    <div className="flex items-center gap-1 text-[10px] font-bold uppercase tracking-[0.12em] text-[var(--muted)]">
+                      <Button
+                        aria-label="Previous response variant"
+                        disabled={isStreaming}
+                        onClick={() =>
+                          onNavigateMessageVariant?.(message.id, "prev")
+                        }
+                        className="size-7"
+                        size="icon"
+                        type="button"
+                        variant="outline"
+                      >
+                        <ChevronLeft className="size-3.5" />
+                      </Button>
+                      <span className="min-w-16 text-center">
+                        {activeVariantIndex + 1}/{variants.length}
+                      </span>
+                      <Button
+                        aria-label="Next response variant"
+                        disabled={isStreaming}
+                        onClick={() =>
+                          onNavigateMessageVariant?.(message.id, "next")
+                        }
+                        className="size-7"
+                        size="icon"
+                        type="button"
+                        variant="outline"
+                      >
+                        <ChevronRight className="size-3.5" />
+                      </Button>
+                    </div>
+                  ) : null}
+                </div>
+              ) : null}
             </article>
           );
         })}

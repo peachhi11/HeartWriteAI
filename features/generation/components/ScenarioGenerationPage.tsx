@@ -5,7 +5,6 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
   Clapperboard,
-  Clipboard,
   CopyPlus,
   Dice5,
   Download,
@@ -16,6 +15,7 @@ import {
   Upload,
 } from "lucide-react";
 
+import CopyButton from "@/components/copy-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -481,11 +481,6 @@ export function ScenarioGenerationPage() {
     });
   }
 
-  async function copy() {
-    await navigator.clipboard.writeText(serialized);
-    setStatus("Copied scenario JSON.");
-  }
-
   function exportJson() {
     downloadUint8Array(
       artifactToJsonBytes(activeScenario),
@@ -780,10 +775,10 @@ export function ScenarioGenerationPage() {
               </div>
             </div>
             <div className="flex shrink-0 flex-wrap gap-2">
-              <Button type="button" variant="outline" onClick={copy}>
-                <Clipboard className="size-4" />
-                Copy
-              </Button>
+              <CopyButton
+                textToCopy={serialized}
+                onCopied={() => setStatus("Copied scenario JSON.")}
+              />
               <Button type="button" variant="outline" onClick={duplicateActive}>
                 <CopyPlus className="size-4" />
                 Duplicate Draft
@@ -1267,7 +1262,13 @@ function AdvancedScenarioPromptPanel(props: {
           />
         </Field>
         <section className="rounded-md border bg-muted p-3">
-          <h3 className="mb-2 text-xs font-semibold">Prompt Preview</h3>
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <h3 className="text-xs font-semibold">Prompt Preview</h3>
+            <CopyButton
+              idleLabel="Copy prompt"
+              textToCopy={props.preview}
+            />
+          </div>
           <pre className="max-h-56 overflow-auto whitespace-pre-wrap text-xs leading-5 text-muted-foreground">
             {props.preview}
           </pre>

@@ -3,7 +3,6 @@
 import type * as React from "react";
 import { useMemo, useState } from "react";
 import {
-  Clipboard,
   CopyPlus,
   Download,
   PackageCheck,
@@ -13,6 +12,7 @@ import {
   Upload,
 } from "lucide-react";
 
+import CopyButton from "@/components/copy-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -305,15 +305,6 @@ export function BundleSelectionPage() {
     setStatus("Edited chat setup draft. Save when ready.");
   }
 
-  async function copy() {
-    if (!activeBundle) {
-      return;
-    }
-
-    await navigator.clipboard.writeText(serialized);
-    setStatus("Copied chat setup JSON.");
-  }
-
   function exportJson() {
     if (!activeBundle) {
       return;
@@ -505,10 +496,10 @@ export function BundleSelectionPage() {
                 </div>
               </div>
               <div className="flex shrink-0 flex-wrap gap-2">
-                <Button type="button" variant="outline" onClick={copy}>
-                  <Clipboard className="size-4" />
-                  Copy
-                </Button>
+                <CopyButton
+                  textToCopy={serialized}
+                  onCopied={() => setStatus("Copied chat setup JSON.")}
+                />
                 <Button type="button" variant="outline" onClick={duplicateActive}>
                   <CopyPlus className="size-4" />
                   Duplicate Draft
@@ -550,7 +541,13 @@ export function BundleSelectionPage() {
                 ))}
               </div>
               <section className="rounded-md border bg-background/70 p-4">
-                <h3 className="mb-2 text-sm font-semibold">Chat Preview Notes</h3>
+                <div className="mb-2 flex items-center justify-between gap-3">
+                  <h3 className="text-sm font-semibold">Chat Preview Notes</h3>
+                  <CopyButton
+                    idleLabel="Copy notes"
+                    textToCopy={activeBundle.compiledContext}
+                  />
+                </div>
                 <pre className="max-h-[32rem] overflow-auto whitespace-pre-wrap text-xs leading-relaxed text-muted-foreground">
                   {activeBundle.compiledContext}
                 </pre>

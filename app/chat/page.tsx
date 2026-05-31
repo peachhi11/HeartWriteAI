@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import type { CSSProperties } from "react";
 import Link from "next/link";
 import {
   BookOpenText,
@@ -38,10 +39,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  createRegenerationVariant,
   createRoleplayMessage,
   getMessageText,
+  navigateRoleplayMessageVariant,
   RoleplayMessage,
   toOllamaMessages,
+  updateRoleplayMessageText,
 } from "@/lib/chat/messages";
 import { classifyTropeInput } from "@/lib/character-card/tropeMatcher";
 import { fetchContextualNpcDialogue } from "@/lib/tauri/contextualDialogue";
@@ -51,7 +55,10 @@ import {
   scanActiveLorebookForChatTurn,
 } from "@/lib/tauri/loreActivation";
 import { streamLocalLlmResponse } from "@/lib/tauri/localLlm";
-import { appendMessageToHistory } from "@/lib/tauri/tropeInteraction";
+import {
+  appendMessageToHistory,
+  replaceDialogueHistory,
+} from "@/lib/tauri/tropeInteraction";
 import {
   clampSidebarWidth,
   loadUserThemePreference,
@@ -634,6 +641,214 @@ export default function RoleplayChat() {
     }
   }
 
+  async function handleRegenerateMessage(targetMessageId: string) {
+    if (isGenerating) {
+      return;
+    }
+
+    const targetIndex = messages.findIndex(
+      (message) => message.id === targetMessageId,
+    );
+    const targetMessage = messages[targetIndex];
+
+    if (!targetMessage || targetMessage.role !== "assistant") {
+      return;
+    }
+
+    const parentUserIndex = findParentUserMessageIndex(messages, targetIndex);
+
+    if (parentUserIndex < 0) {
+      setRuntimeError("Cannot regenerate a response without a parent user turn.");
+      return;
+    }
+
+    const parentUserMessage = messages[parentUserIndex]!;
+    const parentPrompt = getMessageText(parentUserMessage);
+    const baseMessages = messages.slice(0, targetIndex);
+    const contextBeforeParent = messages.slice(0, parentUserIndex);
+    const detectedTrope =
+      targetMessage.detectedTrope ?? parentUserMessage.detectedTrope ?? "casual";
+    const regeneratingMessage = createRegenerationVariant({
+      ...targetMessage,
+      detectedTrope,
+    });
+    const rewoundMessages = [...baseMessages, regeneratingMessage];
+
+    updateActiveSession({ messages: rewoundMessages });
+    setIsGenerating(true);
+    setRuntimeError(null);
+
+    try {
+      const scenarioMessages = compileScenarioOverrideMessages(
+        activeSession.scenarioOverride,
+      );
+      const loreActivation = await scanActiveLorebookForChatTurn(
+        activeLorebook,
+        parentPrompt,
+      );
+      const loreMessages = buildLoreRecallMessages(loreActivation);
+      setActiveLoreFeed(loreActivation.loreInjectionChunk);
+
+      if (loreActivation.hasMatches) {
+        const recallLogs = createLoreRecallAuditLogs(
+          loreActivation,
+          activeLorebook,
+          parentUserMessage.id,
+        );
+        setLoreRecallLogs((current) => [...recallLogs, ...current].slice(0, 40));
+      }
+
+      let accumulatedResponse = "";
+      const didUseNativeStream = await streamLocalLlmResponse(
+        {
+          contextMessages: [
+            ...scenarioMessages,
+            ...loreMessages,
+            ...toOllamaMessages(contextBeforeParent),
+          ],
+          promptText: parentPrompt,
+          storyNodeId: "scene_01_alley_encounter",
+        },
+        {
+          onToken: (token) => {
+            accumulatedResponse += token;
+            updateActiveSession({
+              messages: updateMessageById(
+                rewoundMessages,
+                regeneratingMessage.id,
+                (message) => updateRoleplayMessageText(message, accumulatedResponse),
+              ),
+            });
+          },
+        },
+      );
+
+      if (!didUseNativeStream) {
+        const response = await fetch(OLLAMA_CHAT_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: DEFAULT_MODEL,
+            messages: [
+              ...scenarioMessages,
+              ...loreMessages,
+              ...toOllamaMessages(baseMessages),
+            ],
+            stream: true,
+          }),
+        });
+
+        if (!response.ok || !response.body) {
+          throw new Error(`Ollama returned ${response.status}`);
+        }
+
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let bufferedChunk = "";
+
+        while (true) {
+          const { done, value } = await reader.read();
+
+          if (done) {
+            break;
+          }
+
+          bufferedChunk += decoder.decode(value, { stream: true });
+          const lines = bufferedChunk.split("\n");
+          bufferedChunk = lines.pop() ?? "";
+
+          for (const line of lines) {
+            if (!line.trim()) {
+              continue;
+            }
+
+            const parsed = JSON.parse(line) as {
+              message?: { content?: string };
+            };
+
+            if (parsed.message?.content) {
+              accumulatedResponse += parsed.message.content;
+              updateActiveSession({
+                messages: updateMessageById(
+                  rewoundMessages,
+                  regeneratingMessage.id,
+                  (message) =>
+                    updateRoleplayMessageText(message, accumulatedResponse),
+                ),
+              });
+            }
+          }
+        }
+      }
+
+      if (accumulatedResponse.trim()) {
+        const completedMessages = updateMessageById(
+          rewoundMessages,
+          regeneratingMessage.id,
+          (message) => updateRoleplayMessageText(message, accumulatedResponse),
+        );
+
+        updateActiveSession({ messages: completedMessages });
+        void persistDialogueHistory(completedMessages, setRuntimeError);
+      }
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Unknown inference error.";
+
+      try {
+        const contextualDialogue = await fetchContextualNpcDialogue(
+          "scene_01_alley_encounter",
+        );
+        const fallbackMessage = updateRoleplayMessageText(
+          regeneratingMessage,
+          contextualDialogue.transformed_text,
+        );
+        const fallbackMessages = updateMessageById(
+          rewoundMessages,
+          regeneratingMessage.id,
+          () => fallbackMessage,
+        );
+
+        updateActiveSession({
+          messages: fallbackMessages,
+        });
+        void persistDialogueHistory(fallbackMessages, setRuntimeError);
+        setRuntimeError(
+          `Ollama was unavailable (${message}), so Lucas used the native ${contextualDialogue.applied_archetype} dialogue variant.`,
+        );
+      } catch (fallbackError) {
+        const fallbackDetail =
+          fallbackError instanceof Error
+            ? fallbackError.message
+            : String(fallbackError);
+        setRuntimeError(
+          `Could not regenerate from local Ollama at ${OLLAMA_CHAT_ENDPOINT}. ${message} Native dialogue fallback also failed: ${fallbackDetail}`,
+        );
+        updateActiveSession({ messages });
+      }
+    } finally {
+      setIsGenerating(false);
+    }
+  }
+
+  function handleNavigateMessageVariant(
+    messageId: string,
+    direction: "next" | "prev",
+  ) {
+    if (isGenerating) {
+      return;
+    }
+
+    const nextMessages = messages.map((message) =>
+      message.id === messageId
+        ? navigateRoleplayMessageVariant(message, direction)
+        : message,
+    );
+
+    updateActiveSession({ messages: nextMessages });
+    void persistDialogueHistory(nextMessages, setRuntimeError);
+  }
+
   async function handleIntentSelection(selected: ActionCardVariant) {
     if (isGenerating) {
       return;
@@ -888,14 +1103,16 @@ export default function RoleplayChat() {
         <div
           className={cn(
             "relative grid min-h-[calc(100vh-9rem)] min-w-0 overflow-hidden rounded-xl border bg-card/70 shadow-xl backdrop-blur",
-            !isLorebookDockVisible && "lg:grid-cols-1",
+            isLorebookDockVisible
+              ? "lg:grid-cols-[minmax(0,1fr)_var(--lorebook-dock-width)]"
+              : "lg:grid-cols-1",
           )}
           id="gameplay-chat-viewport"
           style={
             isLorebookDockVisible
-              ? {
-                  gridTemplateColumns: `minmax(0, 1fr) ${sidebarWidth}px`,
-                }
+              ? ({
+                  "--lorebook-dock-width": `${sidebarWidth}px`,
+                } as CSSProperties)
               : undefined
           }
         >
@@ -967,6 +1184,10 @@ export default function RoleplayChat() {
         <ChatViewport
           isStreaming={isGenerating}
           messages={viewportMessages}
+          onRegenerateMessage={(messageId) =>
+            void handleRegenerateMessage(messageId)
+          }
+          onNavigateMessageVariant={handleNavigateMessageVariant}
           runtimeError={runtimeError}
         />
 
@@ -1117,9 +1338,11 @@ function getActiveTrope(messages: RoleplayMessage[]): RomanceTropeClass {
 
 function toViewportMessage(message: RoleplayMessage): ChatMessage {
   return {
+    activeVariantIndex: message.activeVariantIndex,
     detectedTrope: message.detectedTrope ?? "casual",
     id: message.id,
     role: message.role === "user" ? "Player" : "NPC",
+    swipedVariants: message.swipedVariants,
     text: getMessageText(message),
     timestamp: message.timestamp ?? new Date().toISOString(),
   };
@@ -1127,9 +1350,11 @@ function toViewportMessage(message: RoleplayMessage): ChatMessage {
 
 function toDialogueLogEntry(message: RoleplayMessage): DialogueLogEntry {
   return {
+    activeVariantIndex: message.activeVariantIndex,
     detectedTrope: message.detectedTrope ?? "casual",
     id: message.id,
     role: message.role === "user" ? "Player" : "NPC",
+    swipedVariants: message.swipedVariants,
     text: getMessageText(message),
     timestamp: message.timestamp ?? new Date().toISOString(),
   };
@@ -1137,12 +1362,37 @@ function toDialogueLogEntry(message: RoleplayMessage): DialogueLogEntry {
 
 function dialogueLogEntryToMessage(entry: DialogueLogEntry): RoleplayMessage {
   return {
+    activeVariantIndex: entry.activeVariantIndex,
     detectedTrope: entry.detectedTrope,
     id: entry.id,
     parts: [{ type: "text", text: entry.text }],
     role: entry.role === "Player" ? "user" : "assistant",
+    swipedVariants: entry.swipedVariants,
     timestamp: entry.timestamp,
   };
+}
+
+function findParentUserMessageIndex(
+  messages: RoleplayMessage[],
+  targetIndex: number,
+) {
+  for (let index = targetIndex - 1; index >= 0; index -= 1) {
+    if (messages[index]?.role === "user") {
+      return index;
+    }
+  }
+
+  return -1;
+}
+
+function updateMessageById(
+  messages: RoleplayMessage[],
+  messageId: string,
+  update: (message: RoleplayMessage) => RoleplayMessage,
+) {
+  return messages.map((message) =>
+    message.id === messageId ? update(message) : message,
+  );
 }
 
 async function persistDialogueLine(
@@ -1151,6 +1401,18 @@ async function persistDialogueLine(
 ) {
   try {
     await appendMessageToHistory(toDialogueLogEntry(message));
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : String(error);
+    setRuntimeError(`Chat history save failed. ${detail}`);
+  }
+}
+
+async function persistDialogueHistory(
+  messages: RoleplayMessage[],
+  setRuntimeError: (message: string | null) => void,
+) {
+  try {
+    await replaceDialogueHistory(messages.map(toDialogueLogEntry));
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
     setRuntimeError(`Chat history save failed. ${detail}`);

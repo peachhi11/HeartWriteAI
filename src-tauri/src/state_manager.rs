@@ -47,8 +47,12 @@ pub struct ProfileSaveData {
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 pub struct RustDialogueEntry {
+    #[serde(rename = "activeVariantIndex", default)]
+    pub active_variant_index: Option<usize>,
     pub id: String,
     pub role: String,
+    #[serde(rename = "swipedVariants", default)]
+    pub swiped_variants: Vec<String>,
     pub text: String,
     pub timestamp: String,
     #[serde(rename = "detectedTrope")]
@@ -325,8 +329,10 @@ mod tests {
             total_turns_played: 42,
             last_updated: "2026-05-29T00:00:00Z".to_string(),
             dialogue_history: vec![RustDialogueEntry {
+                active_variant_index: None,
                 id: "line-1".to_string(),
                 role: "Player".to_string(),
+                swiped_variants: Vec::new(),
                 text: "Touch them and you die.".to_string(),
                 timestamp: "2026-05-29T00:00:00Z".to_string(),
                 detected_trope: "protective".to_string(),
@@ -373,8 +379,10 @@ mod tests {
                 total_turns_played: 12,
                 last_updated: "2026-05-29T00:00:00Z".to_string(),
                 dialogue_history: vec![RustDialogueEntry {
+                    active_variant_index: None,
                     id: "old-line".to_string(),
                     role: "NPC".to_string(),
+                    swiped_variants: Vec::new(),
                     text: "Old memory.".to_string(),
                     timestamp: "2026-05-29T00:00:00Z".to_string(),
                     detected_trope: "casual".to_string(),

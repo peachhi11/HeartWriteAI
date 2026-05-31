@@ -4,7 +4,6 @@ import type * as React from "react";
 import { useMemo, useState } from "react";
 import {
   BookOpenText,
-  Clipboard,
   CopyPlus,
   Download,
   FilePlus2,
@@ -13,6 +12,7 @@ import {
   Upload,
 } from "lucide-react";
 
+import CopyButton from "@/components/copy-button";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -247,11 +247,6 @@ export function LorebookGenerationPage() {
     });
   }
 
-  async function copy() {
-    await navigator.clipboard.writeText(serialized);
-    setStatus("Copied lorebook V3 JSON.");
-  }
-
   function exportJson() {
     downloadUint8Array(
       new TextEncoder().encode(serialized),
@@ -432,10 +427,10 @@ export function LorebookGenerationPage() {
               ) : null}
             </div>
             <div className="flex shrink-0 flex-wrap gap-2">
-              <Button type="button" variant="outline" onClick={copy}>
-                <Clipboard className="size-4" />
-                Copy
-              </Button>
+              <CopyButton
+                textToCopy={serialized}
+                onCopied={() => setStatus("Copied lorebook V3 JSON.")}
+              />
               <Button type="button" variant="outline" onClick={duplicateActive}>
                 <CopyPlus className="size-4" />
                 Duplicate Draft
