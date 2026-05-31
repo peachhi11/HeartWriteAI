@@ -14,6 +14,7 @@ pub mod state_manager;
 pub mod studio;
 pub mod synthesis;
 pub mod theme_manager;
+pub mod token_counter;
 pub mod updater;
 pub mod utils;
 pub mod wallpaper;
@@ -92,15 +93,14 @@ pub fn run() {
             app.manage(AppInferenceSettingsState::load_on_boot(app.handle()));
 
             let database_file_location = app_dir.join("library_cache.db");
-            let initialised_db = CacheDatabase::init(database_file_location)
-                .map_err(|error| std::io::Error::new(std::io::ErrorKind::Other, error))?;
+            let initialised_db =
+                CacheDatabase::init(database_file_location).map_err(std::io::Error::other)?;
             let state = app.state::<AppState>();
-            *state.db.lock().map_err(|_| {
-                std::io::Error::new(
-                    std::io::ErrorKind::Other,
-                    "Failed lock orchestration structure",
-                )
-            })? = Some(initialised_db);
+            *state
+                .db
+                .lock()
+                .map_err(|_| std::io::Error::other("Failed lock orchestration structure"))? =
+                Some(initialised_db);
 
             if cfg!(debug_assertions) {
                 app.handle().plugin(
@@ -162,6 +162,8 @@ pub fn run() {
             studio::fetch_saved_personas_list,
             theme_manager::export_user_theme_preferences,
             theme_manager::get_boot_theme_settings,
+            token_counter::count_tokens,
+            token_counter::count_tokens_native,
             updater::execute_app_update_check,
             utils::assets::attach_expression_sprite,
             utils::assets::remove_expression_sprite,

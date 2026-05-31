@@ -199,10 +199,9 @@ fn push_import_section(sections: &mut Vec<ImportSection>, label: Option<String>,
 fn read_section_heading(line: &str) -> Option<String> {
     let normalized = line
         .trim()
-        .trim_start_matches(|character: char| matches!(character, '#' | '*' | ' ' | '[' | '('))
-        .trim_end_matches(|character: char| matches!(character, ')' | ']'))
-        .trim_end_matches(|character: char| matches!(character, ':' | '：'))
-        .trim()
+        .trim_start_matches(['#', '*', ' ', '[', '('])
+        .trim_end_matches([')', ']'])
+        .trim_end_matches([':', '：'])
         .split_whitespace()
         .collect::<Vec<_>>()
         .join(" ")

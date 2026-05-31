@@ -25,7 +25,7 @@ pub async fn capture_viewport_screenshot(
         .map_err(|error| format!("Screenshot worker thread failed: {error}"))?;
 
         capture_result?;
-        return Ok(destination.to_string_lossy().into_owned());
+        Ok(destination.to_string_lossy().into_owned())
     }
 
     #[cfg(not(target_os = "macos"))]

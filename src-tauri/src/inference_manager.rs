@@ -211,12 +211,11 @@ fn normalize_local_endpoint(value: &str) -> String {
     };
 
     let is_local_host = matches!(url.host_str(), Some("localhost" | "127.0.0.1" | "::1"));
-    let is_safe =
-        url.scheme() == "http"
-            && is_local_host
-            && url.path() == "/api/chat"
-            && url.username().is_empty()
-            && url.password().is_none();
+    let is_safe = url.scheme() == "http"
+        && is_local_host
+        && url.path() == "/api/chat"
+        && url.username().is_empty()
+        && url.password().is_none();
 
     if is_safe {
         url.to_string()

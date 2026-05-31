@@ -26,6 +26,7 @@
 *.pem
 
 # local reference/recovery drops
+/.agents/
 /CharacterGen-chat-ui/
 /migrations/
 /src-tauri/src/MST Orbs.zip
