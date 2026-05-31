@@ -343,6 +343,23 @@ test("writes a ccv3 metadata chunk that can be read back", () => {
   });
 });
 
+test("rejects oversized browser PNG metadata before export", () => {
+  const pngData = createPngWithTextChunks([]);
+  const card = {
+    spec: "chara_card_v3",
+    spec_version: "3.0",
+    data: {
+      name: "Oversized Export",
+      description: "x".repeat(2 * 1024 * 1024),
+    },
+  };
+
+  assert.throws(
+    () => writeCharacterCardToPng(pngData, card),
+    /too large for safe PNG export/,
+  );
+});
+
 test("scrubs repeated API keys from public export payloads", () => {
   const dirtyCard = {
     spec: "chara_card_v3",

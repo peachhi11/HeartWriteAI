@@ -57,6 +57,7 @@ where
     let image_data = &image_data_buffer[..output_info.buffer_size()];
     let ccv3_json_string = serde_json::to_string(card_data)
         .map_err(|error| format!("Failed serializing CCV3 metadata: {error}"))?;
+    validate_export_text_chunk_size(&ccv3_json_string)?;
 
     let output_png_path = output_png_path.as_ref();
     if let Some(parent_dir) = output_png_path.parent() {
@@ -213,6 +214,17 @@ fn validate_text_chunk_size(length: usize) -> Result<(), String> {
     if length > MAX_TEXT_CHUNK_BYTES {
         return Err(format!(
             "PNG text metadata chunk is too large for safe import. Limit is {} MB.",
+            MAX_TEXT_CHUNK_BYTES / (1024 * 1024)
+        ));
+    }
+
+    Ok(())
+}
+
+fn validate_export_text_chunk_size(payload: &str) -> Result<(), String> {
+    if payload.len() > MAX_TEXT_CHUNK_BYTES {
+        return Err(format!(
+            "CCV3 metadata is too large for safe PNG export. Limit is {} MB.",
             MAX_TEXT_CHUNK_BYTES / (1024 * 1024)
         ));
     }
@@ -435,6 +447,21 @@ mod tests {
 
         assert_eq!(parsed_card.spec, "chara_card_v3");
         assert_eq!(parsed_card.data.name, "Mara");
+    }
+
+    #[test]
+    fn rejects_oversized_ccv3_metadata_before_png_export() {
+        let temp_dir = create_temp_dir("png-export-limit");
+        let source_path = temp_dir.join("source.png");
+        let output_path = temp_dir.join("output.png");
+        write_fixture_png(&source_path);
+        let mut card = fixture_card();
+        card.data.description = "x".repeat(MAX_TEXT_CHUNK_BYTES + 1);
+
+        let error = inject_ccv3_into_png(&source_path, &output_path, &card)
+            .expect_err("oversized metadata should be rejected before writing");
+
+        assert!(error.contains("too large for safe PNG export"));
     }
 
     #[test]
