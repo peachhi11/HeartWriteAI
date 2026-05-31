@@ -6,6 +6,7 @@ use std::sync::Mutex;
 use tauri::{AppHandle, Manager, State};
 
 const INFERENCE_SETTINGS_FILE: &str = "inference-settings.json";
+const DEFAULT_LOCAL_ENDPOINT: &str = "http://127.0.0.1:11434/api/chat";
 const MAX_MODEL_TAG_LENGTH: usize = 96;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
@@ -17,6 +18,8 @@ pub struct InferenceConfig {
     pub max_tokens: u32,
     #[serde(rename = "frequencyPenalty")]
     pub frequency_penalty: f64,
+    #[serde(rename = "localEndpoint", default = "default_local_endpoint")]
+    pub local_endpoint: String,
     #[serde(rename = "selectedModel")]
     pub selected_model: String,
 }
@@ -28,6 +31,7 @@ impl Default for InferenceConfig {
             top_p: 0.9,
             max_tokens: 256,
             frequency_penalty: 0.0,
+            local_endpoint: DEFAULT_LOCAL_ENDPOINT.to_string(),
             selected_model: "llama3:8b".to_string(),
         }
     }
@@ -162,8 +166,13 @@ pub fn normalize_inference_config(config: InferenceConfig) -> InferenceConfig {
         top_p: clamp_f64(config.top_p, 0.0, 1.0, 0.9),
         max_tokens: config.max_tokens.clamp(16, 2048),
         frequency_penalty: clamp_f64(config.frequency_penalty, 0.0, 2.0, 0.0),
+        local_endpoint: normalize_local_endpoint(&config.local_endpoint),
         selected_model: normalize_model_tag(&config.selected_model),
     }
+}
+
+fn default_local_endpoint() -> String {
+    DEFAULT_LOCAL_ENDPOINT.to_string()
 }
 
 fn clamp_f64(value: f64, min: f64, max: f64, fallback: f64) -> f64 {
@@ -190,6 +199,32 @@ fn normalize_model_tag(value: &str) -> String {
     }
 }
 
+fn normalize_local_endpoint(value: &str) -> String {
+    let candidate = value.trim();
+
+    if candidate.len() > 128 {
+        return DEFAULT_LOCAL_ENDPOINT.to_string();
+    }
+
+    let Ok(url) = reqwest::Url::parse(candidate) else {
+        return DEFAULT_LOCAL_ENDPOINT.to_string();
+    };
+
+    let is_local_host = matches!(url.host_str(), Some("localhost" | "127.0.0.1" | "::1"));
+    let is_safe =
+        url.scheme() == "http"
+            && is_local_host
+            && url.path() == "/api/chat"
+            && url.username().is_empty()
+            && url.password().is_none();
+
+    if is_safe {
+        url.to_string()
+    } else {
+        DEFAULT_LOCAL_ENDPOINT.to_string()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -202,6 +237,7 @@ mod tests {
         assert_eq!(config.top_p, 0.9);
         assert_eq!(config.max_tokens, 256);
         assert_eq!(config.frequency_penalty, 0.0);
+        assert_eq!(config.local_endpoint, DEFAULT_LOCAL_ENDPOINT);
         assert_eq!(config.selected_model, "llama3:8b");
     }
 
@@ -212,6 +248,7 @@ mod tests {
             top_p: 4.0,
             max_tokens: 9000,
             frequency_penalty: -3.0,
+            local_endpoint: "https://example.com/api/chat".to_string(),
             selected_model: "../bad model".to_string(),
         });
 
@@ -219,6 +256,7 @@ mod tests {
         assert_eq!(config.top_p, 1.0);
         assert_eq!(config.max_tokens, 2048);
         assert_eq!(config.frequency_penalty, 0.0);
+        assert_eq!(config.local_endpoint, DEFAULT_LOCAL_ENDPOINT);
         assert_eq!(config.selected_model, "llama3:8b");
     }
 
@@ -229,6 +267,7 @@ mod tests {
             top_p: 0.876,
             max_tokens: 511,
             frequency_penalty: 1.49,
+            local_endpoint: "http://localhost:11435/api/chat".to_string(),
             selected_model: "hf.co/local-author/model-q4_K_M:latest".to_string(),
         });
 
@@ -236,9 +275,22 @@ mod tests {
         assert_eq!(config.top_p, 0.88);
         assert_eq!(config.max_tokens, 511);
         assert_eq!(config.frequency_penalty, 1.49);
+        assert_eq!(config.local_endpoint, "http://localhost:11435/api/chat");
         assert_eq!(
             config.selected_model,
             "hf.co/local-author/model-q4_K_M:latest"
         );
+    }
+
+    #[test]
+    fn rejects_non_local_inference_endpoints() {
+        for endpoint in [
+            "https://127.0.0.1:11434/api/chat",
+            "http://example.com/api/chat",
+            "http://127.0.0.1:11434/other",
+            "http://user:pass@127.0.0.1:11434/api/chat",
+        ] {
+            assert_eq!(normalize_local_endpoint(endpoint), DEFAULT_LOCAL_ENDPOINT);
+        }
     }
 }

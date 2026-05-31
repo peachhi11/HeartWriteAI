@@ -5,8 +5,6 @@ use tauri::{ipc::Channel, State};
 use crate::inference_manager::AppInferenceSettingsState;
 use crate::state_manager::{CharacterCardModel, PersistentEngineStore, RelationshipStats};
 
-const OLLAMA_CHAT_ENDPOINT: &str = "http://127.0.0.1:11434/api/chat";
-
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct GenerationPromptPayload {
@@ -75,7 +73,7 @@ impl LocalLlmBroker {
         });
 
         let mut response = reqwest::Client::new()
-            .post(OLLAMA_CHAT_ENDPOINT)
+            .post(&inference_config.local_endpoint)
             .json(&request_body)
             .send()
             .await

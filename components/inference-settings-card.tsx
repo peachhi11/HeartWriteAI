@@ -25,6 +25,9 @@ import { cn } from "@/lib/utils";
 
 export function InferenceSettingsCard() {
   const [config, setConfig] = useState<InferenceConfig>(INFERENCE_DEFAULT_MATRIX);
+  const [endpointDraft, setEndpointDraft] = useState(
+    INFERENCE_DEFAULT_MATRIX.localEndpoint,
+  );
   const [hasHydrated, setHasHydrated] = useState(false);
 
   useEffect(() => {
@@ -35,7 +38,9 @@ export function InferenceSettingsCard() {
         return;
       }
 
-      setConfig(loadInferenceConfig());
+      const localConfig = loadInferenceConfig();
+      setConfig(localConfig);
+      setEndpointDraft(localConfig.localEndpoint);
       setHasHydrated(true);
     });
 
@@ -45,6 +50,7 @@ export function InferenceSettingsCard() {
       }
 
       setConfig(nativeConfig);
+      setEndpointDraft(nativeConfig.localEndpoint);
       setHasHydrated(true);
     });
 
@@ -69,6 +75,16 @@ export function InferenceSettingsCard() {
 
   function updateConfig(patch: Partial<InferenceConfig>) {
     setConfig((current) => normalizeInferenceConfig({ ...current, ...patch }));
+  }
+
+  function commitEndpointDraft() {
+    const nextConfig = normalizeInferenceConfig({
+      ...config,
+      localEndpoint: endpointDraft,
+    });
+
+    setConfig(nextConfig);
+    setEndpointDraft(nextConfig.localEndpoint);
   }
 
   return (
@@ -107,6 +123,26 @@ export function InferenceSettingsCard() {
       </header>
 
       <div className="grid gap-4">
+        <label className="grid gap-1">
+          <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
+            Local Endpoint
+          </span>
+          <input
+            className="h-9 rounded-lg border border-border/70 bg-background px-2 font-mono text-[10px] text-foreground outline-none transition focus:border-user-primary/70"
+            onBlur={commitEndpointDraft}
+            onChange={(event) => setEndpointDraft(event.currentTarget.value)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter") {
+                event.currentTarget.blur();
+              }
+            }}
+            placeholder="http://127.0.0.1:11434/api/chat"
+            value={endpointDraft}
+          />
+          <span className="text-[10px] text-muted-foreground">
+            Use another local Ollama port if another app is occupying 11434.
+          </span>
+        </label>
         <InferenceSlider
           highLabel="Wild"
           icon={Dice5}

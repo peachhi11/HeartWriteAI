@@ -1,5 +1,6 @@
 export interface InferenceConfig {
   frequencyPenalty: number;
+  localEndpoint: string;
   maxTokens: number;
   selectedModel: string;
   temperature: number;
@@ -8,6 +9,7 @@ export interface InferenceConfig {
 
 export const INFERENCE_DEFAULT_MATRIX: InferenceConfig = {
   frequencyPenalty: 0,
+  localEndpoint: "http://127.0.0.1:11434/api/chat",
   maxTokens: 256,
   selectedModel: "llama3:8b",
   temperature: 0.7,
@@ -37,6 +39,11 @@ export function normalizeInferenceConfig(value: unknown): InferenceConfig {
       INFERENCE_DEFAULT_MATRIX.frequencyPenalty,
       2,
     ),
+    localEndpoint:
+      typeof candidate.localEndpoint === "string" &&
+      isSafeLocalEndpoint(candidate.localEndpoint)
+        ? normalizeLocalEndpoint(candidate.localEndpoint)
+        : INFERENCE_DEFAULT_MATRIX.localEndpoint,
     maxTokens: clampInteger(
       candidate.maxTokens,
       16,
@@ -105,4 +112,30 @@ function isSafeModelTag(value: string) {
     trimmed.length <= 96 &&
     /^[a-zA-Z0-9._:/-]+$/.test(trimmed)
   );
+}
+
+function isSafeLocalEndpoint(value: string) {
+  try {
+    const url = new URL(value.trim());
+    const isLocalHost =
+      url.hostname === "localhost" ||
+      url.hostname === "127.0.0.1" ||
+      url.hostname === "[::1]";
+
+    return (
+      isLocalHost &&
+      url.protocol === "http:" &&
+      url.pathname === "/api/chat" &&
+      url.username === "" &&
+      url.password === "" &&
+      value.trim().length <= 128
+    );
+  } catch {
+    return false;
+  }
+}
+
+function normalizeLocalEndpoint(value: string) {
+  const url = new URL(value.trim());
+  return url.toString();
 }

@@ -60,6 +60,10 @@ import {
   replaceDialogueHistory,
 } from "@/lib/tauri/tropeInteraction";
 import {
+  loadInferenceConfig,
+  loadInferencePreference,
+} from "@/lib/ui/runtimeInference";
+import {
   clampSidebarWidth,
   loadUserThemePreference,
   saveUserTheme,
@@ -80,8 +84,6 @@ import type { DockingState, SidePanelType } from "@/types/dock";
 import type { GeneratedLorebookArtifact } from "@/features/generation/workflows";
 import type { LoreRecallAuditLog } from "@/types/lorebook";
 
-const OLLAMA_CHAT_ENDPOINT = "http://localhost:11434/api/chat";
-const DEFAULT_MODEL = "llama3";
 const PREVIEW_CHAT_ID = "preview-chat";
 const PREVIEW_CHAT_UPDATED_AT = 0;
 
@@ -196,6 +198,9 @@ export default function RoleplayChat() {
   const [input, setInput] = useState("");
   const [scenarioId, setScenarioId] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
+  const [inferenceConfig, setInferenceConfig] = useState(() =>
+    loadInferenceConfig(),
+  );
   const [intentModalOpen, setIntentModalOpen] = useState(false);
   const [lorebookPanelOpen, setLorebookPanelOpen] = useState(false);
   const [dockingState, setDockingState] = useState<DockingState>({
@@ -245,6 +250,20 @@ export default function RoleplayChat() {
       setSessions(loaded);
       setActiveSessionId(loaded[0]?.id ?? PREVIEW_CHAT_ID);
       setChatStorageHydrated(true);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void loadInferencePreference().then((config) => {
+      if (!cancelled) {
+        setInferenceConfig(config);
+      }
     });
 
     return () => {
@@ -536,11 +555,12 @@ export default function RoleplayChat() {
         return;
       }
 
-      const response = await fetch(OLLAMA_CHAT_ENDPOINT, {
+      const latestInferenceConfig = loadInferenceConfig();
+      const response = await fetch(latestInferenceConfig.localEndpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: DEFAULT_MODEL,
+          model: latestInferenceConfig.selectedModel,
           messages: [
             ...scenarioMessages,
             ...loreMessages,
@@ -632,7 +652,7 @@ export default function RoleplayChat() {
             ? fallbackError.message
             : String(fallbackError);
         setRuntimeError(
-          `Could not reach local Ollama at ${OLLAMA_CHAT_ENDPOINT}. ${message} Native dialogue fallback also failed: ${fallbackDetail}`,
+          `Could not reach local Ollama at ${loadInferenceConfig().localEndpoint}. ${message} Native dialogue fallback also failed: ${fallbackDetail}`,
         );
         updateActiveSession({ messages: updatedMessages });
       }
@@ -724,11 +744,12 @@ export default function RoleplayChat() {
       );
 
       if (!didUseNativeStream) {
-        const response = await fetch(OLLAMA_CHAT_ENDPOINT, {
+        const latestInferenceConfig = loadInferenceConfig();
+        const response = await fetch(latestInferenceConfig.localEndpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: DEFAULT_MODEL,
+            model: latestInferenceConfig.selectedModel,
             messages: [
               ...scenarioMessages,
               ...loreMessages,
@@ -822,7 +843,7 @@ export default function RoleplayChat() {
             ? fallbackError.message
             : String(fallbackError);
         setRuntimeError(
-          `Could not regenerate from local Ollama at ${OLLAMA_CHAT_ENDPOINT}. ${message} Native dialogue fallback also failed: ${fallbackDetail}`,
+          `Could not regenerate from local Ollama at ${loadInferenceConfig().localEndpoint}. ${message} Native dialogue fallback also failed: ${fallbackDetail}`,
         );
         updateActiveSession({ messages });
       }
@@ -881,7 +902,7 @@ export default function RoleplayChat() {
       eyebrow="Character Chat"
       title="Chat Preview"
       subtitle="Test character replies, lorebook links, and relationship tone before starting a full playthrough."
-      actions={<Badge variant="outline">Ollama: {DEFAULT_MODEL}</Badge>}
+      actions={<Badge variant="outline">Ollama: {inferenceConfig.selectedModel}</Badge>}
     >
       <div className="grid min-h-[calc(100vh-9rem)] gap-5 xl:grid-cols-[20rem_minmax(0,1fr)]">
         <section className="flex max-h-none flex-col gap-5 overflow-y-auto pr-1 xl:sticky xl:top-24 xl:max-h-[calc(100vh-9rem)]">
@@ -900,7 +921,10 @@ export default function RoleplayChat() {
               <div>
                 <p className="text-sm font-medium">HeartWrite Preview</p>
                 <p className="text-xs text-muted-foreground">
-                  Local model: {DEFAULT_MODEL}
+                  Local model: {inferenceConfig.selectedModel}
+                </p>
+                <p className="max-w-56 truncate text-[10px] text-muted-foreground">
+                  {inferenceConfig.localEndpoint}
                 </p>
               </div>
             </CardContent>

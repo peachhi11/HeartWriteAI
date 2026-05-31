@@ -5,8 +5,8 @@
   "identifier": "com.peachhi11.heartwriteai",
   "build": {
     "frontendDist": "../out",
-    "devUrl": "http://localhost:3000",
-    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:3001",
+    "beforeDevCommand": "npm run dev -- --hostname localhost --port 3001",
     "beforeBuildCommand": "npm run build"
   },
   "app": {
