@@ -1,3 +1,9 @@
+import {
+  applyRegexRulesToMessages,
+  type RegexMacroContext,
+} from "./regexScriptRegistry";
+import type { RegexScriptRuleV3 } from "@/types/character-card/RegexScriptRuleV3";
+
 export type ContextChatRole = "system" | "user" | "assistant";
 
 export interface ContextChatMessage {
@@ -49,6 +55,8 @@ export interface ContextCompilationInput {
   activeLorebookEntries?: ContextLorebookEntry[];
   chatHistory?: ContextChatMessage[];
   maxTokens: number;
+  regexMacroContext?: RegexMacroContext;
+  regexRules?: RegexScriptRuleV3[];
   reserveTokens?: number;
 }
 
@@ -104,12 +112,13 @@ function compileWithCounter(
   input: ContextCompilationInput,
   tokenCounter: (text: string) => number,
 ): ContextCompilationResult {
-  const staticMessages = buildSystemLayers(input);
+  const staticMessages = applyBeforeLlmRegexRules(input, buildSystemLayers(input));
+  const chatHistory = applyBeforeLlmRegexRules(input, input.chatHistory ?? []);
   const staticTokens = countMessages(staticMessages, tokenCounter);
   const reserveTokens = readReserveTokens(input.reserveTokens);
   const historyBudget = Math.max(0, input.maxTokens - staticTokens - reserveTokens);
   const historyMessages = selectHistoryMessages(
-    input.chatHistory ?? [],
+    chatHistory,
     historyBudget,
     tokenCounter,
   );
@@ -133,12 +142,13 @@ async function compileWithAsyncCounter(
   input: ContextCompilationInput,
   tokenCounter: ContextTokenCounter,
 ): Promise<ContextCompilationResult> {
-  const staticMessages = buildSystemLayers(input);
+  const staticMessages = applyBeforeLlmRegexRules(input, buildSystemLayers(input));
+  const chatHistory = applyBeforeLlmRegexRules(input, input.chatHistory ?? []);
   const staticTokens = await countMessagesAsync(staticMessages, tokenCounter);
   const reserveTokens = readReserveTokens(input.reserveTokens);
   const historyBudget = Math.max(0, input.maxTokens - staticTokens - reserveTokens);
   const historyMessages = await selectHistoryMessagesAsync(
-    input.chatHistory ?? [],
+    chatHistory,
     historyBudget,
     tokenCounter,
   );
@@ -351,6 +361,19 @@ function createHistorySelection(
     prunedCount: history.length - selected.length,
     protectedCount,
   };
+}
+
+function applyBeforeLlmRegexRules(
+  input: ContextCompilationInput,
+  messages: ContextChatMessage[],
+) {
+  if (!input.regexRules?.length && !input.regexMacroContext) {
+    return messages;
+  }
+
+  return applyRegexRulesToMessages(messages, input.regexRules ?? [], "before_llm", {
+    macroContext: input.regexMacroContext,
+  });
 }
 
 function isProtectedHistoryMessage(message: ContextChatMessage): boolean {

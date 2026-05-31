@@ -8,6 +8,7 @@ pub mod llm_bridge;
 pub mod lore_injector;
 pub mod lore_manager;
 pub mod models;
+pub mod regex_engine;
 pub mod screenshot;
 pub mod security;
 pub mod state_manager;
@@ -154,6 +155,8 @@ pub fn run() {
             lore_manager::import_and_compile_lorebook,
             lore_manager::remove_lorebook_file,
             lore_manager::toggle_lorebook_active_state,
+            regex_engine::apply_regex_native,
+            regex_engine::execute_regex_native,
             security::export_encrypted_character_card,
             security::import_encrypted_character_card,
             screenshot::capture_viewport_screenshot,
