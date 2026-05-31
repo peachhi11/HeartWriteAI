@@ -3,6 +3,7 @@
 import { invoke } from "@tauri-apps/api/core";
 
 import { SaveSessionConfig } from "../../types/character-card/SaveSessionConfig";
+import { scrubCardForPublicExport } from "./exportPrivacyScrubber";
 
 export async function handleCompilationSave({
   currentWorkspaceCard,
@@ -13,7 +14,7 @@ export async function handleCompilationSave({
     await invoke("write_edited_card_to_png", {
       sourceImgPath,
       targetSavePath,
-      updatedCardData: currentWorkspaceCard,
+      updatedCardData: scrubCardForPublicExport(currentWorkspaceCard),
     });
 
     console.log("PNG metadata extraction target updated and recompiled smoothly.");

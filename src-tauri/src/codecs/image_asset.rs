@@ -2,7 +2,10 @@ use std::fs::File;
 use std::io::BufWriter;
 use std::path::Path;
 
-use image::ImageFormat;
+use image::{imageops::FilterType, GenericImageView, ImageFormat};
+
+const STANDARD_PORTRAIT_WIDTH: u32 = 720;
+const STANDARD_PORTRAIT_HEIGHT: u32 = 1280;
 
 pub fn convert_to_standard_png<InputPath, OutputPath>(
     input_path: InputPath,
@@ -27,9 +30,38 @@ where
         .map_err(|error| format!("Failed to create destination PNG file: {error}"))?;
     let mut writer = BufWriter::new(output_file);
 
+    let image = crop_to_portrait_nine_sixteen(image);
+
     image
         .write_to(&mut writer, ImageFormat::Png)
         .map_err(|error| format!("Failed writing normalized PNG pixel buffer: {error}"))
+}
+
+fn crop_to_portrait_nine_sixteen(image: image::DynamicImage) -> image::DynamicImage {
+    let (width, height) = image.dimensions();
+    let target_width = u64::from(STANDARD_PORTRAIT_WIDTH);
+    let target_height = u64::from(STANDARD_PORTRAIT_HEIGHT);
+    let source_width = u64::from(width);
+    let source_height = u64::from(height);
+
+    let (crop_width, crop_height) = if source_width * target_height > source_height * target_width {
+        let crop_width = ((source_height * target_width) / target_height).max(1) as u32;
+        (crop_width, height)
+    } else {
+        let crop_height = ((source_width * target_height) / target_width).max(1) as u32;
+        (width, crop_height)
+    };
+
+    let crop_x = width.saturating_sub(crop_width) / 2;
+    let crop_y = height.saturating_sub(crop_height) / 2;
+
+    image
+        .crop_imm(crop_x, crop_y, crop_width, crop_height)
+        .resize_exact(
+            STANDARD_PORTRAIT_WIDTH,
+            STANDARD_PORTRAIT_HEIGHT,
+            FilterType::Lanczos3,
+        )
 }
 
 #[cfg(test)]
@@ -50,13 +82,63 @@ mod tests {
 
         convert_to_standard_png(&input_path, &output_path).expect("image should convert to PNG");
 
+        let output = image::ImageReader::open(output_path)
+            .expect("PNG should open")
+            .with_guessed_format()
+            .expect("format should be guessed");
+
+        assert_eq!(output.format(), Some(ImageFormat::Png));
+        assert_eq!(
+            output.decode().expect("PNG should decode").dimensions(),
+            (STANDARD_PORTRAIT_WIDTH, STANDARD_PORTRAIT_HEIGHT)
+        );
+    }
+
+    #[test]
+    fn normalizes_wide_images_to_nine_sixteen_portrait_png() {
+        let temp_dir = create_temp_dir("image-wide-crop");
+        let input_path = temp_dir.join("wide.png");
+        let output_path = temp_dir.join("wide.standard.png");
+        let image = RgbImage::from_pixel(36, 16, Rgb([24, 80, 140]));
+        image
+            .save_with_format(&input_path, ImageFormat::Png)
+            .expect("wide PNG fixture should write");
+
+        convert_to_standard_png(&input_path, &output_path).expect("image should convert to PNG");
+
         assert_eq!(
             image::ImageReader::open(output_path)
                 .expect("PNG should open")
                 .with_guessed_format()
                 .expect("format should be guessed")
-                .format(),
-            Some(ImageFormat::Png)
+                .decode()
+                .expect("PNG should decode")
+                .dimensions(),
+            (STANDARD_PORTRAIT_WIDTH, STANDARD_PORTRAIT_HEIGHT)
+        );
+    }
+
+    #[test]
+    fn normalizes_tall_images_to_nine_sixteen_portrait_png() {
+        let temp_dir = create_temp_dir("image-tall-crop");
+        let input_path = temp_dir.join("tall.png");
+        let output_path = temp_dir.join("tall.standard.png");
+        let image = RgbImage::from_pixel(9, 36, Rgb([180, 60, 120]));
+        image
+            .save_with_format(&input_path, ImageFormat::Png)
+            .expect("tall PNG fixture should write");
+
+        convert_to_standard_png(&input_path, &output_path).expect("image should convert to PNG");
+
+        assert_eq!(
+            image::ImageReader::open(output_path)
+                .expect("PNG should open")
+                .with_guessed_format()
+                .expect("format should be guessed")
+                .decode()
+                .expect("PNG should decode")
+                .dimensions(),
+            (STANDARD_PORTRAIT_WIDTH, STANDARD_PORTRAIT_HEIGHT)
         );
     }
 

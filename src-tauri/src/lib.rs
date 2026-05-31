@@ -154,6 +154,8 @@ pub fn run() {
             lore_manager::import_and_compile_lorebook,
             lore_manager::remove_lorebook_file,
             lore_manager::toggle_lorebook_active_state,
+            security::export_encrypted_character_card,
+            security::import_encrypted_character_card,
             screenshot::capture_viewport_screenshot,
             security::parse_secured_character_card,
             studio::delete_saved_persona_file,

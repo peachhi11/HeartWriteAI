@@ -7,6 +7,7 @@ import { PngChunk } from "../../types/character-card/PngChunk";
 import { WriteCharacterCardToPngOptions } from "../../types/character-card/WriteCharacterCardToPngOptions";
 import { createCharacterCardV3Export } from "./createCharacterCardV3Export";
 import { encodeCharacterCardText } from "./encodeCharacterCardText";
+import { scrubCardForPublicExport } from "./exportPrivacyScrubber";
 
 export function writeCharacterCardToPng(
   pngData: Uint8Array,
@@ -14,7 +15,9 @@ export function writeCharacterCardToPng(
   options: WriteCharacterCardToPngOptions = {},
 ): Uint8Array {
   const chunks = extractChunks(pngData).filter(shouldKeepChunk);
-  const ccv3Card = createCharacterCardV3Export(card, options);
+  const ccv3Card = scrubCardForPublicExport(
+    createCharacterCardV3Export(card, options),
+  );
 
   chunks.splice(-1, 0, encodeTextChunk("ccv3", encodeCharacterCardText(ccv3Card)));
 

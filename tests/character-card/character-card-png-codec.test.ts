@@ -14,6 +14,11 @@ import {
   createDraftCharacterCardFromIntake,
 } from "../../lib/character-card/createDraftCharacterCard";
 import { exportCharacterCardPngData } from "../../lib/character-card/exportCharacterCardPngData";
+import {
+  scrubExportPayload,
+  scrubCardForPublicExport,
+} from "../../lib/character-card/exportPrivacyScrubber";
+import { importBrowserCharacterCardFile } from "../../lib/character-card/importBrowserCharacterCardFile";
 import { importCharacterCardPngData } from "../../lib/character-card/importCharacterCardPngData";
 import { mergeCharacterCardIntakeValues } from "../../lib/character-card/mergeCharacterCardIntakeValues";
 import { parseMessyCharacterIntake } from "../../lib/character-card/parseMessyCharacterIntake";
@@ -221,6 +226,84 @@ test("throws when no supported card metadata exists", () => {
   );
 });
 
+test("rejects oversized browser PNG text metadata chunks before decoding", () => {
+  const pngData = createPngWithTextChunks([
+    { keyword: "ccv3", text: "x".repeat(2 * 1024 * 1024 + 1) },
+  ]);
+
+  assert.throws(
+    () => readCharacterCardFromPng(pngData),
+    /text metadata chunk is too large/,
+  );
+});
+
+test("rejects cumulative browser PNG metadata text over safe limits", () => {
+  const pngData = createPngWithTextChunks([
+    { keyword: "chara", text: "a".repeat(1_500_000) },
+    { keyword: "chara", text: "b".repeat(1_500_000) },
+    { keyword: "ccv3", text: "c".repeat(1_500_000) },
+  ]);
+
+  assert.throws(
+    () => readCharacterCardFromPng(pngData),
+    /Combined PNG metadata text is too large/,
+  );
+});
+
+test("rejects compressed browser character metadata and defers to desktop import", () => {
+  const keyword = Buffer.from("ccv3", "ascii");
+  const chunkData = new Uint8Array(keyword.length + 3);
+  chunkData.set(keyword, 0);
+  chunkData[keyword.length] = 0;
+  chunkData[keyword.length + 1] = 0;
+  chunkData[keyword.length + 2] = 1;
+  const pngData = encodeChunks([
+    {
+      name: "IHDR",
+      data: Uint8Array.from([0, 0, 0, 1, 0, 0, 0, 1, 8, 6, 0, 0, 0]),
+    },
+    {
+      name: "zTXt",
+      data: chunkData,
+    },
+    {
+      name: "IDAT",
+      data: Uint8Array.from([120, 156, 99, 248, 15, 4, 0, 9, 251, 3, 253]),
+    },
+    {
+      name: "IEND",
+      data: Uint8Array.from([]),
+    },
+  ]);
+
+  assert.throws(
+    () => readCharacterCardFromPng(pngData),
+    /needs the desktop app for safe import/,
+  );
+});
+
+test("rejects oversized browser card files before reading them into memory", async () => {
+  const oversizedPng = new File(
+    [new Uint8Array(20 * 1024 * 1024 + 1)],
+    "oversized.png",
+    { type: "image/png" },
+  );
+  const oversizedJson = new File(
+    [new Uint8Array(20 * 1024 * 1024 + 1)],
+    "oversized.json",
+    { type: "application/json" },
+  );
+
+  await assert.rejects(
+    () => importBrowserCharacterCardFile(oversizedPng),
+    /too large for browser import/,
+  );
+  await assert.rejects(
+    () => importBrowserCharacterCardFile(oversizedJson),
+    /too large for browser import/,
+  );
+});
+
 test("writes a ccv3 metadata chunk that can be read back", () => {
   const pngData = createPngWithTextChunks([]);
   const card = {
@@ -258,6 +341,111 @@ test("writes a ccv3 metadata chunk that can be read back", () => {
       modification_date: 1_716_199_200,
     },
   });
+});
+
+test("scrubs repeated API keys from public export payloads", () => {
+  const dirtyCard = {
+    spec: "chara_card_v3",
+    spec_version: "3.0",
+    data: {
+      name: "Key Leak",
+      description:
+        "Primary sk-1234567890abcdef1234567890abcdef123456 and backup sk-abcdef1234567890abcdef1234567890abcdef123456.",
+    },
+  };
+
+  const report = scrubExportPayload(dirtyCard);
+  const scrubbedJson = JSON.stringify(report.sanitizedPayload);
+
+  assert.equal(report.redactedCount, 2);
+  assert.ok(report.redactedCategories.includes("openai_api_key"));
+  assert.doesNotMatch(scrubbedJson, /sk-[A-Za-z0-9_-]{32,}/);
+  assert.match(scrubbedJson, /REDACTED_OPENAI_API_KEY/);
+});
+
+test("scrubs bearer tokens URL credentials and local config blocks", () => {
+  const dirtyCard = {
+    spec: "chara_card_v3",
+    spec_version: "3.0",
+    data: {
+      name: "Config Leak",
+      creator_notes:
+        "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9 connects to https://admin:pass123@example.test",
+      chat_history: [{ role: "user", content: "private chat" }],
+      local_api_keys: { openrouter: "sk-or-1234567890abcdef1234567890abcdef" },
+    },
+  };
+
+  const report = scrubExportPayload(dirtyCard);
+  const scrubbedJson = JSON.stringify(report.sanitizedPayload);
+
+  assert.ok(report.redactedCategories.includes("bearer_token"));
+  assert.ok(report.redactedCategories.includes("inline_url_credentials"));
+  assert.ok(report.redactedCategories.includes("field:chat_history"));
+  assert.ok(report.redactedCategories.includes("field:local_api_keys"));
+  assert.doesNotMatch(scrubbedJson, /Bearer eyJ/);
+  assert.doesNotMatch(scrubbedJson, /admin:pass123/);
+  assert.deepEqual(report.sanitizedPayload.data.chat_history, []);
+  assert.deepEqual(report.sanitizedPayload.data.local_api_keys, {});
+});
+
+test("export scrubber preserves normal romantic mystery prose", () => {
+  const narrativeCard = {
+    spec: "chara_card_v3",
+    spec_version: "3.0",
+    data: {
+      name: "Eldrin",
+      personality:
+        "He keeps a dark secret close to his heart. The password to the ancient gate is a family riddle.",
+    },
+  };
+
+  const report = scrubExportPayload(narrativeCard);
+
+  assert.equal(report.redactedCount, 0);
+  assert.equal(
+    report.sanitizedPayload.data.personality,
+    narrativeCard.data.personality,
+  );
+});
+
+test("public PNG exports scrub sensitive metadata before writing ccv3 chunks", () => {
+  const pngData = createPngWithTextChunks([]);
+  const dirtyCard = {
+    spec: "chara_card_v3",
+    spec_version: "3.0",
+    data: {
+      name: "Public Export",
+      description: "Leaked key sk-1234567890abcdef1234567890abcdef123456.",
+      user_settings: { theme: "private" },
+    },
+  };
+
+  const updatedPngData = writeCharacterCardToPng(pngData, dirtyCard);
+  const result = readCharacterCardFromPng(updatedPngData);
+
+  assert.equal(result.source, "ccv3");
+  assert.match(result.card.data?.description as string, /REDACTED_OPENAI_API_KEY/);
+  assert.doesNotMatch(JSON.stringify(result.card), /sk-1234567890abcdef/);
+  assert.deepEqual(result.card.data?.user_settings, {});
+});
+
+test("public CHARX helper scrubber preserves card shape while removing local fields", () => {
+  const card = {
+    spec: "chara_card_v3",
+    spec_version: "3.0",
+    data: {
+      name: "Charx Export",
+      description: "Bearer abcdefghijklmnopqrstuvwxyz123456",
+      proxy_configurations: { url: "https://user:pass@example.test" },
+    },
+  };
+
+  const scrubbedCard = scrubCardForPublicExport(card);
+
+  assert.equal(scrubbedCard.spec, "chara_card_v3");
+  assert.match(scrubbedCard.data.description, /REDACTED_BEARER_TOKEN/);
+  assert.deepEqual(scrubbedCard.data.proxy_configurations, {});
 });
 
 test("removes stale chara and ccv3 chunks during ccv3 export", () => {

@@ -1,6 +1,7 @@
 import { invoke } from "@tauri-apps/api/core";
 
 import { ValidatedCharacterCardV3 } from "@/types/ccv3";
+import { scrubCardForPublicExport } from "@/lib/character-card/exportPrivacyScrubber";
 
 export interface CharxExportCompileConfig {
   destinationCharxPath: string;
@@ -15,7 +16,7 @@ export async function handleCharxExportCompile({
 }: CharxExportCompileConfig): Promise<string | null> {
   try {
     return await invoke<string>("export_character_to_charx", {
-      currentWorkspaceCard,
+      currentWorkspaceCard: scrubCardForPublicExport(currentWorkspaceCard),
       destinationCharxPath,
       sourceCardFilePath,
     });

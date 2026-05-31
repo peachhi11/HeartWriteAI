@@ -17,6 +17,7 @@ import { DevToolsPanel } from "@/components/dev-tools-panel";
 import DropZoneOverlay from "@/components/DropZoneOverlay";
 import ExpressionManager from "@/components/expression-manager";
 import { FolderIntakeReview } from "@/components/folder-intake-review";
+import { SecureCardPasswordModal } from "@/components/secure-card-password-modal";
 import { StudioShell } from "@/components/studio-shell";
 import StructuredCardEditor from "@/components/structured-card-editor";
 import { Textarea } from "@/components/ui/textarea";
@@ -31,6 +32,7 @@ import {
   createBlankDraftCharacterCard,
   createDraftCharacterCardFromIntake,
 } from "@/lib/character-card/createDraftCharacterCard";
+import { scrubCardForPublicExport } from "@/lib/character-card/exportPrivacyScrubber";
 import { writeCharacterCardToPng } from "@/lib/character-card/writeCharacterCardToPng";
 import { ExpressionSprite } from "@/types/character-card/ExpressionSprite";
 import { ValidatedCharacterCardV3 } from "@/types/ccv3";
@@ -96,6 +98,8 @@ const emptyStarterFields: Record<StarterFieldKey, string> = {
   scenario: "",
 };
 
+const MAX_BROWSER_PNG_SHELL_BYTES = 20 * 1024 * 1024;
+
 const characterWorkflowSteps: Array<{
   description: string;
   href: string;
@@ -149,6 +153,10 @@ export default function WorkspacePage() {
   const [selectedExpression, setSelectedExpression] =
     useState<ExpressionSprite | null>(null);
   const [libraryOpen, setLibraryOpen] = useState(false);
+  const [secureCardAction, setSecureCardAction] =
+    useState<"export" | "import" | null>(null);
+  const [secureCardStatus, setSecureCardStatus] = useState<string | null>(null);
+  const [isSecureCardBusy, setIsSecureCardBusy] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const browserImportInputRef = useRef<HTMLInputElement | null>(null);
   const browserPngShellInputRef = useRef<HTMLInputElement | null>(null);
@@ -159,7 +167,10 @@ export default function WorkspacePage() {
     isDesktopRuntime,
     triggerCharxExport,
     triggerFolderIntakeSelect,
+    triggerPngShellImport,
     triggerPngMetadataSave,
+    triggerSecureCardExport,
+    triggerSecureCardImport,
     triggerUniversalImport,
   } = useFileDialogs();
   const canSavePngMetadata = currentFilePath
@@ -275,9 +286,17 @@ export default function WorkspacePage() {
     browserImportInputRef.current?.click();
   }
 
-  function handleImportPngShellClick() {
+  async function handleImportPngShellClick() {
     if (isDesktopRuntime) {
-      void handleManualImportClick();
+      const result = await triggerPngShellImport();
+      if (!result) {
+        return;
+      }
+
+      handleCardLoaded(result.card, result.path, null);
+      setWorkspaceMessage(
+        `Started a blank draft using ${result.path} as the PNG shell.`,
+      );
       return;
     }
 
@@ -295,6 +314,43 @@ export default function WorkspacePage() {
       const result = await importBrowserCharacterCardFile(file);
       handleCardLoaded(result.card, result.path, result.sourcePngData);
       setWorkspaceMessage(`Loaded ${result.card.data.name} from ${result.path}.`);
+    } catch (error) {
+      setWorkspaceMessage(error instanceof Error ? error.message : String(error));
+    }
+  }
+
+  async function handleBrowserPngShellFile(file: File | null) {
+    if (!file) {
+      return;
+    }
+
+    const normalizedName = file.name.toLowerCase();
+    const isPngShell =
+      normalizedName.endsWith(".png") ||
+      normalizedName.endsWith(".apng") ||
+      file.type === "image/png" ||
+      file.type === "image/apng";
+
+    if (!isPngShell) {
+      setWorkspaceMessage("Choose a PNG or APNG image to use as the card shell.");
+      return;
+    }
+
+    if (file.size > MAX_BROWSER_PNG_SHELL_BYTES) {
+      setWorkspaceMessage(
+        "PNG shell is too large for browser import. Use the desktop app for oversized images.",
+      );
+      return;
+    }
+
+    try {
+      const pngData = new Uint8Array(await file.arrayBuffer());
+      const draft = createBlankDraftCharacterCard(file.name);
+
+      handleCardLoaded(draft, file.name, pngData);
+      setWorkspaceMessage(
+        `Started a blank draft using ${file.name} as the PNG shell.`,
+      );
     } catch (error) {
       setWorkspaceMessage(error instanceof Error ? error.message : String(error));
     }
@@ -363,9 +419,8 @@ export default function WorkspacePage() {
       return;
     }
 
-    const encodedCard = new TextEncoder().encode(
-      JSON.stringify(activeCard, null, 2),
-    );
+    const publicCard = scrubCardForPublicExport(activeCard);
+    const encodedCard = new TextEncoder().encode(JSON.stringify(publicCard, null, 2));
     const fileName = createSafeCharacterFileName(
       activeCard.data.name || currentFilePath || "character",
       ".json",
@@ -373,6 +428,42 @@ export default function WorkspacePage() {
 
     downloadUint8Array(encodedCard, fileName, "application/json");
     setWorkspaceMessage(`Downloaded ${fileName}.`);
+  }
+
+  async function handleSecureCardPasswordSubmit(password: string) {
+    if (!secureCardAction || !isDesktopRuntime) {
+      return;
+    }
+
+    setIsSecureCardBusy(true);
+    setSecureCardStatus(null);
+
+    try {
+      if (secureCardAction === "export") {
+        if (!activeCard) {
+          setSecureCardStatus("Open or create a character before exporting.");
+          return;
+        }
+
+        const savedPath = await triggerSecureCardExport(activeCard, password);
+        if (savedPath) {
+          setSecureCardAction(null);
+          setWorkspaceMessage(`Exported encrypted HeartWriteAI card to ${savedPath}.`);
+        }
+        return;
+      }
+
+      const result = await triggerSecureCardImport(password);
+      if (result) {
+        handleCardLoaded(result.card, result.path, null);
+        setSecureCardAction(null);
+        setWorkspaceMessage(`Imported encrypted HeartWriteAI card from ${result.path}.`);
+      }
+    } catch (error) {
+      setSecureCardStatus(error instanceof Error ? error.message : String(error));
+    } finally {
+      setIsSecureCardBusy(false);
+    }
   }
 
   async function handleConvertActiveCardToPersona() {
@@ -525,6 +616,17 @@ export default function WorkspacePage() {
               >
                 Export CHARX...
               </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSecureCardStatus(null);
+                  setSecureCardAction("export");
+                }}
+                className="hidden rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted md:inline-flex"
+                title="Export a password-encrypted HeartWriteAI-only .hwcard file."
+              >
+                Export Secure
+              </button>
             </>
           ) : null}
           {activeCard && !isDesktopRuntime ? (
@@ -556,6 +658,22 @@ export default function WorkspacePage() {
       }
     >
       <div className="relative grid gap-5">
+        {secureCardAction ? (
+          <SecureCardPasswordModal
+            isBusy={isSecureCardBusy}
+            isOpen
+            mode={secureCardAction}
+            onCancel={() => {
+              if (!isSecureCardBusy) {
+                setSecureCardAction(null);
+                setSecureCardStatus(null);
+              }
+            }}
+            onSubmit={(password) => void handleSecureCardPasswordSubmit(password)}
+            statusMessage={secureCardStatus}
+          />
+        ) : null}
+
         <DropZoneOverlay
           onAssetTranscoded={(filePath) =>
             setWorkspaceMessage(`Converted image asset to ${filePath}.`)
@@ -584,7 +702,7 @@ export default function WorkspacePage() {
           accept=".png,.apng,image/png,image/apng"
           className="sr-only"
           onChange={(event) => {
-            void handleBrowserImportFile(event.currentTarget.files?.[0] ?? null);
+            void handleBrowserPngShellFile(event.currentTarget.files?.[0] ?? null);
             event.currentTarget.value = "";
           }}
         />
@@ -684,13 +802,27 @@ export default function WorkspacePage() {
                   <div className="flex flex-wrap gap-2">
                     <button
                       type="button"
-                      onClick={handleImportPngShellClick}
+                      onClick={() => void handleImportPngShellClick()}
                       className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted"
                       title="Import a PNG or APNG image as the shell for a new editable character card."
                     >
                       <FileUp className="size-3.5" />
                       Import PNG Shell
                     </button>
+                    {isDesktopRuntime ? (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSecureCardStatus(null);
+                          setSecureCardAction("import");
+                        }}
+                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted"
+                        title="Import a password-encrypted HeartWriteAI-only .hwcard file."
+                      >
+                        <FileUp className="size-3.5" />
+                        Import Secure
+                      </button>
+                    ) : null}
                     <button
                       type="button"
                       onClick={handleStartBlankDraft}

@@ -9,6 +9,7 @@ import {
   ValidatedCharacterCardV3,
 } from "@/types/character-card/CharacterCardV3Schema";
 import { AppMacroExtensions } from "@/types/character-card/AppMacroExtensions";
+import { scrubCardForPublicExport } from "@/lib/character-card/exportPrivacyScrubber";
 
 export interface SaveCharacterCardResult {
   filePath: string | null;
@@ -173,7 +174,9 @@ export function useCharacterLibrary() {
       await invoke<void>("export_charx_card", {
         assetsSrc: additionalAssetsDir ?? null,
         avatarSrc: avatarPath ?? null,
-        card: validCard satisfies ValidatedCharacterCardV3,
+        card: scrubCardForPublicExport(
+          validCard satisfies ValidatedCharacterCardV3,
+        ),
         destinationZip: outputPath,
       });
 
@@ -199,7 +202,9 @@ export function useCharacterLibrary() {
     try {
       const validCard = CharacterCardV3Schema.parse(currentWorkspaceCard);
       const message = await invoke<string>("export_character_to_charx", {
-        currentWorkspaceCard: validCard satisfies ValidatedCharacterCardV3,
+        currentWorkspaceCard: scrubCardForPublicExport(
+          validCard satisfies ValidatedCharacterCardV3,
+        ),
         destinationCharxPath,
         sourceCardFilePath,
       });
@@ -266,7 +271,9 @@ export function useCharacterLibrary() {
       await invoke<void>("write_edited_card_to_png", {
         sourceImgPath: sourceImagePath,
         targetSavePath,
-        updatedCardData: validCard satisfies ValidatedCharacterCardV3,
+        updatedCardData: scrubCardForPublicExport(
+          validCard satisfies ValidatedCharacterCardV3,
+        ),
       });
 
       return { filePath: targetSavePath, ok: true, error: null };

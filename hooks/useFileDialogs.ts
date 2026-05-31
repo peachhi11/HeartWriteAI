@@ -7,6 +7,7 @@ import {
   CharacterCardV3Schema,
   ValidatedCharacterCardV3,
 } from "@/types/character-card/CharacterCardV3Schema";
+import { scrubCardForPublicExport } from "@/lib/character-card/exportPrivacyScrubber";
 import { createBlankDraftCharacterCard } from "@/lib/character-card/createDraftCharacterCard";
 import { isTauriRuntime } from "@/lib/tauri/native";
 
@@ -63,6 +64,77 @@ export function useFileDialogs() {
     }
   }
 
+  async function triggerSecureCardImport(password: string): Promise<{
+    card: ValidatedCharacterCardV3;
+    path: string;
+  } | null> {
+    if (!isDesktopRuntime) {
+      return null;
+    }
+
+    try {
+      const openedPath = await open({
+        multiple: false,
+        title: "Import Encrypted HeartWriteAI Card",
+        filters: [
+          {
+            name: "HeartWriteAI Secure Card",
+            extensions: ["hwcard"],
+          },
+        ],
+      });
+
+      if (!openedPath || typeof openedPath !== "string") {
+        return null;
+      }
+
+      const cardData = await invoke<unknown>("import_encrypted_character_card", {
+        filePath: openedPath,
+        password,
+      });
+      const card = CharacterCardV3Schema.parse(cardData);
+
+      return { card, path: openedPath };
+    } catch (error) {
+      console.error("Encrypted card import collapsed:", error);
+      throw error;
+    }
+  }
+
+  async function triggerPngShellImport(): Promise<{
+    card: ValidatedCharacterCardV3;
+    path: string;
+  } | null> {
+    if (!isDesktopRuntime) {
+      return null;
+    }
+
+    try {
+      const openedPath = await open({
+        multiple: false,
+        title: "Import PNG Shell",
+        filters: [
+          {
+            name: "PNG or APNG Image Shell",
+            extensions: ["png", "apng"],
+          },
+        ],
+      });
+
+      if (!openedPath || typeof openedPath !== "string") {
+        return null;
+      }
+
+      return {
+        card: createBlankDraftCharacterCard(openedPath),
+        path: openedPath,
+      };
+    } catch (error) {
+      console.error("PNG shell import collapsed:", error);
+      return null;
+    }
+  }
+
   async function triggerFolderIntakeSelect(): Promise<string | null> {
     if (!isDesktopRuntime) {
       return null;
@@ -108,13 +180,43 @@ export function useFileDialogs() {
       await invoke("export_character_to_charx", {
         destinationCharxPath: saveDestinationPath,
         sourceCardFilePath: sourceCardPath,
-        currentWorkspaceCard: cardData,
+        currentWorkspaceCard: scrubCardForPublicExport(cardData),
       });
 
       return saveDestinationPath;
     } catch (error) {
       console.error("Archive compile system wrapper collapsed:", error);
       return null;
+    }
+  }
+
+  async function triggerSecureCardExport(
+    cardData: ValidatedCharacterCardV3,
+    password: string,
+  ): Promise<string | null> {
+    if (!isDesktopRuntime) {
+      return null;
+    }
+
+    try {
+      const saveDestinationPath = await save({
+        title: "Export Encrypted HeartWriteAI Card",
+        defaultPath: createSafeCharacterFileName(cardData.data.name, ".hwcard"),
+        filters: [{ name: "HeartWriteAI Secure Card", extensions: ["hwcard"] }],
+      });
+
+      if (!saveDestinationPath) {
+        return null;
+      }
+
+      return await invoke<string>("export_encrypted_character_card", {
+        cardJson: cardData,
+        password,
+        targetSavePath: saveDestinationPath,
+      });
+    } catch (error) {
+      console.error("Encrypted card export collapsed:", error);
+      throw error;
     }
   }
 
@@ -140,7 +242,7 @@ export function useFileDialogs() {
       await invoke("write_edited_card_to_png", {
         sourceImgPath: sourceImagePath,
         targetSavePath: saveDestinationPath,
-        updatedCardData: cardData,
+        updatedCardData: scrubCardForPublicExport(cardData),
       });
 
       return saveDestinationPath;
@@ -154,7 +256,10 @@ export function useFileDialogs() {
     isDesktopRuntime,
     triggerCharxExport,
     triggerFolderIntakeSelect,
+    triggerPngShellImport,
     triggerPngMetadataSave,
+    triggerSecureCardExport,
+    triggerSecureCardImport,
     triggerUniversalImport,
   };
 }

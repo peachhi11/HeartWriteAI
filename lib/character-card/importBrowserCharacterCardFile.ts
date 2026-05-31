@@ -1,11 +1,13 @@
 import {
   CharacterCardV3Schema,
   ValidatedCharacterCardV3,
-} from "@/types/character-card/CharacterCardV3Schema";
-import { CharacterCardPayload } from "@/types/character-card/CharacterCardPayload";
+} from "../../types/character-card/CharacterCardV3Schema";
+import { CharacterCardPayload } from "../../types/character-card/CharacterCardPayload";
 import { createCharacterCardV3Export } from "./createCharacterCardV3Export";
 import { createBlankDraftCharacterCard } from "./createDraftCharacterCard";
 import { importCharacterCardPngData } from "./importCharacterCardPngData";
+
+const MAX_BROWSER_CARD_FILE_BYTES = 20 * 1024 * 1024;
 
 export interface BrowserCharacterCardImportResult {
   card: ValidatedCharacterCardV3;
@@ -20,6 +22,12 @@ export async function importBrowserCharacterCardFile(
   const normalizedName = fileName.toLowerCase();
 
   if (normalizedName.endsWith(".png") || normalizedName.endsWith(".apng")) {
+    if (file.size > MAX_BROWSER_CARD_FILE_BYTES) {
+      throw new Error(
+        "Card image is too large for browser import. Use the desktop app for oversized cards.",
+      );
+    }
+
     const pngData = new Uint8Array(await file.arrayBuffer());
 
     try {
@@ -51,6 +59,12 @@ export async function importBrowserCharacterCardFile(
   }
 
   if (normalizedName.endsWith(".json")) {
+    if (file.size > MAX_BROWSER_CARD_FILE_BYTES) {
+      throw new Error(
+        "Card JSON is too large for browser import. Use the desktop app for oversized cards.",
+      );
+    }
+
     const parsed = JSON.parse(await file.text()) as CharacterCardPayload;
     const pointerMessage = readPointerPayloadMessage(parsed);
     if (pointerMessage) {
