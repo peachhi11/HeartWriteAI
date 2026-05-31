@@ -58,6 +58,7 @@ import {
   type ContextLorebookEntry,
 } from "@/lib/character-card/contextCompiler";
 import { classifyTropeInput } from "@/lib/character-card/tropeMatcher";
+import { streamLlmCompletion } from "@/lib/inference/llmConnector";
 import { fetchContextualNpcDialogue } from "@/lib/tauri/contextualDialogue";
 import {
   createLoreRecallAuditLogs,
@@ -585,47 +586,20 @@ export default function RoleplayChat() {
         loreActivation,
         override: activeSession.scenarioOverride,
       });
-      const response = await fetch(latestInferenceConfig.localEndpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+
+      await streamLlmCompletion(
+        toLlmConnectorMessages(compiledMessages),
+        {
+          baseUrl: latestInferenceConfig.localEndpoint,
+          maxTokens: latestInferenceConfig.maxTokens,
           model: latestInferenceConfig.selectedModel,
-          messages: compiledMessages,
-          stream: true,
-        }),
-      });
-
-      if (!response.ok || !response.body) {
-        throw new Error(`Ollama returned ${response.status}`);
-      }
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let bufferedChunk = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-
-        if (done) {
-          break;
-        }
-
-        bufferedChunk += decoder.decode(value, { stream: true });
-        const lines = bufferedChunk.split("\n");
-        bufferedChunk = lines.pop() ?? "";
-
-        for (const line of lines) {
-          if (!line.trim()) {
-            continue;
-          }
-
-          const parsed = JSON.parse(line) as {
-            message?: { content?: string };
-          };
-
-          if (parsed.message?.content) {
-            accumulatedResponse += parsed.message.content;
-
+          provider: "ollama",
+          temperature: latestInferenceConfig.temperature,
+          topP: latestInferenceConfig.topP,
+        },
+        {
+          onToken: (token) => {
+            accumulatedResponse += token;
             updateActiveSession({
               messages: [
                 ...updatedMessages,
@@ -636,9 +610,9 @@ export default function RoleplayChat() {
                 },
               ],
             });
-          }
-        }
-      }
+          },
+        },
+      );
 
       if (accumulatedResponse.trim()) {
         void persistDialogueLine(
@@ -772,46 +746,20 @@ export default function RoleplayChat() {
           loreActivation,
           override: activeSession.scenarioOverride,
         });
-        const response = await fetch(latestInferenceConfig.localEndpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
+
+        await streamLlmCompletion(
+          toLlmConnectorMessages(compiledMessages),
+          {
+            baseUrl: latestInferenceConfig.localEndpoint,
+            maxTokens: latestInferenceConfig.maxTokens,
             model: latestInferenceConfig.selectedModel,
-            messages: compiledMessages,
-            stream: true,
-          }),
-        });
-
-        if (!response.ok || !response.body) {
-          throw new Error(`Ollama returned ${response.status}`);
-        }
-
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder();
-        let bufferedChunk = "";
-
-        while (true) {
-          const { done, value } = await reader.read();
-
-          if (done) {
-            break;
-          }
-
-          bufferedChunk += decoder.decode(value, { stream: true });
-          const lines = bufferedChunk.split("\n");
-          bufferedChunk = lines.pop() ?? "";
-
-          for (const line of lines) {
-            if (!line.trim()) {
-              continue;
-            }
-
-            const parsed = JSON.parse(line) as {
-              message?: { content?: string };
-            };
-
-            if (parsed.message?.content) {
-              accumulatedResponse += parsed.message.content;
+            provider: "ollama",
+            temperature: latestInferenceConfig.temperature,
+            topP: latestInferenceConfig.topP,
+          },
+          {
+            onToken: (token) => {
+              accumulatedResponse += token;
               updateActiveSession({
                 messages: updateMessageById(
                   rewoundMessages,
@@ -820,9 +768,9 @@ export default function RoleplayChat() {
                     updateRoleplayMessageText(message, accumulatedResponse),
                 ),
               });
-            }
-          }
-        }
+            },
+          },
+        );
       }
 
       if (accumulatedResponse.trim()) {
@@ -1498,6 +1446,13 @@ async function compileLiveChatContextMessages(input: {
     compileInput,
     countLiveChatTokens,
   ).then((result) => result.messages);
+}
+
+function toLlmConnectorMessages(messages: ContextChatMessage[]) {
+  return messages.map((message) => ({
+    content: message.content,
+    role: message.role,
+  }));
 }
 
 function scenarioOverrideToContextScenario(override: ScenarioOverride) {
