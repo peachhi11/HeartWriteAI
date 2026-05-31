@@ -39,6 +39,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  loadPersistedChatSessions,
+  persistChatSessions,
+} from "@/lib/chat/chatTreePersistence";
+import {
   createRegenerationVariant,
   createRoleplayMessage,
   getMessageText,
@@ -84,6 +88,7 @@ import { StatBar } from "@/features/relationship/components/StatBar";
 import type { RelationshipState } from "@/features/relationship/schema";
 import type { ChatMessage } from "@/types/chat";
 import type { RomanceTropeClass } from "@/types/character-card/RomanceTropeClassification";
+import type { PersistedChatSessionSnapshot } from "@/types/chatTree";
 import type { DialogueLogEntry } from "@/types/history";
 import { COMPLETE_TROPE_MATRIX } from "@/types/tropes";
 import type { ActionCardVariant } from "@/types/cards";
@@ -183,8 +188,6 @@ type ChatSession = {
   updatedAt: number;
 };
 
-const CHAT_STORAGE_KEY = "heartwriteai:chat-sessions";
-
 const emptyScenarioOverride: ScenarioOverride = {
   context: "",
   dynamic: "",
@@ -227,6 +230,9 @@ export default function RoleplayChat() {
     null,
   );
   const animationFrameRef = useRef<number | null>(null);
+  const chatPersistTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const isResizingDockRef = useRef(false);
   const resizeStartRef = useRef({ pointerX: 0, width: 280 });
   const sidebarWidthRef = useRef(sidebarWidth);
@@ -249,12 +255,12 @@ export default function RoleplayChat() {
   useEffect(() => {
     let cancelled = false;
 
-    window.queueMicrotask(() => {
+    window.queueMicrotask(async () => {
       if (cancelled) {
         return;
       }
 
-      const loaded = loadInitialChatSessions();
+      const loaded = await loadInitialChatSessions();
 
       setSessions(loaded);
       setActiveSessionId(loaded[0]?.id ?? PREVIEW_CHAT_ID);
@@ -364,11 +370,24 @@ export default function RoleplayChat() {
       return;
     }
 
-    try {
-      window.localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(sessions));
-    } catch {
-      // Chat preview can still run without persistence.
+    if (chatPersistTimeoutRef.current) {
+      clearTimeout(chatPersistTimeoutRef.current);
     }
+
+    chatPersistTimeoutRef.current = setTimeout(() => {
+      void persistChatSessions(sessions.map(toPersistedSessionSnapshot)).catch(
+        (error) => {
+          const detail = error instanceof Error ? error.message : String(error);
+          setRuntimeError(`Chat tree autosave failed. ${detail}`);
+        },
+      );
+    }, 800);
+
+    return () => {
+      if (chatPersistTimeoutRef.current) {
+        clearTimeout(chatPersistTimeoutRef.current);
+      }
+    };
   }, [chatStorageHydrated, sessions]);
 
   function updateActiveSession(patch: Partial<ChatSession>) {
@@ -1316,24 +1335,17 @@ function createPreviewChatSession(): ChatSession {
   };
 }
 
-function loadInitialChatSessions() {
-  try {
-    if (typeof window === "undefined") {
-      return [createPreviewChatSession()];
+async function loadInitialChatSessions() {
+  const persisted = await loadPersistedChatSessions();
+
+  if (persisted?.length) {
+    const loaded = persisted
+      .map(readChatSession)
+      .filter(Boolean) as ChatSession[];
+
+    if (loaded.length > 0) {
+      return loaded;
     }
-
-    const raw = window.localStorage.getItem(CHAT_STORAGE_KEY);
-    const parsed = raw ? JSON.parse(raw) : null;
-
-    if (Array.isArray(parsed) && parsed.length > 0) {
-      const loaded = parsed.map(readChatSession).filter(Boolean) as ChatSession[];
-
-      if (loaded.length > 0) {
-        return loaded;
-      }
-    }
-  } catch {
-    // Keep the in-memory preview chat if browser storage is unavailable.
   }
 
   return [createPreviewChatSession()];
@@ -1385,6 +1397,18 @@ function toDialogueLogEntry(message: RoleplayMessage): DialogueLogEntry {
     swipedVariants: message.swipedVariants,
     text: getMessageText(message),
     timestamp: message.timestamp ?? new Date().toISOString(),
+  };
+}
+
+function toPersistedSessionSnapshot(
+  session: ChatSession,
+): PersistedChatSessionSnapshot {
+  return {
+    id: session.id,
+    messages: session.messages,
+    scenarioOverride: session.scenarioOverride,
+    title: session.title,
+    updatedAt: session.updatedAt,
   };
 }
 

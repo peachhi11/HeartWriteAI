@@ -1,4 +1,5 @@
 pub mod cache;
+pub mod chat_tree;
 pub mod cloud_sync;
 mod codecs;
 mod commands;
@@ -137,6 +138,9 @@ pub fn run() {
             commands::character_card::transcode_asset_to_png,
             commands::character_card::write_edited_card_to_png,
             commands::chat_export::export_chat_log_to_file,
+            chat_tree::list_chat_trees_native,
+            chat_tree::load_chat_tree_native,
+            chat_tree::save_chat_tree_native,
             commands::trope_runtime::append_message_to_history,
             commands::trope_runtime::boot_gameplay_loop_instance,
             commands::trope_runtime::clear_game_slot,
