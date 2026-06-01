@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FileUp,
   PanelLeftOpen,
@@ -25,6 +25,7 @@ import { savePersonaLibraryItem } from "@/hooks/usePersonaLibrary";
 import { createPersonaArtifactFromCharacterCard } from "@/features/generation/workflows";
 import { downloadUint8Array } from "@/lib/browser/downloadUint8Array";
 import { importBrowserCharacterCardFile } from "@/lib/character-card/importBrowserCharacterCardFile";
+import { consumePendingLibraryCardPath } from "@/lib/character-card/librarySelectionHandoff";
 import { createCharacterCardV3Export } from "@/lib/character-card/createCharacterCardV3Export";
 import {
   createBlankDraftCharacterCard,
@@ -463,6 +464,26 @@ export default function WorkspacePage() {
       setWorkspaceMessage(result.error ?? `Could not load ${filePath}.`);
     }
   }
+
+  useEffect(() => {
+    const pendingFilePath = consumePendingLibraryCardPath();
+    if (!pendingFilePath) {
+      return;
+    }
+
+    if (!isDesktopRuntime) {
+      queueMicrotask(() => {
+        setWorkspaceMessage(
+          "Selected library cards can only be opened inside the desktop app.",
+        );
+      });
+      return;
+    }
+
+    void handleDesktopSelectedCharacterFile(pendingFilePath);
+    // The handoff is a one-shot localStorage event consumed on page mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleBrowserPngCharacterFile(file: File) {
     if (file.size > MAX_BROWSER_PNG_SHELL_BYTES) {

@@ -1,0 +1,197 @@
+import type { RelationshipDynamicMode } from "./relationshipDynamicPresets";
+
+export type RelationshipDynamicVocabularyCategory =
+  | "Caretaker / Hurt-Comfort"
+  | "Dark / Obsessive"
+  | "Formal / Arranged"
+  | "Grumpy / Sunshine"
+  | "Rivalry / Academic";
+
+export interface RelationshipDynamicVocabularyPreset {
+  id: string;
+  category: RelationshipDynamicVocabularyCategory;
+  vibe: string;
+  dynamicModes: readonly RelationshipDynamicMode[];
+  lexicalTokens: {
+    signatureVerbs: readonly string[];
+    descriptiveAdjectives: readonly string[];
+    spatialNouns: readonly string[];
+    dialoguePacing: string;
+  };
+  sampleProseSnippet: string;
+  systemPromptTags: readonly string[];
+}
+
+export interface CompiledRelationshipDynamicVocabularyInjection {
+  formattingDirectives: string;
+  lexicalConstraints: string;
+  systemBehavior: string;
+}
+
+export const RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS = Object.freeze([
+  {
+    id: "vocab_grumpy_sunshine",
+    category: "Grumpy / Sunshine",
+    vibe: "The Stoic Wall x The Vibrant Catalyst",
+    dynamicModes: ["complement", "slow-burn"],
+    lexicalTokens: {
+      signatureVerbs: ["deflect", "bristle", "soften", "thaw", "sigh", "scoff", "endure"],
+      descriptiveAdjectives: [
+        "bubbly",
+        "unfiltered",
+        "guarded",
+        "relentless",
+        "stoic",
+        "radiant",
+        "exhausting",
+      ],
+      spatialNouns: ["fortress", "distance", "orbit", "anchor", "barrier", "perimeter", "catalyst"],
+      dialoguePacing:
+        "Use asymmetric sentence lengths. The guarded character tends toward short, dry replies, while the warmer character can use longer, breathless, emotionally open sentences.",
+    },
+    sampleProseSnippet:
+      "He tried to deflect the radiant onslaught of her attention, retreating behind guarded barriers, but her relentless orbit kept compromising his defensive perimeter.",
+    systemPromptTags: ["linguistic asymmetry", "high-contrast speech lengths", "textual thawing tells", "dry pragmatic lexical choices"],
+  },
+  {
+    id: "vocab_dark_obsessive",
+    category: "Dark / Obsessive",
+    vibe: "The Omnipresent Shadow x The Tracked Fixation",
+    dynamicModes: ["devotion", "obsession", "secret"],
+    lexicalTokens: {
+      signatureVerbs: ["track", "watch", "fixate", "enclose", "hover", "gaze", "provoke", "linger"],
+      descriptiveAdjectives: [
+        "claustrophobic",
+        "all-consuming",
+        "unsteady",
+        "suffocating",
+        "primal",
+        "obsidian",
+        "feverish",
+      ],
+      spatialNouns: ["shadow", "threshold", "tether", "void", "sanctuary", "fixation", "monopoly", "abyss"],
+      dialoguePacing:
+        "Use intense, intimate, low-voiced pacing with heavy pauses. Keep boundary-aware language explicit when proximity, privacy, or protection becomes too intense.",
+    },
+    sampleProseSnippet:
+      "His obsidian eyes tracked the smallest change in her breath, an unsteady presence at the threshold between sanctuary and suffocating attention.",
+    systemPromptTags: ["boundary-aware dark diction", "somatic heavy punctuation", "whispered cadence tokens", "privacy-conscious intensity"],
+  },
+  {
+    id: "vocab_formal_arranged",
+    category: "Formal / Arranged",
+    vibe: "The Stilted Protocol x The Private Fracture",
+    dynamicModes: ["arranged", "fake-dating", "forbidden"],
+    lexicalTokens: {
+      signatureVerbs: ["comply", "endure", "observe", "mask", "constrain", "yield", "escort", "repress"],
+      descriptiveAdjectives: [
+        "stilted",
+        "immaculate",
+        "decorous",
+        "transactional",
+        "rigid",
+        "regal",
+        "bloodless",
+      ],
+      spatialNouns: ["protocol", "treaty", "mask", "court", "hierarchy", "facade", "obligation", "decorum"],
+      dialoguePacing:
+        "Use polished grammar, high-register diction, and minimal slang. Formal titles and honorifics may persist even in private when the dynamic is bound by status or law.",
+    },
+    sampleProseSnippet:
+      "They maintained an immaculate public distance, their stilted dialogue bound by the cold legalities of the treaty and the private fracture behind a decorous smile.",
+    systemPromptTags: ["high-register diction", "zero casual slang bias", "honorific usage", "linguistic posture tracking"],
+  },
+  {
+    id: "vocab_rivalry_academic",
+    category: "Rivalry / Academic",
+    vibe: "The Cutthroat Intellect x The Defiant Counter",
+    dynamicModes: ["rivalry", "friction"],
+    lexicalTokens: {
+      signatureVerbs: ["clash", "dissect", "counter", "smirk", "provoke", "dethrone", "analyze", "taunt"],
+      descriptiveAdjectives: [
+        "razor-sharp",
+        "pretentious",
+        "defiant",
+        "competitive",
+        "calculated",
+        "mocking",
+        "sarcastic",
+      ],
+      spatialNouns: ["boardroom", "arena", "ledger", "tally", "margin", "insult", "parry", "apex"],
+      dialoguePacing:
+        "Use rapid, staccato verbal friction. Let intellectual terminology and sharp punctuation create pressure without collapsing into generic insults.",
+    },
+    sampleProseSnippet:
+      "She dissected his calculated theory with a razor-sharp verbal parry, leaving him with a tense jaw and a distinctly fractured smirk.",
+    systemPromptTags: ["staccato verbal friction", "weaponized intellectual terminology", "rapid conversation pressure", "petty conversational scoring"],
+  },
+  {
+    id: "vocab_caretaker_hurt_comfort",
+    category: "Caretaker / Hurt-Comfort",
+    vibe: "The Grounding Shield x The Exhausted Burnout",
+    dynamicModes: ["caretaker", "flaw-secret"],
+    lexicalTokens: {
+      signatureVerbs: ["ground", "soothe", "anchor", "trace", "shield", "cradle", "murmur", "stabilize"],
+      descriptiveAdjectives: [
+        "feverish",
+        "fragile",
+        "clinical",
+        "hushed",
+        "tender",
+        "exhausted",
+        "calloused",
+      ],
+      spatialNouns: ["bedside", "haven", "grip", "pulse", "shelter", "boundary", "recovery", "linens"],
+      dialoguePacing:
+        "Use soft, decelerated textual flow. Favor grounded physical details, quiet dialogue, and long, careful action beats over sudden escalation.",
+    },
+    sampleProseSnippet:
+      "Her calloused fingers moved to stabilize his trembling hands, her voice dropping to a hushed murmur as she tried to ground his feverish breathing beside the dark haven of the bed.",
+    systemPromptTags: ["decelerated dialogue pacing", "somatic grounding modifiers", "clinical vocabulary tokens", "soft acoustic prose styling"],
+  },
+] satisfies readonly RelationshipDynamicVocabularyPreset[]);
+
+export const RELATIONSHIP_DYNAMIC_VOCABULARY_CATEGORIES = Object.freeze(
+  Array.from(new Set(RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS.map((preset) => preset.category))).sort(),
+);
+
+export function getRelationshipDynamicVocabularyByMode(
+  mode: RelationshipDynamicMode | string,
+): readonly RelationshipDynamicVocabularyPreset[] {
+  const normalizedMode = mode.trim().toLowerCase();
+  return RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS.filter((preset) =>
+    preset.dynamicModes.some((dynamicMode) => dynamicMode === normalizedMode),
+  );
+}
+
+export function getRelationshipDynamicVocabularyByCategory(
+  category: string,
+): readonly RelationshipDynamicVocabularyPreset[] {
+  const normalizedCategory = category.trim().toLowerCase();
+  return RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS.filter(
+    (preset) => preset.category.toLowerCase() === normalizedCategory,
+  );
+}
+
+export function findRelationshipDynamicVocabularyById(
+  id: string,
+): RelationshipDynamicVocabularyPreset | undefined {
+  const normalizedId = id.trim().toLowerCase();
+  return RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS.find(
+    (preset) => preset.id.toLowerCase() === normalizedId,
+  );
+}
+
+export function compileRelationshipDynamicVocabularyInjection(
+  preset: RelationshipDynamicVocabularyPreset,
+): CompiledRelationshipDynamicVocabularyInjection {
+  return {
+    systemBehavior: `Lexical guidance: adjust word choice toward the vocabulary tone of a ${preset.vibe} interaction dynamic without forcing repeated wording.`,
+    lexicalConstraints: [
+      `Prioritize these signature verbs when they fit naturally: ${preset.lexicalTokens.signatureVerbs.join(", ")}.`,
+      `Use these descriptive adjectives as tonal references: ${preset.lexicalTokens.descriptiveAdjectives.join(", ")}.`,
+      `Frame physical blocking with these spatial anchors when useful: ${preset.lexicalTokens.spatialNouns.join(", ")}.`,
+    ].join("\n"),
+    formattingDirectives: `Dialogue pacing: ${preset.lexicalTokens.dialoguePacing} Prose reference: "${preset.sampleProseSnippet}"`,
+  };
+}
