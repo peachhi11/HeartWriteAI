@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
+import { ChevronLeft, ChevronRight, RotateCcw, WandSparkles } from "lucide-react";
 
 import { CopyButton } from "@/components/copy-button";
 import { StreamingBubble } from "@/components/streaming-bubble";
@@ -15,6 +15,7 @@ type ChatViewportProps = {
   isStreaming: boolean;
   runtimeError?: string | null;
   onRegenerateMessage?: (messageId: string) => void;
+  onPolishMessage?: (messageId: string) => void;
   onNavigateMessageVariant?: (
     messageId: string,
     direction: "next" | "prev",
@@ -25,6 +26,7 @@ export function ChatViewport({
   isStreaming,
   messages,
   onNavigateMessageVariant,
+  onPolishMessage,
   onRegenerateMessage,
   runtimeError = null,
 }: ChatViewportProps) {
@@ -72,7 +74,7 @@ export function ChatViewport({
                     message.role === "NPC" && "font-serif",
                   )}
                 >
-                  {roleLabel(message.role)}
+                  {roleLabel(message)}
                 </span>
                 <span aria-hidden="true">/</span>
                 <span className={tropeConfig.headerText}>
@@ -116,6 +118,18 @@ export function ChatViewport({
                     >
                       <RotateCcw className="size-3.5" />
                       Regenerate
+                    </Button>
+
+                    <Button
+                      disabled={isStreaming || !message.text.trim()}
+                      onClick={() => onPolishMessage?.(message.id)}
+                      size="sm"
+                      title="Polish this response with Prose Pixie"
+                      type="button"
+                      variant="outline"
+                    >
+                      <WandSparkles className="size-3.5" />
+                      Polish Prose
                     </Button>
 
                     <CopyButton textToCopy={message.text} />
@@ -181,8 +195,12 @@ export function ChatViewport({
   );
 }
 
-function roleLabel(role: ChatMessage["role"]) {
-  switch (role) {
+function roleLabel(message: ChatMessage) {
+  if (message.speakerName) {
+    return message.speakerName;
+  }
+
+  switch (message.role) {
     case "Player":
       return "You";
     case "NPC":

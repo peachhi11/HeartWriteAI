@@ -3,66 +3,12 @@
 import { invoke } from "@tauri-apps/api/core";
 import { open, save } from "@tauri-apps/plugin-dialog";
 
-import {
-  CharacterCardV3Schema,
-  ValidatedCharacterCardV3,
-} from "@/types/character-card/CharacterCardV3Schema";
+import { ValidatedCharacterCardV3 } from "@/types/character-card/CharacterCardV3Schema";
 import { scrubCardForPublicExport } from "@/lib/character-card/exportPrivacyScrubber";
-import { createBlankDraftCharacterCard } from "@/lib/character-card/createDraftCharacterCard";
 import { isTauriRuntime } from "@/lib/tauri/native";
 
 export function useFileDialogs() {
   const isDesktopRuntime = isTauriRuntime();
-
-  async function triggerUniversalImport(): Promise<{
-    card: ValidatedCharacterCardV3;
-    path: string;
-  } | null> {
-    if (!isDesktopRuntime) {
-      return null;
-    }
-
-    let selectedPath: string | null = null;
-
-    try {
-      const openedPath = await open({
-        multiple: false,
-        title: "Import CCV3 Character Card Package",
-        filters: [
-          {
-            name: "Supported Character Formats",
-            extensions: ["png", "apng", "json", "charx"],
-          },
-        ],
-      });
-
-      if (!openedPath || typeof openedPath !== "string") {
-        return null;
-      }
-
-      selectedPath = openedPath;
-      const cardData = await invoke<unknown>("import_card_from_path", {
-        filePath: selectedPath,
-      });
-      const card = CharacterCardV3Schema.parse(cardData);
-
-      return { card, path: selectedPath };
-    } catch (error) {
-      console.error("Native load interface pipeline collapsed:", error);
-      if (
-        selectedPath &&
-        /\.(apng|png)$/i.test(selectedPath) &&
-        isMissingCardMetadataError(error)
-      ) {
-        return {
-          card: createBlankDraftCharacterCard(selectedPath),
-          path: selectedPath,
-        };
-      }
-
-      return null;
-    }
-  }
 
   async function triggerCharacterFileSelect(): Promise<string | null> {
     if (!isDesktopRuntime) {
@@ -88,40 +34,6 @@ export function useFileDialogs() {
       return openedPath;
     } catch (error) {
       console.error("Character file selection collapsed:", error);
-      return null;
-    }
-  }
-
-  async function triggerPngShellImport(): Promise<{
-    card: ValidatedCharacterCardV3;
-    path: string;
-  } | null> {
-    if (!isDesktopRuntime) {
-      return null;
-    }
-
-    try {
-      const openedPath = await open({
-        multiple: false,
-        title: "Import PNG Shell",
-        filters: [
-          {
-            name: "PNG or APNG Image Shell",
-            extensions: ["png", "apng"],
-          },
-        ],
-      });
-
-      if (!openedPath || typeof openedPath !== "string") {
-        return null;
-      }
-
-      return {
-        card: createBlankDraftCharacterCard(openedPath),
-        path: openedPath,
-      };
-    } catch (error) {
-      console.error("PNG shell import collapsed:", error);
       return null;
     }
   }
@@ -218,14 +130,8 @@ export function useFileDialogs() {
     isDesktopRuntime,
     triggerCharxExport,
     triggerFolderIntakeSelect,
-    triggerPngShellImport,
     triggerPngMetadataSave,
-    triggerUniversalImport,
   };
-}
-
-function isMissingCardMetadataError(error: unknown) {
-  return String(error).includes("No character card metadata");
 }
 
 function createSafeCharacterFileName(name: string, suffix: string) {

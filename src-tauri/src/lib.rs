@@ -7,6 +7,7 @@ mod commands;
 pub mod dialogue;
 pub mod inference_manager;
 pub mod llm_bridge;
+pub mod local_backup;
 pub mod lore_injector;
 pub mod lore_manager;
 pub mod models;
@@ -164,6 +165,8 @@ pub fn run() {
             lore_manager::import_and_compile_lorebook,
             lore_manager::remove_lorebook_file,
             lore_manager::toggle_lorebook_active_state,
+            local_backup::export_local_backup,
+            local_backup::restore_local_backup,
             regex_engine::apply_regex_native,
             regex_engine::execute_regex_native,
             screenshot::capture_viewport_screenshot,

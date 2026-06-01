@@ -10,7 +10,7 @@ export function compileChatTranscript(messages: ChatMessage[]) {
   ];
 
   for (const message of messages) {
-    const speaker = formatSpeaker(message.role);
+    const speaker = formatSpeaker(message);
     const mood = formatMood(message.detectedTrope);
 
     lines.push(`[${message.timestamp}] ${speaker} (Mood: ${mood})`);
@@ -61,16 +61,20 @@ type BrowserDocument = {
   };
 };
 
-function formatSpeaker(role: ChatMessage["role"]) {
-  if (role === "Player") {
+function formatSpeaker(message: ChatMessage) {
+  if (message.speakerName) {
+    return message.speakerName.toUpperCase();
+  }
+
+  if (message.role === "Player") {
     return "YOU";
   }
 
-  if (role === "NPC") {
+  if (message.role === "NPC") {
     return "CHARACTER";
   }
 
-  return role.toUpperCase();
+  return message.role.toUpperCase();
 }
 
 function formatMood(value: string) {

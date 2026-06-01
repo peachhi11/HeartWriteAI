@@ -6,6 +6,7 @@ export interface DialogueLogEntry {
   activeVariantIndex?: number;
   id: string;
   role: DialogueLogRole;
+  speakerName?: string;
   swipedVariants?: string[];
   text: string;
   timestamp: string;

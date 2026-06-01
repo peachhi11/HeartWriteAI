@@ -6,6 +6,7 @@ export interface ChatMessage {
   activeVariantIndex?: number;
   id: string;
   role: SpeakerRole;
+  speakerName?: string;
   swipedVariants?: string[];
   text: string;
   timestamp: string;

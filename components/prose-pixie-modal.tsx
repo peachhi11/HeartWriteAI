@@ -51,6 +51,7 @@ interface ProsePixieAction {
 
 interface ProsePixieModalProps {
   adultModeEnabled: boolean;
+  applyLabel?: string;
   target: ProsePixieTarget | null;
   onApply: (value: string) => void;
   onClose: () => void;
@@ -409,6 +410,7 @@ Output Rules:
 
 export default function ProsePixieModal({
   adultModeEnabled,
+  applyLabel = "Replace Text",
   onApply,
   onClose,
   target,
@@ -627,7 +629,7 @@ export default function ProsePixieModal({
               disabled={!draft.trim()}
               className="rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white transition hover:bg-rose-500 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500"
             >
-              Replace Text
+              {applyLabel}
             </button>
           </div>
         </div>

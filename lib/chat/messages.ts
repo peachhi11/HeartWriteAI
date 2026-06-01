@@ -11,6 +11,7 @@ export interface RoleplayMessage {
   role: "user" | "assistant";
   detectedTrope?: RomanceTropeClass;
   parts: RoleplayTextPart[];
+  speakerName?: string;
   swipedVariants?: string[];
   timestamp?: string;
 }
@@ -19,12 +20,14 @@ export function createRoleplayMessage(
   role: RoleplayMessage["role"],
   text: string,
   detectedTrope: RomanceTropeClass = "casual",
+  speakerName?: string,
 ): RoleplayMessage {
   return {
     detectedTrope,
     id: crypto.randomUUID(),
     role,
     parts: [{ type: "text", text }],
+    speakerName: speakerName?.trim() || undefined,
     timestamp: new Date().toISOString(),
   };
 }
@@ -120,6 +123,28 @@ export function navigateRoleplayMessageVariant(
     activeVariantIndex,
     parts: [{ type: "text", text: variants[activeVariantIndex] ?? "" }],
     swipedVariants: variants,
+  };
+}
+
+export function appendRoleplayMessageVariant(
+  message: RoleplayMessage,
+  text: string,
+): RoleplayMessage {
+  const trimmedText = text.trim();
+
+  if (!trimmedText) {
+    return message;
+  }
+
+  const variants = getMessageVariants(message);
+  variants.push(trimmedText);
+
+  return {
+    ...message,
+    activeVariantIndex: variants.length - 1,
+    parts: [{ type: "text", text: trimmedText }],
+    swipedVariants: variants,
+    timestamp: new Date().toISOString(),
   };
 }
 

@@ -18,6 +18,7 @@ import { AppUpdateChecker } from "@/components/app-update-checker";
 import { CameraSnapperButton } from "@/components/camera-snapper-button";
 import { CloudSyncControlCard } from "@/components/cloud-sync-control-card";
 import { InferenceSettingsCard } from "@/components/inference-settings-card";
+import { LocalBackupControlCard } from "@/components/local-backup-control-card";
 import { LorebookControlPanel } from "@/components/lorebook-control-panel";
 import { RelationshipTreeGraph } from "@/components/relationship-tree-graph";
 import { Badge } from "@/components/ui/badge";
@@ -580,7 +581,10 @@ function BackupWorkspace() {
         <AppUpdateChecker />
       </div>
 
-      <CloudSyncControlCard />
+      <div className="grid content-start gap-4">
+        <LocalBackupControlCard />
+        <CloudSyncControlCard />
+      </div>
     </div>
   );
 }

@@ -1,5 +1,3 @@
-import { BaseDirectory, writeTextFile } from "@tauri-apps/plugin-fs";
-
 import type {
   CharacterCardData,
   GeneratedFrameworkConfigurationData,
@@ -66,28 +64,6 @@ export function createSerializedCardString(
   );
 }
 
-export async function serializeAndExportCard(
-  compiledPayload: FrameworkSerializablePayload,
-  frameworkConfig: GeneratedFrameworkConfigurationData,
-): Promise<boolean> {
-  try {
-    const finalOutputFileString = createSerializedCardString(
-      compiledPayload,
-      frameworkConfig,
-    );
-    const cleanFileName = `${toSafeFilename(compiledPayload.name)}_card.json`;
-
-    await writeTextFile(cleanFileName, finalOutputFileString, {
-      baseDir: BaseDirectory.Desktop,
-    });
-
-    return true;
-  } catch (error) {
-    console.error("Framework serialization file export error:", error);
-    return false;
-  }
-}
-
 export function createFrameworkSerializablePayload(
   cardData: CharacterCardData,
   greeting: string,
@@ -113,14 +89,4 @@ export function createFrameworkSerializablePayload(
     first_message: greeting,
     name: `${cardData.given_name} ${cardData.surname}`,
   };
-}
-
-function toSafeFilename(value: string) {
-  return (
-    value
-      .trim()
-      .replace(/[^a-z0-9]+/gi, "_")
-      .replace(/^_+|_+$/g, "")
-      .toLowerCase() || "character_card"
-  );
 }

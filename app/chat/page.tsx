@@ -26,6 +26,9 @@ import { ContextRecallInspector } from "@/components/context-recall-inspector";
 import { GlowingConnectionNode } from "@/components/glowing-connection-node";
 import { LoreActivationBadge } from "@/components/lore-activation-badge";
 import { LorebookControlPanel } from "@/components/lorebook-control-panel";
+import ProsePixieModal, {
+  type ProsePixieTarget,
+} from "@/components/prose-pixie-modal";
 import { SaveSlotModal } from "@/components/save-slot-modal";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -43,6 +46,7 @@ import {
   persistChatSessions,
 } from "@/lib/chat/chatTreePersistence";
 import {
+  appendRoleplayMessageVariant,
   createRegenerationVariant,
   createRoleplayMessage,
   getMessageText,
@@ -219,6 +223,9 @@ export default function RoleplayChat() {
     loadInferenceConfig(),
   );
   const [intentModalOpen, setIntentModalOpen] = useState(false);
+  const [prosePixieTarget, setProsePixieTarget] = useState<
+    (ProsePixieTarget & { messageId: string }) | null
+  >(null);
   const [lorebookPanelOpen, setLorebookPanelOpen] = useState(false);
   const [dockingState, setDockingState] = useState<DockingState>({
     activePanel: "Lorebook",
@@ -837,6 +844,48 @@ export default function RoleplayChat() {
     void persistDialogueHistory(nextMessages, setRuntimeError);
   }
 
+  function handleOpenProsePixie(messageId: string) {
+    if (isGenerating) {
+      return;
+    }
+
+    const targetMessage = messages.find(
+      (message) => message.id === messageId && message.role === "assistant",
+    );
+
+    if (!targetMessage) {
+      return;
+    }
+
+    const value = getMessageText(targetMessage).trim();
+
+    if (!value) {
+      return;
+    }
+
+    setProsePixieTarget({
+      characterName: targetMessage.speakerName ?? "Character",
+      fieldLabel: "chat response",
+      messageId,
+      value,
+    });
+  }
+
+  function handleApplyPolishedResponse(value: string) {
+    if (!prosePixieTarget) {
+      return;
+    }
+
+    const nextMessages = updateMessageById(
+      messages,
+      prosePixieTarget.messageId,
+      (message) => appendRoleplayMessageVariant(message, value),
+    );
+
+    updateActiveSession({ messages: nextMessages });
+    void persistDialogueHistory(nextMessages, setRuntimeError);
+  }
+
   async function handleIntentSelection(selected: ActionCardVariant) {
     if (isGenerating) {
       return;
@@ -1181,6 +1230,7 @@ export default function RoleplayChat() {
         <ChatViewport
           isStreaming={isGenerating}
           messages={viewportMessages}
+          onPolishMessage={handleOpenProsePixie}
           onRegenerateMessage={(messageId) =>
             void handleRegenerateMessage(messageId)
           }
@@ -1247,6 +1297,13 @@ export default function RoleplayChat() {
           onCloseAbort={() => setIntentModalOpen(false)}
           onSelectAction={(selected) => void handleIntentSelection(selected)}
           scenePrompt={getIntentScenePrompt(activeSession.scenarioOverride)}
+        />
+        <ProsePixieModal
+          adultModeEnabled={false}
+          applyLabel="Save as Variant"
+          target={prosePixieTarget}
+          onApply={handleApplyPolishedResponse}
+          onClose={() => setProsePixieTarget(null)}
         />
         <LorebookControlPanel
           activeLorebookId={activeLorebook?.id}
@@ -1332,6 +1389,7 @@ function toViewportMessage(message: RoleplayMessage): ChatMessage {
     detectedTrope: message.detectedTrope ?? "casual",
     id: message.id,
     role: message.role === "user" ? "Player" : "NPC",
+    speakerName: message.speakerName,
     swipedVariants: message.swipedVariants,
     text: getMessageText(message),
     timestamp: message.timestamp ?? new Date().toISOString(),
@@ -1344,6 +1402,7 @@ function toDialogueLogEntry(message: RoleplayMessage): DialogueLogEntry {
     detectedTrope: message.detectedTrope ?? "casual",
     id: message.id,
     role: message.role === "user" ? "Player" : "NPC",
+    speakerName: message.speakerName,
     swipedVariants: message.swipedVariants,
     text: getMessageText(message),
     timestamp: message.timestamp ?? new Date().toISOString(),
@@ -1369,6 +1428,7 @@ function dialogueLogEntryToMessage(entry: DialogueLogEntry): RoleplayMessage {
     id: entry.id,
     parts: [{ type: "text", text: entry.text }],
     role: entry.role === "Player" ? "user" : "assistant",
+    speakerName: entry.speakerName,
     swipedVariants: entry.swipedVariants,
     timestamp: entry.timestamp,
   };

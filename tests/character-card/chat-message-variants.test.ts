@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  appendRoleplayMessageVariant,
   createRegenerationVariant,
   getMessageText,
   getMessageVariants,
@@ -64,12 +65,39 @@ test("navigates swiped response variants with wraparound arrows", () => {
   ]);
 });
 
-function createAssistantMessage(text: string): RoleplayMessage {
+test("adds polished prose as the active response variant", () => {
+  const message = createAssistantMessage("Original answer.");
+  const polished = appendRoleplayMessageVariant(message, "  Polished answer.  ");
+
+  assert.equal(getMessageText(polished), "Polished answer.");
+  assert.deepEqual(getMessageVariants(polished), [
+    "Original answer.",
+    "Polished answer.",
+  ]);
+  assert.equal(polished.activeVariantIndex, 1);
+
+  const original = navigateRoleplayMessageVariant(polished, "prev");
+  assert.equal(getMessageText(original), "Original answer.");
+  assert.equal(original.activeVariantIndex, 0);
+});
+
+test("preserves assistant speaker names across polished variants", () => {
+  const message = createAssistantMessage("Original answer.", "Seraphina");
+  const polished = appendRoleplayMessageVariant(message, "Polished answer.");
+
+  assert.equal(polished.speakerName, "Seraphina");
+});
+
+function createAssistantMessage(
+  text: string,
+  speakerName?: string,
+): RoleplayMessage {
   return {
     detectedTrope: "casual",
     id: "assistant_1",
     parts: [{ type: "text", text }],
     role: "assistant",
+    speakerName,
     timestamp: "2026-05-31T00:00:00.000Z",
   };
 }
