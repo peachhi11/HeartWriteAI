@@ -101,7 +101,7 @@ export function FolderIntakeReview({
       .map((item) => item.file_path);
 
     setIsImporting(true);
-    setMessage(`Saving ${paths.length} selected cards as CHARX masters...`);
+    setMessage(`Saving ${paths.length} selected cards into the local library...`);
 
     const result = await importFolderCardsAsCharx(paths);
     setIsImporting(false);
@@ -109,7 +109,7 @@ export function FolderIntakeReview({
     if (result.ok && result.result) {
       onImported();
       setMessage(
-        `Saved ${result.result.imported_count} CHARX masters. ${
+        `Saved ${result.result.imported_count} library cards. ${
           result.result.errors.length
             ? `${result.result.errors.length} files need review.`
             : "Library cache refreshed."
@@ -143,8 +143,8 @@ export function FolderIntakeReview({
             Folder Intake Review
           </h2>
           <p className="mt-1 max-w-2xl text-sm text-zinc-500">
-            Scan a folder, review what is ready, then save selected cards as
-            CHARX masters. PNG remains the compatibility export.
+            Scan a folder, review what is ready, then save selected cards into
+            the local library. PNG/CCV3 remains the primary card format.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">

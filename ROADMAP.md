@@ -28,8 +28,8 @@ engineering sequence remains in [`PLAN.md`](PLAN.md).
   variants, copy actions, lore panels, and runtime diagnostics.
 - Stabilize the chat runtime around deterministic context compilation,
   relationship state, lore activation, context guards, and provider streaming.
-- Keep CCV3/PNG/JSON/CHARX import-export reliable while CHARX remains the
-  native master format.
+- Keep CCV3 PNG import/export reliable as the primary character-card path,
+  with CHARX and JSON limited to bundle/archive/debug workflows.
 - Continue making generated scenario, persona, lorebook, and relationship state
   assets editable instead of one-shot output.
 
@@ -47,8 +47,8 @@ engineering sequence remains in [`PLAN.md`](PLAN.md).
      matrices as primary UX.
 
 3. **Asset model convergence**
-   - Reuse the same normalized model across character cards, personas,
-     scenarios, lorebooks, bundles, and chat sessions.
+   - Reuse the same normalized model across character-card PNGs, personas,
+     scenarios, lorebooks, archives, and chat sessions.
    - Keep JSON as export/debug infrastructure, not the main editing surface.
 
 4. **Local-first persistence**

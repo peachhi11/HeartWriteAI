@@ -1,11 +1,9 @@
 "use client";
 
-import Link from "next/link";
-import { type ReactNode, useRef, useState, useSyncExternalStore } from "react";
+import { useRef, useState } from "react";
 import {
   FileUp,
   PanelLeftOpen,
-  Save,
   Sparkles,
   UserRoundPlus,
   X,
@@ -17,7 +15,6 @@ import { DevToolsPanel } from "@/components/dev-tools-panel";
 import DropZoneOverlay from "@/components/DropZoneOverlay";
 import ExpressionManager from "@/components/expression-manager";
 import { FolderIntakeReview } from "@/components/folder-intake-review";
-import { SecureCardPasswordModal } from "@/components/secure-card-password-modal";
 import { StudioShell } from "@/components/studio-shell";
 import StructuredCardEditor from "@/components/structured-card-editor";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,21 +25,27 @@ import { savePersonaLibraryItem } from "@/hooks/usePersonaLibrary";
 import { createPersonaArtifactFromCharacterCard } from "@/features/generation/workflows";
 import { downloadUint8Array } from "@/lib/browser/downloadUint8Array";
 import { importBrowserCharacterCardFile } from "@/lib/character-card/importBrowserCharacterCardFile";
+import { createCharacterCardV3Export } from "@/lib/character-card/createCharacterCardV3Export";
 import {
   createBlankDraftCharacterCard,
   createDraftCharacterCardFromIntake,
 } from "@/lib/character-card/createDraftCharacterCard";
+import { importCharacterCardPngData } from "@/lib/character-card/importCharacterCardPngData";
 import { scrubCardForPublicExport } from "@/lib/character-card/exportPrivacyScrubber";
 import { writeCharacterCardToPng } from "@/lib/character-card/writeCharacterCardToPng";
 import { ExpressionSprite } from "@/types/character-card/ExpressionSprite";
+import { CharacterCardV3Schema } from "@/types/character-card/CharacterCardV3Schema";
 import { ValidatedCharacterCardV3 } from "@/types/ccv3";
 
-type CharacterWorkflowMode = "edit" | "intake" | "create";
 type StarterFieldKey =
   | "name"
   | "basicInfo"
   | "appearance"
+  | "visualSeeds"
   | "personality"
+  | "personalitySeeds"
+  | "background"
+  | "relationshipDynamic"
   | "scenario"
   | "firstMessage";
 
@@ -51,127 +54,243 @@ const starterFieldDefinitions: Array<{
   label: string;
   placeholder: string;
   rows?: number;
+  section: "core" | "vibe" | "relationship" | "opening";
 }> = [
   {
     key: "name",
     label: "Name",
     placeholder: "Magnus Vanderbilt",
+    section: "core",
   },
   {
     key: "basicInfo",
     label: "Basic info",
     placeholder: "Age, role, gender/pronouns, location, occupation...",
     rows: 3,
+    section: "core",
   },
   {
     key: "appearance",
     label: "Appearance",
     placeholder: "Height, build, hair, eyes, style, notable physical details...",
     rows: 3,
+    section: "vibe",
+  },
+  {
+    key: "visualSeeds",
+    label: "Visual seed vocabulary",
+    placeholder: "wavy hair, soft jaw, vintage tailoring, silver rings...",
+    rows: 2,
+    section: "vibe",
   },
   {
     key: "personality",
     label: "Personality",
     placeholder: "Core traits, wounds, habits, voice, behavior patterns...",
     rows: 3,
+    section: "vibe",
+  },
+  {
+    key: "personalitySeeds",
+    label: "Soul sketch seeds",
+    placeholder: "guarded, dry humor, secretly sentimental, observant...",
+    rows: 2,
+    section: "vibe",
+  },
+  {
+    key: "background",
+    label: "Formative memory",
+    placeholder: "The past moment, wound, triumph, or private ritual that shaped them...",
+    rows: 3,
+    section: "relationship",
+  },
+  {
+    key: "relationshipDynamic",
+    label: "Relationship dynamic",
+    placeholder: "caretaker, rivals, forbidden, complement, friction...",
+    rows: 2,
+    section: "relationship",
   },
   {
     key: "scenario",
     label: "Scenario",
     placeholder: "{{user}} walks into his office after everyone else has gone home.",
     rows: 3,
+    section: "relationship",
   },
   {
     key: "firstMessage",
     label: "First message",
     placeholder: "\"You weren't supposed to see this.\"",
     rows: 3,
+    section: "opening",
   },
 ];
 
 const emptyStarterFields: Record<StarterFieldKey, string> = {
   appearance: "",
   basicInfo: "",
+  background: "",
   firstMessage: "",
   name: "",
   personality: "",
+  personalitySeeds: "",
+  relationshipDynamic: "",
   scenario: "",
+  visualSeeds: "",
+};
+
+const starterSections: Array<{
+  description: string;
+  id: "core" | "vibe" | "relationship" | "opening";
+  label: string;
+}> = [
+  {
+    id: "core",
+    label: "Core identity",
+    description: "Name, role, basic facts, and the simplest version of who they are.",
+  },
+  {
+    id: "vibe",
+    label: "Look, aura, and soul",
+    description: "Appearance, aesthetic, personality, and distinctive texture.",
+  },
+  {
+    id: "relationship",
+    label: "History and dynamic",
+    description: "Past shaping moments, relationship pressure, and the active scene.",
+  },
+  {
+    id: "opening",
+    label: "Opening hook",
+    description: "The first message that gives the player something irresistible to answer.",
+  },
+];
+
+const creatorTemplates = [
+  {
+    id: "slow_burn_rivals",
+    label: "Slow Burn Rivals",
+    values: {
+      personalitySeeds: "competitive, observant, proud, secretly protective",
+      relationshipDynamic: "rivals with mutual respect, friction, unresolved attraction",
+      scenario:
+        "{{char}} and {{user}} are forced to work together after a public disagreement makes backing out impossible.",
+      firstMessage:
+        "*{{char}} looks up from the file with a measured, unimpressed stare.* \"Try to keep up. I would hate for this to be embarrassing for both of us.\"",
+    },
+  },
+  {
+    id: "caretaker_pull",
+    label: "Caretaker Pull",
+    values: {
+      personalitySeeds: "controlled, gentle under pressure, stubbornly attentive",
+      relationshipDynamic: "caretaker tension, reluctant vulnerability, protective friction",
+      scenario:
+        "{{user}} arrives hurt or exhausted, and {{char}} has to choose between emotional distance and immediate care.",
+      firstMessage:
+        "*{{char}} closes the door with more force than necessary, eyes dropping to the state of you.* \"Sit down before you make that worse.\"",
+    },
+  },
+  {
+    id: "forbidden_alliance",
+    label: "Forbidden Alliance",
+    values: {
+      personalitySeeds: "disciplined, watchful, loyal to a fault, tempted by defiance",
+      relationshipDynamic: "forbidden, high-stakes trust, public distance and private honesty",
+      scenario:
+        "{{char}} and {{user}} should not be alone together, but the situation leaves them with no safer option.",
+      firstMessage:
+        "*The lock clicks behind you. {{char}} does not move away.* \"Whatever happens next, you were never here. Do you understand me?\"",
+    },
+  },
+  {
+    id: "soft_complement",
+    label: "Soft Complement",
+    values: {
+      personalitySeeds: "warm, grounded, quietly funny, steady when others spiral",
+      relationshipDynamic: "complement, safe honesty, mutual support, gentle chemistry",
+      scenario:
+        "{{char}} notices {{user}} trying to hide a bad day and decides not to let them disappear into it.",
+      firstMessage:
+        "*{{char}} sets a cup down beside you without making a performance of it.* \"You do not have to talk. But you do have to stop pretending I cannot tell.\"",
+    },
+  },
+];
+
+const seedVocabulary = {
+  appearance: [
+    "wavy hair",
+    "soft jaw",
+    "sharp cheekbones",
+    "sleepy eyes",
+    "sun-warmed skin",
+    "ink-stained fingers",
+    "tailored coat",
+    "silver rings",
+    "old scar",
+    "restless hands",
+  ],
+  personality: [
+    "guarded",
+    "dry humor",
+    "secretly sentimental",
+    "fiercely competent",
+    "hyper-observant",
+    "gentle but stubborn",
+    "dangerously charming",
+    "principled",
+    "touch-starved",
+    "quietly intense",
+  ],
+  relationship: [
+    "complement",
+    "friction",
+    "forbidden",
+    "rivals",
+    "caretaker",
+    "mentor tension",
+    "second chance",
+    "protective distance",
+    "fake alliance",
+    "slow burn",
+  ],
 };
 
 const MAX_BROWSER_PNG_SHELL_BYTES = 20 * 1024 * 1024;
 
-const characterWorkflowSteps: Array<{
-  description: string;
-  href: string;
-  icon: typeof FileUp;
-  mode: CharacterWorkflowMode;
-  title: string;
-}> = [
-  {
-    title: "Create / Intake",
-    description: "Import, start blank, or route messy notes to a profile.",
-    href: "/workspace?mode=create",
-    icon: UserRoundPlus,
-    mode: "create",
-  },
-  {
-    title: "Edit / Review",
-    description: "Apply change notes and review the active character card.",
-    href: "/workspace?mode=intake",
-    icon: Sparkles,
-    mode: "intake",
-  },
-  {
-    title: "Finalize / Export",
-    description: "Review final card state and choose save/export format.",
-    href: "/workspace?mode=edit",
-    icon: FileUp,
-    mode: "edit",
-  },
-];
+interface PendingPngMetadataChoice {
+  blankCard: ValidatedCharacterCardV3;
+  filePath: string;
+  sourcePngData: Uint8Array | null;
+  storedCard: ValidatedCharacterCardV3;
+}
 
 export default function WorkspacePage() {
-  const workflowMode = useSyncExternalStore(
-    subscribeToWorkflowModeChanges,
-    readWorkflowMode,
-    () => "edit" as CharacterWorkflowMode,
-  );
   const [activeCard, setActiveCard] =
     useState<ValidatedCharacterCardV3 | null>(null);
   const [workspaceMessage, setWorkspaceMessage] = useState<string | null>(null);
   const [currentFilePath, setCurrentFilePath] = useState<string | null>(null);
   const [browserSourcePngData, setBrowserSourcePngData] =
     useState<Uint8Array | null>(null);
-  const [messyIntakeText, setMessyIntakeText] = useState("");
-  const [messyIntakeMessage, setMessyIntakeMessage] = useState<string | null>(
-    null,
-  );
-  const [starterFields, setStarterFields] =
-    useState<Record<StarterFieldKey, string>>(emptyStarterFields);
   const [editNotesText, setEditNotesText] = useState("");
   const [editNotesMessage, setEditNotesMessage] = useState<string | null>(null);
   const [selectedExpression, setSelectedExpression] =
     useState<ExpressionSprite | null>(null);
   const [libraryOpen, setLibraryOpen] = useState(false);
-  const [secureCardAction, setSecureCardAction] =
-    useState<"export" | "import" | null>(null);
-  const [secureCardStatus, setSecureCardStatus] = useState<string | null>(null);
-  const [isSecureCardBusy, setIsSecureCardBusy] = useState(false);
+  const [pendingMetadataChoice, setPendingMetadataChoice] =
+    useState<PendingPngMetadataChoice | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const browserImportInputRef = useRef<HTMLInputElement | null>(null);
-  const browserPngShellInputRef = useRef<HTMLInputElement | null>(null);
   const library = useCardLibrary(12);
   const { importCardFromPath, saveCard, saveWorkspaceChanges } =
     useCharacterLibrary();
   const {
     isDesktopRuntime,
     triggerCharxExport,
+    triggerCharacterFileSelect,
     triggerFolderIntakeSelect,
-    triggerPngShellImport,
     triggerPngMetadataSave,
-    triggerSecureCardExport,
-    triggerSecureCardImport,
-    triggerUniversalImport,
   } = useFileDialogs();
   const canSavePngMetadata = currentFilePath
     ? /\.(apng|png)$/i.test(currentFilePath)
@@ -197,6 +316,9 @@ export default function WorkspacePage() {
       handleCardLoaded(result.card, filePath);
       setWorkspaceMessage(`Loaded ${result.card.data.name} from ${filePath}.`);
     } else {
+      if (isMissingFilePathMessage(result.error)) {
+        await library.removePath(filePath);
+      }
       setWorkspaceMessage(result.error ?? `Could not load ${filePath}.`);
     }
   }
@@ -268,13 +390,12 @@ export default function WorkspacePage() {
       return;
     }
 
-    const result = await triggerUniversalImport();
-    if (!result) {
+    const selectedPath = await triggerCharacterFileSelect();
+    if (!selectedPath) {
       return;
     }
 
-    handleCardLoaded(result.card, result.path, null);
-    setWorkspaceMessage(`Loaded ${result.card.data.name} from ${result.path}.`);
+    await handleDesktopSelectedCharacterFile(selectedPath);
   }
 
   function handleImportCardClick() {
@@ -286,23 +407,6 @@ export default function WorkspacePage() {
     browserImportInputRef.current?.click();
   }
 
-  async function handleImportPngShellClick() {
-    if (isDesktopRuntime) {
-      const result = await triggerPngShellImport();
-      if (!result) {
-        return;
-      }
-
-      handleCardLoaded(result.card, result.path, null);
-      setWorkspaceMessage(
-        `Started a blank draft using ${result.path} as the PNG shell.`,
-      );
-      return;
-    }
-
-    browserPngShellInputRef.current?.click();
-  }
-
   async function handleBrowserImportFile(file: File | null) {
     if (!file) {
       return;
@@ -311,6 +415,11 @@ export default function WorkspacePage() {
     setWorkspaceMessage(`Loading ${file.name}...`);
 
     try {
+      if (isBrowserPngFile(file)) {
+        await handleBrowserPngCharacterFile(file);
+        return;
+      }
+
       const result = await importBrowserCharacterCardFile(file);
       handleCardLoaded(result.card, result.path, result.sourcePngData);
       setWorkspaceMessage(`Loaded ${result.card.data.name} from ${result.path}.`);
@@ -319,40 +428,75 @@ export default function WorkspacePage() {
     }
   }
 
-  async function handleBrowserPngShellFile(file: File | null) {
-    if (!file) {
+  async function handleDesktopSelectedCharacterFile(filePath: string) {
+    if (isPngPath(filePath)) {
+      const result = await importCardFromPath(filePath);
+      if (result.card) {
+        setPendingMetadataChoice({
+          blankCard: createBlankDraftCharacterCard(filePath),
+          filePath,
+          sourcePngData: null,
+          storedCard: result.card,
+        });
+        setWorkspaceMessage(
+          "This PNG contains stored character-card data. Choose whether to import it or use the image only.",
+        );
+        return;
+      }
+
+      if (isMissingCardMetadataMessage(result.error)) {
+        const blankCard = createBlankDraftCharacterCard(filePath);
+        handleCardLoaded(blankCard, filePath, null);
+        setWorkspaceMessage(`Started a blank character using ${filePath} as the portrait.`);
+        return;
+      }
+
+      setWorkspaceMessage(result.error ?? `Could not read ${filePath}.`);
       return;
     }
 
-    const normalizedName = file.name.toLowerCase();
-    const isPngShell =
-      normalizedName.endsWith(".png") ||
-      normalizedName.endsWith(".apng") ||
-      file.type === "image/png" ||
-      file.type === "image/apng";
-
-    if (!isPngShell) {
-      setWorkspaceMessage("Choose a PNG or APNG image to use as the card shell.");
-      return;
+    const result = await importCardFromPath(filePath);
+    if (result.card) {
+      handleCardLoaded(result.card, filePath, null);
+      setWorkspaceMessage(`Loaded ${result.card.data.name} from ${filePath}.`);
+    } else {
+      setWorkspaceMessage(result.error ?? `Could not load ${filePath}.`);
     }
+  }
 
+  async function handleBrowserPngCharacterFile(file: File) {
     if (file.size > MAX_BROWSER_PNG_SHELL_BYTES) {
       setWorkspaceMessage(
-        "PNG shell is too large for browser import. Use the desktop app for oversized images.",
+        "PNG is too large for browser import. Use the desktop app for oversized images.",
       );
       return;
     }
 
-    try {
-      const pngData = new Uint8Array(await file.arrayBuffer());
-      const draft = createBlankDraftCharacterCard(file.name);
+    const pngData = new Uint8Array(await file.arrayBuffer());
+    const blankCard = createBlankDraftCharacterCard(file.name);
 
-      handleCardLoaded(draft, file.name, pngData);
+    try {
+      const importedData = importCharacterCardPngData(file.name, pngData);
+      const storedCard = CharacterCardV3Schema.parse(
+        createCharacterCardV3Export(importedData.card),
+      );
+
+      setPendingMetadataChoice({
+        blankCard,
+        filePath: file.name,
+        sourcePngData: pngData,
+        storedCard,
+      });
       setWorkspaceMessage(
-        `Started a blank draft using ${file.name} as the PNG shell.`,
+        "This PNG contains stored character-card data. Choose whether to import it or use the image only.",
       );
     } catch (error) {
-      setWorkspaceMessage(error instanceof Error ? error.message : String(error));
+      if (!isMissingBrowserCardMetadataError(error)) {
+        throw error;
+      }
+
+      handleCardLoaded(blankCard, file.name, pngData);
+      setWorkspaceMessage(`Started a blank character using ${file.name} as the portrait.`);
     }
   }
 
@@ -430,42 +574,6 @@ export default function WorkspacePage() {
     setWorkspaceMessage(`Downloaded ${fileName}.`);
   }
 
-  async function handleSecureCardPasswordSubmit(password: string) {
-    if (!secureCardAction || !isDesktopRuntime) {
-      return;
-    }
-
-    setIsSecureCardBusy(true);
-    setSecureCardStatus(null);
-
-    try {
-      if (secureCardAction === "export") {
-        if (!activeCard) {
-          setSecureCardStatus("Open or create a character before exporting.");
-          return;
-        }
-
-        const savedPath = await triggerSecureCardExport(activeCard, password);
-        if (savedPath) {
-          setSecureCardAction(null);
-          setWorkspaceMessage(`Exported encrypted HeartWriteAI card to ${savedPath}.`);
-        }
-        return;
-      }
-
-      const result = await triggerSecureCardImport(password);
-      if (result) {
-        handleCardLoaded(result.card, result.path, null);
-        setSecureCardAction(null);
-        setWorkspaceMessage(`Imported encrypted HeartWriteAI card from ${result.path}.`);
-      }
-    } catch (error) {
-      setSecureCardStatus(error instanceof Error ? error.message : String(error));
-    } finally {
-      setIsSecureCardBusy(false);
-    }
-  }
-
   async function handleConvertActiveCardToPersona() {
     if (!activeCard) {
       return;
@@ -478,17 +586,7 @@ export default function WorkspacePage() {
     );
   }
 
-  function handleRouteMessyIntake() {
-    const starterIntakeText = createStarterIntakeText(starterFields);
-    const combinedIntakeText = joinDefined([messyIntakeText, starterIntakeText]);
-
-    if (!combinedIntakeText.trim()) {
-      setMessyIntakeMessage(
-        "Paste rough character notes or fill at least one starter field before creating a character profile.",
-      );
-      return;
-    }
-
+  function handleRouteCharacterIntake(combinedIntakeText: string) {
     const result = createDraftCharacterCardFromIntake({
       currentCard: activeCard,
       intakeText: combinedIntakeText,
@@ -497,16 +595,15 @@ export default function WorkspacePage() {
 
     setActiveCard(result.card);
     setSelectedExpression(null);
-    setMessyIntakeMessage(
-      result.routedFieldNames.length
-        ? `Routed ${result.routedFieldNames.length} fields into the character draft.`
-        : "Started an editable blank character draft.",
-    );
     setWorkspaceMessage(
       activeCard
         ? "Merged messy intake into the active character card."
         : "Created an editable character card draft from messy intake.",
     );
+
+    return result.routedFieldNames.length
+      ? `Routed ${result.routedFieldNames.length} fields into the character draft.`
+      : "Started an editable blank character draft.";
   }
 
   function handleApplyEditNotes() {
@@ -616,17 +713,6 @@ export default function WorkspacePage() {
               >
                 Export CHARX...
               </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setSecureCardStatus(null);
-                  setSecureCardAction("export");
-                }}
-                className="hidden rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted md:inline-flex"
-                title="Export a password-encrypted HeartWriteAI-only .hwcard file."
-              >
-                Export Secure
-              </button>
             </>
           ) : null}
           {activeCard && !isDesktopRuntime ? (
@@ -658,31 +744,41 @@ export default function WorkspacePage() {
       }
     >
       <div className="relative grid gap-5">
-        {secureCardAction ? (
-          <SecureCardPasswordModal
-            isBusy={isSecureCardBusy}
-            isOpen
-            mode={secureCardAction}
-            onCancel={() => {
-              if (!isSecureCardBusy) {
-                setSecureCardAction(null);
-                setSecureCardStatus(null);
-              }
-            }}
-            onSubmit={(password) => void handleSecureCardPasswordSubmit(password)}
-            statusMessage={secureCardStatus}
-          />
-        ) : null}
-
         <DropZoneOverlay
           onAssetTranscoded={(filePath) =>
             setWorkspaceMessage(`Converted image asset to ${filePath}.`)
           }
           onCardParsed={(parsed, filePath, sourcePngData) => {
+            if (isPngPath(filePath)) {
+              if (isDraftPngShellCard(parsed)) {
+                handleCardLoaded(parsed, filePath, sourcePngData ?? null);
+                setWorkspaceMessage(
+                  `Started a blank character using ${filePath} as the portrait.`,
+                );
+                return;
+              }
+
+              setPendingMetadataChoice({
+                blankCard: createBlankDraftCharacterCard(filePath),
+                filePath,
+                sourcePngData: sourcePngData ?? null,
+                storedCard: parsed,
+              });
+              setWorkspaceMessage(
+                "This PNG contains stored character-card data. Choose whether to import it or use the image only.",
+              );
+              return;
+            }
+
             handleCardLoaded(parsed, filePath, sourcePngData ?? null);
             setWorkspaceMessage(null);
           }}
           onDropError={setWorkspaceMessage}
+          onImageOnlyPng={(filePath, sourcePngData) => {
+            const blankCard = createBlankDraftCharacterCard(filePath);
+            handleCardLoaded(blankCard, filePath, sourcePngData ?? null);
+            setWorkspaceMessage(`Started a blank character using ${filePath} as the portrait.`);
+          }}
         />
 
         <input
@@ -692,17 +788,6 @@ export default function WorkspacePage() {
           className="sr-only"
           onChange={(event) => {
             void handleBrowserImportFile(event.currentTarget.files?.[0] ?? null);
-            event.currentTarget.value = "";
-          }}
-        />
-
-        <input
-          ref={browserPngShellInputRef}
-          type="file"
-          accept=".png,.apng,image/png,image/apng"
-          className="sr-only"
-          onChange={(event) => {
-            void handleBrowserPngShellFile(event.currentTarget.files?.[0] ?? null);
             event.currentTarget.value = "";
           }}
         />
@@ -740,6 +825,36 @@ export default function WorkspacePage() {
           </div>
         ) : null}
 
+        {pendingMetadataChoice ? (
+          <PngMetadataChoiceModal
+            filePath={pendingMetadataChoice.filePath}
+            storedCardName={pendingMetadataChoice.storedCard.data.name}
+            onCancel={() => setPendingMetadataChoice(null)}
+            onUseImageOnly={() => {
+              handleCardLoaded(
+                pendingMetadataChoice.blankCard,
+                pendingMetadataChoice.filePath,
+                pendingMetadataChoice.sourcePngData,
+              );
+              setWorkspaceMessage(
+                `Started a blank character using ${pendingMetadataChoice.filePath} as the portrait.`,
+              );
+              setPendingMetadataChoice(null);
+            }}
+            onUseStoredCharacter={() => {
+              handleCardLoaded(
+                pendingMetadataChoice.storedCard,
+                pendingMetadataChoice.filePath,
+                pendingMetadataChoice.sourcePngData,
+              );
+              setWorkspaceMessage(
+                `Imported ${pendingMetadataChoice.storedCard.data.name} from stored PNG metadata.`,
+              );
+              setPendingMetadataChoice(null);
+            }}
+          />
+        ) : null}
+
         <div className="min-w-0 space-y-6">
           {workspaceMessage ? (
             <p className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-400">
@@ -747,329 +862,168 @@ export default function WorkspacePage() {
             </p>
           ) : null}
 
-          <section className="grid gap-3 lg:grid-cols-3">
-            {characterWorkflowSteps.map((step, index) => (
-              <Link
-                key={step.mode}
-                href={step.href}
-                onClick={() => {
-                  window.setTimeout(() => {
-                    window.dispatchEvent(new Event("heartwriteai:workflow-mode"));
-                  }, 0);
+          <section className="grid gap-5 xl:grid-cols-[minmax(22rem,0.72fr)_minmax(0,1fr)]">
+            <div className="grid gap-5">
+              <div className="liquid-glass-strong grid gap-4 rounded-[1.75rem] border p-5">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                      Character portrait
+                    </p>
+                    <h2 className="mt-2 text-2xl font-semibold tracking-tight">
+                      Upload art, then write the card.
+                    </h2>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                      PNGs with CCV2 or CCV3 data ask whether to import the
+                      stored character. Plain PNGs become a blank portrait shell.
+                    </p>
+                  </div>
+                  <span className="liquid-icon flex size-12 shrink-0 items-center justify-center rounded-2xl text-muted-foreground">
+                    <FileUp className="size-5" />
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={handleImportCardClick}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700"
+                  >
+                    <FileUp className="size-4" />
+                    Upload PNG or Card
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleStartBlankDraft}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted"
+                  >
+                    <UserRoundPlus className="size-4" />
+                    Blank Character
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLibraryOpen(true)}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted"
+                  >
+                    <PanelLeftOpen className="size-4" />
+                    Library
+                  </button>
+                </div>
+              </div>
+
+              <CharacterLibraryWorkspace
+                activeCard={activeCard}
+                currentFilePath={currentFilePath}
+                library={library}
+                onCardSelect={(filePath) => {
+                  void handleCardSelect(filePath);
                 }}
-                className="group block"
-                aria-current={workflowMode === step.mode ? "page" : undefined}
-              >
-                <div
-                  className={[
-                    "liquid-glass h-full rounded-[1.5rem] border p-4 transition duration-200 group-hover:-translate-y-0.5 group-hover:shadow-xl",
-                    workflowMode === step.mode
-                      ? "ring-1 ring-[color:var(--liquid-accent)]"
-                      : "",
-                  ].join(" ")}
-                >
-                  <div className="mb-4 flex items-center gap-3">
-                    <span className="liquid-icon flex size-11 items-center justify-center rounded-2xl text-muted-foreground">
-                      <step.icon className="size-5" />
-                    </span>
-                    <span className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                      Step {index + 1}
-                    </span>
-                  </div>
-                  <h2 className="text-lg font-semibold">{step.title}</h2>
-                  <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                    {step.description}
-                  </p>
-                </div>
-              </Link>
-            ))}
-          </section>
+                onConvertToPersona={() => {
+                  void handleConvertActiveCardToPersona();
+                }}
+                onOpenLibraryDrawer={() => setLibraryOpen(true)}
+                sourcePngData={browserSourcePngData}
+                variant="compact"
+              />
+            </div>
 
-          <section className="grid items-stretch gap-5 lg:grid-cols-3">
-            <WorkflowPanel
-              active={workflowMode === "create"}
-              eyebrow="Step 1"
-              icon={<UserRoundPlus className="size-4" />}
-              title="Create / Intake"
-            >
-              <div className="flex h-full flex-col gap-4">
-                <div className="grid gap-2 text-sm text-muted-foreground">
-                  <p>
-                    Paste messy character material or start with a blank draft.
-                    Import a PNG shell when you want an empty card image to
-                    become the finished character card.
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    <button
-                      type="button"
-                      onClick={() => void handleImportPngShellClick()}
-                      className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted"
-                      title="Import a PNG or APNG image as the shell for a new editable character card."
-                    >
-                      <FileUp className="size-3.5" />
-                      Import PNG Shell
-                    </button>
-                    {isDesktopRuntime ? (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setSecureCardStatus(null);
-                          setSecureCardAction("import");
-                        }}
-                        className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted"
-                        title="Import a password-encrypted HeartWriteAI-only .hwcard file."
-                      >
-                        <FileUp className="size-3.5" />
-                        Import Secure
-                      </button>
-                    ) : null}
-                    <button
-                      type="button"
-                      onClick={handleStartBlankDraft}
-                      className="inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted"
-                    >
-                      <UserRoundPlus className="size-3.5" />
-                      Blank Draft
-                    </button>
-                  </div>
-                </div>
-
-                <div className="grid gap-2">
-                  <label className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                    Messy intake notes
-                  </label>
-                  <Textarea
-                    value={messyIntakeText}
-                    placeholder="Name, age, appearance, wants, fears, background, relationships, scenario, first message..."
-                    className="min-h-44 resize-y"
-                    onChange={(event) =>
-                      setMessyIntakeText(event.currentTarget.value)
-                    }
-                  />
-                  <details className="rounded-xl border bg-background/45 p-3">
-                    <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                      Optional structured starter fields
-                    </summary>
-                    <div className="mt-3 grid gap-3">
-                      {starterFieldDefinitions.map((field) => (
-                        <label key={field.key} className="grid gap-1.5">
-                          <span className="text-xs font-semibold text-muted-foreground">
-                            {field.label}
-                          </span>
-                          {field.rows ? (
-                            <Textarea
-                              value={starterFields[field.key]}
-                              placeholder={field.placeholder}
-                              className="min-h-20 resize-y text-sm"
-                              onChange={(event) =>
-                                setStarterFields((current) => ({
-                                  ...current,
-                                  [field.key]: event.currentTarget.value,
-                                }))
-                              }
-                            />
-                          ) : (
-                            <input
-                              value={starterFields[field.key]}
-                              placeholder={field.placeholder}
-                              className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none transition focus:border-[color:var(--liquid-accent)]"
-                              onChange={(event) =>
-                                setStarterFields((current) => ({
-                                  ...current,
-                                  [field.key]: event.currentTarget.value,
-                                }))
-                              }
-                            />
-                          )}
-                        </label>
-                      ))}
-                    </div>
-                  </details>
-                  <button
-                    type="button"
-                    onClick={handleRouteMessyIntake}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700"
-                  >
-                    <Sparkles className="size-4" />
-                    Route to Profile
-                  </button>
-                  {messyIntakeMessage ? (
-                    <p className="text-xs text-muted-foreground">
-                      {messyIntakeMessage}
-                    </p>
-                  ) : null}
-                </div>
-
-                <details className="mt-auto rounded-xl border bg-background/45 p-3">
-                  <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                    Batch folder intake
-                  </summary>
-                  <div className="mt-3">
-                    <FolderIntakeReview
-                      isDesktopRuntime={isDesktopRuntime}
-                      onChooseFolder={triggerFolderIntakeSelect}
-                      onImported={library.refresh}
-                    />
-                  </div>
-                </details>
+            <div className="liquid-glass-strong grid gap-4 rounded-[1.75rem] border p-5">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                  Character sketch
+                </p>
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight">
+                  One-page creator
+                </h2>
+                <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                  Fill only what you know. Routing merges these fields into the
+                  active card or creates a new blank draft.
+                </p>
               </div>
-            </WorkflowPanel>
-
-            <WorkflowPanel
-              active={workflowMode === "intake"}
-              eyebrow="Step 2"
-              icon={<Sparkles className="size-4" />}
-              title="Edit / Review"
-            >
-              <div className="flex h-full flex-col gap-4">
-                <div className="grid gap-2">
-                  <label className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                    Edit notes for active card
-                  </label>
-                  <Textarea
-                    value={editNotesText}
-                    placeholder="Change age to 29. Update scenario. Add creator notes. Rewrite personality as..."
-                    className="min-h-36 resize-y"
-                    onChange={(event) =>
-                      setEditNotesText(event.currentTarget.value)
-                    }
-                  />
-                  <button
-                    type="button"
-                    onClick={handleApplyEditNotes}
-                    className="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700"
-                  >
-                    <Sparkles className="size-4" />
-                    Apply Edit Notes
-                  </button>
-                  {editNotesMessage ? (
-                    <p className="text-xs text-muted-foreground">
-                      {editNotesMessage}
-                    </p>
-                  ) : null}
-                </div>
-
-                <div className="rounded-xl border bg-background/55 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
-                    Active review
-                  </p>
-                  <h3 className="mt-2 text-xl font-semibold">
-                    {activeCard?.data.name ?? "No character loaded"}
-                  </h3>
-                  <p className="mt-2 line-clamp-6 text-sm leading-6 text-muted-foreground">
-                    {activeCard?.data.description?.trim() ||
-                      activeCard?.data.personality?.trim() ||
-                      "Import, create, or select a card to review the generated profile."}
-                  </p>
-                  <p className="mt-4 text-xs text-muted-foreground">
-                    The full profile editor opens directly below this workflow.
-                  </p>
-                </div>
-              </div>
-            </WorkflowPanel>
-
-            <WorkflowPanel
-              active={workflowMode === "edit"}
-              eyebrow="Step 3"
-              icon={<Save className="size-4" />}
-              title="Finalize / Export"
-            >
-              <div className="flex h-full flex-col gap-4">
-                <div className="rounded-xl border bg-background/55 p-4 text-sm text-muted-foreground">
-                  <p className="text-xs font-semibold uppercase tracking-[0.16em]">
-                    Final card
-                  </p>
-                  <h3 className="mt-2 text-xl font-semibold text-foreground">
-                    {activeCard?.data.name ?? "No final card yet"}
-                  </h3>
-                  <p className="mt-2">
-                    {currentFilePath ?? "Unsaved draft. Save a master or export a copy when ready."}
-                  </p>
-                </div>
-
-                <div className="mt-auto grid gap-2 rounded-xl border bg-background/45 p-4 text-sm">
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-muted-foreground">Card data</span>
-                    <span className={activeCard ? "font-semibold text-emerald-400" : "font-semibold text-muted-foreground"}>
-                      {activeCard ? "Ready" : "Missing"}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-muted-foreground">PNG source</span>
-                    <span className={canSavePngMetadata || browserSourcePngData ? "font-semibold text-emerald-400" : "font-semibold text-muted-foreground"}>
-                      {canSavePngMetadata || browserSourcePngData ? "Available" : "Optional"}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="text-muted-foreground">Export actions</span>
-                    <span className="font-semibold text-muted-foreground">
-                      Top row
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </WorkflowPanel>
-          </section>
-
-          <section
-            className={
-              activeCard
-                ? "grid gap-5 xl:grid-cols-[minmax(22rem,0.82fr)_minmax(0,1fr)]"
-                : "grid gap-5"
-            }
-          >
-            <CharacterLibraryWorkspace
-              activeCard={activeCard}
-              currentFilePath={currentFilePath}
-              library={library}
-              onCardSelect={(filePath) => {
-                void handleCardSelect(filePath);
-              }}
-              onConvertToPersona={() => {
-                void handleConvertActiveCardToPersona();
-              }}
-              onOpenLibraryDrawer={() => setLibraryOpen(true)}
-              sourcePngData={browserSourcePngData}
-              variant="compact"
-            />
-
-            <div className="min-w-0 rounded-[1.75rem] border bg-card/65 p-4">
-              <div className="mb-4 flex items-center gap-3">
-                <span className="liquid-icon flex size-10 items-center justify-center rounded-2xl text-muted-foreground">
-                  <Sparkles className="size-4" />
-                </span>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                    Step 2 Workspace
-                  </p>
-                  <h2 className="text-xl font-semibold tracking-tight">
-                    Profile Editor
-                  </h2>
-                </div>
-              </div>
-
-              {activeCard ? (
-                <StructuredCardEditor
-                  activeCard={activeCard}
-                  setActiveCard={setActiveCard}
-                />
-              ) : (
-                <div className="flex min-h-64 flex-col justify-center rounded-lg border border-dashed border-zinc-800 bg-zinc-900/20 p-6 text-center">
-                  {currentFilePath ? (
-                    <p className="font-mono text-xs text-zinc-400">
-                      Cached selection: {currentFilePath}
-                    </p>
-                  ) : (
-                    <p className="text-sm text-zinc-500">
-                      Import, create, or select a PNG/JSON character card to
-                      begin editing. CHARX and image-asset drops are available
-                      in the desktop app.
-                    </p>
-                  )}
-                </div>
-              )}
+              <CharacterIntakeComposer onRoute={handleRouteCharacterIntake} />
             </div>
           </section>
+
+          <details className="rounded-[1.5rem] border bg-card/65 p-4">
+            <summary className="cursor-pointer text-sm font-semibold">
+              Advanced CCV3 editor and batch tools
+            </summary>
+            <div className="mt-5 grid gap-5">
+              <div className="grid gap-5 xl:grid-cols-[minmax(0,1fr)_minmax(18rem,0.42fr)]">
+                <div className="min-w-0 rounded-[1.25rem] border bg-background/45 p-4">
+                  <div className="mb-4 flex items-center gap-3">
+                    <span className="liquid-icon flex size-10 items-center justify-center rounded-2xl text-muted-foreground">
+                      <Sparkles className="size-4" />
+                    </span>
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                        Full card fields
+                      </p>
+                      <h2 className="text-xl font-semibold tracking-tight">
+                        Profile Editor
+                      </h2>
+                    </div>
+                  </div>
+
+                  {activeCard ? (
+                    <StructuredCardEditor
+                      activeCard={activeCard}
+                      setActiveCard={setActiveCard}
+                    />
+                  ) : (
+                    <div className="flex min-h-64 flex-col justify-center rounded-lg border border-dashed border-zinc-800 bg-zinc-900/20 p-6 text-center">
+                      <p className="text-sm text-zinc-500">
+                        Upload art, import a card, or start a blank character
+                        to open the full CCV3 editor.
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="grid content-start gap-4">
+                  <div className="rounded-xl border bg-background/45 p-4">
+                    <label className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                      Edit notes for active card
+                    </label>
+                    <Textarea
+                      value={editNotesText}
+                      placeholder="Change age to 29. Update scenario. Add creator notes. Rewrite personality as..."
+                      className="mt-2 min-h-36 resize-y"
+                      onChange={(event) =>
+                        setEditNotesText(event.currentTarget.value)
+                      }
+                    />
+                    <button
+                      type="button"
+                      onClick={handleApplyEditNotes}
+                      className="mt-2 inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700"
+                    >
+                      <Sparkles className="size-4" />
+                      Apply Edit Notes
+                    </button>
+                    {editNotesMessage ? (
+                      <p className="mt-2 text-xs text-muted-foreground">
+                        {editNotesMessage}
+                      </p>
+                    ) : null}
+                  </div>
+
+                  <details className="rounded-xl border bg-background/45 p-4">
+                    <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+                      Batch folder intake
+                    </summary>
+                    <div className="mt-3">
+                      <FolderIntakeReview
+                        isDesktopRuntime={isDesktopRuntime}
+                        onChooseFolder={triggerFolderIntakeSelect}
+                        onImported={library.refresh}
+                      />
+                    </div>
+                  </details>
+                </div>
+              </div>
+            </div>
+          </details>
 
           <ExpressionManager
             activeCardPath={currentFilePath}
@@ -1112,8 +1066,20 @@ function createStarterIntakeText(fields: Record<StarterFieldKey, string>) {
     fields.appearance.trim()
       ? `Physical Appearance:\n${fields.appearance.trim()}`
       : "",
+    fields.visualSeeds.trim()
+      ? `Visual Details:\n${fields.visualSeeds.trim()}`
+      : "",
     fields.personality.trim()
       ? `Personality:\n${fields.personality.trim()}`
+      : "",
+    fields.personalitySeeds.trim()
+      ? `Personality Notes:\n${fields.personalitySeeds.trim()}`
+      : "",
+    fields.background.trim()
+      ? `Background Story:\n${fields.background.trim()}`
+      : "",
+    fields.relationshipDynamic.trim()
+      ? `Relationships:\nDynamic with {{user}}: ${fields.relationshipDynamic.trim()}`
       : "",
     fields.scenario.trim() ? `Scenario:\n${fields.scenario.trim()}` : "",
     fields.firstMessage.trim()
@@ -1129,56 +1095,460 @@ function joinDefined(values: string[]) {
     .join("\n\n");
 }
 
-function WorkflowPanel(props: {
-  active: boolean;
-  children: ReactNode;
-  eyebrow: string;
-  icon: ReactNode;
-  title: string;
+function CharacterIntakeComposer(props: {
+  onRoute: (combinedIntakeText: string) => string;
 }) {
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
+  const [imagePromptPreview, setImagePromptPreview] = useState<string | null>(
+    null,
+  );
+
+  function readStarterFields() {
+    const formData = new FormData(formRef.current ?? undefined);
+    return starterFieldDefinitions.reduce(
+      (fields, field) => ({
+        ...fields,
+        [field.key]: readFormString(formData, field.key),
+      }),
+      emptyStarterFields,
+    );
+  }
+
+  function handleRoute() {
+    const formData = new FormData(formRef.current ?? undefined);
+    const messyIntakeText = readFormString(formData, "messyIntakeText");
+    const starterFields = readStarterFields();
+    const starterIntakeText = createStarterIntakeText(starterFields);
+    const combinedIntakeText = joinDefined([messyIntakeText, starterIntakeText]);
+
+    if (!combinedIntakeText.trim()) {
+      setMessage(
+        "Paste rough character notes or fill at least one starter field before creating a character profile.",
+      );
+      return;
+    }
+
+    setMessage(props.onRoute(combinedIntakeText));
+  }
+
+  function handleApplyTemplate(templateId: string) {
+    const template = creatorTemplates.find((item) => item.id === templateId);
+    const form = formRef.current;
+    if (!template || !form) {
+      return;
+    }
+
+    for (const [key, value] of Object.entries(template.values)) {
+      appendFormValue(form, key, value);
+    }
+
+    setMessage(`Filled blank sections from ${template.label}.`);
+  }
+
+  function handleAddSeed(fieldKey: StarterFieldKey, value: string) {
+    const form = formRef.current;
+    if (!form || !value.trim()) {
+      return;
+    }
+
+    appendFormValue(form, fieldKey, value.trim());
+  }
+
+  function handleBuildImagePromptPreview() {
+    const fields = readStarterFields();
+    setImagePromptPreview(createImagePromptPreview(fields));
+  }
+
   return (
-    <section
-      className={[
-        "liquid-glass-strong grid gap-4 rounded-[1.75rem] border p-5",
-        props.active ? "ring-1 ring-[color:var(--liquid-accent)]" : "",
-      ].join(" ")}
+    <form
+      ref={formRef}
+      className="grid gap-3"
+      onSubmit={(event) => event.preventDefault()}
     >
-      <header className="flex items-start gap-3">
-        <span className="liquid-icon flex size-11 shrink-0 items-center justify-center rounded-2xl text-muted-foreground">
-          {props.icon}
-        </span>
-        <div className="min-w-0">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-            {props.eyebrow}
-          </p>
-          <h2 className="mt-1 text-xl font-semibold tracking-tight">
-            {props.title}
-          </h2>
+      <details className="rounded-xl border bg-background/45 p-3">
+        <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          Reusable templates
+        </summary>
+        <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          {creatorTemplates.map((template) => (
+            <button
+              key={template.id}
+              type="button"
+              onClick={() => handleApplyTemplate(template.id)}
+              className="rounded-lg border border-border bg-card px-3 py-2 text-left text-xs font-semibold text-foreground transition hover:bg-muted"
+            >
+              {template.label}
+              <span className="mt-1 block text-[11px] font-normal leading-4 text-muted-foreground">
+                Fills blanks for dynamic, scenario, opening, and texture.
+              </span>
+            </button>
+          ))}
         </div>
-      </header>
-      {props.children}
-    </section>
+      </details>
+
+      {starterSections.map((section, index) => (
+        <details
+          key={section.id}
+          className="rounded-xl border bg-background/45 p-3"
+          open={index < 2}
+        >
+          <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+            {section.label}
+          </summary>
+          <p className="mt-2 text-xs leading-5 text-muted-foreground">
+            {section.description}
+          </p>
+          <div className="mt-3 grid gap-3">
+            {starterFieldDefinitions
+              .filter((field) => field.section === section.id)
+              .map((field) => (
+                <StarterInput key={field.key} field={field} />
+              ))}
+
+            {section.id === "vibe" ? (
+              <div className="grid gap-3 md:grid-cols-2">
+                <SeedCombo
+                  datalistId="appearance-seeds"
+                  label="Add appearance seed"
+                  name="appearanceSeedCustom"
+                  options={seedVocabulary.appearance}
+                  onAdd={(value) => handleAddSeed("visualSeeds", value)}
+                />
+                <SeedCombo
+                  datalistId="personality-seeds"
+                  label="Add soul seed"
+                  name="personalitySeedCustom"
+                  options={seedVocabulary.personality}
+                  onAdd={(value) => handleAddSeed("personalitySeeds", value)}
+                />
+              </div>
+            ) : null}
+
+            {section.id === "relationship" ? (
+              <SeedCombo
+                datalistId="relationship-dynamic-seeds"
+                label="Add relationship dynamic"
+                name="relationshipSeedCustom"
+                options={seedVocabulary.relationship}
+                onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+              />
+            ) : null}
+          </div>
+        </details>
+      ))}
+
+      <details className="rounded-xl border bg-background/45 p-3">
+        <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          Rough notes paste box
+        </summary>
+        <div className="mt-3 grid gap-1.5">
+          <label className="text-xs font-semibold text-muted-foreground">
+            Extra messy intake
+          </label>
+          <textarea
+            data-no-field-copy="true"
+            name="messyIntakeText"
+            placeholder="Paste loose notes, sample dialogue, traits, scenario fragments, or imported profile text..."
+            className="min-h-32 resize-y rounded-md border border-input bg-transparent px-3 py-2 text-base shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 md:text-sm dark:bg-input/30"
+            spellCheck={false}
+          />
+        </div>
+      </details>
+
+      <details className="rounded-xl border bg-background/45 p-3">
+        <summary className="cursor-pointer text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+          Image prompt output
+        </summary>
+        <div className="mt-3 grid gap-3">
+          <p className="text-xs leading-5 text-muted-foreground">
+            Drafts a later-use image prompt from the appearance and style fields.
+            It does not create an image yet.
+          </p>
+          <button
+            type="button"
+            onClick={handleBuildImagePromptPreview}
+            className="w-fit rounded-lg border border-border bg-card px-3 py-2 text-xs font-semibold text-foreground transition hover:bg-muted"
+          >
+            Build Prompt Preview
+          </button>
+          {imagePromptPreview ? (
+            <textarea
+              readOnly
+              value={imagePromptPreview}
+              className="min-h-28 resize-y rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none text-muted-foreground"
+            />
+          ) : null}
+        </div>
+      </details>
+
+      <button
+        type="button"
+        onClick={handleRoute}
+        className="inline-flex items-center justify-center gap-2 rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700"
+      >
+        <Sparkles className="size-4" />
+        Route to Profile
+      </button>
+      {message ? <p className="text-xs text-muted-foreground">{message}</p> : null}
+    </form>
   );
 }
 
-function readWorkflowMode(): CharacterWorkflowMode {
-  if (typeof window === "undefined") {
-    return "edit";
-  }
-
-  const mode = new URLSearchParams(window.location.search).get("mode");
-
-  return mode === "intake" || mode === "create" || mode === "edit"
-    ? mode
-    : "edit";
+function StarterInput(props: {
+  field: (typeof starterFieldDefinitions)[number];
+}) {
+  return (
+    <label className="grid gap-1.5">
+      <span className="text-xs font-semibold text-muted-foreground">
+        {props.field.label}
+      </span>
+      {props.field.rows ? (
+        <textarea
+          data-no-field-copy="true"
+          name={props.field.key}
+          placeholder={props.field.placeholder}
+          className="min-h-20 resize-y rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition-[color,box-shadow] placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 dark:bg-input/30"
+          spellCheck={false}
+        />
+      ) : (
+        <input
+          autoComplete="off"
+          data-no-field-copy="true"
+          name={props.field.key}
+          placeholder={props.field.placeholder}
+          className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none transition focus:border-[color:var(--liquid-accent)]"
+          spellCheck={false}
+        />
+      )}
+    </label>
+  );
 }
 
-function subscribeToWorkflowModeChanges(onStoreChange: () => void) {
-  window.addEventListener("popstate", onStoreChange);
-  window.addEventListener("heartwriteai:workflow-mode", onStoreChange);
+function SeedCombo(props: {
+  datalistId: string;
+  label: string;
+  name: string;
+  onAdd: (value: string) => void;
+  options: string[];
+}) {
+  return (
+    <div className="grid gap-2 rounded-lg border bg-card/50 p-3">
+      <label className="grid gap-1.5">
+        <span className="text-xs font-semibold text-muted-foreground">
+          {props.label}
+        </span>
+        <input
+          autoComplete="off"
+          data-no-field-copy="true"
+          list={props.datalistId}
+          name={props.name}
+          placeholder="Choose a seed or type anything..."
+          className="rounded-lg border border-input bg-background px-3 py-2 text-sm outline-none transition focus:border-[color:var(--liquid-accent)]"
+          spellCheck={false}
+        />
+      </label>
+      <datalist id={props.datalistId}>
+        {props.options.map((option) => (
+          <option key={option} value={option} />
+        ))}
+      </datalist>
+      <div className="flex flex-wrap gap-1.5">
+        {props.options.slice(0, 6).map((option) => (
+          <button
+            key={option}
+            type="button"
+            onClick={() => props.onAdd(option)}
+            className="rounded-full border border-border bg-background px-2 py-1 text-[11px] text-muted-foreground transition hover:bg-muted hover:text-foreground"
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+      <button
+        type="button"
+        onClick={(event) => {
+          const field = event.currentTarget
+            .closest("div")
+            ?.querySelector<HTMLInputElement>(`input[name="${props.name}"]`);
+          const value = field?.value.trim() ?? "";
+          props.onAdd(value);
+          if (field) {
+            field.value = "";
+          }
+        }}
+        className="w-fit rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-semibold text-foreground transition hover:bg-muted"
+      >
+        Add Custom
+      </button>
+    </div>
+  );
+}
 
-  return () => {
-    window.removeEventListener("popstate", onStoreChange);
-    window.removeEventListener("heartwriteai:workflow-mode", onStoreChange);
-  };
+function readFormString(formData: FormData, key: string) {
+  const value = formData.get(key);
+  return typeof value === "string" ? value : "";
+}
+
+function appendFormValue(form: HTMLFormElement, key: string, value: string) {
+  const field = form.elements.namedItem(key);
+  if (
+    !field ||
+    !("value" in field) ||
+    typeof field.value !== "string" ||
+    !value.trim()
+  ) {
+    return;
+  }
+
+  field.value = joinCommaList([field.value, value]);
+}
+
+function joinCommaList(values: string[]) {
+  return values
+    .flatMap((value) => value.split(","))
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .filter((value, index, allValues) => allValues.indexOf(value) === index)
+    .join(", ");
+}
+
+function createImagePromptPreview(fields: Record<StarterFieldKey, string>) {
+  const naturalLanguage = joinDefined([
+    fields.name.trim() ? `Character portrait of ${fields.name.trim()}.` : "",
+    fields.basicInfo.trim(),
+    fields.appearance.trim(),
+    fields.visualSeeds.trim(),
+    fields.personalitySeeds.trim()
+      ? `Mood and presence: ${fields.personalitySeeds.trim()}.`
+      : "",
+  ]);
+
+  const tagPrompt = joinCommaList([
+    fields.visualSeeds,
+    fields.appearance,
+    fields.personalitySeeds,
+    "character portrait",
+    "expressive eyes",
+    "high detail",
+  ]);
+
+  return joinDefined([
+    "Natural language prompt:",
+    naturalLanguage || "Add appearance details to generate a prompt preview.",
+    "Tag-style prompt:",
+    tagPrompt,
+  ]);
+}
+
+function PngMetadataChoiceModal(props: {
+  filePath: string;
+  onCancel: () => void;
+  onUseImageOnly: () => void;
+  onUseStoredCharacter: () => void;
+  storedCardName: string;
+}) {
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-background/75 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-lg rounded-[1.5rem] border bg-card p-6 shadow-2xl">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+              Stored character found
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold tracking-tight">
+              Use this PNG&apos;s card data?
+            </h2>
+          </div>
+          <button
+            type="button"
+            aria-label="Cancel import"
+            onClick={props.onCancel}
+            className="rounded-lg border border-border bg-background p-2 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+          >
+            <X className="size-4" />
+          </button>
+        </div>
+
+        <div className="mt-4 grid gap-3 rounded-xl border bg-background/55 p-4 text-sm text-muted-foreground">
+          <p>
+            This image contains CCV2/CCV3-style character metadata for{" "}
+            <span className="font-semibold text-foreground">
+              {props.storedCardName || "Untitled Character"}
+            </span>
+            .
+          </p>
+          <p className="break-all font-mono text-xs">{props.filePath}</p>
+        </div>
+
+        <div className="mt-5 grid gap-2 sm:grid-cols-2">
+          <button
+            type="button"
+            onClick={props.onUseStoredCharacter}
+            className="inline-flex items-center justify-center rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-rose-700"
+          >
+            Use Stored Character
+          </button>
+          <button
+            type="button"
+            onClick={props.onUseImageOnly}
+            className="inline-flex items-center justify-center rounded-lg border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted"
+          >
+            Use Image Only
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function isPngPath(filePath: string) {
+  return /\.(apng|png)$/i.test(filePath);
+}
+
+function isBrowserPngFile(file: File) {
+  const normalizedName = file.name.toLowerCase();
+  return (
+    normalizedName.endsWith(".png") ||
+    normalizedName.endsWith(".apng") ||
+    file.type === "image/png" ||
+    file.type === "image/apng"
+  );
+}
+
+function isMissingCardMetadataMessage(message: string | null | undefined) {
+  return Boolean(
+    message &&
+      (message.includes("No character card metadata") ||
+        message.includes("supported character card metadata")),
+  );
+}
+
+function isMissingBrowserCardMetadataError(error: unknown) {
+  return (
+    error instanceof Error &&
+    error.message.includes("supported character card metadata")
+  );
+}
+
+function isMissingFilePathMessage(message: string | null | undefined) {
+  return Boolean(
+    message &&
+      (message.includes("does not exist") ||
+        message.includes("no longer exists") ||
+        message.includes("could not be found") ||
+        message.includes("No such file")),
+  );
+}
+
+function isDraftPngShellCard(card: ValidatedCharacterCardV3) {
+  const tags = new Set(card.data.tags.map((tag) => tag.toLowerCase()));
+
+  return (
+    tags.has("draft") &&
+    tags.has("messy intake") &&
+    !card.data.personality.trim() &&
+    !card.data.scenario.trim() &&
+    !card.data.first_mes.trim()
+  );
 }

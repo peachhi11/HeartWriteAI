@@ -3,9 +3,12 @@
 import { useState } from "react";
 import {
   BookOpenText,
+  Brush,
   Flame,
   Heart,
+  History,
   NotebookTabs,
+  Orbit,
   Scissors,
   Sparkles,
   WandSparkles,
@@ -14,6 +17,12 @@ import {
 
 export type ProsePixieActionId =
   | "glow_up"
+  | "aura_alignment"
+  | "soul_sketcher"
+  | "glamour_glow_up"
+  | "mirror_mirror"
+  | "memory_mint"
+  | "hook_and_line"
   | "flesh_it_out"
   | "trim_the_fat"
   | "memory_maker"
@@ -53,16 +62,179 @@ export const PROSE_PIXIE_ACTIONS: ProsePixieAction[] = [
     label: "Glow Up",
     description: "Make the section read cleaner, richer, and more intentional.",
     instruction:
-      "Polish the prose for stronger rhythm, clearer imagery, and a more premium character-card voice. Preserve facts, rating, and core intent.",
+      `Role: Expert fiction editor.
+
+Task:
+Rewrite the provided text so it reads smoother, stronger, and more professionally written while preserving the original meaning, facts, characterization, lore, and intent.
+
+Instructions:
+- Improve prose quality, rhythm, sentence flow, clarity, and readability.
+- Strengthen word choice where appropriate.
+- Remove awkward phrasing.
+- Do not add new lore, traits, events, or facts.
+- Preserve the original tone.
+- Keep approximately the same length unless minor adjustments improve quality.
+
+Output Rules:
+- Output only the revised text.
+- Do not explain changes.
+- Do not add notes, headings, commentary, or formatting outside the revised text.`,
     tone: "violet",
     icon: Sparkles,
+  },
+  {
+    id: "aura_alignment",
+    label: "Aura Alignment",
+    description: "Tune the character's core energy, vibes, and emotional gravity.",
+    instruction:
+      `Role: Character identity analyst.
+
+Task:
+Refine and strengthen the character's core energy and overall presence.
+
+Instructions:
+- Clarify worldview, emotional themes, strengths, flaws, desires, fears, and social dynamics.
+- Make personality traits feel cohesive and intentional.
+- Emphasize what makes the character memorable.
+
+Output Rules:
+- Output only the revised text.
+- Do not explain changes.
+- Do not add headings, notes, or commentary.`,
+    tone: "violet",
+    icon: Orbit,
+  },
+  {
+    id: "soul_sketcher",
+    label: "Soul Sketcher",
+    description: "Draw out quirks, private habits, and inner texture.",
+    instruction:
+      `Role: Personality development specialist.
+
+Task:
+Reveal deeper individuality and uniqueness.
+
+Instructions:
+- Add quirks, rituals, habits, preferences, contradictions, comforts, pet peeves, and distinctive behaviors.
+- Focus on memorable details that make the character feel unique.
+- Keep additions consistent with the existing character.
+
+Output Rules:
+- Output only the revised text.
+- Do not explain changes.
+- Do not add headings, notes, or commentary.`,
+    tone: "emerald",
+    icon: BookOpenText,
+  },
+  {
+    id: "glamour_glow_up",
+    label: "Glamour Glow-Up",
+    description: "Add vivid aesthetic and styling detail.",
+    instruction:
+      `Role: Character visual designer.
+
+Task:
+Enhance the richness and appeal of the character's visual presentation.
+
+Instructions:
+- Add vivid aesthetic details, style choices, accessories, grooming habits, posture, and visual motifs.
+- Ensure appearance supports and reflects personality.
+- Maintain consistency with existing descriptions.
+
+Output Rules:
+- Output only the revised text.
+- Do not explain changes.
+- Do not add headings, notes, or commentary.`,
+    tone: "violet",
+    icon: Brush,
+  },
+  {
+    id: "mirror_mirror",
+    label: "Mirror Mirror",
+    description: "Paint a clearer, more grounded appearance.",
+    instruction:
+      `Role: Character portrait writer.
+
+Task:
+Create a clearer, more vivid physical description.
+
+Instructions:
+- Improve descriptions of facial features, expressions, movement, posture, build, and distinguishing characteristics.
+- Increase visual clarity and specificity.
+- Remain grounded and internally consistent.
+
+Output Rules:
+- Output only the revised text.
+- Do not explain changes.
+- Do not add headings, notes, or commentary.`,
+    tone: "blue",
+    icon: Sparkles,
+  },
+  {
+    id: "memory_mint",
+    label: "Memory Mint",
+    description: "Craft the past moments that shaped them.",
+    instruction:
+      `Role: Character historian.
+
+Task:
+Develop meaningful events that shaped the character.
+
+Instructions:
+- Add defining memories, relationships, victories, failures, losses, lessons, and turning points.
+- Connect those experiences to present-day behavior and personality.
+- Maintain lore consistency.
+
+Output Rules:
+- Output only the revised text.
+- Do not explain changes.
+- Do not add headings, notes, or commentary.`,
+    tone: "emerald",
+    icon: History,
+  },
+  {
+    id: "hook_and_line",
+    label: "Hook & Line",
+    description: "Make the first sentence pull the user in.",
+    instruction:
+      `Role: Roleplay onboarding specialist.
+
+Task:
+Rewrite the introduction to maximize engagement and response potential.
+
+Instructions:
+- Begin with a compelling hook.
+- Establish immediate curiosity, tension, emotion, stakes, or intrigue.
+- Encourage user participation through natural opportunities for interaction.
+- Avoid generic openings.
+
+Output Rules:
+- Output only the revised text.
+- Do not explain changes.
+- Do not add headings, notes, or commentary.`,
+    tone: "rose",
+    icon: Heart,
   },
   {
     id: "flesh_it_out",
     label: "Flesh It Out",
     description: "Add substance, specificity, and emotional texture.",
     instruction:
-      "Expand the section with useful detail, sensory anchors, contradictions, and concrete behavior. Avoid bloat or generic filler.",
+      `Role: Character and narrative development specialist.
+
+Task:
+Expand the provided text with richer detail and specificity.
+
+Instructions:
+- Add sensory detail, body language, behavioral cues, emotional nuance, environmental texture, and distinctive observations.
+- Add depth without changing established lore.
+- Preserve the original tone and intent.
+- Make additions feel natural rather than padded.
+
+Output Rules:
+- Output only the revised text.
+- Do not explain changes.
+- Do not add headings, notes, or commentary.`,
     tone: "emerald",
     icon: BookOpenText,
   },
@@ -71,7 +243,20 @@ export const PROSE_PIXIE_ACTIONS: ProsePixieAction[] = [
     label: "Trim the Fat",
     description: "Condense repetition and keep only the sharpest material.",
     instruction:
-      "Make the section tighter and more readable. Remove repetition, filler, and vague phrasing while preserving the strongest facts.",
+      `Role: Developmental editor.
+
+Task:
+Condense the provided text while preserving its strongest ideas and characterization.
+
+Instructions:
+- Remove repetition, filler, redundancy, weak modifiers, and unnecessary exposition.
+- Retain important information and memorable lines.
+- Improve clarity and efficiency.
+
+Output Rules:
+- Output only the revised text.
+- Do not explain changes.
+- Do not add headings, notes, or commentary.`,
     tone: "blue",
     icon: Scissors,
   },
@@ -80,7 +265,20 @@ export const PROSE_PIXIE_ACTIONS: ProsePixieAction[] = [
     label: "Memory Maker",
     description: "Build past experiences that shape the character now.",
     instruction:
-      "Add formative history, remembered moments, old wounds, habits, or private associations that explain current behavior.",
+      `Role: Character backstory architect.
+
+Task:
+Deepen the character's history and personal foundation.
+
+Instructions:
+- Add formative experiences, important relationships, defining moments, motivations, fears, habits, regrets, and personal values.
+- Ensure new details logically support current behavior and personality.
+- Remain consistent with existing lore and characterization.
+
+Output Rules:
+- Output only the revised text.
+- Do not explain changes.
+- Do not add headings, notes, or commentary.`,
     tone: "emerald",
     icon: NotebookTabs,
   },
@@ -89,7 +287,21 @@ export const PROSE_PIXIE_ACTIONS: ProsePixieAction[] = [
     label: "Spark Starter",
     description: "Create initial romantic tension and a stronger hook.",
     instruction:
-      "Sharpen the romantic charge, opening tension, and character-to-user pull. Keep it character-specific and scene-aware.",
+      `Role: Interactive roleplay writer.
+
+Task:
+Strengthen an opening message, greeting, or scenario introduction.
+
+Instructions:
+- Increase intrigue, chemistry, tension, curiosity, and emotional engagement.
+- Create stronger opportunities for user participation.
+- Establish a compelling narrative hook immediately.
+- Avoid passive introductions.
+
+Output Rules:
+- Output only the revised text.
+- Do not explain changes.
+- Do not add headings, notes, or commentary.`,
     tone: "rose",
     icon: Heart,
   },
@@ -98,7 +310,20 @@ export const PROSE_PIXIE_ACTIONS: ProsePixieAction[] = [
     label: "Vibe Check",
     description: "Fix slang, attitude, cadence, and social voice.",
     instruction:
-      "Adjust the tone, slang, and attitude so the voice feels coherent, current, and natural for this character.",
+      `Role: Voice and tone specialist.
+
+Task:
+Adjust the character's voice and presentation.
+
+Instructions:
+- Match the requested tone, age, confidence level, social background, slang usage, and personality style.
+- Preserve meaning while changing delivery.
+- Keep characterization internally consistent.
+
+Output Rules:
+- Output only the revised text.
+- Do not explain changes.
+- Do not add headings, notes, or commentary.`,
     tone: "blue",
     icon: WandSparkles,
   },
@@ -107,7 +332,21 @@ export const PROSE_PIXIE_ACTIONS: ProsePixieAction[] = [
     label: "Spice Rack",
     description: "Increase tension slightly while staying within this rating.",
     instruction:
-      "Nudge up romantic or sensual tension while staying inside the current content rating. Keep consent, boundaries, and emotional context intact.",
+      `Role: Romance editor.
+
+Task:
+Increase romantic tension while maintaining the current content rating.
+
+Instructions:
+- Strengthen attraction, emotional intimacy, flirtation, anticipation, and chemistry.
+- Focus on subtext, longing, and connection.
+- Do not introduce explicit sexual content.
+- Do not exceed the existing rating.
+
+Output Rules:
+- Output only the revised text.
+- Do not explain changes.
+- Do not add headings, notes, or commentary.`,
     tone: "rose",
     icon: Flame,
   },
@@ -116,7 +355,21 @@ export const PROSE_PIXIE_ACTIONS: ProsePixieAction[] = [
     label: "Add Some Spice",
     description: "Raise the heat and allow the rating to move one step up.",
     instruction:
-      "Increase heat and sensuality by one rating step where appropriate. Preserve character boundaries and avoid jumping straight to explicit content.",
+      `Role: Romance progression specialist.
+
+Task:
+Increase romantic and sensual intensity.
+
+Instructions:
+- Strengthen chemistry, attraction, emotional vulnerability, and desire.
+- Allow the content to naturally move up one rating level if appropriate.
+- Maintain character consistency and narrative quality.
+- Prioritize tension and emotional engagement over explicitness.
+
+Output Rules:
+- Output only the revised text.
+- Do not explain changes.
+- Do not add headings, notes, or commentary.`,
     tone: "rose",
     icon: Flame,
   },
@@ -125,7 +378,20 @@ export const PROSE_PIXIE_ACTIONS: ProsePixieAction[] = [
     label: "Heat Wave",
     description: "Make the scene immediately hotter and more physically charged.",
     instruction:
-      "Raise the scene temperature immediately with stronger attraction, proximity, and physical tension. Keep it adult, consensual, and character-led.",
+      `Role: High-intensity romance writer.
+
+Task:
+Make the scene significantly more emotionally charged and physically intense.
+
+Instructions:
+- Increase urgency, attraction, chemistry, emotional tension, and romantic momentum.
+- Preserve narrative coherence and character consistency.
+- Escalate naturally from the existing text.
+
+Output Rules:
+- Output only the revised text.
+- Do not explain changes.
+- Do not add headings, notes, or commentary.`,
     tone: "rose",
     icon: Flame,
   },

@@ -136,6 +136,51 @@ impl CacheDatabase {
         }))
     }
 
+    pub fn delete_card_for_path(&self, file_path: &str) -> Result<bool, String> {
+        let deleted_count = self
+            .conn
+            .execute(
+                "DELETE FROM card_cache WHERE file_path = ?1;",
+                params![file_path],
+            )
+            .map_err(|error| format!("Failed deleting stale card cache row: {error}"))?;
+
+        Ok(deleted_count > 0)
+    }
+
+    pub fn delete_missing_card_paths(&self) -> Result<usize, String> {
+        let missing_paths = {
+            let mut statement = self
+                .conn
+                .prepare("SELECT file_path FROM card_cache;")
+                .map_err(|error| format!("Failed preparing missing-path scan: {error}"))?;
+            let paths = statement
+                .query_map([], |row| row.get::<_, String>(0))
+                .map_err(|error| format!("Failed querying cached paths: {error}"))?;
+
+            let mut missing_paths = Vec::new();
+            for path in paths {
+                let path =
+                    path.map_err(|error| format!("Failed reading cached path row: {error}"))?;
+                if path.starts_with("/mock/") {
+                    continue;
+                }
+
+                if !Path::new(&path).is_file() {
+                    missing_paths.push(path);
+                }
+            }
+
+            missing_paths
+        };
+
+        for path in &missing_paths {
+            self.delete_card_for_path(path)?;
+        }
+
+        Ok(missing_paths.len())
+    }
+
     pub fn query_library_page(&self, filter: SearchFilters) -> Result<PaginatedResponse, String> {
         let mut conditions = Vec::new();
         let mut sql_params: Vec<Box<dyn rusqlite::types::ToSql>> = Vec::new();
@@ -225,10 +270,13 @@ impl CacheDatabase {
             .query_map(final_param_refs.as_slice(), |row| {
                 let tags_raw_json: String = row.get(5)?;
                 let parsed_tags = serde_json::from_str(&tags_raw_json).unwrap_or_default();
+                let file_path: String = row.get(1)?;
+                let file_exists = Path::new(&file_path).is_file();
 
                 Ok(CacheItemSummary {
                     id: row.get(0)?,
-                    file_path: row.get(1)?,
+                    file_path,
+                    file_exists,
                     name: row.get(2)?,
                     framework: row.get(3)?,
                     relationship: row.get(4)?,
@@ -596,6 +644,54 @@ mod tests {
 
         assert_eq!(page.total_count, 1);
         assert_eq!(page.items[0].name, "Aria Stone");
+    }
+
+    #[test]
+    fn deletes_missing_card_paths_without_pruning_mock_or_existing_rows() {
+        let temp_dir = create_temp_dir("card-cache-clean-missing");
+        let db_path = temp_dir.join("cards.sqlite3");
+        let existing_card_path = temp_dir.join("existing.png");
+        std::fs::write(&existing_card_path, b"png").expect("fixture image should write");
+        let cache = CacheDatabase::init(&db_path).expect("cache should initialize");
+        let existing_path = existing_card_path.to_string_lossy().to_string();
+        let missing_path = temp_dir.join("missing.png").to_string_lossy().to_string();
+
+        cache
+            .upsert_card(
+                &existing_path,
+                &create_card_with_tags("Existing", "Sandbox", "Symmetric", &[]),
+            )
+            .expect("existing card should upsert");
+        cache
+            .upsert_card(
+                &missing_path,
+                &create_card_with_tags("Missing", "Sandbox", "Symmetric", &[]),
+            )
+            .expect("missing card should upsert");
+        cache
+            .upsert_card(
+                "/mock/library-seed.png",
+                &create_card_with_tags("Mock", "Sandbox", "Symmetric", &[]),
+            )
+            .expect("mock card should upsert");
+
+        let removed_count = cache
+            .delete_missing_card_paths()
+            .expect("missing path cleanup should succeed");
+
+        assert_eq!(removed_count, 1);
+        assert!(cache
+            .cached_card_for_path(&existing_path)
+            .expect("existing query should work")
+            .is_some());
+        assert!(cache
+            .cached_card_for_path("/mock/library-seed.png")
+            .expect("mock query should work")
+            .is_some());
+        assert!(cache
+            .cached_card_for_path(&missing_path)
+            .expect("missing query should work")
+            .is_none());
     }
 
     fn create_cache(name: &str) -> CacheDatabase {

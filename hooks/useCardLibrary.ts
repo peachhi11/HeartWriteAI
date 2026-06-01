@@ -18,6 +18,7 @@ export interface SearchFilters {
 export interface CacheItemSummary {
   id: string;
   file_path: string;
+  file_exists: boolean;
   name: string;
   framework: string;
   relationship: string;
@@ -114,6 +115,42 @@ export function useCardLibrary(initialLimit = 12) {
     void fetchPage(filters);
   }, [fetchPage, filters]);
 
+  const removePath = useCallback(
+    async (filePath: string) => {
+      if (!isDesktopRuntime) {
+        return false;
+      }
+
+      const removed = await invoke<boolean>("remove_cached_card_path", {
+        filePath,
+      });
+      await fetchPage(filters);
+      return removed;
+    },
+    [fetchPage, filters, isDesktopRuntime],
+  );
+
+  const cleanMissingPaths = useCallback(async () => {
+    if (!isDesktopRuntime) {
+      return 0;
+    }
+
+    const removedCount = await invoke<number>("clean_missing_cached_card_paths");
+    await fetchPage(filters);
+    return removedCount;
+  }, [fetchPage, filters, isDesktopRuntime]);
+
+  const validateFilePaths = useCallback(
+    async (filePaths: string[]) => {
+      if (!isDesktopRuntime || filePaths.length === 0) {
+        return [];
+      }
+
+      return invoke<string[]>("validate_file_paths", { paths: filePaths });
+    },
+    [isDesktopRuntime],
+  );
+
   return {
     items,
     metadata,
@@ -122,9 +159,12 @@ export function useCardLibrary(initialLimit = 12) {
     filters,
     fetchPage,
     refresh,
+    cleanMissingPaths,
+    removePath,
     setPage,
     updateSearchQuery,
     setFilters,
+    validateFilePaths,
     isDesktopRuntime,
   };
 }

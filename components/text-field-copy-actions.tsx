@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Check, Copy, TriangleAlert } from "lucide-react";
+import { Check, Clipboard, TriangleAlert } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -68,6 +68,9 @@ export function TextFieldCopyActions() {
     const activateField = (target: EventTarget | null) => {
       const field = getCopyableField(target);
       if (!field) {
+        activeFieldRef.current = null;
+        setButtonRect(null);
+        setHasText(false);
         return;
       }
 
@@ -107,11 +110,8 @@ export function TextFieldCopyActions() {
     };
 
     const handleFocusIn = (event: FocusEvent) => activateField(event.target);
-    const handlePointerOver = (event: PointerEvent) => activateField(event.target);
-
     document.addEventListener("focusin", handleFocusIn);
     document.addEventListener("focusout", deactivateIfOutside);
-    document.addEventListener("pointerover", handlePointerOver);
     document.addEventListener("input", handleInput);
     window.addEventListener("resize", updatePosition);
     window.addEventListener("scroll", updatePosition, true);
@@ -120,7 +120,6 @@ export function TextFieldCopyActions() {
       clearResetTimer();
       document.removeEventListener("focusin", handleFocusIn);
       document.removeEventListener("focusout", deactivateIfOutside);
-      document.removeEventListener("pointerover", handlePointerOver);
       document.removeEventListener("input", handleInput);
       window.removeEventListener("resize", updatePosition);
       window.removeEventListener("scroll", updatePosition, true);
@@ -156,7 +155,7 @@ export function TextFieldCopyActions() {
       ? Check
       : copyState === "failed"
         ? TriangleAlert
-        : Copy;
+        : Clipboard;
   const label =
     copyState === "copied"
       ? "Copied"
@@ -168,7 +167,7 @@ export function TextFieldCopyActions() {
     <button
       aria-label={label}
       className={cn(
-        "fixed z-50 inline-flex size-7 items-center justify-center rounded-md border border-border/80 bg-background/95 text-muted-foreground shadow-lg backdrop-blur transition hover:border-primary/50 hover:text-foreground disabled:pointer-events-none disabled:opacity-45",
+        "fixed z-40 inline-flex size-7 items-center justify-center rounded-md border border-border/80 bg-background/95 text-muted-foreground shadow-lg backdrop-blur transition hover:border-primary/50 hover:text-foreground disabled:pointer-events-none disabled:opacity-45",
         copyState === "copied" &&
           "border-emerald-500/40 bg-emerald-500/10 text-emerald-500",
         copyState === "failed" &&

@@ -11,18 +11,20 @@ HeartWriteAI is CCV3-first. The implementation reference for card import/export 
 - Preserve unknown/future card fields where possible.
 - Use `@risuai/ccardlib` for V1/V2/V3 card version checks and conversion.
 - Support browser imports for PNG/APNG/JSON without calling Tauri APIs, and desktop imports through native dialogs when available.
-- Import CHARX packages as full-fidelity card masters when available.
+- Import CHARX packages as bundle/archive packages when adjacent assets need to travel with the card.
 - Treat JSON as an interchange/debug format, not the main editing surface.
 
 ## Native Format Policy
 
-HeartWriteAI treats **CHARX as the clean master format**. A saved/imported master should be a `.charx` package whenever the desktop app is available, because CHARX can carry `card.json` plus bundled assets such as icons, backgrounds, expression images, and future card-specific resources.
+HeartWriteAI treats **PNG/APNG with embedded CCV3 metadata as the primary card format**. A saved/imported character card should stay portable as a CCV3 PNG wherever possible.
 
-PNG/APNG remains the **compatibility and sharing copy**. The app should keep importing and exporting PNG metadata cards for platforms that expect image cards, but users should be warned when an export path cannot preserve CHARX-only bundled assets.
+CHARX remains the **bundle/archive copy**. The app should support CHARX when a card needs to carry `card.json` plus bundled assets such as icons, backgrounds, expression images, and future card-specific resources, but it should not replace PNG/CCV3 as the default card artifact.
 
 JSON remains the **advanced/debug copy**. It is useful for inspection, tests, schema validation, and manual repair, but it should not become the main user-facing save path.
 
-Folder intake follows this policy: scan mixed folders, mark importable card files, identify non-card images/lorebooks/broken files, and save selected ready cards into the local library as CHARX masters.
+HeartWriteAI-only `.hwcard` imports/exports are intentionally out of scope.
+
+Folder intake follows this policy: scan mixed folders, mark importable card files, identify non-card images/lorebooks/broken files, and save selected ready cards into the local library or a CHARX archive when bundled assets are needed.
 
 ## CHARX Import Pipeline
 

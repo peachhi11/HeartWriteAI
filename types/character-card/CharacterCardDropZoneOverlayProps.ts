@@ -8,4 +8,5 @@ export interface CharacterCardDropZoneOverlayProps {
     sourcePngData?: Uint8Array | null,
   ) => void;
   onDropError?: (message: string) => void;
+  onImageOnlyPng?: (filePath: string, sourcePngData?: Uint8Array | null) => void;
 }

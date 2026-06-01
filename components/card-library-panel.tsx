@@ -5,6 +5,7 @@ import {
   Archive,
   ChevronLeft,
   ChevronRight,
+  Eraser,
   Loader2,
   Search,
   Tags,
@@ -201,6 +202,8 @@ export default function CardLibraryPanel({
   const [selectedCharacterRoleTag, setSelectedCharacterRoleTag] = useState("ALL");
   const [selectedUserRoleTag, setSelectedUserRoleTag] = useState("ALL");
   const [selectedTropeTag, setSelectedTropeTag] = useState("ALL");
+  const [cleanMessage, setCleanMessage] = useState<string | null>(null);
+  const [cleaningMissing, setCleaningMissing] = useState(false);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -253,6 +256,26 @@ export default function CardLibraryPanel({
     }));
   }
 
+  async function handleCleanMissing() {
+    setCleaningMissing(true);
+    setCleanMessage(null);
+
+    try {
+      const removedCount = await library.cleanMissingPaths();
+      setCleanMessage(
+        removedCount > 0
+          ? `Removed ${removedCount} missing path${removedCount === 1 ? "" : "s"}.`
+          : "No missing paths found.",
+      );
+    } catch (error) {
+      setCleanMessage(
+        error instanceof Error ? error.message : "Could not clean missing paths.",
+      );
+    } finally {
+      setCleaningMissing(false);
+    }
+  }
+
   return (
     <aside
       className={cn(
@@ -301,22 +324,40 @@ export default function CardLibraryPanel({
         </div>
 
         {activeTab === "characters" ? (
-          <CharacterLibraryFilters
-            filters={filters}
-            searchTerm={searchTerm}
-            selectedCharacterRoleTag={selectedCharacterRoleTag}
-            selectedPovTag={selectedPovTag}
-            selectedTropeTag={selectedTropeTag}
-            selectedUserRoleTag={selectedUserRoleTag}
-            tagSearchTerm={tagSearchTerm}
-            onDropdownChange={handleDropdownChange}
-            onSearchTermChange={setSearchTerm}
-            onSelectedCharacterRoleTagChange={setSelectedCharacterRoleTag}
-            onSelectedPovTagChange={setSelectedPovTag}
-            onSelectedTropeTagChange={setSelectedTropeTag}
-            onSelectedUserRoleTagChange={setSelectedUserRoleTag}
-            onTagSearchTermChange={setTagSearchTerm}
-          />
+          <div className="space-y-3">
+            <CharacterLibraryFilters
+              filters={filters}
+              searchTerm={searchTerm}
+              selectedCharacterRoleTag={selectedCharacterRoleTag}
+              selectedPovTag={selectedPovTag}
+              selectedTropeTag={selectedTropeTag}
+              selectedUserRoleTag={selectedUserRoleTag}
+              tagSearchTerm={tagSearchTerm}
+              onDropdownChange={handleDropdownChange}
+              onSearchTermChange={setSearchTerm}
+              onSelectedCharacterRoleTagChange={setSelectedCharacterRoleTag}
+              onSelectedPovTagChange={setSelectedPovTag}
+              onSelectedTropeTagChange={setSelectedTropeTag}
+              onSelectedUserRoleTagChange={setSelectedUserRoleTag}
+              onTagSearchTermChange={setTagSearchTerm}
+            />
+            {library.isDesktopRuntime ? (
+              <div className="grid gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => void handleCleanMissing()}
+                  disabled={cleaningMissing || loading}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-zinc-400 transition hover:bg-zinc-800 hover:text-zinc-200 disabled:cursor-wait disabled:opacity-45"
+                >
+                  <Eraser className="size-3" />
+                  {cleaningMissing ? "Cleaning..." : "Clean Missing"}
+                </button>
+                {cleanMessage ? (
+                  <p className="text-[11px] text-zinc-500">{cleanMessage}</p>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
         ) : (
           <label className="relative block">
             <span className="sr-only">Search persona name or tag</span>
@@ -569,12 +610,19 @@ function CharacterLibraryList({
       ) : null}
 
       {!loading && !error
-        ? items.map((card) => (
+        ? items.map((card) => {
+            const isMissing = !card.file_exists && !card.file_path.startsWith("/mock/");
+
+            return (
             <button
               key={card.id}
               type="button"
               onClick={() => onCardSelect(card.file_path)}
-              className="group flex w-full flex-col items-start gap-1 rounded-lg border border-transparent p-2.5 text-left transition hover:border-zinc-800 hover:bg-zinc-900/40 focus:border-violet-500/50 focus:bg-violet-500/5 focus:outline-none"
+              className={`group flex w-full flex-col items-start gap-1 rounded-lg border p-2.5 text-left transition focus:border-violet-500/50 focus:bg-violet-500/5 focus:outline-none ${
+                isMissing
+                  ? "border-amber-500/20 bg-amber-500/5 opacity-70 hover:border-amber-500/30"
+                  : "border-transparent hover:border-zinc-800 hover:bg-zinc-900/40"
+              }`}
             >
               <h3 className="w-full truncate text-xs font-bold text-zinc-200 transition group-hover:text-violet-400">
                 {card.name}
@@ -601,8 +649,14 @@ function CharacterLibraryList({
                   ))}
                 </div>
               ) : null}
+              {isMissing ? (
+                <span className="mt-1 text-[10px] font-semibold uppercase tracking-wide text-amber-400">
+                  Missing on disk
+                </span>
+              ) : null}
             </button>
-          ))
+            );
+          })
         : null}
     </>
   );

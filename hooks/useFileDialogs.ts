@@ -64,10 +64,7 @@ export function useFileDialogs() {
     }
   }
 
-  async function triggerSecureCardImport(password: string): Promise<{
-    card: ValidatedCharacterCardV3;
-    path: string;
-  } | null> {
+  async function triggerCharacterFileSelect(): Promise<string | null> {
     if (!isDesktopRuntime) {
       return null;
     }
@@ -75,11 +72,11 @@ export function useFileDialogs() {
     try {
       const openedPath = await open({
         multiple: false,
-        title: "Import Encrypted HeartWriteAI Card",
+        title: "Choose Character Image or Card",
         filters: [
           {
-            name: "HeartWriteAI Secure Card",
-            extensions: ["hwcard"],
+            name: "Character Image or Card",
+            extensions: ["png", "apng", "json", "charx"],
           },
         ],
       });
@@ -88,16 +85,10 @@ export function useFileDialogs() {
         return null;
       }
 
-      const cardData = await invoke<unknown>("import_encrypted_character_card", {
-        filePath: openedPath,
-        password,
-      });
-      const card = CharacterCardV3Schema.parse(cardData);
-
-      return { card, path: openedPath };
+      return openedPath;
     } catch (error) {
-      console.error("Encrypted card import collapsed:", error);
-      throw error;
+      console.error("Character file selection collapsed:", error);
+      return null;
     }
   }
 
@@ -190,36 +181,6 @@ export function useFileDialogs() {
     }
   }
 
-  async function triggerSecureCardExport(
-    cardData: ValidatedCharacterCardV3,
-    password: string,
-  ): Promise<string | null> {
-    if (!isDesktopRuntime) {
-      return null;
-    }
-
-    try {
-      const saveDestinationPath = await save({
-        title: "Export Encrypted HeartWriteAI Card",
-        defaultPath: createSafeCharacterFileName(cardData.data.name, ".hwcard"),
-        filters: [{ name: "HeartWriteAI Secure Card", extensions: ["hwcard"] }],
-      });
-
-      if (!saveDestinationPath) {
-        return null;
-      }
-
-      return await invoke<string>("export_encrypted_character_card", {
-        cardJson: cardData,
-        password,
-        targetSavePath: saveDestinationPath,
-      });
-    } catch (error) {
-      console.error("Encrypted card export collapsed:", error);
-      throw error;
-    }
-  }
-
   async function triggerPngMetadataSave(
     sourceImagePath: string,
     cardData: ValidatedCharacterCardV3,
@@ -253,13 +214,12 @@ export function useFileDialogs() {
   }
 
   return {
+    triggerCharacterFileSelect,
     isDesktopRuntime,
     triggerCharxExport,
     triggerFolderIntakeSelect,
     triggerPngShellImport,
     triggerPngMetadataSave,
-    triggerSecureCardExport,
-    triggerSecureCardImport,
     triggerUniversalImport,
   };
 }

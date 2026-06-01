@@ -41,6 +41,14 @@ pub struct FolderIntakeImportResult {
 }
 
 #[tauri::command]
+pub async fn validate_file_paths(paths: Vec<String>) -> Result<Vec<String>, String> {
+    Ok(paths
+        .into_iter()
+        .filter(|path| Path::new(path).is_file())
+        .collect())
+}
+
+#[tauri::command]
 pub async fn seed_mock_library_cache(
     state: tauri::State<'_, AppState>,
     count: i32,
@@ -62,6 +70,37 @@ pub async fn search_library_cache(
         .ok_or_else(|| "Database engine currently sleeping.".to_string())?;
 
     db.query_library_page(filter)
+}
+
+#[tauri::command]
+pub async fn remove_cached_card_path(
+    state: tauri::State<'_, AppState>,
+    file_path: String,
+) -> Result<bool, String> {
+    let db_guard = state
+        .db
+        .lock()
+        .map_err(|_| "Failed capturing lock hook context".to_string())?;
+    let db = db_guard
+        .as_ref()
+        .ok_or_else(|| "Database engine currently sleeping.".to_string())?;
+
+    db.delete_card_for_path(&file_path)
+}
+
+#[tauri::command]
+pub async fn clean_missing_cached_card_paths(
+    state: tauri::State<'_, AppState>,
+) -> Result<usize, String> {
+    let db_guard = state
+        .db
+        .lock()
+        .map_err(|_| "Failed capturing lock hook context".to_string())?;
+    let db = db_guard
+        .as_ref()
+        .ok_or_else(|| "Database engine currently sleeping.".to_string())?;
+
+    db.delete_missing_card_paths()
 }
 
 #[tauri::command]

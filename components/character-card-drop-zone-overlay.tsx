@@ -13,6 +13,8 @@ import { importBrowserCharacterCardFile } from "@/lib/character-card/importBrows
 import { isTauriRuntime } from "@/lib/tauri/native";
 import { CharacterCardDropZoneOverlayProps } from "@/types/character-card/CharacterCardDropZoneOverlayProps";
 
+const MAX_BROWSER_PNG_SHELL_BYTES = 20 * 1024 * 1024;
+
 const TauriDragDropPayloadSchema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("enter"),
@@ -37,6 +39,7 @@ export function CharacterCardDropZoneOverlay({
   onAssetTranscoded,
   onCardParsed,
   onDropError,
+  onImageOnlyPng,
 }: CharacterCardDropZoneOverlayProps) {
   const [isDragging, setIsDragging] = useState(false);
   const { importCardFromPath, transcodeAssetToPng } = useCharacterLibrary();
@@ -101,6 +104,23 @@ export function CharacterCardDropZoneOverlay({
           const result = await importBrowserCharacterCardFile(file);
           onCardParsed(result.card, result.path, result.sourcePngData);
         } catch (error) {
+          if (isBrowserPngFile(file) && isMissingBrowserCardMetadataError(error)) {
+            if (file.size > MAX_BROWSER_PNG_SHELL_BYTES) {
+              onDropError?.(
+                "PNG is too large for browser import. Use the desktop app for oversized images.",
+              );
+              return;
+            }
+
+            const pngData = new Uint8Array(await file.arrayBuffer());
+            if (onImageOnlyPng) {
+              onImageOnlyPng(file.name, pngData);
+            } else {
+              onCardParsed(createBlankDraftCharacterCard(file.name), file.name, pngData);
+            }
+            return;
+          }
+
           onDropError?.(error instanceof Error ? error.message : String(error));
         }
       }
@@ -137,7 +157,11 @@ export function CharacterCardDropZoneOverlay({
           assetKind === "png-card" &&
           result.error.includes("No character card metadata")
         ) {
-          onCardParsed(createBlankDraftCharacterCard(targetFile), targetFile, null);
+          if (onImageOnlyPng) {
+            onImageOnlyPng(targetFile, null);
+          } else {
+            onCardParsed(createBlankDraftCharacterCard(targetFile), targetFile, null);
+          }
         } else if (result.error) {
           onDropError?.(result.error);
         }
@@ -219,6 +243,7 @@ export function CharacterCardDropZoneOverlay({
     onAssetTranscoded,
     onCardParsed,
     onDropError,
+    onImageOnlyPng,
     transcodeAssetToPng,
   ]);
 
@@ -243,5 +268,22 @@ export function CharacterCardDropZoneOverlay({
         </div>
       </div>
     </div>
+  );
+}
+
+function isBrowserPngFile(file: File) {
+  const normalizedName = file.name.toLowerCase();
+  return (
+    normalizedName.endsWith(".png") ||
+    normalizedName.endsWith(".apng") ||
+    file.type === "image/png" ||
+    file.type === "image/apng"
+  );
+}
+
+function isMissingBrowserCardMetadataError(error: unknown) {
+  return (
+    error instanceof Error &&
+    error.message.includes("supported character card metadata")
   );
 }

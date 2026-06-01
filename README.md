@@ -6,14 +6,20 @@ The app is being built CCV3-first. New cards should be authored as Character Car
 
 ## What HeartWriteAI Is For
 
-- CCV3-first character card creation, editing, conversion, and PNG/CHARX export.
+- CCV3-first character card creation, editing, conversion, and PNG export.
 - Editable persona profiles and persona matching.
 - World, character, persona, scenario, and arc lorebooks.
 - Scenario and trope routing through lorebooks instead of bloating character cards.
 - Local chat runtime with active lorebooks, summaries, shared token budgets, and stop presets.
 - Future local inference through Ollama, llama.cpp-compatible APIs, or proxy/model presets.
 
-CHARX is the native master format for saved cards because it can preserve the full card payload and bundled assets. PNG is the compatibility/share format for platforms that still expect image cards. JSON is infrastructure, not the primary user interface: users should edit readable fields and structured controls, while JSON appears mainly as export data, embedded PNG metadata, or advanced debugging.
+PNG with embedded CCV3 metadata is the primary character-card format because it
+stays portable across the roleplay ecosystem. CHARX is reserved for bundle and
+archive workflows that need adjacent assets. JSON is infrastructure, not the
+primary user interface: users should edit readable fields and structured
+controls, while JSON appears mainly as export data, embedded PNG metadata, or
+advanced debugging. HeartWriteAI does not maintain a bespoke `.hwcard` card
+format.
 
 ## Stack
 
@@ -84,8 +90,8 @@ Implemented in the current scaffold:
 - Browser-side image intake pipeline for validation, compression, blurhash, and EXIF date extraction.
 - CCV3 PNG metadata read/write layer with V1/V2 conversion support through `@risuai/ccardlib`.
 - Browser and desktop import paths for PNG/APNG and JSON character cards, including browser download fallbacks when Tauri APIs are unavailable.
-- CHARX import/export support for full-fidelity card masters.
-- Folder intake review in the desktop app for scanning mixed PNG/JSON/CHARX folders, separating ready cards from image-only, lorebook, skipped, and broken files, and saving selected imports as CHARX masters.
+- CHARX import/export support for bundled/archive card packages.
+- Folder intake review in the desktop app for scanning mixed PNG/JSON/CHARX folders, separating ready cards from image-only, lorebook, skipped, and broken files, and saving selected imports into the local library or a CHARX archive package when bundled assets are needed.
 - Desktop card-library cache with user-facing filters for chat style, POV, character role, user role, tropes, and AU tags.
 - Hidden emotion/feeling lexicon for ForceBary-style tag suggestions, exposed only as friendly story-engine tags rather than classifier internals.
 - Prompt runtime compiler that lets a card override the default app system prompt, or extend it with `{{original}}`.
@@ -142,8 +148,8 @@ The current priority order is:
 
 1. Harden desktop runtime smoke tests for save/load, variants, copy actions,
    lore diagnostics, and Tauri shell parity.
-2. Continue CCV3 PNG/JSON/CHARX import/export stabilization, with CHARX as the
-   native master.
+2. Continue CCV3 PNG import/export stabilization as the primary character-card
+   path, with CHARX and JSON limited to bundle/archive/debug workflows.
 3. Mature persona, scenario, lorebook, and relationship workflows around the
    shared normalized asset model.
 4. Expand Tauri local file/library management.

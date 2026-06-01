@@ -169,7 +169,7 @@ pub fn is_supported_expression_path(path: &Path) -> bool {
         .map(|extension| {
             matches!(
                 extension.to_ascii_lowercase().as_str(),
-                "avif" | "jpeg" | "jpg" | "png" | "webp"
+                "apng" | "avif" | "jpeg" | "jpg" | "png" | "webp"
             )
         })
         .unwrap_or(false)
@@ -191,6 +191,7 @@ pub fn mime_type_for_expression_path(path: &Path) -> &'static str {
     {
         Some("avif") => "image/avif",
         Some("jpeg" | "jpg") => "image/jpeg",
+        Some("apng") => "image/apng",
         Some("png") => "image/png",
         Some("webp") => "image/webp",
         _ => "application/octet-stream",

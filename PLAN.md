@@ -63,9 +63,9 @@ Exit criteria:
 Status: complete for the scaffold baseline. Continue updating docs as features
 graduate from prototype to committed runtime surfaces.
 
-## Phase 2: CCV3 PNG/JSON Import/Export Codec
+## Phase 2: CCV3 PNG Import/Export Codec
 
-Goal: make HeartWriteAI capable of reading and writing character-card metadata across browser and desktop runtimes, with CHARX as the native master format and PNG/JSON as compatibility/debug paths.
+Goal: make HeartWriteAI capable of reading and writing character-card metadata across browser and desktop runtimes, with PNG plus embedded CCV3 metadata as the primary card format. CHARX and JSON remain bundle/archive/debug infrastructure rather than first-class card formats.
 
 - Add a small app-native character-card codec layer using:
   - `png-chunks-extract`
@@ -77,12 +77,13 @@ Goal: make HeartWriteAI capable of reading and writing character-card metadata a
 - Support browser drag/drop and file-picker imports without requiring Tauri APIs.
 - Support desktop native dialogs and desktop drag/drop when Tauri APIs are available.
 - Write exported PNGs with embedded `ccv3` metadata.
-- Support CHARX import/export as the preferred full-fidelity desktop save format.
+- Support CHARX import/export for bundled/archive packages that need adjacent assets.
 - Import CHARX through a safe archive pipeline: reject encrypted zips, reject path traversal, require root `card.json`, cap file count and decompressed size, allowlist asset MIME types, and preserve the original package as a backup/export artifact.
 - Store accepted desktop CHARX imports under Tauri app data as `characters/{character_id}/card.json`, `original.charx`, copied `assets/`, and local `meta.json`.
 - Use Rust/Tauri commands for local CHARX reads, zip validation, asset copying, SQLite writes, and searchable-field indexing; keep the Next.js side focused on preview, confirmation, library browsing, and publish/sync actions.
 - Treat local CHARX validation as sufficient for private desktop library use, but require repeated server-side validation before any publish/sync/public listing path.
 - Keep JSON visible as export/debug infrastructure, not the main editing UI.
+- Do not maintain a HeartWriteAI-only `.hwcard` card format.
 - Add focused tests for:
   - PNG with `ccv3`
   - PNG with only `chara`
@@ -94,7 +95,8 @@ Exit criteria:
 - A dragged-in character PNG can be parsed into app data.
 - A generated or edited CCV3 card can be embedded back into a PNG.
 - Browser mode downloads exported JSON/PNG safely, while desktop mode can use native save dialogs.
-- Desktop mode can save full-fidelity CHARX masters and export PNG copies for wider compatibility.
+- Desktop mode can save CCV3 PNG cards as the primary portable artifact and
+  use CHARX only when a bundle/archive package is needed.
 
 Reference signals:
 
@@ -214,7 +216,8 @@ Goal: support real local libraries rather than one-file browser demos.
 - Add Tauri commands for native open/save dialogs and safe local file reads/writes.
 - Add a local folder intake reviewer for mixed card folders containing PNG/APNG, JSON, CHARX, and stray image files.
 - Sort intake results into user-facing states: ready, will convert, image only, lorebook, skipped, and needs review.
-- Save selected ready imports into the local library as CHARX masters.
+- Save selected ready imports into the local library while preserving PNG/CCV3
+  as the primary character-card artifact and using CHARX only for bundles.
 - Use lazy card metadata loading and thumbnail caching so large libraries remain responsive.
 - Keep image and card storage local-first.
 - Add settings for library paths, cache behavior, and backup behavior.
@@ -226,7 +229,7 @@ Exit criteria:
 
 - The app can browse and manage a local card library without loading every card fully into memory.
 - Users can import/export card PNGs and JSON through native desktop dialogs.
-- Users can scan an inbox folder, review each file before import, and promote selected cards into CHARX master packages.
+- Users can scan an inbox folder, review each file before import, and promote selected cards into the local library or a bundle/archive package.
 - Desktop-only controls are hidden or clearly downgraded in browser mode.
 
 ## Phase 6: Context Compiler and Chat Runtime
@@ -608,11 +611,12 @@ Exit criteria:
 ## Defaults and Constraints
 
 - New cards are CCV3-first.
-- CHARX is the native master format for saved cards in the desktop app.
-- PNG/APNG is the compatibility/share format for other platforms.
+- PNG/APNG with embedded CCV3 metadata is the primary saved card format.
+- CHARX is reserved for bundle/archive workflows that need adjacent assets.
 - V1/V2 support exists for import, conversion, and sanity checks.
 - User-facing editing should be readable fields and controls, not exposed raw JSON.
 - JSON remains necessary for export, embedded PNG metadata, validation, and debugging.
+- HeartWriteAI-only `.hwcard` imports/exports are out of scope.
 - Tauri is the primary desktop wrapper unless a concrete Electron-only requirement appears.
 - Auto-update remains disabled until signing keys, HTTPS releases, updater artifacts, rollback behavior, and staged rollout are real.
 - CharacterGen Python/PyQt remains a reference archive. HeartWriteAI implementation lives in Next.js, Tailwind, TypeScript, Rust, and Tauri v2.

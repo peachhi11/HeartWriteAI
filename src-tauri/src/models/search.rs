@@ -15,6 +15,7 @@ pub struct SearchFilters {
 pub struct CacheItemSummary {
     pub id: String,
     pub file_path: String,
+    pub file_exists: bool,
     pub name: String,
     pub framework: String,
     pub relationship: String,

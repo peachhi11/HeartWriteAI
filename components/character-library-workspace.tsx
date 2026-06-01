@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { convertFileSrc } from "@tauri-apps/api/core";
 import {
   BookOpen,
+  Eraser,
   Heart,
   LibraryBig,
   MessageCircle,
@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import type { CacheItemSummary, useCardLibrary } from "@/hooks/useCardLibrary";
+import { getLocalAssetUrl } from "@/lib/tauri/localAssetUrl";
 import type { ValidatedCharacterCardV3 } from "@/types/ccv3";
 
 interface CharacterLibraryWorkspaceProps {
@@ -60,6 +61,29 @@ export function CharacterLibraryWorkspace({
   sourcePngData,
   variant = "full",
 }: CharacterLibraryWorkspaceProps) {
+  const [cleanMessage, setCleanMessage] = useState<string | null>(null);
+  const [cleaningMissing, setCleaningMissing] = useState(false);
+
+  async function handleCleanMissing() {
+    setCleaningMissing(true);
+    setCleanMessage(null);
+
+    try {
+      const removedCount = await library.cleanMissingPaths();
+      setCleanMessage(
+        removedCount > 0
+          ? `Removed ${removedCount} missing path${removedCount === 1 ? "" : "s"}.`
+          : "No missing paths found.",
+      );
+    } catch (error) {
+      setCleanMessage(
+        error instanceof Error ? error.message : "Could not clean missing paths.",
+      );
+    } finally {
+      setCleaningMissing(false);
+    }
+  }
+
   if (activeCard) {
     return (
       <section
@@ -121,14 +145,30 @@ export function CharacterLibraryWorkspace({
                 : "Desktop library cache appears in the Tauri app"}
             </p>
           </div>
-          <button
-            type="button"
-            onClick={onOpenLibraryDrawer}
-            className="rounded-md border px-3 py-2 text-xs font-semibold transition hover:bg-muted"
-          >
-            Filters
-          </button>
+          <div className="flex flex-wrap justify-end gap-2">
+            {library.isDesktopRuntime ? (
+              <button
+                type="button"
+                onClick={() => void handleCleanMissing()}
+                disabled={cleaningMissing || library.loading}
+                className="inline-flex items-center gap-1.5 rounded-md border px-3 py-2 text-xs font-semibold transition hover:bg-muted disabled:cursor-wait disabled:opacity-50"
+              >
+                <Eraser className="size-3.5" />
+                {cleaningMissing ? "Cleaning" : "Clean Missing"}
+              </button>
+            ) : null}
+            <button
+              type="button"
+              onClick={onOpenLibraryDrawer}
+              className="rounded-md border px-3 py-2 text-xs font-semibold transition hover:bg-muted"
+            >
+              Filters
+            </button>
+          </div>
         </div>
+        {cleanMessage ? (
+          <p className="text-xs text-muted-foreground">{cleanMessage}</p>
+        ) : null}
 
         <CharacterCardGrid
           items={library.items}
@@ -317,12 +357,19 @@ function CharacterCardGrid({
 
   return (
     <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-      {items.map((card) => (
+      {items.map((card) => {
+        const isMissing = !card.file_exists && !card.file_path.startsWith("/mock/");
+
+        return (
         <button
           key={card.id}
           type="button"
           onClick={() => onCardSelect(card.file_path)}
-          className="group overflow-hidden rounded-md border bg-background text-left transition hover:border-rose-200 hover:shadow-sm"
+          className={`group overflow-hidden rounded-md border bg-background text-left transition hover:shadow-sm ${
+            isMissing
+              ? "border-amber-500/30 opacity-75 hover:border-amber-500/50"
+              : "hover:border-rose-200"
+          }`}
         >
           <CardAvatarPreview
             className="aspect-[4/3] border-b"
@@ -349,11 +396,12 @@ function CharacterCardGrid({
               ))}
             </div>
             <span className="text-sm font-semibold text-foreground">
-              Open profile
+              {isMissing ? "Path missing" : "Open profile"}
             </span>
           </div>
         </button>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -378,7 +426,7 @@ function CardAvatarPreview(props: {
   const canPreview = props.filePath
     ? /\.(apng|png)$/i.test(props.filePath)
     : false;
-  const fileSrc = canPreview && props.filePath ? convertFileSrc(props.filePath) : null;
+  const fileSrc = canPreview ? getLocalAssetUrl(props.filePath) : null;
   const src = embeddedPngSrc ?? fileSrc;
   const [failedSrc, setFailedSrc] = useState<string | null>(null);
   const canRenderImage = src && failedSrc !== src;
