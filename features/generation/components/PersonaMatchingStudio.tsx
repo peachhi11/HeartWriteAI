@@ -7,6 +7,31 @@ import { Activity, Gauge, HeartHandshake, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  compileFlirtingPresetAdditions,
+  findFlirtingPresetById,
+  FLIRTING_PRESETS,
+} from "@/data/flirtingPresets";
+import {
+  compileOriginWoundPresetAdditions,
+  findOriginWoundVocabularyPresetById,
+  ORIGIN_WOUND_VOCABULARY_PRESETS,
+} from "@/data/originWoundVocabularyPresets";
+import {
+  compileRelationshipDynamicVocabularyInjection,
+  findRelationshipDynamicVocabularyById,
+  RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS,
+} from "@/data/relationshipDynamicVocabulary";
+import {
+  compileSpeechStylePresetSummary,
+  findSpeechStylePresetById,
+  SPEECH_STYLE_PRESETS,
+} from "@/data/speechStylePresets";
+import {
+  compileVoiceVocabularyPresetAdditions,
+  findVoiceVocabularyPresetById,
+  VOICE_VOCABULARY_PRESETS,
+} from "@/data/voiceVocabularyPresets";
+import {
   Card,
   CardContent,
   CardDescription,
@@ -56,6 +81,14 @@ const fallbackTargetPreferredTones: RomanceTropeClass[] = [
   "sunshine",
 ];
 
+const matchingVocabularySeedIds = [
+  ...RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS.map((preset) => preset.id),
+  ...FLIRTING_PRESETS.map((preset) => preset.id),
+  ...ORIGIN_WOUND_VOCABULARY_PRESETS.map((preset) => preset.id),
+  ...SPEECH_STYLE_PRESETS.map((preset) => preset.id),
+  ...VOICE_VOCABULARY_PRESETS.map((preset) => preset.id),
+];
+
 export function PersonaMatchingStudio() {
   const [name, setName] = useState("Protagonist");
   const [primaryBias, setPrimaryBias] =
@@ -76,6 +109,7 @@ export function PersonaMatchingStudio() {
   const [targetDescription, setTargetDescription] = useState(
     "A protective, brooding royal guard who shields his isolation with rigid, polite duty.",
   );
+  const [matchingSeedInput, setMatchingSeedInput] = useState("");
   const [targetAvatarDataUri, setTargetAvatarDataUri] = useState<string | null>(
     null,
   );
@@ -184,6 +218,21 @@ export function PersonaMatchingStudio() {
     }
   }
 
+  function applyMatchingVocabularySeed() {
+    const compiledSeed = compileMatchingVocabularySeed(matchingSeedInput);
+    if (!compiledSeed) {
+      setSyncStatus("No matching vocabulary preset found for that seed ID.");
+      return;
+    }
+
+    setTargetDescription((current) =>
+      [current, compiledSeed].filter(Boolean).join("\n\n"),
+    );
+    setSyncStatus("Applied vocabulary seed to the target matching profile.");
+    setDialoguePreview(null);
+    setMatchingSeedInput("");
+  }
+
   return (
     <Card className="bg-card/85">
       <CardHeader className="gap-3 md:flex-row md:items-start md:justify-between">
@@ -264,6 +313,33 @@ export function PersonaMatchingStudio() {
               </select>
             </Field>
           </div>
+
+          <Field label="Vocabulary seed influence">
+            <div className="grid gap-2">
+              <Input
+                autoComplete="off"
+                data-no-field-copy="true"
+                list="persona-match-vocabulary-seeds"
+                placeholder="Choose any vocabulary preset ID..."
+                value={matchingSeedInput}
+                onChange={(event) =>
+                  setMatchingSeedInput(event.currentTarget.value)
+                }
+              />
+              <datalist id="persona-match-vocabulary-seeds">
+                {matchingVocabularySeedIds.map((seedId) => (
+                  <option key={seedId} value={seedId} />
+                ))}
+              </datalist>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={applyMatchingVocabularySeed}
+              >
+                Apply Seed to Match
+              </Button>
+            </div>
+          </Field>
 
           <div className="grid gap-4 rounded-md border bg-background/70 p-4">
             <RangeControl label="Charm" value={charm} onChange={setCharm} />
@@ -408,6 +484,63 @@ function normalizeTropeList(tones: string[]) {
     .map((result) => result.data);
 
   return Array.from(new Set(normalized));
+}
+
+function compileMatchingVocabularySeed(seedId: string) {
+  const trimmedSeedId = seedId.trim();
+  if (!trimmedSeedId) {
+    return "";
+  }
+
+  const relationshipVocabulary =
+    findRelationshipDynamicVocabularyById(trimmedSeedId);
+  if (relationshipVocabulary) {
+    const injection =
+      compileRelationshipDynamicVocabularyInjection(relationshipVocabulary);
+    return [
+      `Relationship vocabulary preset: ${relationshipVocabulary.vibe}.`,
+      injection.lexicalConstraints,
+      injection.formattingDirectives,
+      injection.systemBehavior,
+    ].join("\n");
+  }
+
+  const flirting = findFlirtingPresetById(trimmedSeedId);
+  if (flirting) {
+    const additions = compileFlirtingPresetAdditions(flirting);
+    return [
+      additions.personalityAddition,
+      additions.scenarioAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const originWound = findOriginWoundVocabularyPresetById(trimmedSeedId);
+  if (originWound) {
+    const additions = compileOriginWoundPresetAdditions(originWound);
+    return [
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const speechStyle = findSpeechStylePresetById(trimmedSeedId);
+  if (speechStyle) {
+    return compileSpeechStylePresetSummary(speechStyle);
+  }
+
+  const voiceVocabulary = findVoiceVocabularyPresetById(trimmedSeedId);
+  if (voiceVocabulary) {
+    const additions = compileVoiceVocabularyPresetAdditions(voiceVocabulary);
+    return [
+      additions.speechStyleAddition,
+      additions.lexicalGuidance,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  return "";
 }
 
 function toExtractedCharacterPayload(

@@ -24,6 +24,31 @@ import { useCardLibrary } from "@/hooks/useCardLibrary";
 import { savePersonaLibraryItem } from "@/hooks/usePersonaLibrary";
 import { createPersonaArtifactFromCharacterCard } from "@/features/generation/workflows";
 import { downloadUint8Array } from "@/lib/browser/downloadUint8Array";
+import {
+  compileFlirtingPresetAdditions,
+  findFlirtingPresetById,
+  FLIRTING_PRESETS,
+} from "@/data/flirtingPresets";
+import {
+  compileOriginWoundPresetAdditions,
+  findOriginWoundVocabularyPresetById,
+  ORIGIN_WOUND_VOCABULARY_PRESETS,
+} from "@/data/originWoundVocabularyPresets";
+import {
+  compileRelationshipDynamicVocabularyInjection,
+  findRelationshipDynamicVocabularyById,
+  RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS,
+} from "@/data/relationshipDynamicVocabulary";
+import {
+  compileSpeechStylePresetSummary,
+  findSpeechStylePresetById,
+  SPEECH_STYLE_PRESETS,
+} from "@/data/speechStylePresets";
+import {
+  compileVoiceVocabularyPresetAdditions,
+  findVoiceVocabularyPresetById,
+  VOICE_VOCABULARY_PRESETS,
+} from "@/data/voiceVocabularyPresets";
 import { importBrowserCharacterCardFile } from "@/lib/character-card/importBrowserCharacterCardFile";
 import { consumePendingLibraryCardPath } from "@/lib/character-card/librarySelectionHandoff";
 import { createCharacterCardV3Export } from "@/lib/character-card/createCharacterCardV3Export";
@@ -46,6 +71,16 @@ type StarterFieldKey =
   | "personality"
   | "personalitySeeds"
   | "background"
+  | "originWounds"
+  | "formativeEvents"
+  | "familyHistory"
+  | "careerStatus"
+  | "secrets"
+  | "regrets"
+  | "exile"
+  | "betrayal"
+  | "loss"
+  | "ambition"
   | "relationshipDynamic"
   | "scenario"
   | "firstMessage";
@@ -55,7 +90,7 @@ const starterFieldDefinitions: Array<{
   label: string;
   placeholder: string;
   rows?: number;
-  section: "core" | "vibe" | "relationship" | "opening";
+  section: "backstory" | "core" | "vibe" | "relationship" | "opening";
 }> = [
   {
     key: "name",
@@ -100,10 +135,80 @@ const starterFieldDefinitions: Array<{
   },
   {
     key: "background",
-    label: "Formative memory",
-    placeholder: "The past moment, wound, triumph, or private ritual that shaped them...",
+    label: "Backstory summary",
+    placeholder: "A short overview of the past that shaped them...",
     rows: 3,
-    section: "relationship",
+    section: "backstory",
+  },
+  {
+    key: "originWounds",
+    label: "Origin wound",
+    placeholder: "The inner scar, insecurity, fear, or belief they carry...",
+    rows: 2,
+    section: "backstory",
+  },
+  {
+    key: "formativeEvents",
+    label: "Formative event",
+    placeholder: "The moment that pushed them onto their current path...",
+    rows: 2,
+    section: "backstory",
+  },
+  {
+    key: "familyHistory",
+    label: "Family history",
+    placeholder: "Family expectations, lineage, found family, absence, or old obligations...",
+    rows: 2,
+    section: "backstory",
+  },
+  {
+    key: "careerStatus",
+    label: "Status and role",
+    placeholder: "Current job, authority level, social position, reputation, or resource access...",
+    rows: 2,
+    section: "backstory",
+  },
+  {
+    key: "secrets",
+    label: "Hidden secret",
+    placeholder: "Something private, risky, shameful, protected, or not yet confessed...",
+    rows: 2,
+    section: "backstory",
+  },
+  {
+    key: "regrets",
+    label: "Core regret",
+    placeholder: "The choice, silence, failure, or missed chance they still replay...",
+    rows: 2,
+    section: "backstory",
+  },
+  {
+    key: "exile",
+    label: "Exile profile",
+    placeholder: "How they were separated from home, comfort, belonging, or their former life...",
+    rows: 2,
+    section: "backstory",
+  },
+  {
+    key: "betrayal",
+    label: "Past betrayal",
+    placeholder: "A breach of trust that changed what they believe about people...",
+    rows: 2,
+    section: "backstory",
+  },
+  {
+    key: "loss",
+    label: "Critical loss",
+    placeholder: "The person, place, title, object, safety, or future they cannot fully replace...",
+    rows: 2,
+    section: "backstory",
+  },
+  {
+    key: "ambition",
+    label: "Core ambition",
+    placeholder: "What they want now, and what they are willing or unwilling to risk for it...",
+    rows: 2,
+    section: "backstory",
   },
   {
     key: "relationshipDynamic",
@@ -129,21 +234,31 @@ const starterFieldDefinitions: Array<{
 ];
 
 const emptyStarterFields: Record<StarterFieldKey, string> = {
+  ambition: "",
   appearance: "",
   basicInfo: "",
   background: "",
+  betrayal: "",
+  careerStatus: "",
+  exile: "",
+  familyHistory: "",
   firstMessage: "",
+  formativeEvents: "",
+  loss: "",
   name: "",
+  originWounds: "",
   personality: "",
   personalitySeeds: "",
+  regrets: "",
   relationshipDynamic: "",
   scenario: "",
+  secrets: "",
   visualSeeds: "",
 };
 
 const starterSections: Array<{
   description: string;
-  id: "core" | "vibe" | "relationship" | "opening";
+  id: "backstory" | "core" | "vibe" | "relationship" | "opening";
   label: string;
 }> = [
   {
@@ -157,9 +272,14 @@ const starterSections: Array<{
     description: "Appearance, aesthetic, personality, and distinctive texture.",
   },
   {
+    id: "backstory",
+    label: "Backstory dimensions",
+    description: "Optional deeper history fields for wounds, losses, secrets, regrets, and current ambition.",
+  },
+  {
     id: "relationship",
     label: "History and dynamic",
-    description: "Past shaping moments, relationship pressure, and the active scene.",
+    description: "Relationship pressure and the active scene.",
   },
   {
     id: "opening",
@@ -232,6 +352,14 @@ const seedVocabulary = {
     "old scar",
     "restless hands",
   ],
+  backstory: [
+    "old family obligation",
+    "exile from home",
+    "public disgrace",
+    "private grief",
+    "unfinished promise",
+    ...ORIGIN_WOUND_VOCABULARY_PRESETS.map((preset) => preset.id),
+  ],
   personality: [
     "guarded",
     "dry humor",
@@ -243,6 +371,8 @@ const seedVocabulary = {
     "principled",
     "touch-starved",
     "quietly intense",
+    ...SPEECH_STYLE_PRESETS.map((preset) => preset.id),
+    ...VOICE_VOCABULARY_PRESETS.map((preset) => preset.id),
   ],
   relationship: [
     "complement",
@@ -255,6 +385,8 @@ const seedVocabulary = {
     "protective distance",
     "fake alliance",
     "slow burn",
+    ...RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS.map((preset) => preset.id),
+    ...FLIRTING_PRESETS.map((preset) => preset.id),
   ],
 };
 
@@ -1096,9 +1228,8 @@ function createStarterIntakeText(fields: Record<StarterFieldKey, string>) {
     fields.personalitySeeds.trim()
       ? `Personality Notes:\n${fields.personalitySeeds.trim()}`
       : "",
-    fields.background.trim()
-      ? `Background Story:\n${fields.background.trim()}`
-      : "",
+    createBackstoryDimensionsText(fields),
+    createCompiledVocabularySeedText(fields),
     fields.relationshipDynamic.trim()
       ? `Relationships:\nDynamic with {{user}}: ${fields.relationshipDynamic.trim()}`
       : "",
@@ -1109,11 +1240,133 @@ function createStarterIntakeText(fields: Record<StarterFieldKey, string>) {
   ]);
 }
 
+function createCompiledVocabularySeedText(fields: Record<StarterFieldKey, string>) {
+  const relationshipVocabularyAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findRelationshipDynamicVocabularyById,
+  ).map((preset) => {
+    const injection = compileRelationshipDynamicVocabularyInjection(preset);
+    return joinDefined([
+      `Relationship vocabulary preset: ${preset.vibe}.`,
+      injection.lexicalConstraints,
+      injection.formattingDirectives,
+      injection.systemBehavior,
+    ]);
+  });
+
+  const flirtingAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findFlirtingPresetById,
+  ).map((preset) => {
+    const additions = compileFlirtingPresetAdditions(preset);
+    return joinDefined([
+      additions.personalityAddition,
+      additions.scenarioAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const originWoundAdditions = findPresetMatches(
+    fields.originWounds,
+    findOriginWoundVocabularyPresetById,
+  ).map((preset) => {
+    const additions = compileOriginWoundPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const speechStyleAdditions = findPresetMatches(
+    fields.personalitySeeds,
+    findSpeechStylePresetById,
+  ).map(compileSpeechStylePresetSummary);
+
+  const voiceVocabularyAdditions = findPresetMatches(
+    fields.personalitySeeds,
+    findVoiceVocabularyPresetById,
+  ).map((preset) => {
+    const additions = compileVoiceVocabularyPresetAdditions(preset);
+    return joinDefined([
+      additions.speechStyleAddition,
+      additions.lexicalGuidance,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  return joinDefined([
+    relationshipVocabularyAdditions.length
+      ? `Relationships:\n${relationshipVocabularyAdditions.join("\n\n")}`
+      : "",
+    flirtingAdditions.length
+      ? `Scenario:\n${flirtingAdditions.join("\n\n")}`
+      : "",
+    originWoundAdditions.length
+      ? `Background Story:\n${originWoundAdditions.join("\n\n")}`
+      : "",
+    speechStyleAdditions.length || voiceVocabularyAdditions.length
+      ? `Speech Style:\n${joinDefined([...speechStyleAdditions, ...voiceVocabularyAdditions])}`
+      : "",
+  ]);
+}
+
+function createBackstoryDimensionsText(fields: Record<StarterFieldKey, string>) {
+  const dimensionLines = [
+    ["Origin wound", fields.originWounds],
+    ["Formative event", fields.formativeEvents],
+    ["Family history", fields.familyHistory],
+    ["Status and role", fields.careerStatus],
+    ["Hidden secret", fields.secrets],
+    ["Core regret", fields.regrets],
+    ["Exile profile", fields.exile],
+    ["Past betrayal", fields.betrayal],
+    ["Critical loss", fields.loss],
+    ["Core ambition", fields.ambition],
+  ]
+    .map(([label, value]) => {
+      const trimmedValue = value.trim();
+      return trimmedValue ? `${label}: ${trimmedValue}` : "";
+    })
+    .filter(Boolean);
+
+  return joinDefined([
+    fields.background.trim(),
+    ...dimensionLines,
+  ])
+    ? `Background Story:\n${joinDefined([fields.background.trim(), ...dimensionLines])}`
+    : "";
+}
+
 function joinDefined(values: string[]) {
   return values
     .map((value) => value.trim())
     .filter(Boolean)
     .join("\n\n");
+}
+
+function findPresetMatches<T>(
+  rawText: string,
+  findById: (id: string) => T | undefined,
+): T[] {
+  const matches: T[] = [];
+  const seen = new Set<T>();
+
+  for (const token of tokenizeSeedInput(rawText)) {
+    const match = findById(token);
+    if (!match || seen.has(match)) continue;
+    seen.add(match);
+    matches.push(match);
+  }
+
+  return matches;
+}
+
+function tokenizeSeedInput(rawText: string) {
+  return rawText
+    .split(/[\n,;|]+/)
+    .map((token) => token.trim())
+    .filter(Boolean);
 }
 
 function CharacterIntakeComposer(props: {
@@ -1243,17 +1496,50 @@ function CharacterIntakeComposer(props: {
                   options={seedVocabulary.personality}
                   onAdd={(value) => handleAddSeed("personalitySeeds", value)}
                 />
+                <SeedCombo
+                  datalistId="speech-style-seeds"
+                  label="Add speech preset"
+                  name="speechStyleSeedCustom"
+                  options={SPEECH_STYLE_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("personalitySeeds", value)}
+                />
+                <SeedCombo
+                  datalistId="voice-vocabulary-seeds"
+                  label="Add voice vocabulary"
+                  name="voiceVocabularySeedCustom"
+                  options={VOICE_VOCABULARY_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("personalitySeeds", value)}
+                />
               </div>
             ) : null}
 
-            {section.id === "relationship" ? (
+            {section.id === "backstory" ? (
               <SeedCombo
-                datalistId="relationship-dynamic-seeds"
-                label="Add relationship dynamic"
-                name="relationshipSeedCustom"
-                options={seedVocabulary.relationship}
-                onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                datalistId="origin-wound-seeds"
+                label="Add origin wound preset"
+                name="originWoundSeedCustom"
+                options={seedVocabulary.backstory}
+                onAdd={(value) => handleAddSeed("originWounds", value)}
               />
+            ) : null}
+
+            {section.id === "relationship" ? (
+              <div className="grid gap-3 md:grid-cols-2">
+                <SeedCombo
+                  datalistId="relationship-dynamic-seeds"
+                  label="Add relationship dynamic"
+                  name="relationshipSeedCustom"
+                  options={seedVocabulary.relationship}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="flirting-style-seeds"
+                  label="Add flirting style"
+                  name="flirtingSeedCustom"
+                  options={FLIRTING_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+              </div>
             ) : null}
           </div>
         </details>

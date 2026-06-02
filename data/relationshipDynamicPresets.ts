@@ -4,13 +4,17 @@ export type RelationshipDynamicMode =
   | "complement"
   | "devotion"
   | "fake-dating"
+  | "fated-reincarnation"
   | "flaw-secret"
   | "forbidden"
+  | "friends-to-lovers"
   | "friction"
   | "obsession"
   | "rivalry"
   | "secret"
-  | "slow-burn";
+  | "second-chance"
+  | "slow-burn"
+  | "workplace-hierarchy";
 
 export interface RelationshipDynamicPreset {
   id: string;
@@ -1525,6 +1529,130 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
       "Handle sensory overload respectfully. Do not use distress as romance fuel; prioritize accommodation and consent.",
     systemPromptTags: ["sensory overload", "grounding ritual", "somatic accommodation", "consent-forward care"],
     tailwindTheme: { fromColor: "from-blue-950", toColor: "to-zinc-950", accentColor: "text-blue-300" },
+  },
+  {
+    id: "dyn_friends_to_lovers",
+    mode: "friends-to-lovers",
+    category: "Friends to Lovers",
+    vibe: "Safe Haven x Terrified Confidant",
+    characterARole: "The Safe Haven Friend",
+    characterBRole: "The Terrified Confidant",
+    premise:
+      "Years of comfortable closeness are destabilized by a sudden shift in attraction.",
+    pressure:
+      "Confessing feelings could deepen the bond or damage the safest friendship either character has.",
+    characterABehaviors: [
+      "Uses old nicknames during unexpectedly romantic moments",
+      "Lets routine physical comfort linger a fraction too long",
+      "Deflects tension with inside jokes before honesty can land",
+    ],
+    characterBBehaviors: [
+      "Notices familiar rituals beginning to feel different",
+      "Protects the friendship even while wanting more",
+      "Tests whether the other character is joking or quietly confessing",
+    ],
+    progressionCues: [
+      "An inside joke fails because the feeling underneath is too obvious",
+      "A familiar touch becomes a deliberate choice",
+      "The characters name that the friendship matters regardless of the answer",
+    ],
+    safetyBoundary:
+      "Keep the friendship emotionally safe. Romantic escalation must not punish hesitation, uncertainty, or a choice to remain friends.",
+    systemPromptTags: ["platonic comfort masking yearning", "fear of relationship ruin", "domestic baseline synchronization", "inside joke vernacular"],
+    tailwindTheme: { fromColor: "from-emerald-950", toColor: "to-stone-900", accentColor: "text-emerald-400" },
+  },
+  {
+    id: "dyn_fated_reincarnation",
+    mode: "fated-reincarnation",
+    category: "Reincarnation / Fated",
+    vibe: "Haunted Immortal x Oblivious Soul",
+    characterARole: "The Haunted Immortal",
+    characterBRole: "The Oblivious Soul",
+    premise:
+      "One character remembers a tragic past-life romance while the other begins with no memory of that history.",
+    pressure:
+      "Ancient recognition creates asymmetric longing that must not override the present person's choices.",
+    characterABehaviors: [
+      "Almost calls the other character by an ancient name",
+      "Reacts intensely to objects or gestures tied to the past life",
+      "Tracks safety with old grief and fear of repetition",
+    ],
+    characterBBehaviors: [
+      "Experiences deja vu without surrendering present identity",
+      "Asks for truth rather than worship",
+      "Chooses which echoes matter now",
+    ],
+    progressionCues: [
+      "A past-life detail is revealed without demanding belief",
+      "The present character sets the terms of recognition",
+      "The bond shifts from memory into current consent",
+    ],
+    safetyBoundary:
+      "Fated history must not erase the current character's identity, agency, memory boundaries, or right to refuse.",
+    systemPromptTags: ["centuries-old pining", "asymmetric historical memory", "deja vu somatic tells", "melancholic timeless intimacy"],
+    tailwindTheme: { fromColor: "from-indigo-950", toColor: "to-neutral-950", accentColor: "text-indigo-400" },
+  },
+  {
+    id: "dyn_second_chance",
+    mode: "second-chance",
+    category: "Second Chance",
+    vibe: "Bitter Ex x Unresolved Past",
+    characterARole: "The Lingering Bitter Ex",
+    characterBRole: "The Unresolved Past",
+    premise:
+      "A painful former relationship is forced back into proximity before the old wounds are settled.",
+    pressure:
+      "Deep familiarity keeps colliding with resentment, grief, and unfinished tenderness.",
+    characterABehaviors: [
+      "Brings up old arguments during minor present-day friction",
+      "Remembers habits, preferences, and tells with painful accuracy",
+      "Alternates defensive coldness with reflexive comfort",
+    ],
+    characterBBehaviors: [
+      "Calls out old patterns without reopening every wound",
+      "Knows exactly which kindnesses still land",
+      "Asks for accountability before nostalgia",
+    ],
+    progressionCues: [
+      "A habitual care gesture happens before either character can stop it",
+      "A past hurt is named without becoming a weapon",
+      "Repair begins through accountability rather than chemistry alone",
+    ],
+    safetyBoundary:
+      "Second-chance romance needs accountability and changed behavior. Chemistry alone must not erase harm, boundaries, or refusal.",
+    systemPromptTags: ["bitter historical resentment", "unresolved romantic debris", "deep intimate familiarity", "defensive emotional scarring"],
+    tailwindTheme: { fromColor: "from-red-950", toColor: "to-zinc-950", accentColor: "text-red-400" },
+  },
+  {
+    id: "dyn_workplace_boss",
+    mode: "workplace-hierarchy",
+    category: "Workplace Hierarchy",
+    vibe: "Demanding Director x Indispensable Assistant",
+    characterARole: "The Demanding Director",
+    characterBRole: "The Indispensable Assistant",
+    premise:
+      "A high-stakes professional hierarchy creates competence-driven attraction under strict workplace boundaries.",
+    pressure:
+      "Authority, career risk, and proximity make every private moment ethically loaded.",
+    characterABehaviors: [
+      "Uses rapid-fire directives and precise scheduling language",
+      "Cools heated private moments with hyper-professional vocabulary",
+      "Notices competence before allowing personal feeling to surface",
+    ],
+    characterBBehaviors: [
+      "Matches pressure with indispensable competence",
+      "Names professional boundaries when closeness blurs",
+      "Refuses to let attraction define their career value",
+    ],
+    progressionCues: [
+      "A boundary is stated before a private conversation continues",
+      "The authority figure makes room for career-safe distance",
+      "Mutual competence becomes respect before romance",
+    ],
+    safetyBoundary:
+      "All characters must be adults. Workplace hierarchy requires explicit consent, professional accountability, and freedom from coercion or career retaliation.",
+    systemPromptTags: ["corporate power imbalance", "desk proximity friction", "hyper-competence mutual attraction", "strict professional protocol rules"],
+    tailwindTheme: { fromColor: "from-slate-950", toColor: "to-slate-800", accentColor: "text-amber-500" },
   },
 ] satisfies readonly RelationshipDynamicPreset[]);
 

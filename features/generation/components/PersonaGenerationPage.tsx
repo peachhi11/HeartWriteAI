@@ -45,6 +45,31 @@ import {
   type PersonaLibraryItem,
   usePersonaLibrary,
 } from "@/hooks/usePersonaLibrary";
+import {
+  compileFlirtingPresetAdditions,
+  findFlirtingPresetById,
+  FLIRTING_PRESETS,
+} from "@/data/flirtingPresets";
+import {
+  compileOriginWoundPresetAdditions,
+  findOriginWoundVocabularyPresetById,
+  ORIGIN_WOUND_VOCABULARY_PRESETS,
+} from "@/data/originWoundVocabularyPresets";
+import {
+  compileRelationshipDynamicVocabularyInjection,
+  findRelationshipDynamicVocabularyById,
+  RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS,
+} from "@/data/relationshipDynamicVocabulary";
+import {
+  compileSpeechStylePresetSummary,
+  findSpeechStylePresetById,
+  SPEECH_STYLE_PRESETS,
+} from "@/data/speechStylePresets";
+import {
+  compileVoiceVocabularyPresetAdditions,
+  findVoiceVocabularyPresetById,
+  VOICE_VOCABULARY_PRESETS,
+} from "@/data/voiceVocabularyPresets";
 import { downloadUint8Array } from "@/lib/browser/downloadUint8Array";
 import {
   Field,
@@ -81,6 +106,18 @@ const emptyPersonaStarterFields: Record<PersonaStarterFieldKey, string> = {
   name: "",
   personality: "",
   scenario: "",
+};
+
+const personaSeedVocabulary = {
+  backstory: ORIGIN_WOUND_VOCABULARY_PRESETS.map((preset) => preset.id),
+  personality: [
+    ...SPEECH_STYLE_PRESETS.map((preset) => preset.id),
+    ...VOICE_VOCABULARY_PRESETS.map((preset) => preset.id),
+  ],
+  relationship: [
+    ...RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS.map((preset) => preset.id),
+    ...FLIRTING_PRESETS.map((preset) => preset.id),
+  ],
 };
 
 export function PersonaGenerationPage() {
@@ -127,6 +164,8 @@ export function PersonaGenerationPage() {
   function routePersonaIntake() {
     const starterText = createPersonaStarterIntakeText(personaStarterFields);
     const combinedIntakeText = joinDefined([personaIntakeText, starterText]);
+    const vocabularySeedText =
+      createPersonaCompiledVocabularySeedText(personaStarterFields);
 
     if (!combinedIntakeText.trim()) {
       setPersonaIntakeStatus(
@@ -149,6 +188,7 @@ export function PersonaGenerationPage() {
       personaStarterFields.firstMessage.trim()
         ? `Preferred opening / first message:\n${personaStarterFields.firstMessage.trim()}`
         : "",
+      vocabularySeedText.characteristics,
     ]);
     const scenarioContext = personaStarterFields.scenario.trim()
       ? `Scenario / context:\n${personaStarterFields.scenario.trim()}`
@@ -157,7 +197,11 @@ export function PersonaGenerationPage() {
       ...input,
       name: personaStarterFields.name.trim() || input.name,
       characteristics: joinDefined([input.characteristics, profileSections]),
-      referenceCharacter: joinDefined([input.referenceCharacter, scenarioContext]),
+      referenceCharacter: joinDefined([
+        input.referenceCharacter,
+        scenarioContext,
+        vocabularySeedText.referenceContext,
+      ]),
     };
 
     setInput(nextInput);
@@ -166,6 +210,18 @@ export function PersonaGenerationPage() {
     setDeleteArmed(false);
     setPersonaIntakeStatus("Routed persona notes into an editable generated draft.");
     setStatus("Generated persona draft from intake.");
+  }
+
+  function handleAddPersonaSeed(fieldKey: PersonaStarterFieldKey, value: string) {
+    const trimmedValue = value.trim();
+    if (!trimmedValue) {
+      return;
+    }
+
+    setPersonaStarterFields((current) => ({
+      ...current,
+      [fieldKey]: joinInlineList(current[fieldKey], trimmedValue),
+    }));
   }
 
   function newBlankPersona() {
@@ -436,6 +492,18 @@ export function PersonaGenerationPage() {
                       }
                     />
                   </Field>
+                  <PersonaSeedCombo
+                    datalistId="persona-relationship-vocabulary-seeds"
+                    label="Add relationship vocabulary"
+                    options={personaSeedVocabulary.relationship}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-flirting-seeds"
+                    label="Add flirting / tension style"
+                    options={FLIRTING_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
                 </div>
               </PersonaSheetSection>
 
@@ -467,6 +535,12 @@ export function PersonaGenerationPage() {
                       }
                     />
                   </Field>
+                  <PersonaSeedCombo
+                    datalistId="persona-origin-wound-seeds"
+                    label="Add origin wound vocabulary"
+                    options={personaSeedVocabulary.backstory}
+                    onAdd={(value) => handleAddPersonaSeed("personality", value)}
+                  />
                 </div>
               </PersonaSheetSection>
 
@@ -496,6 +570,20 @@ export function PersonaGenerationPage() {
                       }
                     />
                   </Field>
+                  <div className="grid gap-4 md:grid-cols-2">
+                    <PersonaSeedCombo
+                      datalistId="persona-speech-style-seeds"
+                      label="Add speech preset"
+                      options={SPEECH_STYLE_PRESETS.map((preset) => preset.id)}
+                      onAdd={(value) => handleAddPersonaSeed("personality", value)}
+                    />
+                    <PersonaSeedCombo
+                      datalistId="persona-voice-vocabulary-seeds"
+                      label="Add voice vocabulary"
+                      options={VOICE_VOCABULARY_PRESETS.map((preset) => preset.id)}
+                      onAdd={(value) => handleAddPersonaSeed("personality", value)}
+                    />
+                  </div>
                 </div>
               </PersonaSheetSection>
 
@@ -861,9 +949,157 @@ function createPersonaStarterIntakeText(
   ]);
 }
 
+function createPersonaCompiledVocabularySeedText(
+  fields: Record<PersonaStarterFieldKey, string>,
+) {
+  const speechStyleAdditions = findPresetMatches(
+    fields.personality,
+    findSpeechStylePresetById,
+  ).map(compileSpeechStylePresetSummary);
+  const voiceVocabularyAdditions = findPresetMatches(
+    fields.personality,
+    findVoiceVocabularyPresetById,
+  ).map((preset) => {
+    const additions = compileVoiceVocabularyPresetAdditions(preset);
+    return joinDefined([
+      additions.speechStyleAddition,
+      additions.lexicalGuidance,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const originWoundAdditions = findPresetMatches(
+    fields.personality,
+    findOriginWoundVocabularyPresetById,
+  ).map((preset) => {
+    const additions = compileOriginWoundPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const relationshipVocabularyAdditions = findPresetMatches(
+    fields.scenario,
+    findRelationshipDynamicVocabularyById,
+  ).map((preset) => {
+    const injection = compileRelationshipDynamicVocabularyInjection(preset);
+    return joinDefined([
+      `Relationship vocabulary preset: ${preset.vibe}.`,
+      injection.lexicalConstraints,
+      injection.formattingDirectives,
+      injection.systemBehavior,
+    ]);
+  });
+  const flirtingAdditions = findPresetMatches(
+    fields.scenario,
+    findFlirtingPresetById,
+  ).map((preset) => {
+    const additions = compileFlirtingPresetAdditions(preset);
+    return joinDefined([
+      additions.personalityAddition,
+      additions.scenarioAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  return {
+    characteristics: joinDefined([
+      ...speechStyleAdditions,
+      ...voiceVocabularyAdditions,
+      ...originWoundAdditions,
+    ]),
+    referenceContext: joinDefined([
+      ...relationshipVocabularyAdditions,
+      ...flirtingAdditions,
+    ]),
+  };
+}
+
 function joinDefined(values: string[]) {
   return values
     .map((value) => value.trim())
     .filter(Boolean)
     .join("\n\n");
+}
+
+function joinInlineList(currentValue: string, value: string) {
+  return joinDefined([currentValue, value]).replace(/\n\n/g, ", ");
+}
+
+function findPresetMatches<T>(
+  rawText: string,
+  findById: (id: string) => T | undefined,
+): T[] {
+  const matches: T[] = [];
+  const seen = new Set<T>();
+
+  for (const token of tokenizeSeedInput(rawText)) {
+    const match = findById(token);
+    if (!match || seen.has(match)) continue;
+    seen.add(match);
+    matches.push(match);
+  }
+
+  return matches;
+}
+
+function tokenizeSeedInput(rawText: string) {
+  return rawText
+    .split(/[\n,;|]+/)
+    .map((token) => token.trim())
+    .filter(Boolean);
+}
+
+function PersonaSeedCombo(props: {
+  datalistId: string;
+  label: string;
+  onAdd: (value: string) => void;
+  options: string[];
+}) {
+  const [value, setValue] = useState("");
+
+  return (
+    <div className="grid gap-2 rounded-md border bg-background/60 p-3">
+      <label className="grid gap-1.5">
+        <span className="text-xs font-semibold text-muted-foreground">
+          {props.label}
+        </span>
+        <Input
+          autoComplete="off"
+          data-no-field-copy="true"
+          list={props.datalistId}
+          placeholder="Choose a seed or type anything..."
+          value={value}
+          onChange={(event) => setValue(event.currentTarget.value)}
+        />
+      </label>
+      <datalist id={props.datalistId}>
+        {props.options.map((option) => (
+          <option key={option} value={option} />
+        ))}
+      </datalist>
+      <div className="flex flex-wrap gap-1.5">
+        {props.options.slice(0, 5).map((option) => (
+          <button
+            key={option}
+            type="button"
+            onClick={() => props.onAdd(option)}
+            className="rounded-full border bg-card px-2 py-1 text-[11px] text-muted-foreground transition hover:bg-muted hover:text-foreground"
+          >
+            {option}
+          </button>
+        ))}
+      </div>
+      <Button
+        type="button"
+        variant="outline"
+        onClick={() => {
+          props.onAdd(value);
+          setValue("");
+        }}
+      >
+        Add Seed
+      </Button>
+    </div>
+  );
 }

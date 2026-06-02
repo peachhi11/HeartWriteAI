@@ -9,7 +9,7 @@ import {
 } from "../../data/relationshipDynamicPresets";
 
 test("loads one consolidated relationship dynamic seed library", () => {
-  assert.equal(RELATIONSHIP_DYNAMIC_PRESETS.length, 49);
+  assert.equal(RELATIONSHIP_DYNAMIC_PRESETS.length, 53);
 
   const ids = RELATIONSHIP_DYNAMIC_PRESETS.map((preset) => preset.id);
   assert.equal(new Set(ids).size, ids.length);
@@ -17,6 +17,10 @@ test("loads one consolidated relationship dynamic seed library", () => {
   assert.ok(ids.includes("fric_taboo_asymmetric_guilt"));
   assert.ok(ids.includes("obsess_eldritch_symbiosis"));
   assert.ok(ids.includes("flaw_soma_sensory_overload"));
+  assert.ok(ids.includes("dyn_friends_to_lovers"));
+  assert.ok(ids.includes("dyn_fated_reincarnation"));
+  assert.ok(ids.includes("dyn_second_chance"));
+  assert.ok(ids.includes("dyn_workplace_boss"));
 });
 
 test("groups relationship dynamic presets by normalized mode", () => {
@@ -26,18 +30,24 @@ test("groups relationship dynamic presets by normalized mode", () => {
     "complement",
     "devotion",
     "fake-dating",
+    "fated-reincarnation",
     "flaw-secret",
     "forbidden",
     "friction",
+    "friends-to-lovers",
     "obsession",
     "rivalry",
+    "second-chance",
     "secret",
     "slow-burn",
+    "workplace-hierarchy",
   ]);
 
   assert.equal(getRelationshipDynamicPresetsByMode("complement").length, 5);
   assert.equal(getRelationshipDynamicPresetsByMode("friction").length, 4);
   assert.equal(getRelationshipDynamicPresetsByMode("obsession").length, 4);
+  assert.equal(getRelationshipDynamicPresetsByMode("friends-to-lovers").length, 1);
+  assert.equal(getRelationshipDynamicPresetsByMode("second-chance").length, 1);
   assert.equal(getRelationshipDynamicPresetsByMode("missing").length, 0);
 });
 
@@ -77,4 +87,17 @@ test("keeps every dynamic compiler-friendly with non-empty behavior arrays", () 
     assert.ok(preset.progressionCues.length >= 3, preset.id);
     assert.ok(preset.systemPromptTags.length >= 4, preset.id);
   }
+});
+
+test("normalizes final expansion dynamics with consent and accountability boundaries", () => {
+  const fated = findRelationshipDynamicPresetById("dyn_fated_reincarnation");
+  const secondChance = findRelationshipDynamicPresetById("dyn_second_chance");
+  const workplace = findRelationshipDynamicPresetById("dyn_workplace_boss");
+
+  assert.match(fated?.safetyBoundary ?? "", /agency/i);
+  assert.match(fated?.safetyBoundary ?? "", /right to refuse/i);
+  assert.match(secondChance?.safetyBoundary ?? "", /accountability/i);
+  assert.match(secondChance?.safetyBoundary ?? "", /changed behavior/i);
+  assert.match(workplace?.safetyBoundary ?? "", /adults/i);
+  assert.match(workplace?.safetyBoundary ?? "", /coercion/i);
 });

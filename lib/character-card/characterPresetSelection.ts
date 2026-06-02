@@ -11,9 +11,17 @@ import {
   type FacialFeaturePreset,
 } from "../../data/facialFeaturePresets";
 import {
+  compileFlirtingPresetAdditions,
+  type FlirtingPreset,
+} from "../../data/flirtingPresets";
+import {
   HEIGHT_STATURE_PRESETS,
   type HeightStaturePreset,
 } from "../../data/heightStaturePresets";
+import {
+  compileOriginWoundPresetAdditions,
+  type OriginWoundVocabularyPreset,
+} from "../../data/originWoundVocabularyPresets";
 import { OUTFIT_PRESETS, type OutfitPreset } from "../../data/outfitPresets";
 import {
   findRelationshipDynamicPresetById,
@@ -21,11 +29,20 @@ import {
 } from "../../data/relationshipDynamicPresets";
 import {
   compileRelationshipDynamicVocabularyInjection,
+  findRelationshipDynamicVocabularyById,
   getRelationshipDynamicVocabularyByMode,
   type RelationshipDynamicVocabularyPreset,
 } from "../../data/relationshipDynamicVocabulary";
 import { ALL_ROMANCE_PRESETS, type RomancePreset } from "../../data/romancePresets";
 import { SKIN_PRESETS, type SkinPreset } from "../../data/skinPresets";
+import {
+  compileSpeechStylePresetSummary,
+  type SpeechStylePreset,
+} from "../../data/speechStylePresets";
+import {
+  compileVoiceVocabularyPresetAdditions,
+  type VoiceVocabularyPreset,
+} from "../../data/voiceVocabularyPresets";
 import type { CharacterCardFormValues } from "../../types/character-card/CharacterCardFormValues";
 import { createEmptyCharacterCardFormValues } from "./createEmptyCharacterCardFormValues";
 
@@ -41,6 +58,10 @@ export interface CharacterPresetSelection {
   outfit: OutfitPreset;
   relationshipDynamic: RelationshipDynamicPreset;
   relationshipVocabulary?: RelationshipDynamicVocabularyPreset;
+  flirtingStyle?: FlirtingPreset;
+  originWound?: OriginWoundVocabularyPreset;
+  speechStyle?: SpeechStylePreset;
+  voiceVocabulary?: VoiceVocabularyPreset;
 }
 
 export interface CompiledCharacterPresetSelection {
@@ -90,6 +111,10 @@ export function compileCharacterPresetSelection(
     ...selection.outfit.systemPromptTags,
     ...selection.relationshipDynamic.systemPromptTags,
     ...relationshipVocabulary.systemPromptTags,
+    ...(selection.flirtingStyle?.systemPromptTags ?? []),
+    ...(selection.originWound?.systemPromptTags ?? []),
+    ...(selection.speechStyle?.systemPromptTags ?? []),
+    ...(selection.voiceVocabulary?.systemPromptTags ?? []),
   ]);
   const tags = uniquePreserveOrder([
     selection.romance.category,
@@ -103,6 +128,18 @@ export function compileCharacterPresetSelection(
     selection.relationshipDynamic.mode,
     selection.relationshipDynamic.category,
     selection.relationshipVocabulary?.category ?? relationshipVocabulary.category,
+    ...(selection.flirtingStyle
+      ? [selection.flirtingStyle.category, selection.flirtingStyle.vibe]
+      : []),
+    ...(selection.originWound
+      ? [selection.originWound.category, selection.originWound.vibe]
+      : []),
+    ...(selection.speechStyle
+      ? [selection.speechStyle.category, selection.speechStyle.vibe]
+      : []),
+    ...(selection.voiceVocabulary
+      ? [selection.voiceVocabulary.category, selection.voiceVocabulary.vibe]
+      : []),
   ]);
 
   return {
@@ -114,16 +151,33 @@ export function compileCharacterPresetSelection(
       description: buildOverview(selection),
       physicalAppearance: buildPhysicalAppearance(selection),
       personalityPsychology: buildPersonality(selection),
+      backgroundStory: buildBackgroundStory(selection),
       relationshipsConnections: buildRelationshipDynamics(selection, relationshipVocabulary),
+      speechStyle: buildSpeechStyleText(selection, formValues.speechStyle),
       scenario: buildScenario(selection),
       first_mes: buildFirstMessage(selection),
       creator_notes: "Compiled from the HeartWriteAI preset selection library.",
-      system_prompt: buildSystemPrompt(systemPromptTags, relationshipVocabulary),
+      system_prompt: buildSystemPrompt(systemPromptTags, relationshipVocabulary, selection),
       tagsText: tags.join(", "),
     },
     systemPromptTags,
     tags,
   };
+}
+
+function buildSpeechStyleText(
+  selection: CharacterPresetSelection,
+  fallback: string,
+) {
+  return joinDefined([
+    selection.speechStyle
+      ? compileSpeechStylePresetSummary(selection.speechStyle)
+      : fallback,
+    selection.voiceVocabulary
+      ? compileVoiceVocabularyPresetAdditions(selection.voiceVocabulary)
+          .speechStyleAddition
+      : "",
+  ]);
 }
 
 function buildOverview(selection: CharacterPresetSelection): string {
@@ -148,12 +202,28 @@ function buildPhysicalAppearance(selection: CharacterPresetSelection): string {
 }
 
 function buildPersonality(selection: CharacterPresetSelection): string {
+  const originWoundAdditions = selection.originWound
+    ? compileOriginWoundPresetAdditions(selection.originWound)
+    : null;
+
   return [
     `Core personality: ${selection.romance.personality.join(", ")}.`,
     `Stature influence: ${selection.height.personalityInfluence.join(", ")}.`,
     `Build influence: ${selection.build.personalityInfluence.join(", ")}.`,
     `Behavioral texture: ${selection.romance.systemPromptTags.join(", ")}.`,
+    originWoundAdditions?.personalityAddition ?? "",
   ].join("\n");
+}
+
+function buildBackgroundStory(selection: CharacterPresetSelection): string {
+  const originWoundAdditions = selection.originWound
+    ? compileOriginWoundPresetAdditions(selection.originWound)
+    : null;
+
+  return joinDefined([
+    `Romance backstory anchor: ${selection.romance.vibe}.`,
+    originWoundAdditions?.backgroundAddition ?? "",
+  ]);
 }
 
 function buildRelationshipDynamics(
@@ -162,6 +232,9 @@ function buildRelationshipDynamics(
 ): string {
   const vocabularyInjection =
     compileRelationshipDynamicVocabularyInjection(relationshipVocabulary);
+  const flirtingAdditions = selection.flirtingStyle
+    ? compileFlirtingPresetAdditions(selection.flirtingStyle)
+    : null;
 
   return [
     `Primary dynamics: ${selection.romance.dynamics.join(", ")}.`,
@@ -176,14 +249,21 @@ function buildRelationshipDynamics(
     `Lexical palette: ${relationshipVocabulary.vibe}.`,
     vocabularyInjection.lexicalConstraints,
     vocabularyInjection.formattingDirectives,
+    flirtingAdditions?.personalityAddition ?? "",
+    flirtingAdditions?.scenarioAddition ?? "",
   ].join("\n");
 }
 
 function buildScenario(selection: CharacterPresetSelection): string {
+  const flirtingAdditions = selection.flirtingStyle
+    ? compileFlirtingPresetAdditions(selection.flirtingStyle)
+    : null;
+
   return [
     `A romance setup shaped by ${selection.romance.vibe}, using ${selection.romance.dynamics.join(" and ")} dynamics.`,
     `The active relationship dynamic is ${selection.relationshipDynamic.vibe}: ${selection.relationshipDynamic.pressure}`,
     `The scene should notice ${selection.height.vibe.toLowerCase()}, ${selection.build.vibe.toLowerCase()}, ${selection.face.vibe.toLowerCase()}, and the clothing language of ${selection.outfit.styleName}.`,
+    flirtingAdditions?.scenarioAddition ?? "",
   ].join(" ");
 }
 
@@ -197,9 +277,16 @@ function buildFirstMessage(selection: CharacterPresetSelection): string {
 function buildSystemPrompt(
   systemPromptTags: readonly string[],
   relationshipVocabulary: RelationshipDynamicVocabularyPreset,
+  selection?: CharacterPresetSelection,
 ): string {
   const vocabularyInjection =
     compileRelationshipDynamicVocabularyInjection(relationshipVocabulary);
+  const flirtingAdditions = selection?.flirtingStyle
+    ? compileFlirtingPresetAdditions(selection.flirtingStyle)
+    : null;
+  const originWoundAdditions = selection?.originWound
+    ? compileOriginWoundPresetAdditions(selection.originWound)
+    : null;
 
   return [
     "Roleplay as {{char}} using the compiled preset library as appearance and behavior guidance.",
@@ -207,6 +294,8 @@ function buildSystemPrompt(
     "Apply the selected relationship dynamic as pressure and subtext, not as forced plot resolution.",
     vocabularyInjection.systemBehavior,
     vocabularyInjection.formattingDirectives,
+    flirtingAdditions?.systemPromptAddition ?? "",
+    originWoundAdditions?.systemPromptAddition ?? "",
     `Preset behavior tags: ${systemPromptTags.join(", ")}.`,
   ].join("\n");
 }
@@ -250,13 +339,21 @@ function uniquePreserveOrder(values: readonly string[]): string[] {
   return unique;
 }
 
+function joinDefined(values: readonly string[]) {
+  return values
+    .map((value) => value.trim())
+    .filter(Boolean)
+    .join("\n\n");
+}
+
 function resolveRelationshipVocabulary(
   selection: CharacterPresetSelection,
 ): RelationshipDynamicVocabularyPreset {
   if (selection.relationshipVocabulary) return selection.relationshipVocabulary;
 
   return requirePreset(
-    getRelationshipDynamicVocabularyByMode(selection.relationshipDynamic.mode)[0],
+    getRelationshipDynamicVocabularyByMode(selection.relationshipDynamic.mode)[0] ??
+      findRelationshipDynamicVocabularyById("vocab_grumpy_sunshine"),
     `relationship vocabulary preset for ${selection.relationshipDynamic.mode}`,
   );
 }

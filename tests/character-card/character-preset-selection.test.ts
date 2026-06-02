@@ -4,11 +4,15 @@ import test from "node:test";
 import { findBodyBuildPresetById } from "../../data/bodyBuildPresets";
 import { findColorPresetById } from "../../data/colorPresets";
 import { findFacialFeaturePresetById } from "../../data/facialFeaturePresets";
+import { findFlirtingPresetById } from "../../data/flirtingPresets";
 import { findHeightStaturePresetById } from "../../data/heightStaturePresets";
+import { findOriginWoundVocabularyPresetById } from "../../data/originWoundVocabularyPresets";
 import { findOutfitPresetById } from "../../data/outfitPresets";
 import { findRelationshipDynamicPresetById } from "../../data/relationshipDynamicPresets";
 import { findRomancePresetById } from "../../data/romancePresets";
 import { findSkinPresetById } from "../../data/skinPresets";
+import { findSpeechStylePresetById } from "../../data/speechStylePresets";
+import { findVoiceVocabularyPresetById } from "../../data/voiceVocabularyPresets";
 import {
   compileCharacterPresetSelection,
   createDefaultCharacterPresetSelection,
@@ -55,6 +59,48 @@ test("compiles preset selections into editable character form values", () => {
   assert.match(compiled.formValues.relationshipsConnections, /dissect/);
   assert.match(compiled.formValues.scenario, /romance setup shaped by The Grumpy Billionaire/);
   assert.match(compiled.formValues.scenario, /active relationship dynamic is Top of the Class/);
+});
+
+test("maps optional speech presets into editable voice guidance", () => {
+  const compiled = compileCharacterPresetSelection({
+    ...buildSelection(),
+    speechStyle: must(findSpeechStylePresetById("speech_elite_aristocrat")),
+    voiceVocabulary: must(findVoiceVocabularyPresetById("voice_crisp_angular_rival")),
+  });
+
+  assert.match(compiled.formValues.speechStyle, /Speech preset: Cold Aristocrat/);
+  assert.match(compiled.formValues.speechStyle, /Mapped speech engine: Velvet_Formal/);
+  assert.match(compiled.formValues.speechStyle, /Voice vocabulary preset: Academic Rival/);
+  assert.match(compiled.formValues.speechStyle, /Signature voice verbs: dissect, counter/);
+  assert.match(compiled.formValues.tagsText, /Elite & Controlled/);
+  assert.match(compiled.formValues.tagsText, /Cold Aristocrat \/ Corporate Suit/);
+  assert.match(compiled.formValues.tagsText, /Crisp & Angular/);
+  assert.match(compiled.formValues.tagsText, /Academic Rival \/ Cold Aristocrat/);
+  assert.ok(compiled.systemPromptTags.includes("controlled elite diction"));
+  assert.ok(compiled.systemPromptTags.includes("formal address discipline"));
+  assert.ok(compiled.systemPromptTags.includes("crisp angular voice texture"));
+});
+
+test("maps optional flirting and origin wound presets into editable guidance", () => {
+  const compiled = compileCharacterPresetSelection({
+    ...buildSelection(),
+    flirtingStyle: must(findFlirtingPresetById("flirt_seductive_boundary")),
+    originWound: must(findOriginWoundVocabularyPresetById("wound_shame_defilement")),
+  });
+
+  assert.match(compiled.formValues.backgroundStory, /Origin wound preset: Outcast Beast/);
+  assert.match(compiled.formValues.backgroundStory, /contaminated/);
+  assert.match(compiled.formValues.personalityPsychology, /Origin wound behavior texture/);
+  assert.match(compiled.formValues.relationshipsConnections, /Flirting style: The Possessive Vampire/);
+  assert.match(compiled.formValues.relationshipsConnections, /Proximity Encroachment/);
+  assert.match(compiled.formValues.scenario, /Flirting physical tells may include/);
+  assert.match(compiled.formValues.system_prompt, /soft romantic-tension guidance/i);
+  assert.match(compiled.formValues.system_prompt, /soft characterization guidance/i);
+  assert.match(compiled.formValues.system_prompt, /do not override player agency/i);
+  assert.match(compiled.formValues.tagsText, /Seductive & Boundary-Crossing/);
+  assert.match(compiled.formValues.tagsText, /Shame & Defilement/);
+  assert.ok(compiled.systemPromptTags.includes("possessive border crossings"));
+  assert.ok(compiled.systemPromptTags.includes("shame-aware touch boundaries"));
 });
 
 test("compiles preset behavior tags without duplicates and preserves user agency", () => {

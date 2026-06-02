@@ -3,8 +3,12 @@ import type { RelationshipDynamicMode } from "./relationshipDynamicPresets";
 export type RelationshipDynamicVocabularyCategory =
   | "Caretaker / Hurt-Comfort"
   | "Dark / Obsessive"
+  | "Fake Dating"
   | "Formal / Arranged"
+  | "Forbidden / Taboo"
   | "Grumpy / Sunshine"
+  | "Mentor / Protege"
+  | "Arranged Match"
   | "Rivalry / Academic";
 
 export interface RelationshipDynamicVocabularyPreset {
@@ -148,6 +152,102 @@ export const RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS = Object.freeze([
     sampleProseSnippet:
       "Her calloused fingers moved to stabilize his trembling hands, her voice dropping to a hushed murmur as she tried to ground his feverish breathing beside the dark haven of the bed.",
     systemPromptTags: ["decelerated dialogue pacing", "somatic grounding modifiers", "clinical vocabulary tokens", "soft acoustic prose styling"],
+  },
+  {
+    id: "vocab_forbidden_taboo",
+    category: "Forbidden / Taboo",
+    vibe: "The Public Strangers x The Private Confession",
+    dynamicModes: ["forbidden", "secret"],
+    lexicalTokens: {
+      signatureVerbs: ["ignore", "glance", "slip", "risk", "conceal", "pause", "clutch", "breathe"],
+      descriptiveAdjectives: [
+        "clandestine",
+        "dangerous",
+        "scandalous",
+        "stolen",
+        "unrecognizing",
+        "veiled",
+        "desperate",
+      ],
+      spatialNouns: ["shadow", "threshold", "corridor", "sanctuary", "boundary", "gaze", "ruin", "tryst"],
+      dialoguePacing:
+        "Use split public/private pacing. In public, keep speech clipped, plausible, and restrained; in private, let urgency rise while boundaries remain explicit and negotiable.",
+    },
+    sampleProseSnippet:
+      "Passing him in the clandestine twilight of the corridor, she offered only a veiled, unrecognizing nod, concealing the desperate private truth beyond the threshold of the dark library.",
+    systemPromptTags: ["clandestine lexical cues", "public private dialogue split", "exposure-risk pacing", "stolen interaction indicators"],
+  },
+  {
+    id: "vocab_mentor_protege",
+    category: "Mentor / Protege",
+    vibe: "The Asymmetric Intellect x The Defiant Apprentice",
+    dynamicModes: ["friction", "forbidden"],
+    lexicalTokens: {
+      signatureVerbs: ["correct", "critique", "evaluate", "excel", "yield", "instruct", "watch", "stride"],
+      descriptiveAdjectives: [
+        "demanding",
+        "prestigious",
+        "seasoned",
+        "inexperienced",
+        "calloused",
+        "rigorous",
+        "reverent",
+      ],
+      spatialNouns: ["authority", "shadow", "bench", "desk", "hierarchy", "mastery", "critique", "stride"],
+      dialoguePacing:
+        "Use asymmetric instructional density. The mentor tends toward slow, structured, declarative syntax; the protege may answer with clipped acknowledgment or rapid defensive challenge.",
+    },
+    sampleProseSnippet:
+      "The seasoned mentor corrected the flawed form with rigorous precision, their calloused hand hovering near the adjustment while the apprentice stood in the shadow of hard-earned authority.",
+    systemPromptTags: ["asymmetric instructional register", "structured declarative syntax", "deference tension markers", "pedagogical prose structure"],
+  },
+  {
+    id: "vocab_fake_dating",
+    category: "Fake Dating",
+    vibe: "The Public Spectacle x The Private Retreat",
+    dynamicModes: ["fake-dating"],
+    lexicalTokens: {
+      signatureVerbs: ["stage", "flaunt", "interlock", "whisper", "drop", "feign", "linger", "overcompensate"],
+      descriptiveAdjectives: [
+        "performative",
+        "theatrical",
+        "synchronized",
+        "contractual",
+        "flawless",
+        "hollow",
+        "awkward",
+      ],
+      spatialNouns: ["gala", "lens", "audience", "ruse", "script", "facade", "retreat", "elevator"],
+      dialoguePacing:
+        "Use public/private formatting switches. Public banter can sound smoothly romantic and rehearsed; private speech should cut into defensive, breathless, honest recalibration.",
+    },
+    sampleProseSnippet:
+      "They interlocked their fingers with flawless, performative grace before the flashing lens of the crowd, but the second the elevator sealed, the touch dropped with awkward haste.",
+    systemPromptTags: ["public private conversation switching", "theatrical prose attributes", "performative public formatting", "private post-ruse exhaustion"],
+  },
+  {
+    id: "vocab_arranged_match",
+    category: "Arranged Match",
+    vibe: "The Formal Compliance x The Silent Fracture",
+    dynamicModes: ["arranged"],
+    lexicalTokens: {
+      signatureVerbs: ["comply", "endure", "escort", "repress", "negotiate", "sign", "stiffen", "observe"],
+      descriptiveAdjectives: [
+        "stilted",
+        "formal",
+        "resigned",
+        "dynastic",
+        "pristine",
+        "contractual",
+        "unsmiling",
+      ],
+      spatialNouns: ["treaty", "bloodline", "alliance", "decorum", "obligation", "court", "glove", "heirloom"],
+      dialoguePacing:
+        "Use hyper-regulated diplomatic diction. Favor grammatically polished sentences, restrained silence, and careful title usage without implying automatic intimacy.",
+    },
+    sampleProseSnippet:
+      "He offered his pristine, gloved arm to escort his resigned bride across the court, their stilted exchange matching the decorum demanded by the dynastic treaty.",
+    systemPromptTags: ["diplomatic lexical constraints", "formal dialogue restraint", "protocol tracking tokens", "suppressed emotional containment"],
   },
 ] satisfies readonly RelationshipDynamicVocabularyPreset[]);
 
