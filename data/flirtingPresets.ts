@@ -96,7 +96,7 @@ export const FLIRTING_PRESETS = Object.freeze([
         "Longer, compound, and fluid sentence structures. Frequent use of exclamation points, enthusiastic dashes for sudden shifts, and transparent emotional transparency.",
     },
     sampleDialogueLine:
-      "Oh, wow... you're wearing that color today. You look--honestly, I completely forgot what I was about to say just looking at you.",
+      "Oh, wow... you're wearing that colour today. You look--honestly, I completely forgot what I was about to say just looking at you.",
     systemPromptTags: ["transparent praise formatting", "earnest verbal loops", "high vocal pitch variation", "disarming safety metrics"],
     tailwindTheme: { fromColor: "from-amber-500", toColor: "to-orange-600", accentColor: "text-yellow-300" },
   },

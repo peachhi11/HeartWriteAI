@@ -46,20 +46,275 @@ import {
   usePersonaLibrary,
 } from "@/hooks/usePersonaLibrary";
 import {
+  compileComplementVocabularyAdditions,
+  findComplementVocabularyById,
+  COMPLEMENT_VOCABULARY_PRESETS,
+} from "@/data/complementPresets";
+import {
+  compileArrangedMatchPresetAdditions,
+  findArrangedMatchPresetById,
+  ARRANGED_MATCH_PRESETS,
+} from "@/data/arrangedMatchPresets";
+import {
+  compileCommunicationStylePresetAdditions,
+  findCommunicationStylePresetById,
+  COMMUNICATION_STYLE_PRESETS,
+} from "@/data/communicationStylePresets";
+import {
+  compileConflictStylePresetAdditions,
+  findConflictStylePresetById,
+  CONFLICT_STYLE_PRESETS,
+} from "@/data/conflictStylePresets";
+import {
+  compileAmbitionPresetAdditions,
+  findAmbitionPresetById,
+  AMBITION_PRESETS,
+} from "@/data/ambitionPresets";
+import {
+  compileAffectionPresetAdditions,
+  findAffectionPresetById,
+  AFFECTION_PRESETS,
+} from "@/data/affectionPresets";
+import {
+  compileLoyaltyPresetAdditions,
+  findLoyaltyPresetById,
+  LOYALTY_PRESETS,
+} from "@/data/loyaltyPresets";
+import {
+  compileLoveLanguagePresetAdditions,
+  findLoveLanguagePresetById,
+  LOVE_LANGUAGE_PRESETS,
+} from "@/data/loveLanguagePresets";
+import {
+  compileMoralityPresetAdditions,
+  findMoralityPresetById,
+  MORALITY_PRESETS,
+} from "@/data/moralityPresets";
+import {
+  compileDialectPresetAdditions,
+  findDialectPresetById,
+  DIALECT_PRESETS,
+} from "@/data/dialectPresets";
+import {
+  compileFamilyHistoryPresetAdditions,
+  findFamilyHistoryPresetById,
+  FAMILY_HISTORY_PRESETS,
+} from "@/data/familyHistoryPresets";
+import {
+  compileBetrayalPresetAdditions,
+  findBetrayalPresetById,
+  BETRAYAL_PRESETS,
+} from "@/data/betrayalPresets";
+import {
+  compileExilePresetAdditions,
+  findExilePresetById,
+  EXILE_PRESETS,
+} from "@/data/exilePresets";
+import {
+  compileFatedReincarnationPresetAdditions,
+  findFatedReincarnationPresetById,
+  FATED_REINCARNATION_PRESETS,
+} from "@/data/fatedReincarnationPresets";
+import {
+  compileFakeDatingPresetAdditions,
+  findFakeDatingPresetById,
+  FAKE_DATING_PRESETS,
+} from "@/data/fakeDatingPresets";
+import {
+  compileForbiddenTabooPresetAdditions,
+  findForbiddenTabooPresetById,
+  FORBIDDEN_TABOO_PRESETS,
+} from "@/data/forbiddenTabooPresets";
+import {
+  compileMentorProtegePresetAdditions,
+  findMentorProtegePresetById,
+  MENTOR_PROTEGE_PRESETS,
+} from "@/data/mentorProtegePresets";
+import {
   compileFlirtingPresetAdditions,
   findFlirtingPresetById,
   FLIRTING_PRESETS,
 } from "@/data/flirtingPresets";
+import {
+  compileFriendsToLoversPresetAdditions,
+  findFriendsToLoversPresetById,
+  FRIENDS_TO_LOVERS_PRESETS,
+} from "@/data/friendsToLoversPresets";
+import {
+  compileFormativeEventPresetAdditions,
+  findFormativeEventPresetById,
+  FORMATIVE_EVENT_PRESETS,
+} from "@/data/formativeEventPresets";
+import {
+  compileFormalityPresetAdditions,
+  findFormalityPresetById,
+  FORMALITY_PRESETS,
+} from "@/data/formalityPresets";
+import {
+  compileGrumpySunshinePresetAdditions,
+  findGrumpySunshinePresetById,
+  GRUMPY_SUNSHINE_PRESETS,
+} from "@/data/grumpySunshinePresets";
+import {
+  compileDarkObsessivePresetAdditions,
+  findDarkObsessivePresetById,
+  DARK_OBSESSIVE_PRESETS,
+} from "@/data/darkObsessivePresets";
+import {
+  compileFormalArrangedPresetAdditions,
+  findFormalArrangedPresetById,
+  FORMAL_ARRANGED_PRESETS,
+} from "@/data/formalArrangedPresets";
+import {
+  compileAcademicRivalPresetAdditions,
+  findAcademicRivalPresetById,
+  ACADEMIC_RIVAL_PRESETS,
+} from "@/data/academicRivalPresets";
+import {
+  compileCaretakerHurtComfortPresetAdditions,
+  findCaretakerHurtComfortPresetById,
+  CARETAKER_HURT_COMFORT_PRESETS,
+} from "@/data/caretakerHurtComfortPresets";
+import {
+  compileCaretakerPresetAdditions,
+  findCaretakerPresetById,
+  CARETAKER_PRESETS,
+} from "@/data/caretakerPresets";
+import {
+  compileFrictionPresetAdditions,
+  findFrictionPresetById,
+  FRICTION_PRESETS,
+} from "@/data/frictionPresets";
+import {
+  compileRivalryPresetAdditions,
+  findRivalryPresetById,
+  RIVALRY_PRESETS,
+} from "@/data/rivalryPresets";
+import {
+  compileDevotionPresetAdditions,
+  findDevotionPresetById,
+  DEVOTION_PRESETS,
+} from "@/data/devotionPresets";
+import {
+  compileObsessionPresetAdditions,
+  findObsessionPresetById,
+  OBSESSION_PRESETS,
+} from "@/data/obsessionPresets";
+import {
+  compilePossessivePresetAdditions,
+  findPossessivePresetById,
+  POSSESSIVE_PRESETS,
+} from "@/data/possessivePresets";
+import {
+  compileSlowBurnPresetAdditions,
+  findSlowBurnPresetById,
+  SLOW_BURN_PRESETS,
+} from "@/data/slowBurnPresets";
+import {
+  compileFlawSecretPresetAdditions,
+  findFlawSecretPresetById,
+  FLAW_SECRET_PRESETS,
+} from "@/data/flawSecretPresets";
+import {
+  compileTeasingPresetAdditions,
+  findTeasingPresetById,
+  TEASING_PRESETS,
+} from "@/data/teasingPresets";
+import {
+  compileAgeLifeStagePresetAdditions,
+  findAgeLifeStagePresetById,
+  AGE_LIFE_STAGE_PRESETS,
+} from "@/data/ageLifeStagePresets";
+import {
+  compileSpeciesHeritagePresetAdditions,
+  findSpeciesHeritagePresetById,
+  SPECIES_HERITAGE_PRESETS,
+} from "@/data/speciesHeritagePresets";
+import {
+  compileHumanPresetAdditions,
+  findHumanPresetById,
+  HUMAN_PRESETS,
+} from "@/data/humanPresets";
+import {
+  compileVampirePresetAdditions,
+  findVampirePresetById,
+  VAMPIRE_PRESETS,
+} from "@/data/vampirePresets";
+import {
+  compileFaePresetAdditions,
+  findFaePresetById,
+  FAE_PRESETS,
+} from "@/data/faePresets";
+import {
+  compileDemonPresetAdditions,
+  findDemonPresetById,
+  DEMON_PRESETS,
+} from "@/data/demonPresets";
+import {
+  compileAngelPresetAdditions,
+  findAngelPresetById,
+  ANGEL_PRESETS,
+} from "@/data/angelPresets";
+import {
+  compileAndroidPresetAdditions,
+  findAndroidPresetById,
+  ANDROID_PRESETS,
+} from "@/data/androidPresets";
+import {
+  compileAlienPresetAdditions,
+  findAlienPresetById,
+  ALIEN_PRESETS,
+} from "@/data/alienPresets";
+import {
+  compileShifterPresetAdditions,
+  findShifterPresetById,
+  SHIFTER_PRESETS,
+} from "@/data/shifterPresets";
+import {
+  compileLossPresetAdditions,
+  findLossPresetById,
+  LOSS_PRESETS,
+} from "@/data/lossPresets";
+import {
+  compileJealousyPresetAdditions,
+  findJealousyPresetById,
+  JEALOUSY_PRESETS,
+} from "@/data/jealousyPresets";
 import {
   compileOriginWoundPresetAdditions,
   findOriginWoundVocabularyPresetById,
   ORIGIN_WOUND_VOCABULARY_PRESETS,
 } from "@/data/originWoundVocabularyPresets";
 import {
+  compilePetNamePresetAdditions,
+  findPetNamePresetById,
+  PET_NAME_PRESETS,
+} from "@/data/petNamePresets";
+import {
   compileRelationshipDynamicVocabularyInjection,
   findRelationshipDynamicVocabularyById,
   RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS,
 } from "@/data/relationshipDynamicVocabulary";
+import {
+  compileRegretPresetAdditions,
+  findRegretPresetById,
+  REGRET_PRESETS,
+} from "@/data/regretPresets";
+import {
+  compileSecretPresetAdditions,
+  findSecretPresetById,
+  SECRET_PRESETS,
+} from "@/data/secretPresets";
+import {
+  compileSecondChancePresetAdditions,
+  findSecondChancePresetById,
+  SECOND_CHANCE_PRESETS,
+} from "@/data/secondChancePresets";
+import {
+  compileSentenceRhythmPresetAdditions,
+  findSentenceRhythmPresetById,
+  SENTENCE_RHYTHM_PRESETS,
+} from "@/data/sentenceRhythmPresets";
 import {
   compileSpeechStylePresetSummary,
   findSpeechStylePresetById,
@@ -70,6 +325,12 @@ import {
   findVoiceVocabularyPresetById,
   VOICE_VOCABULARY_PRESETS,
 } from "@/data/voiceVocabularyPresets";
+import {
+  compileWorkplaceHierarchyPresetAdditions,
+  findWorkplaceHierarchyPresetById,
+  WORKPLACE_HIERARCHY_PRESETS,
+} from "@/data/workplaceHierarchyPresets";
+import { expandPresetLookupTokens } from "@/lib/character-card/presetSpellingAliases";
 import { downloadUint8Array } from "@/lib/browser/downloadUint8Array";
 import {
   Field,
@@ -109,14 +370,68 @@ const emptyPersonaStarterFields: Record<PersonaStarterFieldKey, string> = {
 };
 
 const personaSeedVocabulary = {
-  backstory: ORIGIN_WOUND_VOCABULARY_PRESETS.map((preset) => preset.id),
+  backstory: [
+    ...ORIGIN_WOUND_VOCABULARY_PRESETS.map((preset) => preset.id),
+    ...FORMATIVE_EVENT_PRESETS.map((preset) => preset.id),
+    ...FAMILY_HISTORY_PRESETS.map((preset) => preset.id),
+    ...REGRET_PRESETS.map((preset) => preset.id),
+    ...EXILE_PRESETS.map((preset) => preset.id),
+    ...BETRAYAL_PRESETS.map((preset) => preset.id),
+    ...LOSS_PRESETS.map((preset) => preset.id),
+    ...SECRET_PRESETS.map((preset) => preset.id),
+    ...AMBITION_PRESETS.map((preset) => preset.id),
+  ],
   personality: [
     ...SPEECH_STYLE_PRESETS.map((preset) => preset.id),
     ...VOICE_VOCABULARY_PRESETS.map((preset) => preset.id),
+    ...DIALECT_PRESETS.map((preset) => preset.id),
+    ...FORMALITY_PRESETS.map((preset) => preset.id),
+    ...PET_NAME_PRESETS.map((preset) => preset.id),
+    ...SENTENCE_RHYTHM_PRESETS.map((preset) => preset.id),
+    ...COMMUNICATION_STYLE_PRESETS.map((preset) => preset.id),
+    ...MORALITY_PRESETS.map((preset) => preset.id),
   ],
   relationship: [
+    ...COMPLEMENT_VOCABULARY_PRESETS.map((preset) => preset.id),
     ...RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS.map((preset) => preset.id),
+    ...ARRANGED_MATCH_PRESETS.map((preset) => preset.id),
+    ...FORBIDDEN_TABOO_PRESETS.map((preset) => preset.id),
+    ...MENTOR_PROTEGE_PRESETS.map((preset) => preset.id),
+    ...FAKE_DATING_PRESETS.map((preset) => preset.id),
+    ...GRUMPY_SUNSHINE_PRESETS.map((preset) => preset.id),
+    ...DARK_OBSESSIVE_PRESETS.map((preset) => preset.id),
+    ...FORMAL_ARRANGED_PRESETS.map((preset) => preset.id),
+    ...ACADEMIC_RIVAL_PRESETS.map((preset) => preset.id),
+    ...CARETAKER_HURT_COMFORT_PRESETS.map((preset) => preset.id),
+    ...CARETAKER_PRESETS.map((preset) => preset.id),
+    ...FRICTION_PRESETS.map((preset) => preset.id),
+    ...RIVALRY_PRESETS.map((preset) => preset.id),
+    ...DEVOTION_PRESETS.map((preset) => preset.id),
+    ...OBSESSION_PRESETS.map((preset) => preset.id),
+    ...POSSESSIVE_PRESETS.map((preset) => preset.id),
+    ...SLOW_BURN_PRESETS.map((preset) => preset.id),
+    ...FLAW_SECRET_PRESETS.map((preset) => preset.id),
+    ...TEASING_PRESETS.map((preset) => preset.id),
+    ...AGE_LIFE_STAGE_PRESETS.map((preset) => preset.id),
+    ...SPECIES_HERITAGE_PRESETS.map((preset) => preset.id),
+    ...HUMAN_PRESETS.map((preset) => preset.id),
+    ...VAMPIRE_PRESETS.map((preset) => preset.id),
+    ...FAE_PRESETS.map((preset) => preset.id),
+    ...DEMON_PRESETS.map((preset) => preset.id),
+    ...ANGEL_PRESETS.map((preset) => preset.id),
+    ...ANDROID_PRESETS.map((preset) => preset.id),
+    ...ALIEN_PRESETS.map((preset) => preset.id),
+    ...SHIFTER_PRESETS.map((preset) => preset.id),
+    ...FATED_REINCARNATION_PRESETS.map((preset) => preset.id),
+    ...SECOND_CHANCE_PRESETS.map((preset) => preset.id),
+    ...WORKPLACE_HIERARCHY_PRESETS.map((preset) => preset.id),
+    ...FRIENDS_TO_LOVERS_PRESETS.map((preset) => preset.id),
     ...FLIRTING_PRESETS.map((preset) => preset.id),
+    ...JEALOUSY_PRESETS.map((preset) => preset.id),
+    ...AFFECTION_PRESETS.map((preset) => preset.id),
+    ...LOYALTY_PRESETS.map((preset) => preset.id),
+    ...LOVE_LANGUAGE_PRESETS.map((preset) => preset.id),
+    ...CONFLICT_STYLE_PRESETS.map((preset) => preset.id),
   ],
 };
 
@@ -499,9 +814,237 @@ export function PersonaGenerationPage() {
                     onAdd={(value) => handleAddPersonaSeed("scenario", value)}
                   />
                   <PersonaSeedCombo
+                    datalistId="persona-complement-vocabulary-seeds"
+                    label="Add complement vocabulary"
+                    options={COMPLEMENT_VOCABULARY_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-forbidden-taboo-seeds"
+                    label="Add forbidden / taboo intersection"
+                    options={FORBIDDEN_TABOO_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-arranged-match-seeds"
+                    label="Add arranged match seed"
+                    options={ARRANGED_MATCH_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-mentor-protege-seeds"
+                    label="Add mentor / protégé seed"
+                    options={MENTOR_PROTEGE_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-fake-dating-seeds"
+                    label="Add fake dating seed"
+                    options={FAKE_DATING_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-grumpy-sunshine-seeds"
+                    label="Add grumpy / sunshine seed"
+                    options={GRUMPY_SUNSHINE_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-dark-obsessive-seeds"
+                    label="Add dark / obsessive seed"
+                    options={DARK_OBSESSIVE_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-formal-arranged-seeds"
+                    label="Add formal / arranged seed"
+                    options={FORMAL_ARRANGED_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-academic-rival-seeds"
+                    label="Add academic / rival seed"
+                    options={ACADEMIC_RIVAL_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-caretaker-hurt-comfort-seeds"
+                    label="Add caretaker / hurt-comfort seed"
+                    options={CARETAKER_HURT_COMFORT_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-caretaker-seeds"
+                    label="Add caretaker seed"
+                    options={CARETAKER_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-friction-seeds"
+                    label="Add friction seed"
+                    options={FRICTION_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-rivalry-seeds"
+                    label="Add rivalry seed"
+                    options={RIVALRY_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-devotion-seeds"
+                    label="Add devotion seed"
+                    options={DEVOTION_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-obsession-seeds"
+                    label="Add obsession seed"
+                    options={OBSESSION_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-possessive-seeds"
+                    label="Add possessive seed"
+                    options={POSSESSIVE_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-slow-burn-seeds"
+                    label="Add slow-burn seed"
+                    options={SLOW_BURN_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-flaw-secret-seeds"
+                    label="Add flaw / secret seed"
+                    options={FLAW_SECRET_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-teasing-seeds"
+                    label="Add teasing seed"
+                    options={TEASING_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-age-life-stage-seeds"
+                    label="Add age / life-stage seed"
+                    options={AGE_LIFE_STAGE_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-species-heritage-seeds"
+                    label="Add species / heritage seed"
+                    options={SPECIES_HERITAGE_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-human-seeds"
+                    label="Add human seed"
+                    options={HUMAN_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-vampire-seeds"
+                    label="Add vampire seed"
+                    options={VAMPIRE_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-fae-seeds"
+                    label="Add fae seed"
+                    options={FAE_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-demon-seeds"
+                    label="Add demon seed"
+                    options={DEMON_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-angel-seeds"
+                    label="Add angel seed"
+                    options={ANGEL_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-android-seeds"
+                    label="Add android seed"
+                    options={ANDROID_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-alien-seeds"
+                    label="Add alien seed"
+                    options={ALIEN_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-shifter-seeds"
+                    label="Add shifter seed"
+                    options={SHIFTER_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-fated-reincarnation-seeds"
+                    label="Add fated / reincarnation seed"
+                    options={FATED_REINCARNATION_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-second-chance-seeds"
+                    label="Add second-chance seed"
+                    options={SECOND_CHANCE_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-workplace-hierarchy-seeds"
+                    label="Add workplace hierarchy seed"
+                    options={WORKPLACE_HIERARCHY_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-friends-to-lovers-seeds"
+                    label="Add friends-to-lovers seed"
+                    options={FRIENDS_TO_LOVERS_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
                     datalistId="persona-flirting-seeds"
                     label="Add flirting / tension style"
                     options={FLIRTING_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-jealousy-seeds"
+                    label="Add jealousy / rivalry seed"
+                    options={JEALOUSY_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-affection-seeds"
+                    label="Add affection / comfort seed"
+                    options={AFFECTION_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-loyalty-seeds"
+                    label="Add loyalty / devotion seed"
+                    options={LOYALTY_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-love-language-seeds"
+                    label="Add love language seed"
+                    options={LOVE_LANGUAGE_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("scenario", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-conflict-style-seeds"
+                    label="Add conflict / repair style"
+                    options={CONFLICT_STYLE_PRESETS.map((preset) => preset.id)}
                     onAdd={(value) => handleAddPersonaSeed("scenario", value)}
                   />
                 </div>
@@ -538,8 +1081,56 @@ export function PersonaGenerationPage() {
                   <PersonaSeedCombo
                     datalistId="persona-origin-wound-seeds"
                     label="Add origin wound vocabulary"
-                    options={personaSeedVocabulary.backstory}
-                    onAdd={(value) => handleAddPersonaSeed("personality", value)}
+                    options={ORIGIN_WOUND_VOCABULARY_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("basicInfo", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-formative-event-seeds"
+                    label="Add formative event"
+                    options={FORMATIVE_EVENT_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("basicInfo", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-family-history-seeds"
+                    label="Add family history"
+                    options={FAMILY_HISTORY_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("basicInfo", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-regret-seeds"
+                    label="Add regret seed"
+                    options={REGRET_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("basicInfo", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-exile-seeds"
+                    label="Add exile seed"
+                    options={EXILE_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("basicInfo", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-betrayal-seeds"
+                    label="Add betrayal seed"
+                    options={BETRAYAL_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("basicInfo", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-loss-seeds"
+                    label="Add loss seed"
+                    options={LOSS_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("basicInfo", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-secret-seeds"
+                    label="Add secret seed"
+                    options={SECRET_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("basicInfo", value)}
+                  />
+                  <PersonaSeedCombo
+                    datalistId="persona-ambition-seeds"
+                    label="Add ambition seed"
+                    options={AMBITION_PRESETS.map((preset) => preset.id)}
+                    onAdd={(value) => handleAddPersonaSeed("basicInfo", value)}
                   />
                 </div>
               </PersonaSheetSection>
@@ -581,6 +1172,42 @@ export function PersonaGenerationPage() {
                       datalistId="persona-voice-vocabulary-seeds"
                       label="Add voice vocabulary"
                       options={VOICE_VOCABULARY_PRESETS.map((preset) => preset.id)}
+                      onAdd={(value) => handleAddPersonaSeed("personality", value)}
+                    />
+                    <PersonaSeedCombo
+                      datalistId="persona-dialect-seeds"
+                      label="Add dialect / accent"
+                      options={DIALECT_PRESETS.map((preset) => preset.id)}
+                      onAdd={(value) => handleAddPersonaSeed("personality", value)}
+                    />
+                    <PersonaSeedCombo
+                      datalistId="persona-formality-seeds"
+                      label="Add formality / titles"
+                      options={FORMALITY_PRESETS.map((preset) => preset.id)}
+                      onAdd={(value) => handleAddPersonaSeed("personality", value)}
+                    />
+                    <PersonaSeedCombo
+                      datalistId="persona-pet-name-seeds"
+                      label="Add pet-name rules"
+                      options={PET_NAME_PRESETS.map((preset) => preset.id)}
+                      onAdd={(value) => handleAddPersonaSeed("personality", value)}
+                    />
+                    <PersonaSeedCombo
+                      datalistId="persona-sentence-rhythm-seeds"
+                      label="Add sentence rhythm"
+                      options={SENTENCE_RHYTHM_PRESETS.map((preset) => preset.id)}
+                      onAdd={(value) => handleAddPersonaSeed("personality", value)}
+                    />
+                    <PersonaSeedCombo
+                      datalistId="persona-communication-style-seeds"
+                      label="Add communication style"
+                      options={COMMUNICATION_STYLE_PRESETS.map((preset) => preset.id)}
+                      onAdd={(value) => handleAddPersonaSeed("personality", value)}
+                    />
+                    <PersonaSeedCombo
+                      datalistId="persona-morality-seeds"
+                      label="Add morality / ethics"
+                      options={MORALITY_PRESETS.map((preset) => preset.id)}
                       onAdd={(value) => handleAddPersonaSeed("personality", value)}
                     />
                   </div>
@@ -952,6 +1579,7 @@ function createPersonaStarterIntakeText(
 function createPersonaCompiledVocabularySeedText(
   fields: Record<PersonaStarterFieldKey, string>,
 ) {
+  const backstorySeedText = joinDefined([fields.basicInfo, fields.personality]);
   const speechStyleAdditions = findPresetMatches(
     fields.personality,
     findSpeechStylePresetById,
@@ -968,10 +1596,160 @@ function createPersonaCompiledVocabularySeedText(
     ]);
   });
   const originWoundAdditions = findPresetMatches(
-    fields.personality,
+    backstorySeedText,
     findOriginWoundVocabularyPresetById,
   ).map((preset) => {
     const additions = compileOriginWoundPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const formativeEventAdditions = findPresetMatches(
+    backstorySeedText,
+    findFormativeEventPresetById,
+  ).map((preset) => {
+    const additions = compileFormativeEventPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const familyHistoryAdditions = findPresetMatches(
+    backstorySeedText,
+    findFamilyHistoryPresetById,
+  ).map((preset) => {
+    const additions = compileFamilyHistoryPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const regretAdditions = findPresetMatches(
+    backstorySeedText,
+    findRegretPresetById,
+  ).map((preset) => {
+    const additions = compileRegretPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const exileAdditions = findPresetMatches(
+    backstorySeedText,
+    findExilePresetById,
+  ).map((preset) => {
+    const additions = compileExilePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const betrayalAdditions = findPresetMatches(
+    backstorySeedText,
+    findBetrayalPresetById,
+  ).map((preset) => {
+    const additions = compileBetrayalPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const lossAdditions = findPresetMatches(
+    backstorySeedText,
+    findLossPresetById,
+  ).map((preset) => {
+    const additions = compileLossPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const secretAdditions = findPresetMatches(
+    backstorySeedText,
+    findSecretPresetById,
+  ).map((preset) => {
+    const additions = compileSecretPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const ambitionAdditions = findPresetMatches(
+    backstorySeedText,
+    findAmbitionPresetById,
+  ).map((preset) => {
+    const additions = compileAmbitionPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const dialectAdditions = findPresetMatches(
+    fields.personality,
+    findDialectPresetById,
+  ).map((preset) => {
+    const additions = compileDialectPresetAdditions(preset);
+    return joinDefined([
+      additions.speechStyleAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const formalityAdditions = findPresetMatches(
+    fields.personality,
+    findFormalityPresetById,
+  ).map((preset) => {
+    const additions = compileFormalityPresetAdditions(preset);
+    return joinDefined([
+      additions.speechStyleAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const petNameAdditions = findPresetMatches(
+    fields.personality,
+    findPetNamePresetById,
+  ).map((preset) => {
+    const additions = compilePetNamePresetAdditions(preset);
+    return joinDefined([
+      additions.speechStyleAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const sentenceRhythmAdditions = findPresetMatches(
+    fields.personality,
+    findSentenceRhythmPresetById,
+  ).map((preset) => {
+    const additions = compileSentenceRhythmPresetAdditions(preset);
+    return joinDefined([
+      additions.speechStyleAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const communicationStyleAdditions = findPresetMatches(
+    fields.personality,
+    findCommunicationStylePresetById,
+  ).map((preset) => {
+    const additions = compileCommunicationStylePresetAdditions(preset);
+    return joinDefined([
+      additions.speechStyleAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const moralityAdditions = findPresetMatches(
+    fields.personality,
+    findMoralityPresetById,
+  ).map((preset) => {
+    const additions = compileMoralityPresetAdditions(preset);
     return joinDefined([
       additions.backgroundAddition,
       additions.personalityAddition,
@@ -990,6 +1768,399 @@ function createPersonaCompiledVocabularySeedText(
       injection.systemBehavior,
     ]);
   });
+  const complementAdditions = findPresetMatches(
+    fields.scenario,
+    findComplementVocabularyById,
+  ).map((preset) => {
+    const additions = compileComplementVocabularyAdditions(preset);
+    return joinDefined([
+      additions.relationshipAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const forbiddenTabooAdditions = findPresetMatches(
+    fields.scenario,
+    findForbiddenTabooPresetById,
+  ).map((preset) => {
+    const additions = compileForbiddenTabooPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const arrangedMatchAdditions = findPresetMatches(
+    fields.scenario,
+    findArrangedMatchPresetById,
+  ).map((preset) => {
+    const additions = compileArrangedMatchPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const mentorProtegeAdditions = findPresetMatches(
+    fields.scenario,
+    findMentorProtegePresetById,
+  ).map((preset) => {
+    const additions = compileMentorProtegePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const fakeDatingAdditions = findPresetMatches(
+    fields.scenario,
+    findFakeDatingPresetById,
+  ).map((preset) => {
+    const additions = compileFakeDatingPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const grumpySunshineAdditions = findPresetMatches(
+    fields.scenario,
+    findGrumpySunshinePresetById,
+  ).map((preset) => {
+    const additions = compileGrumpySunshinePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const darkObsessiveAdditions = findPresetMatches(
+    fields.scenario,
+    findDarkObsessivePresetById,
+  ).map((preset) => {
+    const additions = compileDarkObsessivePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const formalArrangedAdditions = findPresetMatches(
+    fields.scenario,
+    findFormalArrangedPresetById,
+  ).map((preset) => {
+    const additions = compileFormalArrangedPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const academicRivalAdditions = findPresetMatches(
+    fields.scenario,
+    findAcademicRivalPresetById,
+  ).map((preset) => {
+    const additions = compileAcademicRivalPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const caretakerHurtComfortAdditions = findPresetMatches(
+    fields.scenario,
+    findCaretakerHurtComfortPresetById,
+  ).map((preset) => {
+    const additions = compileCaretakerHurtComfortPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const caretakerAdditions = findPresetMatches(
+    fields.scenario,
+    findCaretakerPresetById,
+  ).map((preset) => {
+    const additions = compileCaretakerPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const frictionAdditions = findPresetMatches(
+    fields.scenario,
+    findFrictionPresetById,
+  ).map((preset) => {
+    const additions = compileFrictionPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const rivalryAdditions = findPresetMatches(
+    fields.scenario,
+    findRivalryPresetById,
+  ).map((preset) => {
+    const additions = compileRivalryPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const devotionAdditions = findPresetMatches(
+    fields.scenario,
+    findDevotionPresetById,
+  ).map((preset) => {
+    const additions = compileDevotionPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const obsessionAdditions = findPresetMatches(
+    fields.scenario,
+    findObsessionPresetById,
+  ).map((preset) => {
+    const additions = compileObsessionPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const possessiveAdditions = findPresetMatches(
+    fields.scenario,
+    findPossessivePresetById,
+  ).map((preset) => {
+    const additions = compilePossessivePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const slowBurnAdditions = findPresetMatches(
+    fields.scenario,
+    findSlowBurnPresetById,
+  ).map((preset) => {
+    const additions = compileSlowBurnPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const flawSecretAdditions = findPresetMatches(
+    fields.scenario,
+    findFlawSecretPresetById,
+  ).map((preset) => {
+    const additions = compileFlawSecretPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const teasingAdditions = findPresetMatches(
+    fields.scenario,
+    findTeasingPresetById,
+  ).map((preset) => {
+    const additions = compileTeasingPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const ageLifeStageAdditions = findPresetMatches(
+    fields.scenario,
+    findAgeLifeStagePresetById,
+  ).map((preset) => {
+    const additions = compileAgeLifeStagePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const speciesHeritageAdditions = findPresetMatches(
+    fields.scenario,
+    findSpeciesHeritagePresetById,
+  ).map((preset) => {
+    const additions = compileSpeciesHeritagePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const humanAdditions = findPresetMatches(
+    fields.scenario,
+    findHumanPresetById,
+  ).map((preset) => {
+    const additions = compileHumanPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const vampireAdditions = findPresetMatches(
+    fields.scenario,
+    findVampirePresetById,
+  ).map((preset) => {
+    const additions = compileVampirePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const faeAdditions = findPresetMatches(
+    fields.scenario,
+    findFaePresetById,
+  ).map((preset) => {
+    const additions = compileFaePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const demonAdditions = findPresetMatches(
+    fields.scenario,
+    findDemonPresetById,
+  ).map((preset) => {
+    const additions = compileDemonPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const angelAdditions = findPresetMatches(
+    fields.scenario,
+    findAngelPresetById,
+  ).map((preset) => {
+    const additions = compileAngelPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const androidAdditions = findPresetMatches(
+    fields.scenario,
+    findAndroidPresetById,
+  ).map((preset) => {
+    const additions = compileAndroidPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const alienAdditions = findPresetMatches(
+    fields.scenario,
+    findAlienPresetById,
+  ).map((preset) => {
+    const additions = compileAlienPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const shifterAdditions = findPresetMatches(
+    fields.scenario,
+    findShifterPresetById,
+  ).map((preset) => {
+    const additions = compileShifterPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const fatedReincarnationAdditions = findPresetMatches(
+    fields.scenario,
+    findFatedReincarnationPresetById,
+  ).map((preset) => {
+    const additions = compileFatedReincarnationPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const secondChanceAdditions = findPresetMatches(
+    fields.scenario,
+    findSecondChancePresetById,
+  ).map((preset) => {
+    const additions = compileSecondChancePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const workplaceHierarchyAdditions = findPresetMatches(
+    fields.scenario,
+    findWorkplaceHierarchyPresetById,
+  ).map((preset) => {
+    const additions = compileWorkplaceHierarchyPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const friendsToLoversAdditions = findPresetMatches(
+    fields.scenario,
+    findFriendsToLoversPresetById,
+  ).map((preset) => {
+    const additions = compileFriendsToLoversPresetAdditions(preset);
+    return joinDefined([
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
   const flirtingAdditions = findPresetMatches(
     fields.scenario,
     findFlirtingPresetById,
@@ -1001,16 +2172,123 @@ function createPersonaCompiledVocabularySeedText(
       additions.systemPromptAddition,
     ]);
   });
+  const jealousyAdditions = findPresetMatches(
+    fields.scenario,
+    findJealousyPresetById,
+  ).map((preset) => {
+    const additions = compileJealousyPresetAdditions(preset);
+    return joinDefined([
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const affectionAdditions = findPresetMatches(
+    fields.scenario,
+    findAffectionPresetById,
+  ).map((preset) => {
+    const additions = compileAffectionPresetAdditions(preset);
+    return joinDefined([
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const loyaltyAdditions = findPresetMatches(
+    fields.scenario,
+    findLoyaltyPresetById,
+  ).map((preset) => {
+    const additions = compileLoyaltyPresetAdditions(preset);
+    return joinDefined([
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const loveLanguageAdditions = findPresetMatches(
+    fields.scenario,
+    findLoveLanguagePresetById,
+  ).map((preset) => {
+    const additions = compileLoveLanguagePresetAdditions(preset);
+    return joinDefined([
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const conflictStyleAdditions = findPresetMatches(
+    fields.scenario,
+    findConflictStylePresetById,
+  ).map((preset) => {
+    const additions = compileConflictStylePresetAdditions(preset);
+    return joinDefined([
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
 
   return {
     characteristics: joinDefined([
       ...speechStyleAdditions,
       ...voiceVocabularyAdditions,
       ...originWoundAdditions,
+      ...formativeEventAdditions,
+      ...familyHistoryAdditions,
+      ...regretAdditions,
+      ...exileAdditions,
+      ...betrayalAdditions,
+      ...lossAdditions,
+      ...secretAdditions,
+      ...ambitionAdditions,
+      ...dialectAdditions,
+      ...formalityAdditions,
+      ...petNameAdditions,
+      ...sentenceRhythmAdditions,
+      ...communicationStyleAdditions,
+      ...moralityAdditions,
     ]),
     referenceContext: joinDefined([
       ...relationshipVocabularyAdditions,
+      ...complementAdditions,
+      ...arrangedMatchAdditions,
+      ...forbiddenTabooAdditions,
+      ...mentorProtegeAdditions,
+      ...fakeDatingAdditions,
+      ...grumpySunshineAdditions,
+      ...darkObsessiveAdditions,
+      ...formalArrangedAdditions,
+      ...academicRivalAdditions,
+      ...caretakerHurtComfortAdditions,
+      ...caretakerAdditions,
+      ...frictionAdditions,
+      ...rivalryAdditions,
+      ...devotionAdditions,
+      ...obsessionAdditions,
+      ...possessiveAdditions,
+      ...slowBurnAdditions,
+      ...flawSecretAdditions,
+      ...teasingAdditions,
+      ...ageLifeStageAdditions,
+      ...speciesHeritageAdditions,
+      ...humanAdditions,
+      ...vampireAdditions,
+      ...faeAdditions,
+      ...demonAdditions,
+      ...angelAdditions,
+      ...androidAdditions,
+      ...alienAdditions,
+      ...shifterAdditions,
+      ...fatedReincarnationAdditions,
+      ...secondChanceAdditions,
+      ...workplaceHierarchyAdditions,
+      ...friendsToLoversAdditions,
       ...flirtingAdditions,
+      ...jealousyAdditions,
+      ...affectionAdditions,
+      ...loyaltyAdditions,
+      ...loveLanguageAdditions,
+      ...conflictStyleAdditions,
     ]),
   };
 }
@@ -1034,7 +2312,9 @@ function findPresetMatches<T>(
   const seen = new Set<T>();
 
   for (const token of tokenizeSeedInput(rawText)) {
-    const match = findById(token);
+    const match = expandPresetLookupTokens(token)
+      .map((candidate) => findById(candidate))
+      .find((candidate): candidate is T => Boolean(candidate));
     if (!match || seen.has(match)) continue;
     seen.add(match);
     matches.push(match);

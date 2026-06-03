@@ -25,20 +25,275 @@ import { savePersonaLibraryItem } from "@/hooks/usePersonaLibrary";
 import { createPersonaArtifactFromCharacterCard } from "@/features/generation/workflows";
 import { downloadUint8Array } from "@/lib/browser/downloadUint8Array";
 import {
+  compileComplementVocabularyAdditions,
+  findComplementVocabularyById,
+  COMPLEMENT_VOCABULARY_PRESETS,
+} from "@/data/complementPresets";
+import {
+  compileArrangedMatchPresetAdditions,
+  findArrangedMatchPresetById,
+  ARRANGED_MATCH_PRESETS,
+} from "@/data/arrangedMatchPresets";
+import {
+  compileCommunicationStylePresetAdditions,
+  findCommunicationStylePresetById,
+  COMMUNICATION_STYLE_PRESETS,
+} from "@/data/communicationStylePresets";
+import {
+  compileConflictStylePresetAdditions,
+  findConflictStylePresetById,
+  CONFLICT_STYLE_PRESETS,
+} from "@/data/conflictStylePresets";
+import {
+  compileAmbitionPresetAdditions,
+  findAmbitionPresetById,
+  AMBITION_PRESETS,
+} from "@/data/ambitionPresets";
+import {
+  compileAffectionPresetAdditions,
+  findAffectionPresetById,
+  AFFECTION_PRESETS,
+} from "@/data/affectionPresets";
+import {
+  compileLoyaltyPresetAdditions,
+  findLoyaltyPresetById,
+  LOYALTY_PRESETS,
+} from "@/data/loyaltyPresets";
+import {
+  compileLoveLanguagePresetAdditions,
+  findLoveLanguagePresetById,
+  LOVE_LANGUAGE_PRESETS,
+} from "@/data/loveLanguagePresets";
+import {
+  compileMoralityPresetAdditions,
+  findMoralityPresetById,
+  MORALITY_PRESETS,
+} from "@/data/moralityPresets";
+import {
+  compileFamilyHistoryPresetAdditions,
+  findFamilyHistoryPresetById,
+  FAMILY_HISTORY_PRESETS,
+} from "@/data/familyHistoryPresets";
+import {
+  compileBetrayalPresetAdditions,
+  findBetrayalPresetById,
+  BETRAYAL_PRESETS,
+} from "@/data/betrayalPresets";
+import {
+  compileExilePresetAdditions,
+  findExilePresetById,
+  EXILE_PRESETS,
+} from "@/data/exilePresets";
+import {
+  compileFatedReincarnationPresetAdditions,
+  findFatedReincarnationPresetById,
+  FATED_REINCARNATION_PRESETS,
+} from "@/data/fatedReincarnationPresets";
+import {
+  compileFakeDatingPresetAdditions,
+  findFakeDatingPresetById,
+  FAKE_DATING_PRESETS,
+} from "@/data/fakeDatingPresets";
+import {
+  compileForbiddenTabooPresetAdditions,
+  findForbiddenTabooPresetById,
+  FORBIDDEN_TABOO_PRESETS,
+} from "@/data/forbiddenTabooPresets";
+import {
+  compileMentorProtegePresetAdditions,
+  findMentorProtegePresetById,
+  MENTOR_PROTEGE_PRESETS,
+} from "@/data/mentorProtegePresets";
+import {
+  compileDialectPresetAdditions,
+  findDialectPresetById,
+  DIALECT_PRESETS,
+} from "@/data/dialectPresets";
+import {
   compileFlirtingPresetAdditions,
   findFlirtingPresetById,
   FLIRTING_PRESETS,
 } from "@/data/flirtingPresets";
+import {
+  compileFriendsToLoversPresetAdditions,
+  findFriendsToLoversPresetById,
+  FRIENDS_TO_LOVERS_PRESETS,
+} from "@/data/friendsToLoversPresets";
+import {
+  compileFormativeEventPresetAdditions,
+  findFormativeEventPresetById,
+  FORMATIVE_EVENT_PRESETS,
+} from "@/data/formativeEventPresets";
+import {
+  compileFormalityPresetAdditions,
+  findFormalityPresetById,
+  FORMALITY_PRESETS,
+} from "@/data/formalityPresets";
+import {
+  compileGrumpySunshinePresetAdditions,
+  findGrumpySunshinePresetById,
+  GRUMPY_SUNSHINE_PRESETS,
+} from "@/data/grumpySunshinePresets";
+import {
+  compileDarkObsessivePresetAdditions,
+  findDarkObsessivePresetById,
+  DARK_OBSESSIVE_PRESETS,
+} from "@/data/darkObsessivePresets";
+import {
+  compileFormalArrangedPresetAdditions,
+  findFormalArrangedPresetById,
+  FORMAL_ARRANGED_PRESETS,
+} from "@/data/formalArrangedPresets";
+import {
+  compileAcademicRivalPresetAdditions,
+  findAcademicRivalPresetById,
+  ACADEMIC_RIVAL_PRESETS,
+} from "@/data/academicRivalPresets";
+import {
+  compileCaretakerHurtComfortPresetAdditions,
+  findCaretakerHurtComfortPresetById,
+  CARETAKER_HURT_COMFORT_PRESETS,
+} from "@/data/caretakerHurtComfortPresets";
+import {
+  compileCaretakerPresetAdditions,
+  findCaretakerPresetById,
+  CARETAKER_PRESETS,
+} from "@/data/caretakerPresets";
+import {
+  compileFrictionPresetAdditions,
+  findFrictionPresetById,
+  FRICTION_PRESETS,
+} from "@/data/frictionPresets";
+import {
+  compileRivalryPresetAdditions,
+  findRivalryPresetById,
+  RIVALRY_PRESETS,
+} from "@/data/rivalryPresets";
+import {
+  compileDevotionPresetAdditions,
+  findDevotionPresetById,
+  DEVOTION_PRESETS,
+} from "@/data/devotionPresets";
+import {
+  compileObsessionPresetAdditions,
+  findObsessionPresetById,
+  OBSESSION_PRESETS,
+} from "@/data/obsessionPresets";
+import {
+  compilePossessivePresetAdditions,
+  findPossessivePresetById,
+  POSSESSIVE_PRESETS,
+} from "@/data/possessivePresets";
+import {
+  compileSlowBurnPresetAdditions,
+  findSlowBurnPresetById,
+  SLOW_BURN_PRESETS,
+} from "@/data/slowBurnPresets";
+import {
+  compileFlawSecretPresetAdditions,
+  findFlawSecretPresetById,
+  FLAW_SECRET_PRESETS,
+} from "@/data/flawSecretPresets";
+import {
+  compileTeasingPresetAdditions,
+  findTeasingPresetById,
+  TEASING_PRESETS,
+} from "@/data/teasingPresets";
+import {
+  compileAgeLifeStagePresetAdditions,
+  findAgeLifeStagePresetById,
+  AGE_LIFE_STAGE_PRESETS,
+} from "@/data/ageLifeStagePresets";
+import {
+  compileSpeciesHeritagePresetAdditions,
+  findSpeciesHeritagePresetById,
+  SPECIES_HERITAGE_PRESETS,
+} from "@/data/speciesHeritagePresets";
+import {
+  compileHumanPresetAdditions,
+  findHumanPresetById,
+  HUMAN_PRESETS,
+} from "@/data/humanPresets";
+import {
+  compileVampirePresetAdditions,
+  findVampirePresetById,
+  VAMPIRE_PRESETS,
+} from "@/data/vampirePresets";
+import {
+  compileFaePresetAdditions,
+  findFaePresetById,
+  FAE_PRESETS,
+} from "@/data/faePresets";
+import {
+  compileDemonPresetAdditions,
+  findDemonPresetById,
+  DEMON_PRESETS,
+} from "@/data/demonPresets";
+import {
+  compileAngelPresetAdditions,
+  findAngelPresetById,
+  ANGEL_PRESETS,
+} from "@/data/angelPresets";
+import {
+  compileAndroidPresetAdditions,
+  findAndroidPresetById,
+  ANDROID_PRESETS,
+} from "@/data/androidPresets";
+import {
+  compileAlienPresetAdditions,
+  findAlienPresetById,
+  ALIEN_PRESETS,
+} from "@/data/alienPresets";
+import {
+  compileShifterPresetAdditions,
+  findShifterPresetById,
+  SHIFTER_PRESETS,
+} from "@/data/shifterPresets";
+import {
+  compileLossPresetAdditions,
+  findLossPresetById,
+  LOSS_PRESETS,
+} from "@/data/lossPresets";
+import {
+  compileJealousyPresetAdditions,
+  findJealousyPresetById,
+  JEALOUSY_PRESETS,
+} from "@/data/jealousyPresets";
 import {
   compileOriginWoundPresetAdditions,
   findOriginWoundVocabularyPresetById,
   ORIGIN_WOUND_VOCABULARY_PRESETS,
 } from "@/data/originWoundVocabularyPresets";
 import {
+  compilePetNamePresetAdditions,
+  findPetNamePresetById,
+  PET_NAME_PRESETS,
+} from "@/data/petNamePresets";
+import {
   compileRelationshipDynamicVocabularyInjection,
   findRelationshipDynamicVocabularyById,
   RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS,
 } from "@/data/relationshipDynamicVocabulary";
+import {
+  compileRegretPresetAdditions,
+  findRegretPresetById,
+  REGRET_PRESETS,
+} from "@/data/regretPresets";
+import {
+  compileSecretPresetAdditions,
+  findSecretPresetById,
+  SECRET_PRESETS,
+} from "@/data/secretPresets";
+import {
+  compileSecondChancePresetAdditions,
+  findSecondChancePresetById,
+  SECOND_CHANCE_PRESETS,
+} from "@/data/secondChancePresets";
+import {
+  compileSentenceRhythmPresetAdditions,
+  findSentenceRhythmPresetById,
+  SENTENCE_RHYTHM_PRESETS,
+} from "@/data/sentenceRhythmPresets";
 import {
   compileSpeechStylePresetSummary,
   findSpeechStylePresetById,
@@ -49,8 +304,14 @@ import {
   findVoiceVocabularyPresetById,
   VOICE_VOCABULARY_PRESETS,
 } from "@/data/voiceVocabularyPresets";
+import {
+  compileWorkplaceHierarchyPresetAdditions,
+  findWorkplaceHierarchyPresetById,
+  WORKPLACE_HIERARCHY_PRESETS,
+} from "@/data/workplaceHierarchyPresets";
 import { importBrowserCharacterCardFile } from "@/lib/character-card/importBrowserCharacterCardFile";
 import { consumePendingLibraryCardPath } from "@/lib/character-card/librarySelectionHandoff";
+import { expandPresetLookupTokens } from "@/lib/character-card/presetSpellingAliases";
 import { createCharacterCardV3Export } from "@/lib/character-card/createCharacterCardV3Export";
 import {
   createBlankDraftCharacterCard,
@@ -122,14 +383,14 @@ const starterFieldDefinitions: Array<{
   {
     key: "personality",
     label: "Personality",
-    placeholder: "Core traits, wounds, habits, voice, behavior patterns...",
+    placeholder: "Core traits, wounds, habits, voice, behaviour patterns...",
     rows: 3,
     section: "vibe",
   },
   {
     key: "personalitySeeds",
     label: "Soul sketch seeds",
-    placeholder: "guarded, dry humor, secretly sentimental, observant...",
+    placeholder: "guarded, dry humour, secretly sentimental, observant...",
     rows: 2,
     section: "vibe",
   },
@@ -359,10 +620,18 @@ const seedVocabulary = {
     "private grief",
     "unfinished promise",
     ...ORIGIN_WOUND_VOCABULARY_PRESETS.map((preset) => preset.id),
+    ...FORMATIVE_EVENT_PRESETS.map((preset) => preset.id),
+    ...FAMILY_HISTORY_PRESETS.map((preset) => preset.id),
+    ...REGRET_PRESETS.map((preset) => preset.id),
+    ...EXILE_PRESETS.map((preset) => preset.id),
+    ...BETRAYAL_PRESETS.map((preset) => preset.id),
+    ...LOSS_PRESETS.map((preset) => preset.id),
+    ...SECRET_PRESETS.map((preset) => preset.id),
+    ...AMBITION_PRESETS.map((preset) => preset.id),
   ],
   personality: [
     "guarded",
-    "dry humor",
+    "dry humour",
     "secretly sentimental",
     "fiercely competent",
     "hyper-observant",
@@ -373,6 +642,12 @@ const seedVocabulary = {
     "quietly intense",
     ...SPEECH_STYLE_PRESETS.map((preset) => preset.id),
     ...VOICE_VOCABULARY_PRESETS.map((preset) => preset.id),
+    ...DIALECT_PRESETS.map((preset) => preset.id),
+    ...FORMALITY_PRESETS.map((preset) => preset.id),
+    ...PET_NAME_PRESETS.map((preset) => preset.id),
+    ...SENTENCE_RHYTHM_PRESETS.map((preset) => preset.id),
+    ...COMMUNICATION_STYLE_PRESETS.map((preset) => preset.id),
+    ...MORALITY_PRESETS.map((preset) => preset.id),
   ],
   relationship: [
     "complement",
@@ -385,8 +660,46 @@ const seedVocabulary = {
     "protective distance",
     "fake alliance",
     "slow burn",
+    ...COMPLEMENT_VOCABULARY_PRESETS.map((preset) => preset.id),
     ...RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS.map((preset) => preset.id),
+    ...ARRANGED_MATCH_PRESETS.map((preset) => preset.id),
+    ...FORBIDDEN_TABOO_PRESETS.map((preset) => preset.id),
+    ...MENTOR_PROTEGE_PRESETS.map((preset) => preset.id),
+    ...FAKE_DATING_PRESETS.map((preset) => preset.id),
+    ...GRUMPY_SUNSHINE_PRESETS.map((preset) => preset.id),
+    ...DARK_OBSESSIVE_PRESETS.map((preset) => preset.id),
+    ...FORMAL_ARRANGED_PRESETS.map((preset) => preset.id),
+    ...ACADEMIC_RIVAL_PRESETS.map((preset) => preset.id),
+    ...CARETAKER_HURT_COMFORT_PRESETS.map((preset) => preset.id),
+    ...CARETAKER_PRESETS.map((preset) => preset.id),
+    ...FRICTION_PRESETS.map((preset) => preset.id),
+    ...RIVALRY_PRESETS.map((preset) => preset.id),
+    ...DEVOTION_PRESETS.map((preset) => preset.id),
+    ...OBSESSION_PRESETS.map((preset) => preset.id),
+    ...POSSESSIVE_PRESETS.map((preset) => preset.id),
+    ...SLOW_BURN_PRESETS.map((preset) => preset.id),
+    ...FLAW_SECRET_PRESETS.map((preset) => preset.id),
+    ...TEASING_PRESETS.map((preset) => preset.id),
+    ...AGE_LIFE_STAGE_PRESETS.map((preset) => preset.id),
+    ...SPECIES_HERITAGE_PRESETS.map((preset) => preset.id),
+    ...HUMAN_PRESETS.map((preset) => preset.id),
+    ...VAMPIRE_PRESETS.map((preset) => preset.id),
+    ...FAE_PRESETS.map((preset) => preset.id),
+    ...DEMON_PRESETS.map((preset) => preset.id),
+    ...ANGEL_PRESETS.map((preset) => preset.id),
+    ...ANDROID_PRESETS.map((preset) => preset.id),
+    ...ALIEN_PRESETS.map((preset) => preset.id),
+    ...SHIFTER_PRESETS.map((preset) => preset.id),
+    ...FATED_REINCARNATION_PRESETS.map((preset) => preset.id),
+    ...SECOND_CHANCE_PRESETS.map((preset) => preset.id),
+    ...WORKPLACE_HIERARCHY_PRESETS.map((preset) => preset.id),
+    ...FRIENDS_TO_LOVERS_PRESETS.map((preset) => preset.id),
     ...FLIRTING_PRESETS.map((preset) => preset.id),
+    ...JEALOUSY_PRESETS.map((preset) => preset.id),
+    ...AFFECTION_PRESETS.map((preset) => preset.id),
+    ...LOYALTY_PRESETS.map((preset) => preset.id),
+    ...LOVE_LANGUAGE_PRESETS.map((preset) => preset.id),
+    ...CONFLICT_STYLE_PRESETS.map((preset) => preset.id),
   ],
 };
 
@@ -1241,6 +1554,17 @@ function createStarterIntakeText(fields: Record<StarterFieldKey, string>) {
 }
 
 function createCompiledVocabularySeedText(fields: Record<StarterFieldKey, string>) {
+  const backstorySeedText = joinDefined([
+    fields.originWounds,
+    fields.formativeEvents,
+    fields.familyHistory,
+    fields.secrets,
+    fields.regrets,
+    fields.exile,
+    fields.betrayal,
+    fields.loss,
+    fields.ambition,
+  ]);
   const relationshipVocabularyAdditions = findPresetMatches(
     fields.relationshipDynamic,
     findRelationshipDynamicVocabularyById,
@@ -1251,6 +1575,431 @@ function createCompiledVocabularySeedText(fields: Record<StarterFieldKey, string
       injection.lexicalConstraints,
       injection.formattingDirectives,
       injection.systemBehavior,
+    ]);
+  });
+  const complementAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findComplementVocabularyById,
+  ).map((preset) => {
+    const additions = compileComplementVocabularyAdditions(preset);
+    return joinDefined([
+      additions.relationshipAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const fatedReincarnationAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findFatedReincarnationPresetById,
+  ).map((preset) => {
+    const additions = compileFatedReincarnationPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const forbiddenTabooAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findForbiddenTabooPresetById,
+  ).map((preset) => {
+    const additions = compileForbiddenTabooPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const arrangedMatchAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findArrangedMatchPresetById,
+  ).map((preset) => {
+    const additions = compileArrangedMatchPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const mentorProtegeAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findMentorProtegePresetById,
+  ).map((preset) => {
+    const additions = compileMentorProtegePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const fakeDatingAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findFakeDatingPresetById,
+  ).map((preset) => {
+    const additions = compileFakeDatingPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const grumpySunshineAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findGrumpySunshinePresetById,
+  ).map((preset) => {
+    const additions = compileGrumpySunshinePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const darkObsessiveAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findDarkObsessivePresetById,
+  ).map((preset) => {
+    const additions = compileDarkObsessivePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const formalArrangedAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findFormalArrangedPresetById,
+  ).map((preset) => {
+    const additions = compileFormalArrangedPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const academicRivalAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findAcademicRivalPresetById,
+  ).map((preset) => {
+    const additions = compileAcademicRivalPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const caretakerHurtComfortAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findCaretakerHurtComfortPresetById,
+  ).map((preset) => {
+    const additions = compileCaretakerHurtComfortPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const caretakerAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findCaretakerPresetById,
+  ).map((preset) => {
+    const additions = compileCaretakerPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const frictionAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findFrictionPresetById,
+  ).map((preset) => {
+    const additions = compileFrictionPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const rivalryAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findRivalryPresetById,
+  ).map((preset) => {
+    const additions = compileRivalryPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const devotionAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findDevotionPresetById,
+  ).map((preset) => {
+    const additions = compileDevotionPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const obsessionAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findObsessionPresetById,
+  ).map((preset) => {
+    const additions = compileObsessionPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const possessiveAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findPossessivePresetById,
+  ).map((preset) => {
+    const additions = compilePossessivePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const slowBurnAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findSlowBurnPresetById,
+  ).map((preset) => {
+    const additions = compileSlowBurnPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const flawSecretAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findFlawSecretPresetById,
+  ).map((preset) => {
+    const additions = compileFlawSecretPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const teasingAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findTeasingPresetById,
+  ).map((preset) => {
+    const additions = compileTeasingPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const ageLifeStageAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findAgeLifeStagePresetById,
+  ).map((preset) => {
+    const additions = compileAgeLifeStagePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const speciesHeritageAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findSpeciesHeritagePresetById,
+  ).map((preset) => {
+    const additions = compileSpeciesHeritagePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const humanAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findHumanPresetById,
+  ).map((preset) => {
+    const additions = compileHumanPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const vampireAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findVampirePresetById,
+  ).map((preset) => {
+    const additions = compileVampirePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const faeAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findFaePresetById,
+  ).map((preset) => {
+    const additions = compileFaePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const demonAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findDemonPresetById,
+  ).map((preset) => {
+    const additions = compileDemonPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const angelAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findAngelPresetById,
+  ).map((preset) => {
+    const additions = compileAngelPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const androidAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findAndroidPresetById,
+  ).map((preset) => {
+    const additions = compileAndroidPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const alienAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findAlienPresetById,
+  ).map((preset) => {
+    const additions = compileAlienPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const shifterAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findShifterPresetById,
+  ).map((preset) => {
+    const additions = compileShifterPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const secondChanceAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findSecondChancePresetById,
+  ).map((preset) => {
+    const additions = compileSecondChancePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const workplaceHierarchyAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findWorkplaceHierarchyPresetById,
+  ).map((preset) => {
+    const additions = compileWorkplaceHierarchyPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+
+  const friendsToLoversAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findFriendsToLoversPresetById,
+  ).map((preset) => {
+    const additions = compileFriendsToLoversPresetAdditions(preset);
+    return joinDefined([
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
     ]);
   });
 
@@ -1265,12 +2014,155 @@ function createCompiledVocabularySeedText(fields: Record<StarterFieldKey, string
       additions.systemPromptAddition,
     ]);
   });
+  const jealousyAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findJealousyPresetById,
+  ).map((preset) => {
+    const additions = compileJealousyPresetAdditions(preset);
+    return joinDefined([
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const affectionAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findAffectionPresetById,
+  ).map((preset) => {
+    const additions = compileAffectionPresetAdditions(preset);
+    return joinDefined([
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const loyaltyAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findLoyaltyPresetById,
+  ).map((preset) => {
+    const additions = compileLoyaltyPresetAdditions(preset);
+    return joinDefined([
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const loveLanguageAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findLoveLanguagePresetById,
+  ).map((preset) => {
+    const additions = compileLoveLanguagePresetAdditions(preset);
+    return joinDefined([
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const conflictStyleAdditions = findPresetMatches(
+    fields.relationshipDynamic,
+    findConflictStylePresetById,
+  ).map((preset) => {
+    const additions = compileConflictStylePresetAdditions(preset);
+    return joinDefined([
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
 
   const originWoundAdditions = findPresetMatches(
-    fields.originWounds,
+    backstorySeedText,
     findOriginWoundVocabularyPresetById,
   ).map((preset) => {
     const additions = compileOriginWoundPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const formativeEventAdditions = findPresetMatches(
+    backstorySeedText,
+    findFormativeEventPresetById,
+  ).map((preset) => {
+    const additions = compileFormativeEventPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const familyHistoryAdditions = findPresetMatches(
+    backstorySeedText,
+    findFamilyHistoryPresetById,
+  ).map((preset) => {
+    const additions = compileFamilyHistoryPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const regretAdditions = findPresetMatches(
+    backstorySeedText,
+    findRegretPresetById,
+  ).map((preset) => {
+    const additions = compileRegretPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const exileAdditions = findPresetMatches(
+    backstorySeedText,
+    findExilePresetById,
+  ).map((preset) => {
+    const additions = compileExilePresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const betrayalAdditions = findPresetMatches(
+    backstorySeedText,
+    findBetrayalPresetById,
+  ).map((preset) => {
+    const additions = compileBetrayalPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const lossAdditions = findPresetMatches(
+    backstorySeedText,
+    findLossPresetById,
+  ).map((preset) => {
+    const additions = compileLossPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const secretAdditions = findPresetMatches(
+    backstorySeedText,
+    findSecretPresetById,
+  ).map((preset) => {
+    const additions = compileSecretPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const ambitionAdditions = findPresetMatches(
+    backstorySeedText,
+    findAmbitionPresetById,
+  ).map((preset) => {
+    const additions = compileAmbitionPresetAdditions(preset);
     return joinDefined([
       additions.backgroundAddition,
       additions.personalityAddition,
@@ -1294,19 +2186,231 @@ function createCompiledVocabularySeedText(fields: Record<StarterFieldKey, string
       additions.systemPromptAddition,
     ]);
   });
+  const dialectAdditions = findPresetMatches(
+    fields.personalitySeeds,
+    findDialectPresetById,
+  ).map((preset) => {
+    const additions = compileDialectPresetAdditions(preset);
+    return joinDefined([
+      additions.speechStyleAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const formalityAdditions = findPresetMatches(
+    fields.personalitySeeds,
+    findFormalityPresetById,
+  ).map((preset) => {
+    const additions = compileFormalityPresetAdditions(preset);
+    return joinDefined([
+      additions.speechStyleAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const petNameAdditions = findPresetMatches(
+    fields.personalitySeeds,
+    findPetNamePresetById,
+  ).map((preset) => {
+    const additions = compilePetNamePresetAdditions(preset);
+    return joinDefined([
+      additions.speechStyleAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const sentenceRhythmAdditions = findPresetMatches(
+    fields.personalitySeeds,
+    findSentenceRhythmPresetById,
+  ).map((preset) => {
+    const additions = compileSentenceRhythmPresetAdditions(preset);
+    return joinDefined([
+      additions.speechStyleAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const communicationStyleAdditions = findPresetMatches(
+    fields.personalitySeeds,
+    findCommunicationStylePresetById,
+  ).map((preset) => {
+    const additions = compileCommunicationStylePresetAdditions(preset);
+    return joinDefined([
+      additions.speechStyleAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const moralityAdditions = findPresetMatches(
+    fields.personalitySeeds,
+    findMoralityPresetById,
+  ).map((preset) => {
+    const additions = compileMoralityPresetAdditions(preset);
+    return joinDefined([
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ]);
+  });
+  const speechAdditions = [
+    ...speechStyleAdditions,
+    ...voiceVocabularyAdditions,
+    ...dialectAdditions,
+    ...formalityAdditions,
+    ...petNameAdditions,
+    ...sentenceRhythmAdditions,
+    ...communicationStyleAdditions,
+  ];
 
   return joinDefined([
     relationshipVocabularyAdditions.length
       ? `Relationships:\n${relationshipVocabularyAdditions.join("\n\n")}`
       : "",
+    complementAdditions.length
+      ? `Relationship Complements:\n${complementAdditions.join("\n\n")}`
+      : "",
+    arrangedMatchAdditions.length
+      ? `Arranged Match:\n${arrangedMatchAdditions.join("\n\n")}`
+      : "",
+    forbiddenTabooAdditions.length
+      ? `Forbidden / Taboo Intersections:\n${forbiddenTabooAdditions.join("\n\n")}`
+      : "",
+    mentorProtegeAdditions.length
+      ? `Mentor / Protégé:\n${mentorProtegeAdditions.join("\n\n")}`
+      : "",
+    fakeDatingAdditions.length
+      ? `Fake Dating:\n${fakeDatingAdditions.join("\n\n")}`
+      : "",
+    grumpySunshineAdditions.length
+      ? `Grumpy / Sunshine:\n${grumpySunshineAdditions.join("\n\n")}`
+      : "",
+    darkObsessiveAdditions.length
+      ? `Dark / Obsessive:\n${darkObsessiveAdditions.join("\n\n")}`
+      : "",
+    formalArrangedAdditions.length
+      ? `Formal / Arranged:\n${formalArrangedAdditions.join("\n\n")}`
+      : "",
+    academicRivalAdditions.length
+      ? `Academic / Rival:\n${academicRivalAdditions.join("\n\n")}`
+      : "",
+    caretakerHurtComfortAdditions.length
+      ? `Caretaker / Hurt-Comfort:\n${caretakerHurtComfortAdditions.join("\n\n")}`
+      : "",
+    caretakerAdditions.length
+      ? `Caretaker:\n${caretakerAdditions.join("\n\n")}`
+      : "",
+    frictionAdditions.length
+      ? `Friction:\n${frictionAdditions.join("\n\n")}`
+      : "",
+    rivalryAdditions.length
+      ? `Rivalry:\n${rivalryAdditions.join("\n\n")}`
+      : "",
+    devotionAdditions.length
+      ? `Devotion:\n${devotionAdditions.join("\n\n")}`
+      : "",
+    obsessionAdditions.length
+      ? `Obsession:\n${obsessionAdditions.join("\n\n")}`
+      : "",
+    possessiveAdditions.length
+      ? `Possessive:\n${possessiveAdditions.join("\n\n")}`
+      : "",
+    slowBurnAdditions.length
+      ? `Slow Burn:\n${slowBurnAdditions.join("\n\n")}`
+      : "",
+    flawSecretAdditions.length
+      ? `Flaw / Secret:\n${flawSecretAdditions.join("\n\n")}`
+      : "",
+    teasingAdditions.length
+      ? `Teasing:\n${teasingAdditions.join("\n\n")}`
+      : "",
+    ageLifeStageAdditions.length
+      ? `Age / Life Stage:\n${ageLifeStageAdditions.join("\n\n")}`
+      : "",
+    speciesHeritageAdditions.length
+      ? `Species / Heritage:\n${speciesHeritageAdditions.join("\n\n")}`
+      : "",
+    humanAdditions.length
+      ? `Human:\n${humanAdditions.join("\n\n")}`
+      : "",
+    vampireAdditions.length
+      ? `Vampire:\n${vampireAdditions.join("\n\n")}`
+      : "",
+    faeAdditions.length
+      ? `Fae:\n${faeAdditions.join("\n\n")}`
+      : "",
+    demonAdditions.length
+      ? `Demon:\n${demonAdditions.join("\n\n")}`
+      : "",
+    angelAdditions.length
+      ? `Angel:\n${angelAdditions.join("\n\n")}`
+      : "",
+    androidAdditions.length
+      ? `Android:\n${androidAdditions.join("\n\n")}`
+      : "",
+    alienAdditions.length
+      ? `Alien:\n${alienAdditions.join("\n\n")}`
+      : "",
+    shifterAdditions.length
+      ? `Shifter:\n${shifterAdditions.join("\n\n")}`
+      : "",
+    fatedReincarnationAdditions.length
+      ? `Fated / Reincarnation:\n${fatedReincarnationAdditions.join("\n\n")}`
+      : "",
+    secondChanceAdditions.length
+      ? `Second Chance:\n${secondChanceAdditions.join("\n\n")}`
+      : "",
+    workplaceHierarchyAdditions.length
+      ? `Workplace Hierarchy:\n${workplaceHierarchyAdditions.join("\n\n")}`
+      : "",
+    friendsToLoversAdditions.length
+      ? `Friends to Lovers:\n${friendsToLoversAdditions.join("\n\n")}`
+      : "",
     flirtingAdditions.length
       ? `Scenario:\n${flirtingAdditions.join("\n\n")}`
+      : "",
+    jealousyAdditions.length
+      ? `Jealousy:\n${jealousyAdditions.join("\n\n")}`
+      : "",
+    affectionAdditions.length
+      ? `Affection:\n${affectionAdditions.join("\n\n")}`
+      : "",
+    loyaltyAdditions.length
+      ? `Loyalty:\n${loyaltyAdditions.join("\n\n")}`
+      : "",
+    loveLanguageAdditions.length
+      ? `Love Language:\n${loveLanguageAdditions.join("\n\n")}`
+      : "",
+    conflictStyleAdditions.length
+      ? `Conflict Style:\n${conflictStyleAdditions.join("\n\n")}`
       : "",
     originWoundAdditions.length
       ? `Background Story:\n${originWoundAdditions.join("\n\n")}`
       : "",
-    speechStyleAdditions.length || voiceVocabularyAdditions.length
-      ? `Speech Style:\n${joinDefined([...speechStyleAdditions, ...voiceVocabularyAdditions])}`
+    formativeEventAdditions.length
+      ? `Formative Events:\n${formativeEventAdditions.join("\n\n")}`
+      : "",
+    familyHistoryAdditions.length
+      ? `Family History:\n${familyHistoryAdditions.join("\n\n")}`
+      : "",
+    regretAdditions.length
+      ? `Regrets:\n${regretAdditions.join("\n\n")}`
+      : "",
+    exileAdditions.length
+      ? `Exile:\n${exileAdditions.join("\n\n")}`
+      : "",
+    betrayalAdditions.length
+      ? `Betrayal:\n${betrayalAdditions.join("\n\n")}`
+      : "",
+    lossAdditions.length
+      ? `Loss:\n${lossAdditions.join("\n\n")}`
+      : "",
+    secretAdditions.length
+      ? `Secrets:\n${secretAdditions.join("\n\n")}`
+      : "",
+    ambitionAdditions.length
+      ? `Ambition:\n${ambitionAdditions.join("\n\n")}`
+      : "",
+    moralityAdditions.length
+      ? `Morality:\n${moralityAdditions.join("\n\n")}`
+      : "",
+    speechAdditions.length
+      ? `Speech Style:\n${joinDefined(speechAdditions)}`
       : "",
   ]);
 }
@@ -1353,7 +2457,9 @@ function findPresetMatches<T>(
   const seen = new Set<T>();
 
   for (const token of tokenizeSeedInput(rawText)) {
-    const match = findById(token);
+    const match = expandPresetLookupTokens(token)
+      .map((candidate) => findById(candidate))
+      .find((candidate): candidate is T => Boolean(candidate));
     if (!match || seen.has(match)) continue;
     seen.add(match);
     matches.push(match);
@@ -1510,17 +2616,117 @@ function CharacterIntakeComposer(props: {
                   options={VOICE_VOCABULARY_PRESETS.map((preset) => preset.id)}
                   onAdd={(value) => handleAddSeed("personalitySeeds", value)}
                 />
+                <SeedCombo
+                  datalistId="dialect-seeds"
+                  label="Add dialect / accent"
+                  name="dialectSeedCustom"
+                  options={DIALECT_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("personalitySeeds", value)}
+                />
+                <SeedCombo
+                  datalistId="formality-seeds"
+                  label="Add formality / titles"
+                  name="formalitySeedCustom"
+                  options={FORMALITY_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("personalitySeeds", value)}
+                />
+                <SeedCombo
+                  datalistId="pet-name-seeds"
+                  label="Add pet-name rules"
+                  name="petNameSeedCustom"
+                  options={PET_NAME_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("personalitySeeds", value)}
+                />
+                <SeedCombo
+                  datalistId="sentence-rhythm-seeds"
+                  label="Add sentence rhythm"
+                  name="sentenceRhythmSeedCustom"
+                  options={SENTENCE_RHYTHM_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("personalitySeeds", value)}
+                />
+                <SeedCombo
+                  datalistId="communication-style-seeds"
+                  label="Add communication style"
+                  name="communicationStyleSeedCustom"
+                  options={COMMUNICATION_STYLE_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("personalitySeeds", value)}
+                />
+                <SeedCombo
+                  datalistId="morality-seeds"
+                  label="Add morality / ethics"
+                  name="moralitySeedCustom"
+                  options={MORALITY_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("personalitySeeds", value)}
+                />
               </div>
             ) : null}
 
             {section.id === "backstory" ? (
-              <SeedCombo
-                datalistId="origin-wound-seeds"
-                label="Add origin wound preset"
-                name="originWoundSeedCustom"
-                options={seedVocabulary.backstory}
-                onAdd={(value) => handleAddSeed("originWounds", value)}
-              />
+              <div className="grid gap-3 md:grid-cols-2">
+                <SeedCombo
+                  datalistId="origin-wound-seeds"
+                  label="Add origin wound preset"
+                  name="originWoundSeedCustom"
+                  options={ORIGIN_WOUND_VOCABULARY_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("originWounds", value)}
+                />
+                <SeedCombo
+                  datalistId="formative-event-seeds"
+                  label="Add formative event"
+                  name="formativeEventSeedCustom"
+                  options={FORMATIVE_EVENT_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("formativeEvents", value)}
+                />
+                <SeedCombo
+                  datalistId="family-history-seeds"
+                  label="Add family history"
+                  name="familyHistorySeedCustom"
+                  options={FAMILY_HISTORY_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("familyHistory", value)}
+                />
+                <SeedCombo
+                  datalistId="secret-backstory-seeds"
+                  label="Add secret backstory seed"
+                  name="secretBackstorySeedCustom"
+                  options={SECRET_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("secrets", value)}
+                />
+                <SeedCombo
+                  datalistId="regret-seeds"
+                  label="Add regret seed"
+                  name="regretSeedCustom"
+                  options={REGRET_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("regrets", value)}
+                />
+                <SeedCombo
+                  datalistId="exile-seeds"
+                  label="Add exile seed"
+                  name="exileSeedCustom"
+                  options={EXILE_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("exile", value)}
+                />
+                <SeedCombo
+                  datalistId="betrayal-seeds"
+                  label="Add betrayal seed"
+                  name="betrayalSeedCustom"
+                  options={BETRAYAL_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("betrayal", value)}
+                />
+                <SeedCombo
+                  datalistId="loss-seeds"
+                  label="Add loss seed"
+                  name="lossSeedCustom"
+                  options={LOSS_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("loss", value)}
+                />
+                <SeedCombo
+                  datalistId="ambition-seeds"
+                  label="Add ambition seed"
+                  name="ambitionSeedCustom"
+                  options={AMBITION_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("ambition", value)}
+                />
+              </div>
             ) : null}
 
             {section.id === "relationship" ? (
@@ -1537,6 +2743,272 @@ function CharacterIntakeComposer(props: {
                   label="Add flirting style"
                   name="flirtingSeedCustom"
                   options={FLIRTING_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="complement-vocabulary-seeds"
+                  label="Add complement vocabulary"
+                  name="complementSeedCustom"
+                  options={COMPLEMENT_VOCABULARY_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="forbidden-taboo-seeds"
+                  label="Add forbidden / taboo intersection"
+                  name="forbiddenTabooSeedCustom"
+                  options={FORBIDDEN_TABOO_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="arranged-match-seeds"
+                  label="Add arranged match seed"
+                  name="arrangedMatchSeedCustom"
+                  options={ARRANGED_MATCH_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="mentor-protege-seeds"
+                  label="Add mentor / protégé seed"
+                  name="mentorProtegeSeedCustom"
+                  options={MENTOR_PROTEGE_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="fake-dating-seeds"
+                  label="Add fake dating seed"
+                  name="fakeDatingSeedCustom"
+                  options={FAKE_DATING_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="grumpy-sunshine-seeds"
+                  label="Add grumpy / sunshine seed"
+                  name="grumpySunshineSeedCustom"
+                  options={GRUMPY_SUNSHINE_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="dark-obsessive-seeds"
+                  label="Add dark / obsessive seed"
+                  name="darkObsessiveSeedCustom"
+                  options={DARK_OBSESSIVE_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="formal-arranged-seeds"
+                  label="Add formal / arranged seed"
+                  name="formalArrangedSeedCustom"
+                  options={FORMAL_ARRANGED_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="academic-rival-seeds"
+                  label="Add academic / rival seed"
+                  name="academicRivalSeedCustom"
+                  options={ACADEMIC_RIVAL_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="caretaker-hurt-comfort-seeds"
+                  label="Add caretaker / hurt-comfort seed"
+                  name="caretakerHurtComfortSeedCustom"
+                  options={CARETAKER_HURT_COMFORT_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="caretaker-seeds"
+                  label="Add caretaker seed"
+                  name="caretakerSeedCustom"
+                  options={CARETAKER_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="friction-seeds"
+                  label="Add friction seed"
+                  name="frictionSeedCustom"
+                  options={FRICTION_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="rivalry-seeds"
+                  label="Add rivalry seed"
+                  name="rivalrySeedCustom"
+                  options={RIVALRY_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="devotion-seeds"
+                  label="Add devotion seed"
+                  name="devotionSeedCustom"
+                  options={DEVOTION_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="obsession-seeds"
+                  label="Add obsession seed"
+                  name="obsessionSeedCustom"
+                  options={OBSESSION_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="possessive-seeds"
+                  label="Add possessive seed"
+                  name="possessiveSeedCustom"
+                  options={POSSESSIVE_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="slow-burn-seeds"
+                  label="Add slow-burn seed"
+                  name="slowBurnSeedCustom"
+                  options={SLOW_BURN_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="flaw-secret-seeds"
+                  label="Add flaw / secret seed"
+                  name="flawSecretSeedCustom"
+                  options={FLAW_SECRET_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="teasing-seeds"
+                  label="Add teasing seed"
+                  name="teasingSeedCustom"
+                  options={TEASING_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="age-life-stage-seeds"
+                  label="Add age / life-stage seed"
+                  name="ageLifeStageSeedCustom"
+                  options={AGE_LIFE_STAGE_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="species-heritage-seeds"
+                  label="Add species / heritage seed"
+                  name="speciesHeritageSeedCustom"
+                  options={SPECIES_HERITAGE_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="human-seeds"
+                  label="Add human seed"
+                  name="humanSeedCustom"
+                  options={HUMAN_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="vampire-seeds"
+                  label="Add vampire seed"
+                  name="vampireSeedCustom"
+                  options={VAMPIRE_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="fae-seeds"
+                  label="Add fae seed"
+                  name="faeSeedCustom"
+                  options={FAE_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="demon-seeds"
+                  label="Add demon seed"
+                  name="demonSeedCustom"
+                  options={DEMON_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="angel-seeds"
+                  label="Add angel seed"
+                  name="angelSeedCustom"
+                  options={ANGEL_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="android-seeds"
+                  label="Add android seed"
+                  name="androidSeedCustom"
+                  options={ANDROID_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="alien-seeds"
+                  label="Add alien seed"
+                  name="alienSeedCustom"
+                  options={ALIEN_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="shifter-seeds"
+                  label="Add shifter seed"
+                  name="shifterSeedCustom"
+                  options={SHIFTER_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="fated-reincarnation-seeds"
+                  label="Add fated / reincarnation seed"
+                  name="fatedReincarnationSeedCustom"
+                  options={FATED_REINCARNATION_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="second-chance-seeds"
+                  label="Add second-chance seed"
+                  name="secondChanceSeedCustom"
+                  options={SECOND_CHANCE_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="workplace-hierarchy-seeds"
+                  label="Add workplace hierarchy seed"
+                  name="workplaceHierarchySeedCustom"
+                  options={WORKPLACE_HIERARCHY_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="friends-to-lovers-seeds"
+                  label="Add friends-to-lovers seed"
+                  name="friendsToLoversSeedCustom"
+                  options={FRIENDS_TO_LOVERS_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="jealousy-seeds"
+                  label="Add jealousy seed"
+                  name="jealousySeedCustom"
+                  options={JEALOUSY_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="affection-seeds"
+                  label="Add affection seed"
+                  name="affectionSeedCustom"
+                  options={AFFECTION_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="loyalty-seeds"
+                  label="Add loyalty seed"
+                  name="loyaltySeedCustom"
+                  options={LOYALTY_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="love-language-seeds"
+                  label="Add love language seed"
+                  name="loveLanguageSeedCustom"
+                  options={LOVE_LANGUAGE_PRESETS.map((preset) => preset.id)}
+                  onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
+                />
+                <SeedCombo
+                  datalistId="conflict-style-seeds"
+                  label="Add conflict style"
+                  name="conflictStyleSeedCustom"
+                  options={CONFLICT_STYLE_PRESETS.map((preset) => preset.id)}
                   onAdd={(value) => handleAddSeed("relationshipDynamic", value)}
                 />
               </div>

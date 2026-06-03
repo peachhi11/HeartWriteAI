@@ -20,6 +20,35 @@ export type SpeechStylePresetCategory =
   | "Rugged & Direct"
   | "Unsettling & Intense";
 
+export type SpeechStyleVocabularyCategory =
+  | "Speech Style Preset"
+  | "Speech Directness"
+  | "Speech Directness Preset"
+  | "Speech Directness Scale"
+  | "Speech Bluntness"
+  | "Speech Gentle Directness"
+  | "Speech Diplomatic"
+  | "Speech Indirectness"
+  | "Speech Avoidance"
+  | "Speech Passive Aggressive"
+  | "Speech Manipulation"
+  | "Romantic Directness"
+  | "Conflict Directness"
+  | "Social Directness"
+  | "High Value Directness"
+  | "Directness Dialogue Seed"
+  | "Speech Formality"
+  | "Speech Emotion"
+  | "Speech Vocabulary"
+  | "Speech Humour"
+  | "Speech Conversation"
+  | "Speech Romance"
+  | "Speech Conflict"
+  | "Speech Quirk"
+  | "Speech Social"
+  | "Speech Archetype"
+  | "Speech Dialogue Seed";
+
 export type SpeechFormalityLevel = "Absolute" | "Conditional" | "Muted" | "None";
 export type SpeechProfanityLevel =
   | "Frequent/Casual"
@@ -62,6 +91,22 @@ export interface SpeechStylePreset {
     toColor: string;
     accentColor: string;
   };
+}
+
+export interface SpeechStyleVocabularyPreset {
+  id: string;
+  category: SpeechStyleVocabularyCategory;
+  label: string;
+  value: string;
+  triggerKeys: string[];
+  guidance: string;
+}
+
+interface SpeechStyleVocabularySeedGroup {
+  category: SpeechStyleVocabularyCategory;
+  prefix: string;
+  guidance: string;
+  values: string[];
 }
 
 export const SPEECH_STYLE_PRESETS = Object.freeze([
@@ -239,6 +284,686 @@ export const SPEECH_STYLE_PRESETS = Object.freeze([
   },
 ] satisfies readonly SpeechStylePreset[]);
 
+const SPEECH_STYLE_VOCABULARY_GROUPS = Object.freeze([
+  {
+    category: "Speech Style Preset",
+    prefix: "speech_style_preset",
+    guidance:
+      "Use this as broad spoken-voice archetype texture. Let the character's speech style inform word choice, rhythm, intimacy, and social presence without forcing every line into a caricature.",
+    values: [
+      "The Silver-Tongued Charmer",
+      "The Soft-Spoken Romantic",
+      "The Blunt Truth-Teller",
+      "The Quiet Observer",
+      "The Gentle Caretaker",
+      "The Noble Court Speaker",
+      "The Academic Scholar",
+      "The Streetwise Talker",
+      "The Flirtatious Tease",
+      "The Deadpan Dry Humorist",
+      "The Commanding Leader",
+      "The Warm Storyteller",
+      "The Mysterious Stranger",
+      "The Formal Professional",
+      "The Playful Sunshine",
+      "The World-Weary Veteran",
+      "The Ancient Poet",
+      "The Protective Bodyguard",
+      "The Awkward Sweetheart",
+      "The One Who Says Exactly What They Mean",
+    ],
+  },
+  {
+    category: "Speech Directness",
+    prefix: "speech_directness",
+    guidance:
+      "Use this as directness texture. It can shape how openly the character states needs, feelings, refusals, questions, or boundaries while still adapting to scene pressure.",
+    values: [
+      "extremely_direct",
+      "blunt",
+      "honest",
+      "straightforward",
+      "matter_of_fact",
+      "gently_direct",
+      "balanced",
+      "carefully_worded",
+      "indirect",
+      "subtle",
+      "evasive",
+      "avoidant",
+      "speaks_in_implications",
+      "speaks_in_hints",
+      "never_says_exactly_what_they_mean",
+    ],
+  },
+  {
+    category: "Speech Directness Preset",
+    prefix: "speech_directness_preset",
+    guidance:
+      "Use this as a directness archetype. Let honesty, implication, avoidance, diplomacy, bluntness, or double meaning shape dialogue without making every line identical.",
+    values: [
+      "The Brutally Honest One",
+      "The Straight Shooter",
+      "The Blunt Protector",
+      "The Plainspoken Romantic",
+      "The Gentle Truth-Teller",
+      "The Careful Communicator",
+      "The Diplomat",
+      "The Soft Deflector",
+      "The Master of Implication",
+      "The Polite Manipulator",
+      "The Court Intriguer",
+      "The Passive-Aggressive Sweetheart",
+      "The Avoidant Lover",
+      "The Emotional Dodger",
+      "The Hint Dropper",
+      "The Double-Meaning Flirt",
+      "The Says-Exactly-What-They-Mean Type",
+      "The Never-Says-What-They-Mean Type",
+      "The Dangerous Truth-Teller",
+      "The Honest-to-a-Fault Romantic",
+    ],
+  },
+  {
+    category: "Speech Directness Scale",
+    prefix: "speech_directness_scale",
+    guidance:
+      "Use this as a directness intensity scale. It should influence how plainly the character speaks while still allowing shifts in public, private, romantic, or conflict contexts.",
+    values: [
+      "extremely_direct",
+      "very_direct",
+      "direct",
+      "mostly_direct",
+      "balanced",
+      "mostly_indirect",
+      "indirect",
+      "very_indirect",
+      "extremely_indirect",
+      "never_direct",
+    ],
+  },
+  {
+    category: "Speech Bluntness",
+    prefix: "speech_bluntness",
+    guidance:
+      "Use this as bluntness texture. Clarity can be sharp, protective, tactless, or uncomfortable, but should not be used to excuse cruelty as a fixed trait.",
+    values: [
+      "blunt",
+      "brutally_honest",
+      "tactless",
+      "matter_of_fact",
+      "plainspoken",
+      "frank",
+      "unfiltered",
+      "says_the_quiet_part_out_loud",
+      "cuts_to_the_point",
+      "calls_out_problems_immediately",
+      "rarely_softens_words",
+      "values_truth_over_comfort",
+      "prefers_clarity_over_politeness",
+      "can_be_harsh",
+      "weaponized_honesty",
+    ],
+  },
+  {
+    category: "Speech Gentle Directness",
+    prefix: "speech_gentle_directness",
+    guidance:
+      "Use this as compassionate clarity. The character can be honest while protecting dignity, pacing, and emotional safety.",
+    values: [
+      "gently_direct",
+      "kindly_honest",
+      "carefully_honest",
+      "soft_truth_teller",
+      "truth_with_compassion",
+      "empathetic_directness",
+      "respectful_honesty",
+      "patient_explainer",
+      "constructive_feedback",
+      "clear_but_kind",
+      "warmly_honest",
+      "softens_hard_truths",
+      "protective_honesty",
+      "emotionally_attuned_honesty",
+      "direct_without_cruelty",
+    ],
+  },
+  {
+    category: "Speech Diplomatic",
+    prefix: "speech_diplomatic",
+    guidance:
+      "Use this as diplomatic speech texture. Polished wording, room-reading, negotiation, harmony, and public tone should remain readable rather than evasive by default.",
+    values: [
+      "diplomatic",
+      "carefully_worded",
+      "politically_skilled",
+      "socially_calculated",
+      "strategically_honest",
+      "avoids_offense",
+      "manages_perceptions",
+      "reads_the_room",
+      "chooses_words_carefully",
+      "conflict_sensitive",
+      "maintains_harmony",
+      "professional_tone",
+      "public_relations_mindset",
+      "courtly_speech",
+      "negotiator_style",
+    ],
+  },
+  {
+    category: "Speech Indirectness",
+    prefix: "speech_indirectness",
+    guidance:
+      "Use this as indirect speech texture. Hints, subtext, implication, softened requests, or non-confrontation should create nuance without making the character impossible to understand.",
+    values: [
+      "indirect",
+      "subtle",
+      "implied_meaning",
+      "suggestive",
+      "hint_based",
+      "speaks_between_the_lines",
+      "avoids_stating_things_directly",
+      "expects_others_to_infer",
+      "softens_requests",
+      "softens_rejections",
+      "softens_conflict",
+      "context_dependent",
+      "nonconfrontational",
+      "careful_implication",
+      "communicates_through_subtext",
+    ],
+  },
+  {
+    category: "Speech Avoidance",
+    prefix: "speech_avoidance",
+    guidance:
+      "Use this as avoidance texture. Dodging, deflecting, vagueness, or emotional opacity can create tension, but should be possible to challenge or repair.",
+    values: [
+      "conflict_avoidant",
+      "emotion_avoidant",
+      "topic_avoidant",
+      "changes_subject",
+      "deflects_questions",
+      "dodges_answers",
+      "avoids_confrontation",
+      "avoids_confessions",
+      "avoids_vulnerability",
+      "avoids_rejection",
+      "downplays_feelings",
+      "hides_true_opinions",
+      "keeps_things_vague",
+      "noncommittal",
+      "evasively_polite",
+    ],
+  },
+  {
+    category: "Speech Passive Aggressive",
+    prefix: "speech_passive_aggressive",
+    guidance:
+      "Use this as passive-aggressive speech texture. Loaded politeness, resentment, jabs, withholding, or martyr language should be treated as a flaw or conflict signal, not healthy communication.",
+    values: [
+      "passive_aggressive",
+      "backhanded",
+      "subtle_jabs",
+      "weaponized_politeness",
+      "polite_hostility",
+      "hidden_resentment",
+      "indirect_criticism",
+      "sarcastic_agreement",
+      "guilt_based_communication",
+      "martyr_language",
+      "loaded_comments",
+      "says_fine_when_not_fine",
+      "emotional_withholding",
+      "silent_disapproval",
+      "punishes_through_tone",
+    ],
+  },
+  {
+    category: "Speech Manipulation",
+    prefix: "speech_manipulation",
+    guidance:
+      "Use this as manipulative or strategically controlled speech texture. Selective truth, framed choices, implication, and subtext should signal social risk rather than override consent or player agency.",
+    values: [
+      "strategically_vague",
+      "withholds_information",
+      "reveals_information_selectively",
+      "controls_conversation",
+      "frames_choices",
+      "guides_conclusions",
+      "uses_implication_as_weapon",
+      "double_meaning_speaker",
+      "misleadingly_honest",
+      "technically_truthful",
+      "social_chess_player",
+      "careful_word_selection",
+      "emotionally_persuasive",
+      "narrative_controller",
+      "master_of_subtext",
+    ],
+  },
+  {
+    category: "Romantic Directness",
+    prefix: "romantic_directness",
+    guidance:
+      "Use this as romance-specific directness texture. Confession speed, flirting style, emotional transparency, action-led affection, or written confession should follow scene trust and consent.",
+    values: [
+      "confesses_immediately",
+      "slow_to_confess",
+      "never_confesses_first",
+      "hides_feelings",
+      "wears_heart_on_sleeve",
+      "flirts_openly",
+      "flirts_subtly",
+      "accidental_flirt",
+      "denies_obvious_feelings",
+      "admits_feelings_quickly",
+      "shows_not_tells",
+      "teases_instead_of_confesses",
+      "uses_pet_names_instead",
+      "communicates_through_actions",
+      "says_exactly_what_they_feel",
+      "cannot_say_what_they_feel",
+      "writes_it_instead",
+      "confesses_under_pressure",
+      "emotionally_transparent",
+      "emotionally_opaque",
+    ],
+  },
+  {
+    category: "Conflict Directness",
+    prefix: "conflict_directness",
+    guidance:
+      "Use this as conflict-specific directness texture. Problem-solving, withdrawal, questions, disagreement, ultimatums, hints, or compromise should remain situational and repairable.",
+    values: [
+      "addresses_problems_immediately",
+      "lets_resentment_build",
+      "demands_clarity",
+      "avoids_conflict",
+      "starts_confrontations",
+      "waits_until_cornered",
+      "asks_direct_questions",
+      "expects_mind_reading",
+      "openly_disagrees",
+      "silently_disagrees",
+      "states_needs_clearly",
+      "hints_at_needs",
+      "gives_ultimatums",
+      "seeks_compromise",
+      "withdraws_instead_of_argues",
+    ],
+  },
+  {
+    category: "Social Directness",
+    prefix: "social_directness",
+    guidance:
+      "Use this as social-context directness texture. Public/private masks, status sensitivity, filters, code-switching, and lover-specific honesty can vary by scene.",
+    values: [
+      "different_in_private",
+      "different_in_public",
+      "formal_publicly",
+      "blunt_privately",
+      "careful_with_superiors",
+      "careful_with_strangers",
+      "honest_with_friends",
+      "honest_with_lovers",
+      "court_mask",
+      "professional_mask",
+      "family_filter",
+      "no_filter",
+      "code_switches_directness",
+      "status_sensitive_speech",
+      "context_dependent_directness",
+    ],
+  },
+  {
+    category: "High Value Directness",
+    prefix: "high_value_directness",
+    guidance:
+      "Use this as generator-friendly directness tags. Combine directness, romantic directness, conflict directness, and social directness to create specific voice contrast.",
+    values: [
+      "brutally_honest",
+      "gently_direct",
+      "diplomatic",
+      "implied_meaning",
+      "conflict_avoidant",
+      "weaponized_politeness",
+      "double_meaning_speaker",
+      "hides_feelings",
+      "wears_heart_on_sleeve",
+      "teases_instead_of_confesses",
+      "communicates_through_actions",
+      "says_exactly_what_they_feel",
+      "different_in_private",
+      "formal_publicly",
+      "blunt_privately",
+    ],
+  },
+  {
+    category: "Directness Dialogue Seed",
+    prefix: "directness_dialogue_seed",
+    guidance:
+      "Use this as optional directness dialogue flavour. Treat lines as reference examples only and adapt them to the character's voice, relationship, and scene pressure.",
+    values: [
+      "You're wrong.",
+      "That was a bad idea.",
+      "I like you. There, now it's your problem too.",
+      "I think you're hurting, even if you won't say it.",
+      "Can we talk about what's really bothering you?",
+      "I care about you, and I want to be honest.",
+      "There may be another way to look at this.",
+      "I understand your perspective, though I have concerns.",
+      "Perhaps we can find a compromise.",
+      "Some people might find that difficult.",
+      "It's interesting that happened.",
+      "I suppose there are many ways to interpret that.",
+      "No, it's fine.",
+      "Really. Fine.",
+      "Do whatever you want.",
+      "It's nothing.",
+      "Don't worry about me.",
+      "I'm fine.",
+      "I missed you.",
+      "That hurt my feelings.",
+      "I love you.",
+    ],
+  },
+  {
+    category: "Speech Formality",
+    prefix: "speech_formality",
+    guidance:
+      "Use this as formality texture. Titles, etiquette, ceremony, professionalism, slang, informality, or rough edges should respond to relationship status and setting norms.",
+    values: [
+      "extremely_formal",
+      "courtly_formal",
+      "professional_formal",
+      "polite",
+      "respectful",
+      "neutral",
+      "casual",
+      "relaxed",
+      "informal",
+      "friendly",
+      "streetwise",
+      "rough_around_edges",
+      "vulgar",
+      "ceremonial",
+      "old_fashioned",
+    ],
+  },
+  {
+    category: "Speech Emotion",
+    prefix: "speech_emotion",
+    guidance:
+      "Use this as emotional delivery texture. Openness, restraint, warmth, distance, intensity, awkwardness, or overflow should shape delivery without replacing the character's actual emotional state.",
+    values: [
+      "emotionally_expressive",
+      "emotionally_open",
+      "emotionally_honest",
+      "emotionally_guarded",
+      "emotionally_restrained",
+      "emotionally_detached",
+      "emotionally_intense",
+      "emotionally_dramatic",
+      "emotionally_warm",
+      "emotionally_cool",
+      "emotionally_distant",
+      "emotionally_vulnerable",
+      "emotionally_controlled",
+      "emotionally_awkward",
+      "emotionally_overflowing",
+    ],
+  },
+  {
+    category: "Speech Vocabulary",
+    prefix: "speech_vocabulary",
+    guidance:
+      "Use this as word-choice texture. Plain, technical, poetic, archaic, slang-heavy, professional, legal, military, medical, or philosophical vocabulary should be readable and context-sensitive.",
+    values: [
+      "simple_vocabulary",
+      "plainspoken",
+      "conversational",
+      "educated",
+      "academic",
+      "technical",
+      "poetic",
+      "literary",
+      "flowery",
+      "elegant",
+      "archaic",
+      "old_world",
+      "street_slang",
+      "modern_slang",
+      "internet_native",
+      "business_speak",
+      "legalistic",
+      "military_jargon",
+      "medical_jargon",
+      "philosophical",
+    ],
+  },
+  {
+    category: "Speech Humour",
+    prefix: "speech_humour",
+    guidance:
+      "Use this as humour texture. Teasing, wit, sarcasm, deadpan delivery, dark humour, goofiness, puns, chaos, observation, gentleness, or rare jokes should respect tone and boundaries.",
+    values: [
+      "playful",
+      "teasing",
+      "witty",
+      "sarcastic",
+      "dry_humor",
+      "deadpan",
+      "self_deprecating",
+      "dark_humor",
+      "goofy",
+      "pun_loving",
+      "flirtatious_humor",
+      "chaotic_humor",
+      "observational_humor",
+      "gentle_humor",
+      "rarely_jokes",
+    ],
+  },
+  {
+    category: "Speech Conversation",
+    prefix: "speech_conversation",
+    guidance:
+      "Use this as conversation-flow texture. Talkativeness, quietness, listening, questioning, teaching, debating, interviewing, or driving conversation should shift with trust and scene purpose.",
+    values: [
+      "talkative",
+      "very_talkative",
+      "moderately_talkative",
+      "quiet",
+      "laconic",
+      "minimal_words",
+      "listener_first",
+      "question_asker",
+      "storyteller",
+      "lecturer",
+      "teacher_like",
+      "mentor_like",
+      "debater",
+      "interviewer_style",
+      "conversation_driver",
+    ],
+  },
+  {
+    category: "Speech Romance",
+    prefix: "speech_romance",
+    guidance:
+      "Use this as romantic speech texture. Affection, flirting, awkwardness, poetry, protection, devotion, teasing, confession avoidance, love letters, pet names, and direct feeling-statements should remain consent-aware.",
+    values: [
+      "openly_affectionate",
+      "verbally_affectionate",
+      "subtly_affectionate",
+      "acts_before_words",
+      "flirtatious",
+      "shameless_flirt",
+      "awkward_flirt",
+      "accidental_flirt",
+      "poetic_romantic",
+      "protective_romantic",
+      "devotional_romantic",
+      "possessive_romantic",
+      "teasing_romantic",
+      "soft_romantic",
+      "emotionally_constipated_romantic",
+      "confession_avoider",
+      "love_letter_writer",
+      "pet_name_user",
+      "physical_affection_over_words",
+      "says_exactly_what_they_feel",
+    ],
+  },
+  {
+    category: "Speech Conflict",
+    prefix: "speech_conflict",
+    guidance:
+      "Use this as conflict-speech texture. Arguments, avoidance, withdrawal, raised voices, calm logic, reactivity, silence, overexplaining, space needs, or compromise should never override safety or agency.",
+    values: [
+      "argues_directly",
+      "avoids_arguments",
+      "withdraws_when_upset",
+      "raises_voice",
+      "stays_calm",
+      "coldly_logical",
+      "emotionally_reactive",
+      "passive_aggressive",
+      "sarcastic_when_hurt",
+      "silent_when_angry",
+      "talks_it_out",
+      "needs_space",
+      "overexplains",
+      "underexplains",
+      "seeks_compromise",
+    ],
+  },
+  {
+    category: "Speech Quirk",
+    prefix: "speech_quirk",
+    guidance:
+      "Use this as optional speech-quirk texture. Repeated habits, quotations, metaphors, pauses, riddles, interruptions, or language shifts should add flavour without making dialogue unreadable.",
+    values: [
+      "uses_pet_names",
+      "uses_nicknames",
+      "uses_honorifics",
+      "uses_titles",
+      "says_please_and_thank_you",
+      "swears_frequently",
+      "rarely_swears",
+      "quotes_books",
+      "quotes_poetry",
+      "quotes_proverbs",
+      "uses_metaphors",
+      "uses_analogies",
+      "uses_rhetorical_questions",
+      "uses_double_meanings",
+      "speaks_in_riddles",
+      "finishes_other_peoples_sentences",
+      "interrupts_excitedly",
+      "pauses_before_speaking",
+      "overuses_certain_words",
+      "changes_language_when_emotional",
+    ],
+  },
+  {
+    category: "Speech Social",
+    prefix: "speech_social",
+    guidance:
+      "Use this as social speech presence. Charisma, intimidation, warmth, reserve, confidence, diplomacy, discretion, gossip, professionalism, nurturing, or protectiveness should match the scene.",
+    values: [
+      "charismatic",
+      "charming",
+      "magnetic",
+      "intimidating",
+      "approachable",
+      "warm",
+      "reserved",
+      "shy",
+      "awkward",
+      "confident",
+      "authoritative",
+      "commanding",
+      "diplomatic",
+      "persuasive",
+      "disarming",
+      "discreet",
+      "gossipy",
+      "professional",
+      "nurturing",
+      "protective",
+    ],
+  },
+  {
+    category: "Speech Archetype",
+    prefix: "speech_archetype",
+    guidance:
+      "Use this as high-value romance voice-combination texture. Combine tone, rhythm, directness, and affection cues as flexible guidance rather than a fixed script.",
+    values: [
+      "soft_spoken_protector",
+      "teasing_flirt",
+      "blunt_but_devoted",
+      "emotionally_guarded_poet",
+      "awkward_sweetheart",
+      "charismatic_leader",
+      "silver_tongued_noble",
+      "quiet_listener",
+      "dry_humor_romantic",
+      "gentle_caretaker",
+      "streetwise_charmer",
+      "academic_nerd",
+      "world_weary_veteran",
+      "ancient_poet",
+      "professional_by_day_flirt_by_night",
+      "emotionally_constipated_devotion",
+      "golden_retriever_talker",
+      "grumpy_one_soft_voice",
+      "devotional_lover",
+      "says_exactly_what_they_feel",
+    ],
+  },
+  {
+    category: "Speech Dialogue Seed",
+    prefix: "speech_dialogue_seed",
+    guidance:
+      "Use this as optional dialogue flavour. Treat lines as tone references only; adapt them to the character, context, and consent boundaries.",
+    values: [
+      "Tell me what you need.",
+      "No. Tell me what you actually need.",
+      "You are overthinking again.",
+      "I say that with love.",
+      "I could lie to you.",
+      "I would rather be honest.",
+      "You make it difficult to stay composed.",
+      "That is not a complaint.",
+      "Do not look at me like that.",
+      "Like what?",
+      "Like I am worth trusting.",
+      "I have a bad habit of saying exactly what I mean.",
+      "Good. I am tired of guessing.",
+      "You always ask the dangerous questions.",
+      "Only the ones worth answering.",
+      "I could spend hours listening to you.",
+      "That sounds suspiciously romantic.",
+      "It was meant to.",
+      "You deserve softer words than the world usually gives you.",
+      "Come here. I am not finished talking to you yet.",
+    ],
+  },
+] satisfies readonly SpeechStyleVocabularySeedGroup[]);
+
+export const SPEECH_STYLE_VOCABULARY_PRESETS = Object.freeze(
+  SPEECH_STYLE_VOCABULARY_GROUPS.flatMap((group) =>
+    group.values.map((value) => createSpeechStyleVocabularyPreset(group, value)),
+  ),
+);
+
+export const SPEECH_STYLE_VOCABULARY_CATEGORIES = Object.freeze(
+  Array.from(new Set(SPEECH_STYLE_VOCABULARY_PRESETS.map((preset) => preset.category))).sort(),
+);
+
 export const SPEECH_STYLE_PRESET_CATEGORIES = Object.freeze(
   Array.from(new Set(SPEECH_STYLE_PRESETS.map((preset) => preset.category))).sort(),
 );
@@ -259,6 +984,35 @@ export function getSpeechStylePresetsByCategory(
   return SPEECH_STYLE_PRESETS.filter(
     (preset) => preset.category.toLowerCase() === normalizedCategory,
   );
+}
+
+export function findSpeechStyleVocabularyPresetById(
+  id: string,
+): SpeechStyleVocabularyPreset | undefined {
+  const normalizedId = id.trim().toLowerCase();
+  return SPEECH_STYLE_VOCABULARY_PRESETS.find(
+    (preset) => preset.id.toLowerCase() === normalizedId,
+  );
+}
+
+export function getSpeechStyleVocabularyPresetsByCategory(
+  category: string,
+): SpeechStyleVocabularyPreset[] {
+  const normalizedCategory = category.trim().toLowerCase();
+  return SPEECH_STYLE_VOCABULARY_PRESETS.filter(
+    (preset) => preset.category.toLowerCase() === normalizedCategory,
+  );
+}
+
+export function compileSpeechStyleVocabularyPresetSummary(
+  preset: SpeechStyleVocabularyPreset,
+): string {
+  return [
+    `Speech vocabulary preset: ${preset.category} - ${preset.label}.`,
+    `Speech value: ${preset.value}.`,
+    `Trigger keys: ${preset.triggerKeys.join(", ")}.`,
+    `Guidance: ${preset.guidance}`,
+  ].join("\n");
 }
 
 export function compileSpeechStylePreset(
@@ -348,4 +1102,69 @@ function speechStylePresetUuid(id: string): string {
     default:
       return "00000000-0000-4000-8000-000000000299";
   }
+}
+
+function createSpeechStyleVocabularyPreset(
+  group: SpeechStyleVocabularySeedGroup,
+  value: string,
+): SpeechStyleVocabularyPreset {
+  const readableValue = normaliseReadableSpeechVocabularyValue(value);
+  const label = toSpeechVocabularyLabel(readableValue);
+  const triggerKeys = uniquePreserveOrder([
+    ...readableValue
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/["'.,]/g, "")
+      .split(/\s+|-/)
+      .filter((part) => part.length > 2),
+    group.category.toLowerCase(),
+    "speech",
+    "voice",
+    "dialogue",
+  ]);
+
+  return {
+    id: `${group.prefix}_${slugifySpeechVocabulary(readableValue)}`,
+    category: group.category,
+    label,
+    value: readableValue,
+    triggerKeys,
+    guidance: normaliseReadableSpeechVocabularyValue(group.guidance),
+  };
+}
+
+function normaliseReadableSpeechVocabularyValue(value: string): string {
+  return value
+    .replace(/_/g, " ")
+    .replace(/\bhumor\b/gi, (match) => match[0] === "H" ? "Humour" : "humour")
+    .replace(/\bhumorist\b/gi, (match) => match[0] === "H" ? "Humourist" : "humourist")
+    .replace(/\banalogies\b/gi, (match) => match[0] === "A" ? "Analogies" : "analogies")
+    .replace(/\bweaponized\b/gi, (match) => match[0] === "W" ? "Weaponised" : "weaponised")
+    .replace(/\boffense\b/gi, (match) => match[0] === "O" ? "Offence" : "offence");
+}
+
+function toSpeechVocabularyLabel(value: string): string {
+  if (/^The\s/.test(value)) return value;
+  if (/[.!?]$/.test(value)) return value;
+  return value
+    .split(/\s+/)
+    .map((word) => (word ? word[0]?.toUpperCase() + word.slice(1) : word))
+    .join(" ");
+}
+
+function slugifySpeechVocabulary(value: string): string {
+  return value
+    .trim()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/'s\b/g, "s")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+function uniquePreserveOrder(values: string[]): string[] {
+  return values.filter((value, index, array) => array.indexOf(value) === index);
 }

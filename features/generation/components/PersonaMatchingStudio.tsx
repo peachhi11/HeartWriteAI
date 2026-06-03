@@ -7,20 +7,275 @@ import { Activity, Gauge, HeartHandshake, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
+  compileComplementVocabularyAdditions,
+  findComplementVocabularyById,
+  COMPLEMENT_VOCABULARY_PRESETS,
+} from "@/data/complementPresets";
+import {
+  compileArrangedMatchPresetAdditions,
+  findArrangedMatchPresetById,
+  ARRANGED_MATCH_PRESETS,
+} from "@/data/arrangedMatchPresets";
+import {
+  compileCommunicationStylePresetAdditions,
+  findCommunicationStylePresetById,
+  COMMUNICATION_STYLE_PRESETS,
+} from "@/data/communicationStylePresets";
+import {
+  compileConflictStylePresetAdditions,
+  findConflictStylePresetById,
+  CONFLICT_STYLE_PRESETS,
+} from "@/data/conflictStylePresets";
+import {
+  compileAmbitionPresetAdditions,
+  findAmbitionPresetById,
+  AMBITION_PRESETS,
+} from "@/data/ambitionPresets";
+import {
+  compileAffectionPresetAdditions,
+  findAffectionPresetById,
+  AFFECTION_PRESETS,
+} from "@/data/affectionPresets";
+import {
+  compileLoyaltyPresetAdditions,
+  findLoyaltyPresetById,
+  LOYALTY_PRESETS,
+} from "@/data/loyaltyPresets";
+import {
+  compileLoveLanguagePresetAdditions,
+  findLoveLanguagePresetById,
+  LOVE_LANGUAGE_PRESETS,
+} from "@/data/loveLanguagePresets";
+import {
+  compileMoralityPresetAdditions,
+  findMoralityPresetById,
+  MORALITY_PRESETS,
+} from "@/data/moralityPresets";
+import {
+  compileDialectPresetAdditions,
+  findDialectPresetById,
+  DIALECT_PRESETS,
+} from "@/data/dialectPresets";
+import {
+  compileFamilyHistoryPresetAdditions,
+  findFamilyHistoryPresetById,
+  FAMILY_HISTORY_PRESETS,
+} from "@/data/familyHistoryPresets";
+import {
+  compileBetrayalPresetAdditions,
+  findBetrayalPresetById,
+  BETRAYAL_PRESETS,
+} from "@/data/betrayalPresets";
+import {
+  compileExilePresetAdditions,
+  findExilePresetById,
+  EXILE_PRESETS,
+} from "@/data/exilePresets";
+import {
+  compileFatedReincarnationPresetAdditions,
+  findFatedReincarnationPresetById,
+  FATED_REINCARNATION_PRESETS,
+} from "@/data/fatedReincarnationPresets";
+import {
+  compileFakeDatingPresetAdditions,
+  findFakeDatingPresetById,
+  FAKE_DATING_PRESETS,
+} from "@/data/fakeDatingPresets";
+import {
+  compileForbiddenTabooPresetAdditions,
+  findForbiddenTabooPresetById,
+  FORBIDDEN_TABOO_PRESETS,
+} from "@/data/forbiddenTabooPresets";
+import {
+  compileMentorProtegePresetAdditions,
+  findMentorProtegePresetById,
+  MENTOR_PROTEGE_PRESETS,
+} from "@/data/mentorProtegePresets";
+import {
   compileFlirtingPresetAdditions,
   findFlirtingPresetById,
   FLIRTING_PRESETS,
 } from "@/data/flirtingPresets";
+import {
+  compileFriendsToLoversPresetAdditions,
+  findFriendsToLoversPresetById,
+  FRIENDS_TO_LOVERS_PRESETS,
+} from "@/data/friendsToLoversPresets";
+import {
+  compileFormativeEventPresetAdditions,
+  findFormativeEventPresetById,
+  FORMATIVE_EVENT_PRESETS,
+} from "@/data/formativeEventPresets";
+import {
+  compileFormalityPresetAdditions,
+  findFormalityPresetById,
+  FORMALITY_PRESETS,
+} from "@/data/formalityPresets";
+import {
+  compileGrumpySunshinePresetAdditions,
+  findGrumpySunshinePresetById,
+  GRUMPY_SUNSHINE_PRESETS,
+} from "@/data/grumpySunshinePresets";
+import {
+  compileDarkObsessivePresetAdditions,
+  findDarkObsessivePresetById,
+  DARK_OBSESSIVE_PRESETS,
+} from "@/data/darkObsessivePresets";
+import {
+  compileFormalArrangedPresetAdditions,
+  findFormalArrangedPresetById,
+  FORMAL_ARRANGED_PRESETS,
+} from "@/data/formalArrangedPresets";
+import {
+  compileAcademicRivalPresetAdditions,
+  findAcademicRivalPresetById,
+  ACADEMIC_RIVAL_PRESETS,
+} from "@/data/academicRivalPresets";
+import {
+  compileCaretakerHurtComfortPresetAdditions,
+  findCaretakerHurtComfortPresetById,
+  CARETAKER_HURT_COMFORT_PRESETS,
+} from "@/data/caretakerHurtComfortPresets";
+import {
+  compileCaretakerPresetAdditions,
+  findCaretakerPresetById,
+  CARETAKER_PRESETS,
+} from "@/data/caretakerPresets";
+import {
+  compileFrictionPresetAdditions,
+  findFrictionPresetById,
+  FRICTION_PRESETS,
+} from "@/data/frictionPresets";
+import {
+  compileRivalryPresetAdditions,
+  findRivalryPresetById,
+  RIVALRY_PRESETS,
+} from "@/data/rivalryPresets";
+import {
+  compileDevotionPresetAdditions,
+  findDevotionPresetById,
+  DEVOTION_PRESETS,
+} from "@/data/devotionPresets";
+import {
+  compileObsessionPresetAdditions,
+  findObsessionPresetById,
+  OBSESSION_PRESETS,
+} from "@/data/obsessionPresets";
+import {
+  compilePossessivePresetAdditions,
+  findPossessivePresetById,
+  POSSESSIVE_PRESETS,
+} from "@/data/possessivePresets";
+import {
+  compileSlowBurnPresetAdditions,
+  findSlowBurnPresetById,
+  SLOW_BURN_PRESETS,
+} from "@/data/slowBurnPresets";
+import {
+  compileFlawSecretPresetAdditions,
+  findFlawSecretPresetById,
+  FLAW_SECRET_PRESETS,
+} from "@/data/flawSecretPresets";
+import {
+  compileTeasingPresetAdditions,
+  findTeasingPresetById,
+  TEASING_PRESETS,
+} from "@/data/teasingPresets";
+import {
+  compileAgeLifeStagePresetAdditions,
+  findAgeLifeStagePresetById,
+  AGE_LIFE_STAGE_PRESETS,
+} from "@/data/ageLifeStagePresets";
+import {
+  compileSpeciesHeritagePresetAdditions,
+  findSpeciesHeritagePresetById,
+  SPECIES_HERITAGE_PRESETS,
+} from "@/data/speciesHeritagePresets";
+import {
+  compileHumanPresetAdditions,
+  findHumanPresetById,
+  HUMAN_PRESETS,
+} from "@/data/humanPresets";
+import {
+  compileVampirePresetAdditions,
+  findVampirePresetById,
+  VAMPIRE_PRESETS,
+} from "@/data/vampirePresets";
+import {
+  compileFaePresetAdditions,
+  findFaePresetById,
+  FAE_PRESETS,
+} from "@/data/faePresets";
+import {
+  compileDemonPresetAdditions,
+  findDemonPresetById,
+  DEMON_PRESETS,
+} from "@/data/demonPresets";
+import {
+  compileAngelPresetAdditions,
+  findAngelPresetById,
+  ANGEL_PRESETS,
+} from "@/data/angelPresets";
+import {
+  compileAndroidPresetAdditions,
+  findAndroidPresetById,
+  ANDROID_PRESETS,
+} from "@/data/androidPresets";
+import {
+  compileAlienPresetAdditions,
+  findAlienPresetById,
+  ALIEN_PRESETS,
+} from "@/data/alienPresets";
+import {
+  compileShifterPresetAdditions,
+  findShifterPresetById,
+  SHIFTER_PRESETS,
+} from "@/data/shifterPresets";
+import {
+  compileLossPresetAdditions,
+  findLossPresetById,
+  LOSS_PRESETS,
+} from "@/data/lossPresets";
+import {
+  compileJealousyPresetAdditions,
+  findJealousyPresetById,
+  JEALOUSY_PRESETS,
+} from "@/data/jealousyPresets";
 import {
   compileOriginWoundPresetAdditions,
   findOriginWoundVocabularyPresetById,
   ORIGIN_WOUND_VOCABULARY_PRESETS,
 } from "@/data/originWoundVocabularyPresets";
 import {
+  compilePetNamePresetAdditions,
+  findPetNamePresetById,
+  PET_NAME_PRESETS,
+} from "@/data/petNamePresets";
+import {
   compileRelationshipDynamicVocabularyInjection,
   findRelationshipDynamicVocabularyById,
   RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS,
 } from "@/data/relationshipDynamicVocabulary";
+import {
+  compileRegretPresetAdditions,
+  findRegretPresetById,
+  REGRET_PRESETS,
+} from "@/data/regretPresets";
+import {
+  compileSecretPresetAdditions,
+  findSecretPresetById,
+  SECRET_PRESETS,
+} from "@/data/secretPresets";
+import {
+  compileSecondChancePresetAdditions,
+  findSecondChancePresetById,
+  SECOND_CHANCE_PRESETS,
+} from "@/data/secondChancePresets";
+import {
+  compileSentenceRhythmPresetAdditions,
+  findSentenceRhythmPresetById,
+  SENTENCE_RHYTHM_PRESETS,
+} from "@/data/sentenceRhythmPresets";
 import {
   compileSpeechStylePresetSummary,
   findSpeechStylePresetById,
@@ -32,6 +287,11 @@ import {
   VOICE_VOCABULARY_PRESETS,
 } from "@/data/voiceVocabularyPresets";
 import {
+  compileWorkplaceHierarchyPresetAdditions,
+  findWorkplaceHierarchyPresetById,
+  WORKPLACE_HIERARCHY_PRESETS,
+} from "@/data/workplaceHierarchyPresets";
+import {
   Card,
   CardContent,
   CardDescription,
@@ -39,6 +299,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { expandPresetLookupTokens } from "@/lib/character-card/presetSpellingAliases";
 import {
   calculatePsychologicalResonance,
   type PersonaTraits,
@@ -82,11 +343,63 @@ const fallbackTargetPreferredTones: RomanceTropeClass[] = [
 ];
 
 const matchingVocabularySeedIds = [
+  ...COMPLEMENT_VOCABULARY_PRESETS.map((preset) => preset.id),
   ...RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS.map((preset) => preset.id),
+  ...ARRANGED_MATCH_PRESETS.map((preset) => preset.id),
+  ...FORBIDDEN_TABOO_PRESETS.map((preset) => preset.id),
+  ...MENTOR_PROTEGE_PRESETS.map((preset) => preset.id),
+  ...FAKE_DATING_PRESETS.map((preset) => preset.id),
+  ...GRUMPY_SUNSHINE_PRESETS.map((preset) => preset.id),
+  ...DARK_OBSESSIVE_PRESETS.map((preset) => preset.id),
+  ...FORMAL_ARRANGED_PRESETS.map((preset) => preset.id),
+  ...ACADEMIC_RIVAL_PRESETS.map((preset) => preset.id),
+  ...CARETAKER_HURT_COMFORT_PRESETS.map((preset) => preset.id),
+  ...CARETAKER_PRESETS.map((preset) => preset.id),
+  ...FRICTION_PRESETS.map((preset) => preset.id),
+  ...RIVALRY_PRESETS.map((preset) => preset.id),
+  ...DEVOTION_PRESETS.map((preset) => preset.id),
+  ...OBSESSION_PRESETS.map((preset) => preset.id),
+  ...POSSESSIVE_PRESETS.map((preset) => preset.id),
+  ...SLOW_BURN_PRESETS.map((preset) => preset.id),
+  ...FLAW_SECRET_PRESETS.map((preset) => preset.id),
+  ...TEASING_PRESETS.map((preset) => preset.id),
+  ...AGE_LIFE_STAGE_PRESETS.map((preset) => preset.id),
+  ...SPECIES_HERITAGE_PRESETS.map((preset) => preset.id),
+  ...HUMAN_PRESETS.map((preset) => preset.id),
+  ...VAMPIRE_PRESETS.map((preset) => preset.id),
+  ...FAE_PRESETS.map((preset) => preset.id),
+  ...DEMON_PRESETS.map((preset) => preset.id),
+  ...ANGEL_PRESETS.map((preset) => preset.id),
+  ...ANDROID_PRESETS.map((preset) => preset.id),
+  ...ALIEN_PRESETS.map((preset) => preset.id),
+  ...SHIFTER_PRESETS.map((preset) => preset.id),
+  ...FATED_REINCARNATION_PRESETS.map((preset) => preset.id),
+  ...SECOND_CHANCE_PRESETS.map((preset) => preset.id),
+  ...WORKPLACE_HIERARCHY_PRESETS.map((preset) => preset.id),
+  ...FRIENDS_TO_LOVERS_PRESETS.map((preset) => preset.id),
   ...FLIRTING_PRESETS.map((preset) => preset.id),
+  ...JEALOUSY_PRESETS.map((preset) => preset.id),
+  ...AFFECTION_PRESETS.map((preset) => preset.id),
+  ...LOYALTY_PRESETS.map((preset) => preset.id),
+  ...LOVE_LANGUAGE_PRESETS.map((preset) => preset.id),
+  ...CONFLICT_STYLE_PRESETS.map((preset) => preset.id),
   ...ORIGIN_WOUND_VOCABULARY_PRESETS.map((preset) => preset.id),
+  ...FORMATIVE_EVENT_PRESETS.map((preset) => preset.id),
+  ...FAMILY_HISTORY_PRESETS.map((preset) => preset.id),
+  ...REGRET_PRESETS.map((preset) => preset.id),
+  ...EXILE_PRESETS.map((preset) => preset.id),
+  ...BETRAYAL_PRESETS.map((preset) => preset.id),
+  ...LOSS_PRESETS.map((preset) => preset.id),
+  ...SECRET_PRESETS.map((preset) => preset.id),
+  ...AMBITION_PRESETS.map((preset) => preset.id),
   ...SPEECH_STYLE_PRESETS.map((preset) => preset.id),
   ...VOICE_VOCABULARY_PRESETS.map((preset) => preset.id),
+  ...DIALECT_PRESETS.map((preset) => preset.id),
+  ...FORMALITY_PRESETS.map((preset) => preset.id),
+  ...PET_NAME_PRESETS.map((preset) => preset.id),
+  ...SENTENCE_RHYTHM_PRESETS.map((preset) => preset.id),
+  ...COMMUNICATION_STYLE_PRESETS.map((preset) => preset.id),
+  ...MORALITY_PRESETS.map((preset) => preset.id),
 ];
 
 export function PersonaMatchingStudio() {
@@ -487,13 +800,33 @@ function normalizeTropeList(tones: string[]) {
 }
 
 function compileMatchingVocabularySeed(seedId: string) {
-  const trimmedSeedId = seedId.trim();
-  if (!trimmedSeedId) {
-    return "";
+  return tokenizeMatchingSeedInput(seedId)
+    .map(compileSingleMatchingVocabularySeed)
+    .filter(Boolean)
+    .join("\n\n");
+}
+
+function compileSingleMatchingVocabularySeed(seedId: string) {
+  for (const candidateSeedId of expandPresetLookupTokens(seedId)) {
+    const compiledSeed = compileMatchingVocabularySeedCandidate(candidateSeedId);
+    if (compiledSeed) {
+      return compiledSeed;
+    }
   }
 
+  return "";
+}
+
+function tokenizeMatchingSeedInput(rawText: string) {
+  return rawText
+    .split(/[\n,;|]+/)
+    .map((token) => token.trim())
+    .filter(Boolean);
+}
+
+function compileMatchingVocabularySeedCandidate(seedId: string) {
   const relationshipVocabulary =
-    findRelationshipDynamicVocabularyById(trimmedSeedId);
+    findRelationshipDynamicVocabularyById(seedId);
   if (relationshipVocabulary) {
     const injection =
       compileRelationshipDynamicVocabularyInjection(relationshipVocabulary);
@@ -505,7 +838,370 @@ function compileMatchingVocabularySeed(seedId: string) {
     ].join("\n");
   }
 
-  const flirting = findFlirtingPresetById(trimmedSeedId);
+  const complementVocabulary = findComplementVocabularyById(seedId);
+  if (complementVocabulary) {
+    const additions = compileComplementVocabularyAdditions(complementVocabulary);
+    return [
+      additions.relationshipAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const forbiddenTaboo = findForbiddenTabooPresetById(seedId);
+  if (forbiddenTaboo) {
+    const additions = compileForbiddenTabooPresetAdditions(forbiddenTaboo);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const arrangedMatch = findArrangedMatchPresetById(seedId);
+  if (arrangedMatch) {
+    const additions = compileArrangedMatchPresetAdditions(arrangedMatch);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const mentorProtege = findMentorProtegePresetById(seedId);
+  if (mentorProtege) {
+    const additions = compileMentorProtegePresetAdditions(mentorProtege);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const fakeDating = findFakeDatingPresetById(seedId);
+  if (fakeDating) {
+    const additions = compileFakeDatingPresetAdditions(fakeDating);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const grumpySunshine = findGrumpySunshinePresetById(seedId);
+  if (grumpySunshine) {
+    const additions = compileGrumpySunshinePresetAdditions(grumpySunshine);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const darkObsessive = findDarkObsessivePresetById(seedId);
+  if (darkObsessive) {
+    const additions = compileDarkObsessivePresetAdditions(darkObsessive);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const formalArranged = findFormalArrangedPresetById(seedId);
+  if (formalArranged) {
+    const additions = compileFormalArrangedPresetAdditions(formalArranged);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const academicRival = findAcademicRivalPresetById(seedId);
+  if (academicRival) {
+    const additions = compileAcademicRivalPresetAdditions(academicRival);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const caretakerHurtComfort = findCaretakerHurtComfortPresetById(seedId);
+  if (caretakerHurtComfort) {
+    const additions =
+      compileCaretakerHurtComfortPresetAdditions(caretakerHurtComfort);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const caretaker = findCaretakerPresetById(seedId);
+  if (caretaker) {
+    const additions = compileCaretakerPresetAdditions(caretaker);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const friction = findFrictionPresetById(seedId);
+  if (friction) {
+    const additions = compileFrictionPresetAdditions(friction);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const rivalry = findRivalryPresetById(seedId);
+  if (rivalry) {
+    const additions = compileRivalryPresetAdditions(rivalry);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const devotion = findDevotionPresetById(seedId);
+  if (devotion) {
+    const additions = compileDevotionPresetAdditions(devotion);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const obsession = findObsessionPresetById(seedId);
+  if (obsession) {
+    const additions = compileObsessionPresetAdditions(obsession);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const possessive = findPossessivePresetById(seedId);
+  if (possessive) {
+    const additions = compilePossessivePresetAdditions(possessive);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const slowBurn = findSlowBurnPresetById(seedId);
+  if (slowBurn) {
+    const additions = compileSlowBurnPresetAdditions(slowBurn);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const flawSecret = findFlawSecretPresetById(seedId);
+  if (flawSecret) {
+    const additions = compileFlawSecretPresetAdditions(flawSecret);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const teasing = findTeasingPresetById(seedId);
+  if (teasing) {
+    const additions = compileTeasingPresetAdditions(teasing);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const ageLifeStage = findAgeLifeStagePresetById(seedId);
+  if (ageLifeStage) {
+    const additions = compileAgeLifeStagePresetAdditions(ageLifeStage);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const speciesHeritage = findSpeciesHeritagePresetById(seedId);
+  if (speciesHeritage) {
+    const additions = compileSpeciesHeritagePresetAdditions(speciesHeritage);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const human = findHumanPresetById(seedId);
+  if (human) {
+    const additions = compileHumanPresetAdditions(human);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const vampire = findVampirePresetById(seedId);
+  if (vampire) {
+    const additions = compileVampirePresetAdditions(vampire);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const fae = findFaePresetById(seedId);
+  if (fae) {
+    const additions = compileFaePresetAdditions(fae);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const demon = findDemonPresetById(seedId);
+  if (demon) {
+    const additions = compileDemonPresetAdditions(demon);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const angel = findAngelPresetById(seedId);
+  if (angel) {
+    const additions = compileAngelPresetAdditions(angel);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const android = findAndroidPresetById(seedId);
+  if (android) {
+    const additions = compileAndroidPresetAdditions(android);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const alien = findAlienPresetById(seedId);
+  if (alien) {
+    const additions = compileAlienPresetAdditions(alien);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const shifter = findShifterPresetById(seedId);
+  if (shifter) {
+    const additions = compileShifterPresetAdditions(shifter);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const fatedReincarnation = findFatedReincarnationPresetById(seedId);
+  if (fatedReincarnation) {
+    const additions =
+      compileFatedReincarnationPresetAdditions(fatedReincarnation);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const secondChance = findSecondChancePresetById(seedId);
+  if (secondChance) {
+    const additions = compileSecondChancePresetAdditions(secondChance);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const workplaceHierarchy = findWorkplaceHierarchyPresetById(seedId);
+  if (workplaceHierarchy) {
+    const additions =
+      compileWorkplaceHierarchyPresetAdditions(workplaceHierarchy);
+    return [
+      additions.backgroundAddition,
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const friendsToLovers = findFriendsToLoversPresetById(seedId);
+  if (friendsToLovers) {
+    const additions = compileFriendsToLoversPresetAdditions(friendsToLovers);
+    return [
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const flirting = findFlirtingPresetById(seedId);
   if (flirting) {
     const additions = compileFlirtingPresetAdditions(flirting);
     return [
@@ -515,7 +1211,57 @@ function compileMatchingVocabularySeed(seedId: string) {
     ].join("\n");
   }
 
-  const originWound = findOriginWoundVocabularyPresetById(trimmedSeedId);
+  const jealousy = findJealousyPresetById(seedId);
+  if (jealousy) {
+    const additions = compileJealousyPresetAdditions(jealousy);
+    return [
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const affection = findAffectionPresetById(seedId);
+  if (affection) {
+    const additions = compileAffectionPresetAdditions(affection);
+    return [
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const loyalty = findLoyaltyPresetById(seedId);
+  if (loyalty) {
+    const additions = compileLoyaltyPresetAdditions(loyalty);
+    return [
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const loveLanguage = findLoveLanguagePresetById(seedId);
+  if (loveLanguage) {
+    const additions = compileLoveLanguagePresetAdditions(loveLanguage);
+    return [
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const conflictStyle = findConflictStylePresetById(seedId);
+  if (conflictStyle) {
+    const additions = compileConflictStylePresetAdditions(conflictStyle);
+    return [
+      additions.relationshipAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const originWound = findOriginWoundVocabularyPresetById(seedId);
   if (originWound) {
     const additions = compileOriginWoundPresetAdditions(originWound);
     return [
@@ -525,17 +1271,154 @@ function compileMatchingVocabularySeed(seedId: string) {
     ].join("\n");
   }
 
-  const speechStyle = findSpeechStylePresetById(trimmedSeedId);
+  const formativeEvent = findFormativeEventPresetById(seedId);
+  if (formativeEvent) {
+    const additions = compileFormativeEventPresetAdditions(formativeEvent);
+    return [
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const familyHistory = findFamilyHistoryPresetById(seedId);
+  if (familyHistory) {
+    const additions = compileFamilyHistoryPresetAdditions(familyHistory);
+    return [
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const regret = findRegretPresetById(seedId);
+  if (regret) {
+    const additions = compileRegretPresetAdditions(regret);
+    return [
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const exile = findExilePresetById(seedId);
+  if (exile) {
+    const additions = compileExilePresetAdditions(exile);
+    return [
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const betrayal = findBetrayalPresetById(seedId);
+  if (betrayal) {
+    const additions = compileBetrayalPresetAdditions(betrayal);
+    return [
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const loss = findLossPresetById(seedId);
+  if (loss) {
+    const additions = compileLossPresetAdditions(loss);
+    return [
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const secret = findSecretPresetById(seedId);
+  if (secret) {
+    const additions = compileSecretPresetAdditions(secret);
+    return [
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const ambition = findAmbitionPresetById(seedId);
+  if (ambition) {
+    const additions = compileAmbitionPresetAdditions(ambition);
+    return [
+      additions.backgroundAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const speechStyle = findSpeechStylePresetById(seedId);
   if (speechStyle) {
     return compileSpeechStylePresetSummary(speechStyle);
   }
 
-  const voiceVocabulary = findVoiceVocabularyPresetById(trimmedSeedId);
+  const voiceVocabulary = findVoiceVocabularyPresetById(seedId);
   if (voiceVocabulary) {
     const additions = compileVoiceVocabularyPresetAdditions(voiceVocabulary);
     return [
       additions.speechStyleAddition,
       additions.lexicalGuidance,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const dialect = findDialectPresetById(seedId);
+  if (dialect) {
+    const additions = compileDialectPresetAdditions(dialect);
+    return [
+      additions.speechStyleAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const formality = findFormalityPresetById(seedId);
+  if (formality) {
+    const additions = compileFormalityPresetAdditions(formality);
+    return [
+      additions.speechStyleAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const petNames = findPetNamePresetById(seedId);
+  if (petNames) {
+    const additions = compilePetNamePresetAdditions(petNames);
+    return [
+      additions.speechStyleAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const sentenceRhythm = findSentenceRhythmPresetById(seedId);
+  if (sentenceRhythm) {
+    const additions = compileSentenceRhythmPresetAdditions(sentenceRhythm);
+    return [
+      additions.speechStyleAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const communicationStyle = findCommunicationStylePresetById(seedId);
+  if (communicationStyle) {
+    const additions =
+      compileCommunicationStylePresetAdditions(communicationStyle);
+    return [
+      additions.speechStyleAddition,
+      additions.personalityAddition,
+      additions.systemPromptAddition,
+    ].join("\n");
+  }
+
+  const morality = findMoralityPresetById(seedId);
+  if (morality) {
+    const additions = compileMoralityPresetAdditions(morality);
+    return [
+      additions.backgroundAddition,
+      additions.personalityAddition,
       additions.systemPromptAddition,
     ].join("\n");
   }

@@ -99,11 +99,11 @@ export const RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS = Object.freeze([
       ],
       spatialNouns: ["protocol", "treaty", "mask", "court", "hierarchy", "facade", "obligation", "decorum"],
       dialoguePacing:
-        "Use polished grammar, high-register diction, and minimal slang. Formal titles and honorifics may persist even in private when the dynamic is bound by status or law.",
+        "Use polished grammar, high-register diction, and minimal slang. Formal titles may persist even in private when the dynamic is bound by status or law.",
     },
     sampleProseSnippet:
       "They maintained an immaculate public distance, their stilted dialogue bound by the cold legalities of the treaty and the private fracture behind a decorous smile.",
-    systemPromptTags: ["high-register diction", "zero casual slang bias", "honorific usage", "linguistic posture tracking"],
+    systemPromptTags: ["high-register diction", "zero casual slang bias", "formal title usage", "linguistic posture tracking"],
   },
   {
     id: "vocab_rivalry_academic",
@@ -111,7 +111,7 @@ export const RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS = Object.freeze([
     vibe: "The Cutthroat Intellect x The Defiant Counter",
     dynamicModes: ["rivalry", "friction"],
     lexicalTokens: {
-      signatureVerbs: ["clash", "dissect", "counter", "smirk", "provoke", "dethrone", "analyze", "taunt"],
+      signatureVerbs: ["clash", "dissect", "counter", "smirk", "provoke", "dethrone", "analyse", "taunt"],
       descriptiveAdjectives: [
         "razor-sharp",
         "pretentious",
@@ -127,7 +127,7 @@ export const RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS = Object.freeze([
     },
     sampleProseSnippet:
       "She dissected his calculated theory with a razor-sharp verbal parry, leaving him with a tense jaw and a distinctly fractured smirk.",
-    systemPromptTags: ["staccato verbal friction", "weaponized intellectual terminology", "rapid conversation pressure", "petty conversational scoring"],
+    systemPromptTags: ["staccato verbal friction", "weaponised intellectual terminology", "rapid conversation pressure", "petty conversational scoring"],
   },
   {
     id: "vocab_caretaker_hurt_comfort",
@@ -147,7 +147,7 @@ export const RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS = Object.freeze([
       ],
       spatialNouns: ["bedside", "haven", "grip", "pulse", "shelter", "boundary", "recovery", "linens"],
       dialoguePacing:
-        "Use soft, decelerated textual flow. Favor grounded physical details, quiet dialogue, and long, careful action beats over sudden escalation.",
+        "Use soft, decelerated textual flow. Favour grounded physical details, quiet dialogue, and long, careful action beats over sudden escalation.",
     },
     sampleProseSnippet:
       "Her calloused fingers moved to stabilize his trembling hands, her voice dropping to a hushed murmur as she tried to ground his feverish breathing beside the dark haven of the bed.",
@@ -243,7 +243,7 @@ export const RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS = Object.freeze([
       ],
       spatialNouns: ["treaty", "bloodline", "alliance", "decorum", "obligation", "court", "glove", "heirloom"],
       dialoguePacing:
-        "Use hyper-regulated diplomatic diction. Favor grammatically polished sentences, restrained silence, and careful title usage without implying automatic intimacy.",
+        "Use hyper-regulated diplomatic diction. Favour grammatically polished sentences, restrained silence, and careful title usage without implying automatic intimacy.",
     },
     sampleProseSnippet:
       "He offered his pristine, gloved arm to escort his resigned bride across the court, their stilted exchange matching the decorum demanded by the dynastic treaty.",

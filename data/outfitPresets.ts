@@ -70,10 +70,10 @@ export const OUTFIT_PRESETS = Object.freeze([
     category: "Period / Fantasy",
     vibe: "The Cursed Knight / Silent Bodyguard",
     styleName: "Vanguard Battle Plate",
-    description: "Functional, heavy combat armor designed to absorb lethal blows while maintaining an imposing silhouette.",
+    description: "Functional, heavy combat armour designed to absorb lethal blows while maintaining an imposing silhouette.",
     keyGarments: ["Scuffed steel breastplate", "Thick quilted gambeson underline", "Heavy dark wool cloak"],
     accentsAndAccessories: ["Leather sword sheath", "Chainmail cowl accents", "Iron-shod sabatons"],
-    systemPromptTags: ["armor clanking deeply with strides", "hand resting naturally on the sword hilt", "weight of the heavy damp cloak"],
+    systemPromptTags: ["armour clanking deeply with strides", "hand resting naturally on the sword hilt", "weight of the heavy damp cloak"],
     tailwindTheme: { fromColor: "from-stone-900", toColor: "to-zinc-800", accentColor: "text-stone-400" },
   },
   {

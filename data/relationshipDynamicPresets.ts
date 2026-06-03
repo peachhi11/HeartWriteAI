@@ -63,7 +63,7 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
       "Defends the guarded character when others misread them",
     ],
     progressionCues: [
-      "A practical favor becomes obviously tender",
+      "A practical favour becomes obviously tender",
       "A joke lands and catches both characters off guard",
       "The guarded character stays instead of retreating",
     ],
@@ -186,7 +186,7 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
     progressionCues: [
       "The feared character accepts help without flinching",
       "A dangerous room becomes quiet and safe",
-      "The witness sets a boundary and the beast honors it",
+      "The witness sets a boundary and the beast honours it",
     ],
     safetyBoundary: defaultSafetyBoundary,
     systemPromptTags: ["gentle monster", "softening isolation", "fear versus tenderness", "careful physical contrast"],
@@ -198,11 +198,11 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
     category: "Internal Trauma",
     vibe: "Touch-Starved Recluse",
     characterARole: "The Touch-Averse Recluse",
-    characterBRole: "The Patient Safe Harbor",
+    characterBRole: "The Patient Safe Harbour",
     premise:
       "A character longs for closeness while their body treats sudden touch as danger.",
     pressure:
-      "Desire and panic arrive together, making consent and pacing the center of the relationship.",
+      "Desire and panic arrive together, making consent and pacing the centre of the relationship.",
     characterABehaviors: [
       "Freezes or flinches at sudden unannounced contact",
       "Tracks hands and exits when proximity tightens",
@@ -453,7 +453,7 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
     characterBBehaviors: [
       "Returns every compliment as a challenge",
       "Exposes weak projections without mercy",
-      "Recognizes competence before affection",
+      "Recognises competence before affection",
     ],
     progressionCues: [
       "A boardroom insult protects the rival",
@@ -529,7 +529,7 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
     mode: "rivalry",
     category: "Lethal Combat",
     vibe: "Blades at the Throat",
-    characterARole: "The Honored Killer",
+    characterARole: "The Honoured Killer",
     characterBRole: "The Equal Blade",
     premise:
       "Two dangerous equals communicate through threat assessment, restraint, and precise mercy.",
@@ -588,7 +588,7 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
     id: "care_domestic_anchor",
     mode: "caretaker",
     category: "Domestic Support",
-    vibe: "Home as Safe Harbor",
+    vibe: "Home as Safe Harbour",
     characterARole: "The Domestic Anchor",
     characterBRole: "The Frayed Survivor",
     premise:
@@ -611,7 +611,7 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
       "Home starts meaning a person, not just a place",
     ],
     safetyBoundary: defaultSafetyBoundary,
-    systemPromptTags: ["domestic care", "quiet rituals", "safe harbor", "ordinary intimacy"],
+    systemPromptTags: ["domestic care", "quiet rituals", "safe harbour", "ordinary intimacy"],
     tailwindTheme: { fromColor: "from-rose-950", toColor: "to-stone-900", accentColor: "text-rose-300" },
   },
   {
@@ -958,7 +958,7 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
     premise:
       "Operational secrecy and emotional reliance blur under mission pressure.",
     pressure:
-      "Trust is necessary for survival but dangerous for operational judgment.",
+      "Trust is necessary for survival but dangerous for operational judgement.",
     characterABehaviors: [
       "Uses mission language to cover worry",
       "Tracks risk with controlled calm",
@@ -1046,7 +1046,7 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
     category: "Protective Fidelity",
     vibe: "Unconditional Shield",
     characterARole: "The Devoted Protector",
-    characterBRole: "The Chosen Center",
+    characterBRole: "The Chosen Centre",
     premise:
       "One character's loyalty is absolute, but healthy devotion must still preserve selfhood.",
     pressure:
@@ -1082,7 +1082,7 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
     pressure:
       "Hierarchy can be comforting only when consent and personhood are explicit.",
     characterABehaviors: [
-      "Responds to formal address with practiced reverence",
+      "Responds to formal address with practised reverence",
       "Handles belongings and tasks with careful attention",
       "Fears dismissal more than failure",
     ],
@@ -1109,7 +1109,7 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
     characterARole: "The Feral Protector",
     characterBRole: "The Gentle Anchor",
     premise:
-      "Instinctive loyalty centers one character around the other's safety and emotional grounding.",
+      "Instinctive loyalty centres one character around the other's safety and emotional grounding.",
     pressure:
       "Biological intensity must be translated into choice, communication, and restraint.",
     characterABehaviors: [
@@ -1150,7 +1150,7 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
     ],
     characterBBehaviors: [
       "Sets limits without rejecting care",
-      "Offers reassurance after boundaries are honored",
+      "Offers reassurance after boundaries are honoured",
       "Makes safety a shared plan",
     ],
     progressionCues: [
@@ -1264,7 +1264,7 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
     characterARole: "The Eldritch Tether",
     characterBRole: "The Human Anchor",
     premise:
-      "A supernatural or cosmic bond creates overwhelming awareness that must be humanized through boundaries.",
+      "A supernatural or cosmic bond creates overwhelming awareness that must be humanised through boundaries.",
     pressure:
       "Intimacy becomes terrifying when thoughts, dreams, or sensations bleed across the bond.",
     characterABehaviors: [
@@ -1290,9 +1290,9 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
   {
     id: "burn_emotional_armor",
     mode: "slow-burn",
-    category: "Emotional Armor",
+    category: "Emotional Armour",
     vibe: "Fortified Wall",
-    characterARole: "The Armored Heart",
+    characterARole: "The Armoured Heart",
     characterBRole: "The Patient Siege",
     premise:
       "A fear of vulnerability turns every spark into a perceived breach.",
@@ -1305,16 +1305,16 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
     ],
     characterBBehaviors: [
       "Does not punish retreat",
-      "Recognizes small signs as meaningful",
+      "Recognises small signs as meaningful",
       "Stays steady without forcing confession",
     ],
     progressionCues: [
       "Eye contact lingers one beat longer",
       "Accidental touch is not immediately rejected",
-      "The armored character admits one true thing",
+      "The armoured character admits one true thing",
     ],
     safetyBoundary: defaultSafetyBoundary,
-    systemPromptTags: ["punishing slow burn", "defensive armor", "micro-progressions", "earned vulnerability"],
+    systemPromptTags: ["punishing slow burn", "defensive armour", "micro-progressions", "earned vulnerability"],
     tailwindTheme: { fromColor: "from-stone-900", toColor: "to-stone-950", accentColor: "text-stone-400" },
   },
   {

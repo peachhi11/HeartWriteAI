@@ -60,7 +60,7 @@ export const ORIGIN_WOUND_VOCABULARY_PRESETS = Object.freeze([
     lexicalTokens: {
       signatureVerbs: ["evade", "withdraw", "brace", "preempt", "distance", "mask", "sabotage"],
       descriptiveAdjectives: ["guarded", "hollow", "temporary", "volatile", "self-contained", "wary"],
-      vulnerabilityNouns: ["distance", "exile", "rejection", "scar", "armor", "absence", "threshold"],
+      vulnerabilityNouns: ["distance", "exile", "rejection", "scar", "armour", "absence", "threshold"],
       dialoguePacing:
         "Use clipped replies when abandonment fear is touched. Let short non-sequiturs and sudden quiet suggest retreat without requiring a shutdown.",
     },
@@ -109,7 +109,7 @@ export const ORIGIN_WOUND_VOCABULARY_PRESETS = Object.freeze([
       coreWound:
         "They were treated as an asset, bargaining chip, or obligation before they were treated as a person.",
       defenseMechanism:
-        "Transactional boundaries. They translate care into debts, contracts, favors, and repayment to avoid feeling owned by kindness.",
+        "Transactional boundaries. They translate care into debts, contracts, favours, and repayment to avoid feeling owned by kindness.",
       exposureTriggers: [
         "unconditional gifts",
         "accepting help they cannot repay",
@@ -126,11 +126,11 @@ export const ORIGIN_WOUND_VOCABULARY_PRESETS = Object.freeze([
       descriptiveAdjectives: ["transactional", "conditional", "polished", "sterile", "calculated", "bloodless"],
       vulnerabilityNouns: ["ledger", "debt", "obligation", "asset", "contract", "price", "currency"],
       dialoguePacing:
-        "Use formal, legalistic language when vulnerability rises. Convert emotion into terms and conditions until trust softens the defense.",
+        "Use formal, legalistic language when vulnerability rises. Convert emotion into terms and conditions until trust softens the defence.",
     },
     sampleDialogueLine:
       "{{char}}: \"I will repay you. I do not like debts disguised as kindness.\"",
-    systemPromptTags: ["transactional defense language", "ledger wound vocabulary", "formal vulnerability avoidance", "care-as-debt framing"],
+    systemPromptTags: ["transactional defence language", "ledger wound vocabulary", "formal vulnerability avoidance", "care-as-debt framing"],
     tailwindTheme: { fromColor: "from-slate-950", toColor: "to-slate-800", accentColor: "text-slate-300" },
   },
   {
@@ -227,14 +227,14 @@ export function compileOriginWoundPresetAdditions(
   return {
     backgroundAddition: compileOriginWoundPresetSummary(preset),
     personalityAddition: [
-      `Origin wound behavior texture: ${preset.vibe}.`,
-      `Defense pattern: ${preset.woundProfile.defenseMechanism}`,
+      `Origin wound behaviour texture: ${preset.vibe}.`,
+      `Defence pattern: ${preset.woundProfile.defenseMechanism}`,
       `Relevant triggers may include: ${preset.woundProfile.exposureTriggers.join(", ")}.`,
       `Somatic tells may include: ${preset.woundProfile.somaticTells.join(", ")}.`,
     ].join(" "),
     systemPromptAddition: [
       `Origin wound guidance: ${preset.vibe}.`,
-      "Use this as soft characterization guidance that may surface when relevant; do not override player agency, and avoid flattening the character into trauma-only behavior.",
+      "Use this as soft characterisation guidance that may surface when relevant; do not override player agency, and avoid flattening the character into trauma-only behaviour.",
       `Dialogue pacing: ${preset.lexicalTokens.dialoguePacing}`,
     ].join(" "),
   };
@@ -246,7 +246,7 @@ export function compileOriginWoundPresetSummary(
   return [
     `Origin wound preset: ${preset.vibe}.`,
     `Core wound: ${preset.woundProfile.coreWound}`,
-    `Defense mechanism: ${preset.woundProfile.defenseMechanism}`,
+    `Defence mechanism: ${preset.woundProfile.defenseMechanism}`,
     `Exposure triggers: ${preset.woundProfile.exposureTriggers.join(", ")}.`,
     `Somatic tells: ${preset.woundProfile.somaticTells.join(", ")}.`,
     `Signature wound verbs: ${preset.lexicalTokens.signatureVerbs.join(", ")}.`,

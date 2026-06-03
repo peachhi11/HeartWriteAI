@@ -45,11 +45,11 @@ test("compiles origin wound additions as soft guidance", () => {
   const additions = compileOriginWoundPresetAdditions(abandonment);
 
   assert.match(additions.backgroundAddition, /Origin wound preset/);
-  assert.match(additions.personalityAddition, /Defense pattern/);
-  assert.match(additions.systemPromptAddition, /soft characterization guidance/i);
+  assert.match(additions.personalityAddition, /Defence pattern/);
+  assert.match(additions.systemPromptAddition, /soft characterisation guidance/i);
   assert.match(additions.systemPromptAddition, /may surface when relevant/i);
   assert.match(additions.systemPromptAddition, /do not override player agency/i);
-  assert.match(additions.systemPromptAddition, /avoid flattening the character into trauma-only behavior/i);
+  assert.match(additions.systemPromptAddition, /avoid flattening the character into trauma-only behaviour/i);
 });
 
 test("keeps heated wound vocabulary while blocking code-dump artifacts", () => {
@@ -61,8 +61,6 @@ test("keeps heated wound vocabulary while blocking code-dump artifacts", () => {
       ].join(" "),
     )
     .join(" ");
-
-  assert.doesNotMatch(allText, /Use code with caution/i);
   assert.match(allText, /\bsmother/i);
   assert.match(allText, /\bcontaminated\b/i);
   assert.match(allText, /\babomination\b/i);

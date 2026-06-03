@@ -21,6 +21,14 @@ import {
   OUTFIT_PRESETS,
 } from "../../data/outfitPresets";
 import {
+  compileHairStylePresetAdditions,
+  compileHairStylePresetSummary,
+  findHairStylePresetById,
+  getHairStylePresetsByCategory,
+  HAIR_STYLE_PRESET_CATEGORIES,
+  HAIR_STYLE_PRESETS,
+} from "../../data/hairStylePresets";
+import {
   findSkinPresetById,
   getSkinPresetsByCategory,
   SKIN_PRESET_CATEGORIES,
@@ -79,6 +87,78 @@ test("loads skin presets with tone names, markings, and lookup helpers", () => {
   const androidSkin = findSkinPresetById("SKIN_SCIFI_SYNTH_SILICONE");
   assert.equal(androidSkin?.toneName, "Synthetic Pearl");
   assert.ok(androidSkin?.keyMarkings.some((marking) => /serial numbers/.test(marking)));
+});
+
+test("loads hair style vocabulary with readable appearance lanes", () => {
+  assert.equal(HAIR_STYLE_PRESETS.length, 329);
+  assertUniqueIds(HAIR_STYLE_PRESETS.map((preset) => preset.id));
+  assert.deepEqual(HAIR_STYLE_PRESET_CATEGORIES, [
+    "Feminine Hair Style",
+    "Hair Accessory",
+    "Hair Colour",
+    "Hair Condition",
+    "Hair Dialogue Seed",
+    "Hair Length",
+    "Hair Personality",
+    "Hair Romance Hook",
+    "Hair Style Preset",
+    "Hair Texture",
+    "Masculine Hair Style",
+    "Unisex Hair Style",
+  ]);
+
+  assert.equal(getHairStylePresetsByCategory("Hair Style Preset").length, 20);
+  assert.equal(getHairStylePresetsByCategory("Unisex Hair Style").length, 80);
+  assert.equal(getHairStylePresetsByCategory("Hair Colour").length, 29);
+  assert.equal(getHairStylePresetsByCategory("Hair Romance Hook").length, 20);
+
+  assert.equal(findHairStylePresetById("hair_colour_grey_hair")?.value, "grey hair");
+  assert.equal(
+    findHairStylePresetById("hair_romance_hook_lover_recognises_hair_scent")
+      ?.value,
+    "lover recognises hair scent",
+  );
+  assert.equal(
+    findHairStylePresetById("hair_romance_hook_user_brushes_character_hair")
+      ?.value,
+    "{{user}} brushes character hair",
+  );
+
+  assert.doesNotMatch(
+    JSON.stringify(
+      HAIR_STYLE_PRESETS.map(({ label, value, guidance, triggerKeys, systemPromptTags }) => ({
+        label,
+        value,
+        guidance,
+        triggerKeys,
+        systemPromptTags,
+      })),
+    ),
+    /gray_hair|recognizes|user_brushes_character_hair|Use code with caution/,
+  );
+});
+
+test("compiles hair style presets as optional guidance", () => {
+  const appearancePreset = findHairStylePresetById("hair_style_the_tousled_romantic");
+  const romancePreset = findHairStylePresetById(
+    "hair_romance_hook_touching_hair_requires_trust",
+  );
+
+  assert.ok(appearancePreset);
+  assert.ok(romancePreset);
+  assert.match(
+    compileHairStylePresetSummary(appearancePreset),
+    /Hair preset: Hair Style Preset - The Tousled Romantic/,
+  );
+
+  const appearanceAdditions = compileHairStylePresetAdditions(appearancePreset);
+  const romanceAdditions = compileHairStylePresetAdditions(romancePreset);
+
+  assert.match(appearanceAdditions.appearanceAddition, /The Tousled Romantic/);
+  assert.equal(appearanceAdditions.relationshipAddition, "");
+  assert.equal(romanceAdditions.appearanceAddition, "");
+  assert.match(romanceAdditions.relationshipAddition, /requires trust/);
+  assert.match(romanceAdditions.systemPromptAddition, /may surface when relevant/);
 });
 
 test("loads outfit presets and keeps normalized garment wording", () => {

@@ -6,6 +6,19 @@ export type VoiceVocabularyCategory =
   | "Melodic & Warm"
   | "Velvety & Intimate";
 
+export type VoiceSeedCategory =
+  | "Voice Vocabulary Preset"
+  | "Voice Tone"
+  | "Voice Pitch"
+  | "Voice Texture"
+  | "Voice Pace"
+  | "Voice Volume"
+  | "Voice Emotion"
+  | "Voice Accent"
+  | "Voice Species"
+  | "Voice Romance Hook"
+  | "Voice Dialogue Seed";
+
 export type VoicePitchTier =
   | "Bright Soprano"
   | "Crisp Tenor"
@@ -42,6 +55,22 @@ export interface CompiledVoiceVocabularyAdditions {
   lexicalGuidance: string;
   speechStyleAddition: string;
   systemPromptAddition: string;
+}
+
+export interface VoiceSeedPreset {
+  id: string;
+  category: VoiceSeedCategory;
+  label: string;
+  value: string;
+  triggerKeys: string[];
+  guidance: string;
+}
+
+interface VoiceSeedGroup {
+  category: VoiceSeedCategory;
+  prefix: string;
+  guidance: string;
+  values: string[];
 }
 
 export const VOICE_VOCABULARY_PRESETS = Object.freeze([
@@ -215,8 +244,357 @@ export const VOICE_VOCABULARY_PRESETS = Object.freeze([
   },
 ] satisfies readonly VoiceVocabularyPreset[]);
 
+const VOICE_SEED_GROUPS = Object.freeze([
+  {
+    category: "Voice Vocabulary Preset",
+    prefix: "voice_vocabulary_preset",
+    guidance:
+      "Use this as a broad vocal archetype. Let it colour pitch, texture, pace, and intimacy without replacing the selected speech style or forcing every line to mention the voice.",
+    values: [
+      "The Velvet Voice",
+      "The Honeyed Voice",
+      "The Low Murmur",
+      "The Soft-Spoken Lover",
+      "The Commanding Voice",
+      "The Gentle Caretaker Voice",
+      "The Smoky Voice",
+      "The Bright Sunshine Voice",
+      "The Deadpan Voice",
+      "The Courtly Speaker",
+      "The Bedroom Whisper",
+      "The Warm Storyteller",
+      "The Cool Professional",
+      "The Rough-Edged Protector",
+      "The Musical Voice",
+      "The Ancient Resonant Voice",
+      "The Synthetic Voice",
+      "The Angelic Voice",
+      "The Demonic Voice",
+      "The Voice That Feels Like Home",
+    ],
+  },
+  {
+    category: "Voice Tone",
+    prefix: "voice_tone",
+    guidance:
+      "Use this as vocal tone texture. Tone should support the moment's emotion and relationship state rather than permanently flattening the character.",
+    values: [
+      "warm",
+      "cool",
+      "soft",
+      "gentle",
+      "tender",
+      "low",
+      "deep",
+      "rich",
+      "velvety",
+      "husky",
+      "smoky",
+      "breathy",
+      "airy",
+      "silky",
+      "smooth",
+      "honeyed",
+      "melodic",
+      "musical",
+      "bright",
+      "clear",
+      "crisp",
+      "calm",
+      "steady",
+      "commanding",
+      "authoritative",
+      "playful",
+      "teasing",
+      "dry",
+      "deadpan",
+      "sarcastic",
+      "reserved",
+      "guarded",
+      "formal",
+      "courtly",
+      "intimate",
+      "whispery",
+      "rough",
+      "raspy",
+      "gravelly",
+      "strained",
+      "haunted",
+      "world_weary",
+      "soothing",
+      "hypnotic",
+      "dangerous",
+      "seductive",
+      "devotional",
+      "protective",
+    ],
+  },
+  {
+    category: "Voice Pitch",
+    prefix: "voice_pitch",
+    guidance:
+      "Use this as pitch and resonance texture. Keep pitch descriptive and flexible across stress, privacy, tiredness, and intimacy.",
+    values: [
+      "very_low_pitch",
+      "low_pitch",
+      "medium_low_pitch",
+      "medium_pitch",
+      "medium_high_pitch",
+      "high_pitch",
+      "light_voice",
+      "heavy_voice",
+      "deep_chest_voice",
+      "soft_head_voice",
+      "resonant_voice",
+      "thin_voice",
+      "full_voice",
+      "booming_voice",
+      "quiet_voice",
+      "small_voice",
+      "carrying_voice",
+      "room_filling_voice",
+      "close_to_the_ear_voice",
+      "barely_above_whisper",
+    ],
+  },
+  {
+    category: "Voice Texture",
+    prefix: "voice_texture",
+    guidance:
+      "Use this as audible grain or texture. Treat it as prose colour for the voice, not a repeated stock phrase.",
+    values: [
+      "velvet_texture",
+      "silk_texture",
+      "smoke_texture",
+      "honey_texture",
+      "gravel_texture",
+      "rough_texture",
+      "smooth_texture",
+      "breath_texture",
+      "cracked_texture",
+      "warm_texture",
+      "cool_texture",
+      "metallic_texture",
+      "synthetic_texture",
+      "echoing_texture",
+      "layered_texture",
+      "bell_like_texture",
+      "thunderous_texture",
+      "purring_texture",
+      "whisper_soft_texture",
+      "scarred_voice_texture",
+    ],
+  },
+  {
+    category: "Voice Pace",
+    prefix: "voice_pace",
+    guidance:
+      "Use this as pacing texture. Pacing may shift when the character is nervous, excited, controlled, hurt, or trying to be careful.",
+    values: [
+      "slow_speaker",
+      "measured_speaker",
+      "careful_speaker",
+      "deliberate_pace",
+      "relaxed_pace",
+      "natural_pace",
+      "quick_speaker",
+      "rapid_speaker",
+      "rambles_when_nervous",
+      "pauses_often",
+      "long_pauses",
+      "thinks_before_speaking",
+      "cuts_in_quickly",
+      "drawls",
+      "clips_words",
+      "lingers_on_words",
+      "speaks_in_rhythm",
+      "speech_like_music",
+      "controlled_pacing",
+      "emotion_changes_pace",
+    ],
+  },
+  {
+    category: "Voice Volume",
+    prefix: "voice_volume",
+    guidance:
+      "Use this as volume and projection texture. Let volume respond to public/private context, conflict, affection, and vulnerability.",
+    values: [
+      "soft_volume",
+      "quiet_volume",
+      "murmured",
+      "whispered",
+      "low_volume",
+      "normal_volume",
+      "clear_volume",
+      "projected_voice",
+      "command_voice",
+      "booming_voice",
+      "rarely_raises_voice",
+      "voice_drops_when_serious",
+      "voice_softens_when_affectionate",
+      "voice_sharpens_when_angry",
+      "voice_quiets_when_hurt",
+      "voice_gets_louder_when_excited",
+      "voice_becomes_cold_when_upset",
+      "voice_turns_gentle_for_user",
+      "private_voice",
+      "public_voice",
+    ],
+  },
+  {
+    category: "Voice Emotion",
+    prefix: "voice_emotion",
+    guidance:
+      "Use this as emotional leakage through the voice. It should reveal or conceal feeling as soft guidance, not override the scene's actual emotional arc.",
+    values: [
+      "emotionally_warm_voice",
+      "emotionally_cool_voice",
+      "emotionally_guarded_voice",
+      "emotionally_transparent_voice",
+      "voice_trembles_when_vulnerable",
+      "voice_breaks_when_hurt",
+      "voice_softens_when_in_love",
+      "voice_hardens_when_protective",
+      "voice_goes_flat_when_angry",
+      "voice_gets_quiet_when_afraid",
+      "voice_lifts_when_playful",
+      "voice_deepens_when_serious",
+      "voice_warms_for_user",
+      "voice_reveals_hidden_feelings",
+      "voice_hides_pain",
+      "voice_carries_old_grief",
+      "voice_carries_laughter",
+      "voice_full_of_restraint",
+      "voice_full_of_longing",
+      "voice_full_of_devotion",
+    ],
+  },
+  {
+    category: "Voice Accent",
+    prefix: "voice_accent",
+    guidance:
+      "Use this as accent and cadence texture. Keep accents respectful, readable, and free of caricature.",
+    values: [
+      "no_noticeable_accent",
+      "soft_accent",
+      "strong_accent",
+      "regional_accent",
+      "urban_accent",
+      "rural_accent",
+      "courtly_accent",
+      "old_world_accent",
+      "foreign_accent",
+      "diaspora_accent",
+      "mixed_accent",
+      "fading_accent",
+      "carefully_hidden_accent",
+      "accent_thickens_when_emotional",
+      "accent_softens_in_public",
+      "accent_stronger_with_family",
+      "heritage_language_cadence",
+      "formal_educated_accent",
+      "street_accent",
+      "aristocratic_accent",
+    ],
+  },
+  {
+    category: "Voice Species",
+    prefix: "voice_species",
+    guidance:
+      "Use this as species or origin voice texture. It can suggest resonance, power, age, or nonhuman cadence while preserving agency and scene consent.",
+    values: [
+      "human_voice",
+      "angelic_voice",
+      "demonic_voice",
+      "vampiric_voice",
+      "fae_voice",
+      "shifter_growl",
+      "dragon_resonance",
+      "android_voice",
+      "synthetic_voice",
+      "alien_cadence",
+      "telepathic_voice",
+      "echoing_voice",
+      "layered_voice",
+      "inhuman_voice",
+      "hypnotic_voice",
+      "commanding_true_voice",
+      "voice_with_power",
+      "voice_with_magic_resonance",
+      "voice_that_feels_too_old",
+      "voice_that_does_not_match_face",
+    ],
+  },
+  {
+    category: "Voice Romance Hook",
+    prefix: "voice_romance_hook",
+    guidance:
+      "Use this as romance-specific voice texture. Voice intimacy should emerge from trust, familiarity, and scene pressure rather than bypassing consent.",
+    values: [
+      "voice_softens_only_for_user",
+      "user_recognizes_voice_in_crowd",
+      "late_night_phone_call",
+      "whispered_confession",
+      "voice_note_love_letter",
+      "singing_to_user",
+      "reading_aloud_to_user",
+      "soothing_user_to_sleep",
+      "command_voice_turns_gentle",
+      "teasing_murmur",
+      "protective_warning_voice",
+      "first_time_voice_breaks",
+      "true_voice_revealed",
+      "accent_slips_when_vulnerable",
+      "pet_name_in_private_voice",
+      "user_loves_their_laugh",
+      "voice_as_safe_place",
+      "voice_triggers_memory",
+      "voice_bond_intimacy",
+      "confession_in_a_whisper",
+    ],
+  },
+  {
+    category: "Voice Dialogue Seed",
+    prefix: "voice_dialogue_seed",
+    guidance:
+      "Use this as optional voice-focused dialogue flavour. Treat each line as a humanised reference beat to adapt, not a required script.",
+    values: [
+      "Your voice goes careful when you say my name.",
+      "Careful?",
+      "Like you are holding something breakable.",
+      "Only because you keep pretending you are not.",
+      "Say that again, but do not hide behind the joke.",
+      "You just like hearing me lose my composure.",
+      "I like knowing the softness was meant for me.",
+      "Do not use that voice unless you are willing to be believed.",
+      "I am. That is the problem.",
+      "I could find you in a blackout by that laugh alone.",
+      "Then call once. I will answer before the second breath.",
+      "You make silence feel less empty.",
+      "Careful. Lonely people remember sentences like that.",
+      "Then remember this one: I am staying.",
+      "Read to me until the room stops feeling so loud.",
+      "Come closer. I am tired of making the walls part of this conversation.",
+      "You never have to raise your voice to reach me.",
+      "My voice gives me away whenever you are close.",
+      "Good. I was getting tired of being the only honest thing in the room.",
+      "If my voice sounds like home, then stop standing in the doorway.",
+    ],
+  },
+] satisfies readonly VoiceSeedGroup[]);
+
 export const VOICE_VOCABULARY_CATEGORIES = Object.freeze(
   Array.from(new Set(VOICE_VOCABULARY_PRESETS.map((preset) => preset.category))).sort(),
+);
+
+export const VOICE_SEED_PRESETS = Object.freeze(
+  VOICE_SEED_GROUPS.flatMap((group) =>
+    group.values.map((value) => createVoiceSeedPreset(group, value)),
+  ),
+);
+
+export const VOICE_SEED_CATEGORIES = Object.freeze(
+  Array.from(new Set(VOICE_SEED_PRESETS.map((preset) => preset.category))).sort(),
 );
 
 export function findVoiceVocabularyPresetById(
@@ -233,6 +611,20 @@ export function getVoiceVocabularyPresetsByCategory(
 ): VoiceVocabularyPreset[] {
   const normalizedCategory = category.trim().toLowerCase();
   return VOICE_VOCABULARY_PRESETS.filter(
+    (preset) => preset.category.toLowerCase() === normalizedCategory,
+  );
+}
+
+export function findVoiceSeedPresetById(id: string): VoiceSeedPreset | undefined {
+  const normalizedId = id.trim().toLowerCase();
+  return VOICE_SEED_PRESETS.find(
+    (preset) => preset.id.toLowerCase() === normalizedId,
+  );
+}
+
+export function getVoiceSeedPresetsByCategory(category: string): VoiceSeedPreset[] {
+  const normalizedCategory = category.trim().toLowerCase();
+  return VOICE_SEED_PRESETS.filter(
     (preset) => preset.category.toLowerCase() === normalizedCategory,
   );
 }
@@ -271,4 +663,72 @@ export function compileVoiceVocabularyPresetSummary(
     `Dialogue pacing: ${preset.lexicalTokens.dialoguePacing}`,
     `Voice reference: ${preset.sampleDialogueLine}`,
   ].join("\n");
+}
+
+export function compileVoiceSeedPresetSummary(preset: VoiceSeedPreset): string {
+  return [
+    `Voice seed preset: ${preset.category} - ${preset.label}.`,
+    `Voice value: ${preset.value}.`,
+    `Trigger keys: ${preset.triggerKeys.join(", ")}.`,
+    `Guidance: ${preset.guidance}`,
+  ].join("\n");
+}
+
+function createVoiceSeedPreset(group: VoiceSeedGroup, value: string): VoiceSeedPreset {
+  const readableValue = normaliseReadableVoiceSeedValue(value);
+  const label = toVoiceSeedLabel(readableValue);
+  const triggerKeys = uniquePreserveOrder([
+    ...readableValue
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/["'.,]/g, "")
+      .split(/\s+|-/)
+      .filter((part) => part.length > 2),
+    group.category.toLowerCase(),
+    "voice",
+    "speech",
+    "dialogue",
+  ]);
+
+  return {
+    id: `${group.prefix}_${slugifyVoiceSeed(readableValue)}`,
+    category: group.category,
+    label,
+    value: readableValue,
+    triggerKeys,
+    guidance: normaliseReadableVoiceSeedValue(group.guidance),
+  };
+}
+
+function normaliseReadableVoiceSeedValue(value: string): string {
+  return value
+    .replace(/_/g, " ")
+    .replace(/\brecognizes\b/gi, (match) => match[0] === "R" ? "Recognises" : "recognises")
+    .replace(/\bhumanized\b/gi, (match) => match[0] === "H" ? "Humanised" : "humanised");
+}
+
+function toVoiceSeedLabel(value: string): string {
+  if (/^The\s/.test(value)) return value;
+  if (/[.!?]$/.test(value)) return value;
+  return value
+    .split(/\s+/)
+    .map((word) => (word ? word[0]?.toUpperCase() + word.slice(1) : word))
+    .join(" ");
+}
+
+function slugifyVoiceSeed(value: string): string {
+  return value
+    .trim()
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/&/g, " and ")
+    .replace(/'s\b/g, "s")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+function uniquePreserveOrder(values: string[]): string[] {
+  return values.filter((value, index, array) => array.indexOf(value) === index);
 }
