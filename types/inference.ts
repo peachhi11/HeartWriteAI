@@ -13,6 +13,7 @@ export interface InferenceConfig {
 }
 
 export const OPENROUTER_DEFAULT_MODEL = "google/gemini-2.5-flash";
+export const OLLAMA_DEFAULT_MODEL = "deepseek-r1:8b-llama-distill-q4_K_M";
 
 export const INFERENCE_DEFAULT_MATRIX: InferenceConfig = {
   frequencyPenalty: 0,
@@ -21,7 +22,7 @@ export const INFERENCE_DEFAULT_MATRIX: InferenceConfig = {
   openRouterApiKey: "",
   openRouterModel: OPENROUTER_DEFAULT_MODEL,
   provider: "ollama",
-  selectedModel: "llama3:8b",
+  selectedModel: OLLAMA_DEFAULT_MODEL,
   temperature: 0.7,
   topP: 0.9,
 };
@@ -29,6 +30,7 @@ export const INFERENCE_DEFAULT_MATRIX: InferenceConfig = {
 export const INFERENCE_STORAGE_KEY = "heartwriteai:inference-settings";
 
 export const INFERENCE_MODEL_PRESETS = [
+  { label: "DeepSeek R1 Distill Llama 8B Q4", value: OLLAMA_DEFAULT_MODEL },
   { label: "Llama 3 8B", value: "llama3:8b" },
   { label: "Mistral 7B", value: "mistral:7b" },
   { label: "Phi-3 Mini", value: "phi3:3.8b" },

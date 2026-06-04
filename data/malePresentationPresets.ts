@@ -200,7 +200,7 @@ const MALE_PRESENTATION_SEED_GROUPS = Object.freeze([
     guidance:
       "Use this as optional dialogue inspiration. Dialogue seeds should guide emotional rhythm without requiring verbatim reuse.",
     values: [
-      "You make me feel safe.",
+      "You make safe feel possible.",
       "Good. Not trapped. Safe.",
       "Your hands are rough.",
       "They can still be gentle.",
@@ -208,8 +208,8 @@ const MALE_PRESENTATION_SEED_GROUPS = Object.freeze([
       "I do not know how to be anything else.",
       "Then learn with me.",
       "You are softer than you pretend.",
-      "Only with you.",
-      "That still counts.",
+      "Do not tell everyone. I have a reputation to disappoint.",
+      "I like you better when you forget to perform it.",
     ],
   },
   {

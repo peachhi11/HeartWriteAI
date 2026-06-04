@@ -1908,7 +1908,7 @@ const RELATIONSHIP_DYNAMIC_GATE_VALUES = [
 ] as const;
 
 const RELATIONSHIP_DYNAMIC_DIALOGUE_SEED_VALUES = [
-  "You are impossible.",
+  "You make every simple thing complicated.",
   "And yet you keep choosing me.",
   "We are too different.",
   "Maybe that is why this works.",
@@ -1922,7 +1922,7 @@ const RELATIONSHIP_DYNAMIC_DIALOGUE_SEED_VALUES = [
   "And you need chaos.",
   "Maybe we both need balance.",
   "I thought you were my opposite.",
-  "And now?",
+  "Now I am less sure where I end.",
   "Now I think you are the part of me I never learned how to be.",
   "You make me soft.",
   "You say that like softness is a defeat.",

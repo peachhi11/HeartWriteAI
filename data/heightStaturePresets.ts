@@ -256,7 +256,7 @@ const HEIGHT_GATE_VALUES = [
 ] as const;
 
 const HEIGHT_DIALOGUE_SEED_VALUES = [
-  "You are staring.",
+  "You keep looking up at me like you are deciding whether to complain.",
   "You are difficult to miss.",
   "I can reach that.",
   "I know. I wanted an excuse to stand close.",
@@ -267,7 +267,7 @@ const HEIGHT_DIALOGUE_SEED_VALUES = [
   "No. You take up space where it matters.",
   "Do you always hit your head on doorframes?",
   "Only when I am distracted.",
-  "By what?",
+  "By someone who keeps smiling at the wrong moment.",
   "You.",
 ] as const;
 

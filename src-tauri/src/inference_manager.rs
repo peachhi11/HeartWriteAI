@@ -7,6 +7,7 @@ use tauri::{AppHandle, Manager, State};
 
 const INFERENCE_SETTINGS_FILE: &str = "inference-settings.json";
 const DEFAULT_LOCAL_ENDPOINT: &str = "http://127.0.0.1:11434/api/chat";
+const DEFAULT_LOCAL_MODEL: &str = "deepseek-r1:8b-llama-distill-q4_K_M";
 const DEFAULT_OPENROUTER_MODEL: &str = "google/gemini-2.5-flash";
 const DEFAULT_PROVIDER: &str = "ollama";
 const MAX_API_KEY_LENGTH: usize = 4096;
@@ -44,7 +45,7 @@ impl Default for InferenceConfig {
             provider: DEFAULT_PROVIDER.to_string(),
             frequency_penalty: 0.0,
             local_endpoint: DEFAULT_LOCAL_ENDPOINT.to_string(),
-            selected_model: "llama3:8b".to_string(),
+            selected_model: DEFAULT_LOCAL_MODEL.to_string(),
         }
     }
 }
@@ -284,7 +285,7 @@ mod tests {
         assert_eq!(config.provider, DEFAULT_PROVIDER);
         assert_eq!(config.frequency_penalty, 0.0);
         assert_eq!(config.local_endpoint, DEFAULT_LOCAL_ENDPOINT);
-        assert_eq!(config.selected_model, "llama3:8b");
+        assert_eq!(config.selected_model, DEFAULT_LOCAL_MODEL);
     }
 
     #[test]
@@ -309,7 +310,7 @@ mod tests {
         assert_eq!(config.provider, DEFAULT_PROVIDER);
         assert_eq!(config.frequency_penalty, 0.0);
         assert_eq!(config.local_endpoint, DEFAULT_LOCAL_ENDPOINT);
-        assert_eq!(config.selected_model, "llama3:8b");
+        assert_eq!(config.selected_model, DEFAULT_LOCAL_MODEL);
     }
 
     #[test]

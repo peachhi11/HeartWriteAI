@@ -219,8 +219,8 @@ const CONFLICT_SPEECH_STYLE_SEED_GROUPS = Object.freeze([
       "Stay angry if you need to. Just stay honest.",
       "I do not know how to fight without expecting someone to leave.",
       "Then let this be the first time someone stays.",
-      "I choose repair over pride.",
-      "I choose us over being right.",
+      "I would rather fix this badly than pretend I am fine.",
+      "I can put being right down. I cannot put us down.",
     ],
   },
 ] satisfies readonly ConflictSpeechStyleSeedGroup[]);

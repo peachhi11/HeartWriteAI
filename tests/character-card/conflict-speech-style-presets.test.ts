@@ -52,14 +52,17 @@ test("normalises conflict speech values and keeps dialogue examples readable", (
     "conflict_speech_style_deflects_with_humour",
   );
   const dialogue = findConflictSpeechStylePresetById(
-    "conflict_speech_dialogue_i_choose_repair_over_pride",
+    "conflict_speech_dialogue_i_would_rather_fix_this_badly_than_pretend_i_am_fine",
   );
 
   assert.equal(archetype?.value, "The Calm Negotiator");
   assert.equal(apology?.value, "apologises quickly");
   assert.equal(apologyStruggle?.value, "struggles to apologise");
   assert.equal(humour?.value, "deflects with humour");
-  assert.equal(dialogue?.value, "I choose repair over pride.");
+  assert.equal(
+    dialogue?.value,
+    "I would rather fix this badly than pretend I am fine.",
+  );
   assert.doesNotMatch(allText, /Use code with caution/i);
   assert.doesNotMatch(valueText, /apologizes|apologize|humor/i);
 });

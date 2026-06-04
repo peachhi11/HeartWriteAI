@@ -45,6 +45,11 @@ engineering sequence remains in [`PLAN.md`](PLAN.md).
      lore activation, and relationship-state context insertion.
    - Keep debugging panels copyable and inspectable without exposing internal
      matrices as primary UX.
+   - Keep a Lexicon-inspired lore context router on the roadmap: score active
+     lore, scenario, relationship, and memory entries as inject, hint, or hold
+     decisions with reveal tiers, scene awareness, cooldowns, and resolution
+     state. Build this as original HeartWriteAI context-compiler work, not as a
+     direct code import.
 
 3. **Asset model convergence**
    - Reuse the same normalized model across character-card PNGs, personas,
@@ -65,10 +70,16 @@ engineering sequence remains in [`PLAN.md`](PLAN.md).
 ## Later Tracks
 
 - Group chat orchestration and per-character response routing.
+- Lore context router for paced lore injection, foreshadowing, gated reveals,
+  twist suppression, and resolved/dormant lore handling.
 - Richer lorebook V3 editing, recursive activation, and budget previews.
 - Native tokenization and heavier file processing in Rust/Tauri where it keeps
   the UI responsive.
 - Optional provider presets for OpenRouter, Ollama, llama.cpp-compatible APIs,
   and other local/proxy endpoints.
+- Dataset-backed vocabulary intake registry for Hugging Face and similar
+  sources, keeping taxonomy extraction, rewritten dialogue/style fixtures,
+  persona-structure mining, and eval-rubric inspiration separate from raw corpus
+  copying.
 - Release packaging and signed auto-update activation once the security plan is
   fully satisfied.

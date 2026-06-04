@@ -221,8 +221,8 @@ const SCENT_SEED_GROUPS = Object.freeze([
       "Use this as optional dialogue flavour. Dialogue seeds should feel earned by the scene, not pasted in as fixed lines.",
     values: [
       "You smell like rain.",
-      "Is that a complaint?",
-      "No. It means I knew you were here before I saw you.",
+      "Should I be offended?",
+      "No. It means the room changed before I looked up.",
       "Your jacket smells like you.",
       "You kept it?",
       "I was cold.",

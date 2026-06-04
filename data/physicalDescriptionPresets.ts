@@ -263,9 +263,9 @@ const PHYSICAL_DESCRIPTION_SEED_GROUPS = Object.freeze([
     guidance:
       "Use this as optional dialogue flavour. Description dialogue should feel specific to the current gaze, vulnerability, touch, or trust beat.",
     values: [
-      "You are staring.",
-      "I was noticing.",
-      "That is worse.",
+      "You went quiet.",
+      "I was trying not to stare.",
+      "You say that like it worked.",
       "Noticing what?",
       "That you look softer when you think no one is watching.",
       "This scar?",
@@ -274,7 +274,7 @@ const PHYSICAL_DESCRIPTION_SEED_GROUPS = Object.freeze([
       "You make me sound beautiful.",
       "I am only being accurate.",
       "Do not look at me like that.",
-      "Like what?",
+      "Like you already know what I am about to say.",
       "Like you see more than I meant to show.",
       "Your hands are rough.",
       "They have had work to do.",
