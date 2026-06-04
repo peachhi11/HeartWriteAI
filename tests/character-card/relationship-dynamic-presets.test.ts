@@ -2,10 +2,15 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  compileRelationshipDynamicSeedPresetAdditions,
   findRelationshipDynamicPresetById,
+  findRelationshipDynamicSeedPresetById,
   getRelationshipDynamicPresetsByMode,
+  getRelationshipDynamicSeedPresetsByCategory,
   RELATIONSHIP_DYNAMIC_MODES,
   RELATIONSHIP_DYNAMIC_PRESETS,
+  RELATIONSHIP_DYNAMIC_SEED_PRESET_CATEGORIES,
+  RELATIONSHIP_DYNAMIC_SEED_PRESETS,
 } from "../../data/relationshipDynamicPresets";
 
 test("loads one consolidated relationship dynamic seed library", () => {
@@ -74,7 +79,7 @@ test("normalizes dark dynamics with explicit privacy, consent, and autonomy boun
   assert.match(guardian?.safetyBoundary ?? "", /active consent/i);
 });
 
-test("keeps every dynamic compiler-friendly with non-empty behavior arrays", () => {
+test("keeps every dynamic compiler-friendly with non-empty behaviour arrays", () => {
   for (const preset of RELATIONSHIP_DYNAMIC_PRESETS) {
     assert.ok(preset.vibe.trim(), preset.id);
     assert.ok(preset.characterARole.trim(), preset.id);
@@ -97,7 +102,70 @@ test("normalizes final expansion dynamics with consent and accountability bounda
   assert.match(fated?.safetyBoundary ?? "", /agency/i);
   assert.match(fated?.safetyBoundary ?? "", /right to refuse/i);
   assert.match(secondChance?.safetyBoundary ?? "", /accountability/i);
-  assert.match(secondChance?.safetyBoundary ?? "", /changed behavior/i);
+  assert.match(secondChance?.safetyBoundary ?? "", /changed behaviour/i);
   assert.match(workplace?.safetyBoundary ?? "", /adults/i);
   assert.match(workplace?.safetyBoundary ?? "", /coercion/i);
+});
+
+test("loads relationship dynamic vocabulary seed lane with unique ids", () => {
+  assert.equal(RELATIONSHIP_DYNAMIC_SEED_PRESETS.length, 212);
+
+  const ids = RELATIONSHIP_DYNAMIC_SEED_PRESETS.map((preset) => preset.id);
+  assert.equal(new Set(ids).size, ids.length);
+  assert.ok(ids.every((id) => id.startsWith("rel_dynamic_")));
+});
+
+test("groups relationship dynamic vocabulary seeds by safe category", () => {
+  assert.deepEqual(RELATIONSHIP_DYNAMIC_SEED_PRESET_CATEGORIES, [
+    "Archetype",
+    "Attachment",
+    "Dialogue Seed",
+    "Dynamic",
+    "Gate",
+    "High-Value Seed",
+    "Power",
+    "Romance Hook",
+    "Tension",
+  ]);
+
+  assert.equal(getRelationshipDynamicSeedPresetsByCategory("Archetype").length, 20);
+  assert.equal(getRelationshipDynamicSeedPresetsByCategory("Dynamic").length, 50);
+  assert.equal(getRelationshipDynamicSeedPresetsByCategory("Tension").length, 20);
+  assert.equal(getRelationshipDynamicSeedPresetsByCategory("Power").length, 20);
+  assert.equal(getRelationshipDynamicSeedPresetsByCategory("Attachment").length, 20);
+  assert.equal(getRelationshipDynamicSeedPresetsByCategory("Romance Hook").length, 20);
+  assert.equal(getRelationshipDynamicSeedPresetsByCategory("Gate").length, 20);
+  assert.equal(getRelationshipDynamicSeedPresetsByCategory("Dialogue Seed").length, 22);
+  assert.equal(getRelationshipDynamicSeedPresetsByCategory("High-Value Seed").length, 20);
+});
+
+test("normalizes relationship dynamic seed wording and spelling", () => {
+  const tension = findRelationshipDynamicSeedPresetById(
+    "rel_dynamic_tension_same_wound_different_defences",
+  );
+  const highValue = findRelationshipDynamicSeedPresetById(
+    "rel_dynamic_high_value_seed_same_wound_different_defences",
+  );
+  const combinedText = RELATIONSHIP_DYNAMIC_SEED_PRESETS.map((preset) => preset.value).join(" ");
+
+  assert.equal(tension?.label, "same wound different defences");
+  assert.equal(highValue?.value, "same_wound_different_defences");
+  assert.doesNotMatch(combinedText, /defense|defenses|Use code with caution/i);
+});
+
+test("compiles relationship dynamic seed additions as optional guidance", () => {
+  const preset = findRelationshipDynamicSeedPresetById("rel_dynamic_dynamic_grumpy_sunshine");
+  assert.ok(preset);
+
+  const compiled = compileRelationshipDynamicSeedPresetAdditions(preset);
+  const combinedText = [
+    compiled.scenarioAddition,
+    compiled.relationshipAddition,
+    compiled.systemPromptAddition,
+  ].join(" ");
+
+  assert.match(combinedText, /optional relationship-dynamic guidance/);
+  assert.match(combinedText, /preserving consent, boundaries, and both characters' agency/);
+  assert.match(combinedText, /negotiated, and reversible/);
+  assert.doesNotMatch(combinedText, /must|force|override|SYSTEM PROTOCOL/i);
 });

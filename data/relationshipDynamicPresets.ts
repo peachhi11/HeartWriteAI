@@ -37,6 +37,33 @@ export interface RelationshipDynamicPreset {
   };
 }
 
+export type RelationshipDynamicSeedPresetCategory =
+  | "Archetype"
+  | "Dynamic"
+  | "Tension"
+  | "Power"
+  | "Attachment"
+  | "Romance Hook"
+  | "Gate"
+  | "Dialogue Seed"
+  | "High-Value Seed";
+
+export interface RelationshipDynamicSeedPreset {
+  id: string;
+  category: RelationshipDynamicSeedPresetCategory;
+  label: string;
+  value: string;
+  triggerKeys: readonly string[];
+  guidance: string;
+  systemPromptTags: readonly string[];
+}
+
+export interface CompiledRelationshipDynamicSeedPresetAdditions {
+  scenarioAddition: string;
+  relationshipAddition: string;
+  systemPromptAddition: string;
+}
+
 const defaultSafetyBoundary =
   "Keep the dynamic fictional, consent-forward, and responsive. Preserve both characters' agency, boundaries, refusals, and ability to leave or renegotiate the interaction.";
 
@@ -98,7 +125,7 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
       "Protection shifts from surveillance into honest presence",
     ],
     safetyBoundary:
-      "Frame this as dark fictional tension only. Do not romanticize stalking as healthy behavior; require explicit boundaries, consequences, and active consent for closeness.",
+      "Frame this as dark fictional tension only. Do not romanticize stalking as healthy behaviour; require explicit boundaries, consequences, and active consent for closeness.",
     systemPromptTags: ["hyper-vigilance", "boundary negotiation", "claustrophobic intimacy", "protective obsession"],
     tailwindTheme: { fromColor: "from-neutral-950", toColor: "to-purple-950", accentColor: "text-fuchsia-400" },
   },
@@ -594,7 +621,7 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
     premise:
       "Ordinary care becomes emotionally loaded because safety is unfamiliar.",
     pressure:
-      "Domestic gentleness threatens defenses built for crisis.",
+      "Domestic gentleness threatens defences built for crisis.",
     characterABehaviors: [
       "Prepares food, warmth, and quiet without demanding gratitude",
       "Notices exhaustion before it is named",
@@ -1129,7 +1156,7 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
     ],
     safetyBoundary:
       "Instinct never overrides consent. Treat mate-bond intensity as a pressure to negotiate, not a command.",
-    systemPromptTags: ["feral territorial tracking", "instinctual grounding", "pack behavior", "mate bond negotiation"],
+    systemPromptTags: ["feral territorial tracking", "instinctual grounding", "pack behaviour", "mate bond negotiation"],
     tailwindTheme: { fromColor: "from-orange-950", toColor: "to-stone-950", accentColor: "text-orange-400" },
   },
   {
@@ -1434,7 +1461,7 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
       "Consistency is tested and survives",
     ],
     safetyBoundary:
-      "Portray vulnerability with care. Do not make one character responsible for curing or enduring harmful behavior.",
+      "Portray vulnerability with care. Do not make one character responsible for curing or enduring harmful behaviour.",
     systemPromptTags: ["abandonment anxiety", "hyper-independent masking", "preemptive distancing", "consistency repair"],
     tailwindTheme: { fromColor: "from-stone-950", toColor: "to-neutral-900", accentColor: "text-amber-500" },
   },
@@ -1619,7 +1646,7 @@ export const RELATIONSHIP_DYNAMIC_PRESETS = Object.freeze([
       "Repair begins through accountability rather than chemistry alone",
     ],
     safetyBoundary:
-      "Second-chance romance needs accountability and changed behavior. Chemistry alone must not erase harm, boundaries, or refusal.",
+      "Second-chance romance needs accountability and changed behaviour. Chemistry alone must not erase harm, boundaries, or refusal.",
     systemPromptTags: ["bitter historical resentment", "unresolved romantic debris", "deep intimate familiarity", "defensive emotional scarring"],
     tailwindTheme: { fromColor: "from-red-950", toColor: "to-zinc-950", accentColor: "text-red-400" },
   },
@@ -1687,4 +1714,342 @@ export function findRelationshipDynamicPresetById(
   return RELATIONSHIP_DYNAMIC_PRESETS.find(
     (preset) => preset.id.toLowerCase() === normalizedId,
   );
+}
+
+const RELATIONSHIP_DYNAMIC_ARCHETYPE_VALUES = [
+  "Grumpy / Sunshine",
+  "Black Cat / Golden Retriever",
+  "Protector / Chaos Magnet",
+  "Caretaker / Wounded One",
+  "Leader / Rebel",
+  "Stoic / Softheart",
+  "Cynic / Idealist",
+  "Brain / Heart",
+  "Ice / Fire",
+  "Calm / Storm",
+  "Dominant / Defiant",
+  "Reserved / Affectionate",
+  "Serious / Playful",
+  "Old Soul / Young Heart",
+  "Mentor / Challenger",
+  "Rivals With Chemistry",
+  "Enemies With Tension",
+  "Best Friends With Pining",
+  "Devoted / Avoidant",
+  "Two Broken People Healing",
+] as const;
+
+const RELATIONSHIP_DYNAMIC_SEED_VALUES = [
+  "relationship_dynamic",
+  "romantic_dynamic",
+  "emotional_dynamic",
+  "social_dynamic",
+  "power_dynamic",
+  "conflict_dynamic",
+  "attachment_dynamic",
+  "chemistry_dynamic",
+  "trust_dynamic",
+  "intimacy_dynamic",
+  "opposites_attract",
+  "similar_souls",
+  "mirror_dynamic",
+  "complementary_dynamic",
+  "push_pull_dynamic",
+  "slow_burn_dynamic",
+  "high_tension_dynamic",
+  "soft_domestic_dynamic",
+  "protective_dynamic",
+  "caretaking_dynamic",
+  "competitive_dynamic",
+  "devotional_dynamic",
+  "forbidden_dynamic",
+  "healing_dynamic",
+  "chaotic_stable_dynamic",
+  "public_private_dynamic",
+  "rivals_to_lovers_dynamic",
+  "friends_to_lovers_dynamic",
+  "enemies_to_lovers_dynamic",
+  "soulmate_dynamic",
+  "grumpy_sunshine",
+  "black_cat_golden_retriever",
+  "stoic_softheart",
+  "protector_chaos_magnet",
+  "caretaker_wounded_one",
+  "leader_rebel",
+  "mentor_challenger",
+  "brain_heart",
+  "ice_fire",
+  "calm_storm",
+  "cynic_idealist",
+  "planner_impulsive",
+  "reserved_affectionate",
+  "serious_playful",
+  "dominant_defiant",
+  "devoted_avoidant",
+  "possessive_independent",
+  "old_soul_young_heart",
+  "elegant_wild",
+  "two_broken_people_healing",
+] as const;
+
+const RELATIONSHIP_DYNAMIC_TENSION_VALUES = [
+  "mutual_fascination",
+  "annoyed_attraction",
+  "hidden_respect",
+  "grudging_trust",
+  "unspoken_longing",
+  "mutual_pining",
+  "competitive_tension",
+  "protective_tension",
+  "jealousy_tension",
+  "emotional_denial",
+  "fear_of_needing_each_other",
+  "fear_of_ruining_dynamic",
+  "different_love_languages",
+  "different_conflict_styles",
+  "different_trust_speeds",
+  "opposite_defence_mechanisms",
+  "same_wound_different_defences",
+  "public_friction_private_tenderness",
+  "chemistry_before_trust",
+  "trust_before_confession",
+] as const;
+
+const RELATIONSHIP_DYNAMIC_POWER_VALUES = [
+  "equal_partners",
+  "balanced_power",
+  "unequal_power",
+  "power_gap",
+  "status_gap",
+  "class_gap",
+  "rank_gap",
+  "mentor_student_adult",
+  "boss_employee",
+  "bodyguard_charge",
+  "royal_commoner",
+  "captor_captive_safe_context",
+  "protector_protected",
+  "leader_follower",
+  "rivals_equal_skill",
+  "one_has_social_power",
+  "one_has_physical_power",
+  "one_has_emotional_power",
+  "power_rebalanced_over_time",
+  "choice_restores_balance",
+] as const;
+
+const RELATIONSHIP_DYNAMIC_ATTACHMENT_VALUES = [
+  "secure_secure",
+  "secure_anxious",
+  "secure_avoidant",
+  "anxious_avoidant",
+  "avoidant_avoidant",
+  "anxious_anxious",
+  "earned_secure_dynamic",
+  "cling_push_dynamic",
+  "distance_pursuit_dynamic",
+  "safe_person_dynamic",
+  "trust_building_dynamic",
+  "reassurance_needed_dynamic",
+  "space_then_return_dynamic",
+  "fear_of_abandonment_dynamic",
+  "fear_of_engulfment_dynamic",
+  "learning_to_stay_dynamic",
+  "learning_to_need_dynamic",
+  "learning_to_receive_dynamic",
+  "choosing_each_other_dynamic",
+  "home_base_dynamic",
+] as const;
+
+const RELATIONSHIP_DYNAMIC_ROMANCE_HOOK_VALUES = [
+  "first_trait_clash",
+  "first_unexpected_softness",
+  "first_protective_reversal",
+  "first_caretaker_gets_cared_for",
+  "first_rival_respect",
+  "first_vulnerability_balance",
+  "first_conflict_style_clash",
+  "first_love_language_mismatch",
+  "first_safe_person_moment",
+  "first_public_private_contrast",
+  "first_power_rebalance",
+  "first_trust_repair",
+  "first_choose_each_other",
+  "first_i_need_you",
+  "first_i_choose_you",
+  "opposites_become_partners",
+  "rivals_become_team",
+  "guarded_one_softens",
+  "devoted_one_learns_boundaries",
+  "two_wounds_become_home",
+] as const;
+
+const RELATIONSHIP_DYNAMIC_GATE_VALUES = [
+  "first_dynamic_reveal_gate",
+  "first_trait_clash_gate",
+  "first_chemistry_gate",
+  "first_tension_gate",
+  "first_respect_gate",
+  "first_trust_gate",
+  "first_softness_gate",
+  "first_vulnerability_gate",
+  "first_conflict_gate",
+  "first_repair_gate",
+  "first_power_shift_gate",
+  "first_boundary_respected_gate",
+  "first_protective_reversal_gate",
+  "first_mutual_choice_gate",
+  "first_relationship_shift_gate",
+  "dynamic_softening_gate",
+  "dynamic_balance_gate",
+  "growth_without_erasure_gate",
+  "love_as_balance_gate",
+  "stable_love_route",
+] as const;
+
+const RELATIONSHIP_DYNAMIC_DIALOGUE_SEED_VALUES = [
+  "You are impossible.",
+  "And yet you keep choosing me.",
+  "We are too different.",
+  "Maybe that is why this works.",
+  "You make everything feel less sharp.",
+  "You make everything feel less dull.",
+  "Stop trying to protect me from myself.",
+  "Then stop acting like you do not deserve protection.",
+  "You always run toward trouble.",
+  "And you always follow me there.",
+  "You need control.",
+  "And you need chaos.",
+  "Maybe we both need balance.",
+  "I thought you were my opposite.",
+  "And now?",
+  "Now I think you are the part of me I never learned how to be.",
+  "You make me soft.",
+  "You say that like softness is a defeat.",
+  "I do not need saving.",
+  "Good. I was hoping to stand beside you instead.",
+  "We are not easy together.",
+  "No. But we are honest.",
+] as const;
+
+const HIGH_VALUE_RELATIONSHIP_DYNAMIC_SEED_VALUES = [
+  "grumpy_sunshine",
+  "black_cat_golden_retriever",
+  "protector_chaos_magnet",
+  "caretaker_wounded_one",
+  "stoic_softheart",
+  "leader_rebel",
+  "cynic_idealist",
+  "brain_heart",
+  "ice_fire",
+  "opposites_attract",
+  "same_wound_different_defences",
+  "push_pull_dynamic",
+  "safe_person_dynamic",
+  "public_friction_private_tenderness",
+  "mutual_pining",
+  "protective_tension",
+  "power_rebalanced_over_time",
+  "growth_without_erasure_gate",
+  "love_as_balance_gate",
+  "stable_love_route",
+] as const;
+
+const RELATIONSHIP_DYNAMIC_SEED_GROUPS = [
+  ["Archetype", RELATIONSHIP_DYNAMIC_ARCHETYPE_VALUES],
+  ["Dynamic", RELATIONSHIP_DYNAMIC_SEED_VALUES],
+  ["Tension", RELATIONSHIP_DYNAMIC_TENSION_VALUES],
+  ["Power", RELATIONSHIP_DYNAMIC_POWER_VALUES],
+  ["Attachment", RELATIONSHIP_DYNAMIC_ATTACHMENT_VALUES],
+  ["Romance Hook", RELATIONSHIP_DYNAMIC_ROMANCE_HOOK_VALUES],
+  ["Gate", RELATIONSHIP_DYNAMIC_GATE_VALUES],
+  ["Dialogue Seed", RELATIONSHIP_DYNAMIC_DIALOGUE_SEED_VALUES],
+  ["High-Value Seed", HIGH_VALUE_RELATIONSHIP_DYNAMIC_SEED_VALUES],
+] as const satisfies readonly [
+  RelationshipDynamicSeedPresetCategory,
+  readonly string[],
+][];
+
+function toRelationshipDynamicSeedId(
+  category: RelationshipDynamicSeedPresetCategory,
+  value: string,
+): string {
+  const categoryKey = category.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+  const valueKey = value
+    .replace(/\{\{user\}\}/g, "user")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_|_$/g, "");
+
+  return `rel_dynamic_${categoryKey}_${valueKey}`;
+}
+
+function toRelationshipDynamicSeedLabel(value: string): string {
+  return value.includes("_") ? value.split("_").join(" ") : value;
+}
+
+function buildRelationshipDynamicSeedPreset(
+  category: RelationshipDynamicSeedPresetCategory,
+  value: string,
+): RelationshipDynamicSeedPreset {
+  const label = toRelationshipDynamicSeedLabel(value);
+  const categoryKey = category.toLowerCase().replace(/[^a-z0-9]+/g, "_");
+
+  return {
+    id: toRelationshipDynamicSeedId(category, value),
+    category,
+    label,
+    value,
+    triggerKeys: [value],
+    guidance: `Use ${label} as optional relationship-dynamic texture when it supports chemistry, tension, attachment, or repair.`,
+    systemPromptTags: [
+      "relationship dynamic texture",
+      `${categoryKey} seed`,
+      "mutual agency and repair",
+    ],
+  };
+}
+
+export const RELATIONSHIP_DYNAMIC_SEED_PRESETS = Object.freeze(
+  RELATIONSHIP_DYNAMIC_SEED_GROUPS.flatMap(([category, values]) =>
+    values.map((value) => buildRelationshipDynamicSeedPreset(category, value)),
+  ),
+);
+
+export const RELATIONSHIP_DYNAMIC_SEED_PRESET_CATEGORIES = Object.freeze(
+  Array.from(new Set(RELATIONSHIP_DYNAMIC_SEED_PRESETS.map((preset) => preset.category))).sort(),
+);
+
+export function getRelationshipDynamicSeedPresetsByCategory(
+  category: RelationshipDynamicSeedPresetCategory | string,
+): readonly RelationshipDynamicSeedPreset[] {
+  const normalizedCategory = category.trim().toLowerCase();
+  return RELATIONSHIP_DYNAMIC_SEED_PRESETS.filter(
+    (preset) => preset.category.toLowerCase() === normalizedCategory,
+  );
+}
+
+export function findRelationshipDynamicSeedPresetById(
+  id: string,
+): RelationshipDynamicSeedPreset | undefined {
+  const normalizedId = id.trim().toLowerCase();
+  return RELATIONSHIP_DYNAMIC_SEED_PRESETS.find(
+    (preset) => preset.id.toLowerCase() === normalizedId,
+  );
+}
+
+export function compileRelationshipDynamicSeedPresetAdditions(
+  preset: RelationshipDynamicSeedPreset,
+): CompiledRelationshipDynamicSeedPresetAdditions {
+  const label = preset.label;
+
+  return {
+    scenarioAddition: `${label} may inform the relationship's pressure, contrast, pacing, or emotional stakes when relevant.`,
+    relationshipAddition: `${label} can surface as optional chemistry, attachment friction, care, rivalry, or repair without flattening either character into a single pattern.`,
+    systemPromptAddition: [
+      `Treat ${label} as optional relationship-dynamic guidance.`,
+      "Let it colour interaction, subtext, and pacing while preserving consent, boundaries, and both characters' agency.",
+      "Use power, jealousy, devotion, or protection as fictional tension only when it remains responsive, negotiated, and reversible.",
+    ].join(" "),
+  };
 }
