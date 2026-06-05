@@ -18,6 +18,7 @@ import { findCommunicationStylePresetById } from "../../data/communicationStyleP
 import { findConflictStylePresetById } from "../../data/conflictStylePresets";
 import { findDarkObsessivePresetById } from "../../data/darkObsessivePresets";
 import { findDemonPresetById } from "../../data/demonPresets";
+import { findDescriptiveWritingSeedById } from "../../data/descriptiveWritingSeedPresets";
 import { findDialectPresetById } from "../../data/dialectPresets";
 import { findDevotionPresetById } from "../../data/devotionPresets";
 import { findExilePresetById } from "../../data/exilePresets";
@@ -137,6 +138,53 @@ test("maps optional speech presets into editable voice guidance", () => {
   assert.ok(compiled.systemPromptTags.includes("controlled elite diction"));
   assert.ok(compiled.systemPromptTags.includes("formal address discipline"));
   assert.ok(compiled.systemPromptTags.includes("crisp angular voice texture"));
+});
+
+test("maps descriptive writing seeds into editable prose guidance", () => {
+  const compiled = compileCharacterPresetSelection({
+    ...buildSelection(),
+    descriptiveWritingSeeds: [
+      must(
+        findDescriptiveWritingSeedById(
+          "descriptive_physical_tangled_copper_curls",
+        ),
+      ),
+      must(
+        findDescriptiveWritingSeedById(
+          "descriptive_emotional_trembling_calm_mask",
+        ),
+      ),
+      must(
+        findDescriptiveWritingSeedById(
+          "descriptive_personality_measured_precise_speech",
+        ),
+      ),
+      must(
+        findDescriptiveWritingSeedById(
+          "descriptive_body_language_crossed_arms_shutdown",
+        ),
+      ),
+      must(findDescriptiveWritingSeedById("descriptive_speech_heavy_accent")),
+    ],
+  });
+
+  assert.match(compiled.formValues.physicalAppearance, /Tangled copper curls/);
+  assert.match(compiled.formValues.physicalAppearance, /physical description texture/);
+  assert.match(compiled.formValues.personalityPsychology, /Measured precise speech/);
+  assert.match(compiled.formValues.personalityPsychology, /Trembling calm mask/);
+  assert.match(compiled.formValues.personalityPsychology, /Crossed arms shutdown/);
+  assert.match(compiled.formValues.backgroundStory, /Trembling calm mask/);
+  assert.match(compiled.formValues.backgroundStory, /Crossed arms shutdown/);
+  assert.match(compiled.formValues.speechStyle, /Heavy accent/);
+  assert.match(compiled.formValues.system_prompt, /physical description seed/);
+  assert.match(compiled.formValues.system_prompt, /speech pattern seed/);
+  assert.match(compiled.formValues.system_prompt, /optional prose texture/i);
+  assert.match(compiled.formValues.system_prompt, /not a fixed line to repeat/i);
+  assert.match(compiled.formValues.system_prompt, /\{\{user\}\} agency/i);
+  assert.match(compiled.formValues.tagsText, /Physical Description/);
+  assert.match(compiled.formValues.tagsText, /Tangled copper curls/);
+  assert.ok(compiled.systemPromptTags.includes("descriptive writing seed"));
+  assert.ok(compiled.systemPromptTags.includes("soft prose guidance"));
 });
 
 test("maps optional flirting and origin wound presets into editable guidance", () => {

@@ -19,6 +19,10 @@ import {
   type CommunicationStylePreset,
 } from "../../data/communicationStylePresets";
 import {
+  compileDescriptiveWritingSeedAdditions,
+  type DescriptiveWritingSeed,
+} from "../../data/descriptiveWritingSeedPresets";
+import {
   compileConflictStylePresetAdditions,
   type ConflictStylePreset,
 } from "../../data/conflictStylePresets";
@@ -328,6 +332,7 @@ export interface CharacterPresetSelection {
   petNames?: PetNamePreset;
   sentenceRhythm?: SentenceRhythmPreset;
   communicationStyle?: CommunicationStylePreset;
+  descriptiveWritingSeeds?: readonly DescriptiveWritingSeed[];
 }
 
 export interface CompiledCharacterPresetSelection {
@@ -435,6 +440,9 @@ export function compileCharacterPresetSelection(
     ...(selection.petNames?.systemPromptTags ?? []),
     ...(selection.sentenceRhythm?.systemPromptTags ?? []),
     ...(selection.communicationStyle?.systemPromptTags ?? []),
+    ...compileDescriptiveWritingSeeds(selection).flatMap(
+      (seed) => seed.systemPromptTags,
+    ),
   ]);
   const tags = uniquePreserveOrder([
     selection.romance.category,
@@ -625,6 +633,10 @@ export function compileCharacterPresetSelection(
     ...(selection.communicationStyle
       ? [selection.communicationStyle.category, selection.communicationStyle.label]
       : []),
+    ...compileDescriptiveWritingSeeds(selection).flatMap((seed) => [
+      seed.category,
+      seed.label,
+    ]),
   ]);
 
   return {
@@ -654,6 +666,9 @@ function buildSpeechStyleText(
   selection: CharacterPresetSelection,
   fallback: string,
 ) {
+  const descriptiveWritingAdditions =
+    compileDescriptiveWritingAdditionsByLane(selection);
+
   return joinDefined([
     selection.speechStyle
       ? compileSpeechStylePresetSummary(selection.speechStyle)
@@ -679,6 +694,7 @@ function buildSpeechStyleText(
       ? compileCommunicationStylePresetAdditions(selection.communicationStyle)
           .speechStyleAddition
       : "",
+    ...descriptiveWritingAdditions.speech,
   ]);
 }
 
@@ -695,6 +711,8 @@ function buildPhysicalAppearance(selection: CharacterPresetSelection): string {
   const hairStyleAdditions = selection.hairStyle
     ? compileHairStylePresetAdditions(selection.hairStyle)
     : null;
+  const descriptiveWritingAdditions =
+    compileDescriptiveWritingAdditionsByLane(selection);
 
   return [
     `Height / stature: ${selection.height.measurements}; ${selection.height.vibe}. ${selection.height.visuals.join(", ")}.`,
@@ -705,12 +723,15 @@ function buildPhysicalAppearance(selection: CharacterPresetSelection): string {
     hairStyleAdditions?.appearanceAddition ?? "",
     `Skin / complexion: ${selection.skin.toneName} (${selection.skin.hexValue}) - ${selection.skin.textureDescription} Markings: ${selection.skin.keyMarkings.join(", ")}.`,
     `Clothing / style: ${selection.outfit.styleName}. ${selection.outfit.description} Key garments: ${selection.outfit.keyGarments.join(", ")}. Accessories: ${selection.outfit.accentsAndAccessories.join(", ")}.`,
+    ...descriptiveWritingAdditions.appearance,
   ]
     .filter(Boolean)
     .join("\n");
 }
 
 function buildPersonality(selection: CharacterPresetSelection): string {
+  const descriptiveWritingAdditions =
+    compileDescriptiveWritingAdditionsByLane(selection);
   const originWoundAdditions = selection.originWound
     ? compileOriginWoundPresetAdditions(selection.originWound)
     : null;
@@ -909,10 +930,15 @@ function buildPersonality(selection: CharacterPresetSelection): string {
     friendsToLoversAdditions?.personalityAddition ?? "",
     conflictStyleAdditions?.personalityAddition ?? "",
     communicationStyleAdditions?.personalityAddition ?? "",
+    ...descriptiveWritingAdditions.personality,
+    ...descriptiveWritingAdditions["body-language"],
+    ...descriptiveWritingAdditions["emotional-expression"],
   ].join("\n");
 }
 
 function buildBackgroundStory(selection: CharacterPresetSelection): string {
+  const descriptiveWritingAdditions =
+    compileDescriptiveWritingAdditionsByLane(selection);
   const originWoundAdditions = selection.originWound
     ? compileOriginWoundPresetAdditions(selection.originWound)
     : null;
@@ -1080,6 +1106,8 @@ function buildBackgroundStory(selection: CharacterPresetSelection): string {
     secretAdditions?.backgroundAddition ?? "",
     ambitionAdditions?.backgroundAddition ?? "",
     moralityAdditions?.backgroundAddition ?? "",
+    ...descriptiveWritingAdditions["body-language"],
+    ...descriptiveWritingAdditions["emotional-expression"],
   ]);
 }
 
@@ -1466,6 +1494,11 @@ function buildSystemPrompt(
   const hairStyleAdditions = selection?.hairStyle
     ? compileHairStylePresetAdditions(selection.hairStyle)
     : null;
+  const descriptiveWritingAdditions = selection
+    ? compileDescriptiveWritingSeeds(selection).map(
+        (seed) => compileDescriptiveWritingSeedAdditions(seed).systemPromptAddition,
+      )
+    : [];
 
   return [
     "Roleplay as {{char}} using the compiled preset library as appearance and behaviour guidance.",
@@ -1528,6 +1561,7 @@ function buildSystemPrompt(
     sentenceRhythmAdditions?.systemPromptAddition ?? "",
     communicationStyleAdditions?.systemPromptAddition ?? "",
     hairStyleAdditions?.systemPromptAddition ?? "",
+    ...descriptiveWritingAdditions,
     `Preset behaviour tags: ${systemPromptTags.join(", ")}.`,
   ].join("\n");
 }
@@ -1578,6 +1612,32 @@ function joinDefined(values: readonly string[]) {
     .map((value) => value.trim())
     .filter(Boolean)
     .join("\n\n");
+}
+
+function compileDescriptiveWritingSeeds(
+  selection: CharacterPresetSelection,
+): readonly DescriptiveWritingSeed[] {
+  return selection.descriptiveWritingSeeds ?? [];
+}
+
+function compileDescriptiveWritingAdditionsByLane(
+  selection: CharacterPresetSelection,
+): Record<DescriptiveWritingSeed["lane"], string[]> {
+  const additions: Record<DescriptiveWritingSeed["lane"], string[]> = {
+    appearance: [],
+    "body-language": [],
+    "emotional-expression": [],
+    personality: [],
+    speech: [],
+  };
+
+  for (const seed of compileDescriptiveWritingSeeds(selection)) {
+    additions[seed.lane].push(
+      compileDescriptiveWritingSeedAdditions(seed).styleAddition,
+    );
+  }
+
+  return additions;
 }
 
 function resolveRelationshipVocabulary(

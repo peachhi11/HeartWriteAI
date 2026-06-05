@@ -30,6 +30,11 @@ import {
 import { useLorebookLibrary } from "@/hooks/useLorebookLibrary";
 import { humanizeOptionLabel } from "@/lib/ui/humanizeOptionLabel";
 import {
+  compileCharacterCreationFormToCardDataPatch,
+  createEmptyCharacterCreationForm,
+  parseCharacterCreationForm,
+} from "@/lib/character-card/characterCreationFormCompiler";
+import {
   buildCharacterCard,
   BuildCharacterCardResult,
   CreatorsNotesContentRating,
@@ -99,6 +104,10 @@ import {
   TurnOffDynamicHardline,
 } from "@/lib/character-card/generator";
 import { AppMacroExtensions } from "@/types/character-card/AppMacroExtensions";
+import {
+  CharacterCreationForm,
+  HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY,
+} from "@/types/character-card/CharacterCreationForm";
 import { ValidatedCharacterCardV3 } from "@/types/character-card/CharacterCardV3Schema";
 
 interface StructuredCardEditorProps {
@@ -107,6 +116,12 @@ interface StructuredCardEditorProps {
 }
 
 type EditorTab = "identity" | "behavior" | "greetings";
+type CharacterCreationFormPath = ReadonlyArray<string | number>;
+type CharacterCreationFormTextField = {
+  kind?: "input" | "textarea";
+  label: string;
+  path: CharacterCreationFormPath;
+};
 type ProsePixieFieldKey =
   | "personality"
   | "description"
@@ -328,6 +343,354 @@ const AVAILABLE_TROPES = [
   "Fake Dating",
   "Grumpy x Sunshine",
 ];
+const CHARACTER_CREATION_FORM_FIELD_GROUPS: Array<{
+  fields: CharacterCreationFormTextField[];
+  label: string;
+}> = [
+  {
+    label: "Character Identity",
+    fields: [
+      { label: "Character Name", path: ["identity", "characterName"] },
+      {
+        label: "Nicknames / Aliases",
+        path: ["identity", "nicknamesAliases"],
+      },
+      { label: "Character Age", path: ["identity", "age"] },
+      { label: "Character Birthdate", path: ["identity", "birthdate"] },
+      { label: "Character Birthplace", path: ["identity", "birthplace"] },
+      {
+        label: "Nationality / Ethnicity",
+        path: ["identity", "nationalityEthnicity"],
+      },
+      {
+        label: "Languages Spoken",
+        path: ["identity", "languagesSpoken"],
+      },
+      {
+        label: "Gender / Gender Identity",
+        path: ["identity", "genderIdentity"],
+      },
+      { label: "Pronouns", path: ["identity", "pronouns"] },
+      { label: "Occupation", path: ["identity", "occupation"] },
+      {
+        label: "Species / Heritage",
+        path: ["identity", "speciesHeritage"],
+      },
+    ],
+  },
+  {
+    label: "Appearance",
+    fields: [
+      { label: "Height", path: ["appearance", "height"] },
+      { label: "Build", path: ["appearance", "build"] },
+      {
+        label: "Eyes",
+        path: ["appearance", "eyeColourShape"],
+      },
+      {
+        label: "Hair",
+        path: ["appearance", "hairColourLengthTextureStyle"],
+        kind: "textarea",
+      },
+      {
+        label: "Skin",
+        path: ["appearance", "skinColourUndertoneTexture"],
+        kind: "textarea",
+      },
+      {
+        label: "Facial Features",
+        path: ["appearance", "facialFeatures"],
+        kind: "textarea",
+      },
+      { label: "Piercings", path: ["appearance", "piercings"] },
+      { label: "Tattoos", path: ["appearance", "tattoos"] },
+      {
+        label: "Blemishes / Scars",
+        path: ["appearance", "blemishesScars"],
+        kind: "textarea",
+      },
+      {
+        label: "Freckles / Moles / Beauty Marks",
+        path: ["appearance", "frecklesMolesBeautyMarks"],
+        kind: "textarea",
+      },
+      { label: "Outfit", path: ["appearance", "outfit"], kind: "textarea" },
+    ],
+  },
+  {
+    label: "Personality",
+    fields: [
+      { label: "Archetype", path: ["personality", "archetype"] },
+      {
+        label: "Positive Traits",
+        path: ["personality", "positiveTraits"],
+        kind: "textarea",
+      },
+      { label: "Flaws", path: ["personality", "flaws"], kind: "textarea" },
+      { label: "Humor", path: ["personality", "humor"] },
+      { label: "Intelligence", path: ["personality", "intelligence"] },
+      {
+        label: "Social Behaviour",
+        path: ["personality", "socialBehaviour"],
+        kind: "textarea",
+      },
+    ],
+  },
+  {
+    label: "Cognitive Drivers",
+    fields: [
+      {
+        label: "Motivation",
+        path: ["cognitiveDrivers", "motivation"],
+        kind: "textarea",
+      },
+      { label: "Fear", path: ["cognitiveDrivers", "fear"], kind: "textarea" },
+      {
+        label: "Defenses",
+        path: ["cognitiveDrivers", "defenses"],
+        kind: "textarea",
+      },
+    ],
+  },
+  {
+    label: "Psychology",
+    fields: [
+      { label: "Temperament", path: ["psychology", "temperament"] },
+      {
+        label: "Cognitive Distortions",
+        path: ["psychology", "cognitiveDistortions"],
+        kind: "textarea",
+      },
+      {
+        label: "Decision Engine",
+        path: ["psychology", "decisionEngine"],
+        kind: "textarea",
+      },
+      { label: "Baseline Affect", path: ["psychology", "baselineAffect"] },
+      {
+        label: "Frustration Threshold",
+        path: ["psychology", "frustrationThreshold"],
+      },
+      {
+        label: "Core Wound",
+        path: ["psychology", "coreWound"],
+        kind: "textarea",
+      },
+      {
+        label: "Internalized Lie",
+        path: ["psychology", "internalizedLie"],
+        kind: "textarea",
+      },
+      {
+        label: "Triggers",
+        path: ["psychology", "triggers"],
+        kind: "textarea",
+      },
+      {
+        label: "Beliefs",
+        path: ["psychology", "beliefs"],
+        kind: "textarea",
+      },
+      {
+        label: "Moral Flexibility",
+        path: ["psychology", "moralFlexibility"],
+      },
+      { label: "Attachment Style", path: ["psychology", "attachmentStyle"] },
+      { label: "Conflict Style", path: ["psychology", "conflictStyle"] },
+      { label: "Stress Response", path: ["psychology", "stressResponse"] },
+      { label: "Love Languages", path: ["psychology", "loveLanguages"] },
+      { label: "Big Five: Openness", path: ["psychology", "bigFive", "openness"] },
+      {
+        label: "Big Five: Conscientiousness",
+        path: ["psychology", "bigFive", "conscientiousness"],
+      },
+      {
+        label: "Big Five: Extraversion",
+        path: ["psychology", "bigFive", "extraversion"],
+      },
+      {
+        label: "Big Five: Agreeableness",
+        path: ["psychology", "bigFive", "agreeableness"],
+      },
+      {
+        label: "Big Five: Emotional Stability",
+        path: ["psychology", "bigFive", "emotionalStability"],
+      },
+    ],
+  },
+  {
+    label: "Behaviour",
+    fields: [
+      {
+        label: "Facial Expressions",
+        path: ["behaviour", "facialExpressions"],
+        kind: "textarea",
+      },
+      {
+        label: "Body Language & Posture",
+        path: ["behaviour", "bodyLanguagePosture"],
+        kind: "textarea",
+      },
+      {
+        label: "Mannerisms",
+        path: ["behaviour", "mannerisms"],
+        kind: "textarea",
+      },
+      {
+        label: "Goal-Oriented Actions",
+        path: ["behaviour", "goalOrientedActions"],
+        kind: "textarea",
+      },
+      {
+        label: "Morality in Action",
+        path: ["behaviour", "moralityInAction"],
+        kind: "textarea",
+      },
+      {
+        label: "Habits & Routines",
+        path: ["behaviour", "habitsRoutines"],
+        kind: "textarea",
+      },
+    ],
+  },
+  {
+    label: "Lifestyle",
+    fields: [
+      { label: "Residence", path: ["lifestyle", "residence"] },
+      { label: "Living Style", path: ["lifestyle", "livingStyle"] },
+      { label: "Routines", path: ["lifestyle", "routines"], kind: "textarea" },
+      { label: "Wealth", path: ["lifestyle", "wealth"] },
+      {
+        label: "Work / Life Balance",
+        path: ["lifestyle", "workLifeBalance"],
+      },
+      { label: "Hobbies", path: ["lifestyle", "hobbies"], kind: "textarea" },
+    ],
+  },
+  {
+    label: "Relationships",
+    fields: [
+      {
+        label: "Faction or Group",
+        path: ["relationships", "affiliationCore", "factionOrGroup"],
+      },
+      {
+        label: "Hierarchical Rank",
+        path: ["relationships", "affiliationCore", "hierarchicalRank"],
+      },
+      {
+        label: "Public Status",
+        path: ["relationships", "affiliationCore", "publicStatus"],
+        kind: "textarea",
+      },
+      {
+        label: "Attachment Type",
+        path: ["relationships", "emotionalBonds", "attachmentType"],
+      },
+      {
+        label: "Trust Metric",
+        path: ["relationships", "emotionalBonds", "trustMetric"],
+      },
+      {
+        label: "Shared History Anchor",
+        path: ["relationships", "emotionalBonds", "sharedHistoryAnchor"],
+        kind: "textarea",
+      },
+      {
+        label: "Ideological Clash",
+        path: ["relationships", "behavioralFriction", "ideologicalClash"],
+        kind: "textarea",
+      },
+      {
+        label: "Boundaries",
+        path: ["relationships", "behavioralFriction", "boundaries"],
+        kind: "textarea",
+      },
+      {
+        label: "Micro-Aggressions or Tells",
+        path: [
+          "relationships",
+          "behavioralFriction",
+          "microAggressionsOrTells",
+        ],
+        kind: "textarea",
+      },
+    ],
+  },
+  {
+    label: "Speech & Communication",
+    fields: [
+      {
+        label: "Tone & Vocabulary",
+        path: ["speechCommunication", "toneVocabulary"],
+        kind: "textarea",
+      },
+      {
+        label: "Subtext",
+        path: ["speechCommunication", "subtext"],
+        kind: "textarea",
+      },
+      {
+        label: "Conversational Habits",
+        path: ["speechCommunication", "conversationalHabits"],
+        kind: "textarea",
+      },
+    ],
+  },
+  {
+    label: "Internal Thoughts & Reactions",
+    fields: [
+      {
+        label: "Psychological Responses",
+        path: ["internalThoughts", "psychologicalResponses"],
+        kind: "textarea",
+      },
+      {
+        label: "Motivations & Fears",
+        path: ["internalThoughts", "motivationsFears"],
+        kind: "textarea",
+      },
+      {
+        label: "Internal Monologues",
+        path: ["internalThoughts", "internalMonologues"],
+        kind: "textarea",
+      },
+    ],
+  },
+];
+const CHARACTER_CREATION_ADULT_ANATOMY_FIELDS: CharacterCreationFormTextField[] =
+  [
+    {
+      label: "Penis Descriptors",
+      path: ["adultAnatomy", "penisDescriptors"],
+      kind: "textarea",
+    },
+    {
+      label: "Testicle / Scrotum Descriptors",
+      path: ["adultAnatomy", "testicleScrotumDescriptors"],
+      kind: "textarea",
+    },
+    {
+      label: "Nipple Descriptors",
+      path: ["adultAnatomy", "nippleDescriptors"],
+      kind: "textarea",
+    },
+    {
+      label: "Breast Descriptors",
+      path: ["adultAnatomy", "breastDescriptors"],
+      kind: "textarea",
+    },
+    {
+      label: "Vagina Descriptors",
+      path: ["adultAnatomy", "vaginaDescriptors"],
+      kind: "textarea",
+    },
+    {
+      label: "Anus Descriptors",
+      path: ["adultAnatomy", "anusDescriptors"],
+      kind: "textarea",
+    },
+  ];
 const DEFAULT_NAME_GENERATION: NameGenerationExtension = {
   firstname: "",
   surname: "",
@@ -1255,6 +1618,7 @@ export default function StructuredCardEditor({
     kinkGeneration.nsfwEnabled ||
     fetishGeneration.fetishEnabled ||
     creatorsNotesGeneration.contentRating === "X_Rated_Explicit";
+  const characterCreationForm = readCharacterCreationFormExtension(activeCard);
 
   function updateField<Key extends keyof ValidatedCharacterCardV3["data"]>(
     key: Key,
@@ -1272,6 +1636,74 @@ export default function StructuredCardEditor({
           [key]: value,
         },
       };
+    });
+  }
+
+  function updateCharacterCreationForm(nextForm: CharacterCreationForm) {
+    setActiveCard((currentCard) => {
+      if (!currentCard) {
+        return null;
+      }
+
+      const patch = compileCharacterCreationFormToCardDataPatch(
+        nextForm,
+        currentCard.data,
+      );
+
+      return {
+        ...currentCard,
+        data: {
+          ...currentCard.data,
+          name: patch.name ?? currentCard.data.name,
+          description: patch.description ?? currentCard.data.description,
+          personality: patch.personality ?? currentCard.data.personality,
+          extensions: patch.extensions ?? currentCard.data.extensions,
+        },
+      };
+    });
+  }
+
+  function updateCharacterCreationText(
+    path: CharacterCreationFormPath,
+    value: string,
+  ) {
+    updateCharacterCreationForm(
+      updateNestedValue(characterCreationForm, path, value),
+    );
+  }
+
+  function updateCharacterCreationBoolean(
+    path: CharacterCreationFormPath,
+    value: boolean,
+  ) {
+    updateCharacterCreationForm(
+      updateNestedValue(characterCreationForm, path, value),
+    );
+  }
+
+  function addCharacterCreationTargetOverride() {
+    updateCharacterCreationForm({
+      ...characterCreationForm,
+      relationships: {
+        ...characterCreationForm.relationships,
+        targetOverrides: [
+          ...characterCreationForm.relationships.targetOverrides,
+          { targetId: "", contextualPromptInjection: "" },
+        ],
+      },
+    });
+  }
+
+  function removeCharacterCreationTargetOverride(index: number) {
+    updateCharacterCreationForm({
+      ...characterCreationForm,
+      relationships: {
+        ...characterCreationForm.relationships,
+        targetOverrides:
+          characterCreationForm.relationships.targetOverrides.filter(
+            (_override, overrideIndex) => overrideIndex !== index,
+          ),
+      },
     });
   }
 
@@ -2856,6 +3288,14 @@ export default function StructuredCardEditor({
                 />
               </div>
             </div>
+
+            <CharacterCreationFormPanel
+              form={characterCreationForm}
+              onAddTargetOverride={addCharacterCreationTargetOverride}
+              onBooleanChange={updateCharacterCreationBoolean}
+              onRemoveTargetOverride={removeCharacterCreationTargetOverride}
+              onTextChange={updateCharacterCreationText}
+            />
 
             <div className="space-y-4 rounded-lg border border-zinc-800 bg-zinc-950/40 p-4">
               <div>
@@ -5555,6 +5995,209 @@ function Field({
   );
 }
 
+function CharacterCreationFormPanel({
+  form,
+  onAddTargetOverride,
+  onBooleanChange,
+  onRemoveTargetOverride,
+  onTextChange,
+}: {
+  form: CharacterCreationForm;
+  onAddTargetOverride: () => void;
+  onBooleanChange: (path: CharacterCreationFormPath, value: boolean) => void;
+  onRemoveTargetOverride: (index: number) => void;
+  onTextChange: (path: CharacterCreationFormPath, value: string) => void;
+}) {
+  return (
+    <div className="space-y-3 rounded-lg border border-violet-500/20 bg-violet-500/5 p-4">
+      <div>
+        <h3 className="text-xs font-bold uppercase tracking-wider text-violet-200">
+          One-Form Character Creator
+        </h3>
+      </div>
+
+      {CHARACTER_CREATION_FORM_FIELD_GROUPS.map((group, index) => (
+        <CharacterCreationDetailsSection
+          key={group.label}
+          fields={group.fields}
+          form={form}
+          label={group.label}
+          open={index === 0}
+          onTextChange={onTextChange}
+        />
+      ))}
+
+      <details className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3">
+        <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+          Adult Anatomy
+        </summary>
+        <div className="mt-4 space-y-4">
+          <label className="inline-flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs font-semibold text-zinc-300">
+            <input
+              type="checkbox"
+              checked={form.adultAnatomy.isNsfwAdultCard}
+              onChange={(event) =>
+                onBooleanChange(
+                  ["adultAnatomy", "isNsfwAdultCard"],
+                  event.currentTarget.checked,
+                )
+              }
+              className="size-3.5 accent-violet-500"
+            />
+            NSFW adult anatomy enabled
+          </label>
+
+          <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+            {CHARACTER_CREATION_ADULT_ANATOMY_FIELDS.map((field) => (
+              <CharacterCreationTextControl
+                key={field.path.join(".")}
+                field={field}
+                form={form}
+                onTextChange={onTextChange}
+              />
+            ))}
+          </div>
+        </div>
+      </details>
+
+      <details className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3">
+        <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+          Relationship Target Overrides
+        </summary>
+        <div className="mt-4 space-y-3">
+          {form.relationships.targetOverrides.length === 0 ? (
+            <p className="rounded-lg border border-dashed border-zinc-800 bg-zinc-950 p-3 text-xs text-zinc-500">
+              No target-specific overrides yet.
+            </p>
+          ) : null}
+
+          {form.relationships.targetOverrides.map((override, index) => (
+            <div
+              key={`${override.targetId}-${index}`}
+              className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-950 p-3"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                  Override {index + 1}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onRemoveTargetOverride(index)}
+                  className="inline-flex items-center gap-1 rounded-md border border-rose-500/30 bg-rose-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-rose-200 transition hover:bg-rose-500/20"
+                  title="Remove target override"
+                >
+                  <Trash2 className="size-3.5" />
+                  Remove
+                </button>
+              </div>
+
+              <CharacterCreationTextControl
+                field={{
+                  label: "Target ID",
+                  path: ["relationships", "targetOverrides", index, "targetId"],
+                }}
+                form={form}
+                onTextChange={onTextChange}
+              />
+              <CharacterCreationTextControl
+                field={{
+                  label: "Contextual Prompt Injection",
+                  path: [
+                    "relationships",
+                    "targetOverrides",
+                    index,
+                    "contextualPromptInjection",
+                  ],
+                  kind: "textarea",
+                }}
+                form={form}
+                onTextChange={onTextChange}
+              />
+            </div>
+          ))}
+
+          <button
+            type="button"
+            onClick={onAddTargetOverride}
+            className="inline-flex items-center gap-2 rounded-lg border border-violet-500/40 bg-violet-500/10 px-3 py-2 text-xs font-bold text-violet-200 transition hover:bg-violet-500/20"
+          >
+            <Plus className="size-4" />
+            Add Target Override
+          </button>
+        </div>
+      </details>
+    </div>
+  );
+}
+
+function CharacterCreationDetailsSection({
+  fields,
+  form,
+  label,
+  onTextChange,
+  open,
+}: {
+  fields: CharacterCreationFormTextField[];
+  form: CharacterCreationForm;
+  label: string;
+  onTextChange: (path: CharacterCreationFormPath, value: string) => void;
+  open: boolean;
+}) {
+  return (
+    <details
+      className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3"
+      open={open}
+    >
+      <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+        {label}
+      </summary>
+      <div className="mt-4 grid grid-cols-1 gap-3 xl:grid-cols-2">
+        {fields.map((field) => (
+          <CharacterCreationTextControl
+            key={field.path.join(".")}
+            field={field}
+            form={form}
+            onTextChange={onTextChange}
+          />
+        ))}
+      </div>
+    </details>
+  );
+}
+
+function CharacterCreationTextControl({
+  field,
+  form,
+  onTextChange,
+}: {
+  field: CharacterCreationFormTextField;
+  form: CharacterCreationForm;
+  onTextChange: (path: CharacterCreationFormPath, value: string) => void;
+}) {
+  const value = readNestedStringValue(form, field.path);
+  const className =
+    "rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500";
+
+  return (
+    <Field label={field.label}>
+      {field.kind === "textarea" ? (
+        <textarea
+          value={value}
+          onChange={(event) => onTextChange(field.path, event.currentTarget.value)}
+          className={`${className} min-h-20 resize-y`}
+        />
+      ) : (
+        <input
+          type="text"
+          value={value}
+          onChange={(event) => onTextChange(field.path, event.currentTarget.value)}
+          className={className}
+        />
+      )}
+    </Field>
+  );
+}
+
 function MacroButtonGroup<Value extends string>({
   activeValue,
   label,
@@ -5894,6 +6537,18 @@ function readMacroExtension(
     tones: readStringArray(rawMacro.tones),
     micro_tropes: readStringArray(rawMacro.micro_tropes),
   };
+}
+
+function readCharacterCreationFormExtension(
+  card: ValidatedCharacterCardV3,
+): CharacterCreationForm {
+  try {
+    return parseCharacterCreationForm(
+      card.data.extensions[HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY],
+    );
+  } catch {
+    return createEmptyCharacterCreationForm();
+  }
 }
 
 function readNameGenerationExtension(
@@ -7471,6 +8126,63 @@ function readStringArray(value: unknown) {
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === "string")
     : [];
+}
+
+function readNestedStringValue(
+  source: CharacterCreationForm,
+  path: CharacterCreationFormPath,
+): string {
+  const value = path.reduce<unknown>((currentValue, pathPart) => {
+    if (currentValue === undefined || currentValue === null) {
+      return undefined;
+    }
+
+    return (currentValue as Record<string | number, unknown>)[pathPart];
+  }, source);
+
+  return typeof value === "string" ? value : "";
+}
+
+function updateNestedValue<Value extends string | boolean>(
+  source: CharacterCreationForm,
+  path: CharacterCreationFormPath,
+  value: Value,
+): CharacterCreationForm {
+  return parseCharacterCreationForm(
+    updateNestedValueAtPath(source, [...path], value),
+  );
+}
+
+function updateNestedValueAtPath<Value extends string | boolean>(
+  source: unknown,
+  path: Array<string | number>,
+  value: Value,
+): unknown {
+  if (path.length === 0) {
+    return value;
+  }
+
+  const [pathPart, ...remainingPath] = path;
+  const currentValue =
+    isRecord(source) || Array.isArray(source)
+      ? (source as Record<string | number, unknown>)[pathPart]
+      : undefined;
+  const nextValue = updateNestedValueAtPath(
+    currentValue,
+    remainingPath,
+    value,
+  );
+
+  if (Array.isArray(source)) {
+    return source.map((item, index) =>
+      index === pathPart ? nextValue : item,
+    );
+  }
+
+  return {
+    ...(isRecord(source) ? source : {}),
+    [pathPart]: nextValue,
+  };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
