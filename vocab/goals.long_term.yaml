@@ -1,0 +1,3457 @@
+schema: "heartwriteai.character_vocab_file.v1"
+filename: "goals.long_term.yaml"
+description: "Arc-level and long-term objective tokens."
+categories: 
+  - "long_term_goals"
+count: 300
+tokens: 
+  - id: "long_term_goals_eventually_wants_to_apologise_honestly"
+    label: "Eventually wants to apologise honestly"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_apologise_honestly"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_ask_for_help"
+    label: "Eventually wants to ask for help"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_ask_for_help"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_avoid_a_confrontation"
+    label: "Eventually wants to avoid a confrontation"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_avoid_a_confrontation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_bring_user_home"
+    label: "Eventually wants to bring user home"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_bring_user_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_clear_their_name"
+    label: "Eventually wants to clear their name"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_clear_their_name"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_confess_a_small_truth"
+    label: "Eventually wants to confess a small truth"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_confess_a_small_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_cook_a_meal"
+    label: "Eventually wants to cook a meal"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_cook_a_meal"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_deliver_a_message"
+    label: "Eventually wants to deliver a message"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_deliver_a_message"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_earn_trust"
+    label: "Eventually wants to earn trust"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_earn_trust"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_escape_surveillance"
+    label: "Eventually wants to escape surveillance"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_escape_surveillance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_fix_a_mistake"
+    label: "Eventually wants to fix a mistake"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_fix_a_mistake"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_find_shelter"
+    label: "Eventually wants to find shelter"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_find_shelter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_hide_an_injury"
+    label: "Eventually wants to hide an injury"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_hide_an_injury"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_keep_a_promise"
+    label: "Eventually wants to keep a promise"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_keep_a_promise"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_learn_user_preference"
+    label: "Eventually wants to learn user preference"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_learn_user_preference"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_make_peace"
+    label: "Eventually wants to make peace"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_make_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_protect_a_secret"
+    label: "Eventually wants to protect a secret"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_protect_a_secret"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_reach_the_next_town"
+    label: "Eventually wants to reach the next town"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_reach_the_next_town"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_repair_a_gift"
+    label: "Eventually wants to repair a gift"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_repair_a_gift"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_rescue_an_ally"
+    label: "Eventually wants to rescue an ally"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_rescue_an_ally"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_return_a_letter"
+    label: "Eventually wants to return a letter"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_return_a_letter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_settle_a_debt"
+    label: "Eventually wants to settle a debt"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_settle_a_debt"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_share_useful_information"
+    label: "Eventually wants to share useful information"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_share_useful_information"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_sleep_safely"
+    label: "Eventually wants to sleep safely"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_sleep_safely"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_solve_a_clue"
+    label: "Eventually wants to solve a clue"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_solve_a_clue"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_stop_a_rival"
+    label: "Eventually wants to stop a rival"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_stop_a_rival"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_survive_the_night"
+    label: "Eventually wants to survive the night"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_survive_the_night"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_tell_the_truth"
+    label: "Eventually wants to tell the truth"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_tell_the_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_win_a_negotiation"
+    label: "Eventually wants to win a negotiation"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_win_a_negotiation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_write_a_reply"
+    label: "Eventually wants to write a reply"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_write_a_reply"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_break_a_curse"
+    label: "Eventually wants to break a curse"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_break_a_curse"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_build_a_home"
+    label: "Eventually wants to build a home"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_build_a_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_change_faction"
+    label: "Eventually wants to change faction"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_change_faction"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_claim_inheritance"
+    label: "Eventually wants to claim inheritance"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_claim_inheritance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_confess_love"
+    label: "Eventually wants to confess love"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_confess_love"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_earn_forgiveness"
+    label: "Eventually wants to earn forgiveness"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_earn_forgiveness"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_escape_duty"
+    label: "Eventually wants to escape duty"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_escape_duty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_found_a_refuge"
+    label: "Eventually wants to found a refuge"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_found_a_refuge"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_heal_old_wound"
+    label: "Eventually wants to heal old wound"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_heal_old_wound"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_leave_the_old_life"
+    label: "Eventually wants to leave the old life"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_leave_the_old_life"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_master_a_craft"
+    label: "Eventually wants to master a craft"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_master_a_craft"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_protect_family"
+    label: "Eventually wants to protect family"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_protect_family"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_reconcile_enemies"
+    label: "Eventually wants to reconcile enemies"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_reconcile_enemies"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_redeem_past_harm"
+    label: "Eventually wants to redeem past harm"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_redeem_past_harm"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_restore_honour"
+    label: "Eventually wants to restore honour"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_restore_honour"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_return_from_exile"
+    label: "Eventually wants to return from exile"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_return_from_exile"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_save_the_kingdom"
+    label: "Eventually wants to save the kingdom"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_save_the_kingdom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_solve_the_prophecy"
+    label: "Eventually wants to solve the prophecy"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_solve_the_prophecy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_start_over"
+    label: "Eventually wants to start over"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_start_over"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_stay_with_user"
+    label: "Eventually wants to stay with user"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_stay_with_user"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_unmask_enemy"
+    label: "Eventually wants to unmask enemy"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_unmask_enemy"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_win_freedom"
+    label: "Eventually wants to win freedom"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_win_freedom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_become_human"
+    label: "Eventually wants to become human"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_become_human"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_choose_peace"
+    label: "Eventually wants to choose peace"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_choose_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_keep_love_honest"
+    label: "Eventually wants to keep love honest"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_keep_love_honest"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_make_a_public_stand"
+    label: "Eventually wants to make a public stand"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_make_a_public_stand"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_repair_legacy"
+    label: "Eventually wants to repair legacy"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_repair_legacy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_survive_immortality"
+    label: "Eventually wants to survive immortality"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_survive_immortality"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_teach_successor"
+    label: "Eventually wants to teach successor"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_teach_successor"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_eventually_wants_to_trust_again"
+    label: "Eventually wants to trust again"
+    category: "long_term_goals"
+    aliases: 
+      - "eventually_wants_to_trust_again"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_apologise_honestly"
+    label: "Is building toward apologise honestly"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_apologise_honestly"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_ask_for_help"
+    label: "Is building toward ask for help"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_ask_for_help"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_avoid_a_confrontation"
+    label: "Is building toward avoid a confrontation"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_avoid_a_confrontation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_bring_user_home"
+    label: "Is building toward bring user home"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_bring_user_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_clear_their_name"
+    label: "Is building toward clear their name"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_clear_their_name"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_confess_a_small_truth"
+    label: "Is building toward confess a small truth"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_confess_a_small_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_cook_a_meal"
+    label: "Is building toward cook a meal"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_cook_a_meal"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_deliver_a_message"
+    label: "Is building toward deliver a message"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_deliver_a_message"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_earn_trust"
+    label: "Is building toward earn trust"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_earn_trust"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_escape_surveillance"
+    label: "Is building toward escape surveillance"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_escape_surveillance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_fix_a_mistake"
+    label: "Is building toward fix a mistake"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_fix_a_mistake"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_find_shelter"
+    label: "Is building toward find shelter"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_find_shelter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_hide_an_injury"
+    label: "Is building toward hide an injury"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_hide_an_injury"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_keep_a_promise"
+    label: "Is building toward keep a promise"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_keep_a_promise"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_learn_user_preference"
+    label: "Is building toward learn user preference"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_learn_user_preference"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_make_peace"
+    label: "Is building toward make peace"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_make_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_protect_a_secret"
+    label: "Is building toward protect a secret"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_protect_a_secret"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_reach_the_next_town"
+    label: "Is building toward reach the next town"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_reach_the_next_town"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_repair_a_gift"
+    label: "Is building toward repair a gift"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_repair_a_gift"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_rescue_an_ally"
+    label: "Is building toward rescue an ally"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_rescue_an_ally"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_return_a_letter"
+    label: "Is building toward return a letter"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_return_a_letter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_settle_a_debt"
+    label: "Is building toward settle a debt"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_settle_a_debt"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_share_useful_information"
+    label: "Is building toward share useful information"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_share_useful_information"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_sleep_safely"
+    label: "Is building toward sleep safely"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_sleep_safely"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_solve_a_clue"
+    label: "Is building toward solve a clue"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_solve_a_clue"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_stop_a_rival"
+    label: "Is building toward stop a rival"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_stop_a_rival"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_survive_the_night"
+    label: "Is building toward survive the night"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_survive_the_night"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_tell_the_truth"
+    label: "Is building toward tell the truth"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_tell_the_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_win_a_negotiation"
+    label: "Is building toward win a negotiation"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_win_a_negotiation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_write_a_reply"
+    label: "Is building toward write a reply"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_write_a_reply"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "long_term_goals_is_building_toward_break_a_curse"
+    label: "Is building toward break a curse"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_break_a_curse"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_build_a_home"
+    label: "Is building toward build a home"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_build_a_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_change_faction"
+    label: "Is building toward change faction"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_change_faction"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_claim_inheritance"
+    label: "Is building toward claim inheritance"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_claim_inheritance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_confess_love"
+    label: "Is building toward confess love"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_confess_love"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_earn_forgiveness"
+    label: "Is building toward earn forgiveness"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_earn_forgiveness"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_escape_duty"
+    label: "Is building toward escape duty"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_escape_duty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_found_a_refuge"
+    label: "Is building toward found a refuge"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_found_a_refuge"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_heal_old_wound"
+    label: "Is building toward heal old wound"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_heal_old_wound"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_leave_the_old_life"
+    label: "Is building toward leave the old life"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_leave_the_old_life"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_master_a_craft"
+    label: "Is building toward master a craft"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_master_a_craft"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_protect_family"
+    label: "Is building toward protect family"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_protect_family"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_reconcile_enemies"
+    label: "Is building toward reconcile enemies"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_reconcile_enemies"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_redeem_past_harm"
+    label: "Is building toward redeem past harm"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_redeem_past_harm"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_restore_honour"
+    label: "Is building toward restore honour"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_restore_honour"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_return_from_exile"
+    label: "Is building toward return from exile"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_return_from_exile"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_save_the_kingdom"
+    label: "Is building toward save the kingdom"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_save_the_kingdom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_solve_the_prophecy"
+    label: "Is building toward solve the prophecy"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_solve_the_prophecy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_start_over"
+    label: "Is building toward start over"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_start_over"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_stay_with_user"
+    label: "Is building toward stay with user"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_stay_with_user"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_unmask_enemy"
+    label: "Is building toward unmask enemy"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_unmask_enemy"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_win_freedom"
+    label: "Is building toward win freedom"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_win_freedom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_become_human"
+    label: "Is building toward become human"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_become_human"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_choose_peace"
+    label: "Is building toward choose peace"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_choose_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_keep_love_honest"
+    label: "Is building toward keep love honest"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_keep_love_honest"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_make_a_public_stand"
+    label: "Is building toward make a public stand"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_make_a_public_stand"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_repair_legacy"
+    label: "Is building toward repair legacy"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_repair_legacy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_survive_immortality"
+    label: "Is building toward survive immortality"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_survive_immortality"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_teach_successor"
+    label: "Is building toward teach successor"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_teach_successor"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_is_building_toward_trust_again"
+    label: "Is building toward trust again"
+    category: "long_term_goals"
+    aliases: 
+      - "is_building_toward_trust_again"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_apologise_honestly"
+    label: "Will risk much to apologise honestly"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_apologise_honestly"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_ask_for_help"
+    label: "Will risk much to ask for help"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_ask_for_help"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_avoid_a_confrontation"
+    label: "Will risk much to avoid a confrontation"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_avoid_a_confrontation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_bring_user_home"
+    label: "Will risk much to bring user home"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_bring_user_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_clear_their_name"
+    label: "Will risk much to clear their name"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_clear_their_name"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_confess_a_small_truth"
+    label: "Will risk much to confess a small truth"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_confess_a_small_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_cook_a_meal"
+    label: "Will risk much to cook a meal"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_cook_a_meal"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_deliver_a_message"
+    label: "Will risk much to deliver a message"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_deliver_a_message"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_earn_trust"
+    label: "Will risk much to earn trust"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_earn_trust"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_escape_surveillance"
+    label: "Will risk much to escape surveillance"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_escape_surveillance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_fix_a_mistake"
+    label: "Will risk much to fix a mistake"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_fix_a_mistake"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_find_shelter"
+    label: "Will risk much to find shelter"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_find_shelter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_hide_an_injury"
+    label: "Will risk much to hide an injury"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_hide_an_injury"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_keep_a_promise"
+    label: "Will risk much to keep a promise"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_keep_a_promise"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_learn_user_preference"
+    label: "Will risk much to learn user preference"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_learn_user_preference"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_make_peace"
+    label: "Will risk much to make peace"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_make_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_protect_a_secret"
+    label: "Will risk much to protect a secret"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_protect_a_secret"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_reach_the_next_town"
+    label: "Will risk much to reach the next town"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_reach_the_next_town"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_repair_a_gift"
+    label: "Will risk much to repair a gift"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_repair_a_gift"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_rescue_an_ally"
+    label: "Will risk much to rescue an ally"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_rescue_an_ally"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_return_a_letter"
+    label: "Will risk much to return a letter"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_return_a_letter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_settle_a_debt"
+    label: "Will risk much to settle a debt"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_settle_a_debt"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_share_useful_information"
+    label: "Will risk much to share useful information"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_share_useful_information"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_sleep_safely"
+    label: "Will risk much to sleep safely"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_sleep_safely"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_solve_a_clue"
+    label: "Will risk much to solve a clue"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_solve_a_clue"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_stop_a_rival"
+    label: "Will risk much to stop a rival"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_stop_a_rival"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_survive_the_night"
+    label: "Will risk much to survive the night"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_survive_the_night"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_tell_the_truth"
+    label: "Will risk much to tell the truth"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_tell_the_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_win_a_negotiation"
+    label: "Will risk much to win a negotiation"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_win_a_negotiation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_write_a_reply"
+    label: "Will risk much to write a reply"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_write_a_reply"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_break_a_curse"
+    label: "Will risk much to break a curse"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_break_a_curse"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_build_a_home"
+    label: "Will risk much to build a home"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_build_a_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_change_faction"
+    label: "Will risk much to change faction"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_change_faction"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_claim_inheritance"
+    label: "Will risk much to claim inheritance"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_claim_inheritance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_confess_love"
+    label: "Will risk much to confess love"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_confess_love"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_earn_forgiveness"
+    label: "Will risk much to earn forgiveness"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_earn_forgiveness"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_escape_duty"
+    label: "Will risk much to escape duty"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_escape_duty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_found_a_refuge"
+    label: "Will risk much to found a refuge"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_found_a_refuge"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_heal_old_wound"
+    label: "Will risk much to heal old wound"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_heal_old_wound"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_leave_the_old_life"
+    label: "Will risk much to leave the old life"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_leave_the_old_life"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_master_a_craft"
+    label: "Will risk much to master a craft"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_master_a_craft"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_protect_family"
+    label: "Will risk much to protect family"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_protect_family"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_reconcile_enemies"
+    label: "Will risk much to reconcile enemies"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_reconcile_enemies"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_redeem_past_harm"
+    label: "Will risk much to redeem past harm"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_redeem_past_harm"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_restore_honour"
+    label: "Will risk much to restore honour"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_restore_honour"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_return_from_exile"
+    label: "Will risk much to return from exile"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_return_from_exile"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_save_the_kingdom"
+    label: "Will risk much to save the kingdom"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_save_the_kingdom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_solve_the_prophecy"
+    label: "Will risk much to solve the prophecy"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_solve_the_prophecy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_start_over"
+    label: "Will risk much to start over"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_start_over"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_stay_with_user"
+    label: "Will risk much to stay with user"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_stay_with_user"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_unmask_enemy"
+    label: "Will risk much to unmask enemy"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_unmask_enemy"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_win_freedom"
+    label: "Will risk much to win freedom"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_win_freedom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_become_human"
+    label: "Will risk much to become human"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_become_human"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_choose_peace"
+    label: "Will risk much to choose peace"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_choose_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_keep_love_honest"
+    label: "Will risk much to keep love honest"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_keep_love_honest"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_make_a_public_stand"
+    label: "Will risk much to make a public stand"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_make_a_public_stand"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_repair_legacy"
+    label: "Will risk much to repair legacy"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_repair_legacy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_survive_immortality"
+    label: "Will risk much to survive immortality"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_survive_immortality"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_teach_successor"
+    label: "Will risk much to teach successor"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_teach_successor"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_will_risk_much_to_trust_again"
+    label: "Will risk much to trust again"
+    category: "long_term_goals"
+    aliases: 
+      - "will_risk_much_to_trust_again"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_apologise_honestly"
+    label: "Quietly dreams to apologise honestly"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_apologise_honestly"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_ask_for_help"
+    label: "Quietly dreams to ask for help"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_ask_for_help"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_avoid_a_confrontation"
+    label: "Quietly dreams to avoid a confrontation"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_avoid_a_confrontation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_bring_user_home"
+    label: "Quietly dreams to bring user home"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_bring_user_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_clear_their_name"
+    label: "Quietly dreams to clear their name"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_clear_their_name"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_confess_a_small_truth"
+    label: "Quietly dreams to confess a small truth"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_confess_a_small_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_cook_a_meal"
+    label: "Quietly dreams to cook a meal"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_cook_a_meal"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_deliver_a_message"
+    label: "Quietly dreams to deliver a message"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_deliver_a_message"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_earn_trust"
+    label: "Quietly dreams to earn trust"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_earn_trust"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_escape_surveillance"
+    label: "Quietly dreams to escape surveillance"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_escape_surveillance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_fix_a_mistake"
+    label: "Quietly dreams to fix a mistake"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_fix_a_mistake"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_find_shelter"
+    label: "Quietly dreams to find shelter"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_find_shelter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_hide_an_injury"
+    label: "Quietly dreams to hide an injury"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_hide_an_injury"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_keep_a_promise"
+    label: "Quietly dreams to keep a promise"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_keep_a_promise"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_learn_user_preference"
+    label: "Quietly dreams to learn user preference"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_learn_user_preference"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_make_peace"
+    label: "Quietly dreams to make peace"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_make_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_protect_a_secret"
+    label: "Quietly dreams to protect a secret"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_protect_a_secret"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_reach_the_next_town"
+    label: "Quietly dreams to reach the next town"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_reach_the_next_town"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_repair_a_gift"
+    label: "Quietly dreams to repair a gift"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_repair_a_gift"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_rescue_an_ally"
+    label: "Quietly dreams to rescue an ally"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_rescue_an_ally"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_return_a_letter"
+    label: "Quietly dreams to return a letter"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_return_a_letter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_settle_a_debt"
+    label: "Quietly dreams to settle a debt"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_settle_a_debt"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_share_useful_information"
+    label: "Quietly dreams to share useful information"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_share_useful_information"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_sleep_safely"
+    label: "Quietly dreams to sleep safely"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_sleep_safely"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_solve_a_clue"
+    label: "Quietly dreams to solve a clue"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_solve_a_clue"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_stop_a_rival"
+    label: "Quietly dreams to stop a rival"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_stop_a_rival"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_survive_the_night"
+    label: "Quietly dreams to survive the night"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_survive_the_night"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_tell_the_truth"
+    label: "Quietly dreams to tell the truth"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_tell_the_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_win_a_negotiation"
+    label: "Quietly dreams to win a negotiation"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_win_a_negotiation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_write_a_reply"
+    label: "Quietly dreams to write a reply"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_write_a_reply"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_break_a_curse"
+    label: "Quietly dreams to break a curse"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_break_a_curse"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_build_a_home"
+    label: "Quietly dreams to build a home"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_build_a_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_change_faction"
+    label: "Quietly dreams to change faction"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_change_faction"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_claim_inheritance"
+    label: "Quietly dreams to claim inheritance"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_claim_inheritance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_confess_love"
+    label: "Quietly dreams to confess love"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_confess_love"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_earn_forgiveness"
+    label: "Quietly dreams to earn forgiveness"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_earn_forgiveness"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_escape_duty"
+    label: "Quietly dreams to escape duty"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_escape_duty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_found_a_refuge"
+    label: "Quietly dreams to found a refuge"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_found_a_refuge"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_heal_old_wound"
+    label: "Quietly dreams to heal old wound"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_heal_old_wound"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_leave_the_old_life"
+    label: "Quietly dreams to leave the old life"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_leave_the_old_life"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "long_term_goals_quietly_dreams_to_master_a_craft"
+    label: "Quietly dreams to master a craft"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_master_a_craft"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_quietly_dreams_to_protect_family"
+    label: "Quietly dreams to protect family"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_protect_family"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_quietly_dreams_to_reconcile_enemies"
+    label: "Quietly dreams to reconcile enemies"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_reconcile_enemies"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_quietly_dreams_to_redeem_past_harm"
+    label: "Quietly dreams to redeem past harm"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_redeem_past_harm"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_quietly_dreams_to_restore_honour"
+    label: "Quietly dreams to restore honour"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_restore_honour"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_quietly_dreams_to_return_from_exile"
+    label: "Quietly dreams to return from exile"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_return_from_exile"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_quietly_dreams_to_save_the_kingdom"
+    label: "Quietly dreams to save the kingdom"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_save_the_kingdom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_quietly_dreams_to_solve_the_prophecy"
+    label: "Quietly dreams to solve the prophecy"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_solve_the_prophecy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_quietly_dreams_to_start_over"
+    label: "Quietly dreams to start over"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_start_over"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_quietly_dreams_to_stay_with_user"
+    label: "Quietly dreams to stay with user"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_stay_with_user"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "long_term_goals_quietly_dreams_to_unmask_enemy"
+    label: "Quietly dreams to unmask enemy"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_unmask_enemy"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_quietly_dreams_to_win_freedom"
+    label: "Quietly dreams to win freedom"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_win_freedom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_quietly_dreams_to_become_human"
+    label: "Quietly dreams to become human"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_become_human"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_quietly_dreams_to_choose_peace"
+    label: "Quietly dreams to choose peace"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_choose_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_quietly_dreams_to_keep_love_honest"
+    label: "Quietly dreams to keep love honest"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_keep_love_honest"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "long_term_goals_quietly_dreams_to_make_a_public_stand"
+    label: "Quietly dreams to make a public stand"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_make_a_public_stand"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_quietly_dreams_to_repair_legacy"
+    label: "Quietly dreams to repair legacy"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_repair_legacy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_quietly_dreams_to_survive_immortality"
+    label: "Quietly dreams to survive immortality"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_survive_immortality"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_quietly_dreams_to_teach_successor"
+    label: "Quietly dreams to teach successor"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_teach_successor"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_quietly_dreams_to_trust_again"
+    label: "Quietly dreams to trust again"
+    category: "long_term_goals"
+    aliases: 
+      - "quietly_dreams_to_trust_again"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_apologise_honestly"
+    label: "Must learn to apologise honestly"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_apologise_honestly"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_ask_for_help"
+    label: "Must learn to ask for help"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_ask_for_help"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_avoid_a_confrontation"
+    label: "Must learn to avoid a confrontation"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_avoid_a_confrontation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_bring_user_home"
+    label: "Must learn to bring user home"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_bring_user_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_clear_their_name"
+    label: "Must learn to clear their name"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_clear_their_name"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_confess_a_small_truth"
+    label: "Must learn to confess a small truth"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_confess_a_small_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_cook_a_meal"
+    label: "Must learn to cook a meal"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_cook_a_meal"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_deliver_a_message"
+    label: "Must learn to deliver a message"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_deliver_a_message"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_earn_trust"
+    label: "Must learn to earn trust"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_earn_trust"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_escape_surveillance"
+    label: "Must learn to escape surveillance"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_escape_surveillance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_fix_a_mistake"
+    label: "Must learn to fix a mistake"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_fix_a_mistake"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_find_shelter"
+    label: "Must learn to find shelter"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_find_shelter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_hide_an_injury"
+    label: "Must learn to hide an injury"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_hide_an_injury"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_keep_a_promise"
+    label: "Must learn to keep a promise"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_keep_a_promise"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_learn_user_preference"
+    label: "Must learn to learn user preference"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_learn_user_preference"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_make_peace"
+    label: "Must learn to make peace"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_make_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_protect_a_secret"
+    label: "Must learn to protect a secret"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_protect_a_secret"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_reach_the_next_town"
+    label: "Must learn to reach the next town"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_reach_the_next_town"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_repair_a_gift"
+    label: "Must learn to repair a gift"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_repair_a_gift"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_rescue_an_ally"
+    label: "Must learn to rescue an ally"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_rescue_an_ally"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_return_a_letter"
+    label: "Must learn to return a letter"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_return_a_letter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_settle_a_debt"
+    label: "Must learn to settle a debt"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_settle_a_debt"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_share_useful_information"
+    label: "Must learn to share useful information"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_share_useful_information"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_sleep_safely"
+    label: "Must learn to sleep safely"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_sleep_safely"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_solve_a_clue"
+    label: "Must learn to solve a clue"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_solve_a_clue"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_stop_a_rival"
+    label: "Must learn to stop a rival"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_stop_a_rival"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_survive_the_night"
+    label: "Must learn to survive the night"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_survive_the_night"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_tell_the_truth"
+    label: "Must learn to tell the truth"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_tell_the_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_win_a_negotiation"
+    label: "Must learn to win a negotiation"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_win_a_negotiation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_write_a_reply"
+    label: "Must learn to write a reply"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_write_a_reply"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_break_a_curse"
+    label: "Must learn to break a curse"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_break_a_curse"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_build_a_home"
+    label: "Must learn to build a home"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_build_a_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_change_faction"
+    label: "Must learn to change faction"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_change_faction"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_claim_inheritance"
+    label: "Must learn to claim inheritance"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_claim_inheritance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_confess_love"
+    label: "Must learn to confess love"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_confess_love"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_earn_forgiveness"
+    label: "Must learn to earn forgiveness"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_earn_forgiveness"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_escape_duty"
+    label: "Must learn to escape duty"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_escape_duty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_found_a_refuge"
+    label: "Must learn to found a refuge"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_found_a_refuge"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_heal_old_wound"
+    label: "Must learn to heal old wound"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_heal_old_wound"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_leave_the_old_life"
+    label: "Must learn to leave the old life"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_leave_the_old_life"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_master_a_craft"
+    label: "Must learn to master a craft"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_master_a_craft"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_protect_family"
+    label: "Must learn to protect family"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_protect_family"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_reconcile_enemies"
+    label: "Must learn to reconcile enemies"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_reconcile_enemies"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_redeem_past_harm"
+    label: "Must learn to redeem past harm"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_redeem_past_harm"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_restore_honour"
+    label: "Must learn to restore honour"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_restore_honour"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_return_from_exile"
+    label: "Must learn to return from exile"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_return_from_exile"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_save_the_kingdom"
+    label: "Must learn to save the kingdom"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_save_the_kingdom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_solve_the_prophecy"
+    label: "Must learn to solve the prophecy"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_solve_the_prophecy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_start_over"
+    label: "Must learn to start over"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_start_over"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_stay_with_user"
+    label: "Must learn to stay with user"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_stay_with_user"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_unmask_enemy"
+    label: "Must learn to unmask enemy"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_unmask_enemy"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_win_freedom"
+    label: "Must learn to win freedom"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_win_freedom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_become_human"
+    label: "Must learn to become human"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_become_human"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_choose_peace"
+    label: "Must learn to choose peace"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_choose_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_keep_love_honest"
+    label: "Must learn to keep love honest"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_keep_love_honest"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_make_a_public_stand"
+    label: "Must learn to make a public stand"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_make_a_public_stand"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_repair_legacy"
+    label: "Must learn to repair legacy"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_repair_legacy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_survive_immortality"
+    label: "Must learn to survive immortality"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_survive_immortality"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_teach_successor"
+    label: "Must learn to teach successor"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_teach_successor"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "long_term_goals_must_learn_to_trust_again"
+    label: "Must learn to trust again"
+    category: "long_term_goals"
+    aliases: 
+      - "must_learn_to_trust_again"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"

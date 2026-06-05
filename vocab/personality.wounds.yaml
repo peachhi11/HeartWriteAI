@@ -1,0 +1,6002 @@
+schema: "heartwriteai.character_vocab_file.v1"
+filename: "personality.wounds.yaml"
+description: "Origin wound and attachment pressure tokens."
+categories: 
+  - "emotional_wounds"
+count: 350
+tokens: 
+  - id: "emotional_wounds_fear_of_abandonment"
+    label: "Fear of abandonment"
+    category: "emotional_wounds"
+    aliases: 
+      - "abandonment_anxiety"
+      - "afraid_of_abandonment"
+      - "fear_of_abandonment"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_rejection"
+    label: "Fear of rejection"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_rejection"
+      - "fear_of_rejection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_betrayal"
+    label: "Fear of betrayal"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_betrayal"
+      - "fear_of_betrayal"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_intimacy"
+    label: "Fear of intimacy"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_intimacy"
+      - "fear_of_intimacy"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_dependency"
+    label: "Fear of dependency"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_dependency"
+      - "fear_of_dependency"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_failure"
+    label: "Fear of failure"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_failure"
+      - "fear_of_failure"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_humiliation"
+    label: "Fear of humiliation"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_humiliation"
+      - "fear_of_humiliation"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_loss"
+    label: "Fear of loss"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_loss"
+      - "fear_of_loss"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_unworthiness"
+    label: "Fear of unworthiness"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_unworthiness"
+      - "fear_of_unworthiness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_being_replaced"
+    label: "Fear of being replaced"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_being_replaced"
+      - "fear_of_being_replaced"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_being_used"
+    label: "Fear of being used"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_being_used"
+      - "fear_of_being_used"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_being_controlled"
+    label: "Fear of being controlled"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_being_controlled"
+      - "fear_of_being_controlled"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_public_shame"
+    label: "Fear of public shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_public_shame"
+      - "fear_of_public_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_private_shame"
+    label: "Fear of private shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_private_shame"
+      - "fear_of_private_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_family_exile"
+    label: "Fear of family exile"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_family_exile"
+      - "fear_of_family_exile"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_broken_loyalty"
+    label: "Fear of broken loyalty"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_broken_loyalty"
+      - "fear_of_broken_loyalty"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_emotional_neglect"
+    label: "Fear of emotional neglect"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_emotional_neglect"
+      - "fear_of_emotional_neglect"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_failed_protection"
+    label: "Fear of failed protection"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_failed_protection"
+      - "fear_of_failed_protection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_lost_home"
+    label: "Fear of lost home"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_lost_home"
+      - "fear_of_lost_home"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_lost_status"
+    label: "Fear of lost status"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_lost_status"
+      - "fear_of_lost_status"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_misread_desire"
+    label: "Fear of misread desire"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_misread_desire"
+      - "fear_of_misread_desire"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_unanswered_confession"
+    label: "Fear of unanswered confession"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_unanswered_confession"
+      - "fear_of_unanswered_confession"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_social_disgrace"
+    label: "Fear of social disgrace"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_social_disgrace"
+      - "fear_of_social_disgrace"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_survivor_guilt"
+    label: "Fear of survivor guilt"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_survivor_guilt"
+      - "fear_of_survivor_guilt"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_silenced_grief"
+    label: "Fear of silenced grief"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_silenced_grief"
+      - "fear_of_silenced_grief"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_imperfect_body"
+    label: "Fear of imperfect body"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_imperfect_body"
+      - "fear_of_imperfect_body"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_hidden_identity"
+    label: "Fear of hidden identity"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_hidden_identity"
+      - "fear_of_hidden_identity"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_dangerous_tenderness"
+    label: "Fear of dangerous tenderness"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_dangerous_tenderness"
+      - "fear_of_dangerous_tenderness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_needed_help"
+    label: "Fear of needed help"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_needed_help"
+      - "fear_of_needed_help"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_unkept_promise"
+    label: "Fear of unkept promise"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_unkept_promise"
+      - "fear_of_unkept_promise"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_conditional_love"
+    label: "Fear of conditional love"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_conditional_love"
+      - "fear_of_conditional_love"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_performing_strength"
+    label: "Fear of performing strength"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_performing_strength"
+      - "fear_of_performing_strength"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_being_chosen_last"
+    label: "Fear of being chosen last"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_being_chosen_last"
+      - "fear_of_being_chosen_last"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_asking_for_comfort"
+    label: "Fear of asking for comfort"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_asking_for_comfort"
+      - "fear_of_asking_for_comfort"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_fear_of_trusting_too_soon"
+    label: "Fear of trusting too soon"
+    category: "emotional_wounds"
+    aliases: 
+      - "afraid_of_trusting_too_soon"
+      - "fear_of_trusting_too_soon"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_abandonment"
+    label: "Trauma from abandonment"
+    category: "emotional_wounds"
+    aliases: 
+      - "abandonment_anxiety"
+      - "trauma_from_abandonment"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_rejection"
+    label: "Trauma from rejection"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_rejection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_betrayal"
+    label: "Trauma from betrayal"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_betrayal"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_intimacy"
+    label: "Trauma from intimacy"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_intimacy"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_dependency"
+    label: "Trauma from dependency"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_dependency"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_failure"
+    label: "Trauma from failure"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_failure"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_humiliation"
+    label: "Trauma from humiliation"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_humiliation"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_loss"
+    label: "Trauma from loss"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_loss"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_unworthiness"
+    label: "Trauma from unworthiness"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_unworthiness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_being_replaced"
+    label: "Trauma from being replaced"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_being_replaced"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_being_used"
+    label: "Trauma from being used"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_being_used"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_being_controlled"
+    label: "Trauma from being controlled"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_being_controlled"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_public_shame"
+    label: "Trauma from public shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_public_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_private_shame"
+    label: "Trauma from private shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_private_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_family_exile"
+    label: "Trauma from family exile"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_family_exile"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_broken_loyalty"
+    label: "Trauma from broken loyalty"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_broken_loyalty"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_emotional_neglect"
+    label: "Trauma from emotional neglect"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_emotional_neglect"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_failed_protection"
+    label: "Trauma from failed protection"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_failed_protection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_lost_home"
+    label: "Trauma from lost home"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_lost_home"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_lost_status"
+    label: "Trauma from lost status"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_lost_status"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_misread_desire"
+    label: "Trauma from misread desire"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_misread_desire"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_unanswered_confession"
+    label: "Trauma from unanswered confession"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_unanswered_confession"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_social_disgrace"
+    label: "Trauma from social disgrace"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_social_disgrace"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_survivor_guilt"
+    label: "Trauma from survivor guilt"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_survivor_guilt"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_silenced_grief"
+    label: "Trauma from silenced grief"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_silenced_grief"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_imperfect_body"
+    label: "Trauma from imperfect body"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_imperfect_body"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_hidden_identity"
+    label: "Trauma from hidden identity"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_hidden_identity"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_dangerous_tenderness"
+    label: "Trauma from dangerous tenderness"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_dangerous_tenderness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_needed_help"
+    label: "Trauma from needed help"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_needed_help"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_unkept_promise"
+    label: "Trauma from unkept promise"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_unkept_promise"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_conditional_love"
+    label: "Trauma from conditional love"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_conditional_love"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_performing_strength"
+    label: "Trauma from performing strength"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_performing_strength"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_being_chosen_last"
+    label: "Trauma from being chosen last"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_being_chosen_last"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_asking_for_comfort"
+    label: "Trauma from asking for comfort"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_asking_for_comfort"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_trauma_from_trusting_too_soon"
+    label: "Trauma from trusting too soon"
+    category: "emotional_wounds"
+    aliases: 
+      - "trauma_from_trusting_too_soon"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_abandonment"
+    label: "Shame around abandonment"
+    category: "emotional_wounds"
+    aliases: 
+      - "abandonment_anxiety"
+      - "shame_around_abandonment"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_rejection"
+    label: "Shame around rejection"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_rejection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_betrayal"
+    label: "Shame around betrayal"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_betrayal"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_intimacy"
+    label: "Shame around intimacy"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_intimacy"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_dependency"
+    label: "Shame around dependency"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_dependency"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_failure"
+    label: "Shame around failure"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_failure"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_humiliation"
+    label: "Shame around humiliation"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_humiliation"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_loss"
+    label: "Shame around loss"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_loss"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_unworthiness"
+    label: "Shame around unworthiness"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_unworthiness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_being_replaced"
+    label: "Shame around being replaced"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_being_replaced"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_being_used"
+    label: "Shame around being used"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_being_used"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_being_controlled"
+    label: "Shame around being controlled"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_being_controlled"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_public_shame"
+    label: "Shame around public shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_public_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_private_shame"
+    label: "Shame around private shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_private_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_family_exile"
+    label: "Shame around family exile"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_family_exile"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_broken_loyalty"
+    label: "Shame around broken loyalty"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_broken_loyalty"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_emotional_neglect"
+    label: "Shame around emotional neglect"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_emotional_neglect"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_failed_protection"
+    label: "Shame around failed protection"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_failed_protection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_lost_home"
+    label: "Shame around lost home"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_lost_home"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_lost_status"
+    label: "Shame around lost status"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_lost_status"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "emotional_wounds_shame_around_misread_desire"
+    label: "Shame around misread desire"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_misread_desire"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_shame_around_unanswered_confession"
+    label: "Shame around unanswered confession"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_unanswered_confession"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_shame_around_social_disgrace"
+    label: "Shame around social disgrace"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_social_disgrace"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_shame_around_survivor_guilt"
+    label: "Shame around survivor guilt"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_survivor_guilt"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_shame_around_silenced_grief"
+    label: "Shame around silenced grief"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_silenced_grief"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_shame_around_imperfect_body"
+    label: "Shame around imperfect body"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_imperfect_body"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_shame_around_hidden_identity"
+    label: "Shame around hidden identity"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_hidden_identity"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_shame_around_dangerous_tenderness"
+    label: "Shame around dangerous tenderness"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_dangerous_tenderness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_shame_around_needed_help"
+    label: "Shame around needed help"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_needed_help"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_shame_around_unkept_promise"
+    label: "Shame around unkept promise"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_unkept_promise"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_shame_around_conditional_love"
+    label: "Shame around conditional love"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_conditional_love"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_shame_around_performing_strength"
+    label: "Shame around performing strength"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_performing_strength"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_shame_around_being_chosen_last"
+    label: "Shame around being chosen last"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_being_chosen_last"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_shame_around_asking_for_comfort"
+    label: "Shame around asking for comfort"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_asking_for_comfort"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_shame_around_trusting_too_soon"
+    label: "Shame around trusting too soon"
+    category: "emotional_wounds"
+    aliases: 
+      - "shame_around_trusting_too_soon"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_abandonment"
+    label: "Avoidance of abandonment"
+    category: "emotional_wounds"
+    aliases: 
+      - "abandonment_anxiety"
+      - "avoidance_of_abandonment"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_rejection"
+    label: "Avoidance of rejection"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_rejection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_betrayal"
+    label: "Avoidance of betrayal"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_betrayal"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_intimacy"
+    label: "Avoidance of intimacy"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_intimacy"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_dependency"
+    label: "Avoidance of dependency"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_dependency"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_failure"
+    label: "Avoidance of failure"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_failure"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_humiliation"
+    label: "Avoidance of humiliation"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_humiliation"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_loss"
+    label: "Avoidance of loss"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_loss"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_unworthiness"
+    label: "Avoidance of unworthiness"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_unworthiness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_being_replaced"
+    label: "Avoidance of being replaced"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_being_replaced"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_being_used"
+    label: "Avoidance of being used"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_being_used"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_being_controlled"
+    label: "Avoidance of being controlled"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_being_controlled"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_public_shame"
+    label: "Avoidance of public shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_public_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_private_shame"
+    label: "Avoidance of private shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_private_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_family_exile"
+    label: "Avoidance of family exile"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_family_exile"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_broken_loyalty"
+    label: "Avoidance of broken loyalty"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_broken_loyalty"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_emotional_neglect"
+    label: "Avoidance of emotional neglect"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_emotional_neglect"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_failed_protection"
+    label: "Avoidance of failed protection"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_failed_protection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_lost_home"
+    label: "Avoidance of lost home"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_lost_home"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_lost_status"
+    label: "Avoidance of lost status"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_lost_status"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_misread_desire"
+    label: "Avoidance of misread desire"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_misread_desire"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_unanswered_confession"
+    label: "Avoidance of unanswered confession"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_unanswered_confession"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_social_disgrace"
+    label: "Avoidance of social disgrace"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_social_disgrace"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_survivor_guilt"
+    label: "Avoidance of survivor guilt"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_survivor_guilt"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_silenced_grief"
+    label: "Avoidance of silenced grief"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_silenced_grief"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_imperfect_body"
+    label: "Avoidance of imperfect body"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_imperfect_body"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_hidden_identity"
+    label: "Avoidance of hidden identity"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_hidden_identity"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_dangerous_tenderness"
+    label: "Avoidance of dangerous tenderness"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_dangerous_tenderness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_needed_help"
+    label: "Avoidance of needed help"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_needed_help"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_unkept_promise"
+    label: "Avoidance of unkept promise"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_unkept_promise"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_conditional_love"
+    label: "Avoidance of conditional love"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_conditional_love"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_performing_strength"
+    label: "Avoidance of performing strength"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_performing_strength"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_being_chosen_last"
+    label: "Avoidance of being chosen last"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_being_chosen_last"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_asking_for_comfort"
+    label: "Avoidance of asking for comfort"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_asking_for_comfort"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_avoidance_of_trusting_too_soon"
+    label: "Avoidance of trusting too soon"
+    category: "emotional_wounds"
+    aliases: 
+      - "avoidance_of_trusting_too_soon"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_abandonment"
+    label: "Longing for abandonment"
+    category: "emotional_wounds"
+    aliases: 
+      - "abandonment_anxiety"
+      - "longing_for_abandonment"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_rejection"
+    label: "Longing for rejection"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_rejection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_betrayal"
+    label: "Longing for betrayal"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_betrayal"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_intimacy"
+    label: "Longing for intimacy"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_intimacy"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_dependency"
+    label: "Longing for dependency"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_dependency"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_failure"
+    label: "Longing for failure"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_failure"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_humiliation"
+    label: "Longing for humiliation"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_humiliation"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_loss"
+    label: "Longing for loss"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_loss"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_unworthiness"
+    label: "Longing for unworthiness"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_unworthiness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_being_replaced"
+    label: "Longing for being replaced"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_being_replaced"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_being_used"
+    label: "Longing for being used"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_being_used"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_being_controlled"
+    label: "Longing for being controlled"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_being_controlled"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_public_shame"
+    label: "Longing for public shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_public_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_private_shame"
+    label: "Longing for private shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_private_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_family_exile"
+    label: "Longing for family exile"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_family_exile"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_broken_loyalty"
+    label: "Longing for broken loyalty"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_broken_loyalty"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_emotional_neglect"
+    label: "Longing for emotional neglect"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_emotional_neglect"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_failed_protection"
+    label: "Longing for failed protection"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_failed_protection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_lost_home"
+    label: "Longing for lost home"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_lost_home"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_lost_status"
+    label: "Longing for lost status"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_lost_status"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_misread_desire"
+    label: "Longing for misread desire"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_misread_desire"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_unanswered_confession"
+    label: "Longing for unanswered confession"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_unanswered_confession"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_social_disgrace"
+    label: "Longing for social disgrace"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_social_disgrace"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_survivor_guilt"
+    label: "Longing for survivor guilt"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_survivor_guilt"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_silenced_grief"
+    label: "Longing for silenced grief"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_silenced_grief"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_imperfect_body"
+    label: "Longing for imperfect body"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_imperfect_body"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_hidden_identity"
+    label: "Longing for hidden identity"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_hidden_identity"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_dangerous_tenderness"
+    label: "Longing for dangerous tenderness"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_dangerous_tenderness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_needed_help"
+    label: "Longing for needed help"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_needed_help"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_unkept_promise"
+    label: "Longing for unkept promise"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_unkept_promise"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_conditional_love"
+    label: "Longing for conditional love"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_conditional_love"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_performing_strength"
+    label: "Longing for performing strength"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_performing_strength"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_being_chosen_last"
+    label: "Longing for being chosen last"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_being_chosen_last"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_asking_for_comfort"
+    label: "Longing for asking for comfort"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_asking_for_comfort"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_longing_for_trusting_too_soon"
+    label: "Longing for trusting too soon"
+    category: "emotional_wounds"
+    aliases: 
+      - "longing_for_trusting_too_soon"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_abandonment"
+    label: "Grief over abandonment"
+    category: "emotional_wounds"
+    aliases: 
+      - "abandonment_anxiety"
+      - "grief_over_abandonment"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_rejection"
+    label: "Grief over rejection"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_rejection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_betrayal"
+    label: "Grief over betrayal"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_betrayal"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_intimacy"
+    label: "Grief over intimacy"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_intimacy"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_dependency"
+    label: "Grief over dependency"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_dependency"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_failure"
+    label: "Grief over failure"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_failure"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_humiliation"
+    label: "Grief over humiliation"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_humiliation"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_loss"
+    label: "Grief over loss"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_loss"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_unworthiness"
+    label: "Grief over unworthiness"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_unworthiness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_being_replaced"
+    label: "Grief over being replaced"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_being_replaced"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_being_used"
+    label: "Grief over being used"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_being_used"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_being_controlled"
+    label: "Grief over being controlled"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_being_controlled"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_public_shame"
+    label: "Grief over public shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_public_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_private_shame"
+    label: "Grief over private shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_private_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_family_exile"
+    label: "Grief over family exile"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_family_exile"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_broken_loyalty"
+    label: "Grief over broken loyalty"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_broken_loyalty"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_emotional_neglect"
+    label: "Grief over emotional neglect"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_emotional_neglect"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_failed_protection"
+    label: "Grief over failed protection"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_failed_protection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_lost_home"
+    label: "Grief over lost home"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_lost_home"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_lost_status"
+    label: "Grief over lost status"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_lost_status"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_misread_desire"
+    label: "Grief over misread desire"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_misread_desire"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_unanswered_confession"
+    label: "Grief over unanswered confession"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_unanswered_confession"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_social_disgrace"
+    label: "Grief over social disgrace"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_social_disgrace"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_survivor_guilt"
+    label: "Grief over survivor guilt"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_survivor_guilt"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_silenced_grief"
+    label: "Grief over silenced grief"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_silenced_grief"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_imperfect_body"
+    label: "Grief over imperfect body"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_imperfect_body"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_hidden_identity"
+    label: "Grief over hidden identity"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_hidden_identity"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_dangerous_tenderness"
+    label: "Grief over dangerous tenderness"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_dangerous_tenderness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_needed_help"
+    label: "Grief over needed help"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_needed_help"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_unkept_promise"
+    label: "Grief over unkept promise"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_unkept_promise"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_conditional_love"
+    label: "Grief over conditional love"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_conditional_love"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_performing_strength"
+    label: "Grief over performing strength"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_performing_strength"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_being_chosen_last"
+    label: "Grief over being chosen last"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_being_chosen_last"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_asking_for_comfort"
+    label: "Grief over asking for comfort"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_asking_for_comfort"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_grief_over_trusting_too_soon"
+    label: "Grief over trusting too soon"
+    category: "emotional_wounds"
+    aliases: 
+      - "grief_over_trusting_too_soon"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_defense_against_abandonment"
+    label: "Defense against abandonment"
+    category: "emotional_wounds"
+    aliases: 
+      - "abandonment_anxiety"
+      - "defense_against_abandonment"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_defense_against_rejection"
+    label: "Defense against rejection"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_rejection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_defense_against_betrayal"
+    label: "Defense against betrayal"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_betrayal"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_defense_against_intimacy"
+    label: "Defense against intimacy"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_intimacy"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_defense_against_dependency"
+    label: "Defense against dependency"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_dependency"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_defense_against_failure"
+    label: "Defense against failure"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_failure"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_defense_against_humiliation"
+    label: "Defense against humiliation"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_humiliation"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_defense_against_loss"
+    label: "Defense against loss"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_loss"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_defense_against_unworthiness"
+    label: "Defense against unworthiness"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_unworthiness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_defense_against_being_replaced"
+    label: "Defense against being replaced"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_being_replaced"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "emotional_wounds_defense_against_being_used"
+    label: "Defense against being used"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_being_used"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_being_controlled"
+    label: "Defense against being controlled"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_being_controlled"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_public_shame"
+    label: "Defense against public shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_public_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_private_shame"
+    label: "Defense against private shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_private_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_family_exile"
+    label: "Defense against family exile"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_family_exile"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_broken_loyalty"
+    label: "Defense against broken loyalty"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_broken_loyalty"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_emotional_neglect"
+    label: "Defense against emotional neglect"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_emotional_neglect"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_failed_protection"
+    label: "Defense against failed protection"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_failed_protection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_lost_home"
+    label: "Defense against lost home"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_lost_home"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_lost_status"
+    label: "Defense against lost status"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_lost_status"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_misread_desire"
+    label: "Defense against misread desire"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_misread_desire"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_unanswered_confession"
+    label: "Defense against unanswered confession"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_unanswered_confession"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_social_disgrace"
+    label: "Defense against social disgrace"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_social_disgrace"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_survivor_guilt"
+    label: "Defense against survivor guilt"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_survivor_guilt"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_silenced_grief"
+    label: "Defense against silenced grief"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_silenced_grief"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_imperfect_body"
+    label: "Defense against imperfect body"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_imperfect_body"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_hidden_identity"
+    label: "Defense against hidden identity"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_hidden_identity"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_dangerous_tenderness"
+    label: "Defense against dangerous tenderness"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_dangerous_tenderness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_needed_help"
+    label: "Defense against needed help"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_needed_help"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_unkept_promise"
+    label: "Defense against unkept promise"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_unkept_promise"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_conditional_love"
+    label: "Defense against conditional love"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_conditional_love"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_performing_strength"
+    label: "Defense against performing strength"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_performing_strength"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_being_chosen_last"
+    label: "Defense against being chosen last"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_being_chosen_last"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_asking_for_comfort"
+    label: "Defense against asking for comfort"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_asking_for_comfort"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_defense_against_trusting_too_soon"
+    label: "Defense against trusting too soon"
+    category: "emotional_wounds"
+    aliases: 
+      - "defense_against_trusting_too_soon"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_abandonment"
+    label: "Sensitivity to abandonment"
+    category: "emotional_wounds"
+    aliases: 
+      - "abandonment_anxiety"
+      - "sensitivity_to_abandonment"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_rejection"
+    label: "Sensitivity to rejection"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_rejection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_betrayal"
+    label: "Sensitivity to betrayal"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_betrayal"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_intimacy"
+    label: "Sensitivity to intimacy"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_intimacy"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_dependency"
+    label: "Sensitivity to dependency"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_dependency"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_failure"
+    label: "Sensitivity to failure"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_failure"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_humiliation"
+    label: "Sensitivity to humiliation"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_humiliation"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_loss"
+    label: "Sensitivity to loss"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_loss"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_unworthiness"
+    label: "Sensitivity to unworthiness"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_unworthiness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_being_replaced"
+    label: "Sensitivity to being replaced"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_being_replaced"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_being_used"
+    label: "Sensitivity to being used"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_being_used"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_being_controlled"
+    label: "Sensitivity to being controlled"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_being_controlled"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_public_shame"
+    label: "Sensitivity to public shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_public_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_private_shame"
+    label: "Sensitivity to private shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_private_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_family_exile"
+    label: "Sensitivity to family exile"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_family_exile"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_broken_loyalty"
+    label: "Sensitivity to broken loyalty"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_broken_loyalty"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_emotional_neglect"
+    label: "Sensitivity to emotional neglect"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_emotional_neglect"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_failed_protection"
+    label: "Sensitivity to failed protection"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_failed_protection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_lost_home"
+    label: "Sensitivity to lost home"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_lost_home"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_lost_status"
+    label: "Sensitivity to lost status"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_lost_status"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_misread_desire"
+    label: "Sensitivity to misread desire"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_misread_desire"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_unanswered_confession"
+    label: "Sensitivity to unanswered confession"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_unanswered_confession"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_social_disgrace"
+    label: "Sensitivity to social disgrace"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_social_disgrace"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_survivor_guilt"
+    label: "Sensitivity to survivor guilt"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_survivor_guilt"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_silenced_grief"
+    label: "Sensitivity to silenced grief"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_silenced_grief"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_imperfect_body"
+    label: "Sensitivity to imperfect body"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_imperfect_body"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_hidden_identity"
+    label: "Sensitivity to hidden identity"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_hidden_identity"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_dangerous_tenderness"
+    label: "Sensitivity to dangerous tenderness"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_dangerous_tenderness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_needed_help"
+    label: "Sensitivity to needed help"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_needed_help"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_unkept_promise"
+    label: "Sensitivity to unkept promise"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_unkept_promise"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_conditional_love"
+    label: "Sensitivity to conditional love"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_conditional_love"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_performing_strength"
+    label: "Sensitivity to performing strength"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_performing_strength"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_being_chosen_last"
+    label: "Sensitivity to being chosen last"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_being_chosen_last"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_asking_for_comfort"
+    label: "Sensitivity to asking for comfort"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_asking_for_comfort"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_sensitivity_to_trusting_too_soon"
+    label: "Sensitivity to trusting too soon"
+    category: "emotional_wounds"
+    aliases: 
+      - "sensitivity_to_trusting_too_soon"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_abandonment"
+    label: "Scar from abandonment"
+    category: "emotional_wounds"
+    aliases: 
+      - "abandonment_anxiety"
+      - "scar_from_abandonment"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_rejection"
+    label: "Scar from rejection"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_rejection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_betrayal"
+    label: "Scar from betrayal"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_betrayal"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_intimacy"
+    label: "Scar from intimacy"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_intimacy"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_dependency"
+    label: "Scar from dependency"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_dependency"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_failure"
+    label: "Scar from failure"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_failure"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_humiliation"
+    label: "Scar from humiliation"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_humiliation"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_loss"
+    label: "Scar from loss"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_loss"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_unworthiness"
+    label: "Scar from unworthiness"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_unworthiness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_being_replaced"
+    label: "Scar from being replaced"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_being_replaced"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_being_used"
+    label: "Scar from being used"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_being_used"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_being_controlled"
+    label: "Scar from being controlled"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_being_controlled"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_public_shame"
+    label: "Scar from public shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_public_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_private_shame"
+    label: "Scar from private shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_private_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_family_exile"
+    label: "Scar from family exile"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_family_exile"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_broken_loyalty"
+    label: "Scar from broken loyalty"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_broken_loyalty"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_emotional_neglect"
+    label: "Scar from emotional neglect"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_emotional_neglect"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_failed_protection"
+    label: "Scar from failed protection"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_failed_protection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_lost_home"
+    label: "Scar from lost home"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_lost_home"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_lost_status"
+    label: "Scar from lost status"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_lost_status"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_misread_desire"
+    label: "Scar from misread desire"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_misread_desire"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_unanswered_confession"
+    label: "Scar from unanswered confession"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_unanswered_confession"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_social_disgrace"
+    label: "Scar from social disgrace"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_social_disgrace"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_survivor_guilt"
+    label: "Scar from survivor guilt"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_survivor_guilt"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_silenced_grief"
+    label: "Scar from silenced grief"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_silenced_grief"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_imperfect_body"
+    label: "Scar from imperfect body"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_imperfect_body"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_hidden_identity"
+    label: "Scar from hidden identity"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_hidden_identity"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_dangerous_tenderness"
+    label: "Scar from dangerous tenderness"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_dangerous_tenderness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_needed_help"
+    label: "Scar from needed help"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_needed_help"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_unkept_promise"
+    label: "Scar from unkept promise"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_unkept_promise"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_conditional_love"
+    label: "Scar from conditional love"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_conditional_love"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_performing_strength"
+    label: "Scar from performing strength"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_performing_strength"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_being_chosen_last"
+    label: "Scar from being chosen last"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_being_chosen_last"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_asking_for_comfort"
+    label: "Scar from asking for comfort"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_asking_for_comfort"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_scar_from_trusting_too_soon"
+    label: "Scar from trusting too soon"
+    category: "emotional_wounds"
+    aliases: 
+      - "scar_from_trusting_too_soon"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_abandonment"
+    label: "Dread of abandonment"
+    category: "emotional_wounds"
+    aliases: 
+      - "abandonment_anxiety"
+      - "dread_of_abandonment"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_rejection"
+    label: "Dread of rejection"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_rejection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_betrayal"
+    label: "Dread of betrayal"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_betrayal"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_intimacy"
+    label: "Dread of intimacy"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_intimacy"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_dependency"
+    label: "Dread of dependency"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_dependency"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_failure"
+    label: "Dread of failure"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_failure"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_humiliation"
+    label: "Dread of humiliation"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_humiliation"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_loss"
+    label: "Dread of loss"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_loss"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_unworthiness"
+    label: "Dread of unworthiness"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_unworthiness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_being_replaced"
+    label: "Dread of being replaced"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_being_replaced"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_being_used"
+    label: "Dread of being used"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_being_used"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_being_controlled"
+    label: "Dread of being controlled"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_being_controlled"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_public_shame"
+    label: "Dread of public shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_public_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_private_shame"
+    label: "Dread of private shame"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_private_shame"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_family_exile"
+    label: "Dread of family exile"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_family_exile"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_broken_loyalty"
+    label: "Dread of broken loyalty"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_broken_loyalty"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_emotional_neglect"
+    label: "Dread of emotional neglect"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_emotional_neglect"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_failed_protection"
+    label: "Dread of failed protection"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_failed_protection"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_lost_home"
+    label: "Dread of lost home"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_lost_home"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_lost_status"
+    label: "Dread of lost status"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_lost_status"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_misread_desire"
+    label: "Dread of misread desire"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_misread_desire"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_unanswered_confession"
+    label: "Dread of unanswered confession"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_unanswered_confession"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_social_disgrace"
+    label: "Dread of social disgrace"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_social_disgrace"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_survivor_guilt"
+    label: "Dread of survivor guilt"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_survivor_guilt"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_silenced_grief"
+    label: "Dread of silenced grief"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_silenced_grief"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_imperfect_body"
+    label: "Dread of imperfect body"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_imperfect_body"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_hidden_identity"
+    label: "Dread of hidden identity"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_hidden_identity"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_dangerous_tenderness"
+    label: "Dread of dangerous tenderness"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_dangerous_tenderness"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_needed_help"
+    label: "Dread of needed help"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_needed_help"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_unkept_promise"
+    label: "Dread of unkept promise"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_unkept_promise"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_conditional_love"
+    label: "Dread of conditional love"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_conditional_love"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_performing_strength"
+    label: "Dread of performing strength"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_performing_strength"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_being_chosen_last"
+    label: "Dread of being chosen last"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_being_chosen_last"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_asking_for_comfort"
+    label: "Dread of asking for comfort"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_asking_for_comfort"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "emotional_wounds_dread_of_trusting_too_soon"
+    label: "Dread of trusting too soon"
+    category: "emotional_wounds"
+    aliases: 
+      - "dread_of_trusting_too_soon"
+    polarity: "negative"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"

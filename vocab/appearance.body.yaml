@@ -1,0 +1,1511 @@
+schema: "heartwriteai.character_vocab_file.v1"
+filename: "appearance.body.yaml"
+description: "Body, posture, scars, skin, and movement tokens."
+categories: 
+  - "appearance"
+count: 134
+tokens: 
+  - id: "appearance_gentle_posture"
+    label: "Gentle posture"
+    category: "appearance"
+    aliases: 
+      - "gentle_posture"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_scarred_skin"
+    label: "Scarred skin"
+    category: "appearance"
+    aliases: 
+      - "scarred_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_steady_hands"
+    label: "Steady hands"
+    category: "appearance"
+    aliases: 
+      - "steady_hands"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_slender_build"
+    label: "Slender build"
+    category: "appearance"
+    aliases: 
+      - "slender_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_lean_build"
+    label: "Lean build"
+    category: "appearance"
+    aliases: 
+      - "lean_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_athletic_build"
+    label: "Athletic build"
+    category: "appearance"
+    aliases: 
+      - "athletic_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_muscular_build"
+    label: "Muscular build"
+    category: "appearance"
+    aliases: 
+      - "muscular_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_soft_build"
+    label: "Soft build"
+    category: "appearance"
+    aliases: 
+      - "soft_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_curvy_build"
+    label: "Curvy build"
+    category: "appearance"
+    aliases: 
+      - "curvy_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_sturdy_build"
+    label: "Sturdy build"
+    category: "appearance"
+    aliases: 
+      - "sturdy_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_lithe_build"
+    label: "Lithe build"
+    category: "appearance"
+    aliases: 
+      - "lithe_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_broad_build"
+    label: "Broad build"
+    category: "appearance"
+    aliases: 
+      - "broad_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_delicate_build"
+    label: "Delicate build"
+    category: "appearance"
+    aliases: 
+      - "delicate_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_graceful_movement"
+    label: "Graceful movement"
+    category: "appearance"
+    aliases: 
+      - "graceful_movement"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_quiet_movement"
+    label: "Quiet movement"
+    category: "appearance"
+    aliases: 
+      - "quiet_movement"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_confident_walk"
+    label: "Confident walk"
+    category: "appearance"
+    aliases: 
+      - "confident_walk"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_protective_stance"
+    label: "Protective stance"
+    category: "appearance"
+    aliases: 
+      - "protective_stance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_elegant_posture"
+    label: "Elegant posture"
+    category: "appearance"
+    aliases: 
+      - "elegant_posture"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_relaxed_posture"
+    label: "Relaxed posture"
+    category: "appearance"
+    aliases: 
+      - "relaxed_posture"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_freckled_skin"
+    label: "Freckled skin"
+    category: "appearance"
+    aliases: 
+      - "freckled_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_weathered_skin"
+    label: "Weathered skin"
+    category: "appearance"
+    aliases: 
+      - "weathered_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_sun_kissed_skin"
+    label: "Sun-kissed skin"
+    category: "appearance"
+    aliases: 
+      - "sun_kissed_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "appearance_careful_hands"
+    label: "Careful hands"
+    category: "appearance"
+    aliases: 
+      - "careful_hands"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_calloused_hands"
+    label: "Calloused hands"
+    category: "appearance"
+    aliases: 
+      - "calloused_hands"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_visible_scars"
+    label: "Visible scars"
+    category: "appearance"
+    aliases: 
+      - "visible_scars"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_hidden_scars"
+    label: "Hidden scars"
+    category: "appearance"
+    aliases: 
+      - "hidden_scars"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_classic_handsome"
+    label: "Classic handsome"
+    category: "appearance"
+    aliases: 
+      - "classic_handsome"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_notable_gentle_posture"
+    label: "Notable gentle posture"
+    category: "appearance"
+    aliases: 
+      - "notable_gentle_posture"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_notable_scarred_skin"
+    label: "Notable scarred skin"
+    category: "appearance"
+    aliases: 
+      - "notable_scarred_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_steady_hands"
+    label: "Notable steady hands"
+    category: "appearance"
+    aliases: 
+      - "notable_steady_hands"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_slender_build"
+    label: "Notable slender build"
+    category: "appearance"
+    aliases: 
+      - "notable_slender_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_lean_build"
+    label: "Notable lean build"
+    category: "appearance"
+    aliases: 
+      - "notable_lean_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_athletic_build"
+    label: "Notable athletic build"
+    category: "appearance"
+    aliases: 
+      - "notable_athletic_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_muscular_build"
+    label: "Notable muscular build"
+    category: "appearance"
+    aliases: 
+      - "notable_muscular_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_soft_build"
+    label: "Notable soft build"
+    category: "appearance"
+    aliases: 
+      - "notable_soft_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_curvy_build"
+    label: "Notable curvy build"
+    category: "appearance"
+    aliases: 
+      - "notable_curvy_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_sturdy_build"
+    label: "Notable sturdy build"
+    category: "appearance"
+    aliases: 
+      - "notable_sturdy_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_lithe_build"
+    label: "Notable lithe build"
+    category: "appearance"
+    aliases: 
+      - "notable_lithe_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_broad_build"
+    label: "Notable broad build"
+    category: "appearance"
+    aliases: 
+      - "notable_broad_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_delicate_build"
+    label: "Notable delicate build"
+    category: "appearance"
+    aliases: 
+      - "notable_delicate_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_graceful_movement"
+    label: "Notable graceful movement"
+    category: "appearance"
+    aliases: 
+      - "notable_graceful_movement"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_quiet_movement"
+    label: "Notable quiet movement"
+    category: "appearance"
+    aliases: 
+      - "notable_quiet_movement"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_confident_walk"
+    label: "Notable confident walk"
+    category: "appearance"
+    aliases: 
+      - "notable_confident_walk"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_protective_stance"
+    label: "Notable protective stance"
+    category: "appearance"
+    aliases: 
+      - "notable_protective_stance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_elegant_posture"
+    label: "Notable elegant posture"
+    category: "appearance"
+    aliases: 
+      - "notable_elegant_posture"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_relaxed_posture"
+    label: "Notable relaxed posture"
+    category: "appearance"
+    aliases: 
+      - "notable_relaxed_posture"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_freckled_skin"
+    label: "Notable freckled skin"
+    category: "appearance"
+    aliases: 
+      - "notable_freckled_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_weathered_skin"
+    label: "Notable weathered skin"
+    category: "appearance"
+    aliases: 
+      - "notable_weathered_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_sun_kissed_skin"
+    label: "Notable sun-kissed skin"
+    category: "appearance"
+    aliases: 
+      - "notable_sun_kissed_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "appearance_notable_careful_hands"
+    label: "Notable careful hands"
+    category: "appearance"
+    aliases: 
+      - "notable_careful_hands"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_calloused_hands"
+    label: "Notable calloused hands"
+    category: "appearance"
+    aliases: 
+      - "notable_calloused_hands"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_visible_scars"
+    label: "Notable visible scars"
+    category: "appearance"
+    aliases: 
+      - "notable_visible_scars"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_hidden_scars"
+    label: "Notable hidden scars"
+    category: "appearance"
+    aliases: 
+      - "notable_hidden_scars"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_classic_handsome"
+    label: "Notable classic handsome"
+    category: "appearance"
+    aliases: 
+      - "notable_classic_handsome"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_gentle_posture"
+    label: "Soft gentle posture"
+    category: "appearance"
+    aliases: 
+      - "soft_gentle_posture"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_scarred_skin"
+    label: "Soft scarred skin"
+    category: "appearance"
+    aliases: 
+      - "soft_scarred_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_steady_hands"
+    label: "Soft steady hands"
+    category: "appearance"
+    aliases: 
+      - "soft_steady_hands"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_slender_build"
+    label: "Soft slender build"
+    category: "appearance"
+    aliases: 
+      - "soft_slender_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_lean_build"
+    label: "Soft lean build"
+    category: "appearance"
+    aliases: 
+      - "soft_lean_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_athletic_build"
+    label: "Soft athletic build"
+    category: "appearance"
+    aliases: 
+      - "soft_athletic_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_muscular_build"
+    label: "Soft muscular build"
+    category: "appearance"
+    aliases: 
+      - "soft_muscular_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_soft_build"
+    label: "Soft soft build"
+    category: "appearance"
+    aliases: 
+      - "soft_soft_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_curvy_build"
+    label: "Soft curvy build"
+    category: "appearance"
+    aliases: 
+      - "soft_curvy_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_sturdy_build"
+    label: "Soft sturdy build"
+    category: "appearance"
+    aliases: 
+      - "soft_sturdy_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_lithe_build"
+    label: "Soft lithe build"
+    category: "appearance"
+    aliases: 
+      - "soft_lithe_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_broad_build"
+    label: "Soft broad build"
+    category: "appearance"
+    aliases: 
+      - "soft_broad_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_delicate_build"
+    label: "Soft delicate build"
+    category: "appearance"
+    aliases: 
+      - "soft_delicate_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_graceful_movement"
+    label: "Soft graceful movement"
+    category: "appearance"
+    aliases: 
+      - "soft_graceful_movement"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_quiet_movement"
+    label: "Soft quiet movement"
+    category: "appearance"
+    aliases: 
+      - "soft_quiet_movement"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_confident_walk"
+    label: "Soft confident walk"
+    category: "appearance"
+    aliases: 
+      - "soft_confident_walk"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_protective_stance"
+    label: "Soft protective stance"
+    category: "appearance"
+    aliases: 
+      - "soft_protective_stance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_elegant_posture"
+    label: "Soft elegant posture"
+    category: "appearance"
+    aliases: 
+      - "soft_elegant_posture"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_relaxed_posture"
+    label: "Soft relaxed posture"
+    category: "appearance"
+    aliases: 
+      - "soft_relaxed_posture"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_freckled_skin"
+    label: "Soft freckled skin"
+    category: "appearance"
+    aliases: 
+      - "soft_freckled_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_weathered_skin"
+    label: "Soft weathered skin"
+    category: "appearance"
+    aliases: 
+      - "soft_weathered_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_sun_kissed_skin"
+    label: "Soft sun-kissed skin"
+    category: "appearance"
+    aliases: 
+      - "soft_sun_kissed_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "appearance_soft_careful_hands"
+    label: "Soft careful hands"
+    category: "appearance"
+    aliases: 
+      - "soft_careful_hands"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_soft_calloused_hands"
+    label: "Soft calloused hands"
+    category: "appearance"
+    aliases: 
+      - "soft_calloused_hands"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_soft_visible_scars"
+    label: "Soft visible scars"
+    category: "appearance"
+    aliases: 
+      - "soft_visible_scars"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_soft_hidden_scars"
+    label: "Soft hidden scars"
+    category: "appearance"
+    aliases: 
+      - "soft_hidden_scars"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_soft_classic_handsome"
+    label: "Soft classic handsome"
+    category: "appearance"
+    aliases: 
+      - "soft_classic_handsome"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_gentle_posture"
+    label: "Striking gentle posture"
+    category: "appearance"
+    aliases: 
+      - "striking_gentle_posture"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_scarred_skin"
+    label: "Striking scarred skin"
+    category: "appearance"
+    aliases: 
+      - "striking_scarred_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_steady_hands"
+    label: "Striking steady hands"
+    category: "appearance"
+    aliases: 
+      - "striking_steady_hands"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_slender_build"
+    label: "Striking slender build"
+    category: "appearance"
+    aliases: 
+      - "striking_slender_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_lean_build"
+    label: "Striking lean build"
+    category: "appearance"
+    aliases: 
+      - "striking_lean_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_athletic_build"
+    label: "Striking athletic build"
+    category: "appearance"
+    aliases: 
+      - "striking_athletic_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_muscular_build"
+    label: "Striking muscular build"
+    category: "appearance"
+    aliases: 
+      - "striking_muscular_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_soft_build"
+    label: "Striking soft build"
+    category: "appearance"
+    aliases: 
+      - "striking_soft_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_curvy_build"
+    label: "Striking curvy build"
+    category: "appearance"
+    aliases: 
+      - "striking_curvy_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_sturdy_build"
+    label: "Striking sturdy build"
+    category: "appearance"
+    aliases: 
+      - "striking_sturdy_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_lithe_build"
+    label: "Striking lithe build"
+    category: "appearance"
+    aliases: 
+      - "striking_lithe_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_broad_build"
+    label: "Striking broad build"
+    category: "appearance"
+    aliases: 
+      - "striking_broad_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_delicate_build"
+    label: "Striking delicate build"
+    category: "appearance"
+    aliases: 
+      - "striking_delicate_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_graceful_movement"
+    label: "Striking graceful movement"
+    category: "appearance"
+    aliases: 
+      - "striking_graceful_movement"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_quiet_movement"
+    label: "Striking quiet movement"
+    category: "appearance"
+    aliases: 
+      - "striking_quiet_movement"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_confident_walk"
+    label: "Striking confident walk"
+    category: "appearance"
+    aliases: 
+      - "striking_confident_walk"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_protective_stance"
+    label: "Striking protective stance"
+    category: "appearance"
+    aliases: 
+      - "striking_protective_stance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_elegant_posture"
+    label: "Striking elegant posture"
+    category: "appearance"
+    aliases: 
+      - "striking_elegant_posture"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_relaxed_posture"
+    label: "Striking relaxed posture"
+    category: "appearance"
+    aliases: 
+      - "striking_relaxed_posture"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_freckled_skin"
+    label: "Striking freckled skin"
+    category: "appearance"
+    aliases: 
+      - "striking_freckled_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_weathered_skin"
+    label: "Striking weathered skin"
+    category: "appearance"
+    aliases: 
+      - "striking_weathered_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_sun_kissed_skin"
+    label: "Striking sun-kissed skin"
+    category: "appearance"
+    aliases: 
+      - "striking_sun_kissed_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "appearance_striking_careful_hands"
+    label: "Striking careful hands"
+    category: "appearance"
+    aliases: 
+      - "striking_careful_hands"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_calloused_hands"
+    label: "Striking calloused hands"
+    category: "appearance"
+    aliases: 
+      - "striking_calloused_hands"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_visible_scars"
+    label: "Striking visible scars"
+    category: "appearance"
+    aliases: 
+      - "striking_visible_scars"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_hidden_scars"
+    label: "Striking hidden scars"
+    category: "appearance"
+    aliases: 
+      - "striking_hidden_scars"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_classic_handsome"
+    label: "Striking classic handsome"
+    category: "appearance"
+    aliases: 
+      - "striking_classic_handsome"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_gentle_posture"
+    label: "Romantic gentle posture"
+    category: "appearance"
+    aliases: 
+      - "romantic_gentle_posture"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_scarred_skin"
+    label: "Romantic scarred skin"
+    category: "appearance"
+    aliases: 
+      - "romantic_scarred_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_steady_hands"
+    label: "Romantic steady hands"
+    category: "appearance"
+    aliases: 
+      - "romantic_steady_hands"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_slender_build"
+    label: "Romantic slender build"
+    category: "appearance"
+    aliases: 
+      - "romantic_slender_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_lean_build"
+    label: "Romantic lean build"
+    category: "appearance"
+    aliases: 
+      - "romantic_lean_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_athletic_build"
+    label: "Romantic athletic build"
+    category: "appearance"
+    aliases: 
+      - "romantic_athletic_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_muscular_build"
+    label: "Romantic muscular build"
+    category: "appearance"
+    aliases: 
+      - "romantic_muscular_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_soft_build"
+    label: "Romantic soft build"
+    category: "appearance"
+    aliases: 
+      - "romantic_soft_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_curvy_build"
+    label: "Romantic curvy build"
+    category: "appearance"
+    aliases: 
+      - "romantic_curvy_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_sturdy_build"
+    label: "Romantic sturdy build"
+    category: "appearance"
+    aliases: 
+      - "romantic_sturdy_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_lithe_build"
+    label: "Romantic lithe build"
+    category: "appearance"
+    aliases: 
+      - "romantic_lithe_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_broad_build"
+    label: "Romantic broad build"
+    category: "appearance"
+    aliases: 
+      - "romantic_broad_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_delicate_build"
+    label: "Romantic delicate build"
+    category: "appearance"
+    aliases: 
+      - "romantic_delicate_build"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_graceful_movement"
+    label: "Romantic graceful movement"
+    category: "appearance"
+    aliases: 
+      - "romantic_graceful_movement"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_quiet_movement"
+    label: "Romantic quiet movement"
+    category: "appearance"
+    aliases: 
+      - "romantic_quiet_movement"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_confident_walk"
+    label: "Romantic confident walk"
+    category: "appearance"
+    aliases: 
+      - "romantic_confident_walk"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_protective_stance"
+    label: "Romantic protective stance"
+    category: "appearance"
+    aliases: 
+      - "romantic_protective_stance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_elegant_posture"
+    label: "Romantic elegant posture"
+    category: "appearance"
+    aliases: 
+      - "romantic_elegant_posture"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_relaxed_posture"
+    label: "Romantic relaxed posture"
+    category: "appearance"
+    aliases: 
+      - "romantic_relaxed_posture"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_freckled_skin"
+    label: "Romantic freckled skin"
+    category: "appearance"
+    aliases: 
+      - "romantic_freckled_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_weathered_skin"
+    label: "Romantic weathered skin"
+    category: "appearance"
+    aliases: 
+      - "romantic_weathered_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_sun_kissed_skin"
+    label: "Romantic sun-kissed skin"
+    category: "appearance"
+    aliases: 
+      - "romantic_sun_kissed_skin"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_careful_hands"
+    label: "Romantic careful hands"
+    category: "appearance"
+    aliases: 
+      - "romantic_careful_hands"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_calloused_hands"
+    label: "Romantic calloused hands"
+    category: "appearance"
+    aliases: 
+      - "romantic_calloused_hands"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_visible_scars"
+    label: "Romantic visible scars"
+    category: "appearance"
+    aliases: 
+      - "romantic_visible_scars"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_hidden_scars"
+    label: "Romantic hidden scars"
+    category: "appearance"
+    aliases: 
+      - "romantic_hidden_scars"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"

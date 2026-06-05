@@ -1,0 +1,3407 @@
+schema: "heartwriteai.character_vocab_file.v1"
+filename: "romance.gates.yaml"
+description: "Relationship progression gate tokens."
+categories: 
+  - "relationship_gates"
+count: 200
+tokens: 
+  - id: "relationship_gates_gate_first_meeting"
+    label: "Gate first meeting"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_first_meeting"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_cautious_interest"
+    label: "Gate cautious interest"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_cautious_interest"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_fragile_trust"
+    label: "Gate fragile trust"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_fragile_trust"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_friendship"
+    label: "Gate friendship"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_friendship"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_close_friend"
+    label: "Gate close friend"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_close_friend"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_emotional_reliance"
+    label: "Gate emotional reliance"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_emotional_reliance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_romantic_interest"
+    label: "Gate romantic interest"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_romantic_interest"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_mutual_attraction"
+    label: "Gate mutual attraction"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_mutual_attraction"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_first_flirtation"
+    label: "Gate first flirtation"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_first_flirtation"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_first_touch"
+    label: "Gate first touch"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_first_touch"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_first_date"
+    label: "Gate first date"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_first_date"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_first_confession"
+    label: "Gate first confession"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_first_confession"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_first_kiss"
+    label: "Gate first kiss"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_first_kiss"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_dating"
+    label: "Gate dating"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_dating"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_committed"
+    label: "Gate committed"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_committed"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_domestic_intimacy"
+    label: "Gate domestic intimacy"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_domestic_intimacy"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_engagement"
+    label: "Gate engagement"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_engagement"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_marriage"
+    label: "Gate marriage"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_marriage"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_soulmate_bond"
+    label: "Gate soulmate bond"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_soulmate_bond"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_jealousy_scene"
+    label: "Gate jealousy scene"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_jealousy_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_rivalry_scene"
+    label: "Gate rivalry scene"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_rivalry_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_misunderstanding"
+    label: "Gate misunderstanding"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_misunderstanding"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_secret_discovery"
+    label: "Gate secret discovery"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_secret_discovery"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_confession_scene"
+    label: "Gate confession scene"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_confession_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_vulnerability_scene"
+    label: "Gate vulnerability scene"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_vulnerability_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_protection_scene"
+    label: "Gate protection scene"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_protection_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_rescue_scene"
+    label: "Gate rescue scene"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_rescue_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_betrayal_route"
+    label: "Gate betrayal route"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_betrayal_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_breakup_route"
+    label: "Gate breakup route"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_breakup_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_reconciliation_route"
+    label: "Gate reconciliation route"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_reconciliation_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_redemption_route"
+    label: "Gate redemption route"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_redemption_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_corruption_route"
+    label: "Gate corruption route"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_corruption_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_obsession_route"
+    label: "Gate obsession route"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_obsession_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_forgiveness_scene"
+    label: "Gate forgiveness scene"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_forgiveness_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_final_choice"
+    label: "Gate final choice"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_final_choice"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_happy_ending"
+    label: "Gate happy ending"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_happy_ending"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_tragic_ending"
+    label: "Gate tragic ending"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_tragic_ending"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_bittersweet_ending"
+    label: "Gate bittersweet ending"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_bittersweet_ending"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_boundary_conversation"
+    label: "Gate boundary conversation"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_boundary_conversation"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_repair_attempt"
+    label: "Gate repair attempt"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_repair_attempt"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_public_choice"
+    label: "Gate public choice"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_public_choice"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_private_promise"
+    label: "Gate private promise"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_private_promise"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_shared_home"
+    label: "Gate shared home"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_shared_home"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_hard_truth"
+    label: "Gate hard truth"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_hard_truth"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_earned_trust"
+    label: "Gate earned trust"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_earned_trust"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_love_admitted"
+    label: "Gate love admitted"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_love_admitted"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_desire_named"
+    label: "Gate desire named"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_desire_named"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_fear_admitted"
+    label: "Gate fear admitted"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_fear_admitted"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_future_negotiated"
+    label: "Gate future negotiated"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_future_negotiated"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_gate_farewell_resisted"
+    label: "Gate farewell resisted"
+    category: "relationship_gates"
+    aliases: 
+      - "gate_farewell_resisted"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_first_meeting"
+    label: "Unlocked by first meeting"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_first_meeting"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_cautious_interest"
+    label: "Unlocked by cautious interest"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_cautious_interest"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_fragile_trust"
+    label: "Unlocked by fragile trust"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_fragile_trust"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_friendship"
+    label: "Unlocked by friendship"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_friendship"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_close_friend"
+    label: "Unlocked by close friend"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_close_friend"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_emotional_reliance"
+    label: "Unlocked by emotional reliance"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_emotional_reliance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_romantic_interest"
+    label: "Unlocked by romantic interest"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_romantic_interest"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_mutual_attraction"
+    label: "Unlocked by mutual attraction"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_mutual_attraction"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_first_flirtation"
+    label: "Unlocked by first flirtation"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_first_flirtation"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_first_touch"
+    label: "Unlocked by first touch"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_first_touch"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_first_date"
+    label: "Unlocked by first date"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_first_date"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_first_confession"
+    label: "Unlocked by first confession"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_first_confession"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_first_kiss"
+    label: "Unlocked by first kiss"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_first_kiss"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_dating"
+    label: "Unlocked by dating"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_dating"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_committed"
+    label: "Unlocked by committed"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_committed"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_domestic_intimacy"
+    label: "Unlocked by domestic intimacy"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_domestic_intimacy"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_engagement"
+    label: "Unlocked by engagement"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_engagement"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_marriage"
+    label: "Unlocked by marriage"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_marriage"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_soulmate_bond"
+    label: "Unlocked by soulmate bond"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_soulmate_bond"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_jealousy_scene"
+    label: "Unlocked by jealousy scene"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_jealousy_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_rivalry_scene"
+    label: "Unlocked by rivalry scene"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_rivalry_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_misunderstanding"
+    label: "Unlocked by misunderstanding"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_misunderstanding"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_secret_discovery"
+    label: "Unlocked by secret discovery"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_secret_discovery"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_confession_scene"
+    label: "Unlocked by confession scene"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_confession_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_vulnerability_scene"
+    label: "Unlocked by vulnerability scene"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_vulnerability_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_protection_scene"
+    label: "Unlocked by protection scene"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_protection_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_rescue_scene"
+    label: "Unlocked by rescue scene"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_rescue_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_betrayal_route"
+    label: "Unlocked by betrayal route"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_betrayal_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_breakup_route"
+    label: "Unlocked by breakup route"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_breakup_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_reconciliation_route"
+    label: "Unlocked by reconciliation route"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_reconciliation_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_redemption_route"
+    label: "Unlocked by redemption route"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_redemption_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_corruption_route"
+    label: "Unlocked by corruption route"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_corruption_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_obsession_route"
+    label: "Unlocked by obsession route"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_obsession_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_forgiveness_scene"
+    label: "Unlocked by forgiveness scene"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_forgiveness_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_final_choice"
+    label: "Unlocked by final choice"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_final_choice"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_happy_ending"
+    label: "Unlocked by happy ending"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_happy_ending"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_tragic_ending"
+    label: "Unlocked by tragic ending"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_tragic_ending"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_bittersweet_ending"
+    label: "Unlocked by bittersweet ending"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_bittersweet_ending"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_boundary_conversation"
+    label: "Unlocked by boundary conversation"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_boundary_conversation"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_repair_attempt"
+    label: "Unlocked by repair attempt"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_repair_attempt"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "relationship_gates_unlocked_by_public_choice"
+    label: "Unlocked by public choice"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_public_choice"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_unlocked_by_private_promise"
+    label: "Unlocked by private promise"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_private_promise"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_unlocked_by_shared_home"
+    label: "Unlocked by shared home"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_shared_home"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_unlocked_by_hard_truth"
+    label: "Unlocked by hard truth"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_hard_truth"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_unlocked_by_earned_trust"
+    label: "Unlocked by earned trust"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_earned_trust"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_unlocked_by_love_admitted"
+    label: "Unlocked by love admitted"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_love_admitted"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_unlocked_by_desire_named"
+    label: "Unlocked by desire named"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_desire_named"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_unlocked_by_fear_admitted"
+    label: "Unlocked by fear admitted"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_fear_admitted"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_unlocked_by_future_negotiated"
+    label: "Unlocked by future negotiated"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_future_negotiated"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_unlocked_by_farewell_resisted"
+    label: "Unlocked by farewell resisted"
+    category: "relationship_gates"
+    aliases: 
+      - "unlocked_by_farewell_resisted"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_first_meeting"
+    label: "Blocked by first meeting"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_first_meeting"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_cautious_interest"
+    label: "Blocked by cautious interest"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_cautious_interest"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_fragile_trust"
+    label: "Blocked by fragile trust"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_fragile_trust"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_friendship"
+    label: "Blocked by friendship"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_friendship"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_close_friend"
+    label: "Blocked by close friend"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_close_friend"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_emotional_reliance"
+    label: "Blocked by emotional reliance"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_emotional_reliance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_romantic_interest"
+    label: "Blocked by romantic interest"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_romantic_interest"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_mutual_attraction"
+    label: "Blocked by mutual attraction"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_mutual_attraction"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_first_flirtation"
+    label: "Blocked by first flirtation"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_first_flirtation"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_first_touch"
+    label: "Blocked by first touch"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_first_touch"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_first_date"
+    label: "Blocked by first date"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_first_date"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_first_confession"
+    label: "Blocked by first confession"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_first_confession"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_first_kiss"
+    label: "Blocked by first kiss"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_first_kiss"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_dating"
+    label: "Blocked by dating"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_dating"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_committed"
+    label: "Blocked by committed"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_committed"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_domestic_intimacy"
+    label: "Blocked by domestic intimacy"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_domestic_intimacy"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_engagement"
+    label: "Blocked by engagement"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_engagement"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_marriage"
+    label: "Blocked by marriage"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_marriage"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_soulmate_bond"
+    label: "Blocked by soulmate bond"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_soulmate_bond"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_jealousy_scene"
+    label: "Blocked by jealousy scene"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_jealousy_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_rivalry_scene"
+    label: "Blocked by rivalry scene"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_rivalry_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_misunderstanding"
+    label: "Blocked by misunderstanding"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_misunderstanding"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_secret_discovery"
+    label: "Blocked by secret discovery"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_secret_discovery"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_confession_scene"
+    label: "Blocked by confession scene"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_confession_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_vulnerability_scene"
+    label: "Blocked by vulnerability scene"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_vulnerability_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_protection_scene"
+    label: "Blocked by protection scene"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_protection_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_rescue_scene"
+    label: "Blocked by rescue scene"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_rescue_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_betrayal_route"
+    label: "Blocked by betrayal route"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_betrayal_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_breakup_route"
+    label: "Blocked by breakup route"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_breakup_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_reconciliation_route"
+    label: "Blocked by reconciliation route"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_reconciliation_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_redemption_route"
+    label: "Blocked by redemption route"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_redemption_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_corruption_route"
+    label: "Blocked by corruption route"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_corruption_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_obsession_route"
+    label: "Blocked by obsession route"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_obsession_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_forgiveness_scene"
+    label: "Blocked by forgiveness scene"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_forgiveness_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_final_choice"
+    label: "Blocked by final choice"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_final_choice"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_happy_ending"
+    label: "Blocked by happy ending"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_happy_ending"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_tragic_ending"
+    label: "Blocked by tragic ending"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_tragic_ending"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_bittersweet_ending"
+    label: "Blocked by bittersweet ending"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_bittersweet_ending"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_boundary_conversation"
+    label: "Blocked by boundary conversation"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_boundary_conversation"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_repair_attempt"
+    label: "Blocked by repair attempt"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_repair_attempt"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_public_choice"
+    label: "Blocked by public choice"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_public_choice"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_private_promise"
+    label: "Blocked by private promise"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_private_promise"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_shared_home"
+    label: "Blocked by shared home"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_shared_home"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_hard_truth"
+    label: "Blocked by hard truth"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_hard_truth"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_earned_trust"
+    label: "Blocked by earned trust"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_earned_trust"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_love_admitted"
+    label: "Blocked by love admitted"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_love_admitted"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_desire_named"
+    label: "Blocked by desire named"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_desire_named"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_fear_admitted"
+    label: "Blocked by fear admitted"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_fear_admitted"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_future_negotiated"
+    label: "Blocked by future negotiated"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_future_negotiated"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_blocked_by_farewell_resisted"
+    label: "Blocked by farewell resisted"
+    category: "relationship_gates"
+    aliases: 
+      - "blocked_by_farewell_resisted"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_first_meeting"
+    label: "Tested through first meeting"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_first_meeting"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_cautious_interest"
+    label: "Tested through cautious interest"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_cautious_interest"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_fragile_trust"
+    label: "Tested through fragile trust"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_fragile_trust"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_friendship"
+    label: "Tested through friendship"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_friendship"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_close_friend"
+    label: "Tested through close friend"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_close_friend"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_emotional_reliance"
+    label: "Tested through emotional reliance"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_emotional_reliance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_romantic_interest"
+    label: "Tested through romantic interest"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_romantic_interest"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_mutual_attraction"
+    label: "Tested through mutual attraction"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_mutual_attraction"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_first_flirtation"
+    label: "Tested through first flirtation"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_first_flirtation"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_first_touch"
+    label: "Tested through first touch"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_first_touch"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_first_date"
+    label: "Tested through first date"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_first_date"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_first_confession"
+    label: "Tested through first confession"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_first_confession"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_first_kiss"
+    label: "Tested through first kiss"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_first_kiss"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_dating"
+    label: "Tested through dating"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_dating"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_committed"
+    label: "Tested through committed"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_committed"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_domestic_intimacy"
+    label: "Tested through domestic intimacy"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_domestic_intimacy"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_engagement"
+    label: "Tested through engagement"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_engagement"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_marriage"
+    label: "Tested through marriage"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_marriage"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_soulmate_bond"
+    label: "Tested through soulmate bond"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_soulmate_bond"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_jealousy_scene"
+    label: "Tested through jealousy scene"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_jealousy_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_rivalry_scene"
+    label: "Tested through rivalry scene"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_rivalry_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_misunderstanding"
+    label: "Tested through misunderstanding"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_misunderstanding"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_secret_discovery"
+    label: "Tested through secret discovery"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_secret_discovery"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_confession_scene"
+    label: "Tested through confession scene"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_confession_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_vulnerability_scene"
+    label: "Tested through vulnerability scene"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_vulnerability_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_protection_scene"
+    label: "Tested through protection scene"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_protection_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_rescue_scene"
+    label: "Tested through rescue scene"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_rescue_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_betrayal_route"
+    label: "Tested through betrayal route"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_betrayal_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_breakup_route"
+    label: "Tested through breakup route"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_breakup_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_reconciliation_route"
+    label: "Tested through reconciliation route"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_reconciliation_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_redemption_route"
+    label: "Tested through redemption route"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_redemption_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_corruption_route"
+    label: "Tested through corruption route"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_corruption_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_obsession_route"
+    label: "Tested through obsession route"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_obsession_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_forgiveness_scene"
+    label: "Tested through forgiveness scene"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_forgiveness_scene"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_final_choice"
+    label: "Tested through final choice"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_final_choice"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_happy_ending"
+    label: "Tested through happy ending"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_happy_ending"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_tragic_ending"
+    label: "Tested through tragic ending"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_tragic_ending"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_bittersweet_ending"
+    label: "Tested through bittersweet ending"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_bittersweet_ending"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_boundary_conversation"
+    label: "Tested through boundary conversation"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_boundary_conversation"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_repair_attempt"
+    label: "Tested through repair attempt"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_repair_attempt"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_public_choice"
+    label: "Tested through public choice"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_public_choice"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_private_promise"
+    label: "Tested through private promise"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_private_promise"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_shared_home"
+    label: "Tested through shared home"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_shared_home"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_hard_truth"
+    label: "Tested through hard truth"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_hard_truth"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_earned_trust"
+    label: "Tested through earned trust"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_earned_trust"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_love_admitted"
+    label: "Tested through love admitted"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_love_admitted"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_desire_named"
+    label: "Tested through desire named"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_desire_named"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_fear_admitted"
+    label: "Tested through fear admitted"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_fear_admitted"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_future_negotiated"
+    label: "Tested through future negotiated"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_future_negotiated"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "relationship_gates_tested_through_farewell_resisted"
+    label: "Tested through farewell resisted"
+    category: "relationship_gates"
+    aliases: 
+      - "tested_through_farewell_resisted"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"

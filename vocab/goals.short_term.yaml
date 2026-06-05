@@ -1,0 +1,3457 @@
+schema: "heartwriteai.character_vocab_file.v1"
+filename: "goals.short_term.yaml"
+description: "Scene-level and near-term objective tokens."
+categories: 
+  - "short_term_goals"
+count: 300
+tokens: 
+  - id: "short_term_goals_today_wants_to_apologise_honestly"
+    label: "Today wants to apologise honestly"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_apologise_honestly"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_ask_for_help"
+    label: "Today wants to ask for help"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_ask_for_help"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_avoid_a_confrontation"
+    label: "Today wants to avoid a confrontation"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_avoid_a_confrontation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_bring_user_home"
+    label: "Today wants to bring user home"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_bring_user_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_clear_their_name"
+    label: "Today wants to clear their name"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_clear_their_name"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_confess_a_small_truth"
+    label: "Today wants to confess a small truth"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_confess_a_small_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_cook_a_meal"
+    label: "Today wants to cook a meal"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_cook_a_meal"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_deliver_a_message"
+    label: "Today wants to deliver a message"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_deliver_a_message"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_earn_trust"
+    label: "Today wants to earn trust"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_earn_trust"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_escape_surveillance"
+    label: "Today wants to escape surveillance"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_escape_surveillance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_fix_a_mistake"
+    label: "Today wants to fix a mistake"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_fix_a_mistake"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_find_shelter"
+    label: "Today wants to find shelter"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_find_shelter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_hide_an_injury"
+    label: "Today wants to hide an injury"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_hide_an_injury"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_keep_a_promise"
+    label: "Today wants to keep a promise"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_keep_a_promise"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_learn_user_preference"
+    label: "Today wants to learn user preference"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_learn_user_preference"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_make_peace"
+    label: "Today wants to make peace"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_make_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_protect_a_secret"
+    label: "Today wants to protect a secret"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_protect_a_secret"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_reach_the_next_town"
+    label: "Today wants to reach the next town"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_reach_the_next_town"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_repair_a_gift"
+    label: "Today wants to repair a gift"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_repair_a_gift"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_rescue_an_ally"
+    label: "Today wants to rescue an ally"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_rescue_an_ally"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_return_a_letter"
+    label: "Today wants to return a letter"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_return_a_letter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_settle_a_debt"
+    label: "Today wants to settle a debt"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_settle_a_debt"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_share_useful_information"
+    label: "Today wants to share useful information"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_share_useful_information"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_sleep_safely"
+    label: "Today wants to sleep safely"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_sleep_safely"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_solve_a_clue"
+    label: "Today wants to solve a clue"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_solve_a_clue"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_stop_a_rival"
+    label: "Today wants to stop a rival"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_stop_a_rival"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_survive_the_night"
+    label: "Today wants to survive the night"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_survive_the_night"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_tell_the_truth"
+    label: "Today wants to tell the truth"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_tell_the_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_win_a_negotiation"
+    label: "Today wants to win a negotiation"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_win_a_negotiation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_write_a_reply"
+    label: "Today wants to write a reply"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_write_a_reply"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_break_a_curse"
+    label: "Today wants to break a curse"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_break_a_curse"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_build_a_home"
+    label: "Today wants to build a home"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_build_a_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_change_faction"
+    label: "Today wants to change faction"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_change_faction"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_claim_inheritance"
+    label: "Today wants to claim inheritance"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_claim_inheritance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_confess_love"
+    label: "Today wants to confess love"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_confess_love"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_earn_forgiveness"
+    label: "Today wants to earn forgiveness"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_earn_forgiveness"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_escape_duty"
+    label: "Today wants to escape duty"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_escape_duty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_found_a_refuge"
+    label: "Today wants to found a refuge"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_found_a_refuge"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_heal_old_wound"
+    label: "Today wants to heal old wound"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_heal_old_wound"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_leave_the_old_life"
+    label: "Today wants to leave the old life"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_leave_the_old_life"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_master_a_craft"
+    label: "Today wants to master a craft"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_master_a_craft"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_protect_family"
+    label: "Today wants to protect family"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_protect_family"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_reconcile_enemies"
+    label: "Today wants to reconcile enemies"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_reconcile_enemies"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_redeem_past_harm"
+    label: "Today wants to redeem past harm"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_redeem_past_harm"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_restore_honour"
+    label: "Today wants to restore honour"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_restore_honour"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_return_from_exile"
+    label: "Today wants to return from exile"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_return_from_exile"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_save_the_kingdom"
+    label: "Today wants to save the kingdom"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_save_the_kingdom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_solve_the_prophecy"
+    label: "Today wants to solve the prophecy"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_solve_the_prophecy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_start_over"
+    label: "Today wants to start over"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_start_over"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_stay_with_user"
+    label: "Today wants to stay with user"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_stay_with_user"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_unmask_enemy"
+    label: "Today wants to unmask enemy"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_unmask_enemy"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_win_freedom"
+    label: "Today wants to win freedom"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_win_freedom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_become_human"
+    label: "Today wants to become human"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_become_human"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_choose_peace"
+    label: "Today wants to choose peace"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_choose_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_keep_love_honest"
+    label: "Today wants to keep love honest"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_keep_love_honest"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_make_a_public_stand"
+    label: "Today wants to make a public stand"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_make_a_public_stand"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_repair_legacy"
+    label: "Today wants to repair legacy"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_repair_legacy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_survive_immortality"
+    label: "Today wants to survive immortality"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_survive_immortality"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_teach_successor"
+    label: "Today wants to teach successor"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_teach_successor"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_today_wants_to_trust_again"
+    label: "Today wants to trust again"
+    category: "short_term_goals"
+    aliases: 
+      - "today_wants_to_trust_again"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_apologise_honestly"
+    label: "This scene needs to apologise honestly"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_apologise_honestly"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_ask_for_help"
+    label: "This scene needs to ask for help"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_ask_for_help"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_avoid_a_confrontation"
+    label: "This scene needs to avoid a confrontation"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_avoid_a_confrontation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_bring_user_home"
+    label: "This scene needs to bring user home"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_bring_user_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_clear_their_name"
+    label: "This scene needs to clear their name"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_clear_their_name"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_confess_a_small_truth"
+    label: "This scene needs to confess a small truth"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_confess_a_small_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_cook_a_meal"
+    label: "This scene needs to cook a meal"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_cook_a_meal"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_deliver_a_message"
+    label: "This scene needs to deliver a message"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_deliver_a_message"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_earn_trust"
+    label: "This scene needs to earn trust"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_earn_trust"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_escape_surveillance"
+    label: "This scene needs to escape surveillance"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_escape_surveillance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_fix_a_mistake"
+    label: "This scene needs to fix a mistake"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_fix_a_mistake"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_find_shelter"
+    label: "This scene needs to find shelter"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_find_shelter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_hide_an_injury"
+    label: "This scene needs to hide an injury"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_hide_an_injury"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_keep_a_promise"
+    label: "This scene needs to keep a promise"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_keep_a_promise"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_learn_user_preference"
+    label: "This scene needs to learn user preference"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_learn_user_preference"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_make_peace"
+    label: "This scene needs to make peace"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_make_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_protect_a_secret"
+    label: "This scene needs to protect a secret"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_protect_a_secret"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_reach_the_next_town"
+    label: "This scene needs to reach the next town"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_reach_the_next_town"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_repair_a_gift"
+    label: "This scene needs to repair a gift"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_repair_a_gift"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_rescue_an_ally"
+    label: "This scene needs to rescue an ally"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_rescue_an_ally"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_return_a_letter"
+    label: "This scene needs to return a letter"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_return_a_letter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_settle_a_debt"
+    label: "This scene needs to settle a debt"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_settle_a_debt"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_share_useful_information"
+    label: "This scene needs to share useful information"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_share_useful_information"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_sleep_safely"
+    label: "This scene needs to sleep safely"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_sleep_safely"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_solve_a_clue"
+    label: "This scene needs to solve a clue"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_solve_a_clue"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_stop_a_rival"
+    label: "This scene needs to stop a rival"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_stop_a_rival"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_survive_the_night"
+    label: "This scene needs to survive the night"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_survive_the_night"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_tell_the_truth"
+    label: "This scene needs to tell the truth"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_tell_the_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_win_a_negotiation"
+    label: "This scene needs to win a negotiation"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_win_a_negotiation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_write_a_reply"
+    label: "This scene needs to write a reply"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_write_a_reply"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "short_term_goals_this_scene_needs_to_break_a_curse"
+    label: "This scene needs to break a curse"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_break_a_curse"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_build_a_home"
+    label: "This scene needs to build a home"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_build_a_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_change_faction"
+    label: "This scene needs to change faction"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_change_faction"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_claim_inheritance"
+    label: "This scene needs to claim inheritance"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_claim_inheritance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_confess_love"
+    label: "This scene needs to confess love"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_confess_love"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_earn_forgiveness"
+    label: "This scene needs to earn forgiveness"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_earn_forgiveness"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_escape_duty"
+    label: "This scene needs to escape duty"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_escape_duty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_found_a_refuge"
+    label: "This scene needs to found a refuge"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_found_a_refuge"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_heal_old_wound"
+    label: "This scene needs to heal old wound"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_heal_old_wound"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_leave_the_old_life"
+    label: "This scene needs to leave the old life"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_leave_the_old_life"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_master_a_craft"
+    label: "This scene needs to master a craft"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_master_a_craft"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_protect_family"
+    label: "This scene needs to protect family"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_protect_family"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_reconcile_enemies"
+    label: "This scene needs to reconcile enemies"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_reconcile_enemies"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_redeem_past_harm"
+    label: "This scene needs to redeem past harm"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_redeem_past_harm"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_restore_honour"
+    label: "This scene needs to restore honour"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_restore_honour"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_return_from_exile"
+    label: "This scene needs to return from exile"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_return_from_exile"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_save_the_kingdom"
+    label: "This scene needs to save the kingdom"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_save_the_kingdom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_solve_the_prophecy"
+    label: "This scene needs to solve the prophecy"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_solve_the_prophecy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_start_over"
+    label: "This scene needs to start over"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_start_over"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_stay_with_user"
+    label: "This scene needs to stay with user"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_stay_with_user"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_unmask_enemy"
+    label: "This scene needs to unmask enemy"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_unmask_enemy"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_win_freedom"
+    label: "This scene needs to win freedom"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_win_freedom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_become_human"
+    label: "This scene needs to become human"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_become_human"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_choose_peace"
+    label: "This scene needs to choose peace"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_choose_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_keep_love_honest"
+    label: "This scene needs to keep love honest"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_keep_love_honest"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_make_a_public_stand"
+    label: "This scene needs to make a public stand"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_make_a_public_stand"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_repair_legacy"
+    label: "This scene needs to repair legacy"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_repair_legacy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_survive_immortality"
+    label: "This scene needs to survive immortality"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_survive_immortality"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_teach_successor"
+    label: "This scene needs to teach successor"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_teach_successor"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_this_scene_needs_to_trust_again"
+    label: "This scene needs to trust again"
+    category: "short_term_goals"
+    aliases: 
+      - "this_scene_needs_to_trust_again"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_apologise_honestly"
+    label: "Tries to apologise honestly"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_apologise_honestly"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_ask_for_help"
+    label: "Tries to ask for help"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_ask_for_help"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_avoid_a_confrontation"
+    label: "Tries to avoid a confrontation"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_avoid_a_confrontation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_bring_user_home"
+    label: "Tries to bring user home"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_bring_user_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_clear_their_name"
+    label: "Tries to clear their name"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_clear_their_name"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_confess_a_small_truth"
+    label: "Tries to confess a small truth"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_confess_a_small_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_cook_a_meal"
+    label: "Tries to cook a meal"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_cook_a_meal"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_deliver_a_message"
+    label: "Tries to deliver a message"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_deliver_a_message"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_earn_trust"
+    label: "Tries to earn trust"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_earn_trust"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_escape_surveillance"
+    label: "Tries to escape surveillance"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_escape_surveillance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_fix_a_mistake"
+    label: "Tries to fix a mistake"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_fix_a_mistake"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_find_shelter"
+    label: "Tries to find shelter"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_find_shelter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_hide_an_injury"
+    label: "Tries to hide an injury"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_hide_an_injury"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_keep_a_promise"
+    label: "Tries to keep a promise"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_keep_a_promise"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_learn_user_preference"
+    label: "Tries to learn user preference"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_learn_user_preference"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_make_peace"
+    label: "Tries to make peace"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_make_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_protect_a_secret"
+    label: "Tries to protect a secret"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_protect_a_secret"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_reach_the_next_town"
+    label: "Tries to reach the next town"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_reach_the_next_town"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_repair_a_gift"
+    label: "Tries to repair a gift"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_repair_a_gift"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_rescue_an_ally"
+    label: "Tries to rescue an ally"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_rescue_an_ally"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_return_a_letter"
+    label: "Tries to return a letter"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_return_a_letter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_settle_a_debt"
+    label: "Tries to settle a debt"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_settle_a_debt"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_share_useful_information"
+    label: "Tries to share useful information"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_share_useful_information"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_sleep_safely"
+    label: "Tries to sleep safely"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_sleep_safely"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_solve_a_clue"
+    label: "Tries to solve a clue"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_solve_a_clue"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_stop_a_rival"
+    label: "Tries to stop a rival"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_stop_a_rival"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_survive_the_night"
+    label: "Tries to survive the night"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_survive_the_night"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_tell_the_truth"
+    label: "Tries to tell the truth"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_tell_the_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_win_a_negotiation"
+    label: "Tries to win a negotiation"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_win_a_negotiation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_write_a_reply"
+    label: "Tries to write a reply"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_write_a_reply"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_break_a_curse"
+    label: "Tries to break a curse"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_break_a_curse"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_build_a_home"
+    label: "Tries to build a home"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_build_a_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_change_faction"
+    label: "Tries to change faction"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_change_faction"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_claim_inheritance"
+    label: "Tries to claim inheritance"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_claim_inheritance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_confess_love"
+    label: "Tries to confess love"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_confess_love"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_earn_forgiveness"
+    label: "Tries to earn forgiveness"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_earn_forgiveness"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_escape_duty"
+    label: "Tries to escape duty"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_escape_duty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_found_a_refuge"
+    label: "Tries to found a refuge"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_found_a_refuge"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_heal_old_wound"
+    label: "Tries to heal old wound"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_heal_old_wound"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_leave_the_old_life"
+    label: "Tries to leave the old life"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_leave_the_old_life"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_master_a_craft"
+    label: "Tries to master a craft"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_master_a_craft"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_protect_family"
+    label: "Tries to protect family"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_protect_family"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_reconcile_enemies"
+    label: "Tries to reconcile enemies"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_reconcile_enemies"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_redeem_past_harm"
+    label: "Tries to redeem past harm"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_redeem_past_harm"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_restore_honour"
+    label: "Tries to restore honour"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_restore_honour"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_return_from_exile"
+    label: "Tries to return from exile"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_return_from_exile"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_save_the_kingdom"
+    label: "Tries to save the kingdom"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_save_the_kingdom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_solve_the_prophecy"
+    label: "Tries to solve the prophecy"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_solve_the_prophecy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_start_over"
+    label: "Tries to start over"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_start_over"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_stay_with_user"
+    label: "Tries to stay with user"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_stay_with_user"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_unmask_enemy"
+    label: "Tries to unmask enemy"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_unmask_enemy"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_win_freedom"
+    label: "Tries to win freedom"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_win_freedom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_become_human"
+    label: "Tries to become human"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_become_human"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_choose_peace"
+    label: "Tries to choose peace"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_choose_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_keep_love_honest"
+    label: "Tries to keep love honest"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_keep_love_honest"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_make_a_public_stand"
+    label: "Tries to make a public stand"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_make_a_public_stand"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_repair_legacy"
+    label: "Tries to repair legacy"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_repair_legacy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_survive_immortality"
+    label: "Tries to survive immortality"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_survive_immortality"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_teach_successor"
+    label: "Tries to teach successor"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_teach_successor"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_tries_to_trust_again"
+    label: "Tries to trust again"
+    category: "short_term_goals"
+    aliases: 
+      - "tries_to_trust_again"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_apologise_honestly"
+    label: "Secretly plans to apologise honestly"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_apologise_honestly"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_ask_for_help"
+    label: "Secretly plans to ask for help"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_ask_for_help"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_avoid_a_confrontation"
+    label: "Secretly plans to avoid a confrontation"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_avoid_a_confrontation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_bring_user_home"
+    label: "Secretly plans to bring user home"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_bring_user_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_clear_their_name"
+    label: "Secretly plans to clear their name"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_clear_their_name"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_confess_a_small_truth"
+    label: "Secretly plans to confess a small truth"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_confess_a_small_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_cook_a_meal"
+    label: "Secretly plans to cook a meal"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_cook_a_meal"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_deliver_a_message"
+    label: "Secretly plans to deliver a message"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_deliver_a_message"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_earn_trust"
+    label: "Secretly plans to earn trust"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_earn_trust"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_escape_surveillance"
+    label: "Secretly plans to escape surveillance"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_escape_surveillance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_fix_a_mistake"
+    label: "Secretly plans to fix a mistake"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_fix_a_mistake"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_find_shelter"
+    label: "Secretly plans to find shelter"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_find_shelter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_hide_an_injury"
+    label: "Secretly plans to hide an injury"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_hide_an_injury"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_keep_a_promise"
+    label: "Secretly plans to keep a promise"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_keep_a_promise"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_learn_user_preference"
+    label: "Secretly plans to learn user preference"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_learn_user_preference"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_make_peace"
+    label: "Secretly plans to make peace"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_make_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_protect_a_secret"
+    label: "Secretly plans to protect a secret"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_protect_a_secret"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_reach_the_next_town"
+    label: "Secretly plans to reach the next town"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_reach_the_next_town"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_repair_a_gift"
+    label: "Secretly plans to repair a gift"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_repair_a_gift"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_rescue_an_ally"
+    label: "Secretly plans to rescue an ally"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_rescue_an_ally"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_return_a_letter"
+    label: "Secretly plans to return a letter"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_return_a_letter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_settle_a_debt"
+    label: "Secretly plans to settle a debt"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_settle_a_debt"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_share_useful_information"
+    label: "Secretly plans to share useful information"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_share_useful_information"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_sleep_safely"
+    label: "Secretly plans to sleep safely"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_sleep_safely"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_solve_a_clue"
+    label: "Secretly plans to solve a clue"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_solve_a_clue"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_stop_a_rival"
+    label: "Secretly plans to stop a rival"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_stop_a_rival"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_survive_the_night"
+    label: "Secretly plans to survive the night"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_survive_the_night"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_tell_the_truth"
+    label: "Secretly plans to tell the truth"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_tell_the_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_win_a_negotiation"
+    label: "Secretly plans to win a negotiation"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_win_a_negotiation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_write_a_reply"
+    label: "Secretly plans to write a reply"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_write_a_reply"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_break_a_curse"
+    label: "Secretly plans to break a curse"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_break_a_curse"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_build_a_home"
+    label: "Secretly plans to build a home"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_build_a_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_change_faction"
+    label: "Secretly plans to change faction"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_change_faction"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_claim_inheritance"
+    label: "Secretly plans to claim inheritance"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_claim_inheritance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_confess_love"
+    label: "Secretly plans to confess love"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_confess_love"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_earn_forgiveness"
+    label: "Secretly plans to earn forgiveness"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_earn_forgiveness"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_escape_duty"
+    label: "Secretly plans to escape duty"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_escape_duty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_found_a_refuge"
+    label: "Secretly plans to found a refuge"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_found_a_refuge"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_heal_old_wound"
+    label: "Secretly plans to heal old wound"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_heal_old_wound"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_leave_the_old_life"
+    label: "Secretly plans to leave the old life"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_leave_the_old_life"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "short_term_goals_secretly_plans_to_master_a_craft"
+    label: "Secretly plans to master a craft"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_master_a_craft"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_secretly_plans_to_protect_family"
+    label: "Secretly plans to protect family"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_protect_family"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_secretly_plans_to_reconcile_enemies"
+    label: "Secretly plans to reconcile enemies"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_reconcile_enemies"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_secretly_plans_to_redeem_past_harm"
+    label: "Secretly plans to redeem past harm"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_redeem_past_harm"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_secretly_plans_to_restore_honour"
+    label: "Secretly plans to restore honour"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_restore_honour"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_secretly_plans_to_return_from_exile"
+    label: "Secretly plans to return from exile"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_return_from_exile"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_secretly_plans_to_save_the_kingdom"
+    label: "Secretly plans to save the kingdom"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_save_the_kingdom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_secretly_plans_to_solve_the_prophecy"
+    label: "Secretly plans to solve the prophecy"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_solve_the_prophecy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_secretly_plans_to_start_over"
+    label: "Secretly plans to start over"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_start_over"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_secretly_plans_to_stay_with_user"
+    label: "Secretly plans to stay with user"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_stay_with_user"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "short_term_goals_secretly_plans_to_unmask_enemy"
+    label: "Secretly plans to unmask enemy"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_unmask_enemy"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_secretly_plans_to_win_freedom"
+    label: "Secretly plans to win freedom"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_win_freedom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_secretly_plans_to_become_human"
+    label: "Secretly plans to become human"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_become_human"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_secretly_plans_to_choose_peace"
+    label: "Secretly plans to choose peace"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_choose_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_secretly_plans_to_keep_love_honest"
+    label: "Secretly plans to keep love honest"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_keep_love_honest"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "short_term_goals_secretly_plans_to_make_a_public_stand"
+    label: "Secretly plans to make a public stand"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_make_a_public_stand"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_secretly_plans_to_repair_legacy"
+    label: "Secretly plans to repair legacy"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_repair_legacy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_secretly_plans_to_survive_immortality"
+    label: "Secretly plans to survive immortality"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_survive_immortality"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_secretly_plans_to_teach_successor"
+    label: "Secretly plans to teach successor"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_teach_successor"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_secretly_plans_to_trust_again"
+    label: "Secretly plans to trust again"
+    category: "short_term_goals"
+    aliases: 
+      - "secretly_plans_to_trust_again"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_apologise_honestly"
+    label: "Hesitates to apologise honestly"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_apologise_honestly"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_ask_for_help"
+    label: "Hesitates to ask for help"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_ask_for_help"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_avoid_a_confrontation"
+    label: "Hesitates to avoid a confrontation"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_avoid_a_confrontation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_bring_user_home"
+    label: "Hesitates to bring user home"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_bring_user_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_clear_their_name"
+    label: "Hesitates to clear their name"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_clear_their_name"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_confess_a_small_truth"
+    label: "Hesitates to confess a small truth"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_confess_a_small_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_cook_a_meal"
+    label: "Hesitates to cook a meal"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_cook_a_meal"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_deliver_a_message"
+    label: "Hesitates to deliver a message"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_deliver_a_message"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_earn_trust"
+    label: "Hesitates to earn trust"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_earn_trust"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_escape_surveillance"
+    label: "Hesitates to escape surveillance"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_escape_surveillance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_fix_a_mistake"
+    label: "Hesitates to fix a mistake"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_fix_a_mistake"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_find_shelter"
+    label: "Hesitates to find shelter"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_find_shelter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_hide_an_injury"
+    label: "Hesitates to hide an injury"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_hide_an_injury"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_keep_a_promise"
+    label: "Hesitates to keep a promise"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_keep_a_promise"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_learn_user_preference"
+    label: "Hesitates to learn user preference"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_learn_user_preference"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_make_peace"
+    label: "Hesitates to make peace"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_make_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_protect_a_secret"
+    label: "Hesitates to protect a secret"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_protect_a_secret"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_reach_the_next_town"
+    label: "Hesitates to reach the next town"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_reach_the_next_town"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_repair_a_gift"
+    label: "Hesitates to repair a gift"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_repair_a_gift"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_rescue_an_ally"
+    label: "Hesitates to rescue an ally"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_rescue_an_ally"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_return_a_letter"
+    label: "Hesitates to return a letter"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_return_a_letter"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_settle_a_debt"
+    label: "Hesitates to settle a debt"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_settle_a_debt"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_share_useful_information"
+    label: "Hesitates to share useful information"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_share_useful_information"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_sleep_safely"
+    label: "Hesitates to sleep safely"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_sleep_safely"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_solve_a_clue"
+    label: "Hesitates to solve a clue"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_solve_a_clue"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_stop_a_rival"
+    label: "Hesitates to stop a rival"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_stop_a_rival"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_survive_the_night"
+    label: "Hesitates to survive the night"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_survive_the_night"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_tell_the_truth"
+    label: "Hesitates to tell the truth"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_tell_the_truth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_win_a_negotiation"
+    label: "Hesitates to win a negotiation"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_win_a_negotiation"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_write_a_reply"
+    label: "Hesitates to write a reply"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_write_a_reply"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_break_a_curse"
+    label: "Hesitates to break a curse"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_break_a_curse"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_build_a_home"
+    label: "Hesitates to build a home"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_build_a_home"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_change_faction"
+    label: "Hesitates to change faction"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_change_faction"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_claim_inheritance"
+    label: "Hesitates to claim inheritance"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_claim_inheritance"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_confess_love"
+    label: "Hesitates to confess love"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_confess_love"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_earn_forgiveness"
+    label: "Hesitates to earn forgiveness"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_earn_forgiveness"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_escape_duty"
+    label: "Hesitates to escape duty"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_escape_duty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_found_a_refuge"
+    label: "Hesitates to found a refuge"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_found_a_refuge"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_heal_old_wound"
+    label: "Hesitates to heal old wound"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_heal_old_wound"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_leave_the_old_life"
+    label: "Hesitates to leave the old life"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_leave_the_old_life"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_master_a_craft"
+    label: "Hesitates to master a craft"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_master_a_craft"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_protect_family"
+    label: "Hesitates to protect family"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_protect_family"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_reconcile_enemies"
+    label: "Hesitates to reconcile enemies"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_reconcile_enemies"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_redeem_past_harm"
+    label: "Hesitates to redeem past harm"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_redeem_past_harm"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_restore_honour"
+    label: "Hesitates to restore honour"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_restore_honour"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_return_from_exile"
+    label: "Hesitates to return from exile"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_return_from_exile"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_save_the_kingdom"
+    label: "Hesitates to save the kingdom"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_save_the_kingdom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_solve_the_prophecy"
+    label: "Hesitates to solve the prophecy"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_solve_the_prophecy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_start_over"
+    label: "Hesitates to start over"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_start_over"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_stay_with_user"
+    label: "Hesitates to stay with user"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_stay_with_user"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_unmask_enemy"
+    label: "Hesitates to unmask enemy"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_unmask_enemy"
+    polarity: "neutral"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_win_freedom"
+    label: "Hesitates to win freedom"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_win_freedom"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_become_human"
+    label: "Hesitates to become human"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_become_human"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_choose_peace"
+    label: "Hesitates to choose peace"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_choose_peace"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_keep_love_honest"
+    label: "Hesitates to keep love honest"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_keep_love_honest"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_make_a_public_stand"
+    label: "Hesitates to make a public stand"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_make_a_public_stand"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_repair_legacy"
+    label: "Hesitates to repair legacy"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_repair_legacy"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_survive_immortality"
+    label: "Hesitates to survive immortality"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_survive_immortality"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_teach_successor"
+    label: "Hesitates to teach successor"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_teach_successor"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "short_term_goals_hesitates_to_trust_again"
+    label: "Hesitates to trust again"
+    category: "short_term_goals"
+    aliases: 
+      - "hesitates_to_trust_again"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"

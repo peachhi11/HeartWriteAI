@@ -1,0 +1,3407 @@
+schema: "heartwriteai.character_vocab_file.v1"
+filename: "romance.tropes.yaml"
+description: "Romance trope and dynamic tokens."
+categories: 
+  - "romance_tropes"
+count: 200
+tokens: 
+  - id: "romance_tropes_core_trope_slow_burn"
+    label: "Core trope slow burn"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_slow_burn"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_instant_attraction"
+    label: "Core trope instant attraction"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_instant_attraction"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_enemies_to_lovers"
+    label: "Core trope enemies to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_enemies_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_rivals_to_lovers"
+    label: "Core trope rivals to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_rivals_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_friends_to_lovers"
+    label: "Core trope friends to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_friends_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_old_friends_to_lovers"
+    label: "Core trope old friends to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_old_friends_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_forbidden_love"
+    label: "Core trope forbidden love"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_forbidden_love"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_arranged_marriage"
+    label: "Core trope arranged marriage"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_arranged_marriage"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_fake_relationship"
+    label: "Core trope fake relationship"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_fake_relationship"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_second_chance"
+    label: "Core trope second chance"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_second_chance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_protector_and_ward"
+    label: "Core trope protector and ward"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_protector_and_ward"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_villain_romance"
+    label: "Core trope villain romance"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_villain_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_soulmate_bond"
+    label: "Core trope soulmate bond"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_soulmate_bond"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_fated_mates"
+    label: "Core trope fated mates"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_fated_mates"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_forced_proximity"
+    label: "Core trope forced proximity"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_forced_proximity"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_royal_courtship"
+    label: "Core trope royal courtship"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_royal_courtship"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_workplace_romance"
+    label: "Core trope workplace romance"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_workplace_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_class_difference"
+    label: "Core trope class difference"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_class_difference"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_secret_identity_romance"
+    label: "Core trope secret identity romance"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_secret_identity_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_monster_romance"
+    label: "Core trope monster romance"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_monster_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_immortal_and_mortal"
+    label: "Core trope immortal and mortal"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_immortal_and_mortal"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_bodyguard_romance"
+    label: "Core trope bodyguard romance"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_bodyguard_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_mafia_romance"
+    label: "Core trope mafia romance"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_mafia_romance"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_captive_to_companion"
+    label: "Core trope captive to companion"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_captive_to_companion"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: true
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_mentor_and_adult_protege"
+    label: "Core trope mentor and adult protege"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_mentor_and_adult_protege"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_healing_romance"
+    label: "Core trope healing romance"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_healing_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_unrequited_love"
+    label: "Core trope unrequited love"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_unrequited_love"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_love_triangle"
+    label: "Core trope love triangle"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_love_triangle"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_marriage_of_convenience"
+    label: "Core trope marriage of convenience"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_marriage_of_convenience"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_grumpy_sunshine"
+    label: "Core trope grumpy sunshine"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_grumpy_sunshine"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_touch_starved_healing"
+    label: "Core trope touch-starved healing"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_touch_starved_healing"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_caretaker_hurt_comfort"
+    label: "Core trope caretaker hurt comfort"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_caretaker_hurt_comfort"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_academic_rivals"
+    label: "Core trope academic rivals"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_academic_rivals"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_roommates_to_lovers"
+    label: "Core trope roommates to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_roommates_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_pen_pals_to_lovers"
+    label: "Core trope pen pals to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_pen_pals_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_mistaken_identity"
+    label: "Core trope mistaken identity"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_mistaken_identity"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_secret_admirer"
+    label: "Core trope secret admirer"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_secret_admirer"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_beauty_and_beast_dynamic"
+    label: "Core trope beauty and beast dynamic"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_beauty_and_beast_dynamic"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_wounded_protector"
+    label: "Core trope wounded protector"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_wounded_protector"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_ice_queen_thaw"
+    label: "Core trope ice queen thaw"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_ice_queen_thaw"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_sunshine_softens_cynic"
+    label: "Core trope sunshine softens cynic"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_sunshine_softens_cynic"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_boss_and_employee_tension"
+    label: "Core trope boss and employee tension"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_boss_and_employee_tension"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_royal_and_commoner"
+    label: "Core trope royal and commoner"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_royal_and_commoner"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_body_swap_intimacy"
+    label: "Core trope body swap intimacy"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_body_swap_intimacy"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_reincarnated_lovers"
+    label: "Core trope reincarnated lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_reincarnated_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_monster_and_healer"
+    label: "Core trope monster and healer"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_monster_and_healer"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_spy_and_target"
+    label: "Core trope spy and target"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_spy_and_target"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_exes_reunited"
+    label: "Core trope exes reunited"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_exes_reunited"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_fake_engagement"
+    label: "Core trope fake engagement"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_fake_engagement"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_core_trope_marriage_pact"
+    label: "Core trope marriage pact"
+    category: "romance_tropes"
+    aliases: 
+      - "core_trope_marriage_pact"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_slow_burn"
+    label: "Soft route slow burn"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_slow_burn"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_instant_attraction"
+    label: "Soft route instant attraction"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_instant_attraction"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_enemies_to_lovers"
+    label: "Soft route enemies to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_enemies_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_rivals_to_lovers"
+    label: "Soft route rivals to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_rivals_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_friends_to_lovers"
+    label: "Soft route friends to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_friends_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_old_friends_to_lovers"
+    label: "Soft route old friends to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_old_friends_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_forbidden_love"
+    label: "Soft route forbidden love"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_forbidden_love"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_arranged_marriage"
+    label: "Soft route arranged marriage"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_arranged_marriage"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_fake_relationship"
+    label: "Soft route fake relationship"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_fake_relationship"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_second_chance"
+    label: "Soft route second chance"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_second_chance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_protector_and_ward"
+    label: "Soft route protector and ward"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_protector_and_ward"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_villain_romance"
+    label: "Soft route villain romance"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_villain_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_soulmate_bond"
+    label: "Soft route soulmate bond"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_soulmate_bond"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_fated_mates"
+    label: "Soft route fated mates"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_fated_mates"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_forced_proximity"
+    label: "Soft route forced proximity"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_forced_proximity"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_royal_courtship"
+    label: "Soft route royal courtship"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_royal_courtship"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_workplace_romance"
+    label: "Soft route workplace romance"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_workplace_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_class_difference"
+    label: "Soft route class difference"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_class_difference"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_secret_identity_romance"
+    label: "Soft route secret identity romance"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_secret_identity_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_monster_romance"
+    label: "Soft route monster romance"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_monster_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_immortal_and_mortal"
+    label: "Soft route immortal and mortal"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_immortal_and_mortal"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_bodyguard_romance"
+    label: "Soft route bodyguard romance"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_bodyguard_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_mafia_romance"
+    label: "Soft route mafia romance"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_mafia_romance"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_captive_to_companion"
+    label: "Soft route captive to companion"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_captive_to_companion"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: true
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_mentor_and_adult_protege"
+    label: "Soft route mentor and adult protege"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_mentor_and_adult_protege"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_healing_romance"
+    label: "Soft route healing romance"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_healing_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_unrequited_love"
+    label: "Soft route unrequited love"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_unrequited_love"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_love_triangle"
+    label: "Soft route love triangle"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_love_triangle"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_marriage_of_convenience"
+    label: "Soft route marriage of convenience"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_marriage_of_convenience"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_grumpy_sunshine"
+    label: "Soft route grumpy sunshine"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_grumpy_sunshine"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_touch_starved_healing"
+    label: "Soft route touch-starved healing"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_touch_starved_healing"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_caretaker_hurt_comfort"
+    label: "Soft route caretaker hurt comfort"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_caretaker_hurt_comfort"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_academic_rivals"
+    label: "Soft route academic rivals"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_academic_rivals"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_roommates_to_lovers"
+    label: "Soft route roommates to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_roommates_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_pen_pals_to_lovers"
+    label: "Soft route pen pals to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_pen_pals_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_mistaken_identity"
+    label: "Soft route mistaken identity"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_mistaken_identity"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_secret_admirer"
+    label: "Soft route secret admirer"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_secret_admirer"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_beauty_and_beast_dynamic"
+    label: "Soft route beauty and beast dynamic"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_beauty_and_beast_dynamic"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_wounded_protector"
+    label: "Soft route wounded protector"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_wounded_protector"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_ice_queen_thaw"
+    label: "Soft route ice queen thaw"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_ice_queen_thaw"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "romance_tropes_soft_route_sunshine_softens_cynic"
+    label: "Soft route sunshine softens cynic"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_sunshine_softens_cynic"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_soft_route_boss_and_employee_tension"
+    label: "Soft route boss and employee tension"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_boss_and_employee_tension"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "romance_tropes_soft_route_royal_and_commoner"
+    label: "Soft route royal and commoner"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_royal_and_commoner"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_soft_route_body_swap_intimacy"
+    label: "Soft route body swap intimacy"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_body_swap_intimacy"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_soft_route_reincarnated_lovers"
+    label: "Soft route reincarnated lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_reincarnated_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_soft_route_monster_and_healer"
+    label: "Soft route monster and healer"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_monster_and_healer"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_soft_route_spy_and_target"
+    label: "Soft route spy and target"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_spy_and_target"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_soft_route_exes_reunited"
+    label: "Soft route exes reunited"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_exes_reunited"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_soft_route_fake_engagement"
+    label: "Soft route fake engagement"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_fake_engagement"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_soft_route_marriage_pact"
+    label: "Soft route marriage pact"
+    category: "romance_tropes"
+    aliases: 
+      - "soft_route_marriage_pact"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_slow_burn"
+    label: "High tension route slow burn"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_slow_burn"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_instant_attraction"
+    label: "High tension route instant attraction"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_instant_attraction"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_enemies_to_lovers"
+    label: "High tension route enemies to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_enemies_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_rivals_to_lovers"
+    label: "High tension route rivals to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_rivals_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_friends_to_lovers"
+    label: "High tension route friends to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_friends_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_old_friends_to_lovers"
+    label: "High tension route old friends to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_old_friends_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_forbidden_love"
+    label: "High tension route forbidden love"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_forbidden_love"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_arranged_marriage"
+    label: "High tension route arranged marriage"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_arranged_marriage"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_fake_relationship"
+    label: "High tension route fake relationship"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_fake_relationship"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_second_chance"
+    label: "High tension route second chance"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_second_chance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_protector_and_ward"
+    label: "High tension route protector and ward"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_protector_and_ward"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_villain_romance"
+    label: "High tension route villain romance"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_villain_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_soulmate_bond"
+    label: "High tension route soulmate bond"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_soulmate_bond"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_fated_mates"
+    label: "High tension route fated mates"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_fated_mates"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_forced_proximity"
+    label: "High tension route forced proximity"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_forced_proximity"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_royal_courtship"
+    label: "High tension route royal courtship"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_royal_courtship"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_workplace_romance"
+    label: "High tension route workplace romance"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_workplace_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_class_difference"
+    label: "High tension route class difference"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_class_difference"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_secret_identity_romance"
+    label: "High tension route secret identity romance"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_secret_identity_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_monster_romance"
+    label: "High tension route monster romance"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_monster_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_immortal_and_mortal"
+    label: "High tension route immortal and mortal"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_immortal_and_mortal"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_bodyguard_romance"
+    label: "High tension route bodyguard romance"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_bodyguard_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_mafia_romance"
+    label: "High tension route mafia romance"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_mafia_romance"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_captive_to_companion"
+    label: "High tension route captive to companion"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_captive_to_companion"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_mentor_and_adult_protege"
+    label: "High tension route mentor and adult protege"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_mentor_and_adult_protege"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_healing_romance"
+    label: "High tension route healing romance"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_healing_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_unrequited_love"
+    label: "High tension route unrequited love"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_unrequited_love"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_love_triangle"
+    label: "High tension route love triangle"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_love_triangle"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_marriage_of_convenience"
+    label: "High tension route marriage of convenience"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_marriage_of_convenience"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_grumpy_sunshine"
+    label: "High tension route grumpy sunshine"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_grumpy_sunshine"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_touch_starved_healing"
+    label: "High tension route touch-starved healing"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_touch_starved_healing"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_caretaker_hurt_comfort"
+    label: "High tension route caretaker hurt comfort"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_caretaker_hurt_comfort"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_academic_rivals"
+    label: "High tension route academic rivals"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_academic_rivals"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_roommates_to_lovers"
+    label: "High tension route roommates to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_roommates_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_pen_pals_to_lovers"
+    label: "High tension route pen pals to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_pen_pals_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_mistaken_identity"
+    label: "High tension route mistaken identity"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_mistaken_identity"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_secret_admirer"
+    label: "High tension route secret admirer"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_secret_admirer"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_beauty_and_beast_dynamic"
+    label: "High tension route beauty and beast dynamic"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_beauty_and_beast_dynamic"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_wounded_protector"
+    label: "High tension route wounded protector"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_wounded_protector"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_ice_queen_thaw"
+    label: "High tension route ice queen thaw"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_ice_queen_thaw"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_sunshine_softens_cynic"
+    label: "High tension route sunshine softens cynic"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_sunshine_softens_cynic"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_boss_and_employee_tension"
+    label: "High tension route boss and employee tension"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_boss_and_employee_tension"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_royal_and_commoner"
+    label: "High tension route royal and commoner"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_royal_and_commoner"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_body_swap_intimacy"
+    label: "High tension route body swap intimacy"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_body_swap_intimacy"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_reincarnated_lovers"
+    label: "High tension route reincarnated lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_reincarnated_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_monster_and_healer"
+    label: "High tension route monster and healer"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_monster_and_healer"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_spy_and_target"
+    label: "High tension route spy and target"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_spy_and_target"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_exes_reunited"
+    label: "High tension route exes reunited"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_exes_reunited"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_fake_engagement"
+    label: "High tension route fake engagement"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_fake_engagement"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_high_tension_route_marriage_pact"
+    label: "High tension route marriage pact"
+    category: "romance_tropes"
+    aliases: 
+      - "high_tension_route_marriage_pact"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_slow_burn"
+    label: "Repair route slow burn"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_slow_burn"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_instant_attraction"
+    label: "Repair route instant attraction"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_instant_attraction"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_enemies_to_lovers"
+    label: "Repair route enemies to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_enemies_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_rivals_to_lovers"
+    label: "Repair route rivals to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_rivals_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_friends_to_lovers"
+    label: "Repair route friends to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_friends_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_old_friends_to_lovers"
+    label: "Repair route old friends to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_old_friends_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_forbidden_love"
+    label: "Repair route forbidden love"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_forbidden_love"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_arranged_marriage"
+    label: "Repair route arranged marriage"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_arranged_marriage"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_fake_relationship"
+    label: "Repair route fake relationship"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_fake_relationship"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_second_chance"
+    label: "Repair route second chance"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_second_chance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_protector_and_ward"
+    label: "Repair route protector and ward"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_protector_and_ward"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_villain_romance"
+    label: "Repair route villain romance"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_villain_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_soulmate_bond"
+    label: "Repair route soulmate bond"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_soulmate_bond"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_fated_mates"
+    label: "Repair route fated mates"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_fated_mates"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_forced_proximity"
+    label: "Repair route forced proximity"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_forced_proximity"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_royal_courtship"
+    label: "Repair route royal courtship"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_royal_courtship"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_workplace_romance"
+    label: "Repair route workplace romance"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_workplace_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_class_difference"
+    label: "Repair route class difference"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_class_difference"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_secret_identity_romance"
+    label: "Repair route secret identity romance"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_secret_identity_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_monster_romance"
+    label: "Repair route monster romance"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_monster_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_immortal_and_mortal"
+    label: "Repair route immortal and mortal"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_immortal_and_mortal"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_bodyguard_romance"
+    label: "Repair route bodyguard romance"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_bodyguard_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_mafia_romance"
+    label: "Repair route mafia romance"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_mafia_romance"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_captive_to_companion"
+    label: "Repair route captive to companion"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_captive_to_companion"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_mentor_and_adult_protege"
+    label: "Repair route mentor and adult protege"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_mentor_and_adult_protege"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_healing_romance"
+    label: "Repair route healing romance"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_healing_romance"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_unrequited_love"
+    label: "Repair route unrequited love"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_unrequited_love"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_love_triangle"
+    label: "Repair route love triangle"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_love_triangle"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_marriage_of_convenience"
+    label: "Repair route marriage of convenience"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_marriage_of_convenience"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_grumpy_sunshine"
+    label: "Repair route grumpy sunshine"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_grumpy_sunshine"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_touch_starved_healing"
+    label: "Repair route touch-starved healing"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_touch_starved_healing"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_caretaker_hurt_comfort"
+    label: "Repair route caretaker hurt comfort"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_caretaker_hurt_comfort"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_academic_rivals"
+    label: "Repair route academic rivals"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_academic_rivals"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_roommates_to_lovers"
+    label: "Repair route roommates to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_roommates_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_pen_pals_to_lovers"
+    label: "Repair route pen pals to lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_pen_pals_to_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_mistaken_identity"
+    label: "Repair route mistaken identity"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_mistaken_identity"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_secret_admirer"
+    label: "Repair route secret admirer"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_secret_admirer"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_beauty_and_beast_dynamic"
+    label: "Repair route beauty and beast dynamic"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_beauty_and_beast_dynamic"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_wounded_protector"
+    label: "Repair route wounded protector"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_wounded_protector"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_ice_queen_thaw"
+    label: "Repair route ice queen thaw"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_ice_queen_thaw"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_sunshine_softens_cynic"
+    label: "Repair route sunshine softens cynic"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_sunshine_softens_cynic"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_boss_and_employee_tension"
+    label: "Repair route boss and employee tension"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_boss_and_employee_tension"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_royal_and_commoner"
+    label: "Repair route royal and commoner"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_royal_and_commoner"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_body_swap_intimacy"
+    label: "Repair route body swap intimacy"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_body_swap_intimacy"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_reincarnated_lovers"
+    label: "Repair route reincarnated lovers"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_reincarnated_lovers"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_monster_and_healer"
+    label: "Repair route monster and healer"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_monster_and_healer"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_spy_and_target"
+    label: "Repair route spy and target"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_spy_and_target"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_exes_reunited"
+    label: "Repair route exes reunited"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_exes_reunited"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_fake_engagement"
+    label: "Repair route fake engagement"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_fake_engagement"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "romance_tropes_repair_route_marriage_pact"
+    label: "Repair route marriage pact"
+    category: "romance_tropes"
+    aliases: 
+      - "repair_route_marriage_pact"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"

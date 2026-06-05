@@ -1,0 +1,3367 @@
+schema: "heartwriteai.character_vocab_file.v1"
+filename: "appearance.style.yaml"
+description: "Clothing and styling aesthetic tokens."
+categories: 
+  - "clothing_aesthetic"
+count: 300
+tokens: 
+  - id: "clothing_aesthetic_academic_tailoring"
+    label: "Academic tailoring"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "academic_tailoring"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_battle_practical"
+    label: "Battle practical"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "battle_practical"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_clean_minimalism"
+    label: "Clean minimalism"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "clean_minimalism"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_dark_romantic"
+    label: "Dark romantic"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "dark_romantic"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_elegant_formalwear"
+    label: "Elegant formalwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "elegant_formalwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_forest_wanderer"
+    label: "Forest wanderer"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "forest_wanderer"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_gothic_lace"
+    label: "Gothic lace"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "gothic_lace"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_luxury_casual"
+    label: "Luxury casual"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "luxury_casual"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_soft_domestic"
+    label: "Soft domestic"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "soft_domestic"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_streetwise_layers"
+    label: "Streetwise layers"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "streetwise_layers"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_artist_layers"
+    label: "Artist layers"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "artist_layers"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_royal_courtwear"
+    label: "Royal courtwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "royal_courtwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_field_uniform"
+    label: "Field uniform"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "field_uniform"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_mourning_black"
+    label: "Mourning black"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "mourning_black"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_silk_shirts"
+    label: "Silk shirts"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "silk_shirts"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_leather_jacket"
+    label: "Leather jacket"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "leather_jacket"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_linen_layers"
+    label: "Linen layers"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "linen_layers"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_tailored_coat"
+    label: "Tailored coat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "tailored_coat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_soft_knitwear"
+    label: "Soft knitwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "soft_knitwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_practical_boots"
+    label: "Practical boots"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "practical_boots"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_ritual_robes"
+    label: "Ritual robes"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "ritual_robes"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_armoured_formalwear"
+    label: "Armoured formalwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "armoured_formalwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_borrowed_sweater"
+    label: "Borrowed sweater"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "borrowed_sweater"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_ink_stained_sleeves"
+    label: "Ink-stained sleeves"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "ink_stained_sleeves"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_starched_collar"
+    label: "Starched collar"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "starched_collar"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_loose_linen"
+    label: "Loose linen"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "loose_linen"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_velvet_waistcoat"
+    label: "Velvet waistcoat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "velvet_waistcoat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_embroidered_jacket"
+    label: "Embroidered jacket"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "embroidered_jacket"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_worn_cloak"
+    label: "Worn cloak"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "worn_cloak"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_structured_corsetry"
+    label: "Structured corsetry"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "structured_corsetry"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_utility_belt"
+    label: "Utility belt"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "utility_belt"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_riding_coat"
+    label: "Riding coat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "riding_coat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_rain_dark_coat"
+    label: "Rain-dark coat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "rain_dark_coat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_white_shirt"
+    label: "White shirt"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "white_shirt"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_black_gloves"
+    label: "Black gloves"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "black_gloves"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_jewel_toned_gown"
+    label: "Jewel-toned gown"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "jewel_toned_gown"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_simple_sundress"
+    label: "Simple sundress"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "simple_sundress"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_mechanic_coveralls"
+    label: "Mechanic coveralls"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "mechanic_coveralls"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_pilot_jacket"
+    label: "Pilot jacket"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "pilot_jacket"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_academic_cardigan"
+    label: "Academic cardigan"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "academic_cardigan"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_old_money_polish"
+    label: "Old-money polish"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "old_money_polish"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_punk_romance"
+    label: "Punk romance"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "punk_romance"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_soft_grunge"
+    label: "Soft grunge"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "soft_grunge"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_coastal_ease"
+    label: "Coastal ease"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "coastal_ease"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_desert_traveller"
+    label: "Desert traveller"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "desert_traveller"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_forest_ranger"
+    label: "Forest ranger"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "forest_ranger"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_temple_finery"
+    label: "Temple finery"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "temple_finery"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_wedding_formal"
+    label: "Wedding formal"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "wedding_formal"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_sleep_soft_domestic"
+    label: "Sleep-soft domestic"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "sleep_soft_domestic"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_market_day_practical"
+    label: "Market-day practical"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "market_day_practical"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_duelist_elegance"
+    label: "Duelist elegance"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "duelist_elegance"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_spy_minimalism"
+    label: "Spy minimalism"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "spy_minimalism"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_villain_tailoring"
+    label: "Villain tailoring"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "villain_tailoring"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_healer_apron"
+    label: "Healer apron"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "healer_apron"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_scribe_sleeves"
+    label: "Scribe sleeves"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "scribe_sleeves"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_winter_furs"
+    label: "Winter furs"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "winter_furs"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_rain_cloak"
+    label: "Rain cloak"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "rain_cloak"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_moonlit_silver"
+    label: "Moonlit silver"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "moonlit_silver"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_sun_washed_linen"
+    label: "Sun-washed linen"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "sun_washed_linen"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_blood_red_accent"
+    label: "Blood-red accent"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "blood_red_accent"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_academic_tailoring"
+    label: "Aesthetic academic tailoring"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_academic_tailoring"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_battle_practical"
+    label: "Aesthetic battle practical"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_battle_practical"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_clean_minimalism"
+    label: "Aesthetic clean minimalism"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_clean_minimalism"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_dark_romantic"
+    label: "Aesthetic dark romantic"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_dark_romantic"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_elegant_formalwear"
+    label: "Aesthetic elegant formalwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_elegant_formalwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_forest_wanderer"
+    label: "Aesthetic forest wanderer"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_forest_wanderer"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_gothic_lace"
+    label: "Aesthetic gothic lace"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_gothic_lace"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_luxury_casual"
+    label: "Aesthetic luxury casual"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_luxury_casual"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_soft_domestic"
+    label: "Aesthetic soft domestic"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_soft_domestic"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_streetwise_layers"
+    label: "Aesthetic streetwise layers"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_streetwise_layers"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_artist_layers"
+    label: "Aesthetic artist layers"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_artist_layers"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_royal_courtwear"
+    label: "Aesthetic royal courtwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_royal_courtwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_field_uniform"
+    label: "Aesthetic field uniform"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_field_uniform"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_mourning_black"
+    label: "Aesthetic mourning black"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_mourning_black"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_silk_shirts"
+    label: "Aesthetic silk shirts"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_silk_shirts"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_leather_jacket"
+    label: "Aesthetic leather jacket"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_leather_jacket"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_linen_layers"
+    label: "Aesthetic linen layers"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_linen_layers"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_tailored_coat"
+    label: "Aesthetic tailored coat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_tailored_coat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_soft_knitwear"
+    label: "Aesthetic soft knitwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_soft_knitwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_practical_boots"
+    label: "Aesthetic practical boots"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_practical_boots"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_ritual_robes"
+    label: "Aesthetic ritual robes"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_ritual_robes"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_armoured_formalwear"
+    label: "Aesthetic armoured formalwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_armoured_formalwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_borrowed_sweater"
+    label: "Aesthetic borrowed sweater"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_borrowed_sweater"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_ink_stained_sleeves"
+    label: "Aesthetic ink-stained sleeves"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_ink_stained_sleeves"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_starched_collar"
+    label: "Aesthetic starched collar"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_starched_collar"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_loose_linen"
+    label: "Aesthetic loose linen"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_loose_linen"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_velvet_waistcoat"
+    label: "Aesthetic velvet waistcoat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_velvet_waistcoat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_embroidered_jacket"
+    label: "Aesthetic embroidered jacket"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_embroidered_jacket"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_worn_cloak"
+    label: "Aesthetic worn cloak"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_worn_cloak"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_structured_corsetry"
+    label: "Aesthetic structured corsetry"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_structured_corsetry"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "clothing_aesthetic_aesthetic_utility_belt"
+    label: "Aesthetic utility belt"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_utility_belt"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_riding_coat"
+    label: "Aesthetic riding coat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_riding_coat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_rain_dark_coat"
+    label: "Aesthetic rain-dark coat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_rain_dark_coat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_white_shirt"
+    label: "Aesthetic white shirt"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_white_shirt"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_black_gloves"
+    label: "Aesthetic black gloves"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_black_gloves"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_jewel_toned_gown"
+    label: "Aesthetic jewel-toned gown"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_jewel_toned_gown"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_simple_sundress"
+    label: "Aesthetic simple sundress"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_simple_sundress"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_mechanic_coveralls"
+    label: "Aesthetic mechanic coveralls"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_mechanic_coveralls"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_pilot_jacket"
+    label: "Aesthetic pilot jacket"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_pilot_jacket"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_academic_cardigan"
+    label: "Aesthetic academic cardigan"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_academic_cardigan"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_old_money_polish"
+    label: "Aesthetic old-money polish"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_old_money_polish"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_punk_romance"
+    label: "Aesthetic punk romance"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_punk_romance"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_soft_grunge"
+    label: "Aesthetic soft grunge"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_soft_grunge"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_coastal_ease"
+    label: "Aesthetic coastal ease"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_coastal_ease"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_desert_traveller"
+    label: "Aesthetic desert traveller"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_desert_traveller"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_forest_ranger"
+    label: "Aesthetic forest ranger"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_forest_ranger"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_temple_finery"
+    label: "Aesthetic temple finery"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_temple_finery"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_wedding_formal"
+    label: "Aesthetic wedding formal"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_wedding_formal"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_sleep_soft_domestic"
+    label: "Aesthetic sleep-soft domestic"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_sleep_soft_domestic"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_market_day_practical"
+    label: "Aesthetic market-day practical"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_market_day_practical"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_duelist_elegance"
+    label: "Aesthetic duelist elegance"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_duelist_elegance"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_spy_minimalism"
+    label: "Aesthetic spy minimalism"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_spy_minimalism"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_villain_tailoring"
+    label: "Aesthetic villain tailoring"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_villain_tailoring"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_healer_apron"
+    label: "Aesthetic healer apron"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_healer_apron"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_scribe_sleeves"
+    label: "Aesthetic scribe sleeves"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_scribe_sleeves"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_winter_furs"
+    label: "Aesthetic winter furs"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_winter_furs"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_rain_cloak"
+    label: "Aesthetic rain cloak"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_rain_cloak"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_moonlit_silver"
+    label: "Aesthetic moonlit silver"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_moonlit_silver"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_sun_washed_linen"
+    label: "Aesthetic sun-washed linen"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_sun_washed_linen"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_aesthetic_blood_red_accent"
+    label: "Aesthetic blood-red accent"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "aesthetic_blood_red_accent"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_academic_tailoring"
+    label: "Signature academic tailoring"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_academic_tailoring"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_battle_practical"
+    label: "Signature battle practical"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_battle_practical"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_clean_minimalism"
+    label: "Signature clean minimalism"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_clean_minimalism"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_dark_romantic"
+    label: "Signature dark romantic"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_dark_romantic"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_elegant_formalwear"
+    label: "Signature elegant formalwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_elegant_formalwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_forest_wanderer"
+    label: "Signature forest wanderer"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_forest_wanderer"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_gothic_lace"
+    label: "Signature gothic lace"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_gothic_lace"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_luxury_casual"
+    label: "Signature luxury casual"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_luxury_casual"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_soft_domestic"
+    label: "Signature soft domestic"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_soft_domestic"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_streetwise_layers"
+    label: "Signature streetwise layers"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_streetwise_layers"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_artist_layers"
+    label: "Signature artist layers"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_artist_layers"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_royal_courtwear"
+    label: "Signature royal courtwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_royal_courtwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_field_uniform"
+    label: "Signature field uniform"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_field_uniform"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_mourning_black"
+    label: "Signature mourning black"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_mourning_black"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_silk_shirts"
+    label: "Signature silk shirts"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_silk_shirts"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_leather_jacket"
+    label: "Signature leather jacket"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_leather_jacket"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_linen_layers"
+    label: "Signature linen layers"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_linen_layers"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_tailored_coat"
+    label: "Signature tailored coat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_tailored_coat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_soft_knitwear"
+    label: "Signature soft knitwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_soft_knitwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_practical_boots"
+    label: "Signature practical boots"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_practical_boots"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_ritual_robes"
+    label: "Signature ritual robes"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_ritual_robes"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_armoured_formalwear"
+    label: "Signature armoured formalwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_armoured_formalwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_borrowed_sweater"
+    label: "Signature borrowed sweater"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_borrowed_sweater"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_ink_stained_sleeves"
+    label: "Signature ink-stained sleeves"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_ink_stained_sleeves"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_starched_collar"
+    label: "Signature starched collar"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_starched_collar"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_loose_linen"
+    label: "Signature loose linen"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_loose_linen"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_velvet_waistcoat"
+    label: "Signature velvet waistcoat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_velvet_waistcoat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_embroidered_jacket"
+    label: "Signature embroidered jacket"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_embroidered_jacket"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_worn_cloak"
+    label: "Signature worn cloak"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_worn_cloak"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_structured_corsetry"
+    label: "Signature structured corsetry"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_structured_corsetry"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_utility_belt"
+    label: "Signature utility belt"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_utility_belt"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_riding_coat"
+    label: "Signature riding coat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_riding_coat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_rain_dark_coat"
+    label: "Signature rain-dark coat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_rain_dark_coat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_white_shirt"
+    label: "Signature white shirt"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_white_shirt"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_black_gloves"
+    label: "Signature black gloves"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_black_gloves"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_jewel_toned_gown"
+    label: "Signature jewel-toned gown"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_jewel_toned_gown"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_simple_sundress"
+    label: "Signature simple sundress"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_simple_sundress"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_mechanic_coveralls"
+    label: "Signature mechanic coveralls"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_mechanic_coveralls"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_pilot_jacket"
+    label: "Signature pilot jacket"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_pilot_jacket"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_academic_cardigan"
+    label: "Signature academic cardigan"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_academic_cardigan"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_old_money_polish"
+    label: "Signature old-money polish"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_old_money_polish"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_punk_romance"
+    label: "Signature punk romance"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_punk_romance"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_soft_grunge"
+    label: "Signature soft grunge"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_soft_grunge"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_coastal_ease"
+    label: "Signature coastal ease"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_coastal_ease"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_desert_traveller"
+    label: "Signature desert traveller"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_desert_traveller"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_forest_ranger"
+    label: "Signature forest ranger"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_forest_ranger"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_temple_finery"
+    label: "Signature temple finery"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_temple_finery"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_wedding_formal"
+    label: "Signature wedding formal"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_wedding_formal"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_sleep_soft_domestic"
+    label: "Signature sleep-soft domestic"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_sleep_soft_domestic"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_market_day_practical"
+    label: "Signature market-day practical"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_market_day_practical"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_duelist_elegance"
+    label: "Signature duelist elegance"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_duelist_elegance"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_spy_minimalism"
+    label: "Signature spy minimalism"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_spy_minimalism"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_villain_tailoring"
+    label: "Signature villain tailoring"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_villain_tailoring"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_healer_apron"
+    label: "Signature healer apron"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_healer_apron"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_scribe_sleeves"
+    label: "Signature scribe sleeves"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_scribe_sleeves"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_winter_furs"
+    label: "Signature winter furs"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_winter_furs"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_rain_cloak"
+    label: "Signature rain cloak"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_rain_cloak"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_moonlit_silver"
+    label: "Signature moonlit silver"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_moonlit_silver"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_sun_washed_linen"
+    label: "Signature sun-washed linen"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_sun_washed_linen"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_signature_blood_red_accent"
+    label: "Signature blood-red accent"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "signature_blood_red_accent"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_academic_tailoring"
+    label: "Formal academic tailoring"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_academic_tailoring"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_battle_practical"
+    label: "Formal battle practical"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_battle_practical"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_clean_minimalism"
+    label: "Formal clean minimalism"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_clean_minimalism"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_dark_romantic"
+    label: "Formal dark romantic"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_dark_romantic"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_elegant_formalwear"
+    label: "Formal elegant formalwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_elegant_formalwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_forest_wanderer"
+    label: "Formal forest wanderer"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_forest_wanderer"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_gothic_lace"
+    label: "Formal gothic lace"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_gothic_lace"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_luxury_casual"
+    label: "Formal luxury casual"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_luxury_casual"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_soft_domestic"
+    label: "Formal soft domestic"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_soft_domestic"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_streetwise_layers"
+    label: "Formal streetwise layers"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_streetwise_layers"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_artist_layers"
+    label: "Formal artist layers"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_artist_layers"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_royal_courtwear"
+    label: "Formal royal courtwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_royal_courtwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_field_uniform"
+    label: "Formal field uniform"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_field_uniform"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_mourning_black"
+    label: "Formal mourning black"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_mourning_black"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_silk_shirts"
+    label: "Formal silk shirts"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_silk_shirts"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_leather_jacket"
+    label: "Formal leather jacket"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_leather_jacket"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_linen_layers"
+    label: "Formal linen layers"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_linen_layers"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_tailored_coat"
+    label: "Formal tailored coat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_tailored_coat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_soft_knitwear"
+    label: "Formal soft knitwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_soft_knitwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_practical_boots"
+    label: "Formal practical boots"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_practical_boots"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_ritual_robes"
+    label: "Formal ritual robes"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_ritual_robes"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_armoured_formalwear"
+    label: "Formal armoured formalwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_armoured_formalwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_borrowed_sweater"
+    label: "Formal borrowed sweater"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_borrowed_sweater"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_ink_stained_sleeves"
+    label: "Formal ink-stained sleeves"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_ink_stained_sleeves"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_starched_collar"
+    label: "Formal starched collar"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_starched_collar"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_loose_linen"
+    label: "Formal loose linen"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_loose_linen"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_velvet_waistcoat"
+    label: "Formal velvet waistcoat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_velvet_waistcoat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_embroidered_jacket"
+    label: "Formal embroidered jacket"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_embroidered_jacket"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_worn_cloak"
+    label: "Formal worn cloak"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_worn_cloak"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_structured_corsetry"
+    label: "Formal structured corsetry"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_structured_corsetry"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_utility_belt"
+    label: "Formal utility belt"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_utility_belt"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_riding_coat"
+    label: "Formal riding coat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_riding_coat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_rain_dark_coat"
+    label: "Formal rain-dark coat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_rain_dark_coat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_white_shirt"
+    label: "Formal white shirt"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_white_shirt"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_black_gloves"
+    label: "Formal black gloves"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_black_gloves"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_jewel_toned_gown"
+    label: "Formal jewel-toned gown"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_jewel_toned_gown"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_simple_sundress"
+    label: "Formal simple sundress"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_simple_sundress"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_mechanic_coveralls"
+    label: "Formal mechanic coveralls"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_mechanic_coveralls"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_pilot_jacket"
+    label: "Formal pilot jacket"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_pilot_jacket"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_academic_cardigan"
+    label: "Formal academic cardigan"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_academic_cardigan"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "clothing_aesthetic_formal_old_money_polish"
+    label: "Formal old-money polish"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_old_money_polish"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_formal_punk_romance"
+    label: "Formal punk romance"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_punk_romance"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_formal_soft_grunge"
+    label: "Formal soft grunge"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_soft_grunge"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_formal_coastal_ease"
+    label: "Formal coastal ease"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_coastal_ease"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_formal_desert_traveller"
+    label: "Formal desert traveller"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_desert_traveller"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_formal_forest_ranger"
+    label: "Formal forest ranger"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_forest_ranger"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_formal_temple_finery"
+    label: "Formal temple finery"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_temple_finery"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_formal_wedding_formal"
+    label: "Formal wedding formal"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_wedding_formal"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_formal_sleep_soft_domestic"
+    label: "Formal sleep-soft domestic"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_sleep_soft_domestic"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_formal_market_day_practical"
+    label: "Formal market-day practical"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_market_day_practical"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_formal_duelist_elegance"
+    label: "Formal duelist elegance"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_duelist_elegance"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_formal_spy_minimalism"
+    label: "Formal spy minimalism"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_spy_minimalism"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_formal_villain_tailoring"
+    label: "Formal villain tailoring"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_villain_tailoring"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_formal_healer_apron"
+    label: "Formal healer apron"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_healer_apron"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_formal_scribe_sleeves"
+    label: "Formal scribe sleeves"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_scribe_sleeves"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_formal_winter_furs"
+    label: "Formal winter furs"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_winter_furs"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_formal_rain_cloak"
+    label: "Formal rain cloak"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_rain_cloak"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_formal_moonlit_silver"
+    label: "Formal moonlit silver"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_moonlit_silver"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_formal_sun_washed_linen"
+    label: "Formal sun-washed linen"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_sun_washed_linen"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_formal_blood_red_accent"
+    label: "Formal blood-red accent"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "formal_blood_red_accent"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_academic_tailoring"
+    label: "Casual academic tailoring"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_academic_tailoring"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_battle_practical"
+    label: "Casual battle practical"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_battle_practical"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_clean_minimalism"
+    label: "Casual clean minimalism"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_clean_minimalism"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_dark_romantic"
+    label: "Casual dark romantic"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_dark_romantic"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_elegant_formalwear"
+    label: "Casual elegant formalwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_elegant_formalwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_forest_wanderer"
+    label: "Casual forest wanderer"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_forest_wanderer"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_gothic_lace"
+    label: "Casual gothic lace"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_gothic_lace"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_luxury_casual"
+    label: "Casual luxury casual"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_luxury_casual"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_soft_domestic"
+    label: "Casual soft domestic"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_soft_domestic"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_streetwise_layers"
+    label: "Casual streetwise layers"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_streetwise_layers"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_artist_layers"
+    label: "Casual artist layers"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_artist_layers"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_royal_courtwear"
+    label: "Casual royal courtwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_royal_courtwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_field_uniform"
+    label: "Casual field uniform"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_field_uniform"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_mourning_black"
+    label: "Casual mourning black"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_mourning_black"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_silk_shirts"
+    label: "Casual silk shirts"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_silk_shirts"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_leather_jacket"
+    label: "Casual leather jacket"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_leather_jacket"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_linen_layers"
+    label: "Casual linen layers"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_linen_layers"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_tailored_coat"
+    label: "Casual tailored coat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_tailored_coat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_soft_knitwear"
+    label: "Casual soft knitwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_soft_knitwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_practical_boots"
+    label: "Casual practical boots"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_practical_boots"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_ritual_robes"
+    label: "Casual ritual robes"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_ritual_robes"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_armoured_formalwear"
+    label: "Casual armoured formalwear"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_armoured_formalwear"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_borrowed_sweater"
+    label: "Casual borrowed sweater"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_borrowed_sweater"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_ink_stained_sleeves"
+    label: "Casual ink-stained sleeves"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_ink_stained_sleeves"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_starched_collar"
+    label: "Casual starched collar"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_starched_collar"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_loose_linen"
+    label: "Casual loose linen"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_loose_linen"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_velvet_waistcoat"
+    label: "Casual velvet waistcoat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_velvet_waistcoat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_embroidered_jacket"
+    label: "Casual embroidered jacket"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_embroidered_jacket"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_worn_cloak"
+    label: "Casual worn cloak"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_worn_cloak"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_structured_corsetry"
+    label: "Casual structured corsetry"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_structured_corsetry"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_utility_belt"
+    label: "Casual utility belt"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_utility_belt"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_riding_coat"
+    label: "Casual riding coat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_riding_coat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_rain_dark_coat"
+    label: "Casual rain-dark coat"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_rain_dark_coat"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_white_shirt"
+    label: "Casual white shirt"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_white_shirt"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_black_gloves"
+    label: "Casual black gloves"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_black_gloves"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_jewel_toned_gown"
+    label: "Casual jewel-toned gown"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_jewel_toned_gown"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_simple_sundress"
+    label: "Casual simple sundress"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_simple_sundress"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_mechanic_coveralls"
+    label: "Casual mechanic coveralls"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_mechanic_coveralls"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_pilot_jacket"
+    label: "Casual pilot jacket"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_pilot_jacket"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_academic_cardigan"
+    label: "Casual academic cardigan"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_academic_cardigan"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_old_money_polish"
+    label: "Casual old-money polish"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_old_money_polish"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_punk_romance"
+    label: "Casual punk romance"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_punk_romance"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_soft_grunge"
+    label: "Casual soft grunge"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_soft_grunge"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_coastal_ease"
+    label: "Casual coastal ease"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_coastal_ease"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_desert_traveller"
+    label: "Casual desert traveller"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_desert_traveller"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_forest_ranger"
+    label: "Casual forest ranger"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_forest_ranger"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_temple_finery"
+    label: "Casual temple finery"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_temple_finery"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_wedding_formal"
+    label: "Casual wedding formal"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_wedding_formal"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_sleep_soft_domestic"
+    label: "Casual sleep-soft domestic"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_sleep_soft_domestic"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_market_day_practical"
+    label: "Casual market-day practical"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_market_day_practical"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_duelist_elegance"
+    label: "Casual duelist elegance"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_duelist_elegance"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_spy_minimalism"
+    label: "Casual spy minimalism"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_spy_minimalism"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_villain_tailoring"
+    label: "Casual villain tailoring"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_villain_tailoring"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_healer_apron"
+    label: "Casual healer apron"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_healer_apron"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_scribe_sleeves"
+    label: "Casual scribe sleeves"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_scribe_sleeves"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_winter_furs"
+    label: "Casual winter furs"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_winter_furs"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_rain_cloak"
+    label: "Casual rain cloak"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_rain_cloak"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_moonlit_silver"
+    label: "Casual moonlit silver"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_moonlit_silver"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_sun_washed_linen"
+    label: "Casual sun-washed linen"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_sun_washed_linen"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "clothing_aesthetic_casual_blood_red_accent"
+    label: "Casual blood-red accent"
+    category: "clothing_aesthetic"
+    aliases: 
+      - "casual_blood_red_accent"
+    polarity: "neutral"
+    intensity: "soft"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"

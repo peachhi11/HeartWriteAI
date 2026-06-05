@@ -1,0 +1,3407 @@
+schema: "heartwriteai.character_vocab_file.v1"
+filename: "romance.routes.yaml"
+description: "Route and ending arc tokens."
+categories: 
+  - "routes"
+count: 200
+tokens: 
+  - id: "routes_soft_romance_route"
+    label: "Soft romance route"
+    category: "routes"
+    aliases: 
+      - "soft_romance_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_friendship_route"
+    label: "Soft friendship route"
+    category: "routes"
+    aliases: 
+      - "soft_friendship_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_rivalry_route"
+    label: "Soft rivalry route"
+    category: "routes"
+    aliases: 
+      - "soft_rivalry_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_jealousy_route"
+    label: "Soft jealousy route"
+    category: "routes"
+    aliases: 
+      - "soft_jealousy_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_betrayal_route"
+    label: "Soft betrayal route"
+    category: "routes"
+    aliases: 
+      - "soft_betrayal_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_reconciliation_route"
+    label: "Soft reconciliation route"
+    category: "routes"
+    aliases: 
+      - "soft_reconciliation_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_redemption_route"
+    label: "Soft redemption route"
+    category: "routes"
+    aliases: 
+      - "soft_redemption_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_corruption_route"
+    label: "Soft corruption route"
+    category: "routes"
+    aliases: 
+      - "soft_corruption_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_obsession_route"
+    label: "Soft obsession route"
+    category: "routes"
+    aliases: 
+      - "soft_obsession_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_protection_route"
+    label: "Soft protection route"
+    category: "routes"
+    aliases: 
+      - "soft_protection_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_domestic_route"
+    label: "Soft domestic route"
+    category: "routes"
+    aliases: 
+      - "soft_domestic_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_angst_route"
+    label: "Soft angst route"
+    category: "routes"
+    aliases: 
+      - "soft_angst_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_healing_route"
+    label: "Soft healing route"
+    category: "routes"
+    aliases: 
+      - "soft_healing_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_villain_route"
+    label: "Soft villain route"
+    category: "routes"
+    aliases: 
+      - "soft_villain_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "core"
+  - id: "routes_soft_sacrifice_route"
+    label: "Soft sacrifice route"
+    category: "routes"
+    aliases: 
+      - "soft_sacrifice_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_abandonment_route"
+    label: "Soft abandonment route"
+    category: "routes"
+    aliases: 
+      - "soft_abandonment_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_forbidden_love_route"
+    label: "Soft forbidden love route"
+    category: "routes"
+    aliases: 
+      - "soft_forbidden_love_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "core"
+  - id: "routes_soft_soulmate_route"
+    label: "Soft soulmate route"
+    category: "routes"
+    aliases: 
+      - "soft_soulmate_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_marriage_route"
+    label: "Soft marriage route"
+    category: "routes"
+    aliases: 
+      - "soft_marriage_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_tragic_route"
+    label: "Soft tragic route"
+    category: "routes"
+    aliases: 
+      - "soft_tragic_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_comedy_route"
+    label: "Soft comedy route"
+    category: "routes"
+    aliases: 
+      - "soft_comedy_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_mystery_route"
+    label: "Soft mystery route"
+    category: "routes"
+    aliases: 
+      - "soft_mystery_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_courtship_route"
+    label: "Soft courtship route"
+    category: "routes"
+    aliases: 
+      - "soft_courtship_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_slow_trust_route"
+    label: "Soft slow trust route"
+    category: "routes"
+    aliases: 
+      - "soft_slow_trust_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_second_chance_route"
+    label: "Soft second chance route"
+    category: "routes"
+    aliases: 
+      - "soft_second_chance_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_revenge_route"
+    label: "Soft revenge route"
+    category: "routes"
+    aliases: 
+      - "soft_revenge_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_exile_route"
+    label: "Soft exile route"
+    category: "routes"
+    aliases: 
+      - "soft_exile_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_monster_route"
+    label: "Soft monster route"
+    category: "routes"
+    aliases: 
+      - "soft_monster_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_bodyguard_route"
+    label: "Soft bodyguard route"
+    category: "routes"
+    aliases: 
+      - "soft_bodyguard_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_fake_dating_route"
+    label: "Soft fake dating route"
+    category: "routes"
+    aliases: 
+      - "soft_fake_dating_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_arranged_match_route"
+    label: "Soft arranged match route"
+    category: "routes"
+    aliases: 
+      - "soft_arranged_match_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_found_family_route"
+    label: "Soft found family route"
+    category: "routes"
+    aliases: 
+      - "soft_found_family_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_power_struggle_route"
+    label: "Soft power struggle route"
+    category: "routes"
+    aliases: 
+      - "soft_power_struggle_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: true
+    sourceKind: "core"
+  - id: "routes_soft_hurt_comfort_route"
+    label: "Soft hurt comfort route"
+    category: "routes"
+    aliases: 
+      - "soft_hurt_comfort_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_secret_identity_route"
+    label: "Soft secret identity route"
+    category: "routes"
+    aliases: 
+      - "soft_secret_identity_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_public_scandal_route"
+    label: "Soft public scandal route"
+    category: "routes"
+    aliases: 
+      - "soft_public_scandal_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "core"
+  - id: "routes_soft_private_devotion_route"
+    label: "Soft private devotion route"
+    category: "routes"
+    aliases: 
+      - "soft_private_devotion_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_runaway_route"
+    label: "Soft runaway route"
+    category: "routes"
+    aliases: 
+      - "soft_runaway_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_quest_route"
+    label: "Soft quest route"
+    category: "routes"
+    aliases: 
+      - "soft_quest_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_rescue_route"
+    label: "Soft rescue route"
+    category: "routes"
+    aliases: 
+      - "soft_rescue_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_domestic_healing_route"
+    label: "Soft domestic healing route"
+    category: "routes"
+    aliases: 
+      - "soft_domestic_healing_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_rivals_alliance_route"
+    label: "Soft rivals alliance route"
+    category: "routes"
+    aliases: 
+      - "soft_rivals_alliance_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_loyalty_trial_route"
+    label: "Soft loyalty trial route"
+    category: "routes"
+    aliases: 
+      - "soft_loyalty_trial_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_curse_breaking_route"
+    label: "Soft curse breaking route"
+    category: "routes"
+    aliases: 
+      - "soft_curse_breaking_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_duty_versus_love_route"
+    label: "Soft duty versus love route"
+    category: "routes"
+    aliases: 
+      - "soft_duty_versus_love_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_moral_compromise_route"
+    label: "Soft moral compromise route"
+    category: "routes"
+    aliases: 
+      - "soft_moral_compromise_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_trust_rebuilding_route"
+    label: "Soft trust rebuilding route"
+    category: "routes"
+    aliases: 
+      - "soft_trust_rebuilding_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_soft_epilogue_route"
+    label: "Soft soft epilogue route"
+    category: "routes"
+    aliases: 
+      - "soft_soft_epilogue_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_bittersweet_parting_route"
+    label: "Soft bittersweet parting route"
+    category: "routes"
+    aliases: 
+      - "soft_bittersweet_parting_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_soft_chosen_family_route"
+    label: "Soft chosen family route"
+    category: "routes"
+    aliases: 
+      - "soft_chosen_family_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_romance_route"
+    label: "Tense romance route"
+    category: "routes"
+    aliases: 
+      - "tense_romance_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_friendship_route"
+    label: "Tense friendship route"
+    category: "routes"
+    aliases: 
+      - "tense_friendship_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_rivalry_route"
+    label: "Tense rivalry route"
+    category: "routes"
+    aliases: 
+      - "tense_rivalry_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_jealousy_route"
+    label: "Tense jealousy route"
+    category: "routes"
+    aliases: 
+      - "tense_jealousy_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_betrayal_route"
+    label: "Tense betrayal route"
+    category: "routes"
+    aliases: 
+      - "tense_betrayal_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_reconciliation_route"
+    label: "Tense reconciliation route"
+    category: "routes"
+    aliases: 
+      - "tense_reconciliation_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_redemption_route"
+    label: "Tense redemption route"
+    category: "routes"
+    aliases: 
+      - "tense_redemption_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_corruption_route"
+    label: "Tense corruption route"
+    category: "routes"
+    aliases: 
+      - "tense_corruption_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_obsession_route"
+    label: "Tense obsession route"
+    category: "routes"
+    aliases: 
+      - "tense_obsession_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_protection_route"
+    label: "Tense protection route"
+    category: "routes"
+    aliases: 
+      - "tense_protection_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_domestic_route"
+    label: "Tense domestic route"
+    category: "routes"
+    aliases: 
+      - "tense_domestic_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_angst_route"
+    label: "Tense angst route"
+    category: "routes"
+    aliases: 
+      - "tense_angst_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_healing_route"
+    label: "Tense healing route"
+    category: "routes"
+    aliases: 
+      - "tense_healing_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_villain_route"
+    label: "Tense villain route"
+    category: "routes"
+    aliases: 
+      - "tense_villain_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "core"
+  - id: "routes_tense_sacrifice_route"
+    label: "Tense sacrifice route"
+    category: "routes"
+    aliases: 
+      - "tense_sacrifice_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_abandonment_route"
+    label: "Tense abandonment route"
+    category: "routes"
+    aliases: 
+      - "tense_abandonment_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_forbidden_love_route"
+    label: "Tense forbidden love route"
+    category: "routes"
+    aliases: 
+      - "tense_forbidden_love_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "core"
+  - id: "routes_tense_soulmate_route"
+    label: "Tense soulmate route"
+    category: "routes"
+    aliases: 
+      - "tense_soulmate_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_marriage_route"
+    label: "Tense marriage route"
+    category: "routes"
+    aliases: 
+      - "tense_marriage_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_tragic_route"
+    label: "Tense tragic route"
+    category: "routes"
+    aliases: 
+      - "tense_tragic_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_comedy_route"
+    label: "Tense comedy route"
+    category: "routes"
+    aliases: 
+      - "tense_comedy_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_mystery_route"
+    label: "Tense mystery route"
+    category: "routes"
+    aliases: 
+      - "tense_mystery_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_courtship_route"
+    label: "Tense courtship route"
+    category: "routes"
+    aliases: 
+      - "tense_courtship_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_slow_trust_route"
+    label: "Tense slow trust route"
+    category: "routes"
+    aliases: 
+      - "tense_slow_trust_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_second_chance_route"
+    label: "Tense second chance route"
+    category: "routes"
+    aliases: 
+      - "tense_second_chance_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_revenge_route"
+    label: "Tense revenge route"
+    category: "routes"
+    aliases: 
+      - "tense_revenge_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_exile_route"
+    label: "Tense exile route"
+    category: "routes"
+    aliases: 
+      - "tense_exile_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_monster_route"
+    label: "Tense monster route"
+    category: "routes"
+    aliases: 
+      - "tense_monster_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_bodyguard_route"
+    label: "Tense bodyguard route"
+    category: "routes"
+    aliases: 
+      - "tense_bodyguard_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_fake_dating_route"
+    label: "Tense fake dating route"
+    category: "routes"
+    aliases: 
+      - "tense_fake_dating_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_arranged_match_route"
+    label: "Tense arranged match route"
+    category: "routes"
+    aliases: 
+      - "tense_arranged_match_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_found_family_route"
+    label: "Tense found family route"
+    category: "routes"
+    aliases: 
+      - "tense_found_family_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_power_struggle_route"
+    label: "Tense power struggle route"
+    category: "routes"
+    aliases: 
+      - "tense_power_struggle_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: true
+    sourceKind: "core"
+  - id: "routes_tense_hurt_comfort_route"
+    label: "Tense hurt comfort route"
+    category: "routes"
+    aliases: 
+      - "tense_hurt_comfort_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_secret_identity_route"
+    label: "Tense secret identity route"
+    category: "routes"
+    aliases: 
+      - "tense_secret_identity_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_public_scandal_route"
+    label: "Tense public scandal route"
+    category: "routes"
+    aliases: 
+      - "tense_public_scandal_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "core"
+  - id: "routes_tense_private_devotion_route"
+    label: "Tense private devotion route"
+    category: "routes"
+    aliases: 
+      - "tense_private_devotion_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_runaway_route"
+    label: "Tense runaway route"
+    category: "routes"
+    aliases: 
+      - "tense_runaway_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_quest_route"
+    label: "Tense quest route"
+    category: "routes"
+    aliases: 
+      - "tense_quest_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_rescue_route"
+    label: "Tense rescue route"
+    category: "routes"
+    aliases: 
+      - "tense_rescue_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "core"
+  - id: "routes_tense_domestic_healing_route"
+    label: "Tense domestic healing route"
+    category: "routes"
+    aliases: 
+      - "tense_domestic_healing_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tense_rivals_alliance_route"
+    label: "Tense rivals alliance route"
+    category: "routes"
+    aliases: 
+      - "tense_rivals_alliance_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tense_loyalty_trial_route"
+    label: "Tense loyalty trial route"
+    category: "routes"
+    aliases: 
+      - "tense_loyalty_trial_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tense_curse_breaking_route"
+    label: "Tense curse breaking route"
+    category: "routes"
+    aliases: 
+      - "tense_curse_breaking_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tense_duty_versus_love_route"
+    label: "Tense duty versus love route"
+    category: "routes"
+    aliases: 
+      - "tense_duty_versus_love_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tense_moral_compromise_route"
+    label: "Tense moral compromise route"
+    category: "routes"
+    aliases: 
+      - "tense_moral_compromise_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tense_trust_rebuilding_route"
+    label: "Tense trust rebuilding route"
+    category: "routes"
+    aliases: 
+      - "tense_trust_rebuilding_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tense_soft_epilogue_route"
+    label: "Tense soft epilogue route"
+    category: "routes"
+    aliases: 
+      - "tense_soft_epilogue_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tense_bittersweet_parting_route"
+    label: "Tense bittersweet parting route"
+    category: "routes"
+    aliases: 
+      - "tense_bittersweet_parting_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tense_chosen_family_route"
+    label: "Tense chosen family route"
+    category: "routes"
+    aliases: 
+      - "tense_chosen_family_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_romance_route"
+    label: "Comic romance route"
+    category: "routes"
+    aliases: 
+      - "comic_romance_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_friendship_route"
+    label: "Comic friendship route"
+    category: "routes"
+    aliases: 
+      - "comic_friendship_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_rivalry_route"
+    label: "Comic rivalry route"
+    category: "routes"
+    aliases: 
+      - "comic_rivalry_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_jealousy_route"
+    label: "Comic jealousy route"
+    category: "routes"
+    aliases: 
+      - "comic_jealousy_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_betrayal_route"
+    label: "Comic betrayal route"
+    category: "routes"
+    aliases: 
+      - "comic_betrayal_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_reconciliation_route"
+    label: "Comic reconciliation route"
+    category: "routes"
+    aliases: 
+      - "comic_reconciliation_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_redemption_route"
+    label: "Comic redemption route"
+    category: "routes"
+    aliases: 
+      - "comic_redemption_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_corruption_route"
+    label: "Comic corruption route"
+    category: "routes"
+    aliases: 
+      - "comic_corruption_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_obsession_route"
+    label: "Comic obsession route"
+    category: "routes"
+    aliases: 
+      - "comic_obsession_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_protection_route"
+    label: "Comic protection route"
+    category: "routes"
+    aliases: 
+      - "comic_protection_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_domestic_route"
+    label: "Comic domestic route"
+    category: "routes"
+    aliases: 
+      - "comic_domestic_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_angst_route"
+    label: "Comic angst route"
+    category: "routes"
+    aliases: 
+      - "comic_angst_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_healing_route"
+    label: "Comic healing route"
+    category: "routes"
+    aliases: 
+      - "comic_healing_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_villain_route"
+    label: "Comic villain route"
+    category: "routes"
+    aliases: 
+      - "comic_villain_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "routes_comic_sacrifice_route"
+    label: "Comic sacrifice route"
+    category: "routes"
+    aliases: 
+      - "comic_sacrifice_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_abandonment_route"
+    label: "Comic abandonment route"
+    category: "routes"
+    aliases: 
+      - "comic_abandonment_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_forbidden_love_route"
+    label: "Comic forbidden love route"
+    category: "routes"
+    aliases: 
+      - "comic_forbidden_love_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "routes_comic_soulmate_route"
+    label: "Comic soulmate route"
+    category: "routes"
+    aliases: 
+      - "comic_soulmate_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_marriage_route"
+    label: "Comic marriage route"
+    category: "routes"
+    aliases: 
+      - "comic_marriage_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_tragic_route"
+    label: "Comic tragic route"
+    category: "routes"
+    aliases: 
+      - "comic_tragic_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_comedy_route"
+    label: "Comic comedy route"
+    category: "routes"
+    aliases: 
+      - "comic_comedy_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_mystery_route"
+    label: "Comic mystery route"
+    category: "routes"
+    aliases: 
+      - "comic_mystery_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_courtship_route"
+    label: "Comic courtship route"
+    category: "routes"
+    aliases: 
+      - "comic_courtship_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_slow_trust_route"
+    label: "Comic slow trust route"
+    category: "routes"
+    aliases: 
+      - "comic_slow_trust_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_second_chance_route"
+    label: "Comic second chance route"
+    category: "routes"
+    aliases: 
+      - "comic_second_chance_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_revenge_route"
+    label: "Comic revenge route"
+    category: "routes"
+    aliases: 
+      - "comic_revenge_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_exile_route"
+    label: "Comic exile route"
+    category: "routes"
+    aliases: 
+      - "comic_exile_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_monster_route"
+    label: "Comic monster route"
+    category: "routes"
+    aliases: 
+      - "comic_monster_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_bodyguard_route"
+    label: "Comic bodyguard route"
+    category: "routes"
+    aliases: 
+      - "comic_bodyguard_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_fake_dating_route"
+    label: "Comic fake dating route"
+    category: "routes"
+    aliases: 
+      - "comic_fake_dating_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_arranged_match_route"
+    label: "Comic arranged match route"
+    category: "routes"
+    aliases: 
+      - "comic_arranged_match_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_found_family_route"
+    label: "Comic found family route"
+    category: "routes"
+    aliases: 
+      - "comic_found_family_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_power_struggle_route"
+    label: "Comic power struggle route"
+    category: "routes"
+    aliases: 
+      - "comic_power_struggle_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "routes_comic_hurt_comfort_route"
+    label: "Comic hurt comfort route"
+    category: "routes"
+    aliases: 
+      - "comic_hurt_comfort_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_secret_identity_route"
+    label: "Comic secret identity route"
+    category: "routes"
+    aliases: 
+      - "comic_secret_identity_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_public_scandal_route"
+    label: "Comic public scandal route"
+    category: "routes"
+    aliases: 
+      - "comic_public_scandal_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "routes_comic_private_devotion_route"
+    label: "Comic private devotion route"
+    category: "routes"
+    aliases: 
+      - "comic_private_devotion_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_runaway_route"
+    label: "Comic runaway route"
+    category: "routes"
+    aliases: 
+      - "comic_runaway_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_quest_route"
+    label: "Comic quest route"
+    category: "routes"
+    aliases: 
+      - "comic_quest_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_rescue_route"
+    label: "Comic rescue route"
+    category: "routes"
+    aliases: 
+      - "comic_rescue_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_domestic_healing_route"
+    label: "Comic domestic healing route"
+    category: "routes"
+    aliases: 
+      - "comic_domestic_healing_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_rivals_alliance_route"
+    label: "Comic rivals alliance route"
+    category: "routes"
+    aliases: 
+      - "comic_rivals_alliance_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_loyalty_trial_route"
+    label: "Comic loyalty trial route"
+    category: "routes"
+    aliases: 
+      - "comic_loyalty_trial_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_curse_breaking_route"
+    label: "Comic curse breaking route"
+    category: "routes"
+    aliases: 
+      - "comic_curse_breaking_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_duty_versus_love_route"
+    label: "Comic duty versus love route"
+    category: "routes"
+    aliases: 
+      - "comic_duty_versus_love_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_moral_compromise_route"
+    label: "Comic moral compromise route"
+    category: "routes"
+    aliases: 
+      - "comic_moral_compromise_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_trust_rebuilding_route"
+    label: "Comic trust rebuilding route"
+    category: "routes"
+    aliases: 
+      - "comic_trust_rebuilding_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_soft_epilogue_route"
+    label: "Comic soft epilogue route"
+    category: "routes"
+    aliases: 
+      - "comic_soft_epilogue_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_bittersweet_parting_route"
+    label: "Comic bittersweet parting route"
+    category: "routes"
+    aliases: 
+      - "comic_bittersweet_parting_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_comic_chosen_family_route"
+    label: "Comic chosen family route"
+    category: "routes"
+    aliases: 
+      - "comic_chosen_family_route"
+    polarity: "mixed"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_romance_route"
+    label: "Tragic romance route"
+    category: "routes"
+    aliases: 
+      - "tragic_romance_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_friendship_route"
+    label: "Tragic friendship route"
+    category: "routes"
+    aliases: 
+      - "tragic_friendship_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_rivalry_route"
+    label: "Tragic rivalry route"
+    category: "routes"
+    aliases: 
+      - "tragic_rivalry_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_jealousy_route"
+    label: "Tragic jealousy route"
+    category: "routes"
+    aliases: 
+      - "tragic_jealousy_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_betrayal_route"
+    label: "Tragic betrayal route"
+    category: "routes"
+    aliases: 
+      - "tragic_betrayal_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_reconciliation_route"
+    label: "Tragic reconciliation route"
+    category: "routes"
+    aliases: 
+      - "tragic_reconciliation_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_redemption_route"
+    label: "Tragic redemption route"
+    category: "routes"
+    aliases: 
+      - "tragic_redemption_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_corruption_route"
+    label: "Tragic corruption route"
+    category: "routes"
+    aliases: 
+      - "tragic_corruption_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_obsession_route"
+    label: "Tragic obsession route"
+    category: "routes"
+    aliases: 
+      - "tragic_obsession_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_protection_route"
+    label: "Tragic protection route"
+    category: "routes"
+    aliases: 
+      - "tragic_protection_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_domestic_route"
+    label: "Tragic domestic route"
+    category: "routes"
+    aliases: 
+      - "tragic_domestic_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_angst_route"
+    label: "Tragic angst route"
+    category: "routes"
+    aliases: 
+      - "tragic_angst_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_healing_route"
+    label: "Tragic healing route"
+    category: "routes"
+    aliases: 
+      - "tragic_healing_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_villain_route"
+    label: "Tragic villain route"
+    category: "routes"
+    aliases: 
+      - "tragic_villain_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "routes_tragic_sacrifice_route"
+    label: "Tragic sacrifice route"
+    category: "routes"
+    aliases: 
+      - "tragic_sacrifice_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_abandonment_route"
+    label: "Tragic abandonment route"
+    category: "routes"
+    aliases: 
+      - "tragic_abandonment_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_forbidden_love_route"
+    label: "Tragic forbidden love route"
+    category: "routes"
+    aliases: 
+      - "tragic_forbidden_love_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "routes_tragic_soulmate_route"
+    label: "Tragic soulmate route"
+    category: "routes"
+    aliases: 
+      - "tragic_soulmate_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_marriage_route"
+    label: "Tragic marriage route"
+    category: "routes"
+    aliases: 
+      - "tragic_marriage_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_tragic_route"
+    label: "Tragic tragic route"
+    category: "routes"
+    aliases: 
+      - "tragic_tragic_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_comedy_route"
+    label: "Tragic comedy route"
+    category: "routes"
+    aliases: 
+      - "tragic_comedy_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_mystery_route"
+    label: "Tragic mystery route"
+    category: "routes"
+    aliases: 
+      - "tragic_mystery_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_courtship_route"
+    label: "Tragic courtship route"
+    category: "routes"
+    aliases: 
+      - "tragic_courtship_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_slow_trust_route"
+    label: "Tragic slow trust route"
+    category: "routes"
+    aliases: 
+      - "tragic_slow_trust_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_second_chance_route"
+    label: "Tragic second chance route"
+    category: "routes"
+    aliases: 
+      - "tragic_second_chance_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_revenge_route"
+    label: "Tragic revenge route"
+    category: "routes"
+    aliases: 
+      - "tragic_revenge_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_exile_route"
+    label: "Tragic exile route"
+    category: "routes"
+    aliases: 
+      - "tragic_exile_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_monster_route"
+    label: "Tragic monster route"
+    category: "routes"
+    aliases: 
+      - "tragic_monster_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_bodyguard_route"
+    label: "Tragic bodyguard route"
+    category: "routes"
+    aliases: 
+      - "tragic_bodyguard_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_fake_dating_route"
+    label: "Tragic fake dating route"
+    category: "routes"
+    aliases: 
+      - "tragic_fake_dating_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_arranged_match_route"
+    label: "Tragic arranged match route"
+    category: "routes"
+    aliases: 
+      - "tragic_arranged_match_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_found_family_route"
+    label: "Tragic found family route"
+    category: "routes"
+    aliases: 
+      - "tragic_found_family_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_power_struggle_route"
+    label: "Tragic power struggle route"
+    category: "routes"
+    aliases: 
+      - "tragic_power_struggle_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: true
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "routes_tragic_hurt_comfort_route"
+    label: "Tragic hurt comfort route"
+    category: "routes"
+    aliases: 
+      - "tragic_hurt_comfort_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_secret_identity_route"
+    label: "Tragic secret identity route"
+    category: "routes"
+    aliases: 
+      - "tragic_secret_identity_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_public_scandal_route"
+    label: "Tragic public scandal route"
+    category: "routes"
+    aliases: 
+      - "tragic_public_scandal_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: true
+    sourceKind: "generated"
+  - id: "routes_tragic_private_devotion_route"
+    label: "Tragic private devotion route"
+    category: "routes"
+    aliases: 
+      - "tragic_private_devotion_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_runaway_route"
+    label: "Tragic runaway route"
+    category: "routes"
+    aliases: 
+      - "tragic_runaway_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_quest_route"
+    label: "Tragic quest route"
+    category: "routes"
+    aliases: 
+      - "tragic_quest_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_rescue_route"
+    label: "Tragic rescue route"
+    category: "routes"
+    aliases: 
+      - "tragic_rescue_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_domestic_healing_route"
+    label: "Tragic domestic healing route"
+    category: "routes"
+    aliases: 
+      - "tragic_domestic_healing_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_rivals_alliance_route"
+    label: "Tragic rivals alliance route"
+    category: "routes"
+    aliases: 
+      - "tragic_rivals_alliance_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_loyalty_trial_route"
+    label: "Tragic loyalty trial route"
+    category: "routes"
+    aliases: 
+      - "tragic_loyalty_trial_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_curse_breaking_route"
+    label: "Tragic curse breaking route"
+    category: "routes"
+    aliases: 
+      - "tragic_curse_breaking_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_duty_versus_love_route"
+    label: "Tragic duty versus love route"
+    category: "routes"
+    aliases: 
+      - "tragic_duty_versus_love_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_moral_compromise_route"
+    label: "Tragic moral compromise route"
+    category: "routes"
+    aliases: 
+      - "tragic_moral_compromise_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_trust_rebuilding_route"
+    label: "Tragic trust rebuilding route"
+    category: "routes"
+    aliases: 
+      - "tragic_trust_rebuilding_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_soft_epilogue_route"
+    label: "Tragic soft epilogue route"
+    category: "routes"
+    aliases: 
+      - "tragic_soft_epilogue_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_bittersweet_parting_route"
+    label: "Tragic bittersweet parting route"
+    category: "routes"
+    aliases: 
+      - "tragic_bittersweet_parting_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"
+  - id: "routes_tragic_chosen_family_route"
+    label: "Tragic chosen family route"
+    category: "routes"
+    aliases: 
+      - "tragic_chosen_family_route"
+    polarity: "mixed"
+    intensity: "intense"
+    adult: false
+    unsafe: false
+    romanceRelevant: true
+    contentFlags:
+      adult_romance: true
+      explicit_allowed: false
+      consent_required: true
+      coercion_risk: false
+      taboo_risk: false
+    sourceKind: "generated"

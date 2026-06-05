@@ -1,0 +1,2207 @@
+schema: "heartwriteai.character_vocab_file.v1"
+filename: "appearance.face.yaml"
+description: "Face, gaze, hair, expression, and presence tokens."
+categories: 
+  - "appearance"
+count: 200
+tokens: 
+  - id: "appearance_angular_features"
+    label: "Angular features"
+    category: "appearance"
+    aliases: 
+      - "angular_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_battle_worn_beauty"
+    label: "Battle-worn beauty"
+    category: "appearance"
+    aliases: 
+      - "battle_worn_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_bright_eyes"
+    label: "Bright eyes"
+    category: "appearance"
+    aliases: 
+      - "bright_eyes"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_expressive_face"
+    label: "Expressive face"
+    category: "appearance"
+    aliases: 
+      - "expressive_face"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_guarded_gaze"
+    label: "Guarded gaze"
+    category: "appearance"
+    aliases: 
+      - "guarded_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_soft_smile"
+    label: "Soft smile"
+    category: "appearance"
+    aliases: 
+      - "soft_smile"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_warm_expression"
+    label: "Warm expression"
+    category: "appearance"
+    aliases: 
+      - "warm_expression"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_soft_features"
+    label: "Soft features"
+    category: "appearance"
+    aliases: 
+      - "soft_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_sharp_features"
+    label: "Sharp features"
+    category: "appearance"
+    aliases: 
+      - "sharp_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_delicate_features"
+    label: "Delicate features"
+    category: "appearance"
+    aliases: 
+      - "delicate_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_rugged_features"
+    label: "Rugged features"
+    category: "appearance"
+    aliases: 
+      - "rugged_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_refined_features"
+    label: "Refined features"
+    category: "appearance"
+    aliases: 
+      - "refined_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_strong_features"
+    label: "Strong features"
+    category: "appearance"
+    aliases: 
+      - "strong_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_fine_boned_features"
+    label: "Fine-boned features"
+    category: "appearance"
+    aliases: 
+      - "fine_boned_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_rounded_features"
+    label: "Rounded features"
+    category: "appearance"
+    aliases: 
+      - "rounded_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_warm_gaze"
+    label: "Warm gaze"
+    category: "appearance"
+    aliases: 
+      - "warm_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_cold_gaze"
+    label: "Cold gaze"
+    category: "appearance"
+    aliases: 
+      - "cold_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_piercing_gaze"
+    label: "Piercing gaze"
+    category: "appearance"
+    aliases: 
+      - "piercing_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_playful_gaze"
+    label: "Playful gaze"
+    category: "appearance"
+    aliases: 
+      - "playful_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_long_lashes"
+    label: "Long lashes"
+    category: "appearance"
+    aliases: 
+      - "long_lashes"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_messy_hair"
+    label: "Messy hair"
+    category: "appearance"
+    aliases: 
+      - "messy_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_silky_hair"
+    label: "Silky hair"
+    category: "appearance"
+    aliases: 
+      - "silky_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_thick_hair"
+    label: "Thick hair"
+    category: "appearance"
+    aliases: 
+      - "thick_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_soft_hair"
+    label: "Soft hair"
+    category: "appearance"
+    aliases: 
+      - "soft_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_wind_tousled_hair"
+    label: "Wind-tousled hair"
+    category: "appearance"
+    aliases: 
+      - "wind_tousled_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_carefully_styled_hair"
+    label: "Carefully styled hair"
+    category: "appearance"
+    aliases: 
+      - "carefully_styled_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_long_hair"
+    label: "Long hair"
+    category: "appearance"
+    aliases: 
+      - "long_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_short_hair"
+    label: "Short hair"
+    category: "appearance"
+    aliases: 
+      - "short_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_porcelain_complexion"
+    label: "Porcelain complexion"
+    category: "appearance"
+    aliases: 
+      - "porcelain_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_golden_complexion"
+    label: "Golden complexion"
+    category: "appearance"
+    aliases: 
+      - "golden_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_warm_complexion"
+    label: "Warm complexion"
+    category: "appearance"
+    aliases: 
+      - "warm_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_cool_complexion"
+    label: "Cool complexion"
+    category: "appearance"
+    aliases: 
+      - "cool_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_unforgettable_face"
+    label: "Unforgettable face"
+    category: "appearance"
+    aliases: 
+      - "unforgettable_face"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_soft_mouth"
+    label: "Soft mouth"
+    category: "appearance"
+    aliases: 
+      - "soft_mouth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_firm_jaw"
+    label: "Firm jaw"
+    category: "appearance"
+    aliases: 
+      - "firm_jaw"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_expressive_brows"
+    label: "Expressive brows"
+    category: "appearance"
+    aliases: 
+      - "expressive_brows"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_otherworldly_beauty"
+    label: "Otherworldly beauty"
+    category: "appearance"
+    aliases: 
+      - "otherworldly_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_gothic_beauty"
+    label: "Gothic beauty"
+    category: "appearance"
+    aliases: 
+      - "gothic_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_classic_handsome"
+    label: "Classic handsome"
+    category: "appearance"
+    aliases: 
+      - "classic_handsome"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_androgynous_beauty"
+    label: "Androgynous beauty"
+    category: "appearance"
+    aliases: 
+      - "androgynous_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_haunting_beauty"
+    label: "Haunting beauty"
+    category: "appearance"
+    aliases: 
+      - "haunting_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_notable_angular_features"
+    label: "Notable angular features"
+    category: "appearance"
+    aliases: 
+      - "notable_angular_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_notable_battle_worn_beauty"
+    label: "Notable battle-worn beauty"
+    category: "appearance"
+    aliases: 
+      - "notable_battle_worn_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_notable_bright_eyes"
+    label: "Notable bright eyes"
+    category: "appearance"
+    aliases: 
+      - "notable_bright_eyes"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_notable_expressive_face"
+    label: "Notable expressive face"
+    category: "appearance"
+    aliases: 
+      - "notable_expressive_face"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "core"
+  - id: "appearance_notable_guarded_gaze"
+    label: "Notable guarded gaze"
+    category: "appearance"
+    aliases: 
+      - "notable_guarded_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_soft_smile"
+    label: "Notable soft smile"
+    category: "appearance"
+    aliases: 
+      - "notable_soft_smile"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_warm_expression"
+    label: "Notable warm expression"
+    category: "appearance"
+    aliases: 
+      - "notable_warm_expression"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_soft_features"
+    label: "Notable soft features"
+    category: "appearance"
+    aliases: 
+      - "notable_soft_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_sharp_features"
+    label: "Notable sharp features"
+    category: "appearance"
+    aliases: 
+      - "notable_sharp_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_delicate_features"
+    label: "Notable delicate features"
+    category: "appearance"
+    aliases: 
+      - "notable_delicate_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_rugged_features"
+    label: "Notable rugged features"
+    category: "appearance"
+    aliases: 
+      - "notable_rugged_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_refined_features"
+    label: "Notable refined features"
+    category: "appearance"
+    aliases: 
+      - "notable_refined_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_strong_features"
+    label: "Notable strong features"
+    category: "appearance"
+    aliases: 
+      - "notable_strong_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_fine_boned_features"
+    label: "Notable fine-boned features"
+    category: "appearance"
+    aliases: 
+      - "notable_fine_boned_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_rounded_features"
+    label: "Notable rounded features"
+    category: "appearance"
+    aliases: 
+      - "notable_rounded_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_warm_gaze"
+    label: "Notable warm gaze"
+    category: "appearance"
+    aliases: 
+      - "notable_warm_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_cold_gaze"
+    label: "Notable cold gaze"
+    category: "appearance"
+    aliases: 
+      - "notable_cold_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_piercing_gaze"
+    label: "Notable piercing gaze"
+    category: "appearance"
+    aliases: 
+      - "notable_piercing_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_playful_gaze"
+    label: "Notable playful gaze"
+    category: "appearance"
+    aliases: 
+      - "notable_playful_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_long_lashes"
+    label: "Notable long lashes"
+    category: "appearance"
+    aliases: 
+      - "notable_long_lashes"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_messy_hair"
+    label: "Notable messy hair"
+    category: "appearance"
+    aliases: 
+      - "notable_messy_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_silky_hair"
+    label: "Notable silky hair"
+    category: "appearance"
+    aliases: 
+      - "notable_silky_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_thick_hair"
+    label: "Notable thick hair"
+    category: "appearance"
+    aliases: 
+      - "notable_thick_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_soft_hair"
+    label: "Notable soft hair"
+    category: "appearance"
+    aliases: 
+      - "notable_soft_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_wind_tousled_hair"
+    label: "Notable wind-tousled hair"
+    category: "appearance"
+    aliases: 
+      - "notable_wind_tousled_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_carefully_styled_hair"
+    label: "Notable carefully styled hair"
+    category: "appearance"
+    aliases: 
+      - "notable_carefully_styled_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_long_hair"
+    label: "Notable long hair"
+    category: "appearance"
+    aliases: 
+      - "notable_long_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_short_hair"
+    label: "Notable short hair"
+    category: "appearance"
+    aliases: 
+      - "notable_short_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_porcelain_complexion"
+    label: "Notable porcelain complexion"
+    category: "appearance"
+    aliases: 
+      - "notable_porcelain_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_golden_complexion"
+    label: "Notable golden complexion"
+    category: "appearance"
+    aliases: 
+      - "notable_golden_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_warm_complexion"
+    label: "Notable warm complexion"
+    category: "appearance"
+    aliases: 
+      - "notable_warm_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_cool_complexion"
+    label: "Notable cool complexion"
+    category: "appearance"
+    aliases: 
+      - "notable_cool_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_unforgettable_face"
+    label: "Notable unforgettable face"
+    category: "appearance"
+    aliases: 
+      - "notable_unforgettable_face"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_soft_mouth"
+    label: "Notable soft mouth"
+    category: "appearance"
+    aliases: 
+      - "notable_soft_mouth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_firm_jaw"
+    label: "Notable firm jaw"
+    category: "appearance"
+    aliases: 
+      - "notable_firm_jaw"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_expressive_brows"
+    label: "Notable expressive brows"
+    category: "appearance"
+    aliases: 
+      - "notable_expressive_brows"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_otherworldly_beauty"
+    label: "Notable otherworldly beauty"
+    category: "appearance"
+    aliases: 
+      - "notable_otherworldly_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_gothic_beauty"
+    label: "Notable gothic beauty"
+    category: "appearance"
+    aliases: 
+      - "notable_gothic_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_classic_handsome"
+    label: "Notable classic handsome"
+    category: "appearance"
+    aliases: 
+      - "notable_classic_handsome"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_androgynous_beauty"
+    label: "Notable androgynous beauty"
+    category: "appearance"
+    aliases: 
+      - "notable_androgynous_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_notable_haunting_beauty"
+    label: "Notable haunting beauty"
+    category: "appearance"
+    aliases: 
+      - "notable_haunting_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_angular_features"
+    label: "Soft angular features"
+    category: "appearance"
+    aliases: 
+      - "soft_angular_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_battle_worn_beauty"
+    label: "Soft battle-worn beauty"
+    category: "appearance"
+    aliases: 
+      - "soft_battle_worn_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_bright_eyes"
+    label: "Soft bright eyes"
+    category: "appearance"
+    aliases: 
+      - "soft_bright_eyes"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_expressive_face"
+    label: "Soft expressive face"
+    category: "appearance"
+    aliases: 
+      - "soft_expressive_face"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_guarded_gaze"
+    label: "Soft guarded gaze"
+    category: "appearance"
+    aliases: 
+      - "soft_guarded_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_soft_smile"
+    label: "Soft soft smile"
+    category: "appearance"
+    aliases: 
+      - "soft_soft_smile"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_warm_expression"
+    label: "Soft warm expression"
+    category: "appearance"
+    aliases: 
+      - "soft_warm_expression"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_soft_features"
+    label: "Soft soft features"
+    category: "appearance"
+    aliases: 
+      - "soft_soft_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_sharp_features"
+    label: "Soft sharp features"
+    category: "appearance"
+    aliases: 
+      - "soft_sharp_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_delicate_features"
+    label: "Soft delicate features"
+    category: "appearance"
+    aliases: 
+      - "soft_delicate_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_rugged_features"
+    label: "Soft rugged features"
+    category: "appearance"
+    aliases: 
+      - "soft_rugged_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_refined_features"
+    label: "Soft refined features"
+    category: "appearance"
+    aliases: 
+      - "soft_refined_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_strong_features"
+    label: "Soft strong features"
+    category: "appearance"
+    aliases: 
+      - "soft_strong_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_fine_boned_features"
+    label: "Soft fine-boned features"
+    category: "appearance"
+    aliases: 
+      - "soft_fine_boned_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_rounded_features"
+    label: "Soft rounded features"
+    category: "appearance"
+    aliases: 
+      - "soft_rounded_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_warm_gaze"
+    label: "Soft warm gaze"
+    category: "appearance"
+    aliases: 
+      - "soft_warm_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_cold_gaze"
+    label: "Soft cold gaze"
+    category: "appearance"
+    aliases: 
+      - "soft_cold_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_piercing_gaze"
+    label: "Soft piercing gaze"
+    category: "appearance"
+    aliases: 
+      - "soft_piercing_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_playful_gaze"
+    label: "Soft playful gaze"
+    category: "appearance"
+    aliases: 
+      - "soft_playful_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_long_lashes"
+    label: "Soft long lashes"
+    category: "appearance"
+    aliases: 
+      - "soft_long_lashes"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_messy_hair"
+    label: "Soft messy hair"
+    category: "appearance"
+    aliases: 
+      - "soft_messy_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_silky_hair"
+    label: "Soft silky hair"
+    category: "appearance"
+    aliases: 
+      - "soft_silky_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_thick_hair"
+    label: "Soft thick hair"
+    category: "appearance"
+    aliases: 
+      - "soft_thick_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_soft_hair"
+    label: "Soft soft hair"
+    category: "appearance"
+    aliases: 
+      - "soft_soft_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_wind_tousled_hair"
+    label: "Soft wind-tousled hair"
+    category: "appearance"
+    aliases: 
+      - "soft_wind_tousled_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_carefully_styled_hair"
+    label: "Soft carefully styled hair"
+    category: "appearance"
+    aliases: 
+      - "soft_carefully_styled_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_long_hair"
+    label: "Soft long hair"
+    category: "appearance"
+    aliases: 
+      - "soft_long_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_short_hair"
+    label: "Soft short hair"
+    category: "appearance"
+    aliases: 
+      - "soft_short_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "generated"
+  - id: "appearance_soft_porcelain_complexion"
+    label: "Soft porcelain complexion"
+    category: "appearance"
+    aliases: 
+      - "soft_porcelain_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_soft_golden_complexion"
+    label: "Soft golden complexion"
+    category: "appearance"
+    aliases: 
+      - "soft_golden_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_soft_warm_complexion"
+    label: "Soft warm complexion"
+    category: "appearance"
+    aliases: 
+      - "soft_warm_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_soft_cool_complexion"
+    label: "Soft cool complexion"
+    category: "appearance"
+    aliases: 
+      - "soft_cool_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_soft_unforgettable_face"
+    label: "Soft unforgettable face"
+    category: "appearance"
+    aliases: 
+      - "soft_unforgettable_face"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_soft_soft_mouth"
+    label: "Soft soft mouth"
+    category: "appearance"
+    aliases: 
+      - "soft_soft_mouth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_soft_firm_jaw"
+    label: "Soft firm jaw"
+    category: "appearance"
+    aliases: 
+      - "soft_firm_jaw"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_soft_expressive_brows"
+    label: "Soft expressive brows"
+    category: "appearance"
+    aliases: 
+      - "soft_expressive_brows"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_soft_otherworldly_beauty"
+    label: "Soft otherworldly beauty"
+    category: "appearance"
+    aliases: 
+      - "soft_otherworldly_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_soft_gothic_beauty"
+    label: "Soft gothic beauty"
+    category: "appearance"
+    aliases: 
+      - "soft_gothic_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_soft_classic_handsome"
+    label: "Soft classic handsome"
+    category: "appearance"
+    aliases: 
+      - "soft_classic_handsome"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_soft_androgynous_beauty"
+    label: "Soft androgynous beauty"
+    category: "appearance"
+    aliases: 
+      - "soft_androgynous_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_soft_haunting_beauty"
+    label: "Soft haunting beauty"
+    category: "appearance"
+    aliases: 
+      - "soft_haunting_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_angular_features"
+    label: "Striking angular features"
+    category: "appearance"
+    aliases: 
+      - "striking_angular_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_battle_worn_beauty"
+    label: "Striking battle-worn beauty"
+    category: "appearance"
+    aliases: 
+      - "striking_battle_worn_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_bright_eyes"
+    label: "Striking bright eyes"
+    category: "appearance"
+    aliases: 
+      - "striking_bright_eyes"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_expressive_face"
+    label: "Striking expressive face"
+    category: "appearance"
+    aliases: 
+      - "striking_expressive_face"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_guarded_gaze"
+    label: "Striking guarded gaze"
+    category: "appearance"
+    aliases: 
+      - "striking_guarded_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_soft_smile"
+    label: "Striking soft smile"
+    category: "appearance"
+    aliases: 
+      - "striking_soft_smile"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_warm_expression"
+    label: "Striking warm expression"
+    category: "appearance"
+    aliases: 
+      - "striking_warm_expression"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_soft_features"
+    label: "Striking soft features"
+    category: "appearance"
+    aliases: 
+      - "striking_soft_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_sharp_features"
+    label: "Striking sharp features"
+    category: "appearance"
+    aliases: 
+      - "striking_sharp_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_delicate_features"
+    label: "Striking delicate features"
+    category: "appearance"
+    aliases: 
+      - "striking_delicate_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_rugged_features"
+    label: "Striking rugged features"
+    category: "appearance"
+    aliases: 
+      - "striking_rugged_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_refined_features"
+    label: "Striking refined features"
+    category: "appearance"
+    aliases: 
+      - "striking_refined_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_strong_features"
+    label: "Striking strong features"
+    category: "appearance"
+    aliases: 
+      - "striking_strong_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_fine_boned_features"
+    label: "Striking fine-boned features"
+    category: "appearance"
+    aliases: 
+      - "striking_fine_boned_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_rounded_features"
+    label: "Striking rounded features"
+    category: "appearance"
+    aliases: 
+      - "striking_rounded_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_warm_gaze"
+    label: "Striking warm gaze"
+    category: "appearance"
+    aliases: 
+      - "striking_warm_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_cold_gaze"
+    label: "Striking cold gaze"
+    category: "appearance"
+    aliases: 
+      - "striking_cold_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_piercing_gaze"
+    label: "Striking piercing gaze"
+    category: "appearance"
+    aliases: 
+      - "striking_piercing_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_playful_gaze"
+    label: "Striking playful gaze"
+    category: "appearance"
+    aliases: 
+      - "striking_playful_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_long_lashes"
+    label: "Striking long lashes"
+    category: "appearance"
+    aliases: 
+      - "striking_long_lashes"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_messy_hair"
+    label: "Striking messy hair"
+    category: "appearance"
+    aliases: 
+      - "striking_messy_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_silky_hair"
+    label: "Striking silky hair"
+    category: "appearance"
+    aliases: 
+      - "striking_silky_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_thick_hair"
+    label: "Striking thick hair"
+    category: "appearance"
+    aliases: 
+      - "striking_thick_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_soft_hair"
+    label: "Striking soft hair"
+    category: "appearance"
+    aliases: 
+      - "striking_soft_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_wind_tousled_hair"
+    label: "Striking wind-tousled hair"
+    category: "appearance"
+    aliases: 
+      - "striking_wind_tousled_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_carefully_styled_hair"
+    label: "Striking carefully styled hair"
+    category: "appearance"
+    aliases: 
+      - "striking_carefully_styled_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_long_hair"
+    label: "Striking long hair"
+    category: "appearance"
+    aliases: 
+      - "striking_long_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_short_hair"
+    label: "Striking short hair"
+    category: "appearance"
+    aliases: 
+      - "striking_short_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_porcelain_complexion"
+    label: "Striking porcelain complexion"
+    category: "appearance"
+    aliases: 
+      - "striking_porcelain_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_golden_complexion"
+    label: "Striking golden complexion"
+    category: "appearance"
+    aliases: 
+      - "striking_golden_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_warm_complexion"
+    label: "Striking warm complexion"
+    category: "appearance"
+    aliases: 
+      - "striking_warm_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_cool_complexion"
+    label: "Striking cool complexion"
+    category: "appearance"
+    aliases: 
+      - "striking_cool_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_unforgettable_face"
+    label: "Striking unforgettable face"
+    category: "appearance"
+    aliases: 
+      - "striking_unforgettable_face"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_soft_mouth"
+    label: "Striking soft mouth"
+    category: "appearance"
+    aliases: 
+      - "striking_soft_mouth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_firm_jaw"
+    label: "Striking firm jaw"
+    category: "appearance"
+    aliases: 
+      - "striking_firm_jaw"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_expressive_brows"
+    label: "Striking expressive brows"
+    category: "appearance"
+    aliases: 
+      - "striking_expressive_brows"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_otherworldly_beauty"
+    label: "Striking otherworldly beauty"
+    category: "appearance"
+    aliases: 
+      - "striking_otherworldly_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_gothic_beauty"
+    label: "Striking gothic beauty"
+    category: "appearance"
+    aliases: 
+      - "striking_gothic_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_classic_handsome"
+    label: "Striking classic handsome"
+    category: "appearance"
+    aliases: 
+      - "striking_classic_handsome"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_androgynous_beauty"
+    label: "Striking androgynous beauty"
+    category: "appearance"
+    aliases: 
+      - "striking_androgynous_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_striking_haunting_beauty"
+    label: "Striking haunting beauty"
+    category: "appearance"
+    aliases: 
+      - "striking_haunting_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_angular_features"
+    label: "Romantic angular features"
+    category: "appearance"
+    aliases: 
+      - "romantic_angular_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_battle_worn_beauty"
+    label: "Romantic battle-worn beauty"
+    category: "appearance"
+    aliases: 
+      - "romantic_battle_worn_beauty"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_bright_eyes"
+    label: "Romantic bright eyes"
+    category: "appearance"
+    aliases: 
+      - "romantic_bright_eyes"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_expressive_face"
+    label: "Romantic expressive face"
+    category: "appearance"
+    aliases: 
+      - "romantic_expressive_face"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_guarded_gaze"
+    label: "Romantic guarded gaze"
+    category: "appearance"
+    aliases: 
+      - "romantic_guarded_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_soft_smile"
+    label: "Romantic soft smile"
+    category: "appearance"
+    aliases: 
+      - "romantic_soft_smile"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_warm_expression"
+    label: "Romantic warm expression"
+    category: "appearance"
+    aliases: 
+      - "romantic_warm_expression"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_soft_features"
+    label: "Romantic soft features"
+    category: "appearance"
+    aliases: 
+      - "romantic_soft_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_sharp_features"
+    label: "Romantic sharp features"
+    category: "appearance"
+    aliases: 
+      - "romantic_sharp_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_delicate_features"
+    label: "Romantic delicate features"
+    category: "appearance"
+    aliases: 
+      - "romantic_delicate_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_rugged_features"
+    label: "Romantic rugged features"
+    category: "appearance"
+    aliases: 
+      - "romantic_rugged_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_refined_features"
+    label: "Romantic refined features"
+    category: "appearance"
+    aliases: 
+      - "romantic_refined_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_strong_features"
+    label: "Romantic strong features"
+    category: "appearance"
+    aliases: 
+      - "romantic_strong_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_fine_boned_features"
+    label: "Romantic fine-boned features"
+    category: "appearance"
+    aliases: 
+      - "romantic_fine_boned_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_rounded_features"
+    label: "Romantic rounded features"
+    category: "appearance"
+    aliases: 
+      - "romantic_rounded_features"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_warm_gaze"
+    label: "Romantic warm gaze"
+    category: "appearance"
+    aliases: 
+      - "romantic_warm_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_cold_gaze"
+    label: "Romantic cold gaze"
+    category: "appearance"
+    aliases: 
+      - "romantic_cold_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_piercing_gaze"
+    label: "Romantic piercing gaze"
+    category: "appearance"
+    aliases: 
+      - "romantic_piercing_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_playful_gaze"
+    label: "Romantic playful gaze"
+    category: "appearance"
+    aliases: 
+      - "romantic_playful_gaze"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_long_lashes"
+    label: "Romantic long lashes"
+    category: "appearance"
+    aliases: 
+      - "romantic_long_lashes"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_messy_hair"
+    label: "Romantic messy hair"
+    category: "appearance"
+    aliases: 
+      - "romantic_messy_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_silky_hair"
+    label: "Romantic silky hair"
+    category: "appearance"
+    aliases: 
+      - "romantic_silky_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_thick_hair"
+    label: "Romantic thick hair"
+    category: "appearance"
+    aliases: 
+      - "romantic_thick_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_soft_hair"
+    label: "Romantic soft hair"
+    category: "appearance"
+    aliases: 
+      - "romantic_soft_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_wind_tousled_hair"
+    label: "Romantic wind-tousled hair"
+    category: "appearance"
+    aliases: 
+      - "romantic_wind_tousled_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_carefully_styled_hair"
+    label: "Romantic carefully styled hair"
+    category: "appearance"
+    aliases: 
+      - "romantic_carefully_styled_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_long_hair"
+    label: "Romantic long hair"
+    category: "appearance"
+    aliases: 
+      - "romantic_long_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_short_hair"
+    label: "Romantic short hair"
+    category: "appearance"
+    aliases: 
+      - "romantic_short_hair"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_porcelain_complexion"
+    label: "Romantic porcelain complexion"
+    category: "appearance"
+    aliases: 
+      - "romantic_porcelain_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_golden_complexion"
+    label: "Romantic golden complexion"
+    category: "appearance"
+    aliases: 
+      - "romantic_golden_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_warm_complexion"
+    label: "Romantic warm complexion"
+    category: "appearance"
+    aliases: 
+      - "romantic_warm_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_cool_complexion"
+    label: "Romantic cool complexion"
+    category: "appearance"
+    aliases: 
+      - "romantic_cool_complexion"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_unforgettable_face"
+    label: "Romantic unforgettable face"
+    category: "appearance"
+    aliases: 
+      - "romantic_unforgettable_face"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_soft_mouth"
+    label: "Romantic soft mouth"
+    category: "appearance"
+    aliases: 
+      - "romantic_soft_mouth"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_firm_jaw"
+    label: "Romantic firm jaw"
+    category: "appearance"
+    aliases: 
+      - "romantic_firm_jaw"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
+  - id: "appearance_romantic_expressive_brows"
+    label: "Romantic expressive brows"
+    category: "appearance"
+    aliases: 
+      - "romantic_expressive_brows"
+    polarity: "neutral"
+    intensity: "moderate"
+    adult: false
+    unsafe: false
+    romanceRelevant: false
+    sourceKind: "niche"
