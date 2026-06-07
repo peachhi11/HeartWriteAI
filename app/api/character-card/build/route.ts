@@ -1,7 +1,6 @@
 import { z } from "zod";
 
-import { generateAgeGapRomance } from "@/lib/character-card/generator";
-import { compileSystemPrompt } from "@/lib/character-card/promptCompiler";
+import { createCharacterCardBuildResult } from "@/lib/character-card/buildCharacterCard";
 
 const buildRequestSchema = z
   .object({
@@ -713,110 +712,5 @@ export async function POST(request: Request) {
     );
   }
 
-  const trope = requestResult.data?.trope ?? "Generated Preview";
-  const randomizedData = generateAgeGapRomance(trope, {
-    alternateGreetings: requestResult.data?.alternateGreetings,
-    archetype: requestResult.data?.archetype,
-    anchorYear: requestResult.data?.anchorYear,
-    creatorsNotes: requestResult.data?.creatorsNotes,
-    dialogueArrays: requestResult.data?.dialogueArrays,
-    ethnicityRegion: requestResult.data?.ethnicityRegion,
-    fetish: requestResult.data?.fetish,
-    firstMessage: requestResult.data?.firstMessage,
-    formatting: requestResult.data?.formatting,
-    framework: requestResult.data?.framework,
-    groupAlternateGreetings: requestResult.data?.groupAlternateGreetings,
-    groupGreetings: requestResult.data?.groupGreetings,
-    intimacyStyle: requestResult.data?.intimacyStyle,
-    kink: requestResult.data?.kink,
-    linguisticMatrix: requestResult.data?.linguisticMatrix,
-    loreEntries: requestResult.data?.loreEntries,
-    lorebookSummary: requestResult.data?.lorebookSummary,
-    nationalityCountry: requestResult.data?.nationalityCountry,
-    nationalityLegalStatus: requestResult.data?.nationalityLegalStatus,
-    nationalityLinguisticVibe: requestResult.data?.nationalityLinguisticVibe,
-    nationalityRegionalAlliance: requestResult.data?.nationalityRegionalAlliance,
-    occupationAcademicYear: requestResult.data?.occupationAcademicYear,
-    occupationAuthorityDynamic: requestResult.data?.occupationAuthorityDynamic,
-    occupationCampusAffiliation: requestResult.data?.occupationCampusAffiliation,
-    occupationFundingType: requestResult.data?.occupationFundingType,
-    occupationJobTitle: requestResult.data?.occupationJobTitle,
-    occupationMajorField: requestResult.data?.occupationMajorField,
-    occupationProfessionalDomain: requestResult.data?.occupationProfessionalDomain,
-    occupationSocioeconomicTier: requestResult.data?.occupationSocioeconomicTier,
-    occupationWorkplaceVibe: requestResult.data?.occupationWorkplaceVibe,
-    powerDynamic: requestResult.data?.powerDynamic,
-    postHistoryInstructions: requestResult.data?.postHistoryInstructions,
-    proseGuidance: requestResult.data?.proseGuidance,
-    raceMacroGroup: requestResult.data?.raceMacroGroup,
-    relationshipStatus: requestResult.data?.relationshipStatus,
-    relationships: requestResult.data?.relationships,
-    scenario: requestResult.data?.scenario,
-    scenarioOpeningPairs: requestResult.data?.scenarioOpeningPairs,
-    speciesType: requestResult.data?.speciesType,
-    speechExamples: requestResult.data?.speechExamples,
-    speechStyle: requestResult.data?.speechStyle,
-    tone: requestResult.data?.tone,
-    trope,
-    turnOffs: requestResult.data?.turnOffs,
-    worldLorePlaceholders: requestResult.data?.worldLorePlaceholders,
-  });
-  const fullName = `${randomizedData.given_name} ${randomizedData.surname}`;
-  const speciesHook =
-    randomizedData.species && randomizedData.species.type !== "Human"
-      ? ` Their ${randomizedData.species.instinctualTrait.toLowerCase()} makes the silence feel dangerous.`
-      : "";
-  const nationalityHook = randomizedData.nationality
-    ? ` The cadence carries ${randomizedData.nationality.passportCountry} civic ease: ${randomizedData.nationality.linguisticVibe}`
-    : "";
-  const occupationHook = randomizedData.occupation
-    ? ` The backdrop is ${randomizedData.occupation.workplaceVibe}.`
-    : "";
-  const relationshipHook = randomizedData.relationships?.length
-    ? ` ${randomizedData.relationships[0].npcName} is already close enough to complicate everything: ${randomizedData.relationships[0].oneLineDescription}`
-    : "";
-  const availabilityHook = randomizedData.relationshipStatus
-    ? ` Their availability is ${randomizedData.relationshipStatus.currentLabel.replace(/_/g, " ").toLowerCase()}: ${randomizedData.relationshipStatus.statusContext}`
-    : "";
-  const kinkHook =
-    randomizedData.kink?.nsfwEnabled && randomizedData.kink.systemPromptInstruction
-      ? ` Private intimacy guidance: ${randomizedData.kink.systemPromptInstruction}`
-      : "";
-  const fetishHook =
-    randomizedData.fetish?.fetishEnabled &&
-    randomizedData.fetish.aiDescriptiveFocus
-      ? ` Private fixation focus: ${randomizedData.fetish.aiDescriptiveFocus}`
-      : "";
-  const intimacyHook = randomizedData.intimacyStyle
-    ? ` Intimacy style: ${randomizedData.intimacyStyle.aiBehaviorPrompt}`
-    : "";
-  const turnOffHook = randomizedData.turnOffs
-    ? ` Boundary reaction: ${randomizedData.turnOffs.aiReactionPrompt}`
-    : "";
-  const speechHook = randomizedData.speechStyle
-    ? ` Speech style: ${randomizedData.speechStyle.speechPatternInstruction}`
-    : "";
-  const dialogueHook = randomizedData.dialogueArrays
-    ? ` Dialogue filter: ${randomizedData.dialogueArrays.aiLinguisticConstraintPrompt}`
-    : "";
-  const proseHook = randomizedData.proseGuidance
-    ? ` Prose grounding: ${randomizedData.proseGuidance.proseConstraintPrompt}`
-    : "";
-  const firstMessageHook = randomizedData.firstMessage
-    ? ` The opening starts as ${randomizedData.firstMessage.entryPoint.replace(/_/g, " ").toLowerCase()} and ends with ${randomizedData.firstMessage.userCallToAction.replace(/_/g, " ").toLowerCase()}.`
-    : "";
-  const scenarioHook = randomizedData.scenario
-    ? ` ${randomizedData.scenario.scenePremiseDescription} The space tastes like ${randomizedData.scenario.sensoryDetails.join(", ").toLowerCase()}.`
-    : "";
-  const systemPrompt = compileSystemPrompt(randomizedData);
-  const greeting = [
-    `{{char}} pauses at the edge of the room, the name ${fullName} carrying more weight than either of you expected.${scenarioHook}${firstMessageHook}${speciesHook}${nationalityHook}${occupationHook}${relationshipHook}${availabilityHook}${kinkHook}${fetishHook}${intimacyHook}${turnOffHook}${speechHook}${dialogueHook}${proseHook}`,
-    `"You should probably decide now if you're going to run from this," they say, voice controlled enough to sound calm and tense enough to betray them, "because I am already deciding not to."`,
-  ].join("\n\n");
-
-  return Response.json({
-    greeting,
-    meta: randomizedData,
-    systemPrompt,
-  });
+  return Response.json(createCharacterCardBuildResult(requestResult.data));
 }

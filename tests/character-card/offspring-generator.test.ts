@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { generateAdultOffspringProfile } from "../../lib/character-card/offspringGenerator";
+import {
+  generateAdultOffspringProfile,
+  synthesizeAdultOffspringSeed,
+} from "../../lib/character-card/offspringGenerator";
 
 test("generates adult offspring profiles with policy-safe defaults", () => {
   const offspring = generateAdultOffspringProfile({
@@ -55,4 +58,54 @@ test("inherits supernatural lineage when a parent has one", () => {
 
   assert.equal(offspring.species, "Vampire");
   assert.ok(offspring.inheritedSignals.includes("Vampire lineage"));
+});
+
+test("synthesizes adult offspring seeds from inherited pressure instead of shallow blending", () => {
+  const synthesis = synthesizeAdultOffspringSeed({
+    contentMode: "SFW",
+    parents: [
+      {
+        given_name: "Maren",
+        surname: "Voss",
+        archetype: {
+          coreMotivation: "Security_Protection",
+          defenseMechanism: "Hyper_Rationalization",
+          personaType: "The_Perfectionist",
+        },
+        coreValues: ["control", "procedure"],
+        fears: ["being bypassed"],
+        occupation: {
+          authorityDynamic: "gatekeeper authority",
+          jobTitle: "Museum registrar",
+        },
+        relationshipDynamic: "protector through controlled access",
+        tone: { worldviewFilter: "Jaded_Weary" },
+      },
+      {
+        given_name: "Rowan",
+        surname: "Vale",
+        archetype: {
+          coreMotivation: "Autonomy_Freedom",
+          defenseMechanism: "Defiant_Autonomy",
+          personaType: "The_Rogue_Instigator",
+        },
+        coreValues: ["freedom", "improvisation"],
+        fears: ["becoming trapped"],
+        occupation: {
+          authorityDynamic: "rule breaker",
+          jobTitle: "Private investigator",
+        },
+        relationshipDynamic: "equal but evasive",
+        tone: { worldviewFilter: "Optimistic_Idealistic" },
+      },
+    ],
+    random: () => 0,
+  });
+
+  assert.equal(synthesis.developmentalPath, "conflicted_division");
+  assert.match(synthesis.seed, /Adult/);
+  assert.match(synthesis.seed, /\{\{user\}\}/);
+  assert.match(synthesis.seed, /Power dynamic/);
+  assert.match(synthesis.seed, /Mode: SFW/);
+  assert.ok(synthesis.lineageSignals.includes("Security_Protection"));
 });

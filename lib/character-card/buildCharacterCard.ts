@@ -1,84 +1,12 @@
 import {
+  AgeGapRomanceOptions,
   CharacterCardData,
   CreatorsNotesContentRating,
-  GeneratedAlternateGreetingData,
-  GeneratedArchetypeConfigurationData,
-  GeneratedCreatorsNotesData,
-  GeneratedGroupAlternateGreetingData,
-  GeneratedGroupGreetingData,
-  EthnicityRegion,
-  GeneratedFetishData,
-  GeneratedFirstMessageData,
-  GeneratedFormattingConfigurationData,
-  GeneratedFrameworkConfigurationData,
-  GeneratedIntimacyStyleData,
-  GeneratedKinkData,
-  GeneratedLoreEntryData,
-  GeneratedLorebookSummaryData,
-  GeneratedPostHistoryInstructionsData,
-  GeneratedToneConfigurationData,
-  GeneratedWorldLorePlaceholderData,
-  GeneratedNPCRelationshipData,
-  GeneratedRelationshipStatusData,
-  GeneratedScenarioData,
-  GeneratedScenarioOpeningPairData,
-  GeneratedTurnOffData,
-  LinguisticMatrix,
-  NationalityLegalStatus,
-  NationalityRegionalAlliance,
-  OccupationAuthorityDynamic,
-  OccupationProfessionalDomain,
-  OccupationSocioeconomicTier,
-  RaceMacroGroup,
-  SpeciesType,
-  StudentAcademicYear,
-  StudentFundingType,
-  StudentMajorField,
-} from "@/lib/character-card/generator";
+  generateAgeGapRomance,
+} from "./generator";
+import { compileSystemPrompt } from "./promptCompiler";
 
-export interface BuildCharacterCardRequest {
-  alternateGreetings?: GeneratedAlternateGreetingData[];
-  archetype?: GeneratedArchetypeConfigurationData;
-  anchorYear?: number;
-  creatorsNotes?: GeneratedCreatorsNotesData;
-  ethnicityRegion?: EthnicityRegion;
-  fetish?: GeneratedFetishData;
-  firstMessage?: GeneratedFirstMessageData;
-  formatting?: GeneratedFormattingConfigurationData;
-  framework?: GeneratedFrameworkConfigurationData;
-  groupAlternateGreetings?: GeneratedGroupAlternateGreetingData[];
-  groupGreetings?: GeneratedGroupGreetingData[];
-  intimacyStyle?: GeneratedIntimacyStyleData;
-  kink?: GeneratedKinkData;
-  linguisticMatrix?: LinguisticMatrix;
-  loreEntries?: GeneratedLoreEntryData[];
-  lorebookSummary?: GeneratedLorebookSummaryData;
-  nationalityCountry?: string;
-  nationalityLegalStatus?: NationalityLegalStatus;
-  nationalityLinguisticVibe?: string;
-  nationalityRegionalAlliance?: NationalityRegionalAlliance;
-  occupationAcademicYear?: StudentAcademicYear;
-  occupationAuthorityDynamic?: OccupationAuthorityDynamic;
-  occupationCampusAffiliation?: string;
-  occupationFundingType?: StudentFundingType;
-  occupationJobTitle?: string;
-  occupationMajorField?: StudentMajorField;
-  occupationProfessionalDomain?: OccupationProfessionalDomain;
-  occupationSocioeconomicTier?: OccupationSocioeconomicTier;
-  occupationWorkplaceVibe?: string;
-  powerDynamic?: string;
-  postHistoryInstructions?: GeneratedPostHistoryInstructionsData;
-  raceMacroGroup?: RaceMacroGroup;
-  relationshipStatus?: GeneratedRelationshipStatusData;
-  relationships?: GeneratedNPCRelationshipData[];
-  scenario?: GeneratedScenarioData;
-  scenarioOpeningPairs?: GeneratedScenarioOpeningPairData[];
-  speciesType?: SpeciesType;
-  tone?: GeneratedToneConfigurationData;
-  trope?: string;
-  turnOffs?: GeneratedTurnOffData;
-  worldLorePlaceholders?: GeneratedWorldLorePlaceholderData[];
-}
+export type BuildCharacterCardRequest = Omit<AgeGapRomanceOptions, "random">;
 
 export type { CreatorsNotesContentRating };
 
@@ -91,26 +19,73 @@ export interface BuildCharacterCardResult {
 export async function buildCharacterCard(
   request: BuildCharacterCardRequest = {},
 ): Promise<BuildCharacterCardResult> {
-  const response = await fetch("/api/character-card/build", {
-    body: JSON.stringify(request),
-    headers: {
-      "Content-Type": "application/json",
-    },
-    method: "POST",
+  return createCharacterCardBuildResult(request);
+}
+
+export function createCharacterCardBuildResult(
+  request: BuildCharacterCardRequest = {},
+): BuildCharacterCardResult {
+  const trope = request.trope ?? "Generated Preview";
+  const randomizedData = generateAgeGapRomance(trope, {
+    ...request,
+    trope,
   });
+  const fullName = `${randomizedData.given_name} ${randomizedData.surname}`;
+  const speciesHook =
+    randomizedData.species && randomizedData.species.type !== "Human"
+      ? ` Their ${randomizedData.species.instinctualTrait.toLowerCase()} makes the silence feel dangerous.`
+      : "";
+  const nationalityHook = randomizedData.nationality
+    ? ` The cadence carries ${randomizedData.nationality.passportCountry} civic ease: ${randomizedData.nationality.linguisticVibe}`
+    : "";
+  const occupationHook = randomizedData.occupation
+    ? ` The backdrop is ${randomizedData.occupation.workplaceVibe}.`
+    : "";
+  const relationshipHook = randomizedData.relationships?.length
+    ? ` ${randomizedData.relationships[0].npcName} is already close enough to complicate everything: ${randomizedData.relationships[0].oneLineDescription}`
+    : "";
+  const availabilityHook = randomizedData.relationshipStatus
+    ? ` Their availability is ${randomizedData.relationshipStatus.currentLabel.replace(/_/g, " ").toLowerCase()}: ${randomizedData.relationshipStatus.statusContext}`
+    : "";
+  const kinkHook =
+    randomizedData.kink?.nsfwEnabled && randomizedData.kink.systemPromptInstruction
+      ? ` Private intimacy guidance: ${randomizedData.kink.systemPromptInstruction}`
+      : "";
+  const fetishHook =
+    randomizedData.fetish?.fetishEnabled &&
+    randomizedData.fetish.aiDescriptiveFocus
+      ? ` Private fixation focus: ${randomizedData.fetish.aiDescriptiveFocus}`
+      : "";
+  const intimacyHook = randomizedData.intimacyStyle
+    ? ` Intimacy style: ${randomizedData.intimacyStyle.aiBehaviorPrompt}`
+    : "";
+  const turnOffHook = randomizedData.turnOffs
+    ? ` Boundary reaction: ${randomizedData.turnOffs.aiReactionPrompt}`
+    : "";
+  const speechHook = randomizedData.speechStyle
+    ? ` Speech style: ${randomizedData.speechStyle.speechPatternInstruction}`
+    : "";
+  const dialogueHook = randomizedData.dialogueArrays
+    ? ` Dialogue filter: ${randomizedData.dialogueArrays.aiLinguisticConstraintPrompt}`
+    : "";
+  const proseHook = randomizedData.proseGuidance
+    ? ` Prose grounding: ${randomizedData.proseGuidance.proseConstraintPrompt}`
+    : "";
+  const firstMessageHook = randomizedData.firstMessage
+    ? ` The opening starts as ${randomizedData.firstMessage.entryPoint.replace(/_/g, " ").toLowerCase()} and ends with ${randomizedData.firstMessage.userCallToAction.replace(/_/g, " ").toLowerCase()}.`
+    : "";
+  const scenarioHook = randomizedData.scenario
+    ? ` ${randomizedData.scenario.scenePremiseDescription} The space tastes like ${randomizedData.scenario.sensoryDetails.join(", ").toLowerCase()}.`
+    : "";
+  const systemPrompt = compileSystemPrompt(randomizedData);
+  const greeting = [
+    `{{char}} pauses at the edge of the room, the name ${fullName} carrying more weight than either of you expected.${scenarioHook}${firstMessageHook}${speciesHook}${nationalityHook}${occupationHook}${relationshipHook}${availabilityHook}${kinkHook}${fetishHook}${intimacyHook}${turnOffHook}${speechHook}${dialogueHook}${proseHook}`,
+    `"You should probably decide now if you're going to run from this," they say, voice controlled enough to sound calm and tense enough to betray them, "because I am already deciding not to."`,
+  ].join("\n\n");
 
-  if (!response.ok) {
-    const errorPayload = await response.json().catch(() => null);
-    const message =
-      errorPayload &&
-      typeof errorPayload === "object" &&
-      "error" in errorPayload &&
-      typeof errorPayload.error === "string"
-        ? errorPayload.error
-        : "Character card generation failed.";
-
-    throw new Error(message);
-  }
-
-  return response.json() as Promise<BuildCharacterCardResult>;
+  return {
+    greeting,
+    meta: randomizedData,
+    systemPrompt,
+  };
 }
