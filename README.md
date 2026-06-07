@@ -10,6 +10,11 @@ The app is being built CCV3-first. New cards should be authored as Character Car
 - Editable persona profiles and persona matching.
 - World, character, persona, scenario, and arc lorebooks.
 - Scenario and trope routing through lorebooks instead of bloating character cards.
+- Unified seed preset registry for appearance, personality, world, image, and
+  metadata seed pickers.
+- Semantic seed graph for wounds, fears, desires, triggers, responses,
+  relationship dynamics, and romance tropes that can feed persona matching,
+  scenario routing, lorebooks, and long-form relationship progression.
 - Local chat runtime with active lorebooks, summaries, shared token budgets, and stop presets.
 - Future local inference through Ollama, llama.cpp-compatible APIs, or proxy/model presets.
 
@@ -107,8 +112,23 @@ Implemented in the current scaffold:
 - Copy actions on chat responses, schema/debug panels, prompt previews, and
   ordinary text inputs/textareas through a global field-copy overlay.
 - Adult legacy/offspring profile generator for generational series planning, with minor-NPC guardrails for family/slice-of-life scenes.
-- Seed vocabulary ingestion fixes for skinny/thin body-line semantics and wavy
-  hair wording.
+- One-form character creator schema/compiler that folds sectioned identity,
+  appearance, personality, psychology, behaviour, lifestyle, relationship,
+  speech, internal-reaction, and adult-detail inputs back into CCV3 plus
+  HeartWriteAI extensions.
+- Seed preset packs for appearance prose, backstory events, mental/emotional
+  patterns, music, NPC networks, scenario openers, world lore, genre settings,
+  player-side persona preferences, card metadata taxonomy, and image prompt
+  vocabulary.
+- Unified seed preset registry in `data/seedPresetRegistry.ts` so UI sections
+  can query appearance, personality, world, image, and metadata seeds without
+  importing each preset module manually; see
+  [`docs/seed-preset-registry.md`](docs/seed-preset-registry.md).
+- Semantic seed registry in `data/semanticSeedRegistry.ts` for graph-based
+  psychology/trope expansion, relationship matching, and route/lorebook
+  planning, with the first build prioritizing wounds, fears, desires,
+  triggers, responses, relationship dynamics, and romance tropes before broad
+  appearance scale.
 - Tauri bridge helper for frontend/native command calls.
 - PNG text-chunk dependencies for CCV3 card import/export:
   - `png-chunks-extract`
@@ -123,6 +143,9 @@ Immediate next milestone:
 - Keep hardening the chat runtime with Tauri desktop smoke tests and move the
   same normalized asset model across persona, scenario, lorebook, and card
   workflows.
+- Wire the unified seed preset registry into character/persona creator controls
+  as searchable combo seed lanes, while keeping all selected seed output
+  editable before CCV3 export.
 
 ## Project Shape
 
@@ -150,10 +173,16 @@ The current priority order is:
    lore diagnostics, and Tauri shell parity.
 2. Continue CCV3 PNG import/export stabilization as the primary character-card
    path, with CHARX and JSON limited to bundle/archive/debug workflows.
-3. Mature persona, scenario, lorebook, and relationship workflows around the
+3. Wire registry-backed seed pickers across character creation, persona
+   creation/matching, image prompt output, and card metadata controls.
+4. Expand the semantic seed graph so psychology, trope, trigger, and response
+   nodes can power persona matching, scenario generation, lorebooks, route
+   gates, and similarity/recommendation workflows from one normalized
+   vocabulary layer.
+5. Mature persona, scenario, lorebook, and relationship workflows around the
    shared normalized asset model.
-4. Expand Tauri local file/library management.
-5. Build the production chat runtime around deterministic context compilation,
+6. Expand Tauri local file/library management.
+7. Build the production chat runtime around deterministic context compilation,
    memory guards, lore injection, relationship state, and provider streaming.
 
 ## Auto-Update Safety

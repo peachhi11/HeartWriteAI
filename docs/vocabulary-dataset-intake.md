@@ -5,8 +5,20 @@ boundary is narrow on purpose. Datasets are for taxonomy gaps, fixture design,
 and rewritten craft patterns. They are not a shortcut for importing raw prose
 into character cards, dialogue examples, or prompt text.
 
-The typed registry lives in
+The external dataset intake registry lives in
 [`data/vocabularyDatasetRegistry.ts`](../data/vocabularyDatasetRegistry.ts).
+This is separate from the app-facing seed preset registry in
+[`data/seedPresetRegistry.ts`](../data/seedPresetRegistry.ts), which indexes
+approved HeartWriteAI seed modules for character creator controls.
+It is also separate from the semantic seed graph in
+[`data/semanticSeedRegistry.ts`](../data/semanticSeedRegistry.ts), which stores
+normalized relationships between approved local nodes.
+
+The intake registry answers: "Can this external dataset inform future seed or
+fixture work?" The seed preset registry answers: "Which already-approved local
+seed chips can the app show for appearance, personality, world, image, or
+metadata fields?" The semantic seed registry answers: "How do approved nodes
+relate to each other for matching, routes, triggers, goals, and recommendation?"
 
 ## Intake Lanes
 
@@ -63,6 +75,13 @@ Current structural findings:
 - Do not vendor raw dataset rows into `data/*Presets.ts`.
 - Do not paste external dialogue, blurbs, book summaries, or profile prose into
   shipping seed modules.
+- Promote only rewritten, normalized, tested HeartWriteAI seed text into
+  `data/*Presets.ts`, then expose it through `data/seedPresetRegistry.ts` when
+  it belongs in app creator controls.
+- Promote graph relationships into `data/semanticSeedRegistry.ts` only after
+  the local node has stable IDs, aliases, soft guidance, and a clear use case
+  for matching, route expansion, trigger handling, goal inference, or
+  similarity search.
 - Prefer labels, schema shape, and evaluation ideas over corpus copying.
 - Run a humaniser pass for any rewritten examples before they become app-facing
   seed text.

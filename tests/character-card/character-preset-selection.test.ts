@@ -581,7 +581,10 @@ test("maps dialect formality and pet name presets into editable voice guidance",
 });
 
 test("compiles preset behaviour tags without duplicates and preserves user agency", () => {
-  const compiled = compileCharacterPresetSelection(buildSelection());
+  const compiled = compileCharacterPresetSelection({
+    ...buildSelection(),
+    semanticSeedIds: ["fear_of_abandonment", "slow_burn"],
+  });
 
   assert.equal(new Set(compiled.systemPromptTags).size, compiled.systemPromptTags.length);
   assert.ok(compiled.systemPromptTags.includes("stoic dialogue"));
@@ -592,6 +595,14 @@ test("compiles preset behaviour tags without duplicates and preserves user agenc
   assert.match(compiled.formValues.system_prompt, /Never write \{\{user\}\}'s dialogue/);
   assert.match(compiled.formValues.system_prompt, /not as forced plot resolution/);
   assert.match(compiled.formValues.system_prompt, /Lexical guidance/);
+  assert.match(compiled.formValues.system_prompt, /Internal semantic routing guidance/);
+  assert.match(compiled.formValues.system_prompt, /Fear of abandonment/);
+  assert.match(compiled.formValues.system_prompt, /Slow burn/);
+  assert.doesNotMatch(compiled.formValues.system_prompt, /fear_of_abandonment/);
+  assert.match(compiled.formValues.personalityPsychology, /Semantic psychology guidance/);
+  assert.match(compiled.formValues.relationshipsConnections, /Semantic relationship guidance/);
+  assert.match(compiled.formValues.tagsText, /Fear of abandonment/);
+  assert.match(compiled.formValues.tagsText, /Slow burn/);
   assert.match(compiled.formValues.first_mes, /leaves the next move entirely to \{\{user\}\}/);
 });
 

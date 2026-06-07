@@ -1657,6 +1657,7 @@ export default function StructuredCardEditor({
           name: patch.name ?? currentCard.data.name,
           description: patch.description ?? currentCard.data.description,
           personality: patch.personality ?? currentCard.data.personality,
+          tags: patch.tags ?? currentCard.data.tags,
           extensions: patch.extensions ?? currentCard.data.extensions,
         },
       };

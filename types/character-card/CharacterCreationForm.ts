@@ -15,6 +15,7 @@ export const CharacterCreationTargetOverrideSchema = z.object({
 });
 
 export const CharacterCreationFormSchema = z.object({
+  semanticSeedIds: z.array(z.string()).default([]),
   identity: section({
     characterName: textField,
     nicknamesAliases: textField,
@@ -139,7 +140,10 @@ export type CharacterCreationTargetOverride = z.infer<
   typeof CharacterCreationTargetOverrideSchema
 >;
 
-export type CharacterCreationFormSectionKey = keyof CharacterCreationForm;
+export type CharacterCreationFormSectionKey = Exclude<
+  keyof CharacterCreationForm,
+  "semanticSeedIds"
+>;
 
 export const CHARACTER_CREATION_FORM_SECTIONS: Array<{
   key: CharacterCreationFormSectionKey;

@@ -465,6 +465,38 @@ test("public CHARX helper scrubber preserves card shape while removing local fie
   assert.deepEqual(scrubbedCard.data.proxy_configurations, {});
 });
 
+test("public export scrubber removes internal semantic seed ids", () => {
+  const card = {
+    spec: "chara_card_v3",
+    spec_version: "3.0",
+    data: {
+      name: "Semantic Export",
+      tags: ["Fear of abandonment", "Slow burn"],
+      extensions: {
+        heartwriteai_character_creation_form: {
+          semanticSeedIds: ["fear_of_abandonment", "slow_burn"],
+          identity: { characterName: "Semantic Export" },
+        },
+        heartwriteai_personality_engine: {
+          semanticSeedIds: ["fear_of_abandonment"],
+          semanticSeedLabels: ["Fear of abandonment"],
+        },
+      },
+    },
+  };
+
+  const scrubbedCard = scrubCardForPublicExport(card);
+  const scrubbedJson = JSON.stringify(scrubbedCard);
+
+  assert.deepEqual(scrubbedCard.data.tags, [
+    "Fear of abandonment",
+    "Slow burn",
+  ]);
+  assert.doesNotMatch(scrubbedJson, /semanticSeedIds/);
+  assert.doesNotMatch(scrubbedJson, /fear_of_abandonment|slow_burn/);
+  assert.match(scrubbedJson, /Fear of abandonment/);
+});
+
 test("removes stale chara and ccv3 chunks during ccv3 export", () => {
   const staleCard = {
     spec: "chara_card_v2",

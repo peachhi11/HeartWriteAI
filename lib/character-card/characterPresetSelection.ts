@@ -262,6 +262,10 @@ import {
 } from "../../data/workplaceHierarchyPresets";
 import type { CharacterCardFormValues } from "../../types/character-card/CharacterCardFormValues";
 import { createEmptyCharacterCardFormValues } from "./createEmptyCharacterCardFormValues";
+import {
+  compileSemanticSeedPromptAdditionsByLane,
+  compileSemanticSeedVisibleTags,
+} from "./semanticSeedResolver";
 
 export interface CharacterPresetSelection {
   name: string;
@@ -333,6 +337,7 @@ export interface CharacterPresetSelection {
   sentenceRhythm?: SentenceRhythmPreset;
   communicationStyle?: CommunicationStylePreset;
   descriptiveWritingSeeds?: readonly DescriptiveWritingSeed[];
+  semanticSeedIds?: readonly string[];
 }
 
 export interface CompiledCharacterPresetSelection {
@@ -637,6 +642,7 @@ export function compileCharacterPresetSelection(
       seed.category,
       seed.label,
     ]),
+    ...compileSemanticSeedVisibleTags(selection.semanticSeedIds ?? []),
   ]);
 
   return {
@@ -732,6 +738,9 @@ function buildPhysicalAppearance(selection: CharacterPresetSelection): string {
 function buildPersonality(selection: CharacterPresetSelection): string {
   const descriptiveWritingAdditions =
     compileDescriptiveWritingAdditionsByLane(selection);
+  const semanticAdditions = compileSemanticSeedPromptAdditionsByLane(
+    selection.semanticSeedIds ?? [],
+  );
   const originWoundAdditions = selection.originWound
     ? compileOriginWoundPresetAdditions(selection.originWound)
     : null;
@@ -930,6 +939,7 @@ function buildPersonality(selection: CharacterPresetSelection): string {
     friendsToLoversAdditions?.personalityAddition ?? "",
     conflictStyleAdditions?.personalityAddition ?? "",
     communicationStyleAdditions?.personalityAddition ?? "",
+    semanticAdditions.psychologyAddition,
     ...descriptiveWritingAdditions.personality,
     ...descriptiveWritingAdditions["body-language"],
     ...descriptiveWritingAdditions["emotional-expression"],
@@ -1237,6 +1247,9 @@ function buildRelationshipDynamics(
   const hairStyleAdditions = selection.hairStyle
     ? compileHairStylePresetAdditions(selection.hairStyle)
     : null;
+  const semanticAdditions = compileSemanticSeedPromptAdditionsByLane(
+    selection.semanticSeedIds ?? [],
+  );
 
   return [
     `Primary dynamics: ${selection.romance.dynamics.join(", ")}.`,
@@ -1292,6 +1305,7 @@ function buildRelationshipDynamics(
     conflictStyleAdditions?.relationshipAddition ?? "",
     jealousyAdditions?.relationshipAddition ?? "",
     hairStyleAdditions?.relationshipAddition ?? "",
+    semanticAdditions.relationshipAddition,
   ].join("\n");
 }
 
@@ -1499,6 +1513,9 @@ function buildSystemPrompt(
         (seed) => compileDescriptiveWritingSeedAdditions(seed).systemPromptAddition,
       )
     : [];
+  const semanticAdditions = selection
+    ? compileSemanticSeedPromptAdditionsByLane(selection.semanticSeedIds ?? [])
+    : null;
 
   return [
     "Roleplay as {{char}} using the compiled preset library as appearance and behaviour guidance.",
@@ -1561,6 +1578,7 @@ function buildSystemPrompt(
     sentenceRhythmAdditions?.systemPromptAddition ?? "",
     communicationStyleAdditions?.systemPromptAddition ?? "",
     hairStyleAdditions?.systemPromptAddition ?? "",
+    semanticAdditions?.systemPromptAddition ?? "",
     ...descriptiveWritingAdditions,
     `Preset behaviour tags: ${systemPromptTags.join(", ")}.`,
   ].join("\n");

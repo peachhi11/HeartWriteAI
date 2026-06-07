@@ -9,7 +9,13 @@ import { CharacterCardFormValues } from "../../types/character-card/CharacterCar
 import { CharacterCardPayload } from "../../types/character-card/CharacterCardPayload";
 import { CharacterCardV3 } from "../../types/character-card/CharacterCardV3";
 import { createCharacterCardFromFormValues } from "./createCharacterCardFromFormValues";
+import { createCharacterCardFormValues } from "./createCharacterCardFormValues";
 import { createEmptyCharacterCardFormValues } from "./createEmptyCharacterCardFormValues";
+import {
+  compileSemanticSeedPromptAdditions,
+  compileSemanticSeedPromptAdditionsByLane,
+  compileSemanticSeedVisibleTags,
+} from "./semanticSeedResolver";
 
 export function createEmptyCharacterCreationForm(): CharacterCreationForm {
   return CharacterCreationFormSchema.parse({});
@@ -24,6 +30,7 @@ export function compileCharacterCreationFormToFormValues(
   baseValues: CharacterCardFormValues = createEmptyCharacterCardFormValues(),
 ): CharacterCardFormValues {
   const form = parseCharacterCreationForm(rawForm);
+  const semanticTags = compileSemanticSeedVisibleTags(form.semanticSeedIds);
 
   return {
     ...baseValues,
@@ -44,6 +51,7 @@ export function compileCharacterCreationFormToFormValues(
     speechStyle: compileSpeechStyle(form),
     relationshipsConnections: compileRelationships(form),
     intimacyProfile: compileAdultAnatomy(form),
+    tagsText: mergeCommaSeparatedValues(baseValues.tagsText, semanticTags),
   };
 }
 
@@ -54,7 +62,10 @@ export function createCharacterCardFromCreationForm(
 ): CharacterCardV3 {
   const card = createCharacterCardFromFormValues(
     sourceCard,
-    compileCharacterCreationFormToFormValues(form, baseValues),
+    compileCharacterCreationFormToFormValues(
+      form,
+      baseValues ?? createCharacterCardFormValues(sourceCard),
+    ),
   );
 
   return {
@@ -95,6 +106,7 @@ export function compileCharacterCreationFormToCardDataPatch(
     name: compiledCard.data.name,
     description: compiledCard.data.description,
     personality: compiledCard.data.personality,
+    tags: compiledCard.data.tags,
     extensions: createCharacterCreationExtensions(currentData.extensions, form),
   };
 }
@@ -159,6 +171,10 @@ function compilePhysicalAppearance(form: CharacterCreationForm): string {
 }
 
 function compilePersonalityEngine(form: CharacterCreationForm): string {
+  const semanticAdditions = compileSemanticSeedPromptAdditionsByLane(
+    form.semanticSeedIds,
+  );
+
   return createSections([
     createSection("Personality", [
       createLine("Archetype", form.personality.archetype),
@@ -208,6 +224,7 @@ function compilePersonalityEngine(form: CharacterCreationForm): string {
         form.psychology.bigFive.emotionalStability,
       ),
     ]),
+    semanticAdditions.psychologyAddition,
   ]);
 }
 
@@ -241,6 +258,10 @@ function compileSpeechStyle(form: CharacterCreationForm): string {
 }
 
 function compileRelationships(form: CharacterCreationForm): string {
+  const semanticAdditions = compileSemanticSeedPromptAdditionsByLane(
+    form.semanticSeedIds,
+  );
+
   return createSections([
     createSection("Societal Affiliation & Standing", [
       createLine(
@@ -276,6 +297,7 @@ function compileRelationships(form: CharacterCreationForm): string {
       ),
     ]),
     createTargetOverrideSection(form),
+    semanticAdditions.relationshipAddition,
   ]);
 }
 
@@ -302,6 +324,11 @@ function compileAdultAnatomy(form: CharacterCreationForm): string {
 function createPersonalityEngineExtension(form: CharacterCreationForm) {
   return {
     source: "character_creation_form",
+    semanticSeedLabels: compileSemanticSeedVisibleTags(form.semanticSeedIds),
+    semanticPromptGuidance: compileSemanticSeedPromptAdditions(
+      form.semanticSeedIds,
+      { header: "Internal semantic routing guidance" },
+    ),
     identity: form.identity,
     personality: form.personality,
     cognitiveDrivers: form.cognitiveDrivers,
@@ -347,4 +374,27 @@ function joinInlineValues(values: string[]): string {
     .map((value) => value.trim())
     .filter(Boolean)
     .join(" / ");
+}
+
+function mergeCommaSeparatedValues(
+  currentValue: string,
+  nextValues: readonly string[],
+): string {
+  const seen = new Set<string>();
+  const merged: string[] = [];
+
+  for (const value of [
+    ...currentValue.split(","),
+    ...nextValues,
+  ]) {
+    const trimmed = value.trim();
+    const key = trimmed.toLowerCase();
+    if (!trimmed || seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    merged.push(trimmed);
+  }
+
+  return merged.join(", ");
 }

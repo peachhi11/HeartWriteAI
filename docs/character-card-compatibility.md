@@ -156,6 +156,34 @@ Card controls should use readable platform-familiar language, not raw schema lab
 
 The underlying card metadata can still keep normalized tags and aliases for search, filtering, and export.
 
+HeartWriteAI's current local seed surface for these controls is
+[`data/seedPresetRegistry.ts`](../data/seedPresetRegistry.ts). It groups
+approved preset modules into app-facing lanes:
+
+- `appearance`: visual presence and descriptive appearance texture.
+- `personality`: personality engine, backstory, coping, music, player-side
+  preference, body-language, speech, and emotional-expression texture.
+- `world`: setting, genre, scenario-opening, and NPC-network context.
+- `image`: portrait/image prompt tags and negative-prompt quality controls.
+- `metadata`: discoverability tags, content warnings, compatibility labels,
+  relationship types, chat styles, scenario labels, and library-routing gates.
+
+The registry is a UI discovery layer, not a hidden card mutation layer. Selected
+seeds should be shown as editable fields or chips before export. Metadata seeds
+can inform `tags`, creator notes, filters, warnings, and compatibility review,
+but they must not override live chat safety, runtime pacing, or character
+behavior by themselves.
+
+HeartWriteAI's semantic seed graph lives in
+[`data/semanticSeedRegistry.ts`](../data/semanticSeedRegistry.ts). It is also
+not a hidden card mutation layer. It exists so selected seeds can expand into
+reviewable related concepts for persona matching, trope routing, scenario
+generation, lorebook suggestions, relationship gates, and recommendation or
+similarity workflows. The graph should keep psychology and trope nodes such as
+wounds, fears, desires, triggers, responses, relationship dynamics, and romance
+tropes separate from exported CCV3 card text until the user confirms the
+resulting fields.
+
 ## Prompt Runtime
 
 CCV3 `data.system_prompt` is allowed to replace the app's default runtime system prompt. If the card prompt contains `{{original}}`, HeartWriteAI treats that as an explicit extension point and inserts the default app prompt there.

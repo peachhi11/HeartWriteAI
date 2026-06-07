@@ -256,6 +256,7 @@ import {
   findRelationshipDynamicVocabularyById,
   RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS,
 } from "@/data/relationshipDynamicVocabulary";
+import { compileSemanticSeedPromptAdditions } from "@/lib/character-card/semanticSeedResolver";
 import {
   compileRegretPresetAdditions,
   findRegretPresetById,
@@ -825,6 +826,13 @@ function tokenizeMatchingSeedInput(rawText: string) {
 }
 
 function compileMatchingVocabularySeedCandidate(seedId: string) {
+  const semanticSeed = compileSemanticSeedPromptAdditions([seedId], {
+    header: "Semantic matching guidance",
+  });
+  if (semanticSeed) {
+    return semanticSeed;
+  }
+
   const relationshipVocabulary =
     findRelationshipDynamicVocabularyById(seedId);
   if (relationshipVocabulary) {

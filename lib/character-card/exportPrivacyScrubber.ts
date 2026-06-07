@@ -49,6 +49,8 @@ const STRIPPED_EXPORT_KEYS = new Set([
   "userSettings",
 ]);
 
+const OMITTED_EXPORT_KEYS = new Set(["semanticSeedIds"]);
+
 export function scrubExportPayload<T>(payload: T): ExportPrivacyScrubReport<T> {
   const redactedCategories = new Set<string>();
   let redactedCount = 0;
@@ -73,9 +75,17 @@ export function scrubExportPayload<T>(payload: T): ExportPrivacyScrubReport<T> {
     }
 
     if (isRecord(node)) {
-      return Object.fromEntries(
-        Object.entries(node).map(([key, value]) => [key, cleanNode(value, key)]),
-      );
+      const entries: [string, unknown][] = [];
+      for (const [key, value] of Object.entries(node)) {
+        if (OMITTED_EXPORT_KEYS.has(key)) {
+          markRedaction(`field:${key}`);
+          continue;
+        }
+
+        entries.push([key, cleanNode(value, key)]);
+      }
+
+      return Object.fromEntries(entries);
     }
 
     return node;

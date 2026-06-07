@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  compileCharacterCreationFormToCardDataPatch,
   compileCharacterCreationFormToFormValues,
   createCharacterCardFromCreationForm,
   createEmptyCharacterCreationForm,
@@ -20,6 +21,7 @@ test("hydrates an empty sectioned character creation form", () => {
   assert.equal(form.appearance.eyeColourShape, "");
   assert.equal(form.psychology.bigFive.openness, "");
   assert.deepEqual(form.relationships.targetOverrides, []);
+  assert.deepEqual(form.semanticSeedIds, []);
 });
 
 test("folds split form input into one coherent editable CCv3 field set", () => {
@@ -35,11 +37,17 @@ test("folds split form input into one coherent editable CCv3 field set", () => {
   assert.match(values.physicalAppearance, /Eyes: Grey, heavy-lidded/);
   assert.match(values.personalityPsychology, /Cognitive Drivers:/);
   assert.match(values.personalityPsychology, /Big Five:/);
+  assert.match(values.personalityPsychology, /Semantic psychology guidance/);
+  assert.match(values.personalityPsychology, /Fear of abandonment/);
+  assert.doesNotMatch(values.personalityPsychology, /fear_of_abandonment/);
   assert.match(values.relationshipsConnections, /Rapport Ledger:/);
   assert.match(values.relationshipsConnections, /{{user}}:/);
+  assert.match(values.relationshipsConnections, /Semantic relationship guidance/);
+  assert.match(values.relationshipsConnections, /Slow burn/);
   assert.match(values.speechStyle, /Tone & Vocabulary:/);
   assert.match(values.backgroundStory, /Internal Thoughts & Reactions:/);
   assert.match(values.intimacyProfile, /Adult Anatomy:/);
+  assert.equal(values.tagsText, "Fear of abandonment, Slow burn");
 });
 
 test("creates a valid CCv3 card with HeartWriteAI form extensions", () => {
@@ -69,6 +77,12 @@ test("creates a valid CCv3 card with HeartWriteAI form extensions", () => {
   assert.equal(card.spec, "chara_card_v3");
   assert.equal(card.spec_version, "3.0");
   assert.equal(card.data.name, "Magnus Vanderbilt");
+  assert.deepEqual(card.data.tags, [
+    "romance",
+    "gothic",
+    "Fear of abandonment",
+    "Slow burn",
+  ]);
   assert.match(card.data.description, /Full Name: Magnus Vanderbilt/);
   assert.match(card.data.description, /Overview:\nIdentity:/);
   assert.match(card.data.personality, /Personality & Psychology:/);
@@ -78,19 +92,87 @@ test("creates a valid CCv3 card with HeartWriteAI form extensions", () => {
     (
       card.data.extensions[
         HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY
-      ] as { identity: { characterName: string } }
+      ] as { identity: { characterName: string }; semanticSeedIds?: string[] }
     ).identity.characterName,
     "Magnus Vanderbilt",
+  );
+  assert.deepEqual(
+    (
+      card.data.extensions[
+        HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY
+      ] as { semanticSeedIds?: string[] }
+    ).semanticSeedIds,
+    ["fear_of_abandonment", "slow_burn"],
   );
   assert.equal(
     (
       card.data.extensions[
         HEARTWRITE_PERSONALITY_ENGINE_EXTENSION_KEY
-      ] as { source: string }
+      ] as { source: string; semanticSeedLabels: readonly string[] }
     ).source,
     "character_creation_form",
   );
+  assert.deepEqual(
+    (
+      card.data.extensions[
+        HEARTWRITE_PERSONALITY_ENGINE_EXTENSION_KEY
+      ] as { semanticSeedLabels: readonly string[] }
+    ).semanticSeedLabels,
+    ["Fear of abandonment", "Slow burn"],
+  );
+  assert.doesNotMatch(
+    JSON.stringify(
+      card.data.extensions[HEARTWRITE_PERSONALITY_ENGINE_EXTENSION_KEY],
+    ),
+    /semanticSeedIds|fear_of_abandonment|slow_burn/,
+  );
   assert.equal("identity" in card, false);
+});
+
+test("updates card data patches with semantic tags and overwrites stale raw-id extensions", () => {
+  const form = createExampleCreationForm();
+  const patch = compileCharacterCreationFormToCardDataPatch(form, {
+    name: "Draft",
+    description: "",
+    personality: "",
+    scenario: "A rainy manor house after midnight.",
+    first_mes: "You hear a careful knock at the study door.",
+    mes_example: "",
+    creator_notes: "",
+    system_prompt: "",
+    post_history_instructions: "",
+    creator: "",
+    character_version: "",
+    tags: ["romance", "Fear of abandonment"],
+    alternate_greetings: [],
+    group_only_greetings: [],
+    extensions: {
+      [HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY]: {
+        semanticSeedIds: ["stale_raw_id"],
+      },
+      [HEARTWRITE_PERSONALITY_ENGINE_EXTENSION_KEY]: {
+        semanticSeedIds: ["stale_raw_id"],
+      },
+    },
+  });
+
+  assert.deepEqual(patch.tags, [
+    "romance",
+    "Fear of abandonment",
+    "Slow burn",
+  ]);
+  assert.deepEqual(
+    (
+      patch.extensions?.[
+        HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY
+      ] as { semanticSeedIds?: string[] }
+    ).semanticSeedIds,
+    ["fear_of_abandonment", "slow_burn"],
+  );
+  assert.doesNotMatch(
+    JSON.stringify(patch.extensions?.[HEARTWRITE_PERSONALITY_ENGINE_EXTENSION_KEY]),
+    /semanticSeedIds|stale_raw_id|fear_of_abandonment|slow_burn/,
+  );
 });
 
 test("does not compile adult anatomy unless the form is marked as adult NSFW", () => {
@@ -111,6 +193,7 @@ test("does not compile adult anatomy unless the form is marked as adult NSFW", (
 function createExampleCreationForm() {
   return {
     ...createEmptyCharacterCreationForm(),
+    semanticSeedIds: ["fear_of_abandonment", "slow_burn"],
     identity: {
       ...createEmptyCharacterCreationForm().identity,
       characterName: "Magnus Vanderbilt",

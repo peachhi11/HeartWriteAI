@@ -19,8 +19,20 @@ prototype. The current branch includes:
 - Global copy affordances for ordinary text inputs/textareas, while excluding
   passwords, file inputs, sliders, date/color controls, disabled fields, and
   explicit `data-no-field-copy` opt-outs.
-- Seed vocabulary ingestion fixes for skinny/thin body-line semantics and wavy
-  hair wording.
+- One-form character creation schema/compiler that keeps the input experience
+  sectioned while compiling back into one coherent CCV3 card plus HeartWriteAI
+  extensions.
+- Seed preset packs for descriptive prose, backstory events,
+  mental/emotional patterns, music, NPC networks, scenario openers, world lore,
+  genre settings, player-side persona preferences, card metadata taxonomy, and
+  image prompt vocabulary.
+- Unified seed preset registry in `data/seedPresetRegistry.ts` for app-facing
+  appearance, personality, world, image, and metadata seed lanes.
+- Semantic seed registry in `data/semanticSeedRegistry.ts` for graph-based
+  seed meaning, relationship expansion, persona matching, route planning, and
+  future recommendation/similarity workflows. Its first priority is psychology
+  and trope pressure: wounds, fears, desires, triggers, responses,
+  relationship dynamics, and romance tropes.
 - Build/test/QC coverage through lint, Node tests, Next build, Cargo tests, and
   debug Tauri app bundling.
 
@@ -142,16 +154,39 @@ Goal: make the character page the first creation point.
   - persona
   - scenario
   - world/character/persona/scenario lorebooks
+- Use `data/seedPresetRegistry.ts` as the app-facing source for seed pickers:
+  - `appearance` for visual presence, descriptive appearance texture, and later
+    image prompt handoff
+  - `personality` for traits, wounds, backstory events, coping patterns,
+    music, player-side preferences, speech/body-language prose texture, and
+    persona matching
+  - `world` for setting, genre, scenario opening, and NPC network context
+  - `image` for visual prompt tags and negative prompt quality controls
+  - `metadata` for discoverability tags, content warnings, compatibility,
+    relationship type, chat style, and library routing
+- Use `data/semanticSeedRegistry.ts` when selected seeds need graph behavior:
+  aliases, parents, children, related nodes, opposites, trigger hooks, goal
+  hooks, route tags, or similarity expansion.
+- Prioritize semantic graph growth in wounds, fears, desires, triggers,
+  responses, relationship dynamics, and romance tropes before expanding
+  appearance at full scale, because psychology creates reusable story pressure
+  for character creation, persona matching, scenario generation, lorebooks,
+  gates, and long-form chat progression.
 - Keep all generated outputs editable through normal fields, not raw JSON.
 - Preserve CCV3 as the main new-card format.
 - Treat V1/V2 as import/convert/sanity-check paths.
 - Add dirty-state protection before switching cards or clearing fields.
+- Keep individual `data/*Presets.ts` modules deterministic and test-backed;
+  the registry should adapt them for UI discovery without replacing their
+  focused compiler helpers.
 
 Exit criteria:
 
 - A user can paste raw notes and receive editable structured outputs.
 - The user can adjust any generated field before export.
 - The intake hub can suggest likely tags, route/trope metadata, and lorebook candidates without exposing raw taxonomy noise.
+- Character and persona creator sections can query broad seed lanes without
+  manually importing each preset module.
 
 ## Phase 4: Editable Lorebook, Persona, and Scenario Assets
 
@@ -195,6 +230,9 @@ Goal: replace raw technical filters with a friendly suggestion layer inspired by
 
 - Build a local suggestion engine for card tags, AU tags, role tags, POV tags, and route/trope tags.
 - Use CharacterGen `trope_engine_catalog.py` and `engine_state_card_tropes/` as source taxonomy references, then normalize into readable HeartWriteAI labels.
+- Use `data/seedPresetRegistry.ts` for current metadata taxonomy and broad
+  seed discovery, then layer specialty tag suggestion logic on top once the
+  creator controls are wired.
 - Keep tags searchable by aliases such as Dom, Domme, Sub, switch, FemPOV, MalePOV, AnyPOV, enemies to lovers, omegaverse, rockstar AU, esports AU, college AU, mafia AU, and royal AU.
 - Add a ForceBary-style action that can suggest tags from card text, scenario, first message, lorebook entries, and creator notes.
 - Show suggestions as user-reviewable chips, never as silent hidden metadata.
@@ -208,6 +246,8 @@ Exit criteria:
 - Suggested tags explain themselves in friendly language.
 - Tags populate the library filters and exported metadata only after user confirmation.
 - The user-facing surface exposes the chosen tag/engine label, while hidden compiler logic handles the detailed emotion, feeling, body-signal, and prose-routing rules.
+- Metadata registry seeds remain reviewable labels and do not silently mutate
+  live chat safety, romance pacing, or character behaviour.
 
 ## Phase 5: Tauri Local Library and File Bridge
 
