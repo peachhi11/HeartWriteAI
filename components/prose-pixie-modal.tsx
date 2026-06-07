@@ -15,6 +15,12 @@ import {
   X,
 } from "lucide-react";
 
+import {
+  streamLlmCompletion,
+  type LlmChatMessage,
+} from "@/lib/inference/llmConnector";
+import { loadInferenceConfig } from "@/lib/ui/runtimeInference";
+
 export type ProsePixieActionId =
   | "glow_up"
   | "aura_alignment"
@@ -408,6 +414,79 @@ Output Rules:
   },
 ];
 
+interface LocalProsePixieDraftRequest {
+  action: ProsePixieAction;
+  adultModeEnabled: boolean;
+  characterName: string;
+  customInstruction: string;
+  fieldLabel: string;
+  originalText: string;
+}
+
+async function generateLocalProsePixieDraft(
+  request: LocalProsePixieDraftRequest,
+) {
+  const config = loadInferenceConfig();
+  let rewrittenText = "";
+  const messages: LlmChatMessage[] = [
+    {
+      role: "system",
+      content:
+        "You are Prose Pixie, a character-card prose editor. Rewrite only the requested field. Return only the revised field text. Preserve canon facts, names, placeholders like {{char}} and {{user}}, and the user's stated content rating boundaries.",
+    },
+    {
+      role: "user",
+      content: buildLocalRewritePrompt(request),
+    },
+  ];
+
+  await streamLlmCompletion(
+    messages,
+    {
+      apiKey: config.openRouterApiKey,
+      baseUrl: config.provider === "openrouter" ? undefined : config.localEndpoint,
+      maxTokens: config.maxTokens,
+      model:
+        config.provider === "openrouter"
+          ? config.openRouterModel
+          : config.selectedModel,
+      provider: config.provider,
+      temperature: config.temperature,
+      topP: config.topP,
+    },
+    {
+      onToken: (token) => {
+        rewrittenText += token;
+      },
+    },
+  );
+
+  if (!rewrittenText.trim()) {
+    throw new Error("Local Prose Pixie did not return usable rewritten text.");
+  }
+
+  return rewrittenText;
+}
+
+function buildLocalRewritePrompt(request: LocalProsePixieDraftRequest) {
+  const customInstruction = request.customInstruction.trim()
+    ? `\nExtra user direction:\n${request.customInstruction.trim()}`
+    : "";
+
+  return [
+    `Character: ${request.characterName || "Unnamed character"}`,
+    `Field: ${request.fieldLabel}`,
+    `Mode: ${request.action.label}`,
+    `Mode instruction: ${request.action.instruction}`,
+    `Adult mode enabled: ${request.adultModeEnabled ? "yes" : "no"}`,
+    customInstruction,
+    "Original field text:",
+    request.originalText,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+}
+
 export default function ProsePixieModal({
   adultModeEnabled,
   applyLabel = "Replace Text",
@@ -459,6 +538,19 @@ export default function ProsePixieModal({
         | null;
 
       if (!response.ok || !payload?.rewrittenText) {
+        if (response.status === 501) {
+          const localDraft = await generateLocalProsePixieDraft({
+            action: selectedAction,
+            adultModeEnabled,
+            characterName: target.characterName,
+            customInstruction,
+            fieldLabel: target.fieldLabel,
+            originalText: target.value,
+          });
+          setDraft(localDraft.trim());
+          return;
+        }
+
         throw new Error(payload?.error ?? "Prose Pixie could not produce a draft.");
       }
 

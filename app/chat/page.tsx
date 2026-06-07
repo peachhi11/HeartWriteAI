@@ -1531,6 +1531,17 @@ function createLlmProviderConfig(
     };
   }
 
+  if (config.provider === "openai-compatible") {
+    return {
+      baseUrl: config.localEndpoint,
+      maxTokens: config.maxTokens,
+      model: config.selectedModel,
+      provider: "openai-compatible",
+      temperature: config.temperature,
+      topP: config.topP,
+    };
+  }
+
   return {
     baseUrl: config.localEndpoint,
     maxTokens: config.maxTokens,
@@ -1542,7 +1553,13 @@ function createLlmProviderConfig(
 }
 
 function formatInferenceProviderLabel(config: InferenceConfig) {
-  return config.provider === "openrouter" ? "OpenRouter" : "Ollama";
+  if (config.provider === "openrouter") {
+    return "OpenRouter";
+  }
+
+  return config.provider === "openai-compatible"
+    ? "OpenAI-compatible local"
+    : "Ollama";
 }
 
 function getInferenceModelLabel(config: InferenceConfig) {
@@ -1552,8 +1569,12 @@ function getInferenceModelLabel(config: InferenceConfig) {
 }
 
 function formatInferenceProviderTarget(config: InferenceConfig) {
-  return config.provider === "openrouter"
-    ? "OpenRouter chat completions"
+  if (config.provider === "openrouter") {
+    return "OpenRouter chat completions";
+  }
+
+  return config.provider === "openai-compatible"
+    ? `local OpenAI-compatible endpoint at ${config.localEndpoint}`
     : `local Ollama at ${config.localEndpoint}`;
 }
 

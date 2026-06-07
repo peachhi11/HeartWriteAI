@@ -29,6 +29,9 @@ export function InferenceSettingsCard() {
   const [endpointDraft, setEndpointDraft] = useState(
     INFERENCE_DEFAULT_MATRIX.localEndpoint,
   );
+  const [selectedModelDraft, setSelectedModelDraft] = useState(
+    INFERENCE_DEFAULT_MATRIX.selectedModel,
+  );
   const [openRouterModelDraft, setOpenRouterModelDraft] = useState(
     INFERENCE_DEFAULT_MATRIX.openRouterModel,
   );
@@ -45,6 +48,7 @@ export function InferenceSettingsCard() {
       const localConfig = loadInferenceConfig();
       setConfig(localConfig);
       setEndpointDraft(localConfig.localEndpoint);
+      setSelectedModelDraft(localConfig.selectedModel);
       setOpenRouterModelDraft(localConfig.openRouterModel);
       setHasHydrated(true);
     });
@@ -56,6 +60,7 @@ export function InferenceSettingsCard() {
 
       setConfig(nativeConfig);
       setEndpointDraft(nativeConfig.localEndpoint);
+      setSelectedModelDraft(nativeConfig.selectedModel);
       setOpenRouterModelDraft(nativeConfig.openRouterModel);
       setHasHydrated(true);
     });
@@ -72,6 +77,7 @@ export function InferenceSettingsCard() {
 
     void saveInferenceConfig(config).then((savedConfig) => {
       setEndpointDraft(savedConfig.localEndpoint);
+      setSelectedModelDraft(savedConfig.selectedModel);
       setOpenRouterModelDraft(savedConfig.openRouterModel);
       setConfig((current) =>
         JSON.stringify(current) === JSON.stringify(savedConfig)
@@ -95,6 +101,16 @@ export function InferenceSettingsCard() {
     setEndpointDraft(nextConfig.localEndpoint);
   }
 
+  function commitSelectedModelDraft() {
+    const nextConfig = normalizeInferenceConfig({
+      ...config,
+      selectedModel: selectedModelDraft,
+    });
+
+    setConfig(nextConfig);
+    setSelectedModelDraft(nextConfig.selectedModel);
+  }
+
   function commitOpenRouterModelDraft() {
     const nextConfig = normalizeInferenceConfig({
       ...config,
@@ -108,6 +124,11 @@ export function InferenceSettingsCard() {
   const hasPresetOpenRouterModel = OPENROUTER_MODEL_PRESETS.some(
     (model) => model.value === config.openRouterModel,
   );
+  const hasPresetLocalModel = INFERENCE_MODEL_PRESETS.some(
+    (model) => model.value === config.selectedModel,
+  );
+  const isLocalProvider =
+    config.provider === "ollama" || config.provider === "openai-compatible";
 
   return (
     <section className="grid gap-4 rounded-2xl border border-border/70 bg-background/60 p-4 shadow-xl backdrop-blur-sm">
@@ -138,31 +159,59 @@ export function InferenceSettingsCard() {
             value={config.provider}
           >
             <option value="ollama">Ollama Local</option>
+            <option value="openai-compatible">OpenAI-Compatible Local</option>
             <option value="openrouter">OpenRouter</option>
           </select>
         </label>
       </header>
 
       <div className="grid gap-4">
-        {config.provider === "ollama" ? (
-          <label className="grid gap-1">
-            <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
-              Local AI Model
-            </span>
-            <select
-              className="h-9 rounded-lg border border-border/70 bg-background px-2 font-mono text-[10px] text-foreground outline-none transition focus:border-user-primary/70"
-              onChange={(event) =>
-                updateConfig({ selectedModel: event.currentTarget.value })
-              }
-              value={config.selectedModel}
-            >
-              {INFERENCE_MODEL_PRESETS.map((model) => (
-                <option key={model.value} value={model.value}>
-                  {model.label}
-                </option>
-              ))}
-            </select>
-          </label>
+        {isLocalProvider ? (
+          <div className="grid gap-3 rounded-xl border border-border/70 bg-background/60 p-3">
+            <label className="grid gap-1">
+              <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
+                Local AI Model
+              </span>
+              <select
+                className="h-9 rounded-lg border border-border/70 bg-background px-2 font-mono text-[10px] text-foreground outline-none transition focus:border-user-primary/70"
+                onChange={(event) => {
+                  const selectedModel = event.currentTarget.value;
+                  setSelectedModelDraft(selectedModel);
+                  updateConfig({ selectedModel });
+                }}
+                value={config.selectedModel}
+              >
+                {hasPresetLocalModel ? null : (
+                  <option value={config.selectedModel}>Custom model</option>
+                )}
+                {INFERENCE_MODEL_PRESETS.map((model) => (
+                  <option key={model.value} value={model.value}>
+                    {model.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="grid gap-1">
+              <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
+                Custom Local Model
+              </span>
+              <input
+                className="h-9 rounded-lg border border-border/70 bg-background px-2 font-mono text-[10px] text-foreground outline-none transition focus:border-user-primary/70"
+                onBlur={commitSelectedModelDraft}
+                onChange={(event) =>
+                  setSelectedModelDraft(event.currentTarget.value)
+                }
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.currentTarget.blur();
+                  }
+                }}
+                placeholder="local-model-name"
+                value={selectedModelDraft}
+              />
+            </label>
+          </div>
         ) : (
           <div className="grid gap-3 rounded-xl border border-border/70 bg-background/60 p-3">
             <label className="grid gap-1">
@@ -210,7 +259,7 @@ export function InferenceSettingsCard() {
           </div>
         )}
 
-        {config.provider === "ollama" ? (
+        {isLocalProvider ? (
           <label className="grid gap-1">
             <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
               Local Endpoint
@@ -224,16 +273,22 @@ export function InferenceSettingsCard() {
                   event.currentTarget.blur();
                 }
               }}
-              placeholder="http://127.0.0.1:11434/api/chat"
+              placeholder={
+                config.provider === "openai-compatible"
+                  ? "http://127.0.0.1:1234/v1"
+                  : "http://127.0.0.1:11434/api/chat"
+              }
               value={endpointDraft}
             />
             <span className="text-[10px] text-muted-foreground">
-              Use another local Ollama port if another app is occupying 11434.
+              {config.provider === "openai-compatible"
+                ? "Use a local or private-network OpenAI-compatible base URL, such as LM Studio /v1."
+                : "Use another local Ollama port if another app is occupying 11434."}
             </span>
           </label>
         ) : null}
 
-        {config.provider === "ollama" ? null : (
+        {config.provider !== "openrouter" ? null : (
           <label className="grid gap-1">
             <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
               Custom OpenRouter Model

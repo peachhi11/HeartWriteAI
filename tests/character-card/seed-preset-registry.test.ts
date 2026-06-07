@@ -29,6 +29,10 @@ import {
 } from "../../data/seedPresetRegistry";
 import { SETTING_SUBTYPE_PRESETS } from "../../data/settingSubtypePresets";
 import { WORLD_LORE_EXPANSION_PRESETS } from "../../data/worldLoreExpansionPresets";
+import {
+  SEED_PICKER_ENTRIES,
+  searchSeedPickerEntries,
+} from "../../data/seedPickerRegistry";
 
 const descriptiveAppearanceSeeds = DESCRIPTIVE_WRITING_SEEDS.filter(
   (seed) => seed.lane === "appearance",
@@ -195,4 +199,20 @@ test("filters registry sources and search results by lane", () => {
   assert.equal(worldResults.every((entry) => entry.lane === "world"), true);
   assert.equal(metadataResults.every((entry) => entry.lane === "metadata"), true);
   assert.equal(searchSeedPresetRegistryEntries("").length, 0);
+});
+
+test("builds unified picker entries across flat and semantic registries", () => {
+  const replacement = searchSeedPickerEntries("divided attention temporary", {
+    kinds: ["semantic"],
+    limit: 1,
+  });
+  const portrait = searchSeedPickerEntries("portrait negative prompt", {
+    lanes: ["image"],
+    limit: 5,
+  });
+
+  assert.equal(SEED_PICKER_ENTRIES.length > SEED_PRESET_REGISTRY.length, true);
+  assert.equal(replacement[0]?.id, "fear_of_replacement");
+  assert.equal(replacement[0]?.kind, "semantic");
+  assert.equal(portrait.every((entry) => entry.lane === "image"), true);
 });

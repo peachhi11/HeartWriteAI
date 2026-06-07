@@ -1,4 +1,4 @@
-export type InferenceProvider = "ollama" | "openrouter";
+export type InferenceProvider = "ollama" | "openai-compatible" | "openrouter";
 
 export interface InferenceConfig {
   frequencyPenalty: number;
@@ -14,6 +14,7 @@ export interface InferenceConfig {
 
 export const OPENROUTER_DEFAULT_MODEL = "google/gemini-2.5-flash";
 export const OLLAMA_DEFAULT_MODEL = "deepseek-r1:8b-llama-distill-q4_K_M";
+export const OPENAI_COMPATIBLE_DEFAULT_MODEL = "local-model";
 
 export const INFERENCE_DEFAULT_MATRIX: InferenceConfig = {
   frequencyPenalty: 0,
@@ -79,7 +80,9 @@ export function normalizeInferenceConfig(value: unknown): InferenceConfig {
         ? candidate.openRouterModel.trim()
         : INFERENCE_DEFAULT_MATRIX.openRouterModel,
     provider:
-      candidate.provider === "openrouter" || candidate.provider === "ollama"
+      candidate.provider === "openrouter" ||
+      candidate.provider === "ollama" ||
+      candidate.provider === "openai-compatible"
         ? candidate.provider
         : INFERENCE_DEFAULT_MATRIX.provider,
     selectedModel:
@@ -160,22 +163,46 @@ function normalizeApiKey(value: string) {
 function isSafeLocalEndpoint(value: string) {
   try {
     const url = new URL(value.trim());
-    const isLocalHost =
-      url.hostname === "localhost" ||
-      url.hostname === "127.0.0.1" ||
-      url.hostname === "[::1]";
+    const hostname = url.hostname.replace(/^\[|\]$/g, "");
+    const isApprovedLocalHost =
+      hostname === "localhost" ||
+      hostname === "127.0.0.1" ||
+      hostname === "::1" ||
+      isPrivateIpv4Host(hostname);
+    const isApprovedPath =
+      url.pathname === "/api/chat" ||
+      url.pathname === "/v1" ||
+      url.pathname === "/v1/" ||
+      url.pathname === "/v1/chat/completions";
 
     return (
-      isLocalHost &&
+      isApprovedLocalHost &&
       url.protocol === "http:" &&
-      url.pathname === "/api/chat" &&
+      isApprovedPath &&
       url.username === "" &&
       url.password === "" &&
-      value.trim().length <= 128
+      value.trim().length <= 160
     );
   } catch {
     return false;
   }
+}
+
+function isPrivateIpv4Host(hostname: string) {
+  const octets = hostname.split(".").map((part) => Number(part));
+  if (
+    octets.length !== 4 ||
+    octets.some((octet) => !Number.isInteger(octet) || octet < 0 || octet > 255)
+  ) {
+    return false;
+  }
+
+  const [first, second] = octets;
+  return (
+    first === 10 ||
+    (first === 172 && second >= 16 && second <= 31) ||
+    (first === 192 && second === 168)
+  );
 }
 
 function normalizeLocalEndpoint(value: string) {

@@ -14,6 +14,8 @@ import CharacterCardPreview from "@/components/character-card-preview";
 import ProsePixieModal, {
   type ProsePixieTarget,
 } from "@/components/prose-pixie-modal";
+import { SearchableSeedPicker } from "@/components/searchable-seed-picker";
+import type { SeedPickerEntry } from "@/data/seedPickerRegistry";
 import {
   generatedLorebookArtifactToV3Document,
   importLorebookV3Json,
@@ -1682,6 +1684,12 @@ export default function StructuredCardEditor({
     );
   }
 
+  function applyCharacterCreationSeed(entry: SeedPickerEntry) {
+    updateCharacterCreationForm(
+      applySeedPickerEntryToCharacterCreationForm(characterCreationForm, entry),
+    );
+  }
+
   function addCharacterCreationTargetOverride() {
     updateCharacterCreationForm({
       ...characterCreationForm,
@@ -3295,6 +3303,7 @@ export default function StructuredCardEditor({
               onAddTargetOverride={addCharacterCreationTargetOverride}
               onBooleanChange={updateCharacterCreationBoolean}
               onRemoveTargetOverride={removeCharacterCreationTargetOverride}
+              onSeedSelect={applyCharacterCreationSeed}
               onTextChange={updateCharacterCreationText}
             />
 
@@ -6001,12 +6010,14 @@ function CharacterCreationFormPanel({
   onAddTargetOverride,
   onBooleanChange,
   onRemoveTargetOverride,
+  onSeedSelect,
   onTextChange,
 }: {
   form: CharacterCreationForm;
   onAddTargetOverride: () => void;
   onBooleanChange: (path: CharacterCreationFormPath, value: boolean) => void;
   onRemoveTargetOverride: (index: number) => void;
+  onSeedSelect: (entry: SeedPickerEntry) => void;
   onTextChange: (path: CharacterCreationFormPath, value: string) => void;
 }) {
   return (
@@ -6016,6 +6027,17 @@ function CharacterCreationFormPanel({
           One-Form Character Creator
         </h3>
       </div>
+
+      <SearchableSeedPicker
+        className="border-violet-500/20 bg-zinc-950/60"
+        description="Select a structured seed to prefill editable creator fields or add internal semantic guidance."
+        kinds={["preset", "semantic"]}
+        label="Seed Template Injector"
+        lanes={["appearance", "personality", "world", "image", "semantic"]}
+        maxResults={8}
+        onSelect={onSeedSelect}
+        placeholder="Try fear of replacement, copper curls, slow burn, vampire..."
+      />
 
       {CHARACTER_CREATION_FORM_FIELD_GROUPS.map((group, index) => (
         <CharacterCreationDetailsSection
@@ -8142,6 +8164,113 @@ function readNestedStringValue(
   }, source);
 
   return typeof value === "string" ? value : "";
+}
+
+function applySeedPickerEntryToCharacterCreationForm(
+  form: CharacterCreationForm,
+  entry: SeedPickerEntry,
+): CharacterCreationForm {
+  let nextForm = form;
+
+  if (entry.kind === "semantic") {
+    nextForm = {
+      ...nextForm,
+      semanticSeedIds: Array.from(new Set([...nextForm.semanticSeedIds, entry.id])),
+    };
+  }
+
+  const targetPath = resolveCharacterCreationSeedTargetPath(entry);
+  const currentValue = readNestedStringValue(nextForm, targetPath);
+  const seedText = formatCharacterCreationSeedSnippet(entry);
+
+  return updateNestedValue(
+    nextForm,
+    targetPath,
+    appendCharacterCreationSeedText(currentValue, seedText),
+  );
+}
+
+function resolveCharacterCreationSeedTargetPath(
+  entry: SeedPickerEntry,
+): CharacterCreationFormPath {
+  if (entry.kind === "semantic") {
+    switch (entry.category) {
+      case "wounds":
+      case "fears":
+        return ["psychology", "coreWound"];
+      case "desires":
+      case "motivations":
+      case "goals_short":
+      case "goals_long":
+        return ["cognitiveDrivers", "motivation"];
+      case "triggers":
+        return ["psychology", "triggers"];
+      case "responses":
+        return ["psychology", "stressResponse"];
+      case "attachment_styles":
+        return ["psychology", "attachmentStyle"];
+      case "conflict_styles":
+        return ["psychology", "conflictStyle"];
+      case "repair_styles":
+        return ["relationships", "emotionalBonds", "trustMetric"];
+      case "love_languages":
+        return ["psychology", "loveLanguages"];
+      case "relationship_dynamics":
+      case "romance_tropes":
+      case "relationship_gates":
+      case "routes":
+        return ["relationships", "emotionalBonds", "attachmentType"];
+      case "appearance":
+        return ["appearance", "facialFeatures"];
+      case "fashion":
+        return ["appearance", "outfit"];
+      case "occupations":
+        return ["identity", "occupation"];
+      default:
+        return ["personality", "positiveTraits"];
+    }
+  }
+
+  switch (entry.lane) {
+    case "appearance":
+      return entry.category.toLowerCase().includes("outfit") ||
+        entry.category.toLowerCase().includes("style")
+        ? ["appearance", "outfit"]
+        : ["appearance", "facialFeatures"];
+    case "image":
+      return ["appearance", "outfit"];
+    case "personality":
+      return entry.category.toLowerCase().includes("backstory") ||
+        entry.category.toLowerCase().includes("event")
+        ? ["internalThoughts", "motivationsFears"]
+        : ["personality", "positiveTraits"];
+    case "world":
+      return ["lifestyle", "residence"];
+    default:
+      return ["personality", "positiveTraits"];
+  }
+}
+
+function formatCharacterCreationSeedSnippet(entry: SeedPickerEntry) {
+  const prefix = entry.kind === "semantic" ? entry.label : entry.value;
+  const detail = entry.description || entry.guidance;
+
+  return detail ? `${prefix}: ${detail}` : prefix;
+}
+
+function appendCharacterCreationSeedText(currentValue: string, nextValue: string) {
+  const trimmedCurrent = currentValue.trim();
+  const trimmedNext = nextValue.trim();
+
+  if (!trimmedNext) {
+    return trimmedCurrent;
+  }
+
+  if (trimmedCurrent.toLowerCase().includes(trimmedNext.toLowerCase())) {
+    return trimmedCurrent;
+  }
+
+  return [trimmedCurrent, trimmedNext].filter(Boolean).join("\n");
 }
 
 function updateNestedValue<Value extends string | boolean>(

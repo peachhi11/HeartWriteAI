@@ -47,6 +47,21 @@ test("parses OpenRouter SSE delta tokens and done markers", () => {
   assert.equal(parsed.done, true);
 });
 
+test("parses OpenAI-compatible local SSE delta tokens", () => {
+  const parsed = parseProviderStreamChunk(
+    "openai-compatible",
+    [
+      'data: {"choices":[{"delta":{"content":"Local"},"finish_reason":null}]}',
+      'data: {"choices":[{"delta":{"content":" prose"},"finish_reason":"stop"}]}',
+      "data: [DONE]",
+      "",
+    ].join("\n"),
+  );
+
+  assert.deepEqual(parsed.tokens, ["Local", " prose"]);
+  assert.equal(parsed.done, true);
+});
+
 test("ignores malformed provider stream lines without throwing", () => {
   const parsed = parseProviderStreamChunk(
     "openrouter",

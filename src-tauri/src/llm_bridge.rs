@@ -1,3 +1,4 @@
+use reqwest::Url;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tauri::{ipc::Channel, State};
@@ -56,30 +57,45 @@ impl LocalLlmBroker {
         };
 
         let inference_config = inference_settings.snapshot()?;
-        if inference_config.provider != "ollama" {
-            return Err(
-                "Native local LLM bridge is only available for the Ollama provider.".to_string(),
-            );
-        }
-
         let system_prompt =
             build_system_prompt(active_character.as_ref(), &stats, &payload.story_node_id);
         let messages = build_ollama_messages(system_prompt, &payload);
-
-        let request_body = serde_json::json!({
-            "model": inference_config.selected_model,
-            "messages": messages,
-            "stream": true,
-            "options": {
-                "temperature": inference_config.temperature,
-                "top_p": inference_config.top_p,
-                "num_predict": inference_config.max_tokens,
-                "repeat_penalty": 1.0 + inference_config.frequency_penalty
-            }
-        });
+        let (endpoint, request_body) = if inference_config.provider == "openai-compatible" {
+            (
+                resolve_openai_compatible_endpoint(&inference_config.local_endpoint)?,
+                serde_json::json!({
+                    "model": inference_config.selected_model,
+                    "messages": messages,
+                    "stream": true,
+                    "max_tokens": inference_config.max_tokens,
+                    "temperature": inference_config.temperature,
+                    "top_p": inference_config.top_p,
+                    "frequency_penalty": inference_config.frequency_penalty
+                }),
+            )
+        } else if inference_config.provider == "ollama" {
+            (
+                inference_config.local_endpoint.clone(),
+                serde_json::json!({
+                    "model": inference_config.selected_model,
+                    "messages": messages,
+                    "stream": true,
+                    "options": {
+                        "temperature": inference_config.temperature,
+                        "top_p": inference_config.top_p,
+                        "num_predict": inference_config.max_tokens,
+                        "repeat_penalty": 1.0 + inference_config.frequency_penalty
+                    }
+                }),
+            )
+        } else {
+            return Err(
+                "Native local LLM bridge is only available for local providers.".to_string(),
+            );
+        };
 
         let mut response = reqwest::Client::new()
-            .post(&inference_config.local_endpoint)
+            .post(&endpoint)
             .json(&request_body)
             .send()
             .await
@@ -107,7 +123,7 @@ impl LocalLlmBroker {
             let complete_line_count = lines.len().saturating_sub(1);
 
             for line in lines.iter().take(complete_line_count) {
-                if let Some(fragment) = parse_ollama_stream_line(line)? {
+                if let Some(fragment) = parse_local_stream_line(&inference_config.provider, line)? {
                     sent_done = sent_done || fragment.done;
                     on_token
                         .send(fragment)
@@ -119,7 +135,9 @@ impl LocalLlmBroker {
         }
 
         if !buffered_chunk.trim().is_empty() {
-            if let Some(fragment) = parse_ollama_stream_line(&buffered_chunk)? {
+            if let Some(fragment) =
+                parse_local_stream_line(&inference_config.provider, &buffered_chunk)?
+            {
                 sent_done = sent_done || fragment.done;
                 on_token
                     .send(fragment)
@@ -138,6 +156,18 @@ impl LocalLlmBroker {
 
         Ok(())
     }
+}
+
+fn resolve_openai_compatible_endpoint(base_url: &str) -> Result<String, String> {
+    let mut url = Url::parse(base_url)
+        .map_err(|error| format!("Malformed OpenAI-compatible endpoint: {error}"))?;
+    let path = url.path().trim_end_matches('/');
+
+    if path == "/v1" {
+        url.set_path("/v1/chat/completions");
+    }
+
+    Ok(url.to_string())
 }
 
 fn build_ollama_messages(
@@ -212,6 +242,61 @@ fn parse_ollama_stream_line(line: &str) -> Result<Option<TokenStreamFragment>, S
     Ok(Some(TokenStreamFragment { token, done }))
 }
 
+fn parse_local_stream_line(
+    provider: &str,
+    line: &str,
+) -> Result<Option<TokenStreamFragment>, String> {
+    if provider == "openai-compatible" {
+        parse_openai_compatible_stream_line(line)
+    } else {
+        parse_ollama_stream_line(line)
+    }
+}
+
+fn parse_openai_compatible_stream_line(line: &str) -> Result<Option<TokenStreamFragment>, String> {
+    let trimmed = line.trim();
+
+    if trimmed.is_empty() || !trimmed.starts_with("data: ") {
+        return Ok(None);
+    }
+
+    let payload = trimmed.trim_start_matches("data: ").trim();
+    if payload == "[DONE]" {
+        return Ok(Some(TokenStreamFragment {
+            done: true,
+            token: String::new(),
+        }));
+    }
+
+    let parsed: Value = serde_json::from_str(payload)
+        .map_err(|error| format!("Malformed local OpenAI-compatible stream payload: {error}"))?;
+    let choice = parsed
+        .get("choices")
+        .and_then(Value::as_array)
+        .and_then(|choices| choices.first());
+    let token = choice
+        .and_then(|choice| choice.get("delta"))
+        .and_then(|delta| delta.get("content"))
+        .and_then(Value::as_str)
+        .or_else(|| {
+            choice
+                .and_then(|choice| choice.get("message"))
+                .and_then(|message| message.get("content"))
+                .and_then(Value::as_str)
+        })
+        .unwrap_or_default()
+        .to_string();
+    let done = choice
+        .and_then(|choice| choice.get("finish_reason"))
+        .is_some_and(|finish_reason| !finish_reason.is_null());
+
+    if token.is_empty() && !done {
+        return Ok(None);
+    }
+
+    Ok(Some(TokenStreamFragment { token, done }))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -249,6 +334,31 @@ mod tests {
 
         assert!(fragment.done);
         assert!(fragment.token.is_empty());
+    }
+
+    #[test]
+    fn parses_openai_compatible_stream_tokens() {
+        let fragment = parse_openai_compatible_stream_line(
+            r#"data: {"choices":[{"delta":{"content":"Local prose"},"finish_reason":null}]}"#,
+        )
+        .expect("line should parse")
+        .expect("fragment should exist");
+        let done = parse_openai_compatible_stream_line("data: [DONE]")
+            .expect("done should parse")
+            .expect("done fragment should exist");
+
+        assert_eq!(fragment.token, "Local prose");
+        assert!(!fragment.done);
+        assert!(done.done);
+    }
+
+    #[test]
+    fn resolves_openai_compatible_v1_base_url() {
+        assert_eq!(
+            resolve_openai_compatible_endpoint("http://10.0.0.18:1234/v1")
+                .expect("endpoint should resolve"),
+            "http://10.0.0.18:1234/v1/chat/completions"
+        );
     }
 
     #[test]

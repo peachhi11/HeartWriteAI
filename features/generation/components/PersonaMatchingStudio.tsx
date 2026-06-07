@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import { Activity, Gauge, HeartHandshake, Sparkles } from "lucide-react";
 
+import { SearchableSeedPicker } from "@/components/searchable-seed-picker";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -301,6 +302,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { expandPresetLookupTokens } from "@/lib/character-card/presetSpellingAliases";
+import type { SeedPickerEntry } from "@/data/seedPickerRegistry";
 import {
   calculatePsychologicalResonance,
   type PersonaTraits,
@@ -424,6 +426,9 @@ export function PersonaMatchingStudio() {
     "A protective, brooding royal guard who shields his isolation with rigid, polite duty.",
   );
   const [matchingSeedInput, setMatchingSeedInput] = useState("");
+  const [selectedMatchingSeeds, setSelectedMatchingSeeds] = useState<
+    SeedPickerEntry[]
+  >([]);
   const [targetAvatarDataUri, setTargetAvatarDataUri] = useState<string | null>(
     null,
   );
@@ -547,6 +552,40 @@ export function PersonaMatchingStudio() {
     setMatchingSeedInput("");
   }
 
+  function applySeedPickerMatch(entry: SeedPickerEntry) {
+    setSelectedMatchingSeeds((current) =>
+      current.some((seed) => seed.registryKey === entry.registryKey)
+        ? current
+        : [...current, entry].slice(-8),
+    );
+
+    const compiledSeed =
+      entry.kind === "semantic"
+        ? compileSemanticSeedPromptAdditions([entry.id], {
+            header: "Semantic match profile",
+            includeRelated: true,
+          })
+        : `${entry.label}: ${entry.description || entry.value}`;
+    setTargetDescription((current) =>
+      [current, compiledSeed].filter(Boolean).join("\n\n"),
+    );
+
+    const toneHints = inferRomanceToneHints(entry);
+    if (toneHints.preferred.length > 0) {
+      setTargetPreferredTones((current) =>
+        mergeToneHints(current, toneHints.preferred),
+      );
+    }
+    if (toneHints.friction.length > 0) {
+      setTargetForbiddenTones((current) =>
+        mergeToneHints(current, toneHints.friction),
+      );
+    }
+
+    setSyncStatus(`Applied ${entry.label} to the semantic match profile.`);
+    setDialoguePreview(null);
+  }
+
   return (
     <Card className="bg-card/85">
       <CardHeader className="gap-3 md:flex-row md:items-start md:justify-between">
@@ -654,6 +693,27 @@ export function PersonaMatchingStudio() {
               </Button>
             </div>
           </Field>
+
+          <SearchableSeedPicker
+            description="Use semantic seeds as compatibility profiles for the target card."
+            kinds={["semantic", "preset"]}
+            label="Semantic Match Seeds"
+            lanes={["semantic", "personality", "world", "metadata"]}
+            maxResults={6}
+            onSelect={applySeedPickerMatch}
+            placeholder="Search slow burn, abandonment, repair, rivalry..."
+            selectedKeys={selectedMatchingSeeds.map((seed) => seed.registryKey)}
+          />
+
+          {selectedMatchingSeeds.length > 0 ? (
+            <div className="flex flex-wrap gap-1.5">
+              {selectedMatchingSeeds.map((seed) => (
+                <Badge key={seed.registryKey} variant="secondary">
+                  {seed.label}
+                </Badge>
+              ))}
+            </div>
+          ) : null}
 
           <div className="grid gap-4 rounded-md border bg-background/70 p-4">
             <RangeControl label="Charm" value={charm} onChange={setCharm} />
@@ -798,6 +858,56 @@ function normalizeTropeList(tones: string[]) {
     .map((result) => result.data);
 
   return Array.from(new Set(normalized));
+}
+
+function inferRomanceToneHints(entry: SeedPickerEntry): {
+  friction: RomanceTropeClass[];
+  preferred: RomanceTropeClass[];
+} {
+  const haystack = [
+    entry.id,
+    entry.label,
+    entry.category,
+    entry.value,
+    entry.description,
+    entry.guidance,
+    ...entry.tags,
+  ]
+    .join(" ")
+    .toLowerCase();
+  const preferred: RomanceTropeClass[] = [];
+  const friction: RomanceTropeClass[] = [];
+
+  if (/banter|teas|wit|humou?r|flirt/.test(haystack)) {
+    preferred.push("bantering", "flustered");
+  }
+  if (/yearn|pining|slow.?burn|longing|devotion/.test(haystack)) {
+    preferred.push("yearning");
+  }
+  if (/protect|caretaker|safety|guard/.test(haystack)) {
+    preferred.push("protective");
+  }
+  if (/sunshine|warmth|affection|comfort/.test(haystack)) {
+    preferred.push("sunshine");
+  }
+  if (/grumpy|guarded|withdraw|cold/.test(haystack)) {
+    friction.push("grumpy");
+  }
+  if (/enemy|rival|conflict|forbidden|taboo|betray|threat/.test(haystack)) {
+    friction.push("antagonistic", "forbidden");
+  }
+
+  return {
+    friction: normalizeTropeList(friction),
+    preferred: normalizeTropeList(preferred),
+  };
+}
+
+function mergeToneHints(
+  current: RomanceTropeClass[],
+  additions: RomanceTropeClass[],
+) {
+  return Array.from(new Set([...current, ...additions])).slice(0, 6);
 }
 
 function compileMatchingVocabularySeed(seedId: string) {

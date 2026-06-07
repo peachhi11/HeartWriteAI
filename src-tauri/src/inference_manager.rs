@@ -240,6 +240,7 @@ fn normalize_api_key(value: &str) -> String {
 fn normalize_provider(value: &str) -> String {
     match value {
         "openrouter" => "openrouter".to_string(),
+        "openai-compatible" => "openai-compatible".to_string(),
         _ => DEFAULT_PROVIDER.to_string(),
     }
 }
@@ -247,7 +248,7 @@ fn normalize_provider(value: &str) -> String {
 fn normalize_local_endpoint(value: &str) -> String {
     let candidate = value.trim();
 
-    if candidate.len() > 128 {
+    if candidate.len() > 160 {
         return DEFAULT_LOCAL_ENDPOINT.to_string();
     }
 
@@ -255,10 +256,16 @@ fn normalize_local_endpoint(value: &str) -> String {
         return DEFAULT_LOCAL_ENDPOINT.to_string();
     };
 
-    let is_local_host = matches!(url.host_str(), Some("localhost" | "127.0.0.1" | "::1"));
+    let host = url.host_str().unwrap_or_default();
+    let is_local_host =
+        matches!(host, "localhost" | "127.0.0.1" | "::1") || is_private_ipv4_host(host);
+    let is_approved_path = matches!(
+        url.path(),
+        "/api/chat" | "/v1" | "/v1/" | "/v1/chat/completions"
+    );
     let is_safe = url.scheme() == "http"
         && is_local_host
-        && url.path() == "/api/chat"
+        && is_approved_path
         && url.username().is_empty()
         && url.password().is_none();
 
@@ -267,6 +274,22 @@ fn normalize_local_endpoint(value: &str) -> String {
     } else {
         DEFAULT_LOCAL_ENDPOINT.to_string()
     }
+}
+
+fn is_private_ipv4_host(host: &str) -> bool {
+    let octets: Vec<u8> = host
+        .split('.')
+        .filter_map(|part| part.parse::<u8>().ok())
+        .collect();
+
+    if octets.len() != 4 {
+        return false;
+    }
+
+    matches!(
+        (octets[0], octets[1]),
+        (10, _) | (172, 16..=31) | (192, 168)
+    )
 }
 
 #[cfg(test)]
@@ -338,6 +361,23 @@ mod tests {
         assert_eq!(
             config.selected_model,
             "hf.co/local-author/model-q4_K_M:latest"
+        );
+    }
+
+    #[test]
+    fn preserves_openai_compatible_local_lan_endpoint() {
+        let config = normalize_inference_config(InferenceConfig {
+            provider: "openai-compatible".to_string(),
+            local_endpoint: "http://10.0.0.18:1234/v1".to_string(),
+            selected_model: "deepseek-r1-distill-qwen-14b-uncensored".to_string(),
+            ..InferenceConfig::default()
+        });
+
+        assert_eq!(config.provider, "openai-compatible");
+        assert_eq!(config.local_endpoint, "http://10.0.0.18:1234/v1");
+        assert_eq!(
+            config.selected_model,
+            "deepseek-r1-distill-qwen-14b-uncensored"
         );
     }
 

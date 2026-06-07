@@ -1,4 +1,4 @@
-export type LlmProvider = "ollama" | "openrouter";
+export type LlmProvider = "ollama" | "openai-compatible" | "openrouter";
 
 export interface LlmChatMessage {
   content: string;
@@ -29,6 +29,8 @@ export interface LlmStreamHandlers {
 const DEFAULT_OPENROUTER_ENDPOINT =
   "https://openrouter.ai/api/v1/chat/completions";
 const DEFAULT_OLLAMA_ENDPOINT = "http://127.0.0.1:11434/api/chat";
+const DEFAULT_OPENAI_COMPATIBLE_ENDPOINT =
+  "http://127.0.0.1:1234/v1/chat/completions";
 
 export async function streamLlmCompletion(
   messages: LlmChatMessage[],
@@ -96,7 +98,7 @@ export function parseProviderStreamChunk(
       continue;
     }
 
-    if (provider === "openrouter") {
+    if (provider === "openrouter" || provider === "openai-compatible") {
       const parsed = parseOpenRouterStreamLine(line);
       if (parsed.done) {
         done = true;
@@ -167,7 +169,7 @@ function createProviderBody(
   messages: LlmChatMessage[],
   config: LlmProviderConfig,
 ) {
-  if (config.provider === "openrouter") {
+  if (config.provider === "openrouter" || config.provider === "openai-compatible") {
     return {
       max_tokens: config.maxTokens,
       messages,
@@ -209,14 +211,32 @@ function createProviderHeaders(config: LlmProviderConfig) {
 }
 
 function resolveProviderEndpoint(config: LlmProviderConfig) {
-  return (
-    config.baseUrl ??
-    (config.provider === "openrouter"
-      ? DEFAULT_OPENROUTER_ENDPOINT
-      : DEFAULT_OLLAMA_ENDPOINT)
-  );
+  if (config.provider === "openai-compatible") {
+    return normalizeOpenAiCompatibleEndpoint(
+      config.baseUrl ?? DEFAULT_OPENAI_COMPATIBLE_ENDPOINT,
+    );
+  }
+
+  return config.baseUrl ?? (config.provider === "openrouter"
+    ? DEFAULT_OPENROUTER_ENDPOINT
+    : DEFAULT_OLLAMA_ENDPOINT);
 }
 
 function formatProviderName(provider: LlmProvider) {
-  return provider === "openrouter" ? "OpenRouter" : "Ollama";
+  if (provider === "openrouter") {
+    return "OpenRouter";
+  }
+
+  return provider === "openai-compatible" ? "OpenAI-compatible local" : "Ollama";
+}
+
+function normalizeOpenAiCompatibleEndpoint(baseUrl: string) {
+  const url = new URL(baseUrl);
+  const normalizedPath = url.pathname.replace(/\/+$/g, "");
+
+  if (normalizedPath === "/v1") {
+    url.pathname = "/v1/chat/completions";
+  }
+
+  return url.toString();
 }

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 
 import CopyButton from "@/components/copy-button";
+import { SearchableSeedPicker } from "@/components/searchable-seed-picker";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -331,6 +332,8 @@ import {
   WORKPLACE_HIERARCHY_PRESETS,
 } from "@/data/workplaceHierarchyPresets";
 import { expandPresetLookupTokens } from "@/lib/character-card/presetSpellingAliases";
+import { compileSemanticSeedPromptAdditions } from "@/lib/character-card/semanticSeedResolver";
+import type { SeedPickerEntry } from "@/data/seedPickerRegistry";
 import { downloadUint8Array } from "@/lib/browser/downloadUint8Array";
 import {
   Field,
@@ -539,6 +542,26 @@ export function PersonaGenerationPage() {
     }));
   }
 
+  function handleUnifiedPersonaSeed(entry: SeedPickerEntry) {
+    const fieldKey = resolvePersonaSeedFieldKey(entry);
+    const seedText = formatPersonaSeedText(entry);
+
+    handleAddPersonaSeed(fieldKey, seedText);
+
+    if (entry.kind === "semantic") {
+      updateInput(
+        "characteristics",
+        joinDefined([
+          input.characteristics,
+          compileSemanticSeedPromptAdditions([entry.id], {
+            header: "Persona semantic guidance",
+            includeRelated: true,
+          }),
+        ]).replace(/\n\n/g, "\n"),
+      );
+    }
+  }
+
   function newBlankPersona() {
     setActivePersona(createBlankPersonaArtifact());
     setSavedSnapshot(null);
@@ -726,6 +749,16 @@ export function PersonaGenerationPage() {
                   {activePersona.name.slice(0, 1).toUpperCase() || "P"}
                 </div>
               </div>
+
+              <SearchableSeedPicker
+                description="Add registry or semantic seeds into editable persona fields before generating."
+                kinds={["preset", "semantic"]}
+                label="Persona Seed Picker"
+                lanes={["personality", "world", "metadata", "semantic"]}
+                maxResults={8}
+                onSelect={handleUnifiedPersonaSeed}
+                placeholder="Search relationship, wound, trope, speech, backstory..."
+              />
 
               <PersonaSheetSection title="General" defaultOpen>
                 <div className="grid gap-4 md:grid-cols-2">
@@ -2302,6 +2335,43 @@ function joinDefined(values: string[]) {
 
 function joinInlineList(currentValue: string, value: string) {
   return joinDefined([currentValue, value]).replace(/\n\n/g, ", ");
+}
+
+function resolvePersonaSeedFieldKey(entry: SeedPickerEntry): PersonaStarterFieldKey {
+  if (entry.lane === "appearance" || entry.lane === "image") {
+    return "appearance";
+  }
+
+  if (entry.lane === "world" || entry.category.includes("relationship")) {
+    return "scenario";
+  }
+
+  if (entry.lane === "metadata") {
+    return "basicInfo";
+  }
+
+  if (
+    entry.kind === "semantic" &&
+    ["wounds", "fears", "desires", "motivations", "triggers"].includes(
+      entry.category,
+    )
+  ) {
+    return "basicInfo";
+  }
+
+  return "personality";
+}
+
+function formatPersonaSeedText(entry: SeedPickerEntry) {
+  if (entry.lane === "metadata") {
+    return `Tag: ${entry.value}`;
+  }
+
+  if (entry.kind === "semantic") {
+    return [entry.label, entry.description].filter(Boolean).join(": ");
+  }
+
+  return entry.value;
 }
 
 function findPresetMatches<T>(

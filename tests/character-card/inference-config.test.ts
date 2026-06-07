@@ -23,3 +23,19 @@ test("keeps the DeepSeek R1 Ollama tag through model normalization", () => {
 
   assert.equal(config.selectedModel, OLLAMA_DEFAULT_MODEL);
 });
+
+test("supports configurable OpenAI-compatible local endpoints", () => {
+  const config = normalizeInferenceConfig({
+    ...INFERENCE_DEFAULT_MATRIX,
+    localEndpoint: " http://10.0.0.18:1234/v1 ",
+    provider: "openai-compatible",
+    selectedModel: "deepseek-r1-distill-qwen-14b-uncensored",
+  });
+
+  assert.equal(config.provider, "openai-compatible");
+  assert.equal(config.localEndpoint, "http://10.0.0.18:1234/v1");
+  assert.equal(
+    config.selectedModel,
+    "deepseek-r1-distill-qwen-14b-uncensored",
+  );
+});
