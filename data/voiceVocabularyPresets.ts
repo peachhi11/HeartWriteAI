@@ -1,3 +1,9 @@
+import {
+  createVocabularySeedFromPresetLike,
+  createVocabularySeedPreset,
+  type VocabularySeedPreset,
+} from "./vocabularySeedTypes";
+
 export type VoiceVocabularyCategory =
   | "Crisp & Angular"
   | "Ethereal & Detached"
@@ -592,6 +598,63 @@ export const VOICE_SEED_PRESETS = Object.freeze(
     group.values.map((value) => createVoiceSeedPreset(group, value)),
   ),
 );
+
+export const VOICE_VOCABULARY_SEEDS = Object.freeze(
+  VOICE_VOCABULARY_PRESETS.map((preset) =>
+    createVocabularySeedPreset({
+      seed: preset.id,
+      label: preset.vibe,
+      description: `${preset.vocalProfile.vocalGrain} ${preset.vocalProfile.acousticSpace}`,
+      examples: [
+        preset.sampleDialogueLine,
+        preset.lexicalTokens.dialoguePacing,
+        ...preset.vocalProfile.somaticIndicators,
+      ],
+      tags: [
+        "voice",
+        "speech",
+        preset.category,
+        preset.vocalProfile.pitchTier,
+        ...preset.systemPromptTags,
+        ...preset.lexicalTokens.descriptiveAdjectives,
+      ],
+      relatedSeeds: [
+        ...preset.lexicalTokens.signatureVerbs,
+        ...preset.lexicalTokens.acousticNouns,
+      ],
+      oppositeSeeds: [],
+      romanceHooks: ["voice_intimacy", "dialogue_texture", preset.vibe],
+      scenarioHooks: preset.vocalProfile.somaticIndicators,
+      dialoguePatterns: [preset.sampleDialogueLine, preset.lexicalTokens.dialoguePacing],
+      metadata: {
+        rarity: "uncommon",
+        romanceValue: 8,
+        conflictPotential: 4,
+      },
+    }),
+  ),
+) satisfies readonly VocabularySeedPreset[];
+
+export const VOICE_SEED_VOCABULARY_SEEDS = Object.freeze(
+  VOICE_SEED_PRESETS.map((preset) =>
+    createVocabularySeedFromPresetLike(preset, {
+      examples: [
+        `Use ${preset.value} as a voice, speech, or dialogue cue.`,
+        preset.guidance,
+      ],
+      tags: ["voice", "speech", "dialogue", preset.category],
+      romanceHooks:
+        preset.category === "Voice Romance Hook" ? [preset.value] : [],
+      dialoguePatterns:
+        preset.category === "Voice Dialogue Seed" ? [preset.value] : [],
+      metadata: {
+        rarity: preset.category === "Voice Vocabulary Preset" ? "uncommon" : "common",
+        romanceValue: preset.category === "Voice Romance Hook" ? 9 : 6,
+        conflictPotential: 4,
+      },
+    }),
+  ),
+) satisfies readonly VocabularySeedPreset[];
 
 export const VOICE_SEED_CATEGORIES = Object.freeze(
   Array.from(new Set(VOICE_SEED_PRESETS.map((preset) => preset.category))).sort(),

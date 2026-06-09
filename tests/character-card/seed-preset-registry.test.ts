@@ -9,11 +9,13 @@ import { DESCRIPTIVE_WRITING_SEEDS } from "../../data/descriptiveWritingSeedPres
 import { GENRE_SETTING_PACK_PRESETS } from "../../data/genreSettingPackPresets";
 import { IMAGE_PROMPT_VOCAB_PRESETS } from "../../data/imagePromptVocabPresets";
 import { MENTAL_EMOTIONAL_PATTERN_PRESETS } from "../../data/mentalEmotionalPatternPresets";
+import { MORAL_FRAMEWORK_VOCABULARY_REGISTRY_PRESETS } from "../../data/moralFrameworkVocabularyPresets";
 import { MUSIC_PRESETS } from "../../data/musicPresets";
 import { NPC_NETWORK_PRESETS } from "../../data/npcNetworkPresets";
 import { PERSONA_PLAYER_SIDE_PRESETS } from "../../data/personaPlayerSidePresets";
 import { PERSONALITY_ENGINE_VOCABULARY_PRESETS } from "../../data/personalityEngineVocabularyPresets";
 import { PERSONALITY_TYPOLOGY_PRESETS } from "../../data/personalityTypologyPresets";
+import { SAMPLE_CARD_PROSE_STRUCTURE_PRESETS } from "../../data/sampleCardProseStructurePresets";
 import { SCENARIO_OPENING_MOMENT_PRESETS } from "../../data/scenarioOpeningMomentPresets";
 import {
   SEED_PRESET_REGISTRY,
@@ -61,10 +63,12 @@ test("collects high-level seed lanes from shared preset modules", () => {
       MENTAL_EMOTIONAL_PATTERN_PRESETS.length +
       PERSONALITY_TYPOLOGY_PRESETS.length +
       COGNITIVE_DRIVER_PRESETS.length +
+      MORAL_FRAMEWORK_VOCABULARY_REGISTRY_PRESETS.length +
       BACKSTORY_EVENT_PRESETS.length +
       MUSIC_PRESETS.length +
       PERSONA_PLAYER_SIDE_PRESETS.length +
-      descriptivePersonalitySeeds.length,
+      descriptivePersonalitySeeds.length +
+      SAMPLE_CARD_PROSE_STRUCTURE_PRESETS.length,
   );
   assert.equal(
     getSeedPresetRegistryEntriesByLane("world").length,
@@ -119,6 +123,18 @@ test("keeps source and registry keys stable and unique", () => {
     SEED_PRESET_REGISTRY_SOURCE_COUNTS["personality:cognitive-driver"],
     COGNITIVE_DRIVER_PRESETS.length,
   );
+  assert.equal(
+    SEED_PRESET_REGISTRY_SOURCE_COUNTS[
+      "personality:moral-framework-vocabulary"
+    ],
+    MORAL_FRAMEWORK_VOCABULARY_REGISTRY_PRESETS.length,
+  );
+  assert.equal(
+    SEED_PRESET_REGISTRY_SOURCE_COUNTS[
+      "personality:sample-card-prose-structure"
+    ],
+    SAMPLE_CARD_PROSE_STRUCTURE_PRESETS.length,
+  );
 });
 
 test("finds registry entries by key or source id without each form knowing modules", () => {
@@ -146,6 +162,14 @@ test("finds registry entries by key or source id without each form knowing modul
     "cognitive-driver",
     "cognitive_driver_internal_belief_everyone_leaves",
   );
+  const moralFramework = findSeedPresetRegistryEntryById(
+    "moral-framework-vocabulary",
+    "moral_framework_vocabulary_mercy_ethics",
+  );
+  const proseStructure = findSeedPresetRegistryEntryById(
+    "sample-card-prose-structure",
+    "sample_card_structure_guarded_professional",
+  );
 
   assert.equal(appearance?.lane, "appearance");
   assert.equal(appearance?.value, "plain but magnetic");
@@ -160,6 +184,14 @@ test("finds registry entries by key or source id without each form knowing modul
   assert.equal(typology?.value, "INFJ advocate");
   assert.equal(cognitiveDriver?.lane, "personality");
   assert.equal(cognitiveDriver?.value, "everyone leaves");
+  assert.equal(moralFramework?.lane, "personality");
+  assert.equal(moralFramework?.value, "Mercy Ethics");
+  assert.equal(moralFramework?.triggerKeys.includes("redemption_romance"), true);
+  assert.equal(proseStructure?.lane, "personality");
+  assert.equal(
+    proseStructure?.value,
+    "guarded professional with private softness",
+  );
 });
 
 test("filters registry sources and search results by lane", () => {
@@ -206,6 +238,10 @@ test("builds unified picker entries across flat and semantic registries", () => 
     kinds: ["semantic"],
     limit: 1,
   });
+  const careEthics = searchSeedPickerEntries("reducing suffering", {
+    kinds: ["vocabulary"],
+    limit: 1,
+  });
   const portrait = searchSeedPickerEntries("portrait negative prompt", {
     lanes: ["image"],
     limit: 5,
@@ -214,5 +250,8 @@ test("builds unified picker entries across flat and semantic registries", () => 
   assert.equal(SEED_PICKER_ENTRIES.length > SEED_PRESET_REGISTRY.length, true);
   assert.equal(replacement[0]?.id, "fear_of_replacement");
   assert.equal(replacement[0]?.kind, "semantic");
+  assert.equal(careEthics[0]?.kind, "vocabulary");
+  assert.equal(careEthics[0]?.label, "Care Ethics");
+  assert.equal(careEthics[0]?.vocabularySeed?.seed.endsWith("care_ethics"), true);
   assert.equal(portrait.every((entry) => entry.lane === "image"), true);
 });

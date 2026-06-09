@@ -1,3 +1,10 @@
+import {
+  createWoundSeedPreset,
+  createVocabularySeedPreset,
+  type WoundSeed,
+  type VocabularySeedPreset,
+} from "./vocabularySeedTypes";
+
 export type OriginWoundCategory =
   | "Abandonment & Discard"
   | "Betrayal & Treason"
@@ -202,6 +209,174 @@ export const ORIGIN_WOUND_VOCABULARY_PRESETS = Object.freeze([
 export const ORIGIN_WOUND_CATEGORIES = Object.freeze(
   Array.from(new Set(ORIGIN_WOUND_VOCABULARY_PRESETS.map((preset) => preset.category))).sort(),
 );
+
+export const ORIGIN_WOUND_SEEDS = Object.freeze(
+  ORIGIN_WOUND_VOCABULARY_PRESETS.map((preset) =>
+    createWoundSeedPreset({
+      seed: preset.id,
+      label: preset.vibe,
+      description: preset.woundProfile.coreWound,
+      examples: [
+        preset.woundProfile.defenseMechanism,
+        preset.sampleDialogueLine,
+        preset.lexicalTokens.dialoguePacing,
+      ],
+      tags: [
+        "wound",
+        "origin_wound",
+        preset.category,
+        ...preset.systemPromptTags,
+        ...preset.lexicalTokens.descriptiveAdjectives,
+      ],
+      relatedSeeds: [
+        ...preset.woundProfile.exposureTriggers,
+        ...preset.woundProfile.somaticTells,
+      ],
+      oppositeSeeds: [],
+      romanceHooks: ["hurt_comfort", "trust_pacing", "wound_repair"],
+      scenarioHooks: preset.woundProfile.exposureTriggers,
+      dialoguePatterns: [preset.sampleDialogueLine, preset.lexicalTokens.dialoguePacing],
+      triggers: preset.woundProfile.exposureTriggers,
+      defenseMechanisms: [
+        preset.woundProfile.defenseMechanism,
+        ...preset.lexicalTokens.signatureVerbs,
+      ],
+      attachmentEffects: inferOriginWoundAttachmentEffects(preset),
+      healingNeeds: inferOriginWoundHealingNeeds(preset),
+      repairMethods: inferOriginWoundRepairMethods(preset),
+      growthArcs: inferOriginWoundGrowthArcs(preset),
+      metadata: {
+        category: preset.category,
+        severity: inferOriginWoundSeverity(preset),
+        romanceValue: 9,
+        angstValue: 8,
+        healingValue: 9,
+      },
+    }),
+  ),
+) satisfies readonly WoundSeed[];
+
+export const ORIGIN_WOUND_VOCABULARY_SEEDS = Object.freeze(
+  ORIGIN_WOUND_SEEDS.map((seed) =>
+    createVocabularySeedPreset({
+      seed: seed.seed,
+      label: seed.label,
+      description: seed.description,
+      examples: seed.examples,
+      tags: seed.tags,
+      relatedSeeds: seed.relatedSeeds,
+      oppositeSeeds: seed.oppositeSeeds,
+      romanceHooks: seed.romanceHooks,
+      scenarioHooks: seed.scenarioHooks,
+      dialoguePatterns: seed.dialoguePatterns,
+      metadata: {
+        rarity: seed.metadata.severity === "soft" ? "common" : "uncommon",
+        romanceValue: seed.metadata.romanceValue,
+        conflictPotential: seed.metadata.angstValue,
+      },
+    }),
+  ),
+) satisfies readonly VocabularySeedPreset[];
+
+function inferOriginWoundSeverity(
+  preset: OriginWoundVocabularyPreset,
+): WoundSeed["metadata"]["severity"] {
+  if (preset.id === "wound_shame_defilement") {
+    return "core";
+  }
+  if (preset.id === "wound_helplessness_failure") {
+    return "major";
+  }
+  return "core";
+}
+
+function inferOriginWoundAttachmentEffects(
+  preset: OriginWoundVocabularyPreset,
+): readonly string[] {
+  switch (preset.category) {
+    case "Abandonment & Discard":
+      return [
+        "Reads distance as a warning sign.",
+        "May leave first to avoid being left.",
+        "Needs consistency before closeness feels safe.",
+      ];
+    case "Betrayal & Treason":
+      return [
+        "Treats secrecy as possible leverage.",
+        "Tests trust before accepting tenderness.",
+        "Needs loyalty to be proven through repeated honesty.",
+      ];
+    case "Helplessness & Failure":
+      return [
+        "Equates love with responsibility.",
+        "May overprotect when fear spikes.",
+        "Needs reassurance that care does not require control.",
+      ];
+    case "Objectification & Ledger":
+      return [
+        "Translates care into debt.",
+        "Feels exposed by gifts that cannot be repaid.",
+        "Needs affection that does not become ownership.",
+      ];
+    case "Shame & Defilement":
+      return [
+        "Treats being seen as a risk.",
+        "May keep intimacy behind a protective perimeter.",
+        "Needs choice over exposure, touch, and disclosure.",
+      ];
+  }
+}
+
+function inferOriginWoundHealingNeeds(
+  preset: OriginWoundVocabularyPreset,
+): readonly string[] {
+  switch (preset.category) {
+    case "Abandonment & Discard":
+      return ["Consistent return", "Clear reassurance", "Space without disappearance"];
+    case "Betrayal & Treason":
+      return ["Transparency", "Kept promises", "Accountable repair"];
+    case "Helplessness & Failure":
+      return ["Shared agency", "Grounded reassurance", "Permission to rest"];
+    case "Objectification & Ledger":
+      return ["Unconditional care", "Non-transactional affection", "Freedom from repayment"];
+    case "Shame & Defilement":
+      return ["Gentle pacing", "Choice over disclosure", "Acceptance without spectacle"];
+  }
+}
+
+function inferOriginWoundRepairMethods(
+  preset: OriginWoundVocabularyPreset,
+): readonly string[] {
+  switch (preset.category) {
+    case "Abandonment & Discard":
+      return ["Name the need before retreating", "Return after conflict", "Offer clear continuity"];
+    case "Betrayal & Treason":
+      return ["Tell the whole truth", "Repair broken promises", "Separate privacy from deception"];
+    case "Helplessness & Failure":
+      return ["Ask before intervening", "Share risk decisions", "Let protection include listening"];
+    case "Objectification & Ledger":
+      return ["Accept care without repayment", "Name terms when terms are needed", "Practice receiving"];
+    case "Shame & Defilement":
+      return ["Ask before looking or touching", "Let disclosure stay chosen", "Meet shame with steadiness"];
+  }
+}
+
+function inferOriginWoundGrowthArcs(
+  preset: OriginWoundVocabularyPreset,
+): readonly string[] {
+  switch (preset.category) {
+    case "Abandonment & Discard":
+      return ["Learns absence is not always abandonment", "Lets someone return without punishing them"];
+    case "Betrayal & Treason":
+      return ["Learns trust can be rebuilt through evidence", "Asks direct questions before assuming betrayal"];
+    case "Helplessness & Failure":
+      return ["Learns care can respect agency", "Stops making love prove itself through sacrifice"];
+    case "Objectification & Ledger":
+      return ["Lets kindness remain unpriced", "Learns personhood is not a debt to settle"];
+    case "Shame & Defilement":
+      return ["Lets trusted love see the marked places", "Stops reducing the self to the wound"];
+  }
+}
 
 export function findOriginWoundVocabularyPresetById(
   id: string,

@@ -4,6 +4,10 @@ import type {
   HeartWriteSeedPolarity,
   SeedBase,
 } from "./heartwriteSeedTypes";
+import {
+  ALL_STANDARD_VOCABULARY_SEEDS,
+} from "./standardVocabularySeedRegistry";
+import type { VocabularySeedPreset } from "./vocabularySeedTypes";
 
 export type SemanticSeedNodeCategory =
   | "traits"
@@ -10675,15 +10679,55 @@ export const SEMANTIC_SEED_NODES_BY_CATEGORY = Object.freeze(
   ),
 );
 
+export const STANDARD_VOCABULARY_SEMANTIC_NODES = Object.freeze(
+  ALL_STANDARD_VOCABULARY_SEEDS.map(toSemanticSeedNodeFromStandardVocabularySeed),
+) satisfies readonly SemanticSeedNode[];
+
+export const SEMANTIC_SEED_GRAPH_NODES = Object.freeze([
+  ...SEMANTIC_SEED_NODES,
+  ...STANDARD_VOCABULARY_SEMANTIC_NODES,
+] as const satisfies readonly SemanticSeedNode[]);
+
+export const SEMANTIC_SEED_GRAPH_NODE_IDS = Object.freeze(
+  SEMANTIC_SEED_GRAPH_NODES.map((node) => node.id),
+);
+
+export const SEMANTIC_SEED_GRAPH_NODES_BY_CATEGORY = Object.freeze(
+  SEMANTIC_SEED_REGISTRY_CATEGORIES.reduce(
+    (nodesByCategory, category) => ({
+      ...nodesByCategory,
+      [category]: SEMANTIC_SEED_GRAPH_NODES.filter(
+        (node) => node.category === category,
+      ),
+    }),
+    {} as Record<SemanticSeedNodeCategory, readonly SemanticSeedNode[]>,
+  ),
+);
+
 export function getSemanticSeedNodesByCategory(
   category: SemanticSeedNodeCategory,
 ): readonly SemanticSeedNode[] {
   return SEMANTIC_SEED_NODES_BY_CATEGORY[category];
 }
 
+export function getSemanticSeedGraphNodesByCategory(
+  category: SemanticSeedNodeCategory,
+): readonly SemanticSeedNode[] {
+  return SEMANTIC_SEED_GRAPH_NODES_BY_CATEGORY[category];
+}
+
 export function findSemanticSeedNodeById(id: string): SemanticSeedNode | undefined {
   const normalizedId = id.trim().toLowerCase();
   return SEMANTIC_SEED_NODES.find((node) => node.id.toLowerCase() === normalizedId);
+}
+
+export function findSemanticSeedGraphNodeById(
+  id: string,
+): SemanticSeedNode | undefined {
+  const normalizedId = normalizeSemanticGraphLookup(id);
+  return SEMANTIC_SEED_GRAPH_NODES.find((node) =>
+    semanticNodeMatchesLookup(node, normalizedId),
+  );
 }
 
 export function getSemanticSeedNodeNeighborhood(
@@ -10703,6 +10747,23 @@ export function getSemanticSeedNodeNeighborhood(
   };
 }
 
+export function getSemanticSeedGraphNodeNeighborhood(
+  id: string,
+): SemanticSeedNodeNeighborhood | undefined {
+  const node = findSemanticSeedGraphNodeById(id);
+  if (!node) {
+    return undefined;
+  }
+
+  return {
+    node,
+    parents: resolveSemanticSeedGraphNodes(node.parents),
+    children: resolveSemanticSeedGraphNodes(node.children),
+    related: resolveSemanticSeedGraphNodes(node.related),
+    opposite: resolveSemanticSeedGraphNodes(node.opposite ?? []),
+  };
+}
+
 export function expandSemanticSeedNodeIds(
   ids: readonly string[],
   options: {
@@ -10716,6 +10777,41 @@ export function expandSemanticSeedNodeIds(
 
   for (const id of ids) {
     const node = findSemanticSeedNodeById(id);
+    if (!node) {
+      continue;
+    }
+
+    expanded.add(node.id);
+    if (options.includeParents) {
+      node.parents.forEach((parent) => expanded.add(parent));
+    }
+    if (options.includeChildren) {
+      node.children.forEach((child) => expanded.add(child));
+    }
+    if (options.includeRelated) {
+      node.related.forEach((related) => expanded.add(related));
+    }
+    if (options.includeOpposite) {
+      (node.opposite ?? []).forEach((opposite) => expanded.add(opposite));
+    }
+  }
+
+  return Array.from(expanded);
+}
+
+export function expandSemanticSeedGraphNodeIds(
+  ids: readonly string[],
+  options: {
+    includeParents?: boolean;
+    includeChildren?: boolean;
+    includeRelated?: boolean;
+    includeOpposite?: boolean;
+  } = {},
+): readonly string[] {
+  const expanded = new Set<string>();
+
+  for (const id of ids) {
+    const node = findSemanticSeedGraphNodeById(id);
     if (!node) {
       continue;
     }
@@ -10789,6 +10885,36 @@ export function searchSemanticSeedNodes(
       ...(node.triggers ?? []),
       ...(node.goals ?? []),
     ].some((value) => value.toLowerCase().includes(normalizedQuery));
+  });
+
+  return options.limit === undefined ? results : results.slice(0, options.limit);
+}
+
+export function searchSemanticSeedGraphNodes(
+  query: string,
+  options: {
+    categories?: readonly SemanticSeedNodeCategory[];
+    tags?: readonly string[];
+    limit?: number;
+  } = {},
+): readonly SemanticSeedNode[] {
+  const normalizedQuery = query.trim().toLowerCase();
+  if (!normalizedQuery) {
+    return [];
+  }
+
+  const categories = new Set(options.categories);
+  const tags = new Set((options.tags ?? []).map((tag) => tag.toLowerCase()));
+
+  const results = SEMANTIC_SEED_GRAPH_NODES.filter((node) => {
+    if (categories.size > 0 && !categories.has(node.category)) {
+      return false;
+    }
+    if (tags.size > 0 && !node.tags.some((tag) => tags.has(tag.toLowerCase()))) {
+      return false;
+    }
+
+    return flattenSemanticSeedNodeForSearch(node).includes(normalizedQuery);
   });
 
   return options.limit === undefined ? results : results.slice(0, options.limit);
@@ -10896,14 +11022,14 @@ export function toSeedBaseFromSemanticNode(node: SemanticSeedNode): SeedBase {
 }
 
 export function findSeedBaseBySemanticSeedId(id: string): SeedBase | undefined {
-  const node = findSemanticSeedNodeById(id);
+  const node = findSemanticSeedGraphNodeById(id);
   return node ? toSeedBaseFromSemanticNode(node) : undefined;
 }
 
 export function getSemanticSeedStoryPayloadStatus(
   id: string,
 ): SemanticSeedStoryPayloadStatus | undefined {
-  const node = findSemanticSeedNodeById(id);
+  const node = findSemanticSeedGraphNodeById(id);
   if (!node) {
     return undefined;
   }
@@ -10932,12 +11058,263 @@ export function getSemanticSeedStoryPayloadStatus(
   };
 }
 
+function toSemanticSeedNodeFromStandardVocabularySeed(
+  seed: VocabularySeedPreset,
+): SemanticSeedNode {
+  const category = inferSemanticCategoryFromVocabularySeed(seed);
+  const related = resolveVocabularySeedGraphReferences(seed.relatedSeeds);
+  const opposite = resolveVocabularySeedGraphReferences(seed.oppositeSeeds);
+  const parent = inferSemanticParentFromVocabularySeedCategory(category);
+  const parents = parent === undefined ? [] : [parent];
+  const tags = uniqueSemanticText([
+    "standard_vocabulary",
+    `standard_vocabulary_category:${category}`,
+    ...seed.tags,
+  ]);
+  const lowerTags = tags.map((tag) => tag.toLowerCase());
+
+  return {
+    id: `standard_vocabulary__${toSemanticGraphId(seed.seed)}`,
+    category,
+    label: seed.label,
+    description: seed.description,
+    internalMeaning: seed.examples[0],
+    emotionalMeaning: seed.examples[1],
+    aliases: uniqueSemanticText([
+      seed.seed,
+      seed.label,
+      ...seed.tags,
+      ...seed.relatedSeeds,
+    ]),
+    parents,
+    children: [],
+    related,
+    opposite,
+    tags,
+    romanceRelevant:
+      seed.romanceHooks.length > 0 ||
+      seed.metadata.romanceValue >= 6 ||
+      lowerTags.some((tag) => /romance|relationship|love/.test(tag)),
+    adult: lowerTags.some((tag) => /adult|nsfw/.test(tag)),
+    unsafe: lowerTags.some((tag) => /unsafe|coercive|boundary_check/.test(tag)),
+    dialogueExamples: seed.dialoguePatterns,
+    commonTriggers: seed.scenarioHooks,
+    commonConflicts: seed.oppositeSeeds,
+    relatedConcepts: uniqueSemanticText([
+      ...seed.relatedSeeds,
+      ...seed.romanceHooks,
+      ...seed.scenarioHooks,
+    ]),
+    visual: category === "appearance" || category === "fashion"
+      ? seed.description
+      : undefined,
+    impression: category === "appearance" || category === "fashion"
+      ? seed.examples[0]
+      : undefined,
+    associatedVibes: category === "appearance" || category === "fashion"
+      ? seed.tags
+      : undefined,
+    triggers: seed.scenarioHooks,
+    sourceRegistryKeys: [seed.seed],
+    guidance:
+      "Projected from a standardized vocabulary seed. Use as graph-readable routing prose while preserving the original standardized seed as the source of truth.",
+  };
+}
+
+function inferSemanticCategoryFromVocabularySeed(
+  seed: VocabularySeedPreset,
+): SemanticSeedNodeCategory {
+  const haystack = [
+    seed.seed,
+    seed.label,
+    seed.description,
+    ...seed.tags,
+    ...seed.relatedSeeds,
+    ...seed.romanceHooks,
+    ...seed.scenarioHooks,
+  ].join(" ").toLowerCase();
+
+  if (/acts-of-service-vocabulary/.test(haystack)) {
+    return "love_languages";
+  }
+  if (/desire-vocabulary/.test(haystack)) {
+    return "desires";
+  }
+  if (/fear-vocabulary/.test(haystack)) {
+    return "fears";
+  }
+  if (/trigger-vocabulary/.test(haystack)) {
+    return "triggers";
+  }
+  if (/repair-style-vocabulary/.test(haystack)) {
+    return "repair_styles";
+  }
+  if (/response-vocabulary/.test(haystack)) {
+    return "responses";
+  }
+  if (/origin-wound-vocabulary|wound-vocabulary/.test(haystack)) {
+    return "wounds";
+  }
+  if (/voice-vocabulary|voice-seed-vocabulary/.test(haystack)) {
+    return "speech_patterns";
+  }
+  if (/moral-framework-vocabulary/.test(haystack)) {
+    return "motivations";
+  }
+  if (/complement-vocabulary/.test(haystack)) {
+    return "relationship_dynamics";
+  }
+  if (/image-prompt-vocabulary|lane:image|appearance|visual|portrait|face|hair|skin|body/.test(haystack)) {
+    return /fashion|outfit|clothing|garment|fabric|armou?r|jewell?ery/.test(haystack)
+      ? "fashion"
+      : "appearance";
+  }
+  if (/voice-vocabulary|voice-seed-vocabulary|speech|dialogue|tone|accent|cadence/.test(haystack)) {
+    return "speech_patterns";
+  }
+  if (/_response|\\bresponse\\b|fight|flight|freeze|fawn|shutdown|masking|reassurance/.test(haystack)) {
+    return "responses";
+  }
+  if (/_repair|\\brepair\\b|accountability|changed_behavior|recommitment/.test(haystack)) {
+    return "repair_styles";
+  }
+  if (/_trigger|\\btrigger\\b|unanswered_message|broken_promise|raised_voice|delayed_reply/.test(haystack)) {
+    return "triggers";
+  }
+  if (/origin_wound|wound|shame|betrayal|loss|exile|regret|trauma/.test(haystack)) {
+    return "wounds";
+  }
+  if (/fear|anxiety|phobia/.test(haystack)) {
+    return "fears";
+  }
+  if (/romance_trope|trope|slow_burn|rivals_to_lovers|friends_to_lovers|fake_dating/.test(haystack)) {
+    return "romance_tropes";
+  }
+  if (/moral-framework-vocabulary|moral|ethic|justice|mercy|truth|loyalty|honou?r|duty|value/.test(haystack)) {
+    return "motivations";
+  }
+  if (/complement-vocabulary|relationship_dynamic|relationship|dynamic|attachment|love_language/.test(haystack)) {
+    return "relationship_dynamics";
+  }
+  if (/lane:world|setting|settlement|culture|threat|daily_life|lore/.test(haystack)) {
+    return "world_tags";
+  }
+  if (/lane:metadata|metadata|tag|rating|warning|compatibility/.test(haystack)) {
+    return "metadata_tags";
+  }
+  if (/occupation|job|profession|career/.test(haystack)) {
+    return "occupations";
+  }
+  if (/skill|mastery|competence/.test(haystack)) {
+    return "skills";
+  }
+  if (/humor|banter|joke|teasing/.test(haystack)) {
+    return "humor";
+  }
+
+  return "traits";
+}
+
+function inferSemanticParentFromVocabularySeedCategory(
+  category: SemanticSeedNodeCategory,
+): string | undefined {
+  switch (category) {
+    case "wounds":
+    case "fears":
+      return "attachment_wound";
+    case "motivations":
+      return "value_driver";
+    case "speech_patterns":
+      return "internal_dialogue";
+    default:
+      return undefined;
+  }
+}
+
+function resolveVocabularySeedGraphReferences(
+  values: readonly string[],
+): readonly string[] {
+  return uniqueSemanticText(
+    values.flatMap((value) => {
+      const direct = findSemanticSeedNodeById(value);
+      if (direct) {
+        return [direct.id];
+      }
+
+      const normalized = findSemanticSeedNodeById(toSemanticGraphId(value));
+      return normalized ? [normalized.id] : [];
+    }),
+  );
+}
+
 function resolveSemanticSeedNodes(
   ids: readonly string[],
 ): readonly SemanticSeedNode[] {
   return ids
     .map((id) => findSemanticSeedNodeById(id))
     .filter((node): node is SemanticSeedNode => node !== undefined);
+}
+
+function resolveSemanticSeedGraphNodes(
+  ids: readonly string[],
+): readonly SemanticSeedNode[] {
+  return ids
+    .map((id) => findSemanticSeedGraphNodeById(id))
+    .filter((node): node is SemanticSeedNode => node !== undefined);
+}
+
+function semanticNodeMatchesLookup(
+  node: SemanticSeedNode,
+  normalizedLookup: string,
+): boolean {
+  return [
+    node.id,
+    ...node.aliases,
+    ...(node.sourceRegistryKeys ?? []),
+  ].some((value) => normalizeSemanticGraphLookup(value) === normalizedLookup);
+}
+
+function flattenSemanticSeedNodeForSearch(node: SemanticSeedNode): string {
+  return [
+    node.id,
+    node.category,
+    node.label,
+    node.description ?? "",
+    node.internalMeaning ?? "",
+    node.emotionalMeaning ?? "",
+    node.visual ?? "",
+    node.impression ?? "",
+    node.payoff ?? "",
+    node.guidance ?? "",
+    ...node.aliases,
+    ...node.tags,
+    ...(node.behaviors ?? []),
+    ...(node.dialogueExamples ?? []),
+    ...(node.bodyLanguage ?? []),
+    ...(node.commonTriggers ?? []),
+    ...(node.commonConflicts ?? []),
+    ...(node.hiddenNeeds ?? []),
+    ...(node.commonWounds ?? []),
+    ...(node.growthPath ?? []),
+    ...(node.relatedConcepts ?? []),
+    ...(node.associatedVibes ?? []),
+    ...(node.emotionalArc ?? []),
+    ...(node.triggers ?? []),
+    ...(node.goals ?? []),
+    ...(node.sourceRegistryKeys ?? []),
+  ].join(" ").toLowerCase();
+}
+
+function normalizeSemanticGraphLookup(value: string): string {
+  return value.trim().toLowerCase();
+}
+
+function toSemanticGraphId(value: string): string {
+  return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
+}
+
+function uniqueSemanticText(values: readonly string[]): readonly string[] {
+  return Array.from(new Set(values.filter((value) => value.trim().length > 0)));
 }
 
 function inferSeedPolarity(tags: readonly string[]): HeartWriteSeedPolarity | undefined {

@@ -62,3 +62,22 @@ test("splits semantic prompt additions into psychology and relationship lanes", 
   assert.match(additions.systemPromptAddition, /Fear of abandonment/);
   assert.match(additions.systemPromptAddition, /Slow burn/);
 });
+
+test("resolves standardized vocabulary seed ids through the semantic graph bridge", () => {
+  const nodes = resolveSemanticSeedIds([
+    "moral-framework-vocabulary:care_ethics",
+  ]);
+  const prompt = compileSemanticSeedPromptAdditions([
+    "moral-framework-vocabulary:care_ethics",
+  ]);
+  const tags = compileSemanticSeedVisibleTags([
+    "moral-framework-vocabulary:care_ethics",
+  ]);
+
+  assert.equal(nodes[0]?.label, "Care Ethics");
+  assert.equal(nodes[0]?.category, "motivations");
+  assert.deepEqual(tags, ["Care Ethics"]);
+  assert.match(prompt, /Care Ethics/);
+  assert.match(prompt, /soft internal guidance/);
+  assert.doesNotMatch(prompt, /moral-framework-vocabulary:care_ethics/);
+});

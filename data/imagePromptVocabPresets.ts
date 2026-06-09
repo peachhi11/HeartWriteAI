@@ -1,3 +1,8 @@
+import {
+  createVocabularySeedFromPresetLike,
+  type VocabularySeedPreset,
+} from "./vocabularySeedTypes";
+
 export type ImagePromptVocabPresetCategory =
   | "Image Prompt Preset"
   | "Appearance Tag"
@@ -488,9 +493,45 @@ export const IMAGE_PROMPT_VOCAB_PRESETS = IMAGE_PROMPT_VOCAB_SEED_GROUPS.flatMap
   (group) => group.values.map((value) => makeImagePromptVocabPreset(group, value)),
 );
 
+export const IMAGE_PROMPT_VOCABULARY_SEEDS = Object.freeze(
+  IMAGE_PROMPT_VOCAB_PRESETS.map((preset) =>
+    createVocabularySeedFromPresetLike(preset, {
+      examples: [
+        `Use ${preset.value} as image prompt vocabulary.`,
+        preset.guidance,
+      ],
+      tags: ["image", "visual_prompt", preset.category],
+      scenarioHooks:
+        preset.category === "Environment Tag" || preset.category === "Image Mood"
+          ? [preset.value]
+          : [],
+      metadata: {
+        rarity: preset.category === "High-Value Image Seed" ? "uncommon" : "common",
+        romanceValue: imagePromptRomanceValue(preset.category),
+        conflictPotential:
+          preset.category === "Negative Prompt" || preset.category === "Image Quality"
+            ? 1
+            : 3,
+      },
+    }),
+  ),
+) satisfies readonly VocabularySeedPreset[];
+
 export const IMAGE_PROMPT_VOCAB_PRESET_CATEGORIES = Array.from(
   new Set(IMAGE_PROMPT_VOCAB_PRESETS.map((preset) => preset.category)),
 ).sort();
+
+function imagePromptRomanceValue(category: ImagePromptVocabPresetCategory): number {
+  if (["Image Prompt Preset", "Image Mood", "Pose"].includes(category)) {
+    return 7;
+  }
+
+  if (["Appearance Tag", "Lighting", "Environment Tag"].includes(category)) {
+    return 6;
+  }
+
+  return 4;
+}
 
 export const getImagePromptVocabPresetsByCategory = (
   category: ImagePromptVocabPresetCategory,

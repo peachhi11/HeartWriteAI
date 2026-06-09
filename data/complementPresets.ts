@@ -1,3 +1,8 @@
+import {
+  createVocabularySeedPreset,
+  type VocabularySeedPreset,
+} from "./vocabularySeedTypes";
+
 export type ComplementVocabularyDynamicCategory =
   | "Academic/Rivals"
   | "Beast/Beauty"
@@ -115,6 +120,37 @@ export const COMPLEMENT_VOCABULARY_PRESETS = Object.freeze([
 export const COMPLEMENT_VOCABULARY_CATEGORIES = Object.freeze(
   Array.from(new Set(COMPLEMENT_VOCABULARY_PRESETS.map((preset) => preset.dynamicCategory))).sort(),
 );
+
+export const COMPLEMENT_VOCABULARY_SEEDS = Object.freeze(
+  COMPLEMENT_VOCABULARY_PRESETS.map((preset) =>
+    createVocabularySeedPreset({
+      seed: preset.id,
+      label: preset.vibe,
+      description: `Complement dynamic for ${preset.dynamicCategory}: ${preset.vibe}.`,
+      examples: [
+        preset.sampleProseSnippet,
+        preset.lexicalTokens.pacingDirectives,
+      ],
+      tags: [
+        "relationship_dynamic",
+        "complement",
+        preset.dynamicCategory,
+        ...preset.systemPromptTags,
+        ...preset.lexicalTokens.contrastingAdjectives,
+      ],
+      relatedSeeds: preset.lexicalTokens.relationalNouns,
+      oppositeSeeds: [],
+      romanceHooks: [preset.dynamicCategory, preset.vibe],
+      scenarioHooks: preset.lexicalTokens.clashingVerbs,
+      dialoguePatterns: [preset.lexicalTokens.pacingDirectives],
+      metadata: {
+        rarity: "uncommon",
+        romanceValue: 9,
+        conflictPotential: 8,
+      },
+    }),
+  ),
+) satisfies readonly VocabularySeedPreset[];
 
 export function findComplementVocabularyById(
   id: string,

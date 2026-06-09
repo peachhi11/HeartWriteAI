@@ -1,3 +1,8 @@
+import {
+  createVocabularySeedFromPresetLike,
+  type VocabularySeedPreset,
+} from "./vocabularySeedTypes";
+
 export type PersonalityEngineVocabularyCategory =
   | "Core Identity"
   | "Archetype"
@@ -966,9 +971,76 @@ export const PERSONALITY_ENGINE_VOCABULARY_PRESETS =
     group.values.map((value) => makePreset(group, value)),
   );
 
+export const PERSONALITY_ENGINE_VOCABULARY_SEEDS = Object.freeze(
+  PERSONALITY_ENGINE_VOCABULARY_PRESETS.map((preset) =>
+    createVocabularySeedFromPresetLike(preset, {
+      examples: [
+        `Use ${preset.value} as a route, gate, pressure, or character texture cue.`,
+        preset.guidance,
+      ],
+      romanceHooks: preset.category === "Romance Trope" ? [preset.value] : [],
+      scenarioHooks: [
+        preset.category.toLowerCase().replace(/[^a-z0-9]+/g, "_"),
+        ...preset.triggerKeys.slice(0, 3),
+      ],
+      metadata: {
+        rarity: preset.category === "High-Value Engine Tag" ? "uncommon" : "common",
+        romanceValue: personalityEngineRomanceValue(preset.category),
+        conflictPotential: personalityEngineConflictPotential(preset.category),
+      },
+    }),
+  ),
+) satisfies readonly VocabularySeedPreset[];
+
 export const PERSONALITY_ENGINE_VOCABULARY_CATEGORIES = Array.from(
   new Set(PERSONALITY_ENGINE_VOCABULARY_PRESETS.map((preset) => preset.category)),
 ).sort();
+
+function personalityEngineRomanceValue(
+  category: PersonalityEngineVocabularyCategory,
+): number {
+  if (
+    [
+      "Attachment Style",
+      "Desire",
+      "Gate",
+      "Romance Trope",
+      "Route",
+      "Route Entry",
+      "Resolution",
+    ].includes(category)
+  ) {
+    return 9;
+  }
+
+  if (["Like", "Secret", "Wound"].includes(category)) {
+    return 8;
+  }
+
+  return 6;
+}
+
+function personalityEngineConflictPotential(
+  category: PersonalityEngineVocabularyCategory,
+): number {
+  if (
+    [
+      "Betrayal Trigger",
+      "Betrayal Method",
+      "Escalation",
+      "Trigger",
+      "Wound",
+    ].includes(category)
+  ) {
+    return 9;
+  }
+
+  if (["De-escalation", "Resolution", "Like"].includes(category)) {
+    return 4;
+  }
+
+  return 6;
+}
 
 export const getPersonalityEngineVocabularyByCategory = (
   category: PersonalityEngineVocabularyCategory,

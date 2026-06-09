@@ -1,6 +1,6 @@
 import {
-  expandSemanticSeedNodeIds,
-  findSemanticSeedNodeById,
+  expandSemanticSeedGraphNodeIds,
+  findSemanticSeedGraphNodeById,
   type SemanticSeedNode,
   type SemanticSeedNodeCategory,
 } from "../../data/semanticSeedRegistry";
@@ -51,7 +51,7 @@ export function resolveSemanticSeedIds(
   ids: readonly string[] = [],
   options: SemanticSeedResolutionOptions = {},
 ): readonly SemanticSeedNode[] {
-  const expandedIds = expandSemanticSeedNodeIds(
+  const expandedIds = expandSemanticSeedGraphNodeIds(
     ids.map(normalizeSemanticSeedId),
     options,
   );
@@ -60,7 +60,7 @@ export function resolveSemanticSeedIds(
   const seen = new Set<string>();
 
   for (const id of expandedIds) {
-    const node = findSemanticSeedNodeById(id);
+    const node = findSemanticSeedGraphNodeById(id);
     if (!node || seen.has(node.id)) {
       continue;
     }
@@ -155,6 +155,10 @@ function compileSemanticSeedPromptLine(node: SemanticSeedNode): string {
 }
 
 function normalizeSemanticSeedId(id: string): string {
+  if (id.includes(":")) {
+    return id.trim().toLowerCase();
+  }
+
   return id.trim().toLowerCase().replace(/[\s-]+/g, "_");
 }
 

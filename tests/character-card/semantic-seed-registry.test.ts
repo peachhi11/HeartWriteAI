@@ -5,20 +5,29 @@ import { SEED_PRESET_REGISTRY } from "../../data/seedPresetRegistry";
 import {
   SEMANTIC_SEED_CATEGORY_TARGETS,
   SEMANTIC_SEED_GRAPH_VERSION,
+  SEMANTIC_SEED_GRAPH_NODE_IDS,
+  SEMANTIC_SEED_GRAPH_NODES,
   SEMANTIC_SEED_NODES,
   SEMANTIC_SEED_NODE_IDS,
   SEMANTIC_SEED_PRIORITY_CATEGORIES,
   SEMANTIC_SEED_REGISTRY_CATEGORIES,
+  STANDARD_VOCABULARY_SEMANTIC_NODES,
   expandSemanticSeedNodeIds,
+  findSemanticSeedGraphNodeById,
   findSemanticSeedNodeById,
+  getSemanticSeedGraphNodesByCategory,
   getSemanticSeedCategoryTarget,
   getSemanticSeedNodeNeighborhood,
   getSemanticSeedNodesByCategory,
   getSemanticSeedStoryPayloadStatus,
   mapSemanticSeedCategoryToHeartWriteSeedCategory,
+  searchSemanticSeedGraphNodes,
   searchSemanticSeedNodes,
   toSeedBaseFromSemanticNode,
 } from "../../data/semanticSeedRegistry";
+import {
+  ALL_STANDARD_VOCABULARY_SEEDS,
+} from "../../data/standardVocabularySeedRegistry";
 
 const seedPresetRegistryKeys = new Set(
   SEED_PRESET_REGISTRY.map((entry) => entry.registryKey),
@@ -1166,4 +1175,91 @@ test("keeps semantic source registry keys resolvable", () => {
   );
 
   assert.deepEqual(missingSourceKeys, []);
+});
+
+test("bridges standardized vocabulary seeds into graph-readable semantic nodes", () => {
+  const care = findSemanticSeedGraphNodeById(
+    "moral-framework-vocabulary:care_ethics",
+  );
+  const careByDerivedId = care
+    ? findSemanticSeedGraphNodeById(care.id)
+    : undefined;
+  const reducingSufferingResults = searchSemanticSeedGraphNodes(
+    "reducing suffering",
+    {
+      categories: ["motivations"],
+      tags: ["standard_vocabulary"],
+      limit: 5,
+    },
+  );
+
+  assert.equal(
+    STANDARD_VOCABULARY_SEMANTIC_NODES.length,
+    ALL_STANDARD_VOCABULARY_SEEDS.length,
+  );
+  assert.equal(
+    SEMANTIC_SEED_GRAPH_NODES.length,
+    SEMANTIC_SEED_NODES.length + ALL_STANDARD_VOCABULARY_SEEDS.length,
+  );
+  assert.equal(care?.label, "Care Ethics");
+  assert.equal(care?.category, "motivations");
+  assert.equal(care?.parents.includes("value_driver"), true);
+  assert.equal(
+    care?.sourceRegistryKeys?.includes("moral-framework-vocabulary:care_ethics"),
+    true,
+  );
+  assert.equal(careByDerivedId?.label, "Care Ethics");
+  assert.equal(
+    reducingSufferingResults.some((node) => node.label === "Care Ethics"),
+    true,
+  );
+  assert.equal(
+    getSemanticSeedGraphNodesByCategory("motivations").length >
+      getSemanticSeedNodesByCategory("motivations").length,
+    true,
+  );
+});
+
+test("keeps explicit standardized vocabulary sources ahead of generic prose heuristics", () => {
+  const acts = findSemanticSeedGraphNodeById(
+    "acts-of-service-vocabulary:makes_tea",
+  );
+  const response = findSemanticSeedGraphNodeById(
+    "response-vocabulary:reassurance_seeking_response",
+  );
+  const repair = findSemanticSeedGraphNodeById(
+    "repair-style-vocabulary:verbal_reassurance_repair",
+  );
+  const moral = findSemanticSeedGraphNodeById(
+    "moral-framework-vocabulary:care_ethics",
+  );
+
+  assert.equal(acts?.category, "love_languages");
+  assert.equal(response?.category, "responses");
+  assert.equal(repair?.category, "repair_styles");
+  assert.equal(moral?.category, "motivations");
+});
+
+test("keeps projected standardized vocabulary graph references resolvable", () => {
+  const graphIds = new Set(SEMANTIC_SEED_GRAPH_NODE_IDS);
+  const standardVocabularySeedIds = new Set(
+    ALL_STANDARD_VOCABULARY_SEEDS.map((seed) => seed.seed),
+  );
+  const edgeFields = ["parents", "children", "related", "opposite"] as const;
+  const missingReferences = SEMANTIC_SEED_GRAPH_NODES.flatMap((node) =>
+    edgeFields.flatMap((field) =>
+      (node[field] ?? [])
+        .filter((ref) => !graphIds.has(ref))
+        .map((ref) => `${node.id}.${field}:${ref}`),
+    ),
+  );
+  const missingProjectedSources = STANDARD_VOCABULARY_SEMANTIC_NODES.flatMap(
+    (node) =>
+      (node.sourceRegistryKeys ?? [])
+        .filter((sourceKey) => !standardVocabularySeedIds.has(sourceKey))
+        .map((sourceKey) => `${node.id}:${sourceKey}`),
+  );
+
+  assert.deepEqual(missingReferences, []);
+  assert.deepEqual(missingProjectedSources, []);
 });

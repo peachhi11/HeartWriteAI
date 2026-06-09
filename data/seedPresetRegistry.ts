@@ -6,11 +6,13 @@ import { DESCRIPTIVE_WRITING_SEEDS } from "./descriptiveWritingSeedPresets";
 import { GENRE_SETTING_PACK_PRESETS } from "./genreSettingPackPresets";
 import { IMAGE_PROMPT_VOCAB_PRESETS } from "./imagePromptVocabPresets";
 import { MENTAL_EMOTIONAL_PATTERN_PRESETS } from "./mentalEmotionalPatternPresets";
+import { MORAL_FRAMEWORK_VOCABULARY_REGISTRY_PRESETS } from "./moralFrameworkVocabularyPresets";
 import { MUSIC_PRESETS } from "./musicPresets";
 import { NPC_NETWORK_PRESETS } from "./npcNetworkPresets";
 import { PERSONA_PLAYER_SIDE_PRESETS } from "./personaPlayerSidePresets";
 import { PERSONALITY_ENGINE_VOCABULARY_PRESETS } from "./personalityEngineVocabularyPresets";
 import { PERSONALITY_TYPOLOGY_PRESETS } from "./personalityTypologyPresets";
+import { SAMPLE_CARD_PROSE_STRUCTURE_PRESETS } from "./sampleCardProseStructurePresets";
 import { SCENARIO_OPENING_MOMENT_PRESETS } from "./scenarioOpeningMomentPresets";
 import { SETTING_SUBTYPE_PRESETS } from "./settingSubtypePresets";
 import { WORLD_LORE_EXPANSION_PRESETS } from "./worldLoreExpansionPresets";
@@ -31,11 +33,13 @@ export type SeedPresetRegistrySourceId =
   | "genre-setting-pack"
   | "image-prompt-vocab"
   | "mental-emotional-pattern"
+  | "moral-framework-vocabulary"
   | "music"
   | "npc-network"
   | "persona-player-side"
   | "personality-engine"
   | "personality-typology"
+  | "sample-card-prose-structure"
   | "scenario-opening-moment"
   | "setting-subtype"
   | "world-lore-expansion";
@@ -128,6 +132,13 @@ export const SEED_PRESET_REGISTRY_SOURCES = Object.freeze([
     presets: COGNITIVE_DRIVER_PRESETS,
   },
   {
+    id: "moral-framework-vocabulary",
+    lane: "personality",
+    label: "Moral Framework Vocabulary",
+    description: "Structured ethical frameworks with examples, relationship hooks, scenario hooks, dialogue cues, and similarity metadata.",
+    presets: MORAL_FRAMEWORK_VOCABULARY_REGISTRY_PRESETS,
+  },
+  {
     id: "backstory-event",
     lane: "personality",
     label: "Backstory Events",
@@ -154,6 +165,13 @@ export const SEED_PRESET_REGISTRY_SOURCES = Object.freeze([
     label: "Descriptive Writing",
     description: "Concrete prose texture for personality, emotional expression, body language, and speech.",
     presets: DESCRIPTIVE_WRITING_SEEDS.filter((seed) => seed.lane !== "appearance"),
+  },
+  {
+    id: "sample-card-prose-structure",
+    lane: "personality",
+    label: "Sample Card Prose Structure",
+    description: "Original structure patterns mined from sample cards for description, scenario, and opening-message drafting.",
+    presets: SAMPLE_CARD_PROSE_STRUCTURE_PRESETS,
   },
   {
     id: "world-lore-expansion",

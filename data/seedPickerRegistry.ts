@@ -7,8 +7,12 @@ import {
   SEMANTIC_SEED_NODES,
   type SemanticSeedNode,
 } from "./semanticSeedRegistry";
+import {
+  RICH_STANDARD_VOCABULARY_SEEDS,
+} from "./standardVocabularySeedRegistry";
+import type { VocabularySeedPreset } from "./vocabularySeedTypes";
 
-export type SeedPickerEntryKind = "preset" | "semantic";
+export type SeedPickerEntryKind = "preset" | "semantic" | "vocabulary";
 export type SeedPickerLane = SeedPresetRegistryLane | "semantic";
 
 export interface SeedPickerEntry {
@@ -24,6 +28,7 @@ export interface SeedPickerEntry {
   sourceLabel: string;
   tags: readonly string[];
   value: string;
+  vocabularySeed?: VocabularySeedPreset;
 }
 
 export interface SeedPickerSearchOptions {
@@ -36,6 +41,7 @@ export interface SeedPickerSearchOptions {
 export const SEED_PICKER_ENTRIES = Object.freeze([
   ...SEED_PRESET_REGISTRY.map(toPresetPickerEntry),
   ...SEMANTIC_SEED_NODES.map(toSemanticPickerEntry),
+  ...RICH_STANDARD_VOCABULARY_SEEDS.map(toVocabularyPickerEntry),
 ] as const satisfies readonly SeedPickerEntry[]);
 
 export function getSeedPickerEntries(
@@ -204,6 +210,100 @@ function toSemanticPickerEntry(node: SemanticSeedNode): SeedPickerEntry {
     tags: node.tags,
     value: node.id,
   };
+}
+
+function toVocabularyPickerEntry(seed: VocabularySeedPreset): SeedPickerEntry {
+  const lane = inferVocabularySeedLane(seed);
+  const sourceLabel = inferVocabularySeedSourceLabel(seed);
+  const searchValues = [
+    seed.seed,
+    seed.label,
+    seed.description,
+    ...seed.examples,
+    ...seed.tags,
+    ...seed.relatedSeeds,
+    ...seed.oppositeSeeds,
+    ...seed.romanceHooks,
+    ...seed.scenarioHooks,
+    ...seed.dialoguePatterns,
+    seed.metadata.rarity,
+    String(seed.metadata.romanceValue),
+    String(seed.metadata.conflictPotential),
+  ];
+
+  return {
+    category: inferVocabularySeedCategory(seed),
+    description: seed.description,
+    guidance: [
+      seed.description,
+      seed.examples.slice(0, 2).join(" "),
+      seed.romanceHooks.length > 0
+        ? `Romance hooks: ${seed.romanceHooks.slice(0, 3).join(", ")}.`
+        : "",
+      seed.scenarioHooks.length > 0
+        ? `Scenario hooks: ${seed.scenarioHooks.slice(0, 3).join(", ")}.`
+        : "",
+    ].filter(Boolean).join(" "),
+    id: seed.seed,
+    kind: "vocabulary",
+    label: seed.label,
+    lane,
+    registryKey: `vocabulary:${seed.seed}`,
+    searchText: searchValues.join(" "),
+    sourceLabel,
+    tags: seed.tags,
+    value: seed.label,
+    vocabularySeed: seed,
+  };
+}
+
+function inferVocabularySeedLane(seed: VocabularySeedPreset): SeedPickerLane {
+  if (seed.tags.includes("image-prompt-vocabulary") || seed.tags.includes("image")) {
+    return "image";
+  }
+
+  if (
+    seed.tags.includes("relationship_dynamic") ||
+    seed.tags.includes("complement") ||
+    seed.tags.includes("origin_wound") ||
+    seed.tags.includes("personality-engine-vocabulary") ||
+    seed.tags.includes("moral-framework-vocabulary") ||
+    seed.tags.includes("voice-vocabulary") ||
+    seed.tags.includes("voice-seed-vocabulary")
+  ) {
+    return "personality";
+  }
+
+  return "personality";
+}
+
+function inferVocabularySeedCategory(seed: VocabularySeedPreset): string {
+  return firstTagMatching(seed, [
+    "Moral Framework Vocabulary",
+    "relationship_dynamic",
+    "origin_wound",
+    "voice",
+    "image",
+  ]) ?? "Vocabulary Seed";
+}
+
+function inferVocabularySeedSourceLabel(seed: VocabularySeedPreset): string {
+  const sourceId = seed.seed.split(":")[0] ?? "";
+  return sourceId
+    .split("-")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ") || "Vocabulary Seeds";
+}
+
+function firstTagMatching(
+  seed: VocabularySeedPreset,
+  candidates: readonly string[],
+): string | undefined {
+  const normalizedCandidates = new Set(
+    candidates.map((candidate) => candidate.toLowerCase()),
+  );
+  return seed.tags.find((tag) => normalizedCandidates.has(tag.toLowerCase()));
 }
 
 function normalizeSearchToken(value: string) {
