@@ -11137,6 +11137,12 @@ function inferSemanticCategoryFromVocabularySeed(
   if (/acts-of-service-vocabulary/.test(haystack)) {
     return "love_languages";
   }
+  if (/attachment-style-vocabulary/.test(haystack)) {
+    return "attachment_styles";
+  }
+  if (/love-language-vocabulary/.test(haystack)) {
+    return "love_languages";
+  }
   if (/desire-vocabulary/.test(haystack)) {
     return "desires";
   }
@@ -11147,6 +11153,9 @@ function inferSemanticCategoryFromVocabularySeed(
     return "triggers";
   }
   if (/repair-style-vocabulary/.test(haystack)) {
+    return "repair_styles";
+  }
+  if (/repair-beat-vocabulary/.test(haystack)) {
     return "repair_styles";
   }
   if (/response-vocabulary/.test(haystack)) {
@@ -11163,6 +11172,36 @@ function inferSemanticCategoryFromVocabularySeed(
   }
   if (/complement-vocabulary/.test(haystack)) {
     return "relationship_dynamics";
+  }
+  if (/conflict-beat-vocabulary/.test(haystack)) {
+    return "relationship_gates";
+  }
+  if (/conflict-style-vocabulary/.test(haystack)) {
+    return "conflict_styles";
+  }
+  if (/consequence-vocabulary/.test(haystack)) {
+    return "routes";
+  }
+  if (/relationship-dynamic-vocabulary/.test(haystack)) {
+    return "relationship_dynamics";
+  }
+  if (/relationship-identity-vocabulary/.test(haystack)) {
+    return "relationship_dynamics";
+  }
+  if (/romance-trope-vocabulary/.test(haystack)) {
+    return "romance_tropes";
+  }
+  if (/route-phase-vocabulary/.test(haystack)) {
+    return "routes";
+  }
+  if (/payoff-fantasy-vocabulary/.test(haystack)) {
+    return "routes";
+  }
+  if (/growth-arc-vocabulary/.test(haystack)) {
+    return "goals_long";
+  }
+  if (/rupture-type-vocabulary/.test(haystack)) {
+    return "relationship_gates";
   }
   if (/image-prompt-vocabulary|lane:image|appearance|visual|portrait|face|hair|skin|body/.test(haystack)) {
     return /fashion|outfit|clothing|garment|fabric|armou?r|jewell?ery/.test(haystack)

@@ -232,8 +232,8 @@ export const repairDefaultsByType = {
     romanceHooks: ["earned_trust_slow_burn", "truth_after_lie"],
     scenarioHooks: ["after_the_betrayal", "trust_rebuilding_arc"],
     dialoguePatterns: [
-      "You do not owe me trust yet.",
-      "Ask anything. I will answer.",
+      "I thought I could trust you.",
+      "How could I ever believe another word you tell me?",
       "I broke it. I will not rush you to heal it.",
     ],
   },
@@ -673,8 +673,8 @@ const REPAIR_STYLE_OVERRIDES: Record<string, RepairStyleOverride> = {
       "abandonment_trigger_repair",
     ],
     dialoguePatterns: [
-      "I am here.",
-      "I am not leaving because we argued.",
+      "I will be gone for a while, but I will always eventually come back to you. I promise.",
+      "This will be our last conversation for a while. But it will never be the last.",
       "You matter to me, even when this is hard.",
     ],
     repairsBestFor: [

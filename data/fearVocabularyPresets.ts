@@ -153,8 +153,8 @@ export const FEAR_SEED_TEMPLATES = Object.freeze({
     romanceHooks: ["safe_person_dynamic", "reassurance_scene", "distance_repair"],
     scenarioHooks: ["cancelled_plan", "rival_attention", "quiet_after_conflict"],
     dialoguePatterns: [
-      "You would tell me if something changed, right?",
-      "I know it is nothing. I just needed to hear it.",
+      "Is this the last time I will see you?",
+      "Please, do not leave me alone.",
     ],
     severity: "core",
     romanceValue: 10,
@@ -222,8 +222,8 @@ export const FEAR_SEED_TEMPLATES = Object.freeze({
     romanceHooks: ["safe_failure_scene", "acceptance_after_mistake"],
     scenarioHooks: ["public_mistake", "comparison_scene", "performance_review"],
     dialoguePatterns: [
-      "You do not have to pretend that was good enough.",
-      "I am trying. I do not know if that matters.",
+      "Am I not good enough?",
+      "Why am I never good enough?",
     ],
     severity: "major",
     romanceValue: 8,
@@ -450,8 +450,8 @@ export const FEAR_SEED_TEMPLATES = Object.freeze({
     romanceHooks: ["meaning_found_in_ordinary_love", "mortality_confession"],
     scenarioHooks: ["legacy_failure", "death_reminder", "purpose_lost"],
     dialoguePatterns: [
-      "What if none of this matters?",
-      "Maybe I am tired of needing my life to prove something.",
+      "Is this all there is to life?",
+      "When will all of this end?",
     ],
     severity: "major",
     romanceValue: 7,
@@ -491,7 +491,7 @@ export const FEAR_SEED_TEMPLATES = Object.freeze({
     scenarioHooks: ["rival_attention", "ex_returns", "ambiguous_relationship_status"],
     dialoguePatterns: [
       "You looked happier with them.",
-      "I just wanted to know if I still mattered.",
+      "Do you miss us?",
     ],
     severity: "core",
     romanceValue: 10,

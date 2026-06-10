@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   compileDialogueExamplePresetAdditions,
   compileDialogueExamplePresetSummary,
+  DIALOGUE_DUMP_SUITABILITY_GROUPS,
   DIALOGUE_EXAMPLE_PRESET_CATEGORIES,
   DIALOGUE_EXAMPLE_PRESETS,
   findDialogueExamplePresetById,
@@ -82,6 +83,34 @@ test("preserves structured dialogue usage presets as soft recipes", () => {
     "voice shift",
     "unspoken feeling",
   ]);
+});
+
+test("sorts raw dialogue dump lines into reusable suitability groups", () => {
+  assert.equal(DIALOGUE_DUMP_SUITABILITY_GROUPS.length, 7);
+
+  const betrayal = DIALOGUE_DUMP_SUITABILITY_GROUPS.find(
+    (group) => group.id === "betrayal_truth_rupture",
+  );
+  const crisis = DIALOGUE_DUMP_SUITABILITY_GROUPS.find(
+    (group) => group.id === "crisis_caretaking_checks",
+  );
+  const fragmented = DIALOGUE_DUMP_SUITABILITY_GROUPS.find(
+    (group) => group.id === "fragmented_overwhelm",
+  );
+
+  assert.ok(betrayal);
+  assert.equal(
+    betrayal.strongestLines.includes("What other secrets did you keep from me?"),
+    true,
+  );
+  assert.equal(
+    betrayal.recommendedTargets.includes("triggerVocabularyPresets"),
+    true,
+  );
+  assert.ok(crisis);
+  assert.equal(crisis.strongestLines.includes("Can you tell me your name?"), true);
+  assert.ok(fragmented);
+  assert.equal(fragmented.suits.includes("shutdown responses"), true);
 });
 
 test("compiles dialogue examples as soft agency-preserving guidance", () => {

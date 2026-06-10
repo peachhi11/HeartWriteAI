@@ -45,6 +45,185 @@ interface DialogueExampleUsageInput {
   requiredSeeds: string[];
 }
 
+export interface DialogueDumpSuitabilityGroup {
+  id: string;
+  label: string;
+  suits: readonly string[];
+  recommendedTargets: readonly string[];
+  strongestLines: readonly string[];
+  notes: string;
+}
+
+export const DIALOGUE_DUMP_SUITABILITY_GROUPS = Object.freeze([
+  {
+    id: "confrontation_questions",
+    label: "Confrontation Questions",
+    suits: [
+      "argument dialogue",
+      "conflict style seeds",
+      "rupture triggers",
+      "defensive response seeds",
+    ],
+    recommendedTargets: [
+      "conflictStyleVocabularyPresets",
+      "responseVocabularyPresets",
+      "triggerVocabularyPresets",
+    ],
+    strongestLines: [
+      "Were you ever going to tell me the truth?",
+      "Did you really think I would not find out?",
+      "How does that make it okay?",
+      "Do you even listen to yourself?",
+      "Do not spin it around like I am the bad guy right now.",
+    ],
+    notes:
+      "Best used for truth pressure, defensive anger, betrayal aftermath, and argument escalation. Prefer the specific accusation lines over generic anger questions.",
+  },
+  {
+    id: "crisis_caretaking_checks",
+    label: "Crisis Caretaking Checks",
+    suits: [
+      "hurt-comfort dialogue",
+      "safety triggers",
+      "caretaking response seeds",
+      "grounding scenes",
+    ],
+    recommendedTargets: [
+      "triggerVocabularyPresets",
+      "responseVocabularyPresets",
+      "actsOfServiceVocabularyPresets",
+    ],
+    strongestLines: [
+      "Do you need an ambulance?",
+      "Can you tell me your name?",
+      "When was the last time you ate anything?",
+      "Can you let me see your eyes?",
+      "Should I stay a bit longer?",
+    ],
+    notes:
+      "Most useful as practical check-in texture. Keep these as questions that preserve agency rather than character narration.",
+  },
+  {
+    id: "abandonment_goodbye",
+    label: "Abandonment and Goodbye",
+    suits: [
+      "attachment fear seeds",
+      "goodbye triggers",
+      "pursuer conflict style",
+      "return-and-stay repair",
+    ],
+    recommendedTargets: [
+      "fearVocabularyPresets",
+      "triggerVocabularyPresets",
+      "conflictStyleVocabularyPresets",
+      "repairStyleVocabularyPresets",
+    ],
+    strongestLines: [
+      "Is this the last time I will see you?",
+      "Please, do not leave me alone.",
+      "I will be gone for a while, but I will always eventually come back to you. I promise.",
+      "Tell me what I can do to make you stay.",
+      "This will be our last conversation for a while. But it will never be the last.",
+    ],
+    notes:
+      "Strongest for attachment pressure, separation repair, and route gates. Avoid overusing the most desperate lines unless the scene is already high-intensity.",
+  },
+  {
+    id: "breakup_aftermath",
+    label: "Breakup and Aftermath",
+    suits: [
+      "rupture aftermath",
+      "second-chance routes",
+      "ending scenes",
+      "grief and closure dialogue",
+    ],
+    recommendedTargets: [
+      "romanceTropeVocabularyPresets",
+      "relationshipDynamicVocabularyPresets",
+      "repairStyleVocabularyPresets",
+    ],
+    strongestLines: [
+      "There need to be two people willing to fix this.",
+      "You deserved better, but so did I.",
+      "There is nothing else to say, I guess.",
+      "We tried. We really did.",
+      "Maybe we should just end it here.",
+    ],
+    notes:
+      "Useful for closure and second-chance setup. The quieter lines are stronger than the more declarative breakup lines.",
+  },
+  {
+    id: "betrayal_truth_rupture",
+    label: "Betrayal and Truth Rupture",
+    suits: [
+      "betrayal triggers",
+      "trust repair",
+      "emotional lockdown",
+      "suspicion responses",
+    ],
+    recommendedTargets: [
+      "triggerVocabularyPresets",
+      "repairStyleVocabularyPresets",
+      "responseVocabularyPresets",
+    ],
+    strongestLines: [
+      "I thought I could trust you.",
+      "What other secrets did you keep from me?",
+      "How could I ever believe another word you tell me?",
+      "I do not even know who you really are.",
+      "You lied to me over and over again.",
+    ],
+    notes:
+      "High-value trust-rupture language. Use with accountability and full-truth repair seeds rather than as generic conflict flavour.",
+  },
+  {
+    id: "apology_repair",
+    label: "Apology and Repair",
+    suits: [
+      "repair style seeds",
+      "accountability responses",
+      "apology dialogue",
+      "reconnection routes",
+    ],
+    recommendedTargets: [
+      "repairStyleVocabularyPresets",
+      "responseVocabularyPresets",
+    ],
+    strongestLines: [
+      "I am sorry for not believing you.",
+      "I am sorry for hurting you.",
+      "I am sorry for not responding.",
+      "I am sorry for lying to you.",
+      "I never meant to hurt you, but it seems like I still did.",
+    ],
+    notes:
+      "Good for clean apology variants. Prefer specific apologies over vague 'sorry you feel that way' phrasing.",
+  },
+  {
+    id: "fragmented_overwhelm",
+    label: "Fragmented Overwhelm",
+    suits: [
+      "freeze responses",
+      "shutdown responses",
+      "flight responses",
+      "emotional overwhelm",
+    ],
+    recommendedTargets: [
+      "responseVocabularyPresets",
+      "conflictStyleVocabularyPresets",
+    ],
+    strongestLines: [
+      "I cannot think straight.",
+      "I cannot talk right now.",
+      "I cannot go on like this.",
+      "I cannot imagine myself without you.",
+      "I cannot believe another word you say.",
+    ],
+    notes:
+      "Useful as clipped emotional pressure. Correct typos and keep fragments sparse so they feel like overwhelm, not filler.",
+  },
+] as const satisfies readonly DialogueDumpSuitabilityGroup[]);
+
 const DIALOGUE_EXAMPLE_SEED_GROUPS = Object.freeze([
   {
     category: "Scene Preset",

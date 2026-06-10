@@ -1224,19 +1224,71 @@ test("keeps explicit standardized vocabulary sources ahead of generic prose heur
   const acts = findSemanticSeedGraphNodeById(
     "acts-of-service-vocabulary:makes_tea",
   );
+  const attachmentStyle = findSemanticSeedGraphNodeById(
+    "attachment-style-vocabulary:anxious_attachment",
+  );
+  const loveLanguage = findSemanticSeedGraphNodeById(
+    "love-language-vocabulary:acts_of_service",
+  );
   const response = findSemanticSeedGraphNodeById(
     "response-vocabulary:reassurance_seeking_response",
   );
   const repair = findSemanticSeedGraphNodeById(
     "repair-style-vocabulary:verbal_reassurance_repair",
   );
+  const repairBeat = findSemanticSeedGraphNodeById(
+    "repair-beat-vocabulary:accountability_beat",
+  );
+  const conflictBeat = findSemanticSeedGraphNodeById(
+    "conflict-beat-vocabulary:delayed_reply_spiral",
+  );
+  const consequence = findSemanticSeedGraphNodeById(
+    "consequence-vocabulary:trust_damage_consequence",
+  );
+  const ruptureType = findSemanticSeedGraphNodeById(
+    "rupture-type-vocabulary:abandonment_rupture",
+  );
+  const conflictStyle = findSemanticSeedGraphNodeById(
+    "conflict-style-vocabulary:pursuer_conflict_style",
+  );
+  const relationshipDynamic = findSemanticSeedGraphNodeById(
+    "relationship-dynamic-vocabulary:safe_haven_dynamic",
+  );
+  const relationshipIdentity = findSemanticSeedGraphNodeById(
+    "relationship-identity-vocabulary:safe_haven_relationship",
+  );
+  const romanceTrope = findSemanticSeedGraphNodeById(
+    "romance-trope-vocabulary:enemies_to_lovers",
+  );
+  const routePhase = findSemanticSeedGraphNodeById(
+    "route-phase-vocabulary:initial_dynamic",
+  );
+  const payoffFantasy = findSemanticSeedGraphNodeById(
+    "payoff-fantasy-vocabulary:chosen_above_everyone",
+  );
+  const growthArc = findSemanticSeedGraphNodeById(
+    "growth-arc-vocabulary:learning_to_trust",
+  );
   const moral = findSemanticSeedGraphNodeById(
     "moral-framework-vocabulary:care_ethics",
   );
 
   assert.equal(acts?.category, "love_languages");
+  assert.equal(attachmentStyle?.category, "attachment_styles");
+  assert.equal(loveLanguage?.category, "love_languages");
   assert.equal(response?.category, "responses");
   assert.equal(repair?.category, "repair_styles");
+  assert.equal(repairBeat?.category, "repair_styles");
+  assert.equal(conflictBeat?.category, "relationship_gates");
+  assert.equal(consequence?.category, "routes");
+  assert.equal(ruptureType?.category, "relationship_gates");
+  assert.equal(conflictStyle?.category, "conflict_styles");
+  assert.equal(relationshipDynamic?.category, "relationship_dynamics");
+  assert.equal(relationshipIdentity?.category, "relationship_dynamics");
+  assert.equal(romanceTrope?.category, "romance_tropes");
+  assert.equal(routePhase?.category, "routes");
+  assert.equal(payoffFantasy?.category, "routes");
+  assert.equal(growthArc?.category, "goals_long");
   assert.equal(moral?.category, "motivations");
 });
 

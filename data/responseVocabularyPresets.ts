@@ -309,7 +309,7 @@ const RESPONSE_PROFILES = {
     scenarioHooks: ["confession_pressure", "argument_aftercare", "doorway_pause"],
     dialoguePatterns: [
       "I need air.",
-      "Do not follow me unless you can let me breathe.",
+      "I will leave now, or I am going to say things I will regret later.",
       "I am leaving the conversation, not you.",
     ],
     activators: ["intimacy pressure", "conflict escalation", "feeling trapped"],
@@ -353,8 +353,8 @@ const RESPONSE_PROFILES = {
     romanceHooks: ["patient_partner_waits", "quiet_regulation", "soft_question_after_freeze"],
     scenarioHooks: ["sudden_confession", "public_pressure", "threat_arrives"],
     dialoguePatterns: [
-      "I heard you. I just cannot answer yet.",
-      "Give me a second.",
+      "I cannot think straight.",
+      "I cannot talk right now.",
       "If I speak too fast, I will say it wrong.",
     ],
     activators: ["sudden pressure", "public attention", "conflicting choices"],
@@ -443,7 +443,7 @@ const RESPONSE_PROFILES = {
     romanceHooks: ["gentle_return", "safe_silence", "patient_aftercare"],
     scenarioHooks: ["betrayal_reveal", "argument_aftermath", "grief_trigger"],
     dialoguePatterns: [
-      "I cannot feel this right now.",
+      "I do not want to talk about it anymore.",
       "Do not mistake quiet for okay.",
       "If I open this door, I do not know what comes out.",
     ],
@@ -488,7 +488,7 @@ const RESPONSE_PROFILES = {
     romanceHooks: ["mask_cracks_in_private", "seen_behind_composure", "private_reassurance"],
     scenarioHooks: ["public_scandal", "family_dinner", "court_event"],
     dialoguePatterns: [
-      "I am fine.",
+      "Great. Really great. This is just perfect.",
       "This is not the place.",
       "Please do not look at me like you know.",
     ],
@@ -669,7 +669,7 @@ const RESPONSE_PROFILES = {
     scenarioHooks: ["argument_aftermath", "trust_gate", "second_chance"],
     dialoguePatterns: [
       "I hurt you. I understand that now.",
-      "I am not asking you to be over it.",
+      "I never meant to hurt you, but it seems like I still did.",
       "Let me show you I heard you.",
     ],
     activators: ["harm recognized", "relationship rupture", "trust damaged"],
@@ -728,7 +728,7 @@ const RESPONSE_OVERRIDES: Record<string, ResponseOverride> = {
     },
     dialoguePatterns: [
       "I did not know how to come back.",
-      "Silence felt safer until it started hurting you.",
+      "I am sorry for not responding.",
     ],
   },
   people_pleasing_response: {

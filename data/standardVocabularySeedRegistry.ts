@@ -2,8 +2,20 @@ import {
   ACTS_OF_SERVICE_VOCABULARY_SEEDS,
 } from "./actsOfServiceVocabularyPresets";
 import {
+  ATTACHMENT_STYLE_VOCABULARY_STANDARD_SEEDS,
+} from "./attachmentStyleVocabularyPresets";
+import {
   COMPLEMENT_VOCABULARY_SEEDS,
 } from "./complementPresets";
+import {
+  CONFLICT_BEAT_VOCABULARY_STANDARD_SEEDS,
+} from "./conflictBeatVocabularyPresets";
+import {
+  CONFLICT_STYLE_VOCABULARY_STANDARD_SEEDS,
+} from "./conflictStyleVocabularyPresets";
+import {
+  CONSEQUENCE_VOCABULARY_STANDARD_SEEDS,
+} from "./consequenceVocabularyPresets";
 import {
   DESIRE_VOCABULARY_STANDARD_SEEDS,
 } from "./desireVocabularyPresets";
@@ -11,8 +23,14 @@ import {
   FEAR_VOCABULARY_STANDARD_SEEDS,
 } from "./fearVocabularyPresets";
 import {
+  GROWTH_ARC_VOCABULARY_STANDARD_SEEDS,
+} from "./growthArcVocabularyPresets";
+import {
   IMAGE_PROMPT_VOCABULARY_SEEDS,
 } from "./imagePromptVocabPresets";
+import {
+  LOVE_LANGUAGE_VOCABULARY_STANDARD_SEEDS,
+} from "./loveLanguageVocabularyPresets";
 import {
   MORAL_FRAMEWORK_VOCABULARY_SEEDS,
 } from "./moralFrameworkVocabularyPresets";
@@ -20,14 +38,35 @@ import {
   ORIGIN_WOUND_VOCABULARY_SEEDS,
 } from "./originWoundVocabularyPresets";
 import {
+  PAYOFF_FANTASY_VOCABULARY_STANDARD_SEEDS,
+} from "./payoffFantasyVocabularyPresets";
+import {
   PERSONALITY_ENGINE_VOCABULARY_SEEDS,
 } from "./personalityEngineVocabularyPresets";
+import {
+  RELATIONSHIP_DYNAMIC_VOCABULARY_STANDARD_SEEDS,
+} from "./relationshipDynamicVocabularyPresets";
+import {
+  RELATIONSHIP_IDENTITY_VOCABULARY_STANDARD_SEEDS,
+} from "./relationshipIdentityVocabularyPresets";
+import {
+  ROMANCE_TROPE_VOCABULARY_STANDARD_SEEDS,
+} from "./romanceTropeVocabularyPresets";
+import {
+  ROUTE_PHASE_VOCABULARY_STANDARD_SEEDS,
+} from "./routePhaseVocabularyPresets";
 import {
   RESPONSE_VOCABULARY_STANDARD_SEEDS,
 } from "./responseVocabularyPresets";
 import {
   REPAIR_STYLE_VOCABULARY_STANDARD_SEEDS,
 } from "./repairStyleVocabularyPresets";
+import {
+  REPAIR_BEAT_VOCABULARY_STANDARD_SEEDS,
+} from "./repairBeatVocabularyPresets";
+import {
+  RUPTURE_TYPE_VOCABULARY_STANDARD_SEEDS,
+} from "./ruptureTypeVocabularyPresets";
 import {
   SEED_PRESET_REGISTRY,
   type SeedPresetRegistryEntry,
@@ -50,16 +89,29 @@ import {
 
 export type StandardVocabularySeedSourceId =
   | "acts-of-service-vocabulary"
+  | "attachment-style-vocabulary"
   | "registry"
   | "complement-vocabulary"
+  | "conflict-beat-vocabulary"
+  | "conflict-style-vocabulary"
+  | "consequence-vocabulary"
   | "desire-vocabulary"
   | "fear-vocabulary"
+  | "growth-arc-vocabulary"
   | "image-prompt-vocabulary"
+  | "love-language-vocabulary"
   | "moral-framework-vocabulary"
   | "origin-wound-vocabulary"
+  | "payoff-fantasy-vocabulary"
   | "personality-engine-vocabulary"
+  | "relationship-dynamic-vocabulary"
+  | "relationship-identity-vocabulary"
+  | "romance-trope-vocabulary"
+  | "route-phase-vocabulary"
   | "repair-style-vocabulary"
+  | "repair-beat-vocabulary"
   | "response-vocabulary"
+  | "rupture-type-vocabulary"
   | "trigger-vocabulary"
   | "voice-vocabulary"
   | "voice-seed-vocabulary"
@@ -82,9 +134,29 @@ export const RICH_STANDARD_VOCABULARY_SEED_COLLECTIONS = Object.freeze([
     seeds: ACTS_OF_SERVICE_VOCABULARY_SEEDS,
   },
   {
+    sourceId: "attachment-style-vocabulary",
+    label: "Attachment Style Vocabulary",
+    seeds: ATTACHMENT_STYLE_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
     sourceId: "complement-vocabulary",
     label: "Complement Vocabulary",
     seeds: COMPLEMENT_VOCABULARY_SEEDS,
+  },
+  {
+    sourceId: "conflict-beat-vocabulary",
+    label: "Conflict Beat Vocabulary",
+    seeds: CONFLICT_BEAT_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "conflict-style-vocabulary",
+    label: "Conflict Style Vocabulary",
+    seeds: CONFLICT_STYLE_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "consequence-vocabulary",
+    label: "Consequence Vocabulary",
+    seeds: CONSEQUENCE_VOCABULARY_STANDARD_SEEDS,
   },
   {
     sourceId: "desire-vocabulary",
@@ -100,6 +172,11 @@ export const RICH_STANDARD_VOCABULARY_SEED_COLLECTIONS = Object.freeze([
     sourceId: "image-prompt-vocabulary",
     label: "Image Prompt Vocabulary",
     seeds: IMAGE_PROMPT_VOCABULARY_SEEDS,
+  },
+  {
+    sourceId: "love-language-vocabulary",
+    label: "Love Language Vocabulary",
+    seeds: LOVE_LANGUAGE_VOCABULARY_STANDARD_SEEDS,
   },
   {
     sourceId: "moral-framework-vocabulary",
@@ -127,6 +204,16 @@ export const RICH_STANDARD_VOCABULARY_SEED_COLLECTIONS = Object.freeze([
     seeds: REPAIR_STYLE_VOCABULARY_STANDARD_SEEDS,
   },
   {
+    sourceId: "repair-beat-vocabulary",
+    label: "Repair Beat Vocabulary",
+    seeds: REPAIR_BEAT_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "rupture-type-vocabulary",
+    label: "Rupture Type Vocabulary",
+    seeds: RUPTURE_TYPE_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
     sourceId: "trigger-vocabulary",
     label: "Trigger Vocabulary",
     seeds: TRIGGER_VOCABULARY_STANDARD_SEEDS,
@@ -135,6 +222,36 @@ export const RICH_STANDARD_VOCABULARY_SEED_COLLECTIONS = Object.freeze([
     sourceId: "personality-engine-vocabulary",
     label: "Personality Engine Vocabulary",
     seeds: PERSONALITY_ENGINE_VOCABULARY_SEEDS,
+  },
+  {
+    sourceId: "relationship-dynamic-vocabulary",
+    label: "Relationship Dynamic Vocabulary",
+    seeds: RELATIONSHIP_DYNAMIC_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "relationship-identity-vocabulary",
+    label: "Relationship Identity Vocabulary",
+    seeds: RELATIONSHIP_IDENTITY_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "romance-trope-vocabulary",
+    label: "Romance Trope Vocabulary",
+    seeds: ROMANCE_TROPE_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "route-phase-vocabulary",
+    label: "Route Phase Vocabulary",
+    seeds: ROUTE_PHASE_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "payoff-fantasy-vocabulary",
+    label: "Payoff Fantasy Vocabulary",
+    seeds: PAYOFF_FANTASY_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "growth-arc-vocabulary",
+    label: "Growth Arc Vocabulary",
+    seeds: GROWTH_ARC_VOCABULARY_STANDARD_SEEDS,
   },
   {
     sourceId: "voice-vocabulary",
