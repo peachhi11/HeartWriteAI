@@ -6031,7 +6031,7 @@ function CharacterCreationFormPanel({
       <SearchableSeedPicker
         className="border-violet-500/20 bg-zinc-950/60"
         description="Select a structured seed to prefill editable creator fields or add internal semantic guidance."
-        kinds={["preset", "semantic"]}
+        kinds={["preset", "semantic", "vocabulary"]}
         label="Seed Template Injector"
         lanes={["appearance", "personality", "world", "image", "semantic"]}
         maxResults={8}
@@ -8172,7 +8172,7 @@ function applySeedPickerEntryToCharacterCreationForm(
 ): CharacterCreationForm {
   let nextForm = form;
 
-  if (entry.kind === "semantic") {
+  if (entry.kind === "semantic" || entry.kind === "vocabulary") {
     nextForm = {
       ...nextForm,
       semanticSeedIds: Array.from(new Set([...nextForm.semanticSeedIds, entry.id])),
@@ -8193,6 +8193,10 @@ function applySeedPickerEntryToCharacterCreationForm(
 function resolveCharacterCreationSeedTargetPath(
   entry: SeedPickerEntry,
 ): CharacterCreationFormPath {
+  if (entry.kind === "vocabulary") {
+    return resolveVocabularyCharacterCreationSeedTargetPath(entry);
+  }
+
   if (entry.kind === "semantic") {
     switch (entry.category) {
       case "wounds":
@@ -8252,10 +8256,62 @@ function resolveCharacterCreationSeedTargetPath(
 }
 
 function formatCharacterCreationSeedSnippet(entry: SeedPickerEntry) {
+  if (entry.vocabularySeed) {
+    const seed = entry.vocabularySeed;
+    return [
+      `${seed.label}: ${seed.description}`,
+      seed.examples.length > 0 ? `Examples: ${seed.examples.slice(0, 2).join(" ")}` : "",
+      seed.romanceHooks.length > 0
+        ? `Romance hooks: ${seed.romanceHooks.slice(0, 3).join(", ")}.`
+        : "",
+      seed.scenarioHooks.length > 0
+        ? `Scenario hooks: ${seed.scenarioHooks.slice(0, 3).join(", ")}.`
+        : "",
+    ].filter(Boolean).join("\n");
+  }
+
   const prefix = entry.kind === "semantic" ? entry.label : entry.value;
   const detail = entry.description || entry.guidance;
 
   return detail ? `${prefix}: ${detail}` : prefix;
+}
+
+function resolveVocabularyCharacterCreationSeedTargetPath(
+  entry: SeedPickerEntry,
+): CharacterCreationFormPath {
+  const seed = entry.vocabularySeed;
+  const haystack = [
+    entry.category,
+    entry.label,
+    entry.description,
+    ...entry.tags,
+    ...(seed?.romanceHooks ?? []),
+    ...(seed?.scenarioHooks ?? []),
+  ].join(" ").toLowerCase();
+
+  if (/image|visual|portrait|appearance|face|hair|outfit|clothing/.test(haystack)) {
+    return /outfit|clothing|fashion|fabric|armou?r|jewell?ery/.test(haystack)
+      ? ["appearance", "outfit"]
+      : ["appearance", "facialFeatures"];
+  }
+
+  if (/voice|speech|dialogue|accent|tone/.test(haystack)) {
+    return ["speechCommunication", "toneVocabulary"];
+  }
+
+  if (/origin_wound|wound|fear|shame|abandonment|betrayal/.test(haystack)) {
+    return ["psychology", "coreWound"];
+  }
+
+  if (/moral|ethic|justice|mercy|truth|loyalty|honou?r|duty/.test(haystack)) {
+    return ["behaviour", "moralityInAction"];
+  }
+
+  if (/relationship|romance|dynamic|complement|trope|gate|route/.test(haystack)) {
+    return ["relationships", "emotionalBonds", "attachmentType"];
+  }
+
+  return ["personality", "positiveTraits"];
 }
 
 function appendCharacterCreationSeedText(currentValue: string, nextValue: string) {

@@ -11,8 +11,22 @@ import {
 test("defaults local inference to the DeepSeek R1 Llama distill Ollama tag", () => {
   assert.equal(OLLAMA_DEFAULT_MODEL, "deepseek-r1:8b-llama-distill-q4_K_M");
   assert.equal(INFERENCE_DEFAULT_MATRIX.provider, "ollama");
+  assert.equal(INFERENCE_DEFAULT_MATRIX.contextLength, 8192);
   assert.equal(INFERENCE_DEFAULT_MATRIX.selectedModel, OLLAMA_DEFAULT_MODEL);
   assert.equal(INFERENCE_MODEL_PRESETS[0]?.value, OLLAMA_DEFAULT_MODEL);
+});
+
+test("supports proxy endpoints and clamps context length", () => {
+  const config = normalizeInferenceConfig({
+    ...INFERENCE_DEFAULT_MATRIX,
+    contextLength: 999999,
+    localEndpoint: " http://127.0.0.1:3000/api/chat ",
+    provider: "proxy",
+  });
+
+  assert.equal(config.provider, "proxy");
+  assert.equal(config.contextLength, 262144);
+  assert.equal(config.localEndpoint, "http://127.0.0.1:3000/api/chat");
 });
 
 test("keeps the DeepSeek R1 Ollama tag through model normalization", () => {

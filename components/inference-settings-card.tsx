@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import {
   BrainCircuit,
   Dice5,
+  Gauge,
   type LucideIcon,
   Orbit,
   Repeat2,
@@ -12,6 +13,7 @@ import {
 
 import {
   INFERENCE_DEFAULT_MATRIX,
+  INFERENCE_ENDPOINT_PRESETS,
   INFERENCE_MODEL_PRESETS,
   OPENROUTER_MODEL_PRESETS,
   type InferenceConfig,
@@ -121,14 +123,33 @@ export function InferenceSettingsCard() {
     setOpenRouterModelDraft(nextConfig.openRouterModel);
   }
 
+  function handleProviderChange(provider: InferenceConfig["provider"]) {
+    const endpointPreset = INFERENCE_ENDPOINT_PRESETS.find(
+      (preset) => preset.provider === provider,
+    );
+    const patch: Partial<InferenceConfig> = { provider };
+
+    if (endpointPreset) {
+      patch.localEndpoint = endpointPreset.value;
+      setEndpointDraft(endpointPreset.value);
+    }
+
+    updateConfig(patch);
+  }
+
   const hasPresetOpenRouterModel = OPENROUTER_MODEL_PRESETS.some(
     (model) => model.value === config.openRouterModel,
   );
   const hasPresetLocalModel = INFERENCE_MODEL_PRESETS.some(
     (model) => model.value === config.selectedModel,
   );
-  const isLocalProvider =
-    config.provider === "ollama" || config.provider === "openai-compatible";
+  const usesEndpoint =
+    config.provider === "ollama" ||
+    config.provider === "openai-compatible" ||
+    config.provider === "proxy";
+  const matchingEndpointPresets = INFERENCE_ENDPOINT_PRESETS.filter(
+    (preset) => preset.provider === config.provider,
+  );
 
   return (
     <section className="grid gap-4 rounded-2xl border border-border/70 bg-background/60 p-4 shadow-xl backdrop-blur-sm">
@@ -152,25 +173,26 @@ export function InferenceSettingsCard() {
           <select
             className="h-9 rounded-lg border border-border/70 bg-background px-2 font-mono text-[10px] text-foreground outline-none transition focus:border-user-primary/70"
             onChange={(event) =>
-              updateConfig({
-                provider: event.currentTarget.value as InferenceConfig["provider"],
-              })
+              handleProviderChange(
+                event.currentTarget.value as InferenceConfig["provider"],
+              )
             }
             value={config.provider}
           >
             <option value="ollama">Ollama Local</option>
             <option value="openai-compatible">OpenAI-Compatible Local</option>
+            <option value="proxy">Proxy / API</option>
             <option value="openrouter">OpenRouter</option>
           </select>
         </label>
       </header>
 
       <div className="grid gap-4">
-        {isLocalProvider ? (
+        {usesEndpoint ? (
           <div className="grid gap-3 rounded-xl border border-border/70 bg-background/60 p-3">
             <label className="grid gap-1">
               <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
-                Local AI Model
+                {config.provider === "proxy" ? "Proxy Model" : "Local AI Model"}
               </span>
               <select
                 className="h-9 rounded-lg border border-border/70 bg-background px-2 font-mono text-[10px] text-foreground outline-none transition focus:border-user-primary/70"
@@ -259,33 +281,60 @@ export function InferenceSettingsCard() {
           </div>
         )}
 
-        {isLocalProvider ? (
-          <label className="grid gap-1">
-            <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
-              Local Endpoint
-            </span>
-            <input
-              className="h-9 rounded-lg border border-border/70 bg-background px-2 font-mono text-[10px] text-foreground outline-none transition focus:border-user-primary/70"
-              onBlur={commitEndpointDraft}
-              onChange={(event) => setEndpointDraft(event.currentTarget.value)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") {
-                  event.currentTarget.blur();
+        {usesEndpoint ? (
+          <div className="grid gap-2">
+            <div className="flex flex-wrap gap-1.5">
+              {matchingEndpointPresets.map((preset) => (
+                <button
+                  key={`${preset.provider}:${preset.value}`}
+                  type="button"
+                  onClick={() => {
+                    setEndpointDraft(preset.value);
+                    updateConfig({ localEndpoint: preset.value });
+                  }}
+                  className={cn(
+                    "rounded-md border px-2 py-1 text-[10px] font-semibold transition",
+                    config.localEndpoint === preset.value
+                      ? "border-user-primary/60 bg-user-primary/10 text-user-primary"
+                      : "border-border/70 bg-background/70 text-muted-foreground hover:border-user-primary/50 hover:text-foreground",
+                  )}
+                  title={preset.description}
+                >
+                  {preset.label}
+                </button>
+              ))}
+            </div>
+            <label className="grid gap-1">
+              <span className="text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
+                Endpoint
+              </span>
+              <input
+                className="h-9 rounded-lg border border-border/70 bg-background px-2 font-mono text-[10px] text-foreground outline-none transition focus:border-user-primary/70"
+                onBlur={commitEndpointDraft}
+                onChange={(event) => setEndpointDraft(event.currentTarget.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    event.currentTarget.blur();
+                  }
+                }}
+                placeholder={
+                  config.provider === "openai-compatible"
+                    ? "http://127.0.0.1:1234/v1"
+                    : config.provider === "proxy"
+                      ? "http://127.0.0.1:3000/api/chat"
+                      : "http://127.0.0.1:11434/api/chat"
                 }
-              }}
-              placeholder={
-                config.provider === "openai-compatible"
-                  ? "http://127.0.0.1:1234/v1"
-                  : "http://127.0.0.1:11434/api/chat"
-              }
-              value={endpointDraft}
-            />
-            <span className="text-[10px] text-muted-foreground">
-              {config.provider === "openai-compatible"
-                ? "Use a local or private-network OpenAI-compatible base URL, such as LM Studio /v1."
-                : "Use another local Ollama port if another app is occupying 11434."}
-            </span>
-          </label>
+                value={endpointDraft}
+              />
+              <span className="text-[10px] text-muted-foreground">
+                {config.provider === "openai-compatible"
+                  ? "Use a local or private-network OpenAI-compatible base URL, such as LM Studio /v1."
+                  : config.provider === "proxy"
+                    ? "Use an approved local/private backend or API proxy endpoint."
+                    : "Use another local Ollama port if another app is occupying 11434."}
+              </span>
+            </label>
+          </div>
         ) : null}
 
         {config.provider !== "openrouter" ? null : (
@@ -344,6 +393,18 @@ export function InferenceSettingsCard() {
           step={16}
           value={config.maxTokens}
           valueLabel={`${config.maxTokens} tokens`}
+        />
+        <InferenceSlider
+          highLabel="Large"
+          icon={Gauge}
+          label="Context Window"
+          lowLabel="Small"
+          max={262144}
+          min={1024}
+          onChange={(contextLength) => updateConfig({ contextLength })}
+          step={1024}
+          value={config.contextLength}
+          valueLabel={`${config.contextLength.toLocaleString()} tokens`}
         />
         <InferenceSlider
           highLabel="Strict"

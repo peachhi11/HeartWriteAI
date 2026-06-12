@@ -243,6 +243,349 @@ export interface DesireSeedInput {
   metadata?: Partial<DesireSeedMetadata>;
 }
 
+export type HiddenNeedSeedType =
+  | "safety"
+  | "attachment"
+  | "belonging"
+  | "recognition"
+  | "autonomy"
+  | "boundaries"
+  | "rest"
+  | "truth"
+  | "repair"
+  | "touch"
+  | "validation"
+  | "mutuality"
+  | "acceptance";
+
+export type HiddenNeedUrgency = "soft" | "moderate" | "strong" | "core";
+export type HiddenNeedPacingPressure = "low" | "medium" | "high";
+
+export interface HiddenNeedSeedMetadata {
+  category: "hidden_need";
+  urgency: HiddenNeedUrgency;
+  romanceValue: number;
+  conflictPotential: number;
+  healingValue: number;
+  pacingPressure: HiddenNeedPacingPressure;
+}
+
+export interface HiddenNeedSeed {
+  seed: string;
+  label: string;
+  description: string;
+  examples: readonly string[];
+  tags: readonly string[];
+  relatedSeeds: readonly string[];
+  oppositeSeeds: readonly string[];
+  romanceHooks: readonly string[];
+  scenarioHooks: readonly string[];
+  dialoguePatterns: readonly string[];
+  needType: HiddenNeedSeedType;
+  masksAs: readonly string[];
+  createdByWounds: readonly string[];
+  drivenByFears: readonly string[];
+  expressedAsDesires: readonly string[];
+  activatedByTriggers: readonly string[];
+  commonResponses: readonly string[];
+  loveLanguages: readonly string[];
+  compatibleRepairStyles: readonly string[];
+  growthArcs: readonly string[];
+  unmetConsequences: readonly string[];
+  fulfillmentSignals: readonly string[];
+  routeGates: readonly string[];
+  milestoneMemories: readonly string[];
+  metadata: HiddenNeedSeedMetadata;
+}
+
+export interface HiddenNeedSeedInput {
+  seed: string;
+  label: string;
+  description: string;
+  examples?: readonly string[];
+  tags?: readonly string[];
+  relatedSeeds?: readonly string[];
+  oppositeSeeds?: readonly string[];
+  romanceHooks?: readonly string[];
+  scenarioHooks?: readonly string[];
+  dialoguePatterns?: readonly string[];
+  needType: HiddenNeedSeedType;
+  masksAs?: readonly string[];
+  createdByWounds?: readonly string[];
+  drivenByFears?: readonly string[];
+  expressedAsDesires?: readonly string[];
+  activatedByTriggers?: readonly string[];
+  commonResponses?: readonly string[];
+  loveLanguages?: readonly string[];
+  compatibleRepairStyles?: readonly string[];
+  growthArcs?: readonly string[];
+  unmetConsequences?: readonly string[];
+  fulfillmentSignals?: readonly string[];
+  routeGates?: readonly string[];
+  milestoneMemories?: readonly string[];
+  metadata?: Partial<HiddenNeedSeedMetadata>;
+}
+
+export type EmotionalMeaningSeedType =
+  | "attention"
+  | "safety"
+  | "choice"
+  | "reassurance"
+  | "devotion"
+  | "care"
+  | "respect"
+  | "validation"
+  | "belonging"
+  | "repair"
+  | "presence"
+  | "home";
+
+export type EmotionalMeaningSubtlety = "low" | "medium" | "high";
+
+export interface EmotionalMeaningSeedMetadata {
+  category: "emotional_meaning";
+  subtlety: EmotionalMeaningSubtlety;
+  romanceValue: number;
+  healingValue: number;
+  conflictPotential: number;
+  intimacyValue: number;
+}
+
+export interface EmotionalMeaningSeed {
+  seed: string;
+  label: string;
+  description: string;
+  examples: readonly string[];
+  tags: readonly string[];
+  relatedSeeds: readonly string[];
+  oppositeSeeds: readonly string[];
+  romanceHooks: readonly string[];
+  scenarioHooks: readonly string[];
+  dialoguePatterns: readonly string[];
+  meaningType: EmotionalMeaningSeedType;
+  expressedThrough: readonly string[];
+  oftenMisreadAs: readonly string[];
+  hiddenNeedMet: readonly string[];
+  associatedWounds: readonly string[];
+  associatedFears: readonly string[];
+  associatedDesires: readonly string[];
+  compatibleLoveLanguages: readonly string[];
+  compatibleVisibleBehaviors: readonly string[];
+  triggerWhenAbsent: readonly string[];
+  likelyResponsesWhenAbsent: readonly string[];
+  repairStyles: readonly string[];
+  growthArcs: readonly string[];
+  payoffFantasies: readonly string[];
+  relationshipIdentities: readonly string[];
+  routeGates: readonly string[];
+  milestoneMemories: readonly string[];
+  metadata: EmotionalMeaningSeedMetadata;
+}
+
+export interface EmotionalMeaningSeedInput {
+  seed: string;
+  label: string;
+  description: string;
+  examples?: readonly string[];
+  tags?: readonly string[];
+  relatedSeeds?: readonly string[];
+  oppositeSeeds?: readonly string[];
+  romanceHooks?: readonly string[];
+  scenarioHooks?: readonly string[];
+  dialoguePatterns?: readonly string[];
+  meaningType: EmotionalMeaningSeedType;
+  expressedThrough?: readonly string[];
+  oftenMisreadAs?: readonly string[];
+  hiddenNeedMet?: readonly string[];
+  associatedWounds?: readonly string[];
+  associatedFears?: readonly string[];
+  associatedDesires?: readonly string[];
+  compatibleLoveLanguages?: readonly string[];
+  compatibleVisibleBehaviors?: readonly string[];
+  triggerWhenAbsent?: readonly string[];
+  likelyResponsesWhenAbsent?: readonly string[];
+  repairStyles?: readonly string[];
+  growthArcs?: readonly string[];
+  payoffFantasies?: readonly string[];
+  relationshipIdentities?: readonly string[];
+  routeGates?: readonly string[];
+  milestoneMemories?: readonly string[];
+  metadata?: Partial<EmotionalMeaningSeedMetadata>;
+}
+
+export type RepairNeedSeedType =
+  | "reassurance"
+  | "accountability"
+  | "behavior_change"
+  | "truth"
+  | "validation"
+  | "presence"
+  | "return"
+  | "consistency"
+  | "boundary"
+  | "choice"
+  | "dignity"
+  | "loyalty"
+  | "comfort"
+  | "space"
+  | "time"
+  | "action"
+  | "vulnerability"
+  | "recommitment";
+
+export type RepairNeedUrgency = "low" | "medium" | "high" | "critical";
+
+export interface RepairNeedSeedMetadata {
+  category: "repair_need";
+  urgency: RepairNeedUrgency;
+  repairPower: number;
+  trustRepairValue: number;
+  attachmentRepairValue: number;
+  healingValue: number;
+}
+
+export interface RepairNeedSeed {
+  seed: string;
+  label: string;
+  description: string;
+  examples: readonly string[];
+  tags: readonly string[];
+  relatedSeeds: readonly string[];
+  oppositeSeeds: readonly string[];
+  romanceHooks: readonly string[];
+  scenarioHooks: readonly string[];
+  dialoguePatterns: readonly string[];
+  needType: RepairNeedSeedType;
+  repairsConsequences: readonly string[];
+  repairsRuptures: readonly string[];
+  activatedByWounds: readonly string[];
+  activatedByFears: readonly string[];
+  frustratedDesires: readonly string[];
+  compatibleRepairStyles: readonly string[];
+  compatibleRepairBeats: readonly string[];
+  incompatibleRepairs: readonly string[];
+  requiredConditions: readonly string[];
+  fulfillmentSignals: readonly string[];
+  failureModes: readonly string[];
+  growthArcs: readonly string[];
+  routeGates: readonly string[];
+  milestoneMemories: readonly string[];
+  metadata: RepairNeedSeedMetadata;
+}
+
+export interface RepairNeedSeedInput {
+  seed: string;
+  label: string;
+  description: string;
+  examples?: readonly string[];
+  tags?: readonly string[];
+  relatedSeeds?: readonly string[];
+  oppositeSeeds?: readonly string[];
+  romanceHooks?: readonly string[];
+  scenarioHooks?: readonly string[];
+  dialoguePatterns?: readonly string[];
+  needType: RepairNeedSeedType;
+  repairsConsequences?: readonly string[];
+  repairsRuptures?: readonly string[];
+  activatedByWounds?: readonly string[];
+  activatedByFears?: readonly string[];
+  frustratedDesires?: readonly string[];
+  compatibleRepairStyles?: readonly string[];
+  compatibleRepairBeats?: readonly string[];
+  incompatibleRepairs?: readonly string[];
+  requiredConditions?: readonly string[];
+  fulfillmentSignals?: readonly string[];
+  failureModes?: readonly string[];
+  growthArcs?: readonly string[];
+  routeGates?: readonly string[];
+  milestoneMemories?: readonly string[];
+  metadata?: Partial<RepairNeedSeedMetadata>;
+}
+
+export type RouteGateSeedType =
+  | "opening"
+  | "trust"
+  | "boundary"
+  | "reassurance"
+  | "vulnerability"
+  | "conflict"
+  | "rupture"
+  | "repair"
+  | "choice"
+  | "confession"
+  | "commitment"
+  | "integration"
+  | "payoff";
+
+export type RouteGateImportance = "minor" | "moderate" | "major" | "critical";
+
+export interface RouteGateSeedMetadata {
+  category: "route_gate";
+  importance: RouteGateImportance;
+  romanceValue: number;
+  angstValue: number;
+  healingValue: number;
+  routeProgressValue: number;
+}
+
+export interface RouteGateSeed {
+  seed: string;
+  label: string;
+  description: string;
+  examples: readonly string[];
+  tags: readonly string[];
+  relatedSeeds: readonly string[];
+  oppositeSeeds: readonly string[];
+  romanceHooks: readonly string[];
+  scenarioHooks: readonly string[];
+  dialoguePatterns: readonly string[];
+  gateType: RouteGateSeedType;
+  unlocksRoutePhases: readonly string[];
+  requiredBefore: readonly string[];
+  blockedBy: readonly string[];
+  activatedByWounds: readonly string[];
+  activatedByFears: readonly string[];
+  fulfillsDesires: readonly string[];
+  satisfiesHiddenNeeds: readonly string[];
+  likelyTriggers: readonly string[];
+  likelyResponses: readonly string[];
+  compatibleRepairBeats: readonly string[];
+  compatibleGrowthArcs: readonly string[];
+  successSignals: readonly string[];
+  failureSignals: readonly string[];
+  milestoneMemories: readonly string[];
+  metadata: RouteGateSeedMetadata;
+}
+
+export interface RouteGateSeedInput {
+  seed: string;
+  label: string;
+  description: string;
+  examples?: readonly string[];
+  tags?: readonly string[];
+  relatedSeeds?: readonly string[];
+  oppositeSeeds?: readonly string[];
+  romanceHooks?: readonly string[];
+  scenarioHooks?: readonly string[];
+  dialoguePatterns?: readonly string[];
+  gateType: RouteGateSeedType;
+  unlocksRoutePhases?: readonly string[];
+  requiredBefore?: readonly string[];
+  blockedBy?: readonly string[];
+  activatedByWounds?: readonly string[];
+  activatedByFears?: readonly string[];
+  fulfillsDesires?: readonly string[];
+  satisfiesHiddenNeeds?: readonly string[];
+  likelyTriggers?: readonly string[];
+  likelyResponses?: readonly string[];
+  compatibleRepairBeats?: readonly string[];
+  compatibleGrowthArcs?: readonly string[];
+  successSignals?: readonly string[];
+  failureSignals?: readonly string[];
+  milestoneMemories?: readonly string[];
+  metadata?: Partial<RouteGateSeedMetadata>;
+}
+
 export type TriggerSeedType =
   | "attachment"
   | "rejection"
@@ -1243,6 +1586,93 @@ export interface LoveLanguageSeedInput {
   growthArcs?: readonly string[];
   routeGates?: readonly string[];
   metadata?: Partial<LoveLanguageSeedMetadata>;
+}
+
+export type VisibleBehaviorSeedType =
+  | "domestic"
+  | "protective"
+  | "caretaking"
+  | "practical"
+  | "ritual"
+  | "reassurance"
+  | "devotional"
+  | "attention"
+  | "touch"
+  | "communication"
+  | "repair"
+  | "public_loyalty";
+
+export type VisibleBehaviorSubtlety = "low" | "medium" | "high";
+export type VisibleBehaviorRepeatability = "one_off" | "recurring" | "ritual";
+
+export interface VisibleBehaviorSeedMetadata {
+  category: "visible_behavior";
+  subtlety: VisibleBehaviorSubtlety;
+  romanceValue: number;
+  intimacyValue: number;
+  healingValue: number;
+  conflictPotential: number;
+  repeatability: VisibleBehaviorRepeatability;
+}
+
+export interface VisibleBehaviorSeed {
+  seed: string;
+  label: string;
+  description: string;
+  examples: readonly string[];
+  tags: readonly string[];
+  relatedSeeds: readonly string[];
+  oppositeSeeds: readonly string[];
+  romanceHooks: readonly string[];
+  scenarioHooks: readonly string[];
+  dialoguePatterns: readonly string[];
+  behaviorType: VisibleBehaviorSeedType;
+  emotionalMeaning: string;
+  hiddenMotivation: string;
+  loveLanguageSource: readonly string[];
+  associatedWounds: readonly string[];
+  associatedFears: readonly string[];
+  associatedDesires: readonly string[];
+  associatedDynamics: readonly string[];
+  activatedBy: readonly string[];
+  fulfillmentSignals: readonly string[];
+  misreadRisks: readonly string[];
+  conflictRisks: readonly string[];
+  repairStyles: readonly string[];
+  growthArcs: readonly string[];
+  routeGates: readonly string[];
+  milestoneMemories: readonly string[];
+  metadata: VisibleBehaviorSeedMetadata;
+}
+
+export interface VisibleBehaviorSeedInput {
+  seed: string;
+  label: string;
+  description: string;
+  examples?: readonly string[];
+  tags?: readonly string[];
+  relatedSeeds?: readonly string[];
+  oppositeSeeds?: readonly string[];
+  romanceHooks?: readonly string[];
+  scenarioHooks?: readonly string[];
+  dialoguePatterns?: readonly string[];
+  behaviorType: VisibleBehaviorSeedType;
+  emotionalMeaning: string;
+  hiddenMotivation: string;
+  loveLanguageSource?: readonly string[];
+  associatedWounds?: readonly string[];
+  associatedFears?: readonly string[];
+  associatedDesires?: readonly string[];
+  associatedDynamics?: readonly string[];
+  activatedBy?: readonly string[];
+  fulfillmentSignals?: readonly string[];
+  misreadRisks?: readonly string[];
+  conflictRisks?: readonly string[];
+  repairStyles?: readonly string[];
+  growthArcs?: readonly string[];
+  routeGates?: readonly string[];
+  milestoneMemories?: readonly string[];
+  metadata?: Partial<VisibleBehaviorSeedMetadata>;
 }
 
 export type GrowthArcSeedType =
@@ -2485,6 +2915,249 @@ export function createLoveLanguageSeedPreset(
       healingValue: clampScore(input.metadata?.healingValue ?? 8),
       conflictPotential: clampScore(input.metadata?.conflictPotential ?? 5),
       pacingPressure: input.metadata?.pacingPressure ?? "medium",
+    },
+  };
+}
+
+export function createHiddenNeedSeedPreset(
+  input: HiddenNeedSeedInput,
+): HiddenNeedSeed {
+  const base = createVocabularySeedPreset({
+    seed: input.seed,
+    label: input.label,
+    description: input.description,
+    examples: input.examples,
+    tags: input.tags,
+    relatedSeeds: input.relatedSeeds,
+    oppositeSeeds: input.oppositeSeeds,
+    romanceHooks: input.romanceHooks,
+    scenarioHooks: input.scenarioHooks,
+    dialoguePatterns: input.dialoguePatterns,
+    metadata: {
+      romanceValue: input.metadata?.romanceValue,
+      conflictPotential: input.metadata?.conflictPotential,
+    },
+  });
+
+  return {
+    ...base,
+    needType: input.needType,
+    masksAs: uniqueText(input.masksAs ?? []),
+    createdByWounds: uniqueText(input.createdByWounds ?? []),
+    drivenByFears: uniqueText(input.drivenByFears ?? []),
+    expressedAsDesires: uniqueText(input.expressedAsDesires ?? []),
+    activatedByTriggers: uniqueText(input.activatedByTriggers ?? []),
+    commonResponses: uniqueText(input.commonResponses ?? []),
+    loveLanguages: uniqueText(input.loveLanguages ?? []),
+    compatibleRepairStyles: uniqueText(input.compatibleRepairStyles ?? []),
+    growthArcs: uniqueText(input.growthArcs ?? []),
+    unmetConsequences: uniqueText(input.unmetConsequences ?? []),
+    fulfillmentSignals: uniqueText(input.fulfillmentSignals ?? []),
+    routeGates: uniqueText(input.routeGates ?? []),
+    milestoneMemories: uniqueText(input.milestoneMemories ?? []),
+    metadata: {
+      category: "hidden_need",
+      urgency: input.metadata?.urgency ?? "moderate",
+      romanceValue: clampScore(input.metadata?.romanceValue ?? 8),
+      conflictPotential: clampScore(input.metadata?.conflictPotential ?? 6),
+      healingValue: clampScore(input.metadata?.healingValue ?? 8),
+      pacingPressure: input.metadata?.pacingPressure ?? "medium",
+    },
+  };
+}
+
+export function createEmotionalMeaningSeedPreset(
+  input: EmotionalMeaningSeedInput,
+): EmotionalMeaningSeed {
+  const base = createVocabularySeedPreset({
+    seed: input.seed,
+    label: input.label,
+    description: input.description,
+    examples: input.examples,
+    tags: input.tags,
+    relatedSeeds: input.relatedSeeds,
+    oppositeSeeds: input.oppositeSeeds,
+    romanceHooks: input.romanceHooks,
+    scenarioHooks: input.scenarioHooks,
+    dialoguePatterns: input.dialoguePatterns,
+    metadata: {
+      romanceValue: input.metadata?.romanceValue,
+      conflictPotential: input.metadata?.conflictPotential,
+    },
+  });
+
+  return {
+    ...base,
+    meaningType: input.meaningType,
+    expressedThrough: uniqueText(input.expressedThrough ?? []),
+    oftenMisreadAs: uniqueText(input.oftenMisreadAs ?? []),
+    hiddenNeedMet: uniqueText(input.hiddenNeedMet ?? []),
+    associatedWounds: uniqueText(input.associatedWounds ?? []),
+    associatedFears: uniqueText(input.associatedFears ?? []),
+    associatedDesires: uniqueText(input.associatedDesires ?? []),
+    compatibleLoveLanguages: uniqueText(input.compatibleLoveLanguages ?? []),
+    compatibleVisibleBehaviors: uniqueText(input.compatibleVisibleBehaviors ?? []),
+    triggerWhenAbsent: uniqueText(input.triggerWhenAbsent ?? []),
+    likelyResponsesWhenAbsent: uniqueText(input.likelyResponsesWhenAbsent ?? []),
+    repairStyles: uniqueText(input.repairStyles ?? []),
+    growthArcs: uniqueText(input.growthArcs ?? []),
+    payoffFantasies: uniqueText(input.payoffFantasies ?? []),
+    relationshipIdentities: uniqueText(input.relationshipIdentities ?? []),
+    routeGates: uniqueText(input.routeGates ?? []),
+    milestoneMemories: uniqueText(input.milestoneMemories ?? []),
+    metadata: {
+      category: "emotional_meaning",
+      subtlety: input.metadata?.subtlety ?? "medium",
+      romanceValue: clampScore(input.metadata?.romanceValue ?? 8),
+      healingValue: clampScore(input.metadata?.healingValue ?? 8),
+      conflictPotential: clampScore(input.metadata?.conflictPotential ?? 5),
+      intimacyValue: clampScore(input.metadata?.intimacyValue ?? 8),
+    },
+  };
+}
+
+export function createRepairNeedSeedPreset(
+  input: RepairNeedSeedInput,
+): RepairNeedSeed {
+  const base = createVocabularySeedPreset({
+    seed: input.seed,
+    label: input.label,
+    description: input.description,
+    examples: input.examples,
+    tags: input.tags,
+    relatedSeeds: input.relatedSeeds,
+    oppositeSeeds: input.oppositeSeeds,
+    romanceHooks: input.romanceHooks,
+    scenarioHooks: input.scenarioHooks,
+    dialoguePatterns: input.dialoguePatterns,
+    metadata: {
+      romanceValue: input.metadata?.repairPower,
+      conflictPotential: 11 - (input.metadata?.healingValue ?? 8),
+    },
+  });
+
+  return {
+    ...base,
+    needType: input.needType,
+    repairsConsequences: uniqueText(input.repairsConsequences ?? []),
+    repairsRuptures: uniqueText(input.repairsRuptures ?? []),
+    activatedByWounds: uniqueText(input.activatedByWounds ?? []),
+    activatedByFears: uniqueText(input.activatedByFears ?? []),
+    frustratedDesires: uniqueText(input.frustratedDesires ?? []),
+    compatibleRepairStyles: uniqueText(input.compatibleRepairStyles ?? []),
+    compatibleRepairBeats: uniqueText(input.compatibleRepairBeats ?? []),
+    incompatibleRepairs: uniqueText(input.incompatibleRepairs ?? []),
+    requiredConditions: uniqueText(input.requiredConditions ?? []),
+    fulfillmentSignals: uniqueText(input.fulfillmentSignals ?? []),
+    failureModes: uniqueText(input.failureModes ?? []),
+    growthArcs: uniqueText(input.growthArcs ?? []),
+    routeGates: uniqueText(input.routeGates ?? []),
+    milestoneMemories: uniqueText(input.milestoneMemories ?? []),
+    metadata: {
+      category: "repair_need",
+      urgency: input.metadata?.urgency ?? "medium",
+      repairPower: clampScore(input.metadata?.repairPower ?? 8),
+      trustRepairValue: clampScore(input.metadata?.trustRepairValue ?? 8),
+      attachmentRepairValue: clampScore(input.metadata?.attachmentRepairValue ?? 8),
+      healingValue: clampScore(input.metadata?.healingValue ?? 8),
+    },
+  };
+}
+
+export function createRouteGateSeedPreset(
+  input: RouteGateSeedInput,
+): RouteGateSeed {
+  const base = createVocabularySeedPreset({
+    seed: input.seed,
+    label: input.label,
+    description: input.description,
+    examples: input.examples,
+    tags: input.tags,
+    relatedSeeds: input.relatedSeeds,
+    oppositeSeeds: input.oppositeSeeds,
+    romanceHooks: input.romanceHooks,
+    scenarioHooks: input.scenarioHooks,
+    dialoguePatterns: input.dialoguePatterns,
+    metadata: {
+      romanceValue: input.metadata?.romanceValue,
+      conflictPotential: input.metadata?.angstValue,
+    },
+  });
+
+  return {
+    ...base,
+    gateType: input.gateType,
+    unlocksRoutePhases: uniqueText(input.unlocksRoutePhases ?? []),
+    requiredBefore: uniqueText(input.requiredBefore ?? []),
+    blockedBy: uniqueText(input.blockedBy ?? []),
+    activatedByWounds: uniqueText(input.activatedByWounds ?? []),
+    activatedByFears: uniqueText(input.activatedByFears ?? []),
+    fulfillsDesires: uniqueText(input.fulfillsDesires ?? []),
+    satisfiesHiddenNeeds: uniqueText(input.satisfiesHiddenNeeds ?? []),
+    likelyTriggers: uniqueText(input.likelyTriggers ?? []),
+    likelyResponses: uniqueText(input.likelyResponses ?? []),
+    compatibleRepairBeats: uniqueText(input.compatibleRepairBeats ?? []),
+    compatibleGrowthArcs: uniqueText(input.compatibleGrowthArcs ?? []),
+    successSignals: uniqueText(input.successSignals ?? []),
+    failureSignals: uniqueText(input.failureSignals ?? []),
+    milestoneMemories: uniqueText(input.milestoneMemories ?? []),
+    metadata: {
+      category: "route_gate",
+      importance: input.metadata?.importance ?? "moderate",
+      romanceValue: clampScore(input.metadata?.romanceValue ?? 7),
+      angstValue: clampScore(input.metadata?.angstValue ?? 6),
+      healingValue: clampScore(input.metadata?.healingValue ?? 7),
+      routeProgressValue: clampScore(input.metadata?.routeProgressValue ?? 7),
+    },
+  };
+}
+
+export function createVisibleBehaviorSeedPreset(
+  input: VisibleBehaviorSeedInput,
+): VisibleBehaviorSeed {
+  const base = createVocabularySeedPreset({
+    seed: input.seed,
+    label: input.label,
+    description: input.description,
+    examples: input.examples,
+    tags: input.tags,
+    relatedSeeds: input.relatedSeeds,
+    oppositeSeeds: input.oppositeSeeds,
+    romanceHooks: input.romanceHooks,
+    scenarioHooks: input.scenarioHooks,
+    dialoguePatterns: input.dialoguePatterns,
+    metadata: {
+      romanceValue: input.metadata?.romanceValue,
+      conflictPotential: input.metadata?.conflictPotential,
+    },
+  });
+
+  return {
+    ...base,
+    behaviorType: input.behaviorType,
+    emotionalMeaning: input.emotionalMeaning,
+    hiddenMotivation: input.hiddenMotivation,
+    loveLanguageSource: uniqueText(input.loveLanguageSource ?? []),
+    associatedWounds: uniqueText(input.associatedWounds ?? []),
+    associatedFears: uniqueText(input.associatedFears ?? []),
+    associatedDesires: uniqueText(input.associatedDesires ?? []),
+    associatedDynamics: uniqueText(input.associatedDynamics ?? []),
+    activatedBy: uniqueText(input.activatedBy ?? []),
+    fulfillmentSignals: uniqueText(input.fulfillmentSignals ?? []),
+    misreadRisks: uniqueText(input.misreadRisks ?? []),
+    conflictRisks: uniqueText(input.conflictRisks ?? []),
+    repairStyles: uniqueText(input.repairStyles ?? []),
+    growthArcs: uniqueText(input.growthArcs ?? []),
+    routeGates: uniqueText(input.routeGates ?? []),
+    milestoneMemories: uniqueText(input.milestoneMemories ?? []),
+    metadata: {
+      category: "visible_behavior",
+      subtlety: input.metadata?.subtlety ?? "medium",
+      romanceValue: clampScore(input.metadata?.romanceValue ?? 8),
+      intimacyValue: clampScore(input.metadata?.intimacyValue ?? 8),
+      healingValue: clampScore(input.metadata?.healingValue ?? 8),
+      conflictPotential: clampScore(input.metadata?.conflictPotential ?? 4),
+      repeatability: input.metadata?.repeatability ?? "recurring",
     },
   };
 }

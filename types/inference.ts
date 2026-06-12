@@ -1,6 +1,11 @@
-export type InferenceProvider = "ollama" | "openai-compatible" | "openrouter";
+export type InferenceProvider =
+  | "ollama"
+  | "openai-compatible"
+  | "openrouter"
+  | "proxy";
 
 export interface InferenceConfig {
+  contextLength: number;
   frequencyPenalty: number;
   localEndpoint: string;
   maxTokens: number;
@@ -17,6 +22,7 @@ export const OLLAMA_DEFAULT_MODEL = "deepseek-r1:8b-llama-distill-q4_K_M";
 export const OPENAI_COMPATIBLE_DEFAULT_MODEL = "local-model";
 
 export const INFERENCE_DEFAULT_MATRIX: InferenceConfig = {
+  contextLength: 8192,
   frequencyPenalty: 0,
   localEndpoint: "http://127.0.0.1:11434/api/chat",
   maxTokens: 256,
@@ -44,6 +50,38 @@ export const OPENROUTER_MODEL_PRESETS = [
   { label: "MythoMax L2 13B", value: "gryphe/mythomax-l2-13b" },
 ] as const;
 
+export const INFERENCE_ENDPOINT_PRESETS = [
+  {
+    description: "Native Ollama chat endpoint on this machine.",
+    label: "Ollama local",
+    provider: "ollama",
+    value: "http://127.0.0.1:11434/api/chat",
+  },
+  {
+    description: "LM Studio or another OpenAI-compatible server on this machine.",
+    label: "LM Studio local",
+    provider: "openai-compatible",
+    value: "http://127.0.0.1:1234/v1",
+  },
+  {
+    description: "OpenAI-compatible server on your private LAN.",
+    label: "LM Studio LAN",
+    provider: "openai-compatible",
+    value: "http://10.0.0.18:1234/v1",
+  },
+  {
+    description: "Local app/backend proxy that accepts chat completion payloads.",
+    label: "Local proxy",
+    provider: "proxy",
+    value: "http://127.0.0.1:3000/api/chat",
+  },
+] as const satisfies ReadonlyArray<{
+  description: string;
+  label: string;
+  provider: Exclude<InferenceProvider, "openrouter">;
+  value: string;
+}>;
+
 export function normalizeInferenceConfig(value: unknown): InferenceConfig {
   if (!value || typeof value !== "object") {
     return INFERENCE_DEFAULT_MATRIX;
@@ -52,6 +90,12 @@ export function normalizeInferenceConfig(value: unknown): InferenceConfig {
   const candidate = value as Partial<InferenceConfig>;
 
   return {
+    contextLength: clampInteger(
+      candidate.contextLength,
+      1024,
+      262144,
+      INFERENCE_DEFAULT_MATRIX.contextLength,
+    ),
     frequencyPenalty: clampFloat(
       candidate.frequencyPenalty,
       0,
@@ -82,7 +126,8 @@ export function normalizeInferenceConfig(value: unknown): InferenceConfig {
     provider:
       candidate.provider === "openrouter" ||
       candidate.provider === "ollama" ||
-      candidate.provider === "openai-compatible"
+      candidate.provider === "openai-compatible" ||
+      candidate.provider === "proxy"
         ? candidate.provider
         : INFERENCE_DEFAULT_MATRIX.provider,
     selectedModel:

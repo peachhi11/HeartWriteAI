@@ -752,7 +752,7 @@ export function PersonaGenerationPage() {
 
               <SearchableSeedPicker
                 description="Add registry or semantic seeds into editable persona fields before generating."
-                kinds={["preset", "semantic"]}
+                kinds={["preset", "semantic", "vocabulary"]}
                 label="Persona Seed Picker"
                 lanes={["personality", "world", "metadata", "semantic"]}
                 maxResults={8}
@@ -2338,6 +2338,27 @@ function joinInlineList(currentValue: string, value: string) {
 }
 
 function resolvePersonaSeedFieldKey(entry: SeedPickerEntry): PersonaStarterFieldKey {
+  if (entry.kind === "vocabulary") {
+    const haystack = [
+      entry.category,
+      entry.label,
+      entry.description,
+      ...entry.tags,
+      ...(entry.vocabularySeed?.romanceHooks ?? []),
+      ...(entry.vocabularySeed?.scenarioHooks ?? []),
+    ].join(" ").toLowerCase();
+
+    if (/appearance|image|visual|portrait|outfit|clothing/.test(haystack)) {
+      return "appearance";
+    }
+    if (/relationship|romance|dynamic|trope|world|scenario|setting/.test(haystack)) {
+      return "scenario";
+    }
+    if (/tag|metadata|moral|ethic/.test(haystack)) {
+      return "basicInfo";
+    }
+  }
+
   if (entry.lane === "appearance" || entry.lane === "image") {
     return "appearance";
   }
@@ -2363,6 +2384,17 @@ function resolvePersonaSeedFieldKey(entry: SeedPickerEntry): PersonaStarterField
 }
 
 function formatPersonaSeedText(entry: SeedPickerEntry) {
+  if (entry.vocabularySeed) {
+    const seed = entry.vocabularySeed;
+    return [
+      `${seed.label}: ${seed.description}`,
+      seed.examples[0] ? `Example: ${seed.examples[0]}` : "",
+      seed.romanceHooks.length > 0
+        ? `Hooks: ${seed.romanceHooks.slice(0, 3).join(", ")}`
+        : "",
+    ].filter(Boolean).join(" ");
+  }
+
   if (entry.lane === "metadata") {
     return `Tag: ${entry.value}`;
   }

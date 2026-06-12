@@ -14,6 +14,8 @@ export type SemanticSeedNodeCategory =
   | "wounds"
   | "fears"
   | "desires"
+  | "hidden_needs"
+  | "emotional_meanings"
   | "motivations"
   | "emotions"
   | "moods"
@@ -24,7 +26,9 @@ export type SemanticSeedNodeCategory =
   | "attachment_styles"
   | "conflict_styles"
   | "repair_styles"
+  | "repair_needs"
   | "love_languages"
+  | "visible_behaviors"
   | "relationship_dynamics"
   | "romance_tropes"
   | "relationship_gates"
@@ -113,6 +117,8 @@ export const SEMANTIC_SEED_REGISTRY_CATEGORIES = Object.freeze([
   "wounds",
   "fears",
   "desires",
+  "hidden_needs",
+  "emotional_meanings",
   "motivations",
   "emotions",
   "moods",
@@ -123,7 +129,9 @@ export const SEMANTIC_SEED_REGISTRY_CATEGORIES = Object.freeze([
   "attachment_styles",
   "conflict_styles",
   "repair_styles",
+  "repair_needs",
   "love_languages",
+  "visible_behaviors",
   "relationship_dynamics",
   "romance_tropes",
   "relationship_gates",
@@ -147,8 +155,11 @@ export const SEMANTIC_SEED_PRIORITY_CATEGORIES = Object.freeze([
   "wounds",
   "fears",
   "desires",
+  "hidden_needs",
+  "emotional_meanings",
   "triggers",
   "responses",
+  "repair_needs",
   "relationship_dynamics",
   "romance_tropes",
 ] as const satisfies readonly SemanticSeedNodeCategory[]);
@@ -179,6 +190,18 @@ export const SEMANTIC_SEED_CATEGORY_TARGETS = Object.freeze([
     rationale: "Desires give characters active direction instead of only damage.",
   },
   {
+    category: "hidden_needs",
+    targetCount: 400,
+    priority: "highest",
+    rationale: "Hidden needs explain the emotional request beneath desire, trigger, and response.",
+  },
+  {
+    category: "emotional_meanings",
+    targetCount: 400,
+    priority: "highest",
+    rationale: "Emotional meanings translate visible behavior into subtext, misread route pressure, and repair needs.",
+  },
+  {
     category: "triggers",
     targetCount: 1500,
     priority: "highest",
@@ -189,6 +212,12 @@ export const SEMANTIC_SEED_CATEGORY_TARGETS = Object.freeze([
     targetCount: 2000,
     priority: "highest",
     rationale: "Responses turn semantic pressure into observable behavior.",
+  },
+  {
+    category: "repair_needs",
+    targetCount: 300,
+    priority: "highest",
+    rationale: "Repair needs identify what a rupture must restore before repair style or beat selection.",
   },
   {
     category: "relationship_dynamics",
@@ -213,6 +242,12 @@ export const SEMANTIC_SEED_CATEGORY_TARGETS = Object.freeze([
     targetCount: 250,
     priority: "high",
     rationale: "Repair styles keep hurt/comfort and long-form chat cumulative.",
+  },
+  {
+    category: "visible_behaviors",
+    targetCount: 1200,
+    priority: "high",
+    rationale: "Visible behaviors turn internal psychology into repeatable prose actions.",
   },
   {
     category: "romance_tropes",
@@ -10938,11 +10973,15 @@ export function mapSemanticSeedCategoryToHeartWriteSeedCategory(
     case "conflict_styles":
     case "repair_styles":
     case "love_languages":
+    case "visible_behaviors":
       return "personality_trait";
     case "wounds":
     case "fears":
       return "wound";
     case "desires":
+    case "hidden_needs":
+    case "emotional_meanings":
+    case "repair_needs":
     case "motivations":
       return "motivation";
     case "emotions":
@@ -11143,11 +11182,20 @@ function inferSemanticCategoryFromVocabularySeed(
   if (/love-language-vocabulary/.test(haystack)) {
     return "love_languages";
   }
+  if (/visible-behavior-vocabulary/.test(haystack)) {
+    return "visible_behaviors";
+  }
   if (/desire-vocabulary/.test(haystack)) {
     return "desires";
   }
   if (/fear-vocabulary/.test(haystack)) {
     return "fears";
+  }
+  if (/hidden-need-vocabulary/.test(haystack)) {
+    return "hidden_needs";
+  }
+  if (/emotional-meaning-vocabulary/.test(haystack)) {
+    return "emotional_meanings";
   }
   if (/trigger-vocabulary/.test(haystack)) {
     return "triggers";
@@ -11157,6 +11205,12 @@ function inferSemanticCategoryFromVocabularySeed(
   }
   if (/repair-beat-vocabulary/.test(haystack)) {
     return "repair_styles";
+  }
+  if (/repair-need-vocabulary/.test(haystack)) {
+    return "repair_needs";
+  }
+  if (/route-gate-vocabulary/.test(haystack)) {
+    return "relationship_gates";
   }
   if (/response-vocabulary/.test(haystack)) {
     return "responses";

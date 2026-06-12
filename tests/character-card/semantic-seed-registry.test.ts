@@ -39,8 +39,11 @@ test("defines the planned semantic registry categories and priority lanes", () =
     "wounds",
     "fears",
     "desires",
+    "hidden_needs",
+    "emotional_meanings",
     "triggers",
     "responses",
+    "repair_needs",
     "relationship_dynamics",
     "romance_tropes",
   ]);
@@ -49,6 +52,8 @@ test("defines the planned semantic registry categories and priority lanes", () =
     "wounds",
     "fears",
     "desires",
+    "hidden_needs",
+    "emotional_meanings",
     "motivations",
     "emotions",
     "moods",
@@ -59,7 +64,9 @@ test("defines the planned semantic registry categories and priority lanes", () =
     "attachment_styles",
     "conflict_styles",
     "repair_styles",
+    "repair_needs",
     "love_languages",
+    "visible_behaviors",
     "relationship_dynamics",
     "romance_tropes",
     "relationship_gates",
@@ -80,6 +87,11 @@ test("defines the planned semantic registry categories and priority lanes", () =
   ]);
 
   assert.equal(getSemanticSeedCategoryTarget("wounds")?.targetCount, 400);
+  assert.equal(
+    getSemanticSeedCategoryTarget("emotional_meanings")?.targetCount,
+    400,
+  );
+  assert.equal(getSemanticSeedCategoryTarget("repair_needs")?.targetCount, 300);
   assert.equal(getSemanticSeedCategoryTarget("responses")?.targetCount, 2000);
   assert.equal(getSemanticSeedCategoryTarget("appearance")?.priority, "medium");
   const totalTarget = SEMANTIC_SEED_CATEGORY_TARGETS.reduce(
@@ -87,7 +99,7 @@ test("defines the planned semantic registry categories and priority lanes", () =
     0,
   );
   assert.equal(totalTarget >= 16000, true);
-  assert.equal(totalTarget <= 20000, true);
+  assert.equal(totalTarget <= 22000, true);
 });
 
 test("stores semantic nodes with stable ids and graph relationships", () => {
@@ -983,6 +995,14 @@ test("adapts semantic nodes into the shared HeartWrite seed base shape", () => {
     mapSemanticSeedCategoryToHeartWriteSeedCategory("romance_tropes"),
     "romance_trope",
   );
+  assert.equal(
+    mapSemanticSeedCategoryToHeartWriteSeedCategory("emotional_meanings"),
+    "motivation",
+  );
+  assert.equal(
+    mapSemanticSeedCategoryToHeartWriteSeedCategory("repair_needs"),
+    "motivation",
+  );
   assert.equal(abandonmentBase.category, "wound");
   assert.equal(abandonmentBase.romanceRelevant, true);
   assert.equal(abandonmentBase.adult, false);
@@ -1032,6 +1052,7 @@ test("queries semantic nodes by category and text", () => {
   assert.equal(getSemanticSeedNodesByCategory("fears").length, 6);
   assert.equal(getSemanticSeedNodesByCategory("responses").length, 65);
   assert.equal(getSemanticSeedNodesByCategory("desires").length, 15);
+  assert.equal(getSemanticSeedNodesByCategory("hidden_needs").length, 0);
   assert.equal(getSemanticSeedNodesByCategory("attachment_styles").length, 7);
   assert.equal(getSemanticSeedNodesByCategory("repair_styles").length, 7);
   assert.equal(getSemanticSeedNodesByCategory("relationship_gates").length, 5);
@@ -1046,6 +1067,7 @@ test("queries semantic nodes by category and text", () => {
   assert.equal(getSemanticSeedNodesByCategory("intelligence").length, 5);
   assert.equal(getSemanticSeedNodesByCategory("goals_long").length, 2);
   assert.equal(getSemanticSeedNodesByCategory("love_languages").length, 1);
+  assert.equal(getSemanticSeedNodesByCategory("visible_behaviors").length, 0);
   assert.equal(getSemanticSeedNodesByCategory("skills").length, 3);
   assert.equal(getSemanticSeedNodesByCategory("speech_patterns").length, 1);
   assert.equal(getSemanticSeedNodesByCategory("triggers").length, 13);
@@ -1117,8 +1139,11 @@ test("connects psychology before appearance for current product priority", () =>
     "wounds",
     "fears",
     "desires",
+    "hidden_needs",
+    "emotional_meanings",
     "triggers",
     "responses",
+    "repair_needs",
     "relationship_dynamics",
     "romance_tropes",
   ]);
@@ -1239,6 +1264,12 @@ test("keeps explicit standardized vocabulary sources ahead of generic prose heur
   const repairBeat = findSemanticSeedGraphNodeById(
     "repair-beat-vocabulary:accountability_beat",
   );
+  const repairNeed = findSemanticSeedGraphNodeById(
+    "repair-need-vocabulary:need_for_accountability",
+  );
+  const routeGate = findSemanticSeedGraphNodeById(
+    "route-gate-vocabulary:first_reassurance_gate",
+  );
   const conflictBeat = findSemanticSeedGraphNodeById(
     "conflict-beat-vocabulary:delayed_reply_spiral",
   );
@@ -1272,13 +1303,27 @@ test("keeps explicit standardized vocabulary sources ahead of generic prose heur
   const moral = findSemanticSeedGraphNodeById(
     "moral-framework-vocabulary:care_ethics",
   );
+  const visibleBehavior = findSemanticSeedGraphNodeById(
+    "visible-behavior-vocabulary:makes_tea_when_worried",
+  );
+  const hiddenNeed = findSemanticSeedGraphNodeById(
+    "hidden-need-vocabulary:need_for_reassurance",
+  );
+  const emotionalMeaning = findSemanticSeedGraphNodeById(
+    "emotional-meaning-vocabulary:i_notice_you",
+  );
 
   assert.equal(acts?.category, "love_languages");
   assert.equal(attachmentStyle?.category, "attachment_styles");
   assert.equal(loveLanguage?.category, "love_languages");
+  assert.equal(hiddenNeed?.category, "hidden_needs");
+  assert.equal(emotionalMeaning?.category, "emotional_meanings");
+  assert.equal(visibleBehavior?.category, "visible_behaviors");
   assert.equal(response?.category, "responses");
   assert.equal(repair?.category, "repair_styles");
   assert.equal(repairBeat?.category, "repair_styles");
+  assert.equal(repairNeed?.category, "repair_needs");
+  assert.equal(routeGate?.category, "relationship_gates");
   assert.equal(conflictBeat?.category, "relationship_gates");
   assert.equal(consequence?.category, "routes");
   assert.equal(ruptureType?.category, "relationship_gates");

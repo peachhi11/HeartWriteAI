@@ -62,6 +62,21 @@ test("parses OpenAI-compatible local SSE delta tokens", () => {
   assert.equal(parsed.done, true);
 });
 
+test("parses proxy SSE delta tokens like OpenAI-compatible providers", () => {
+  const parsed = parseProviderStreamChunk(
+    "proxy",
+    [
+      'data: {"choices":[{"delta":{"content":"Proxy"},"finish_reason":null}]}',
+      'data: {"choices":[{"delta":{"content":" reply"},"finish_reason":"stop"}]}',
+      "data: [DONE]",
+      "",
+    ].join("\n"),
+  );
+
+  assert.deepEqual(parsed.tokens, ["Proxy", " reply"]);
+  assert.equal(parsed.done, true);
+});
+
 test("ignores malformed provider stream lines without throwing", () => {
   const parsed = parseProviderStreamChunk(
     "openrouter",

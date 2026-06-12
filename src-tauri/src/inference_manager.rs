@@ -15,6 +15,8 @@ const MAX_MODEL_TAG_LENGTH: usize = 96;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 pub struct InferenceConfig {
+    #[serde(rename = "contextLength", default = "default_context_length")]
+    pub context_length: u32,
     pub temperature: f64,
     #[serde(rename = "topP")]
     pub top_p: f64,
@@ -37,6 +39,7 @@ pub struct InferenceConfig {
 impl Default for InferenceConfig {
     fn default() -> Self {
         Self {
+            context_length: 8192,
             temperature: 0.7,
             top_p: 0.9,
             max_tokens: 256,
@@ -175,6 +178,7 @@ fn persist_inference_to_path(path: &Path, config: &InferenceConfig) -> Result<()
 
 pub fn normalize_inference_config(config: InferenceConfig) -> InferenceConfig {
     InferenceConfig {
+        context_length: config.context_length.clamp(1024, 262_144),
         temperature: clamp_f64(config.temperature, 0.0, 2.0, 0.7),
         top_p: clamp_f64(config.top_p, 0.0, 1.0, 0.9),
         max_tokens: config.max_tokens.clamp(16, 2048),
@@ -200,6 +204,10 @@ fn default_open_router_model() -> String {
 
 fn default_provider() -> String {
     DEFAULT_PROVIDER.to_string()
+}
+
+fn default_context_length() -> u32 {
+    8192
 }
 
 fn clamp_f64(value: f64, min: f64, max: f64, fallback: f64) -> f64 {
@@ -241,6 +249,7 @@ fn normalize_provider(value: &str) -> String {
     match value {
         "openrouter" => "openrouter".to_string(),
         "openai-compatible" => "openai-compatible".to_string(),
+        "proxy" => "proxy".to_string(),
         _ => DEFAULT_PROVIDER.to_string(),
     }
 }
@@ -300,6 +309,7 @@ mod tests {
     fn defaults_match_frontend_matrix() {
         let config = InferenceConfig::default();
 
+        assert_eq!(config.context_length, 8192);
         assert_eq!(config.temperature, 0.7);
         assert_eq!(config.top_p, 0.9);
         assert_eq!(config.max_tokens, 256);
@@ -314,6 +324,7 @@ mod tests {
     #[test]
     fn normalizes_untrusted_inference_values() {
         let config = normalize_inference_config(InferenceConfig {
+            context_length: 999_999,
             temperature: f64::NAN,
             top_p: 4.0,
             max_tokens: 9000,
@@ -325,6 +336,7 @@ mod tests {
             selected_model: "../bad model".to_string(),
         });
 
+        assert_eq!(config.context_length, 262_144);
         assert_eq!(config.temperature, 0.7);
         assert_eq!(config.top_p, 1.0);
         assert_eq!(config.max_tokens, 2048);
@@ -339,6 +351,7 @@ mod tests {
     #[test]
     fn preserves_safe_custom_model_tags() {
         let config = normalize_inference_config(InferenceConfig {
+            context_length: 32_768,
             temperature: 1.234,
             top_p: 0.876,
             max_tokens: 511,
@@ -350,6 +363,7 @@ mod tests {
             selected_model: "hf.co/local-author/model-q4_K_M:latest".to_string(),
         });
 
+        assert_eq!(config.context_length, 32_768);
         assert_eq!(config.temperature, 1.23);
         assert_eq!(config.top_p, 0.88);
         assert_eq!(config.max_tokens, 511);
@@ -379,6 +393,18 @@ mod tests {
             config.selected_model,
             "deepseek-r1-distill-qwen-14b-uncensored"
         );
+    }
+
+    #[test]
+    fn preserves_proxy_provider_for_local_api_endpoint() {
+        let config = normalize_inference_config(InferenceConfig {
+            provider: "proxy".to_string(),
+            local_endpoint: "http://127.0.0.1:3000/api/chat".to_string(),
+            ..InferenceConfig::default()
+        });
+
+        assert_eq!(config.provider, "proxy");
+        assert_eq!(config.local_endpoint, "http://127.0.0.1:3000/api/chat");
     }
 
     #[test]

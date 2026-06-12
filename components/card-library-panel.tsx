@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Archive,
   ChevronLeft,
@@ -202,8 +202,10 @@ export default function CardLibraryPanel({
   const [selectedCharacterRoleTag, setSelectedCharacterRoleTag] = useState("ALL");
   const [selectedUserRoleTag, setSelectedUserRoleTag] = useState("ALL");
   const [selectedTropeTag, setSelectedTropeTag] = useState("ALL");
+  const [selectedQuickTags, setSelectedQuickTags] = useState<string[]>([]);
   const [cleanMessage, setCleanMessage] = useState<string | null>(null);
   const [cleaningMissing, setCleaningMissing] = useState(false);
+  const visibleTagCounts = useMemo(() => buildVisibleTagCounts(items), [items]);
 
   useEffect(() => {
     const timeoutId = window.setTimeout(() => {
@@ -225,6 +227,7 @@ export default function CardLibraryPanel({
         selectedUserRoleTag,
         selectedTropeTag,
         tagSearchTerm.trim(),
+        ...selectedQuickTags,
       ].filter((tag) => tag && tag !== "ALL");
 
       setFilters((previous) => ({
@@ -241,9 +244,22 @@ export default function CardLibraryPanel({
     selectedPovTag,
     selectedTropeTag,
     selectedUserRoleTag,
+    selectedQuickTags,
     tagSearchTerm,
     setFilters,
   ]);
+
+  function toggleQuickTag(tag: string) {
+    setSelectedQuickTags((current) =>
+      current.includes(tag)
+        ? current.filter((selectedTag) => selectedTag !== tag)
+        : [...current, tag],
+    );
+  }
+
+  function clearQuickTags() {
+    setSelectedQuickTags([]);
+  }
 
   function handleDropdownChange(
     key: Extract<keyof SearchFilters, "framework">,
@@ -331,8 +347,10 @@ export default function CardLibraryPanel({
               selectedCharacterRoleTag={selectedCharacterRoleTag}
               selectedPovTag={selectedPovTag}
               selectedTropeTag={selectedTropeTag}
+              selectedQuickTags={selectedQuickTags}
               selectedUserRoleTag={selectedUserRoleTag}
               tagSearchTerm={tagSearchTerm}
+              tagCounts={visibleTagCounts}
               onDropdownChange={handleDropdownChange}
               onSearchTermChange={setSearchTerm}
               onSelectedCharacterRoleTagChange={setSelectedCharacterRoleTag}
@@ -340,6 +358,8 @@ export default function CardLibraryPanel({
               onSelectedTropeTagChange={setSelectedTropeTag}
               onSelectedUserRoleTagChange={setSelectedUserRoleTag}
               onTagSearchTermChange={setTagSearchTerm}
+              onClearQuickTags={clearQuickTags}
+              onToggleQuickTag={toggleQuickTag}
             />
             {library.isDesktopRuntime ? (
               <div className="grid gap-1.5">
@@ -432,11 +452,15 @@ function CharacterLibraryFilters({
   onSelectedTropeTagChange,
   onSelectedUserRoleTagChange,
   onTagSearchTermChange,
+  onClearQuickTags,
+  onToggleQuickTag,
   searchTerm,
   selectedCharacterRoleTag,
   selectedPovTag,
+  selectedQuickTags,
   selectedTropeTag,
   selectedUserRoleTag,
+  tagCounts,
   tagSearchTerm,
 }: {
   filters: SearchFilters;
@@ -450,13 +474,19 @@ function CharacterLibraryFilters({
   onSelectedTropeTagChange: (value: string) => void;
   onSelectedUserRoleTagChange: (value: string) => void;
   onTagSearchTermChange: (value: string) => void;
+  onClearQuickTags: () => void;
+  onToggleQuickTag: (tag: string) => void;
   searchTerm: string;
   selectedCharacterRoleTag: string;
   selectedPovTag: string;
+  selectedQuickTags: string[];
   selectedTropeTag: string;
   selectedUserRoleTag: string;
+  tagCounts: Array<{ count: number; tag: string }>;
   tagSearchTerm: string;
 }) {
+  const visibleTagFacets = mergeSelectedQuickTags(tagCounts, selectedQuickTags);
+
   return (
     <>
       <label className="relative block">
@@ -555,6 +585,58 @@ function CharacterLibraryFilters({
           ))}
         </select>
       </div>
+
+      {visibleTagFacets.length > 0 ? (
+        <div className="grid gap-2 rounded-lg border border-zinc-800 bg-zinc-900/60 p-2">
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[9px] font-bold uppercase tracking-wide text-zinc-500">
+              Visible tags
+            </span>
+            {selectedQuickTags.length > 0 ? (
+              <button
+                type="button"
+                onClick={onClearQuickTags}
+                className="text-[9px] font-semibold uppercase tracking-wide text-violet-300 transition hover:text-violet-100"
+              >
+                Clear
+              </button>
+            ) : (
+              <span className="font-mono text-[9px] text-zinc-600">
+                {tagCounts.length}
+              </span>
+            )}
+          </div>
+          <div className="grid max-h-32 gap-1 overflow-y-auto pr-1">
+            {visibleTagFacets.slice(0, 18).map(({ count, tag }) => {
+              const selected = selectedQuickTags.includes(tag);
+
+              return (
+                <button
+                  key={tag}
+                  type="button"
+                  onClick={() => onToggleQuickTag(tag)}
+                  className={cn(
+                    "flex items-center justify-between gap-2 rounded-md border px-2 py-1 text-left text-[10px] transition",
+                    selected
+                      ? "border-violet-400/50 bg-violet-500/15 text-violet-200"
+                      : "border-zinc-800 bg-zinc-950/60 text-zinc-500 hover:border-zinc-700 hover:text-zinc-300",
+                  )}
+                >
+                  <span className="truncate">#{formatTagForDisplay(tag)}</span>
+                  <span className="rounded bg-zinc-800 px-1.5 py-0.5 font-mono text-[9px] text-zinc-400">
+                    {count}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          {selectedQuickTags.length > 0 ? (
+            <p className="text-[10px] leading-4 text-zinc-500">
+              Filtering by {selectedQuickTags.map(formatTagForDisplay).join(", ")}
+            </p>
+          ) : null}
+        </div>
+      ) : null}
     </>
   );
 }
@@ -749,6 +831,49 @@ function formatRelativeDate(timestamp: number) {
   });
 
   return formatter.format(new Date(timestamp));
+}
+
+function buildVisibleTagCounts(
+  items: ReturnType<typeof useCardLibrary>["items"],
+) {
+  const counts = new Map<string, number>();
+
+  items.forEach((item) => {
+    item.tags.forEach((tag) => {
+      const normalizedTag = normalizeTag(tag);
+      if (normalizedTag) {
+        counts.set(normalizedTag, (counts.get(normalizedTag) ?? 0) + 1);
+      }
+    });
+  });
+
+  return Array.from(counts.entries())
+    .map(([tag, count]) => ({ count, tag }))
+    .sort((left, right) =>
+      right.count === left.count
+        ? left.tag.localeCompare(right.tag)
+        : right.count - left.count,
+    );
+}
+
+function normalizeTag(tag: string) {
+  return tag.trim().toLowerCase().replace(/\s+/g, " ");
+}
+
+function formatTagForDisplay(tag: string) {
+  return tag.replace(/\s+/g, "");
+}
+
+function mergeSelectedQuickTags(
+  tagCounts: Array<{ count: number; tag: string }>,
+  selectedQuickTags: string[],
+) {
+  const existingTags = new Set(tagCounts.map((entry) => entry.tag));
+  const missingSelectedTags = selectedQuickTags
+    .filter((tag) => !existingTags.has(tag))
+    .map((tag) => ({ count: 0, tag }));
+
+  return [...missingSelectedTags, ...tagCounts];
 }
 
 function relationshipLabel(relationship: string, tags: string[]) {

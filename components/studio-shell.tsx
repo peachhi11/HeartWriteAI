@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { ReactNode, useEffect, useState } from "react";
 
 import { LiquidThemePicker } from "@/components/liquid-theme-picker";
+import { ModelStatusIndicator } from "@/components/model-status-indicator";
 import { ModeToggle } from "@/components/mode-toggle";
 import { cn } from "@/lib/utils";
 
@@ -184,6 +185,7 @@ export function StudioShell({
               </div>
               <div className="flex shrink-0 items-center gap-2">
                 {actions}
+                <ModelStatusIndicator />
                 <div className="md:hidden">
                   <div className="flex items-center gap-2">
                     <LiquidThemePicker />

@@ -7,31 +7,41 @@ import {
   createConflictStyleSeedPreset,
   createConsequenceSeedPreset,
   createDesireSeedPreset,
+  createEmotionalMeaningSeedPreset,
   createFearSeedPreset,
   createGrowthArcSeedPreset,
+  createHiddenNeedSeedPreset,
   createLoveLanguageSeedPreset,
   createPayoffFantasySeedPreset,
   createRelationshipDynamicSeedPreset,
   createRelationshipIdentitySeedPreset,
+  createRepairNeedSeedPreset,
+  createRouteGateSeedPreset,
   createRepairBeatSeedPreset,
   createRomanceTropeSeedPreset,
   createRoutePhaseSeedPreset,
   createRuptureTypeSeedPreset,
+  createVisibleBehaviorSeedPreset,
   type AttachmentStyleSeed,
   type ConflictBeatSeed,
   type ConflictStyleSeed,
   type ConsequenceSeed,
   type DesireSeed,
+  type EmotionalMeaningSeed,
   type FearSeed,
   type GrowthArcSeed,
+  type HiddenNeedSeed,
   type LoveLanguageSeed,
   type PayoffFantasySeed,
   type RelationshipDynamicSeed,
   type RelationshipIdentitySeed,
+  type RepairNeedSeed,
+  type RouteGateSeed,
   type RepairBeatSeed,
   type RomanceTropeSeed,
   type RoutePhaseSeed,
   type RuptureTypeSeed,
+  type VisibleBehaviorSeed,
 } from "../../data/vocabularySeedTypes";
 
 test("creates fear seed presets with fear-specific story psychology fields", () => {
@@ -163,6 +173,280 @@ test("creates lean desire seed presets with category and route pressure metadata
   assert.equal("coreLonging" in desire, false);
   assert.equal("fulfillmentNeeds" in desire, false);
   assert.equal("routeGates" in desire, false);
+});
+
+test("creates hidden need seed presets with route psychology fields", () => {
+  const need = createHiddenNeedSeedPreset({
+    seed: "need_for_reassurance",
+    label: "Need for Reassurance",
+    description: "Needs clear confirmation that care has not disappeared.",
+    examples: [
+      "Needs to hear conflict does not mean abandonment.",
+      "Softens when care is stated directly.",
+      "Needs to hear conflict does not mean abandonment.",
+    ],
+    tags: ["hidden_need", "attachment"],
+    relatedSeeds: ["fear_of_abandonment"],
+    oppositeSeeds: ["silent_treatment"],
+    romanceHooks: ["i_am_not_leaving_scene"],
+    scenarioHooks: ["post_argument_check_in"],
+    dialoguePatterns: ["I need to know we are okay."],
+    needType: "attachment",
+    masksAs: ["overthinking", "testing_love"],
+    createdByWounds: ["abandonment_wound"],
+    drivenByFears: ["fear_of_abandonment"],
+    expressedAsDesires: ["desire_for_reliable_love"],
+    activatedByTriggers: ["unanswered_message_trigger"],
+    commonResponses: ["reassurance_seeking_response"],
+    loveLanguages: ["words_of_affirmation"],
+    compatibleRepairStyles: ["verbal_reassurance_repair"],
+    growthArcs: ["learning_to_trust"],
+    unmetConsequences: ["attachment_damage_consequence"],
+    fulfillmentSignals: ["asks_directly_instead_of_testing"],
+    routeGates: ["first_reassurance_gate"],
+    milestoneMemories: ["first_i_am_not_leaving_memory"],
+    metadata: {
+      urgency: "core",
+      romanceValue: 12,
+      conflictPotential: 8,
+      healingValue: 10,
+      pacingPressure: "high",
+    },
+  }) satisfies HiddenNeedSeed;
+
+  assert.equal(need.metadata.category, "hidden_need");
+  assert.equal(need.metadata.urgency, "core");
+  assert.equal(need.metadata.romanceValue, 10);
+  assert.equal(need.metadata.pacingPressure, "high");
+  assert.deepEqual(need.examples, [
+    "Needs to hear conflict does not mean abandonment.",
+    "Softens when care is stated directly.",
+  ]);
+  assert.equal(need.needType, "attachment");
+  assert.equal(need.masksAs.includes("testing_love"), true);
+  assert.equal(need.compatibleRepairStyles.includes("verbal_reassurance_repair"), true);
+});
+
+test("creates emotional meaning seed presets with subtext routing fields", () => {
+  const meaning = createEmotionalMeaningSeedPreset({
+    seed: "i_notice_you",
+    label: "I Notice You",
+    description: "Pays attention to small needs, mood shifts, and quiet distress.",
+    examples: [
+      "Remembers how they take their tea.",
+      "Recognizes a fake smile.",
+      "Remembers how they take their tea.",
+    ],
+    tags: ["emotional_meaning", "attention"],
+    relatedSeeds: ["desire_to_be_seen"],
+    oppositeSeeds: ["emotional_neglect"],
+    romanceHooks: ["seen_through_the_mask"],
+    scenarioHooks: ["fake_smile_called_out"],
+    dialoguePatterns: ["I noticed."],
+    meaningType: "attention",
+    expressedThrough: ["remembers_preferences", "remembers_preferences"],
+    oftenMisreadAs: ["being_watched"],
+    hiddenNeedMet: ["need_to_be_seen"],
+    associatedWounds: ["emotional_neglect_wound"],
+    associatedFears: ["fear_of_not_mattering"],
+    associatedDesires: ["desire_to_be_seen"],
+    compatibleLoveLanguages: ["acts_of_service"],
+    compatibleVisibleBehaviors: ["makes_tea_when_worried"],
+    triggerWhenAbsent: ["being_overlooked_trigger"],
+    likelyResponsesWhenAbsent: ["withdrawal_response"],
+    repairStyles: ["validation_repair"],
+    growthArcs: ["learning_to_be_seen"],
+    payoffFantasies: ["seen_and_still_loved"],
+    relationshipIdentities: ["safe_haven_relationship"],
+    routeGates: ["first_noticed_gate"],
+    milestoneMemories: ["first_time_they_noticed_memory"],
+    metadata: {
+      subtlety: "high",
+      romanceValue: 12,
+      healingValue: 10,
+      conflictPotential: 4,
+      intimacyValue: 9,
+    },
+  }) satisfies EmotionalMeaningSeed;
+
+  assert.equal(meaning.metadata.category, "emotional_meaning");
+  assert.equal(meaning.metadata.subtlety, "high");
+  assert.equal(meaning.metadata.romanceValue, 10);
+  assert.equal(meaning.metadata.healingValue, 10);
+  assert.deepEqual(meaning.examples, [
+    "Remembers how they take their tea.",
+    "Recognizes a fake smile.",
+  ]);
+  assert.deepEqual(meaning.expressedThrough, ["remembers_preferences"]);
+  assert.equal(meaning.meaningType, "attention");
+  assert.equal(meaning.hiddenNeedMet.includes("need_to_be_seen"), true);
+  assert.equal(
+    meaning.compatibleVisibleBehaviors.includes("makes_tea_when_worried"),
+    true,
+  );
+});
+
+test("creates repair need seed presets with consequence and rupture routing fields", () => {
+  const need = createRepairNeedSeedPreset({
+    seed: "need_for_accountability",
+    label: "Need for Accountability",
+    description: "Requires the harm to be owned without excuses.",
+    examples: [
+      "Needs the broken promise acknowledged.",
+      "Cannot move forward while the harm is explained away.",
+      "Needs the broken promise acknowledged.",
+    ],
+    tags: ["repair_need", "accountability"],
+    relatedSeeds: ["accountability_repair"],
+    oppositeSeeds: ["excuse_making"],
+    romanceHooks: ["owning_the_hurt"],
+    scenarioHooks: ["after_the_lie"],
+    dialoguePatterns: ["An apology is not the same as accountability."],
+    needType: "accountability",
+    repairsConsequences: ["trust_damage_consequence", "trust_damage_consequence"],
+    repairsRuptures: ["betrayal_rupture"],
+    activatedByWounds: ["betrayal_wound"],
+    activatedByFears: ["fear_of_betrayal"],
+    frustratedDesires: ["desire_for_truth"],
+    compatibleRepairStyles: ["accountability_repair"],
+    compatibleRepairBeats: ["accountability_beat"],
+    incompatibleRepairs: ["empty_apology"],
+    requiredConditions: ["specific_admission"],
+    fulfillmentSignals: ["responsibility_is_accepted"],
+    failureModes: ["accountability_without_change"],
+    growthArcs: ["learning_safe_conflict"],
+    routeGates: ["first_accountability_gate"],
+    milestoneMemories: ["first_real_accountability_memory"],
+    metadata: {
+      urgency: "high",
+      repairPower: 11,
+      trustRepairValue: 10,
+      attachmentRepairValue: 6,
+      healingValue: 9,
+    },
+  }) satisfies RepairNeedSeed;
+
+  assert.equal(need.metadata.category, "repair_need");
+  assert.equal(need.metadata.urgency, "high");
+  assert.equal(need.metadata.repairPower, 10);
+  assert.equal(need.metadata.trustRepairValue, 10);
+  assert.deepEqual(need.examples, [
+    "Needs the broken promise acknowledged.",
+    "Cannot move forward while the harm is explained away.",
+  ]);
+  assert.deepEqual(need.repairsConsequences, ["trust_damage_consequence"]);
+  assert.equal(need.needType, "accountability");
+  assert.equal(need.compatibleRepairStyles.includes("accountability_repair"), true);
+  assert.equal(need.compatibleRepairBeats.includes("accountability_beat"), true);
+});
+
+test("creates route gate seed presets with route progress fields", () => {
+  const gate = createRouteGateSeedPreset({
+    seed: "first_reassurance_gate",
+    label: "First Reassurance Gate",
+    description:
+      "Receives clear emotional reassurance and begins to believe the bond may be safer than expected.",
+    examples: [
+      "After panic, the partner says they are not leaving.",
+      "A delayed reply is repaired with clear care.",
+      "After panic, the partner says they are not leaving.",
+    ],
+    tags: ["route_gate", "reassurance"],
+    relatedSeeds: ["need_for_reassurance"],
+    oppositeSeeds: ["silent_treatment"],
+    romanceHooks: ["i_am_not_leaving_scene"],
+    scenarioHooks: ["delayed_reply_spiral"],
+    dialoguePatterns: ["You do not have to guess where you stand with me."],
+    gateType: "reassurance",
+    unlocksRoutePhases: ["vulnerability_leak", "trust_rebuilding_phase"],
+    requiredBefore: ["safe_to_need_gate"],
+    blockedBy: ["mocked_need_for_reassurance"],
+    activatedByWounds: ["abandonment_wound"],
+    activatedByFears: ["fear_of_abandonment"],
+    fulfillsDesires: ["desire_for_reliable_love"],
+    satisfiesHiddenNeeds: ["need_for_reassurance"],
+    likelyTriggers: ["unanswered_message_trigger"],
+    likelyResponses: ["panic_spiral_response"],
+    compatibleRepairBeats: ["i_am_not_leaving_beat"],
+    compatibleGrowthArcs: ["learning_secure_attachment"],
+    successSignals: ["panic_deescalates"],
+    failureSignals: ["words_are_not_followed_by_consistency"],
+    milestoneMemories: ["first_reassurance_received_memory"],
+    metadata: {
+      importance: "major",
+      romanceValue: 12,
+      angstValue: 7,
+      healingValue: 10,
+      routeProgressValue: 9,
+    },
+  }) satisfies RouteGateSeed;
+
+  assert.equal(gate.metadata.category, "route_gate");
+  assert.equal(gate.metadata.importance, "major");
+  assert.equal(gate.metadata.romanceValue, 10);
+  assert.equal(gate.metadata.routeProgressValue, 9);
+  assert.deepEqual(gate.examples, [
+    "After panic, the partner says they are not leaving.",
+    "A delayed reply is repaired with clear care.",
+  ]);
+  assert.equal(gate.gateType, "reassurance");
+  assert.equal(gate.satisfiesHiddenNeeds.includes("need_for_reassurance"), true);
+  assert.equal(gate.compatibleRepairBeats.includes("i_am_not_leaving_beat"), true);
+});
+
+test("creates visible behavior seed presets with action-level romance fields", () => {
+  const behavior = createVisibleBehaviorSeedPreset({
+    seed: "makes_tea_when_worried",
+    label: "Makes Tea When Worried",
+    description: "Turns worry into a small domestic action.",
+    examples: [
+      "Starts the kettle after noticing silence.",
+      "Brings the cup without forcing a conversation.",
+      "Starts the kettle after noticing silence.",
+    ],
+    tags: ["visible_behavior", "acts_of_service"],
+    relatedSeeds: ["acts_of_service"],
+    oppositeSeeds: ["neglect"],
+    romanceHooks: ["tea_after_argument"],
+    scenarioHooks: ["post_conflict_kitchen_scene"],
+    dialoguePatterns: ["I made it how you like it."],
+    behaviorType: "domestic",
+    emotionalMeaning: "I noticed you were hurting.",
+    hiddenMotivation: "To offer care without crowding the hurt.",
+    loveLanguageSource: ["acts_of_service", "domestic_care"],
+    associatedWounds: ["emotional_neglect_wound"],
+    associatedFears: ["fear_of_vulnerability"],
+    associatedDesires: ["desire_to_be_seen"],
+    associatedDynamics: ["soft_domestic_relationship"],
+    activatedBy: ["stressful_silence"],
+    fulfillmentSignals: ["drink_is_accepted"],
+    misreadRisks: ["care_mistaken_for_avoidance"],
+    conflictRisks: ["service_replaces_words_too_often"],
+    repairStyles: ["acts_of_service_repair"],
+    growthArcs: ["learns_to_pair_action_with_honesty"],
+    routeGates: ["first_wordless_care_gate"],
+    milestoneMemories: ["first_tea_when_worried_memory"],
+    metadata: {
+      subtlety: "high",
+      romanceValue: 11,
+      intimacyValue: 8,
+      healingValue: 9,
+      conflictPotential: 3,
+      repeatability: "ritual",
+    },
+  }) satisfies VisibleBehaviorSeed;
+
+  assert.equal(behavior.metadata.category, "visible_behavior");
+  assert.equal(behavior.metadata.subtlety, "high");
+  assert.equal(behavior.metadata.romanceValue, 10);
+  assert.equal(behavior.metadata.repeatability, "ritual");
+  assert.deepEqual(behavior.examples, [
+    "Starts the kettle after noticing silence.",
+    "Brings the cup without forcing a conversation.",
+  ]);
+  assert.equal(behavior.behaviorType, "domestic");
+  assert.equal(behavior.loveLanguageSource.includes("acts_of_service"), true);
+  assert.equal(behavior.repairStyles.includes("acts_of_service_repair"), true);
 });
 
 test("defaults desire seed metadata for future broad catalogue generation", () => {

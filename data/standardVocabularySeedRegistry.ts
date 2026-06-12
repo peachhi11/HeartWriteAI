@@ -20,11 +20,17 @@ import {
   DESIRE_VOCABULARY_STANDARD_SEEDS,
 } from "./desireVocabularyPresets";
 import {
+  EMOTIONAL_MEANING_VOCABULARY_STANDARD_SEEDS,
+} from "./emotionalMeaningVocabularyPresets";
+import {
   FEAR_VOCABULARY_STANDARD_SEEDS,
 } from "./fearVocabularyPresets";
 import {
   GROWTH_ARC_VOCABULARY_STANDARD_SEEDS,
 } from "./growthArcVocabularyPresets";
+import {
+  HIDDEN_NEED_VOCABULARY_STANDARD_SEEDS,
+} from "./hiddenNeedVocabularyPresets";
 import {
   IMAGE_PROMPT_VOCABULARY_SEEDS,
 } from "./imagePromptVocabPresets";
@@ -53,6 +59,9 @@ import {
   ROMANCE_TROPE_VOCABULARY_STANDARD_SEEDS,
 } from "./romanceTropeVocabularyPresets";
 import {
+  ROUTE_GATE_VOCABULARY_STANDARD_SEEDS,
+} from "./routeGateVocabularyPresets";
+import {
   ROUTE_PHASE_VOCABULARY_STANDARD_SEEDS,
 } from "./routePhaseVocabularyPresets";
 import {
@@ -65,6 +74,9 @@ import {
   REPAIR_BEAT_VOCABULARY_STANDARD_SEEDS,
 } from "./repairBeatVocabularyPresets";
 import {
+  REPAIR_NEED_VOCABULARY_STANDARD_SEEDS,
+} from "./repairNeedVocabularyPresets";
+import {
   RUPTURE_TYPE_VOCABULARY_STANDARD_SEEDS,
 } from "./ruptureTypeVocabularyPresets";
 import {
@@ -75,6 +87,9 @@ import {
 import {
   TRIGGER_VOCABULARY_STANDARD_SEEDS,
 } from "./triggerVocabularyPresets";
+import {
+  VISIBLE_BEHAVIOR_VOCABULARY_STANDARD_SEEDS,
+} from "./visibleBehaviorVocabularyPresets";
 import {
   VOICE_SEED_VOCABULARY_SEEDS,
   VOICE_VOCABULARY_SEEDS,
@@ -96,8 +111,10 @@ export type StandardVocabularySeedSourceId =
   | "conflict-style-vocabulary"
   | "consequence-vocabulary"
   | "desire-vocabulary"
+  | "emotional-meaning-vocabulary"
   | "fear-vocabulary"
   | "growth-arc-vocabulary"
+  | "hidden-need-vocabulary"
   | "image-prompt-vocabulary"
   | "love-language-vocabulary"
   | "moral-framework-vocabulary"
@@ -107,12 +124,15 @@ export type StandardVocabularySeedSourceId =
   | "relationship-dynamic-vocabulary"
   | "relationship-identity-vocabulary"
   | "romance-trope-vocabulary"
+  | "route-gate-vocabulary"
   | "route-phase-vocabulary"
   | "repair-style-vocabulary"
   | "repair-beat-vocabulary"
+  | "repair-need-vocabulary"
   | "response-vocabulary"
   | "rupture-type-vocabulary"
   | "trigger-vocabulary"
+  | "visible-behavior-vocabulary"
   | "voice-vocabulary"
   | "voice-seed-vocabulary"
   | "wound-vocabulary";
@@ -164,9 +184,19 @@ export const RICH_STANDARD_VOCABULARY_SEED_COLLECTIONS = Object.freeze([
     seeds: DESIRE_VOCABULARY_STANDARD_SEEDS,
   },
   {
+    sourceId: "emotional-meaning-vocabulary",
+    label: "Emotional Meaning Vocabulary",
+    seeds: EMOTIONAL_MEANING_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
     sourceId: "fear-vocabulary",
     label: "Fear Vocabulary",
     seeds: FEAR_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "hidden-need-vocabulary",
+    label: "Hidden Need Vocabulary",
+    seeds: HIDDEN_NEED_VOCABULARY_STANDARD_SEEDS,
   },
   {
     sourceId: "image-prompt-vocabulary",
@@ -209,6 +239,11 @@ export const RICH_STANDARD_VOCABULARY_SEED_COLLECTIONS = Object.freeze([
     seeds: REPAIR_BEAT_VOCABULARY_STANDARD_SEEDS,
   },
   {
+    sourceId: "repair-need-vocabulary",
+    label: "Repair Need Vocabulary",
+    seeds: REPAIR_NEED_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
     sourceId: "rupture-type-vocabulary",
     label: "Rupture Type Vocabulary",
     seeds: RUPTURE_TYPE_VOCABULARY_STANDARD_SEEDS,
@@ -217,6 +252,11 @@ export const RICH_STANDARD_VOCABULARY_SEED_COLLECTIONS = Object.freeze([
     sourceId: "trigger-vocabulary",
     label: "Trigger Vocabulary",
     seeds: TRIGGER_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "visible-behavior-vocabulary",
+    label: "Visible Behavior Vocabulary",
+    seeds: VISIBLE_BEHAVIOR_VOCABULARY_STANDARD_SEEDS,
   },
   {
     sourceId: "personality-engine-vocabulary",
@@ -237,6 +277,11 @@ export const RICH_STANDARD_VOCABULARY_SEED_COLLECTIONS = Object.freeze([
     sourceId: "romance-trope-vocabulary",
     label: "Romance Trope Vocabulary",
     seeds: ROMANCE_TROPE_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "route-gate-vocabulary",
+    label: "Route Gate Vocabulary",
+    seeds: ROUTE_GATE_VOCABULARY_STANDARD_SEEDS,
   },
   {
     sourceId: "route-phase-vocabulary",

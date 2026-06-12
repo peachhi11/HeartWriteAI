@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import {
+  AlertTriangle,
+  CheckCircle2,
   FileUp,
   PanelLeftOpen,
   Sparkles,
@@ -15,6 +17,7 @@ import { DevToolsPanel } from "@/components/dev-tools-panel";
 import DropZoneOverlay from "@/components/DropZoneOverlay";
 import ExpressionManager from "@/components/expression-manager";
 import { FolderIntakeReview } from "@/components/folder-intake-review";
+import { SemanticNodeCreatorPanel } from "@/components/semantic-node-creator-panel";
 import { StudioShell } from "@/components/studio-shell";
 import StructuredCardEditor from "@/components/structured-card-editor";
 import { Textarea } from "@/components/ui/textarea";
@@ -24,6 +27,7 @@ import { useCardLibrary } from "@/hooks/useCardLibrary";
 import { savePersonaLibraryItem } from "@/hooks/usePersonaLibrary";
 import { createPersonaArtifactFromCharacterCard } from "@/features/generation/workflows";
 import { downloadUint8Array } from "@/lib/browser/downloadUint8Array";
+import { cn } from "@/lib/utils";
 import {
   compileComplementVocabularyAdditions,
   findComplementVocabularyById,
@@ -712,6 +716,14 @@ interface PendingPngMetadataChoice {
   storedCard: ValidatedCharacterCardV3;
 }
 
+interface ImportReviewSummary {
+  emptyFields: string[];
+  filePath: string;
+  formatLabel: string;
+  preservedFields: string[];
+  warnings: string[];
+}
+
 export default function WorkspacePage() {
   const [activeCard, setActiveCard] =
     useState<ValidatedCharacterCardV3 | null>(null);
@@ -724,6 +736,8 @@ export default function WorkspacePage() {
   const [selectedExpression, setSelectedExpression] =
     useState<ExpressionSprite | null>(null);
   const [libraryOpen, setLibraryOpen] = useState(false);
+  const [lastImportReview, setLastImportReview] =
+    useState<ImportReviewSummary | null>(null);
   const [pendingMetadataChoice, setPendingMetadataChoice] =
     useState<PendingPngMetadataChoice | null>(null);
   const [isSaving, setIsSaving] = useState(false);
@@ -746,11 +760,13 @@ export default function WorkspacePage() {
     card: ValidatedCharacterCardV3,
     filePath: string,
     sourcePngData: Uint8Array | null = null,
+    importReview: ImportReviewSummary | null = null,
   ) {
     setActiveCard(card);
     setCurrentFilePath(filePath);
     setBrowserSourcePngData(sourcePngData);
     setSelectedExpression(null);
+    setLastImportReview(importReview);
     library.refresh();
   }
 
@@ -759,7 +775,12 @@ export default function WorkspacePage() {
 
     const result = await importCardFromPath(filePath);
     if (result.card) {
-      handleCardLoaded(result.card, filePath);
+      handleCardLoaded(
+        result.card,
+        filePath,
+        null,
+        createImportReviewSummary(result.card, filePath, "Cached library card"),
+      );
       setWorkspaceMessage(`Loaded ${result.card.data.name} from ${filePath}.`);
     } else {
       if (isMissingFilePathMessage(result.error)) {
@@ -867,7 +888,16 @@ export default function WorkspacePage() {
       }
 
       const result = await importBrowserCharacterCardFile(file);
-      handleCardLoaded(result.card, result.path, result.sourcePngData);
+      handleCardLoaded(
+        result.card,
+        result.path,
+        result.sourcePngData,
+        createImportReviewSummary(
+          result.card,
+          result.path,
+          inferImportFormatLabel(result.path),
+        ),
+      );
       setWorkspaceMessage(`Loaded ${result.card.data.name} from ${result.path}.`);
     } catch (error) {
       setWorkspaceMessage(error instanceof Error ? error.message : String(error));
@@ -892,7 +922,12 @@ export default function WorkspacePage() {
 
       if (isMissingCardMetadataMessage(result.error)) {
         const blankCard = createBlankDraftCharacterCard(filePath);
-        handleCardLoaded(blankCard, filePath, null);
+        handleCardLoaded(
+          blankCard,
+          filePath,
+          null,
+          createImportReviewSummary(blankCard, filePath, "PNG image shell"),
+        );
         setWorkspaceMessage(`Started a blank character using ${filePath} as the portrait.`);
         return;
       }
@@ -903,7 +938,16 @@ export default function WorkspacePage() {
 
     const result = await importCardFromPath(filePath);
     if (result.card) {
-      handleCardLoaded(result.card, filePath, null);
+      handleCardLoaded(
+        result.card,
+        filePath,
+        null,
+        createImportReviewSummary(
+          result.card,
+          filePath,
+          inferImportFormatLabel(filePath),
+        ),
+      );
       setWorkspaceMessage(`Loaded ${result.card.data.name} from ${filePath}.`);
     } else {
       setWorkspaceMessage(result.error ?? `Could not load ${filePath}.`);
@@ -961,7 +1005,12 @@ export default function WorkspacePage() {
         throw error;
       }
 
-      handleCardLoaded(blankCard, file.name, pngData);
+      handleCardLoaded(
+        blankCard,
+        file.name,
+        pngData,
+        createImportReviewSummary(blankCard, file.name, "PNG image shell"),
+      );
       setWorkspaceMessage(`Started a blank character using ${file.name} as the portrait.`);
     }
   }
@@ -1217,7 +1266,12 @@ export default function WorkspacePage() {
           onCardParsed={(parsed, filePath, sourcePngData) => {
             if (isPngPath(filePath)) {
               if (isDraftPngShellCard(parsed)) {
-                handleCardLoaded(parsed, filePath, sourcePngData ?? null);
+                handleCardLoaded(
+                  parsed,
+                  filePath,
+                  sourcePngData ?? null,
+                  createImportReviewSummary(parsed, filePath, "PNG image shell"),
+                );
                 setWorkspaceMessage(
                   `Started a blank character using ${filePath} as the portrait.`,
                 );
@@ -1236,13 +1290,27 @@ export default function WorkspacePage() {
               return;
             }
 
-            handleCardLoaded(parsed, filePath, sourcePngData ?? null);
+            handleCardLoaded(
+              parsed,
+              filePath,
+              sourcePngData ?? null,
+              createImportReviewSummary(
+                parsed,
+                filePath,
+                inferImportFormatLabel(filePath),
+              ),
+            );
             setWorkspaceMessage(null);
           }}
           onDropError={setWorkspaceMessage}
           onImageOnlyPng={(filePath, sourcePngData) => {
             const blankCard = createBlankDraftCharacterCard(filePath);
-            handleCardLoaded(blankCard, filePath, sourcePngData ?? null);
+            handleCardLoaded(
+              blankCard,
+              filePath,
+              sourcePngData ?? null,
+              createImportReviewSummary(blankCard, filePath, "PNG image shell"),
+            );
             setWorkspaceMessage(`Started a blank character using ${filePath} as the portrait.`);
           }}
         />
@@ -1301,6 +1369,11 @@ export default function WorkspacePage() {
                 pendingMetadataChoice.blankCard,
                 pendingMetadataChoice.filePath,
                 pendingMetadataChoice.sourcePngData,
+                createImportReviewSummary(
+                  pendingMetadataChoice.blankCard,
+                  pendingMetadataChoice.filePath,
+                  "PNG image shell",
+                ),
               );
               setWorkspaceMessage(
                 `Started a blank character using ${pendingMetadataChoice.filePath} as the portrait.`,
@@ -1312,6 +1385,11 @@ export default function WorkspacePage() {
                 pendingMetadataChoice.storedCard,
                 pendingMetadataChoice.filePath,
                 pendingMetadataChoice.sourcePngData,
+                createImportReviewSummary(
+                  pendingMetadataChoice.storedCard,
+                  pendingMetadataChoice.filePath,
+                  "PNG stored card metadata",
+                ),
               );
               setWorkspaceMessage(
                 `Imported ${pendingMetadataChoice.storedCard.data.name} from stored PNG metadata.`,
@@ -1326,6 +1404,10 @@ export default function WorkspacePage() {
             <p className="rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2 text-sm text-zinc-400">
               {workspaceMessage}
             </p>
+          ) : null}
+
+          {lastImportReview ? (
+            <ImportReviewPanel review={lastImportReview} />
           ) : null}
 
           <section className="grid gap-5 xl:grid-cols-[minmax(22rem,0.72fr)_minmax(0,1fr)]">
@@ -1506,6 +1588,7 @@ export default function WorkspacePage() {
           ) : null}
 
           <DevToolsPanel onSeeded={library.refresh} />
+          <SemanticNodeCreatorPanel />
         </div>
       </div>
     </StudioShell>
@@ -3218,6 +3301,171 @@ function createImagePromptPreview(fields: Record<StarterFieldKey, string>) {
     "Tag-style prompt:",
     tagPrompt,
   ]);
+}
+
+function ImportReviewPanel({ review }: { review: ImportReviewSummary }) {
+  return (
+    <section className="rounded-xl border border-border bg-card/75 p-4 shadow-sm">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="size-4 text-emerald-500" />
+            <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+              Import Review
+            </h2>
+          </div>
+          <p className="mt-1 truncate text-sm text-foreground">
+            {review.formatLabel}
+          </p>
+          <p className="mt-1 break-all font-mono text-[11px] text-muted-foreground">
+            {review.filePath}
+          </p>
+        </div>
+        {review.warnings.length > 0 ? (
+          <span className="inline-flex items-center gap-1 rounded-md border border-amber-400/30 bg-amber-400/10 px-2 py-1 text-[11px] font-semibold text-amber-700 dark:text-amber-200">
+            <AlertTriangle className="size-3" />
+            {review.warnings.length} warning
+            {review.warnings.length === 1 ? "" : "s"}
+          </span>
+        ) : (
+          <span className="rounded-md border border-emerald-400/30 bg-emerald-400/10 px-2 py-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-200">
+            Ready to edit
+          </span>
+        )}
+      </div>
+
+      <div className="mt-3 grid gap-3 md:grid-cols-3">
+        <ImportReviewColumn
+          label="Preserved"
+          tone="good"
+          values={review.preservedFields}
+        />
+        <ImportReviewColumn
+          label="Empty / optional"
+          tone="muted"
+          values={review.emptyFields}
+        />
+        <ImportReviewColumn
+          label="Review"
+          tone="warning"
+          values={review.warnings}
+        />
+      </div>
+    </section>
+  );
+}
+
+function ImportReviewColumn({
+  label,
+  tone,
+  values,
+}: {
+  label: string;
+  tone: "good" | "muted" | "warning";
+  values: string[];
+}) {
+  const toneClass =
+    tone === "good"
+      ? "border-emerald-400/20 bg-emerald-400/5"
+      : tone === "warning"
+        ? "border-amber-400/25 bg-amber-400/10"
+        : "border-border bg-background/60";
+
+  return (
+    <div className={cn("rounded-lg border p-3", toneClass)}>
+      <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">
+        {label}
+      </p>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {values.length > 0 ? (
+          values.map((value) => (
+            <span
+              key={value}
+              className="rounded-md border border-border/70 bg-card px-2 py-1 text-[11px] text-muted-foreground"
+            >
+              {value}
+            </span>
+          ))
+        ) : (
+          <span className="text-xs text-muted-foreground">None</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function createImportReviewSummary(
+  card: ValidatedCharacterCardV3,
+  filePath: string,
+  formatLabel: string,
+): ImportReviewSummary {
+  const data = card.data;
+  const fields = [
+    { label: "Name", value: data.name },
+    { label: "Description", value: data.description },
+    { label: "Personality", value: data.personality },
+    { label: "Scenario", value: data.scenario },
+    { label: "First message", value: data.first_mes },
+    { label: "Example dialogue", value: data.mes_example },
+    { label: "Creator notes", value: data.creator_notes },
+    { label: "System prompt", value: data.system_prompt },
+    { label: "Post history", value: data.post_history_instructions },
+    { label: "Tags", value: data.tags },
+    { label: "Alt greetings", value: data.alternate_greetings },
+    { label: "Lorebook", value: data.character_book?.entries },
+  ];
+  const preservedFields = fields
+    .filter((field) => hasImportReviewValue(field.value))
+    .map((field) => field.label);
+  const emptyFields = fields
+    .filter((field) => !hasImportReviewValue(field.value))
+    .map((field) => field.label);
+  const warnings = [
+    hasImportReviewValue(data.first_mes)
+      ? null
+      : "First message is empty; add an opening before chat testing.",
+    data.tags.length > 0
+      ? null
+      : "No tags found; add discoverability and routing tags before export.",
+    hasImportReviewValue(data.personality) || hasImportReviewValue(data.description)
+      ? null
+      : "Character prose is sparse; review description and personality.",
+    formatLabel.includes("shell")
+      ? "Image-only import created a draft card shell."
+      : null,
+  ].filter(Boolean) as string[];
+
+  return {
+    emptyFields,
+    filePath,
+    formatLabel,
+    preservedFields,
+    warnings,
+  };
+}
+
+function hasImportReviewValue(value: unknown) {
+  if (Array.isArray(value)) {
+    return value.length > 0;
+  }
+
+  return typeof value === "string" ? value.trim().length > 0 : Boolean(value);
+}
+
+function inferImportFormatLabel(filePath: string) {
+  if (/\.json$/i.test(filePath)) {
+    return "JSON card converted to CCV3";
+  }
+
+  if (isPngPath(filePath)) {
+    return "PNG stored card metadata";
+  }
+
+  if (/\.charx$/i.test(filePath)) {
+    return "CHARX card archive";
+  }
+
+  return "Character card import";
 }
 
 function PngMetadataChoiceModal(props: {

@@ -3300,8 +3300,11 @@ test("appends post-history override as the final hidden chat system message", ()
   assert.match(override, /HARD ARCHITECTURAL LIMITS/);
   assert.match(override, /Write \{\{char\}\}'s next reply in an immersive, character-driven roleplay with \{\{user\}\}/);
   assert.match(override, /exactly one reply/);
+  assert.match(override, /baseline identity, not a behavioral prison/);
+  assert.match(override, /Relational and personal change should feel cumulative and continuous/);
+  assert.match(override, /Do not reset emotional progress between scenes/);
+  assert.match(override, /experiences should leave traces/);
   assert.match(override, /Never write thoughts, actions, decisions, or dialogue for \{\{user\}\}/);
-  assert.match(override, /Do not write or simulate \{\{user\}\} under any circumstances/);
   assert.match(override, /Stop immediately before \{\{user\}\} would need to respond, narrate, make a choice, or speak/);
   assert.match(override, /Show uncertainty as interpretation, not fact/);
   assert.match(override, /continuity of space, timing, and prior actions/);

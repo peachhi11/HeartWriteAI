@@ -98,6 +98,7 @@ export function SearchableSeedPicker({
         {entries.length > 0 ? (
           entries.map((entry) => {
             const isSelected = selectedKeySet.has(entry.registryKey);
+            const visibleTags = dedupeSeedPickerTags(entry.tags).slice(0, 4);
 
             return (
               <button
@@ -126,9 +127,9 @@ export function SearchableSeedPicker({
                 <p className="mt-1 truncate text-[11px] text-muted-foreground">
                   {entry.sourceLabel} / {entry.category}
                 </p>
-                {entry.tags.length > 0 ? (
+                {visibleTags.length > 0 ? (
                   <div className="mt-2 flex flex-wrap gap-1">
-                    {entry.tags.slice(0, 4).map((tag) => (
+                    {visibleTags.map((tag) => (
                       <span
                         className="rounded-full border bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground"
                         key={`${entry.registryKey}-${tag}`}
@@ -149,4 +150,19 @@ export function SearchableSeedPicker({
       </div>
     </section>
   );
+}
+
+function dedupeSeedPickerTags(tags: readonly string[]) {
+  const seen = new Set<string>();
+
+  return tags.filter((tag) => {
+    const normalized = tag.trim().toLowerCase();
+
+    if (!normalized || seen.has(normalized)) {
+      return false;
+    }
+
+    seen.add(normalized);
+    return true;
+  });
 }

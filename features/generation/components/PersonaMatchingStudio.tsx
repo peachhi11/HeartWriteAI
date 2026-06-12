@@ -257,6 +257,11 @@ import {
   findRelationshipDynamicVocabularyById,
   RELATIONSHIP_DYNAMIC_VOCABULARY_PRESETS,
 } from "@/data/relationshipDynamicVocabulary";
+import {
+  compileStandardVocabularySeedPrompt,
+  findStandardVocabularySeedBySeed,
+  searchStandardVocabularySeeds,
+} from "@/data/standardVocabularySeedRegistry";
 import { compileSemanticSeedPromptAdditions } from "@/lib/character-card/semanticSeedResolver";
 import {
   compileRegretPresetAdditions,
@@ -559,8 +564,11 @@ export function PersonaMatchingStudio() {
         : [...current, entry].slice(-8),
     );
 
-    const compiledSeed =
-      entry.kind === "semantic"
+    const compiledSeed = entry.vocabularySeed
+      ? compileStandardVocabularySeedPrompt(entry.vocabularySeed, {
+          header: "Vocabulary match profile",
+        })
+      : entry.kind === "semantic"
         ? compileSemanticSeedPromptAdditions([entry.id], {
             header: "Semantic match profile",
             includeRelated: true,
@@ -696,7 +704,7 @@ export function PersonaMatchingStudio() {
 
           <SearchableSeedPicker
             description="Use semantic seeds as compatibility profiles for the target card."
-            kinds={["semantic", "preset"]}
+            kinds={["semantic", "preset", "vocabulary"]}
             label="Semantic Match Seeds"
             lanes={["semantic", "personality", "world", "metadata"]}
             maxResults={6}
@@ -936,6 +944,15 @@ function tokenizeMatchingSeedInput(rawText: string) {
 }
 
 function compileMatchingVocabularySeedCandidate(seedId: string) {
+  const standardVocabulary =
+    findStandardVocabularySeedBySeed(seedId) ??
+    searchStandardVocabularySeeds(seedId, { limit: 1 })[0];
+  if (standardVocabulary) {
+    return compileStandardVocabularySeedPrompt(standardVocabulary, {
+      header: "Vocabulary matching guidance",
+    });
+  }
+
   const semanticSeed = compileSemanticSeedPromptAdditions([seedId], {
     header: "Semantic matching guidance",
   });

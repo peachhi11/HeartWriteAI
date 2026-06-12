@@ -4,6 +4,7 @@ import {
   FormEvent,
   PointerEvent as ReactPointerEvent,
   useEffect,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -26,6 +27,7 @@ import { ContextRecallInspector } from "@/components/context-recall-inspector";
 import { GlowingConnectionNode } from "@/components/glowing-connection-node";
 import { LoreActivationBadge } from "@/components/lore-activation-badge";
 import { LorebookControlPanel } from "@/components/lorebook-control-panel";
+import { RuntimeContextInspector } from "@/components/runtime-context-inspector";
 import ProsePixieModal, {
   type ProsePixieTarget,
 } from "@/components/prose-pixie-modal";
@@ -59,6 +61,7 @@ import {
   ContextCompiler,
   estimateContextTokens,
   type ContextChatMessage,
+  type ContextCompilationResult,
   type ContextLorebookEntry,
 } from "@/lib/character-card/contextCompiler";
 import { classifyTropeInput } from "@/lib/character-card/tropeMatcher";
@@ -66,6 +69,11 @@ import {
   type LlmProviderConfig,
   streamLlmCompletion,
 } from "@/lib/inference/llmConnector";
+import {
+  formatInferenceProviderLabel,
+  formatInferenceProviderTarget,
+  getInferenceModelLabel,
+} from "@/lib/inference/inferenceLabels";
 import { fetchContextualNpcDialogue } from "@/lib/tauri/contextualDialogue";
 import {
   createLoreRecallAuditLogs,
@@ -103,12 +111,11 @@ import type { ActionCardVariant } from "@/types/cards";
 import type { SystemSyncStatus } from "@/types/diagnostics";
 import type { DockingState, SidePanelType } from "@/types/dock";
 import type { GeneratedLorebookArtifact } from "@/features/generation/workflows";
-import type { InferenceConfig } from "@/types/inference";
+import { INFERENCE_DEFAULT_MATRIX, type InferenceConfig } from "@/types/inference";
 import type { LoreRecallAuditLog } from "@/types/lorebook";
 
 const PREVIEW_CHAT_ID = "preview-chat";
 const PREVIEW_CHAT_UPDATED_AT = 0;
-const CHAT_CONTEXT_MAX_TOKENS = 8192;
 
 const initialMessages: RoleplayMessage[] = [
   {
@@ -219,9 +226,7 @@ export default function RoleplayChat() {
   const [input, setInput] = useState("");
   const [scenarioId, setScenarioId] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [inferenceConfig, setInferenceConfig] = useState(() =>
-    loadInferenceConfig(),
-  );
+  const [inferenceConfig, setInferenceConfig] = useState(INFERENCE_DEFAULT_MATRIX);
   const [intentModalOpen, setIntentModalOpen] = useState(false);
   const [prosePixieTarget, setProsePixieTarget] = useState<
     (ProsePixieTarget & { messageId: string }) | null
@@ -257,6 +262,21 @@ export default function RoleplayChat() {
   const isLorebookDockVisible =
     dockingState.activePanel === "Lorebook" && !dockingState.isCollapsed;
   const loreDiagnostic = getLorebookDiagnostic(activeLorebook);
+  const contextPreview = useMemo(
+    () =>
+      compileLiveChatContextPreview({
+        activeLoreFeed,
+        history: messages,
+        maxTokens: inferenceConfig.contextLength,
+        override: activeSession.scenarioOverride,
+      }),
+    [
+      activeLoreFeed,
+      activeSession.scenarioOverride,
+      inferenceConfig.contextLength,
+      messages,
+    ],
+  );
 
   useEffect(() => {
     if (!relationshipHydrated) {
@@ -547,11 +567,13 @@ export default function RoleplayChat() {
       }
 
       const latestInferenceConfig = loadInferenceConfig();
-      const contextMessages = await compileLiveChatContextMessages({
+      const contextCompilation = await compileLiveChatContextMessages({
         history: messages,
         loreActivation,
+        maxTokens: latestInferenceConfig.contextLength,
         override: activeSession.scenarioOverride,
       });
+      const contextMessages = contextCompilation.messages;
       let accumulatedResponse = "";
 
       const didUseNativeStream =
@@ -595,11 +617,13 @@ export default function RoleplayChat() {
         return;
       }
 
-      const compiledMessages = await compileLiveChatContextMessages({
+      const compiledContext = await compileLiveChatContextMessages({
         history: updatedMessages,
         loreActivation,
+        maxTokens: latestInferenceConfig.contextLength,
         override: activeSession.scenarioOverride,
       });
+      const compiledMessages = compiledContext.messages;
 
       await streamLlmCompletion(
         toLlmConnectorMessages(compiledMessages),
@@ -722,11 +746,13 @@ export default function RoleplayChat() {
 
       const latestInferenceConfig = loadInferenceConfig();
       let accumulatedResponse = "";
-      const contextMessages = await compileLiveChatContextMessages({
+      const contextCompilation = await compileLiveChatContextMessages({
         history: contextBeforeParent,
         loreActivation,
+        maxTokens: latestInferenceConfig.contextLength,
         override: activeSession.scenarioOverride,
       });
+      const contextMessages = contextCompilation.messages;
       const didUseNativeStream =
         latestInferenceConfig.provider === "ollama" &&
         (await streamLocalLlmResponse(
@@ -751,11 +777,13 @@ export default function RoleplayChat() {
         ));
 
       if (!didUseNativeStream) {
-        const compiledMessages = await compileLiveChatContextMessages({
+        const compiledContext = await compileLiveChatContextMessages({
           history: baseMessages,
           loreActivation,
+          maxTokens: latestInferenceConfig.contextLength,
           override: activeSession.scenarioOverride,
         });
+        const compiledMessages = compiledContext.messages;
 
         await streamLlmCompletion(
           toLlmConnectorMessages(compiledMessages),
@@ -1288,6 +1316,7 @@ export default function RoleplayChat() {
                 onClearAuditLog={() => setLoreRecallLogs([])}
                 recallLogs={loreRecallLogs}
               />
+              <RuntimeContextInspector compilation={contextPreview} />
             </div>
           </aside>
         ) : null}
@@ -1484,30 +1513,62 @@ async function persistDialogueHistory(
 async function compileLiveChatContextMessages(input: {
   history: RoleplayMessage[];
   loreActivation: LoreActivationPayload;
+  maxTokens: number;
   override: ScenarioOverride;
-}): Promise<ContextChatMessage[]> {
-  const compileInput = {
-    activeLorebookEntries: loreActivationToContextEntries(input.loreActivation),
+}): Promise<ContextCompilationResult> {
+  return ContextCompiler.compileDetailedWithTokenCounter(
+    createLiveChatContextCompileInput({
+      activeLorebookEntries: loreActivationToContextEntries(input.loreActivation),
+      history: input.history,
+      loreInjectionChunk: input.loreActivation.loreInjectionChunk,
+      maxTokens: input.maxTokens,
+      override: input.override,
+    }),
+    countLiveChatTokens,
+  );
+}
+
+function compileLiveChatContextPreview(input: {
+  activeLoreFeed: string;
+  history: RoleplayMessage[];
+  maxTokens: number;
+  override: ScenarioOverride;
+}): ContextCompilationResult {
+  return ContextCompiler.compileDetailed(
+    createLiveChatContextCompileInput({
+      activeLorebookEntries: activeLoreFeedToContextEntries(input.activeLoreFeed),
+      history: input.history,
+      loreInjectionChunk: input.activeLoreFeed,
+      maxTokens: input.maxTokens,
+      override: input.override,
+    }),
+  );
+}
+
+function createLiveChatContextCompileInput(input: {
+  activeLorebookEntries: ContextLorebookEntry[];
+  history: RoleplayMessage[];
+  loreInjectionChunk: string;
+  maxTokens: number;
+  override: ScenarioOverride;
+}) {
+  return {
+    activeLorebookEntries: input.activeLorebookEntries,
     chatHistory: toOllamaMessages(input.history).map((message) => ({
       content: message.content,
       role: message.role,
     })),
-    maxTokens: CHAT_CONTEXT_MAX_TOKENS,
+    maxTokens: input.maxTokens,
     reserveTokens: 500,
     systemPrompt: [
       "Roleplay naturally and preserve user agency.",
       "Do not write {{user}} decisions, private thoughts, dialogue, consent, or actions.",
-      input.loreActivation.loreInjectionChunk.trim()
+      input.loreInjectionChunk.trim()
         ? "Use only the remembered lore that directly fits this turn. Do not dump unrelated background."
         : "",
     ].filter(Boolean).join("\n"),
     v3Scenario: scenarioOverrideToContextScenario(input.override),
   };
-
-  return ContextCompiler.compileDetailedWithTokenCounter(
-    compileInput,
-    countLiveChatTokens,
-  ).then((result) => result.messages);
 }
 
 function toLlmConnectorMessages(messages: ContextChatMessage[]) {
@@ -1542,6 +1603,17 @@ function createLlmProviderConfig(
     };
   }
 
+  if (config.provider === "proxy") {
+    return {
+      baseUrl: config.localEndpoint,
+      maxTokens: config.maxTokens,
+      model: config.selectedModel,
+      provider: "proxy",
+      temperature: config.temperature,
+      topP: config.topP,
+    };
+  }
+
   return {
     baseUrl: config.localEndpoint,
     maxTokens: config.maxTokens,
@@ -1550,32 +1622,6 @@ function createLlmProviderConfig(
     temperature: config.temperature,
     topP: config.topP,
   };
-}
-
-function formatInferenceProviderLabel(config: InferenceConfig) {
-  if (config.provider === "openrouter") {
-    return "OpenRouter";
-  }
-
-  return config.provider === "openai-compatible"
-    ? "OpenAI-compatible local"
-    : "Ollama";
-}
-
-function getInferenceModelLabel(config: InferenceConfig) {
-  return config.provider === "openrouter"
-    ? config.openRouterModel
-    : config.selectedModel;
-}
-
-function formatInferenceProviderTarget(config: InferenceConfig) {
-  if (config.provider === "openrouter") {
-    return "OpenRouter chat completions";
-  }
-
-  return config.provider === "openai-compatible"
-    ? `local OpenAI-compatible endpoint at ${config.localEndpoint}`
-    : `local Ollama at ${config.localEndpoint}`;
 }
 
 function scenarioOverrideToContextScenario(override: ScenarioOverride) {
@@ -1613,6 +1659,25 @@ function loreActivationToContextEntries(
     key: match.entryTitle || match.entryId,
     priority: 100 - index,
   }));
+}
+
+function activeLoreFeedToContextEntries(
+  activeLoreFeed: string,
+): ContextLorebookEntry[] {
+  const trimmed = activeLoreFeed.trim();
+
+  if (!trimmed) {
+    return [];
+  }
+
+  return [
+    {
+      content: trimmed,
+      depth: 4,
+      key: "Active lore feed",
+      priority: 100,
+    },
+  ];
 }
 
 async function countLiveChatTokens(text: string) {

@@ -18,6 +18,7 @@ export async function saveInferenceConfig(config: InferenceConfig) {
 
   const safeConfig = normalizeInferenceConfig(config);
   window.localStorage.setItem(INFERENCE_STORAGE_KEY, JSON.stringify(safeConfig));
+  window.dispatchEvent(new CustomEvent("heartwriteai:inference-settings"));
 
   try {
     const nativeConfig = await exportUserInferenceSettings(safeConfig);
@@ -27,6 +28,7 @@ export async function saveInferenceConfig(config: InferenceConfig) {
         INFERENCE_STORAGE_KEY,
         JSON.stringify(normalizedNativeConfig),
       );
+      window.dispatchEvent(new CustomEvent("heartwriteai:inference-settings"));
       return normalizedNativeConfig;
     }
   } catch (error) {

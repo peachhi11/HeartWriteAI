@@ -1,4 +1,8 @@
-export type LlmProvider = "ollama" | "openai-compatible" | "openrouter";
+export type LlmProvider =
+  | "ollama"
+  | "openai-compatible"
+  | "openrouter"
+  | "proxy";
 
 export interface LlmChatMessage {
   content: string;
@@ -98,7 +102,11 @@ export function parseProviderStreamChunk(
       continue;
     }
 
-    if (provider === "openrouter" || provider === "openai-compatible") {
+    if (
+      provider === "openrouter" ||
+      provider === "openai-compatible" ||
+      provider === "proxy"
+    ) {
       const parsed = parseOpenRouterStreamLine(line);
       if (parsed.done) {
         done = true;
@@ -169,7 +177,11 @@ function createProviderBody(
   messages: LlmChatMessage[],
   config: LlmProviderConfig,
 ) {
-  if (config.provider === "openrouter" || config.provider === "openai-compatible") {
+  if (
+    config.provider === "openrouter" ||
+    config.provider === "openai-compatible" ||
+    config.provider === "proxy"
+  ) {
     return {
       max_tokens: config.maxTokens,
       messages,
@@ -217,6 +229,10 @@ function resolveProviderEndpoint(config: LlmProviderConfig) {
     );
   }
 
+  if (config.provider === "proxy") {
+    return config.baseUrl ?? "http://127.0.0.1:3000/api/chat";
+  }
+
   return config.baseUrl ?? (config.provider === "openrouter"
     ? DEFAULT_OPENROUTER_ENDPOINT
     : DEFAULT_OLLAMA_ENDPOINT);
@@ -227,7 +243,11 @@ function formatProviderName(provider: LlmProvider) {
     return "OpenRouter";
   }
 
-  return provider === "openai-compatible" ? "OpenAI-compatible local" : "Ollama";
+  if (provider === "openai-compatible") {
+    return "OpenAI-compatible local";
+  }
+
+  return provider === "proxy" ? "Proxy/API" : "Ollama";
 }
 
 function normalizeOpenAiCompatibleEndpoint(baseUrl: string) {

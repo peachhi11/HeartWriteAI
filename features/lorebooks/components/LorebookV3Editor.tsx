@@ -63,6 +63,11 @@ export function LorebookV3Editor(props: {
       ),
     [props.document.data.entries],
   );
+  const tokenBudget = props.document.data.token_budget ?? TOTAL_TOKEN_WARNING;
+  const tokenBudgetPercent = Math.min(
+    100,
+    Math.round((totalEstimatedTokens / Math.max(1, tokenBudget)) * 100),
+  );
 
   function updateDocument(patch: Partial<LorebookV3Document["data"]>) {
     props.onChange(
@@ -162,9 +167,13 @@ export function LorebookV3Editor(props: {
                 <p className="mt-1 truncate text-xs text-muted-foreground">
                   {entry.keys.join(", ") || "No keys"}
                 </p>
-                <div className="mt-2 flex gap-1">
+                <div className="mt-2 flex flex-wrap gap-1">
+                  <Badge variant={entry.enabled ? "secondary" : "outline"}>
+                    {entry.enabled ? "active" : "disabled"}
+                  </Badge>
                   {entry.constant ? <Badge variant="secondary">constant</Badge> : null}
-                  {!entry.enabled ? <Badge variant="outline">disabled</Badge> : null}
+                  {entry.selective ? <Badge variant="outline">selective</Badge> : null}
+                  {entry.use_regex ? <Badge variant="outline">regex</Badge> : null}
                 </div>
               </button>
             ))}
@@ -186,6 +195,24 @@ export function LorebookV3Editor(props: {
                   {estimateTokens(selectedEntry.content)} tokens ·{" "}
                   {selectedEntry.content.length} chars
                 </p>
+                <div className="mt-2 flex flex-wrap gap-1">
+                  <Badge variant={selectedEntry.enabled ? "secondary" : "outline"}>
+                    {selectedEntry.enabled ? "active" : "disabled"}
+                  </Badge>
+                  {selectedEntry.constant ? (
+                    <Badge variant="secondary">always active</Badge>
+                  ) : null}
+                  {selectedEntry.selective ? (
+                    <Badge variant="outline">requires secondary key</Badge>
+                  ) : null}
+                  {selectedEntry.position ? (
+                    <Badge variant="outline">
+                      {selectedEntry.position === "before_char"
+                        ? "before character"
+                        : "after character"}
+                    </Badge>
+                  ) : null}
+                </div>
               </div>
               <Button
                 type="button"
@@ -334,6 +361,21 @@ export function LorebookV3Editor(props: {
               disabled={!selectedEntry}
             />
           </Field>
+          <Field label="Insertion position">
+            <select
+              value={selectedEntry?.position ?? "after_char"}
+              onChange={(event) =>
+                updateSelectedEntry({
+                  position: event.currentTarget.value as LorebookV3Entry["position"],
+                })
+              }
+              disabled={!selectedEntry}
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm"
+            >
+              <option value="before_char">Before character</option>
+              <option value="after_char">After character</option>
+            </select>
+          </Field>
         </div>
 
         <div className="grid gap-2 rounded-md border bg-card/60 p-3 text-sm text-muted-foreground">
@@ -371,10 +413,43 @@ export function LorebookV3Editor(props: {
           />
         </div>
 
-        <div className="rounded-md border bg-card/60 p-3 text-sm text-muted-foreground">
-          <p>Total estimated tokens: {totalEstimatedTokens}</p>
-          <p>Entries: {props.document.data.entries.length}</p>
-          <p>Active entries: {props.document.data.entries.filter((entry) => entry.enabled).length}</p>
+        <div className="grid gap-3 rounded-md border bg-card/60 p-3 text-sm text-muted-foreground">
+          <div>
+            <div className="flex items-center justify-between gap-3">
+              <p className="font-medium text-foreground">Token budget</p>
+              <span className="font-mono text-xs">
+                {totalEstimatedTokens} / {tokenBudget}
+              </span>
+            </div>
+            <div className="mt-2 h-1.5 overflow-hidden rounded-full bg-muted">
+              <div
+                className={cn(
+                  "h-full rounded-full",
+                  tokenBudgetPercent > 90
+                    ? "bg-amber-500"
+                    : tokenBudgetPercent > 70
+                      ? "bg-primary"
+                      : "bg-emerald-500",
+                )}
+                style={{ width: `${tokenBudgetPercent}%` }}
+              />
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <p>Entries: {props.document.data.entries.length}</p>
+            <p>
+              Active:{" "}
+              {props.document.data.entries.filter((entry) => entry.enabled).length}
+            </p>
+            <p>
+              Constant:{" "}
+              {props.document.data.entries.filter((entry) => entry.constant).length}
+            </p>
+            <p>
+              Selective:{" "}
+              {props.document.data.entries.filter((entry) => entry.selective).length}
+            </p>
+          </div>
         </div>
 
         <details className="rounded-md border bg-card/60 p-3">
@@ -437,13 +512,21 @@ function Toggle(props: {
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex items-center gap-2">
+    <label
+      className={cn(
+        "flex cursor-pointer items-center justify-between gap-3 rounded-md border px-3 py-2 transition",
+        props.checked
+          ? "border-primary/50 bg-primary/10 text-foreground"
+          : "border-border/70 bg-background/70 text-muted-foreground",
+      )}
+    >
+      <span>{props.label}</span>
       <input
         checked={props.checked}
+        className="accent-rose-600"
         onChange={(event) => props.onChange(event.currentTarget.checked)}
         type="checkbox"
       />
-      {props.label}
     </label>
   );
 }
