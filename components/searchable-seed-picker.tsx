@@ -97,7 +97,8 @@ export function SearchableSeedPicker({
       <div className="grid max-h-72 gap-2 overflow-y-auto pr-1">
         {entries.length > 0 ? (
           entries.map((entry) => {
-            const isSelected = selectedKeySet.has(entry.registryKey);
+            const isSelected =
+              selectedKeySet.has(entry.registryKey) || selectedKeySet.has(entry.id);
             const visibleTags = dedupeSeedPickerTags(entry.tags).slice(0, 4);
 
             return (

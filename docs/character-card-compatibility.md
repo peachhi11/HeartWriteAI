@@ -190,6 +190,18 @@ CCV3 `data.system_prompt` is allowed to replace the app's default runtime system
 
 `data.post_history_instructions` remains final-turn steering and should be placed after assembled character, persona, world, lore, memory, and recent-chat context.
 
+HeartWriteAI tracks this with a SillyTavern-style ordered prompt stack in
+[`types/promptLayout.ts`](../types/promptLayout.ts). The runtime distinction is:
+
+- `main_prompt` and `enhance_definitions` are global behavior and formatting rules.
+- `char_description`, `char_personality`, and `scenario` are character-card content.
+- `persona_description` is user persona context and must not mutate the card.
+- `world_info_before` and `world_info_after` are lorebook placement lanes.
+- `chat_examples` demonstrates voice and format.
+- `chat_history` carries recent events and protected milestones.
+- `impersonation` is a runtime-only override for intentional user-perspective turns.
+- `post_history_instructions` stays last and controls reply pacing, ending style, and final reminders.
+
 Runtime romance pacing should be managed outside the static card file. Story-engine tags such as `angsty`, `slow burn`, `hurt/comfort`, or `dark romance` may select an internal route profile, but the detailed relationship tier, trigger state, emotion blend, body cue, and sensory priority data belongs in saved chat/session state. The card should export readable tags and author instructions, not hidden intimacy-score machinery.
 
 ## Minor NPC Guardrail

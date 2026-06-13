@@ -8,6 +8,13 @@ import {
   createEmptyCharacterCreationForm,
 } from "../../lib/character-card/characterCreationFormCompiler";
 import {
+  applySeedPickerEntryToCharacterCreationForm,
+} from "../../lib/character-card/characterCreationSeedTemplates";
+import {
+  SEED_PICKER_ENTRIES,
+  searchSeedPickerEntries,
+} from "../../data/seedPickerRegistry";
+import {
   HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY,
   HEARTWRITE_PERSONALITY_ENGINE_EXTENSION_KEY,
 } from "../../types/character-card/CharacterCreationForm";
@@ -22,6 +29,82 @@ test("hydrates an empty sectioned character creation form", () => {
   assert.equal(form.psychology.bigFive.openness, "");
   assert.deepEqual(form.relationships.targetOverrides, []);
   assert.deepEqual(form.semanticSeedIds, []);
+});
+
+test("applies semantic seed picker entries as editable form templates", () => {
+  const form = createEmptyCharacterCreationForm();
+  const [replacementFear] = searchSeedPickerEntries(
+    "divided attention temporary",
+    {
+      kinds: ["semantic"],
+      limit: 1,
+    },
+  );
+
+  assert.ok(replacementFear);
+  assert.equal(replacementFear.id, "fear_of_replacement");
+
+  const nextForm = applySeedPickerEntryToCharacterCreationForm(
+    form,
+    replacementFear,
+  );
+  const repeatedForm = applySeedPickerEntryToCharacterCreationForm(
+    nextForm,
+    replacementFear,
+  );
+
+  assert.deepEqual(nextForm.semanticSeedIds, ["fear_of_replacement"]);
+  assert.match(nextForm.psychology.coreWound, /Fear of replacement/);
+  assert.match(
+    nextForm.psychology.coreWound,
+    /Interprets divided attention as a sign of being temporary/,
+  );
+  assert.match(nextForm.psychology.coreWound, /Tracks potential rivals/);
+  assert.equal(repeatedForm.psychology.coreWound, nextForm.psychology.coreWound);
+  assert.deepEqual(repeatedForm.semanticSeedIds, ["fear_of_replacement"]);
+});
+
+test("routes rich vocabulary seed picker entries into their natural creator fields", () => {
+  const form = createEmptyCharacterCreationForm();
+  const actsOfService = SEED_PICKER_ENTRIES.find(
+    (entry) =>
+      entry.kind === "vocabulary" &&
+      entry.id.endsWith(":acts_of_service"),
+  );
+
+  assert.ok(actsOfService);
+  assert.equal(actsOfService.label, "Acts Of Service");
+
+  const nextForm = applySeedPickerEntryToCharacterCreationForm(
+    form,
+    actsOfService,
+  );
+
+  assert.deepEqual(nextForm.semanticSeedIds, [
+    "acts-of-service-vocabulary:acts_of_service",
+  ]);
+  assert.match(nextForm.psychology.loveLanguages, /Acts Of Service/);
+  assert.match(nextForm.psychology.loveLanguages, /service/i);
+  assert.match(nextForm.psychology.loveLanguages, /Romance hooks:/);
+});
+
+test("routes preset seed picker entries without exposing internal semantic IDs", () => {
+  const form = createEmptyCharacterCreationForm();
+  const preset = SEED_PICKER_ENTRIES.find(
+    (entry) =>
+      entry.kind === "preset" &&
+      entry.lane === "world" &&
+      /routine|daily|domestic/i.test(entry.searchText),
+  );
+
+  assert.ok(preset);
+  assert.equal(preset.kind, "preset");
+
+  const nextForm = applySeedPickerEntryToCharacterCreationForm(form, preset);
+
+  assert.deepEqual(nextForm.semanticSeedIds, []);
+  assert.notEqual(nextForm.lifestyle.routines, "");
+  assert.match(nextForm.lifestyle.routines, new RegExp(preset.label));
 });
 
 test("folds split form input into one coherent editable CCv3 field set", () => {

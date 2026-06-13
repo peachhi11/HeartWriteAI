@@ -28,6 +28,7 @@ export interface SeedPickerEntry {
   sourceLabel: string;
   tags: readonly string[];
   value: string;
+  semanticNode?: SemanticSeedNode;
   vocabularySeed?: VocabularySeedPreset;
 }
 
@@ -209,6 +210,7 @@ function toSemanticPickerEntry(node: SemanticSeedNode): SeedPickerEntry {
     sourceLabel: "Semantic Registry",
     tags: node.tags,
     value: node.id,
+    semanticNode: node,
   };
 }
 

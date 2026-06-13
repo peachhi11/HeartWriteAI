@@ -37,6 +37,12 @@ import {
   parseCharacterCreationForm,
 } from "@/lib/character-card/characterCreationFormCompiler";
 import {
+  applySeedPickerEntryToCharacterCreationForm,
+  readCharacterCreationFormTextPath,
+  updateCharacterCreationFormPath,
+  type CharacterCreationFormPath,
+} from "@/lib/character-card/characterCreationSeedTemplates";
+import {
   buildCharacterCard,
   BuildCharacterCardResult,
   CreatorsNotesContentRating,
@@ -118,7 +124,6 @@ interface StructuredCardEditorProps {
 }
 
 type EditorTab = "identity" | "behavior" | "greetings";
-type CharacterCreationFormPath = ReadonlyArray<string | number>;
 type CharacterCreationFormTextField = {
   kind?: "input" | "textarea";
   label: string;
@@ -1671,7 +1676,7 @@ export default function StructuredCardEditor({
     value: string,
   ) {
     updateCharacterCreationForm(
-      updateNestedValue(characterCreationForm, path, value),
+      updateCharacterCreationFormPath(characterCreationForm, path, value),
     );
   }
 
@@ -1680,7 +1685,7 @@ export default function StructuredCardEditor({
     value: boolean,
   ) {
     updateCharacterCreationForm(
-      updateNestedValue(characterCreationForm, path, value),
+      updateCharacterCreationFormPath(characterCreationForm, path, value),
     );
   }
 
@@ -6037,6 +6042,7 @@ function CharacterCreationFormPanel({
         maxResults={8}
         onSelect={onSeedSelect}
         placeholder="Try fear of replacement, copper curls, slow burn, vampire..."
+        selectedKeys={form.semanticSeedIds}
       />
 
       {CHARACTER_CREATION_FORM_FIELD_GROUPS.map((group, index) => (
@@ -6197,7 +6203,7 @@ function CharacterCreationTextControl({
   form: CharacterCreationForm;
   onTextChange: (path: CharacterCreationFormPath, value: string) => void;
 }) {
-  const value = readNestedStringValue(form, field.path);
+  const value = readCharacterCreationFormTextPath(form, field.path);
   const className =
     "rounded-lg border border-zinc-800 bg-zinc-950 p-2.5 text-xs text-zinc-200 outline-none focus:border-violet-500";
 
@@ -8149,226 +8155,6 @@ function readStringArray(value: unknown) {
   return Array.isArray(value)
     ? value.filter((item): item is string => typeof item === "string")
     : [];
-}
-
-function readNestedStringValue(
-  source: CharacterCreationForm,
-  path: CharacterCreationFormPath,
-): string {
-  const value = path.reduce<unknown>((currentValue, pathPart) => {
-    if (currentValue === undefined || currentValue === null) {
-      return undefined;
-    }
-
-    return (currentValue as Record<string | number, unknown>)[pathPart];
-  }, source);
-
-  return typeof value === "string" ? value : "";
-}
-
-function applySeedPickerEntryToCharacterCreationForm(
-  form: CharacterCreationForm,
-  entry: SeedPickerEntry,
-): CharacterCreationForm {
-  let nextForm = form;
-
-  if (entry.kind === "semantic" || entry.kind === "vocabulary") {
-    nextForm = {
-      ...nextForm,
-      semanticSeedIds: Array.from(new Set([...nextForm.semanticSeedIds, entry.id])),
-    };
-  }
-
-  const targetPath = resolveCharacterCreationSeedTargetPath(entry);
-  const currentValue = readNestedStringValue(nextForm, targetPath);
-  const seedText = formatCharacterCreationSeedSnippet(entry);
-
-  return updateNestedValue(
-    nextForm,
-    targetPath,
-    appendCharacterCreationSeedText(currentValue, seedText),
-  );
-}
-
-function resolveCharacterCreationSeedTargetPath(
-  entry: SeedPickerEntry,
-): CharacterCreationFormPath {
-  if (entry.kind === "vocabulary") {
-    return resolveVocabularyCharacterCreationSeedTargetPath(entry);
-  }
-
-  if (entry.kind === "semantic") {
-    switch (entry.category) {
-      case "wounds":
-      case "fears":
-        return ["psychology", "coreWound"];
-      case "desires":
-      case "motivations":
-      case "goals_short":
-      case "goals_long":
-        return ["cognitiveDrivers", "motivation"];
-      case "triggers":
-        return ["psychology", "triggers"];
-      case "responses":
-        return ["psychology", "stressResponse"];
-      case "attachment_styles":
-        return ["psychology", "attachmentStyle"];
-      case "conflict_styles":
-        return ["psychology", "conflictStyle"];
-      case "repair_styles":
-        return ["relationships", "emotionalBonds", "trustMetric"];
-      case "love_languages":
-        return ["psychology", "loveLanguages"];
-      case "relationship_dynamics":
-      case "romance_tropes":
-      case "relationship_gates":
-      case "routes":
-        return ["relationships", "emotionalBonds", "attachmentType"];
-      case "appearance":
-        return ["appearance", "facialFeatures"];
-      case "fashion":
-        return ["appearance", "outfit"];
-      case "occupations":
-        return ["identity", "occupation"];
-      default:
-        return ["personality", "positiveTraits"];
-    }
-  }
-
-  switch (entry.lane) {
-    case "appearance":
-      return entry.category.toLowerCase().includes("outfit") ||
-        entry.category.toLowerCase().includes("style")
-        ? ["appearance", "outfit"]
-        : ["appearance", "facialFeatures"];
-    case "image":
-      return ["appearance", "outfit"];
-    case "personality":
-      return entry.category.toLowerCase().includes("backstory") ||
-        entry.category.toLowerCase().includes("event")
-        ? ["internalThoughts", "motivationsFears"]
-        : ["personality", "positiveTraits"];
-    case "world":
-      return ["lifestyle", "residence"];
-    default:
-      return ["personality", "positiveTraits"];
-  }
-}
-
-function formatCharacterCreationSeedSnippet(entry: SeedPickerEntry) {
-  if (entry.vocabularySeed) {
-    const seed = entry.vocabularySeed;
-    return [
-      `${seed.label}: ${seed.description}`,
-      seed.examples.length > 0 ? `Examples: ${seed.examples.slice(0, 2).join(" ")}` : "",
-      seed.romanceHooks.length > 0
-        ? `Romance hooks: ${seed.romanceHooks.slice(0, 3).join(", ")}.`
-        : "",
-      seed.scenarioHooks.length > 0
-        ? `Scenario hooks: ${seed.scenarioHooks.slice(0, 3).join(", ")}.`
-        : "",
-    ].filter(Boolean).join("\n");
-  }
-
-  const prefix = entry.kind === "semantic" ? entry.label : entry.value;
-  const detail = entry.description || entry.guidance;
-
-  return detail ? `${prefix}: ${detail}` : prefix;
-}
-
-function resolveVocabularyCharacterCreationSeedTargetPath(
-  entry: SeedPickerEntry,
-): CharacterCreationFormPath {
-  const seed = entry.vocabularySeed;
-  const haystack = [
-    entry.category,
-    entry.label,
-    entry.description,
-    ...entry.tags,
-    ...(seed?.romanceHooks ?? []),
-    ...(seed?.scenarioHooks ?? []),
-  ].join(" ").toLowerCase();
-
-  if (/image|visual|portrait|appearance|face|hair|outfit|clothing/.test(haystack)) {
-    return /outfit|clothing|fashion|fabric|armou?r|jewell?ery/.test(haystack)
-      ? ["appearance", "outfit"]
-      : ["appearance", "facialFeatures"];
-  }
-
-  if (/voice|speech|dialogue|accent|tone/.test(haystack)) {
-    return ["speechCommunication", "toneVocabulary"];
-  }
-
-  if (/origin_wound|wound|fear|shame|abandonment|betrayal/.test(haystack)) {
-    return ["psychology", "coreWound"];
-  }
-
-  if (/moral|ethic|justice|mercy|truth|loyalty|honou?r|duty/.test(haystack)) {
-    return ["behaviour", "moralityInAction"];
-  }
-
-  if (/relationship|romance|dynamic|complement|trope|gate|route/.test(haystack)) {
-    return ["relationships", "emotionalBonds", "attachmentType"];
-  }
-
-  return ["personality", "positiveTraits"];
-}
-
-function appendCharacterCreationSeedText(currentValue: string, nextValue: string) {
-  const trimmedCurrent = currentValue.trim();
-  const trimmedNext = nextValue.trim();
-
-  if (!trimmedNext) {
-    return trimmedCurrent;
-  }
-
-  if (trimmedCurrent.toLowerCase().includes(trimmedNext.toLowerCase())) {
-    return trimmedCurrent;
-  }
-
-  return [trimmedCurrent, trimmedNext].filter(Boolean).join("\n");
-}
-
-function updateNestedValue<Value extends string | boolean>(
-  source: CharacterCreationForm,
-  path: CharacterCreationFormPath,
-  value: Value,
-): CharacterCreationForm {
-  return parseCharacterCreationForm(
-    updateNestedValueAtPath(source, [...path], value),
-  );
-}
-
-function updateNestedValueAtPath<Value extends string | boolean>(
-  source: unknown,
-  path: Array<string | number>,
-  value: Value,
-): unknown {
-  if (path.length === 0) {
-    return value;
-  }
-
-  const [pathPart, ...remainingPath] = path;
-  const currentValue =
-    isRecord(source) || Array.isArray(source)
-      ? (source as Record<string | number, unknown>)[pathPart]
-      : undefined;
-  const nextValue = updateNestedValueAtPath(
-    currentValue,
-    remainingPath,
-    value,
-  );
-
-  if (Array.isArray(source)) {
-    return source.map((item, index) =>
-      index === pathPart ? nextValue : item,
-    );
-  }
-
-  return {
-    ...(isRecord(source) ? source : {}),
-    [pathPart]: nextValue,
-  };
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
