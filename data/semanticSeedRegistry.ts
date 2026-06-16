@@ -6,6 +6,7 @@ import type {
 } from "./heartwriteSeedTypes";
 import {
   ALL_STANDARD_VOCABULARY_SEEDS,
+  type StandardVocabularySeedSourceId,
 } from "./standardVocabularySeedRegistry";
 import type { VocabularySeedPreset } from "./vocabularySeedTypes";
 
@@ -10718,6 +10719,41 @@ export const STANDARD_VOCABULARY_SEMANTIC_NODES = Object.freeze(
   ALL_STANDARD_VOCABULARY_SEEDS.map(toSemanticSeedNodeFromStandardVocabularySeed),
 ) satisfies readonly SemanticSeedNode[];
 
+export const SEMANTIC_GRAPH_PROMOTION_SOURCE_IDS = Object.freeze([
+  "wound-vocabulary",
+  "origin-wound-vocabulary",
+  "fear-vocabulary",
+  "desire-vocabulary",
+  "trigger-vocabulary",
+  "response-vocabulary",
+] as const satisfies readonly StandardVocabularySeedSourceId[]);
+
+export const PROMOTED_SEMANTIC_GRAPH_NODES = Object.freeze(
+  STANDARD_VOCABULARY_SEMANTIC_NODES.filter((node) =>
+    node.sourceRegistryKeys?.some((sourceKey) =>
+      SEMANTIC_GRAPH_PROMOTION_SOURCE_IDS.some((sourceId) =>
+        sourceKey.startsWith(`${sourceId}:`),
+      ),
+    ),
+  ),
+) satisfies readonly SemanticSeedNode[];
+
+export const PROMOTED_SEMANTIC_GRAPH_NODE_IDS = Object.freeze(
+  PROMOTED_SEMANTIC_GRAPH_NODES.map((node) => node.id),
+);
+
+export const PROMOTED_SEMANTIC_GRAPH_NODES_BY_CATEGORY = Object.freeze(
+  SEMANTIC_SEED_REGISTRY_CATEGORIES.reduce(
+    (nodesByCategory, category) => ({
+      ...nodesByCategory,
+      [category]: PROMOTED_SEMANTIC_GRAPH_NODES.filter(
+        (node) => node.category === category,
+      ),
+    }),
+    {} as Record<SemanticSeedNodeCategory, readonly SemanticSeedNode[]>,
+  ),
+);
+
 export const SEMANTIC_SEED_GRAPH_NODES = Object.freeze([
   ...SEMANTIC_SEED_NODES,
   ...STANDARD_VOCABULARY_SEMANTIC_NODES,
@@ -10749,6 +10785,12 @@ export function getSemanticSeedGraphNodesByCategory(
   category: SemanticSeedNodeCategory,
 ): readonly SemanticSeedNode[] {
   return SEMANTIC_SEED_GRAPH_NODES_BY_CATEGORY[category];
+}
+
+export function getPromotedSemanticGraphNodesByCategory(
+  category: SemanticSeedNodeCategory,
+): readonly SemanticSeedNode[] {
+  return PROMOTED_SEMANTIC_GRAPH_NODES_BY_CATEGORY[category];
 }
 
 export function findSemanticSeedNodeById(id: string): SemanticSeedNode | undefined {

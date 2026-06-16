@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  containsNegativeBehaviorConstraint,
   expectSemanticRegistryToPassQc,
   qcSemanticExpansionRegistry,
   type SemanticSeedNode,
@@ -86,6 +87,54 @@ test("semantic expansion QC allows future-facing references as warnings", () => 
   assert.equal(
     issues[0]?.message,
     "Unknown referenced seed: future_public_choice_node",
+  );
+});
+
+test("semantic expansion QC warns when negative constraints lack alternative actions", () => {
+  const issues = qcSemanticExpansionRegistry([
+    {
+      seed: "silent_constraint",
+      label: "Silent Constraint",
+      category: "communication",
+      description: "Does not speak aloud during tense scenes.",
+    },
+    {
+      seed: "silent_with_alternative",
+      label: "Silent With Alternative",
+      category: "communication",
+      description: "Does not speak aloud during tense scenes.",
+      behaviors: ["Writes on a notepad and gestures toward exits."],
+    },
+    {
+      seed: "acceptance_reassurance",
+      label: "Acceptance Reassurance",
+      category: "repair",
+      description: "Needs care that does not have to be earned first.",
+    },
+  ]);
+
+  assert.equal(
+    issues.some(
+      (issue) =>
+        issue.seed === "silent_constraint" &&
+        issue.field === "constraintAlternative" &&
+        issue.message ===
+          "Negative behavior constraints need a positive alternative action.",
+    ),
+    true,
+  );
+  assert.equal(
+    issues.some((issue) => issue.seed === "silent_with_alternative"),
+    false,
+  );
+  assert.equal(
+    issues.some((issue) => issue.seed === "acceptance_reassurance"),
+    false,
+  );
+  assert.equal(containsNegativeBehaviorConstraint("Does not speak aloud."), true);
+  assert.equal(
+    containsNegativeBehaviorConstraint("Does not have to earn care."),
+    false,
   );
 });
 

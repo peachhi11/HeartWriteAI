@@ -7,14 +7,18 @@ import {
   SEMANTIC_SEED_GRAPH_VERSION,
   SEMANTIC_SEED_GRAPH_NODE_IDS,
   SEMANTIC_SEED_GRAPH_NODES,
+  SEMANTIC_GRAPH_PROMOTION_SOURCE_IDS,
   SEMANTIC_SEED_NODES,
   SEMANTIC_SEED_NODE_IDS,
   SEMANTIC_SEED_PRIORITY_CATEGORIES,
   SEMANTIC_SEED_REGISTRY_CATEGORIES,
+  PROMOTED_SEMANTIC_GRAPH_NODE_IDS,
+  PROMOTED_SEMANTIC_GRAPH_NODES,
   STANDARD_VOCABULARY_SEMANTIC_NODES,
   expandSemanticSeedNodeIds,
   findSemanticSeedGraphNodeById,
   findSemanticSeedNodeById,
+  getPromotedSemanticGraphNodesByCategory,
   getSemanticSeedGraphNodesByCategory,
   getSemanticSeedCategoryTarget,
   getSemanticSeedNodeNeighborhood,
@@ -28,6 +32,12 @@ import {
 import {
   ALL_STANDARD_VOCABULARY_SEEDS,
 } from "../../data/standardVocabularySeedRegistry";
+import { DESIRE_VOCABULARY_STANDARD_SEEDS } from "../../data/desireVocabularyPresets";
+import { FEAR_VOCABULARY_STANDARD_SEEDS } from "../../data/fearVocabularyPresets";
+import { ORIGIN_WOUND_VOCABULARY_SEEDS } from "../../data/originWoundVocabularyPresets";
+import { RESPONSE_VOCABULARY_STANDARD_SEEDS } from "../../data/responseVocabularyPresets";
+import { TRIGGER_VOCABULARY_STANDARD_SEEDS } from "../../data/triggerVocabularyPresets";
+import { WOUND_VOCABULARY_STANDARD_SEEDS } from "../../data/woundVocabularyPresets";
 
 const seedPresetRegistryKeys = new Set(
   SEED_PRESET_REGISTRY.map((entry) => entry.registryKey),
@@ -1241,6 +1251,104 @@ test("bridges standardized vocabulary seeds into graph-readable semantic nodes",
   assert.equal(
     getSemanticSeedGraphNodesByCategory("motivations").length >
       getSemanticSeedNodesByCategory("motivations").length,
+    true,
+  );
+});
+
+test("promotes wound, fear, desire, trigger, and response vocabulary into semantic graph lanes", () => {
+  const expectedPromotedCount =
+    WOUND_VOCABULARY_STANDARD_SEEDS.length +
+    ORIGIN_WOUND_VOCABULARY_SEEDS.length +
+    FEAR_VOCABULARY_STANDARD_SEEDS.length +
+    DESIRE_VOCABULARY_STANDARD_SEEDS.length +
+    TRIGGER_VOCABULARY_STANDARD_SEEDS.length +
+    RESPONSE_VOCABULARY_STANDARD_SEEDS.length;
+  const sampleLookups = [
+    `wound-vocabulary:${WOUND_VOCABULARY_STANDARD_SEEDS[0].seed}`,
+    `origin-wound-vocabulary:${ORIGIN_WOUND_VOCABULARY_SEEDS[0].seed}`,
+    `fear-vocabulary:${FEAR_VOCABULARY_STANDARD_SEEDS[0].seed}`,
+    `desire-vocabulary:${DESIRE_VOCABULARY_STANDARD_SEEDS[0].seed}`,
+    `trigger-vocabulary:${TRIGGER_VOCABULARY_STANDARD_SEEDS[0].seed}`,
+    `response-vocabulary:${RESPONSE_VOCABULARY_STANDARD_SEEDS[0].seed}`,
+  ];
+  const promotedIds = new Set(PROMOTED_SEMANTIC_GRAPH_NODE_IDS);
+  const promotedSourceIds = new Set(SEMANTIC_GRAPH_PROMOTION_SOURCE_IDS);
+
+  assert.deepEqual(SEMANTIC_GRAPH_PROMOTION_SOURCE_IDS, [
+    "wound-vocabulary",
+    "origin-wound-vocabulary",
+    "fear-vocabulary",
+    "desire-vocabulary",
+    "trigger-vocabulary",
+    "response-vocabulary",
+  ]);
+  assert.equal(PROMOTED_SEMANTIC_GRAPH_NODES.length, expectedPromotedCount);
+  assert.equal(
+    getPromotedSemanticGraphNodesByCategory("wounds").length,
+    WOUND_VOCABULARY_STANDARD_SEEDS.length + ORIGIN_WOUND_VOCABULARY_SEEDS.length,
+  );
+  assert.equal(
+    getPromotedSemanticGraphNodesByCategory("fears").length,
+    FEAR_VOCABULARY_STANDARD_SEEDS.length,
+  );
+  assert.equal(
+    getPromotedSemanticGraphNodesByCategory("desires").length,
+    DESIRE_VOCABULARY_STANDARD_SEEDS.length,
+  );
+  assert.equal(
+    getPromotedSemanticGraphNodesByCategory("triggers").length,
+    TRIGGER_VOCABULARY_STANDARD_SEEDS.length,
+  );
+  assert.equal(
+    getPromotedSemanticGraphNodesByCategory("responses").length,
+    RESPONSE_VOCABULARY_STANDARD_SEEDS.length,
+  );
+  assert.equal(
+    PROMOTED_SEMANTIC_GRAPH_NODES.every((node) =>
+      node.sourceRegistryKeys?.some((sourceKey) =>
+        Array.from(promotedSourceIds).some((sourceId) =>
+          sourceKey.startsWith(`${sourceId}:`),
+        ),
+      ),
+    ),
+    true,
+  );
+  assert.equal(
+    sampleLookups.every((lookup) => {
+      const node = findSemanticSeedGraphNodeById(lookup);
+      return node !== undefined && promotedIds.has(node.id);
+    }),
+    true,
+  );
+});
+
+test("promoted semantic graph nodes carry route-useful prose and search fields", () => {
+  const unansweredMessage = findSemanticSeedGraphNodeById(
+    "trigger-vocabulary:unanswered_message_trigger",
+  );
+  const reassuranceSeeking = findSemanticSeedGraphNodeById(
+    "response-vocabulary:reassurance_seeking_response",
+  );
+  const silenceResults = searchSemanticSeedGraphNodes("Silence feels like", {
+    categories: ["triggers"],
+    tags: ["standard_vocabulary"],
+    limit: 5,
+  });
+
+  assert.equal(unansweredMessage?.category, "triggers");
+  assert.equal(
+    unansweredMessage?.sourceRegistryKeys?.includes(
+      "trigger-vocabulary:unanswered_message_trigger",
+    ),
+    true,
+  );
+  assert.match(unansweredMessage?.description ?? "", /reply|message|silence/i);
+  assert.equal((unansweredMessage?.dialogueExamples?.length ?? 0) > 0, true);
+  assert.equal((unansweredMessage?.commonTriggers?.length ?? 0) > 0, true);
+  assert.equal(reassuranceSeeking?.category, "responses");
+  assert.equal((reassuranceSeeking?.relatedConcepts?.length ?? 0) > 0, true);
+  assert.equal(
+    silenceResults.some((node) => node.id === unansweredMessage?.id),
     true,
   );
 });

@@ -3,6 +3,8 @@ import test from "node:test";
 
 import {
   createCharacterExportPresetResult,
+  findCharacterCardExportMode,
+  listCharacterCardExportModes,
   listCharacterExportPresets,
   resolveCharacterExportFileName,
 } from "../../lib/character-card/exportPresetMapping";
@@ -38,6 +40,29 @@ test("lists built-in export presets", () => {
   );
 });
 
+test("lists card export modes for UI toggles", () => {
+  assert.deepEqual(
+    listCharacterCardExportModes().map((mode) => mode.id),
+    [
+      "solo_deep_character",
+      "group_party_functional",
+      "sillytavern_compact",
+      "markdown_prose",
+    ],
+  );
+
+  const compact = findCharacterCardExportMode("sillytavern_compact");
+
+  assert.equal(compact.defaultPresetId, "tavern_ai");
+  assert.match(compact.fieldStrategy, /description for identity/i);
+  assert.equal(
+    compact.promptCompilerGuidance.some((line) =>
+      /positive alternatives/i.test(line),
+    ),
+    true,
+  );
+});
+
 test("maps raw export preset to separate asset files", () => {
   const result = createCharacterExportPresetResult(card, "raw_text_files");
 
@@ -58,9 +83,12 @@ test("maps Tavern-style export payload without losing tags or first message", ()
 });
 
 test("keeps native CCv3 export available as a preset", () => {
-  const result = createCharacterExportPresetResult(card, "ccv3_json");
+  const result = createCharacterExportPresetResult(card, "ccv3_json", {
+    modeId: "solo_deep_character",
+  });
 
   assert.equal(result.format, "json");
+  assert.equal(result.mode?.id, "solo_deep_character");
   assert.equal(result.payload.spec, "chara_card_v3");
   assert.equal((result.payload.data as CharacterCardDataV3).name, "Maren Voss");
 });

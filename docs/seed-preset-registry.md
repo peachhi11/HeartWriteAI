@@ -145,6 +145,12 @@ generation, lorebooks, relationship gates, and long-form chat progression.
   to drive generation, give it description, internal meaning, behaviors,
   dialogue examples, body language, triggers/conflicts, growth path, and
   related concepts.
+- Pair every negative constraint with a positive alternative action. If a seed
+  says a character cannot, does not, refuses to, avoids, or never does
+  something, also state what they do instead. For example, pair "does not speak
+  aloud" with "writes on a notepad, gestures, or signals for help" so the model
+  has an active behavior to generate instead of drifting back into the blocked
+  behavior.
 
 ## Related Files
 

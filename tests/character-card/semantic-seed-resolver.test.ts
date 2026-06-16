@@ -63,6 +63,28 @@ test("splits semantic prompt additions into psychology and relationship lanes", 
   assert.match(additions.systemPromptAddition, /Slow burn/);
 });
 
+test("compiles negative constraints with an alternative behavior route", () => {
+  const prompt = compileSemanticSeedPromptAdditions(["hypervigilance"], {
+    includeAgencyReminder: false,
+  });
+
+  assert.match(prompt, /Hypervigilance/);
+  assert.match(prompt, /Do instead:/);
+  assert.match(prompt, /Startles hard at small ambient sounds/);
+});
+
+test("uses concrete fallback routes when behaviors are absent", () => {
+  const prompt = compileSemanticSeedPromptAdditions(
+    ["moral-framework-vocabulary:care_ethics"],
+    {
+      includeAgencyReminder: false,
+    },
+  );
+
+  assert.match(prompt, /Care Ethics/i);
+  assert.match(prompt, /Show through:/);
+});
+
 test("resolves standardized vocabulary seed ids through the semantic graph bridge", () => {
   const nodes = resolveSemanticSeedIds([
     "moral-framework-vocabulary:care_ethics",

@@ -4,6 +4,9 @@ import {
   type SemanticSeedNode,
   type SemanticSeedNodeCategory,
 } from "../../data/semanticSeedRegistry";
+import {
+  containsNegativeBehaviorConstraint,
+} from "../../data/semanticExpansionQc";
 
 export interface SemanticSeedResolutionOptions {
   includeParents?: boolean;
@@ -141,12 +144,16 @@ function compileSemanticSeedPromptLine(node: SemanticSeedNode): string {
     node.visual,
     node.impression,
   ]);
-  const behaviors = takeJoined(node.behaviors, 2);
+  const hasNegativeConstraint = nodeHasNegativeBehaviorConstraint(node);
+  const actionRoute = compileSemanticSeedActionRoute(node);
+  const behaviorPrefix = hasNegativeConstraint
+    ? "Do instead"
+    : "Show through";
   const triggers = takeJoined(node.commonTriggers ?? node.triggers, 2);
   const growth = takeJoined(node.growthPath, 1);
   const parts = [
     description,
-    behaviors ? `Show through: ${behaviors}.` : "",
+    actionRoute ? `${behaviorPrefix}: ${actionRoute}.` : "",
     triggers ? `Watch for: ${triggers}.` : "",
     growth ? `Growth: ${growth}.` : "",
   ].filter(Boolean);
@@ -168,6 +175,25 @@ function firstNonEmpty(values: readonly (string | undefined)[]): string {
 
 function takeJoined(values: readonly string[] | undefined, count: number): string {
   return (values ?? []).slice(0, count).join("; ");
+}
+
+function compileSemanticSeedActionRoute(node: SemanticSeedNode): string {
+  return firstNonEmpty([
+    takeJoined(node.behaviors, 2),
+    takeJoined(node.bodyLanguage, 2),
+    takeJoined(node.dialogueExamples, 1),
+    takeJoined(node.relatedConcepts, 2),
+  ]);
+}
+
+function nodeHasNegativeBehaviorConstraint(node: SemanticSeedNode): boolean {
+  return [
+    node.description,
+    node.internalMeaning,
+    node.emotionalMeaning,
+    node.guidance,
+    ...(node.dialogueExamples ?? []),
+  ].some((value) => containsNegativeBehaviorConstraint(value ?? ""));
 }
 
 function formatCategory(category: SemanticSeedNodeCategory): string {

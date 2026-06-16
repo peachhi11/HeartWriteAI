@@ -11,6 +11,21 @@ export type CharacterExportPresetId =
 
 export type CharacterExportPresetFormat = "files" | "json";
 
+export type CharacterCardExportModeId =
+  | "solo_deep_character"
+  | "group_party_functional"
+  | "sillytavern_compact"
+  | "markdown_prose";
+
+export interface CharacterCardExportMode {
+  id: CharacterCardExportModeId;
+  label: string;
+  description: string;
+  defaultPresetId: CharacterExportPresetId;
+  fieldStrategy: string;
+  promptCompilerGuidance: readonly string[];
+}
+
 export interface CharacterExportFieldMapping {
   asset: CharacterExportAssetKey;
   optional?: boolean;
@@ -50,13 +65,19 @@ export type CharacterExportPresetResult =
   | {
       files: readonly CharacterExportFile[];
       format: "files";
+      mode?: CharacterCardExportMode;
       preset: CharacterExportPreset;
     }
   | {
       format: "json";
+      mode?: CharacterCardExportMode;
       payload: Record<string, unknown> | CharacterCardV3;
       preset: CharacterExportPreset;
     };
+
+export interface CreateCharacterExportPresetOptions {
+  modeId?: CharacterCardExportModeId;
+}
 
 export const CHARACTER_EXPORT_PRESETS = [
   {
@@ -148,8 +169,71 @@ export const CHARACTER_EXPORT_PRESETS = [
   },
 ] as const satisfies readonly CharacterExportPreset[];
 
+export const CHARACTER_CARD_EXPORT_MODES = [
+  {
+    id: "solo_deep_character",
+    label: "Solo Deep Character",
+    description:
+      "Full psychological card mode for one-on-one roleplay where all card fields and examples can carry long-form character depth.",
+    defaultPresetId: "ccv3_json",
+    fieldStrategy:
+      "Keep durable identity in description/personality, scenario in scenario, voice range in examples, and concrete current reminders in PHI.",
+    promptCompilerGuidance: [
+      "Use rich description and personality fields.",
+      "Keep 6-10 useful example-message beats when available.",
+      "Let semantic wounds, fears, desires, triggers, responses, and repair routes remain visible to the prompt compiler.",
+    ],
+  },
+  {
+    id: "group_party_functional",
+    label: "Group / Party Functional",
+    description:
+      "Compact role clarity mode for group chats where a character may need to remain coherent even when only description persists.",
+    defaultPresetId: "tavern_ai",
+    fieldStrategy:
+      "Put role, skills, current goal, hard constraints, and observable behavior in description; keep personality concise.",
+    promptCompilerGuidance: [
+      "Make the description self-contained.",
+      "Prefer party function, current goal, and visible behavior over deep private lore.",
+      "Avoid examples that make the character dominate group momentum.",
+    ],
+  },
+  {
+    id: "sillytavern_compact",
+    label: "SillyTavern Compact",
+    description:
+      "SillyTavern-friendly card mode with concise fields, clear scenario, example messages, and short PHI-ready reminders.",
+    defaultPresetId: "tavern_ai",
+    fieldStrategy:
+      "Keep field boundaries clear: description for identity, personality for stable pattern, scenario for current setup, examples for voice, PHI for immediate behavior.",
+    promptCompilerGuidance: [
+      "Use concise markdown or natural language rather than heavy JSON/XML inside card prose.",
+      "Pair negative constraints with positive alternatives.",
+      "Keep post-history instructions short and concrete.",
+    ],
+  },
+  {
+    id: "markdown_prose",
+    label: "Markdown Prose",
+    description:
+      "Readable review mode for creators who want clean markdown/natural prose before exporting to a platform-specific card shape.",
+    defaultPresetId: "raw_text_files",
+    fieldStrategy:
+      "Export separated markdown/text assets for human review, editing, and prose QC before final CCv3 or Tavern-style packaging.",
+    promptCompilerGuidance: [
+      "Use headings and lists for reviewability.",
+      "Preserve all prompt-safe prose while keeping internal semantic IDs out of visible card text.",
+      "Use QC checklist items before platform export.",
+    ],
+  },
+] as const satisfies readonly CharacterCardExportMode[];
+
 export function listCharacterExportPresets(): readonly CharacterExportPreset[] {
   return CHARACTER_EXPORT_PRESETS;
+}
+
+export function listCharacterCardExportModes(): readonly CharacterCardExportMode[] {
+  return CHARACTER_CARD_EXPORT_MODES;
 }
 
 export function findCharacterExportPreset(
@@ -164,16 +248,33 @@ export function findCharacterExportPreset(
   return preset;
 }
 
+export function findCharacterCardExportMode(
+  modeId: CharacterCardExportModeId,
+): CharacterCardExportMode {
+  const mode = CHARACTER_CARD_EXPORT_MODES.find(({ id }) => id === modeId);
+
+  if (!mode) {
+    throw new Error(`Unknown character export mode: ${modeId}`);
+  }
+
+  return mode;
+}
+
 export function createCharacterExportPresetResult(
   card: CharacterCardV3,
   presetId: CharacterExportPresetId,
+  options: CreateCharacterExportPresetOptions = {},
 ): CharacterExportPresetResult {
   const preset = findCharacterExportPreset(presetId);
+  const mode = options.modeId
+    ? findCharacterCardExportMode(options.modeId)
+    : undefined;
   const normalizedCard = createCharacterCardV3Export(card);
 
   if (preset.id === "ccv3_json") {
     return {
       format: "json",
+      mode,
       payload: normalizedCard,
       preset,
     };
@@ -185,12 +286,14 @@ export function createCharacterExportPresetResult(
         .map((mapping) => createMappedFile(normalizedCard.data, mapping))
         .filter((file): file is CharacterExportFile => Boolean(file)),
       format: "files",
+      mode,
       preset,
     };
   }
 
   return {
     format: "json",
+    mode,
     payload: createMappedJsonPayload(normalizedCard.data, preset),
     preset,
   };

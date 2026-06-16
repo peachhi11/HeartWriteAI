@@ -6,6 +6,8 @@ import {
   injectPromptLayoutMacros,
 } from "../../lib/inference/layoutCompiler";
 import {
+  CARD_PROMPT_COMPILER_RULES,
+  PROMPT_CARD_QC_CHECKLIST,
   PROMPT_LAYOUT_PRESETS,
   SILLYTAVERN_STYLE_PROMPT_STACK,
 } from "../../types/promptLayout";
@@ -99,5 +101,59 @@ test("keeps card content, global rules, and post-history instructions separated"
   assert.deepEqual(
     byId.get("post_history_instructions")?.mainlyControls,
     ["reply length", "pacing", "ending style", "last-step reminders"],
+  );
+});
+
+test("defines prompt/card QC checklist items for card compiler review", () => {
+  assert.deepEqual(
+    PROMPT_CARD_QC_CHECKLIST.map((item) => item.id),
+    [
+      "negation_alternative_action",
+      "action_over_label_ratio",
+      "field_visibility",
+      "physical_and_rule_constraints",
+      "token_distance_reinforcement",
+      "user_agency_boundary",
+    ],
+  );
+
+  const negation = PROMPT_CARD_QC_CHECKLIST.find(
+    (item) => item.id === "negation_alternative_action",
+  );
+  const agency = PROMPT_CARD_QC_CHECKLIST.find(
+    (item) => item.id === "user_agency_boundary",
+  );
+
+  assert.match(negation?.recommendedFix ?? "", /writes|gestures|delegates/i);
+  assert.match(negation?.failureMode ?? "", /drifts back/i);
+  assert.equal(
+    negation?.promptLayers.includes("post_history_instructions"),
+    true,
+  );
+  assert.match(agency?.description ?? "", /{{user}} decisions/i);
+});
+
+test("defines compiler rules for field placement and concrete alternatives", () => {
+  assert.deepEqual(
+    CARD_PROMPT_COMPILER_RULES.map((rule) => rule.id),
+    [
+      "foundation_durable_identity",
+      "examples_behavioral_range",
+      "post_history_concrete_reminders",
+      "negative_constraints_need_alternatives",
+    ],
+  );
+
+  const foundation = CARD_PROMPT_COMPILER_RULES.find(
+    (rule) => rule.id === "foundation_durable_identity",
+  );
+  const constraint = CARD_PROMPT_COMPILER_RULES.find(
+    (rule) => rule.id === "negative_constraints_need_alternatives",
+  );
+
+  assert.equal(foundation?.targetLayers.includes("character_prompt"), true);
+  assert.match(
+    constraint?.compilerBehavior ?? "",
+    /Do instead: writes, gestures, waits, delegates/i,
   );
 });
