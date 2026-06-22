@@ -3,6 +3,7 @@ import test from "node:test";
 
 import { ACTS_OF_SERVICE_VOCABULARY_SEEDS } from "../../data/actsOfServiceVocabularyPresets";
 import { ATTACHMENT_STYLE_VOCABULARY_STANDARD_SEEDS } from "../../data/attachmentStyleVocabularyPresets";
+import { BEHAVIOR_ARCHITECTURE_VOCABULARY_STANDARD_SEEDS } from "../../data/behaviorArchitectureVocabularyPresets";
 import { COMPLEMENT_VOCABULARY_SEEDS } from "../../data/complementPresets";
 import { CONFLICT_BEAT_VOCABULARY_STANDARD_SEEDS } from "../../data/conflictBeatVocabularyPresets";
 import { CONFLICT_STYLE_VOCABULARY_STANDARD_SEEDS } from "../../data/conflictStyleVocabularyPresets";
@@ -20,6 +21,7 @@ import { PAYOFF_FANTASY_VOCABULARY_STANDARD_SEEDS } from "../../data/payoffFanta
 import { PERSONALITY_ENGINE_VOCABULARY_SEEDS } from "../../data/personalityEngineVocabularyPresets";
 import { RELATIONSHIP_DYNAMIC_VOCABULARY_STANDARD_SEEDS } from "../../data/relationshipDynamicVocabularyPresets";
 import { RELATIONSHIP_IDENTITY_VOCABULARY_STANDARD_SEEDS } from "../../data/relationshipIdentityVocabularyPresets";
+import { RELATIONSHIP_STAGE_PROGRESSION_VOCABULARY_STANDARD_SEEDS } from "../../data/relationshipStageProgressionPresets";
 import { ROMANCE_TROPE_VOCABULARY_STANDARD_SEEDS } from "../../data/romanceTropeVocabularyPresets";
 import { ROUTE_GATE_VOCABULARY_STANDARD_SEEDS } from "../../data/routeGateVocabularyPresets";
 import { ROUTE_PHASE_VOCABULARY_STANDARD_SEEDS } from "../../data/routePhaseVocabularyPresets";
@@ -83,6 +85,7 @@ test("collects rich vocabulary seed collections across explicit vocabulary modul
   const expectedRichCount =
     ACTS_OF_SERVICE_VOCABULARY_SEEDS.length +
     ATTACHMENT_STYLE_VOCABULARY_STANDARD_SEEDS.length +
+    BEHAVIOR_ARCHITECTURE_VOCABULARY_STANDARD_SEEDS.length +
     COMPLEMENT_VOCABULARY_SEEDS.length +
     CONFLICT_BEAT_VOCABULARY_STANDARD_SEEDS.length +
     CONFLICT_STYLE_VOCABULARY_STANDARD_SEEDS.length +
@@ -100,6 +103,7 @@ test("collects rich vocabulary seed collections across explicit vocabulary modul
     PERSONALITY_ENGINE_VOCABULARY_SEEDS.length +
     RELATIONSHIP_DYNAMIC_VOCABULARY_STANDARD_SEEDS.length +
     RELATIONSHIP_IDENTITY_VOCABULARY_STANDARD_SEEDS.length +
+    RELATIONSHIP_STAGE_PROGRESSION_VOCABULARY_STANDARD_SEEDS.length +
     ROMANCE_TROPE_VOCABULARY_STANDARD_SEEDS.length +
     ROUTE_GATE_VOCABULARY_STANDARD_SEEDS.length +
     ROUTE_PHASE_VOCABULARY_STANDARD_SEEDS.length +
@@ -126,6 +130,7 @@ test("collects rich vocabulary seed collections across explicit vocabulary modul
     [
       "acts-of-service-vocabulary",
       "attachment-style-vocabulary",
+      "behavior-architecture-vocabulary",
       "complement-vocabulary",
       "conflict-beat-vocabulary",
       "conflict-style-vocabulary",
@@ -149,6 +154,7 @@ test("collects rich vocabulary seed collections across explicit vocabulary modul
       "personality-engine-vocabulary",
       "relationship-dynamic-vocabulary",
       "relationship-identity-vocabulary",
+      "relationship-stage-progression-vocabulary",
       "romance-trope-vocabulary",
       "route-gate-vocabulary",
       "route-phase-vocabulary",
@@ -165,6 +171,7 @@ test("keeps canonical shape for explicit vocabulary seed exports", () => {
     COMPLEMENT_VOCABULARY_SEEDS[0],
     ACTS_OF_SERVICE_VOCABULARY_SEEDS[0],
     ATTACHMENT_STYLE_VOCABULARY_STANDARD_SEEDS[0],
+    BEHAVIOR_ARCHITECTURE_VOCABULARY_STANDARD_SEEDS[0],
     CONFLICT_BEAT_VOCABULARY_STANDARD_SEEDS[0],
     CONFLICT_STYLE_VOCABULARY_STANDARD_SEEDS[0],
     CONSEQUENCE_VOCABULARY_STANDARD_SEEDS[0],
@@ -185,6 +192,7 @@ test("keeps canonical shape for explicit vocabulary seed exports", () => {
     PERSONALITY_ENGINE_VOCABULARY_SEEDS[0],
     RELATIONSHIP_DYNAMIC_VOCABULARY_STANDARD_SEEDS[0],
     RELATIONSHIP_IDENTITY_VOCABULARY_STANDARD_SEEDS[0],
+    RELATIONSHIP_STAGE_PROGRESSION_VOCABULARY_STANDARD_SEEDS[0],
     ROMANCE_TROPE_VOCABULARY_STANDARD_SEEDS[0],
     ROUTE_GATE_VOCABULARY_STANDARD_SEEDS[0],
     ROUTE_PHASE_VOCABULARY_STANDARD_SEEDS[0],
@@ -251,6 +259,9 @@ test("filters and searches standard vocabulary seeds across all categories", () 
   const attachmentStyleSeeds = getRichStandardVocabularySeedsBySource(
     "attachment-style-vocabulary",
   );
+  const behaviorArchitectureSeeds = getRichStandardVocabularySeedsBySource(
+    "behavior-architecture-vocabulary",
+  );
   const triggerSeeds = getRichStandardVocabularySeedsBySource("trigger-vocabulary");
   const visibleBehaviorSeeds = getRichStandardVocabularySeedsBySource(
     "visible-behavior-vocabulary",
@@ -260,6 +271,9 @@ test("filters and searches standard vocabulary seeds across all categories", () 
   );
   const relationshipIdentitySeeds = getRichStandardVocabularySeedsBySource(
     "relationship-identity-vocabulary",
+  );
+  const relationshipStageProgressionSeeds = getRichStandardVocabularySeedsBySource(
+    "relationship-stage-progression-vocabulary",
   );
   const romanceTropeSeeds = getRichStandardVocabularySeedsBySource(
     "romance-trope-vocabulary",
@@ -369,6 +383,13 @@ test("filters and searches standard vocabulary seeds across all categories", () 
       limit: 3,
     },
   );
+  const behaviorArchitectureResults = searchStandardVocabularySeeds(
+    "threat to autonomy",
+    {
+      sourceIds: ["behavior-architecture-vocabulary"],
+      limit: 3,
+    },
+  );
   const loveLanguageResults = searchStandardVocabularySeeds(
     "I notice what burdens you",
     {
@@ -395,6 +416,13 @@ test("filters and searches standard vocabulary seeds across all categories", () 
     "conflict does not erase love",
     {
       sourceIds: ["relationship-identity-vocabulary"],
+      limit: 3,
+    },
+  );
+  const relationshipStageProgressionResults = searchStandardVocabularySeeds(
+    "stalled commitment",
+    {
+      sourceIds: ["relationship-stage-progression-vocabulary"],
       limit: 3,
     },
   );
@@ -460,6 +488,10 @@ test("filters and searches standard vocabulary seeds across all categories", () 
     attachmentStyleSeeds.length,
     ATTACHMENT_STYLE_VOCABULARY_STANDARD_SEEDS.length,
   );
+  assert.equal(
+    behaviorArchitectureSeeds.length,
+    BEHAVIOR_ARCHITECTURE_VOCABULARY_STANDARD_SEEDS.length,
+  );
   assert.equal(triggerSeeds.length, TRIGGER_VOCABULARY_STANDARD_SEEDS.length);
   assert.equal(
     visibleBehaviorSeeds.length,
@@ -472,6 +504,10 @@ test("filters and searches standard vocabulary seeds across all categories", () 
   assert.equal(
     relationshipIdentitySeeds.length,
     RELATIONSHIP_IDENTITY_VOCABULARY_STANDARD_SEEDS.length,
+  );
+  assert.equal(
+    relationshipStageProgressionSeeds.length,
+    RELATIONSHIP_STAGE_PROGRESSION_VOCABULARY_STANDARD_SEEDS.length,
   );
   assert.equal(romanceTropeSeeds.length, ROMANCE_TROPE_VOCABULARY_STANDARD_SEEDS.length);
   assert.equal(routeGateSeeds.length, ROUTE_GATE_VOCABULARY_STANDARD_SEEDS.length);
@@ -497,11 +533,13 @@ test("filters and searches standard vocabulary seeds across all categories", () 
   assert.equal(ruptureTypeResults[0]?.label, "Abandonment Rupture");
   assert.equal(actsOfServiceResults[0]?.label, "Quiet Devotion");
   assert.equal(attachmentStyleResults[0]?.label, "Anxious Attachment");
+  assert.equal(behaviorArchitectureResults[0]?.label, "Agency Threat");
   assert.equal(loveLanguageResults[0]?.label, "Acts of Service");
   assert.equal(triggerResults[0]?.label, "Unanswered Message Trigger");
   assert.equal(visibleBehaviorResults[0]?.label, "Makes Tea When Worried");
   assert.equal(relationshipDynamicResults[0]?.label, "Safe Haven Dynamic");
   assert.equal(relationshipIdentityResults[0]?.label, "Safe Haven Relationship");
+  assert.equal(relationshipStageProgressionResults[0]?.label, "Situationship");
   assert.equal(romanceTropeResults[0]?.label, "Enemies to Lovers");
   assert.equal(routeGateResults[0]?.label, "First Reassurance Gate");
   assert.equal(routePhaseResults[0]?.label, "Initial Dynamic");

@@ -5,6 +5,9 @@ import {
   ATTACHMENT_STYLE_VOCABULARY_STANDARD_SEEDS,
 } from "./attachmentStyleVocabularyPresets";
 import {
+  BEHAVIOR_ARCHITECTURE_VOCABULARY_STANDARD_SEEDS,
+} from "./behaviorArchitectureVocabularyPresets";
+import {
   COMPLEMENT_VOCABULARY_SEEDS,
 } from "./complementPresets";
 import {
@@ -56,6 +59,9 @@ import {
   RELATIONSHIP_IDENTITY_VOCABULARY_STANDARD_SEEDS,
 } from "./relationshipIdentityVocabularyPresets";
 import {
+  RELATIONSHIP_STAGE_PROGRESSION_VOCABULARY_STANDARD_SEEDS,
+} from "./relationshipStageProgressionPresets";
+import {
   ROMANCE_TROPE_VOCABULARY_STANDARD_SEEDS,
 } from "./romanceTropeVocabularyPresets";
 import {
@@ -105,6 +111,7 @@ import {
 export type StandardVocabularySeedSourceId =
   | "acts-of-service-vocabulary"
   | "attachment-style-vocabulary"
+  | "behavior-architecture-vocabulary"
   | "registry"
   | "complement-vocabulary"
   | "conflict-beat-vocabulary"
@@ -123,6 +130,7 @@ export type StandardVocabularySeedSourceId =
   | "personality-engine-vocabulary"
   | "relationship-dynamic-vocabulary"
   | "relationship-identity-vocabulary"
+  | "relationship-stage-progression-vocabulary"
   | "romance-trope-vocabulary"
   | "route-gate-vocabulary"
   | "route-phase-vocabulary"
@@ -157,6 +165,11 @@ export const RICH_STANDARD_VOCABULARY_SEED_COLLECTIONS = Object.freeze([
     sourceId: "attachment-style-vocabulary",
     label: "Attachment Style Vocabulary",
     seeds: ATTACHMENT_STYLE_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "behavior-architecture-vocabulary",
+    label: "Behavior Architecture Vocabulary",
+    seeds: BEHAVIOR_ARCHITECTURE_VOCABULARY_STANDARD_SEEDS,
   },
   {
     sourceId: "complement-vocabulary",
@@ -272,6 +285,11 @@ export const RICH_STANDARD_VOCABULARY_SEED_COLLECTIONS = Object.freeze([
     sourceId: "relationship-identity-vocabulary",
     label: "Relationship Identity Vocabulary",
     seeds: RELATIONSHIP_IDENTITY_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "relationship-stage-progression-vocabulary",
+    label: "Relationship Stage Progression Vocabulary",
+    seeds: RELATIONSHIP_STAGE_PROGRESSION_VOCABULARY_STANDARD_SEEDS,
   },
   {
     sourceId: "romance-trope-vocabulary",

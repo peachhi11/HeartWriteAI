@@ -15,6 +15,8 @@ The app is being built CCV3-first. New cards should be authored as Character Car
 - Semantic seed graph for wounds, fears, desires, triggers, responses,
   relationship dynamics, and romance tropes that can feed persona matching,
   scenario routing, lorebooks, and long-form relationship progression.
+- Character-card engineering guidance for identity design, behavior
+  architecture, and narrative execution layers.
 - Local chat runtime with active lorebooks, summaries, shared token budgets, and stop presets.
 - Future local inference through Ollama, llama.cpp-compatible APIs, or proxy/model presets.
 
@@ -129,6 +131,11 @@ Implemented in the current scaffold:
   planning, with the first build prioritizing wounds, fears, desires,
   triggers, responses, relationship dynamics, and romance tropes before broad
   appearance scale.
+- Character-card engineering guidance in
+  [`docs/character-card-engineering.md`](docs/character-card-engineering.md)
+  for layering identity design, event-driven behavior architecture, and
+  writing-layer controls such as POV, tense, agency, continuity, scene pacing,
+  NPC autonomy, and diagnostics.
 - Tauri bridge helper for frontend/native command calls.
 - PNG text-chunk dependencies for CCV3 card import/export:
   - `png-chunks-extract`
@@ -196,6 +203,9 @@ The secure activation plan is tracked in [`docs/auto-update-security.md`](docs/a
 ## Compatibility Notes
 
 CCV3 and JanitorAI compatibility research is tracked in [`docs/character-card-compatibility.md`](docs/character-card-compatibility.md).
+
+Character-card engineering notes for advanced authorship patterns are tracked
+in [`docs/character-card-engineering.md`](docs/character-card-engineering.md).
 
 ## Attribution
 

@@ -1360,6 +1360,9 @@ test("keeps explicit standardized vocabulary sources ahead of generic prose heur
   const attachmentStyle = findSemanticSeedGraphNodeById(
     "attachment-style-vocabulary:anxious_attachment",
   );
+  const behaviorArchitecture = findSemanticSeedGraphNodeById(
+    "behavior-architecture-vocabulary:trusted_ally_during_crisis",
+  );
   const loveLanguage = findSemanticSeedGraphNodeById(
     "love-language-vocabulary:acts_of_service",
   );
@@ -1396,6 +1399,9 @@ test("keeps explicit standardized vocabulary sources ahead of generic prose heur
   const relationshipIdentity = findSemanticSeedGraphNodeById(
     "relationship-identity-vocabulary:safe_haven_relationship",
   );
+  const relationshipStageProgression = findSemanticSeedGraphNodeById(
+    "relationship-stage-progression-vocabulary:mutual_longing",
+  );
   const romanceTrope = findSemanticSeedGraphNodeById(
     "romance-trope-vocabulary:enemies_to_lovers",
   );
@@ -1423,6 +1429,7 @@ test("keeps explicit standardized vocabulary sources ahead of generic prose heur
 
   assert.equal(acts?.category, "love_languages");
   assert.equal(attachmentStyle?.category, "attachment_styles");
+  assert.equal(behaviorArchitecture?.category, "responses");
   assert.equal(loveLanguage?.category, "love_languages");
   assert.equal(hiddenNeed?.category, "hidden_needs");
   assert.equal(emotionalMeaning?.category, "emotional_meanings");
@@ -1438,6 +1445,7 @@ test("keeps explicit standardized vocabulary sources ahead of generic prose heur
   assert.equal(conflictStyle?.category, "conflict_styles");
   assert.equal(relationshipDynamic?.category, "relationship_dynamics");
   assert.equal(relationshipIdentity?.category, "relationship_dynamics");
+  assert.equal(relationshipStageProgression?.category, "routes");
   assert.equal(romanceTrope?.category, "romance_tropes");
   assert.equal(routePhase?.category, "routes");
   assert.equal(payoffFantasy?.category, "routes");

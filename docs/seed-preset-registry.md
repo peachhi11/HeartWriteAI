@@ -126,6 +126,38 @@ important, but the product advantage comes from making the same normalized
 psychology/trope graph feed character creation, persona matching, scenario
 generation, lorebooks, relationship gates, and long-form chat progression.
 
+## Behavior Architecture
+
+Advanced character cards should distinguish three systems that authors often
+accidentally mix together:
+
+- Character layer: who the character is and how they process events.
+- Writing layer: how behavior is presented in prose, formatting, agency, and
+  scene flow.
+- Context architecture layer: where information is placed so it survives
+  attention pressure, context decay, and long sessions.
+
+The behavior architecture vocabulary in
+[`data/behaviorArchitectureVocabularyPresets.ts`](../data/behaviorArchitectureVocabularyPresets.ts)
+captures this as reusable internal guidance:
+
+- Character layer: description, personality, history, relationships,
+  motivations, goals, flaws, examples, character books, reinforcement, and
+  behavior architecture.
+- Writing layer: POV, tense, agency, formatting, continuity, scene pacing, NPC
+  autonomy, dialogue style, and OOC diagnostics.
+- Context architecture layer: description strategy, solo vs party design,
+  attention management, field visibility, reinforcement placement, Author's
+  Notes, Post-History, context decay mitigation, and entropy management.
+
+Use behavior architecture seeds when a card needs repeatable
+`event -> interpretation -> reaction` patterns rather than a larger pile of
+static traits. Metrics should color delivery as friction or ease, not act as
+absolute locks that prevent believable narrative exceptions.
+
+See [`docs/character-card-engineering.md`](./character-card-engineering.md)
+for the author-facing explanation of the same design principle.
+
 ## Usage Rules
 
 - Use the registry for UI discovery, search, and seed-chip selection.

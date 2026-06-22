@@ -11221,6 +11221,9 @@ function inferSemanticCategoryFromVocabularySeed(
   if (/attachment-style-vocabulary/.test(haystack)) {
     return "attachment_styles";
   }
+  if (/behavior-architecture-vocabulary/.test(haystack)) {
+    return "responses";
+  }
   if (/love-language-vocabulary/.test(haystack)) {
     return "love_languages";
   }
@@ -11283,6 +11286,9 @@ function inferSemanticCategoryFromVocabularySeed(
   }
   if (/relationship-identity-vocabulary/.test(haystack)) {
     return "relationship_dynamics";
+  }
+  if (/relationship-stage-progression-vocabulary/.test(haystack)) {
+    return "routes";
   }
   if (/romance-trope-vocabulary/.test(haystack)) {
     return "romance_tropes";
