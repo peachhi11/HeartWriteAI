@@ -67,6 +67,7 @@ test("defines the planned semantic registry categories and priority lanes", () =
     "motivations",
     "emotions",
     "moods",
+    "states",
     "triggers",
     "responses",
     "humor",
@@ -102,6 +103,7 @@ test("defines the planned semantic registry categories and priority lanes", () =
     400,
   );
   assert.equal(getSemanticSeedCategoryTarget("repair_needs")?.targetCount, 300);
+  assert.equal(getSemanticSeedCategoryTarget("states")?.targetCount, 300);
   assert.equal(getSemanticSeedCategoryTarget("responses")?.targetCount, 2000);
   assert.equal(getSemanticSeedCategoryTarget("appearance")?.priority, "medium");
   const totalTarget = SEMANTIC_SEED_CATEGORY_TARGETS.reduce(
@@ -1363,8 +1365,20 @@ test("keeps explicit standardized vocabulary sources ahead of generic prose heur
   const behaviorArchitecture = findSemanticSeedGraphNodeById(
     "behavior-architecture-vocabulary:trusted_ally_during_crisis",
   );
+  const compatibilityMatrix = findSemanticSeedGraphNodeById(
+    "compatibility-matrix-vocabulary:attraction_vector_compatibility_section",
+  );
+  const userPersonaProfile = findSemanticSeedGraphNodeById(
+    "user-persona-profile-vocabulary:user_persona_basic_profile_section",
+  );
+  const dialogueControl = findSemanticSeedGraphNodeById(
+    "dialogue-control-vocabulary:subtext_layer",
+  );
   const loveLanguage = findSemanticSeedGraphNodeById(
     "love-language-vocabulary:acts_of_service",
+  );
+  const memoryCompressionRecall = findSemanticSeedGraphNodeById(
+    "memory-compression-recall-vocabulary:relationship_memory_memory_tier",
   );
   const response = findSemanticSeedGraphNodeById(
     "response-vocabulary:reassurance_seeking_response",
@@ -1417,6 +1431,9 @@ test("keeps explicit standardized vocabulary sources ahead of generic prose heur
   const moral = findSemanticSeedGraphNodeById(
     "moral-framework-vocabulary:care_ethics",
   );
+  const narrativeArcController = findSemanticSeedGraphNodeById(
+    "narrative-arc-controller-vocabulary:escalation",
+  );
   const visibleBehavior = findSemanticSeedGraphNodeById(
     "visible-behavior-vocabulary:makes_tea_when_worried",
   );
@@ -1426,13 +1443,29 @@ test("keeps explicit standardized vocabulary sources ahead of generic prose heur
   const emotionalMeaning = findSemanticSeedGraphNodeById(
     "emotional-meaning-vocabulary:i_notice_you",
   );
+  const eventEngine = findSemanticSeedGraphNodeById(
+    "event-engine-vocabulary:third_party_flirtation_event",
+  );
+  const firstMessageGenerator = findSemanticSeedGraphNodeById(
+    "first-message-generator-vocabulary:dialogue_first_message_structure",
+  );
+  const dynamicStateSystem = findSemanticSeedGraphNodeById(
+    "dynamic-state-system-vocabulary:trust_state_axis",
+  );
 
   assert.equal(acts?.category, "love_languages");
   assert.equal(attachmentStyle?.category, "attachment_styles");
   assert.equal(behaviorArchitecture?.category, "responses");
+  assert.equal(compatibilityMatrix?.category, "relationship_dynamics");
+  assert.equal(userPersonaProfile?.category, "metadata_tags");
+  assert.equal(dialogueControl?.category, "speech_patterns");
   assert.equal(loveLanguage?.category, "love_languages");
+  assert.equal(memoryCompressionRecall?.category, "metadata_tags");
   assert.equal(hiddenNeed?.category, "hidden_needs");
   assert.equal(emotionalMeaning?.category, "emotional_meanings");
+  assert.equal(eventEngine?.category, "triggers");
+  assert.equal(firstMessageGenerator?.category, "scenario_tags");
+  assert.equal(dynamicStateSystem?.category, "states");
   assert.equal(visibleBehavior?.category, "visible_behaviors");
   assert.equal(response?.category, "responses");
   assert.equal(repair?.category, "repair_styles");
@@ -1451,6 +1484,7 @@ test("keeps explicit standardized vocabulary sources ahead of generic prose heur
   assert.equal(payoffFantasy?.category, "routes");
   assert.equal(growthArc?.category, "goals_long");
   assert.equal(moral?.category, "motivations");
+  assert.equal(narrativeArcController?.category, "routes");
 });
 
 test("keeps projected standardized vocabulary graph references resolvable", () => {

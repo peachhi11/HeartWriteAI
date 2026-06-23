@@ -158,6 +158,283 @@ absolute locks that prevent believable narrative exceptions.
 See [`docs/character-card-engineering.md`](./character-card-engineering.md)
 for the author-facing explanation of the same design principle.
 
+## Dynamic State System
+
+Dynamic state system vocabulary stores the internal axes that bend character
+behavior without replacing personality. The source module is
+[`data/dynamicStateSystemVocabularyPresets.ts`](../data/dynamicStateSystemVocabularyPresets.ts).
+
+It models current behavior as:
+
+```text
+Character Sheet
++ Current State
+= Final Behavior
+```
+
+State updates follow:
+
+```text
+Trigger -> Interpretation -> Adjustment
+```
+
+Use dynamic state seeds when prompt output needs:
+
+- trust, attraction, emotional regulation, and power perception axes
+- low, middle, high, and extreme state bands
+- state modifiers such as kindness without cost, inconsistency, vulnerability,
+  or challenges to authority
+- behavior overrides where the same baseline trait bends under high trust or
+  low regulation
+- character-specific weighting, such as guarded trust, impulsive regulation,
+  or dominant power perception
+- prompt-safe guidance that exposes tone and behavior effects without exposing
+  raw state numbers
+
+Dynamic state seeds project into the semantic graph as `states`. The shared
+HeartWrite seed adapter maps that lane to mood-style prompt support while the
+graph keeps the more specific state category for matching and route logic.
+
+## User Persona Profile
+
+User persona profile vocabulary stores the input scaffold for player/user
+persona cards. The source module is
+[`data/userPersonaProfileVocabularyPresets.ts`](../data/userPersonaProfileVocabularyPresets.ts).
+
+It models persona input as:
+
+```text
+Basic Identity
++ Psychology
++ Cognition
++ Motivational Drivers
++ Relational Style
++ Chemistry Hooks
++ Behavior Patterns
++ Story Hooks
+= Persona Matching Profile
+```
+
+Use user persona profile seeds when the app needs:
+
+- searchable persona form sections
+- user-side profile templates for persona cards
+- compatibility matching inputs
+- route pressure from insecurities, desires, boundaries, and goals
+- behavior pattern templates shaped as trigger -> interpretation -> response
+- prompt-safe compact persona prose for model routing
+
+These seeds project into the semantic graph as `metadata_tags`, because they
+describe the user's profile surface for matching and organization. They should
+not be compiled into instructions that write {{user}}'s dialogue, actions,
+thoughts, feelings, intentions, or consent.
+
+## Compatibility Matrix
+
+Compatibility matrix vocabulary stores character/persona matching and route
+prediction fields. The source module is
+[`data/compatibilityMatrixVocabularyPresets.ts`](../data/compatibilityMatrixVocabularyPresets.ts).
+
+It models pair fit as:
+
+```text
+Attraction Vector
++ Friction Points
++ Emotional Economy
++ Power Dynamics
++ Behavioral Feedback Loop
++ Narrative Trajectory
++ Risk Factors
+= Compatibility Assessment
+```
+
+Use compatibility matrix seeds when prompt output or internal routing needs:
+
+- attraction alignment between what a character wants and what a persona emits
+- collision typing across value clash, emotional mismatch, pacing mismatch, and
+  power imbalance
+- emotional economy tracking for investment, withholding, reciprocity, and
+  volatility
+- power-dynamic stability checks
+- character -> persona -> character feedback loops
+- trajectory prediction such as collapse, growth, obsession, rivalry, or slow
+  bond
+- burnout, repetition, and derailment risk flags
+- final assessment fields for overall compatibility, best use case, and
+  required adjustments
+
+Compatibility matrix seeds project into the semantic graph as
+`relationship_dynamics`, because they describe how two profiles interact rather
+than a single character trait.
+
+## Memory Compression + Recall
+
+Memory compression and recall vocabulary stores long-context stability rules.
+The source module is
+[`data/memoryCompressionRecallVocabularyPresets.ts`](../data/memoryCompressionRecallVocabularyPresets.ts).
+
+It models continuity as:
+
+```text
+Raw Interaction
++ Event
++ Meaning
++ State Impact
+= Compressed Memory
+```
+
+Recall then activates through:
+
+```text
+Similar Situation
+or Same Emotional Trigger
+or Repeated Behavior Pattern
+or State Threshold Crossed
+= Reinforced Behavior
+```
+
+Use memory compression recall seeds when the app needs:
+
+- tiered memory routing for core identity, relationship memory, and contextual
+  scene details
+- compression rules that preserve meaning and state impact instead of raw logs
+- recall triggers for similar situations, emotional triggers, repeated
+  patterns, and state threshold changes
+- integration points for dynamic state, event engine, dialogue subtext, and
+  narrative arc control
+- low-token memory context that keeps what changed behavior and drops filler
+
+These seeds project into the semantic graph as `metadata_tags`, because they
+describe internal context architecture and persistence behavior. Prompt output
+should expose concise memory effects, not raw transcripts or internal storage
+details.
+
+## Dialogue Control
+
+Dialogue control is a writing-layer vocabulary source for keeping character
+speech recognizable without letting it become static. The source module is
+[`data/dialogueControlVocabularyPresets.ts`](../data/dialogueControlVocabularyPresets.ts).
+
+It models dialogue as:
+
+```text
+Character Sheet
++ Dynamic State System
++ Narrative Arc Phase
++ Variation Engine
++ Subtext
+= Performed Dialogue
+```
+
+Use dialogue control seeds when prompt output needs:
+
+- baseline voice anchoring from the character sheet
+- anti-repetition rules for sentence structure, phrasing, openings, and
+  closings
+- state-based modulation for trust, attraction, regulation, and perceived power
+- arc-based dialogue pacing from initiation through resolution
+- subtext, silence, negative space, and action beats
+- dialogue-function rotation across probe, push, pull, deflect, reveal, and
+  control
+
+The low-token version is: no repeated phrases, state affects tone, alternate
+sentence length, and maintain voice consistency.
+
+## First Message Generator
+
+First message generator vocabulary stores starter-prompt construction rules.
+The source module is
+[`data/firstMessageGeneratorVocabularyPresets.ts`](../data/firstMessageGeneratorVocabularyPresets.ts).
+
+It models the opening message as:
+
+```text
+Character Sheet
++ Core Traits
++ Speech Profile
++ Behavior Profile
++ Motivational Drivers
++ Worldview
+= Opening Hook + Action + Dialogue + Subtext
+```
+
+Use first message generator seeds when prompt output needs:
+
+- sheet-driven starter prompts rather than generic greetings
+- hooks that reflect the character's sensory or situational perception style
+- small revealing behaviors before exposition
+- interpretation layers anchored to {{char}} only
+- dialogue that matches the speech profile
+- subtext from motivational drivers
+- variation types such as dominant, reactive, slow-burn, or high-tension entry
+- playable endings that preserve {{user}} autonomy
+
+First message generator seeds project into the semantic graph as
+`scenario_tags`, because they shape opening scene construction and starter
+prompt layout.
+
+## Narrative Arc Controller
+
+Narrative arc control is a route-level vocabulary source for pacing story
+movement. The source module is
+[`data/narrativeArcControllerVocabularyPresets.ts`](../data/narrativeArcControllerVocabularyPresets.ts).
+
+It models story pressure as:
+
+```text
+Current Phase
++ Allowed Event Type
++ Event Outcome
++ State Change
++ Behavior Modulation
+= Next Phase Pressure
+```
+
+Use narrative arc controller seeds when prompt output needs:
+
+- phase-aware event restrictions
+- slow burn, fast-paced, or chaotic pacing modes
+- state movement speed controls
+- transition pressure between initiation, development, escalation, crisis, and
+  resolution
+- anti-derail correction for calm, chaos, repetition, premature crisis, or
+  dragging aftermath
+- route guidance where phase controls events, events change states, and states
+  modify behavior
+
+## Event Engine
+
+Event engine vocabulary stores context-aware pressures that create route
+movement without feeling random. The source module is
+[`data/eventEngineVocabularyPresets.ts`](../data/eventEngineVocabularyPresets.ts).
+
+It models events as:
+
+```text
+Context
++ Current State
++ Recent Interaction Pattern
++ Narrative Fatigue
+= Event Pressure
+```
+
+Every event should compile through:
+
+```text
+Trigger -> Interpretation -> State Impact -> Behavioral Outcome
+```
+
+Use event engine seeds when prompt output needs:
+
+- interpersonal, environmental, internal, or relationship event categories
+- micro, meso, and major escalation tiers
+- state-aware event selection
+- character-specific interpretation through fears, desires, and values
+- event chains such as misunderstanding -> argument -> emotional reveal
+- anti-repetition safeguards that vary category or scale
+- momentum injection when loops, plateaus, predictable trajectories, or overly
+  stable emotional intensity appear
+
 ## Usage Rules
 
 - Use the registry for UI discovery, search, and seed-chip selection.

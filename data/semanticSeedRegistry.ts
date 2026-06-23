@@ -20,6 +20,7 @@ export type SemanticSeedNodeCategory =
   | "motivations"
   | "emotions"
   | "moods"
+  | "states"
   | "triggers"
   | "responses"
   | "humor"
@@ -123,6 +124,7 @@ export const SEMANTIC_SEED_REGISTRY_CATEGORIES = Object.freeze([
   "motivations",
   "emotions",
   "moods",
+  "states",
   "triggers",
   "responses",
   "humor",
@@ -201,6 +203,12 @@ export const SEMANTIC_SEED_CATEGORY_TARGETS = Object.freeze([
     targetCount: 400,
     priority: "highest",
     rationale: "Emotional meanings translate visible behavior into subtext, misread route pressure, and repair needs.",
+  },
+  {
+    category: "states",
+    targetCount: 300,
+    priority: "high",
+    rationale: "Dynamic states modulate perception, speech, decisions, and route pacing without replacing personality.",
   },
   {
     category: "triggers",
@@ -11028,6 +11036,7 @@ export function mapSemanticSeedCategoryToHeartWriteSeedCategory(
       return "motivation";
     case "emotions":
     case "moods":
+    case "states":
       return "mood";
     case "triggers":
       return "trigger";
@@ -11224,8 +11233,20 @@ function inferSemanticCategoryFromVocabularySeed(
   if (/behavior-architecture-vocabulary/.test(haystack)) {
     return "responses";
   }
+  if (/compatibility-matrix-vocabulary/.test(haystack)) {
+    return "relationship_dynamics";
+  }
+  if (/dialogue-control-vocabulary/.test(haystack)) {
+    return "speech_patterns";
+  }
+  if (/dynamic-state-system-vocabulary/.test(haystack)) {
+    return "states";
+  }
   if (/love-language-vocabulary/.test(haystack)) {
     return "love_languages";
+  }
+  if (/memory-compression-recall-vocabulary/.test(haystack)) {
+    return "metadata_tags";
   }
   if (/visible-behavior-vocabulary/.test(haystack)) {
     return "visible_behaviors";
@@ -11236,14 +11257,23 @@ function inferSemanticCategoryFromVocabularySeed(
   if (/fear-vocabulary/.test(haystack)) {
     return "fears";
   }
+  if (/first-message-generator-vocabulary/.test(haystack)) {
+    return "scenario_tags";
+  }
   if (/hidden-need-vocabulary/.test(haystack)) {
     return "hidden_needs";
   }
   if (/emotional-meaning-vocabulary/.test(haystack)) {
     return "emotional_meanings";
   }
+  if (/event-engine-vocabulary/.test(haystack)) {
+    return "triggers";
+  }
   if (/trigger-vocabulary/.test(haystack)) {
     return "triggers";
+  }
+  if (/user-persona-profile-vocabulary/.test(haystack)) {
+    return "metadata_tags";
   }
   if (/repair-style-vocabulary/.test(haystack)) {
     return "repair_styles";
@@ -11268,6 +11298,9 @@ function inferSemanticCategoryFromVocabularySeed(
   }
   if (/moral-framework-vocabulary/.test(haystack)) {
     return "motivations";
+  }
+  if (/narrative-arc-controller-vocabulary/.test(haystack)) {
+    return "routes";
   }
   if (/complement-vocabulary/.test(haystack)) {
     return "relationship_dynamics";

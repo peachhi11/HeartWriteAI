@@ -134,8 +134,11 @@ Implemented in the current scaffold:
 - Character-card engineering guidance in
   [`docs/character-card-engineering.md`](docs/character-card-engineering.md)
   for layering identity design, event-driven behavior architecture, and
-  writing-layer controls such as POV, tense, agency, continuity, scene pacing,
-  NPC autonomy, and diagnostics.
+  dynamic state modulation with user persona profiles, compatibility matrix
+  persona matching, memory compression and recall, and writing-layer controls
+  such as dialogue control, first-message generation, POV, tense, agency,
+  continuity, scene pacing, NPC autonomy, diagnostics, narrative arc control,
+  and event engine pressure for route pacing.
 - Tauri bridge helper for frontend/native command calls.
 - PNG text-chunk dependencies for CCV3 card import/export:
   - `png-chunks-extract`

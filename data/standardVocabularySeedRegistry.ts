@@ -11,6 +11,9 @@ import {
   COMPLEMENT_VOCABULARY_SEEDS,
 } from "./complementPresets";
 import {
+  COMPATIBILITY_MATRIX_VOCABULARY_STANDARD_SEEDS,
+} from "./compatibilityMatrixVocabularyPresets";
+import {
   CONFLICT_BEAT_VOCABULARY_STANDARD_SEEDS,
 } from "./conflictBeatVocabularyPresets";
 import {
@@ -20,14 +23,26 @@ import {
   CONSEQUENCE_VOCABULARY_STANDARD_SEEDS,
 } from "./consequenceVocabularyPresets";
 import {
+  DIALOGUE_CONTROL_VOCABULARY_STANDARD_SEEDS,
+} from "./dialogueControlVocabularyPresets";
+import {
+  DYNAMIC_STATE_SYSTEM_VOCABULARY_STANDARD_SEEDS,
+} from "./dynamicStateSystemVocabularyPresets";
+import {
   DESIRE_VOCABULARY_STANDARD_SEEDS,
 } from "./desireVocabularyPresets";
 import {
   EMOTIONAL_MEANING_VOCABULARY_STANDARD_SEEDS,
 } from "./emotionalMeaningVocabularyPresets";
 import {
+  EVENT_ENGINE_VOCABULARY_STANDARD_SEEDS,
+} from "./eventEngineVocabularyPresets";
+import {
   FEAR_VOCABULARY_STANDARD_SEEDS,
 } from "./fearVocabularyPresets";
+import {
+  FIRST_MESSAGE_GENERATOR_VOCABULARY_STANDARD_SEEDS,
+} from "./firstMessageGeneratorVocabularyPresets";
 import {
   GROWTH_ARC_VOCABULARY_STANDARD_SEEDS,
 } from "./growthArcVocabularyPresets";
@@ -41,8 +56,14 @@ import {
   LOVE_LANGUAGE_VOCABULARY_STANDARD_SEEDS,
 } from "./loveLanguageVocabularyPresets";
 import {
+  MEMORY_COMPRESSION_RECALL_VOCABULARY_STANDARD_SEEDS,
+} from "./memoryCompressionRecallVocabularyPresets";
+import {
   MORAL_FRAMEWORK_VOCABULARY_SEEDS,
 } from "./moralFrameworkVocabularyPresets";
+import {
+  NARRATIVE_ARC_CONTROLLER_VOCABULARY_STANDARD_SEEDS,
+} from "./narrativeArcControllerVocabularyPresets";
 import {
   ORIGIN_WOUND_VOCABULARY_SEEDS,
 } from "./originWoundVocabularyPresets";
@@ -94,6 +115,9 @@ import {
   TRIGGER_VOCABULARY_STANDARD_SEEDS,
 } from "./triggerVocabularyPresets";
 import {
+  USER_PERSONA_PROFILE_VOCABULARY_STANDARD_SEEDS,
+} from "./userPersonaProfileVocabularyPresets";
+import {
   VISIBLE_BEHAVIOR_VOCABULARY_STANDARD_SEEDS,
 } from "./visibleBehaviorVocabularyPresets";
 import {
@@ -114,17 +138,24 @@ export type StandardVocabularySeedSourceId =
   | "behavior-architecture-vocabulary"
   | "registry"
   | "complement-vocabulary"
+  | "compatibility-matrix-vocabulary"
   | "conflict-beat-vocabulary"
   | "conflict-style-vocabulary"
   | "consequence-vocabulary"
   | "desire-vocabulary"
+  | "dialogue-control-vocabulary"
+  | "dynamic-state-system-vocabulary"
   | "emotional-meaning-vocabulary"
+  | "event-engine-vocabulary"
   | "fear-vocabulary"
+  | "first-message-generator-vocabulary"
   | "growth-arc-vocabulary"
   | "hidden-need-vocabulary"
   | "image-prompt-vocabulary"
   | "love-language-vocabulary"
+  | "memory-compression-recall-vocabulary"
   | "moral-framework-vocabulary"
+  | "narrative-arc-controller-vocabulary"
   | "origin-wound-vocabulary"
   | "payoff-fantasy-vocabulary"
   | "personality-engine-vocabulary"
@@ -140,6 +171,7 @@ export type StandardVocabularySeedSourceId =
   | "response-vocabulary"
   | "rupture-type-vocabulary"
   | "trigger-vocabulary"
+  | "user-persona-profile-vocabulary"
   | "visible-behavior-vocabulary"
   | "voice-vocabulary"
   | "voice-seed-vocabulary"
@@ -177,6 +209,11 @@ export const RICH_STANDARD_VOCABULARY_SEED_COLLECTIONS = Object.freeze([
     seeds: COMPLEMENT_VOCABULARY_SEEDS,
   },
   {
+    sourceId: "compatibility-matrix-vocabulary",
+    label: "Compatibility Matrix Vocabulary",
+    seeds: COMPATIBILITY_MATRIX_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
     sourceId: "conflict-beat-vocabulary",
     label: "Conflict Beat Vocabulary",
     seeds: CONFLICT_BEAT_VOCABULARY_STANDARD_SEEDS,
@@ -192,6 +229,16 @@ export const RICH_STANDARD_VOCABULARY_SEED_COLLECTIONS = Object.freeze([
     seeds: CONSEQUENCE_VOCABULARY_STANDARD_SEEDS,
   },
   {
+    sourceId: "dialogue-control-vocabulary",
+    label: "Dialogue Control Vocabulary",
+    seeds: DIALOGUE_CONTROL_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "dynamic-state-system-vocabulary",
+    label: "Dynamic State System Vocabulary",
+    seeds: DYNAMIC_STATE_SYSTEM_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
     sourceId: "desire-vocabulary",
     label: "Desire Vocabulary",
     seeds: DESIRE_VOCABULARY_STANDARD_SEEDS,
@@ -202,9 +249,19 @@ export const RICH_STANDARD_VOCABULARY_SEED_COLLECTIONS = Object.freeze([
     seeds: EMOTIONAL_MEANING_VOCABULARY_STANDARD_SEEDS,
   },
   {
+    sourceId: "event-engine-vocabulary",
+    label: "Event Engine Vocabulary",
+    seeds: EVENT_ENGINE_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
     sourceId: "fear-vocabulary",
     label: "Fear Vocabulary",
     seeds: FEAR_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "first-message-generator-vocabulary",
+    label: "First Message Generator Vocabulary",
+    seeds: FIRST_MESSAGE_GENERATOR_VOCABULARY_STANDARD_SEEDS,
   },
   {
     sourceId: "hidden-need-vocabulary",
@@ -222,9 +279,19 @@ export const RICH_STANDARD_VOCABULARY_SEED_COLLECTIONS = Object.freeze([
     seeds: LOVE_LANGUAGE_VOCABULARY_STANDARD_SEEDS,
   },
   {
+    sourceId: "memory-compression-recall-vocabulary",
+    label: "Memory Compression Recall Vocabulary",
+    seeds: MEMORY_COMPRESSION_RECALL_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
     sourceId: "moral-framework-vocabulary",
     label: "Moral Framework Vocabulary",
     seeds: MORAL_FRAMEWORK_VOCABULARY_SEEDS,
+  },
+  {
+    sourceId: "narrative-arc-controller-vocabulary",
+    label: "Narrative Arc Controller Vocabulary",
+    seeds: NARRATIVE_ARC_CONTROLLER_VOCABULARY_STANDARD_SEEDS,
   },
   {
     sourceId: "origin-wound-vocabulary",
@@ -265,6 +332,11 @@ export const RICH_STANDARD_VOCABULARY_SEED_COLLECTIONS = Object.freeze([
     sourceId: "trigger-vocabulary",
     label: "Trigger Vocabulary",
     seeds: TRIGGER_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "user-persona-profile-vocabulary",
+    label: "User Persona Profile Vocabulary",
+    seeds: USER_PERSONA_PROFILE_VOCABULARY_STANDARD_SEEDS,
   },
   {
     sourceId: "visible-behavior-vocabulary",

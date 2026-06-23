@@ -189,6 +189,577 @@ Attraction + low trust -> conflicted friction
 This is not just who the character is. It is how the character interprets
 important events and converts them into behavior.
 
+## Dynamic State System Bends Behavior
+
+The dynamic state system is the character-layer bridge between fixed identity
+and moment-to-moment behavior. The character is still recognizable, but their
+perception, tone, restraint, and decisions shift as internal state changes.
+
+The primary axes are:
+
+```text
+Trust:
+- low trust: defensive, suspicious, closed
+- middle trust: cautious engagement
+- high trust: open, responsive, more personal
+- very high trust: vulnerable, invested, protective
+
+Attraction:
+- optional romance layer
+- low: neutral or only curious
+- high: drawn in, attentive, proximity-seeking
+- very high: fixated, attached, difficult to compartmentalize
+
+Emotional regulation:
+- low: volatile, impulsive, fragmented
+- middle: reactive but still able to think
+- high: controlled and responsive
+- very high: composed, filtered, possibly suppressed
+
+Power perception:
+- negative: feels dominated, cornered, or intimidated
+- neutral: equal footing
+- positive: feels able to steer, protect, or command
+```
+
+State changes should follow the same causal pattern as events:
+
+```text
+Trigger -> Interpretation -> Adjustment
+```
+
+For example:
+
+```text
+Kindness without cost
+-> "This might be genuine"
+-> trust rises slightly
+
+Inconsistency
+-> "Something is off"
+-> trust drops and regulation tightens
+
+Emotional vulnerability shown
+-> "They are opening up"
+-> trust or attraction may rise, depending on the character
+```
+
+States modify the existing behavior profile. They do not overwrite it.
+
+```text
+Baseline:
+Being helped -> suspicious -> resists
+
+High trust:
+Being helped -> accepts -> quiet gratitude
+
+Low regulation:
+Being helped -> snaps -> regrets the overreaction later
+```
+
+Expose effects, not numbers. The prompt should show tone shifts, openness,
+initiative, visible restraint, and decision bias. Raw state values belong to
+the engine, not to the prose-facing card output.
+
+State memory prevents reset. Trust should not return to neutral after a
+meaningful betrayal or repair. Attraction can decay if ignored. Emotional
+spikes can normalize, but repeated triggers should keep pressure active.
+
+The implementation rule is:
+
+```text
+Character Sheet
++ Current State
+= Final Behavior
+```
+
+Never use state alone, and never use traits alone. The believable behavior is
+the interaction of both.
+
+## Dialogue Control Belongs to the Writing Layer
+
+Dialogue control is not the same thing as personality. It is the writing-layer
+system that decides how a character's current voice is performed on the page.
+
+Good dialogue comes from three inputs working together:
+
+```text
+Character sheet voice
+x Dynamic state modulation
+x Narrative arc phase
+= Performed dialogue
+```
+
+The character sheet anchors baseline voice: sentence length, vocabulary level,
+directness, emotional expressiveness, and quirks.
+
+The dynamic state system modulates that voice. Low trust makes dialogue more
+guarded and testing. High trust makes it more personal. Low emotional
+regulation makes it sharper, interrupted, or incomplete. Attraction can make
+language more specific and attentive without requiring direct confession.
+
+The narrative arc phase controls pacing and exposure. Initiation favors
+probing and observation. Development allows light personal reveals. Escalation
+sharpens the tone. Crisis strips dialogue down to urgent truth. Resolution
+slows the rhythm and lets reflection enter.
+
+Dialogue should also rotate function. A line can probe, push, pull, deflect,
+reveal, or control. Repeating the same function over and over makes scenes feel
+circular even if every line is technically in character.
+
+Subtext is the pressure valve. What is said should not always equal what is
+meant. Instead of making a character announce "I like you," a stronger line may
+be:
+
+```text
+"You're... harder to ignore than you should be."
+```
+
+Variation matters. Avoid repeated phrases, predictable openings and closings,
+and identical sentence shapes. Use silence, pauses, short replies, and
+action-only beats when negative space carries more force than explanation.
+
+The compact rule is:
+
+```text
+No repeated phrases.
+State affects tone.
+Alternate sentence length.
+Maintain voice consistency.
+```
+
+## First Message Generator Converts Sheet Into Starter
+
+The first message generator is the opening-scene compiler. It should not invent
+a generic greeting and then paste the character's name into it. It should pull
+from the sheet and turn character data into a playable first beat.
+
+The generator reads:
+
+```text
+Core traits -> tone and pacing
+Speech profile -> voice and quirks
+Behavior profile -> revealing action and reaction pattern
+Motivational drivers -> hidden intent and subtext
+Worldview -> framing of the situation
+```
+
+The message structure is:
+
+```text
+Hook:
+- immediate sensory or situational anchor
+- reflects the character's perception style
+
+Character action:
+- small revealing behavior
+- not a generic greeting
+
+Interpretation layer:
+- how {{char}} processes {{user}} or the situation
+- anchored only to what {{char}} can perceive or infer
+
+Dialogue:
+- voice, tone, diction, and quirks from the speech profile
+
+Subtext:
+- hidden intent from motivational drivers
+
+Optional tension or curiosity gap:
+- question, contradiction, withheld detail, or open action
+```
+
+The starter must imply personality, power dynamic, and emotional stance. It
+should create curiosity, tension, or invitation.
+
+Avoid:
+
+```text
+"Hi."
+"Hello."
+generic smiles
+neutral exposition
+writing {{user}}'s thoughts, actions, feelings, or decisions
+```
+
+The compact output template is:
+
+```text
+*<environmental or physical action>*
+
+"<dialogue line>"
+
+*<micro-reaction or internal interpretation>*
+
+Optional: add tension hook or curiosity gap.
+```
+
+Variation types change how the same structure enters the scene:
+
+```text
+Dominant entry:
+- controls the scene frame
+
+Reactive entry:
+- responds to {{user}}'s presence or interruption
+
+Slow-burn entry:
+- low intensity, high subtext
+
+High-tension entry:
+- conflict or danger is already present
+```
+
+The first message should end before {{user}} responds. It is an invitation to
+play, not both sides of the exchange.
+
+## User Persona Profiles Shape Matching
+
+User persona profiles describe the user's playable stance for matching,
+search, and route pressure. They are not instructions to write the user's
+actions, thoughts, feelings, or consent.
+
+The useful sections are:
+
+```text
+Basic:
+- name or alias
+- age
+- background
+- role or archetype
+- starting situation
+
+Psychology:
+- core traits
+- insecurities
+- desires
+- boundaries
+
+Cognition:
+- attention
+- perception
+- memory
+- decision style
+
+Motivational drivers:
+- autonomy
+- competence
+- relatedness
+- intrinsic
+- extrinsic
+
+Relational style:
+- attachment style
+- trust formation
+- conflict style
+
+Attraction and chemistry hooks:
+- what they respond to
+- what destabilizes them
+
+Behavior patterns:
+- trigger -> interpretation -> response
+
+Story hooks:
+- goals
+- internal conflicts
+- external pressures
+```
+
+This layer gives the compatibility matrix something concrete to compare
+against character models. It should remain editable and prompt-safe: expose
+the persona's tags, boundaries, preferences, and route-relevant signals, but
+do not convert them into forced user behavior.
+
+## Compatibility Matrix Predicts Pair Dynamics
+
+The compatibility matrix is the persona-matching layer. It does not decide
+that a pairing must succeed or fail. It predicts what kind of pressure the
+character and persona will create together.
+
+The matrix asks:
+
+```text
+Attraction vector:
+- what the character is drawn to
+- what the persona emits
+- alignment: high, medium, or low
+- result: immediate chemistry, slow burn, or no spark
+
+Friction points:
+- character sensitivities
+- persona pressure points
+- collision type: value clash, emotional mismatch, pacing mismatch, or power
+  imbalance
+- result: productive tension, destructive loop, or avoidance pattern
+
+Emotional economy:
+- who invests first
+- who withholds
+- reciprocity pattern
+- result: balanced, asymmetrical, parasitic, or volatile
+
+Power dynamics:
+- control axis: dominant, reactive, or avoidant
+- dependency axis
+- stability: stable, shifting, or unstable
+
+Behavioral feedback loop:
+- character -> persona -> character
+- trigger -> response -> escalation or de-escalation
+- loop type: reinforcing, degrading, or chaotic
+
+Narrative trajectory:
+- likely arc: collapse, growth, obsession, rivalry, or slow bond
+- sustainability: short-term, mid-term, or long-term viable
+
+Risk factors:
+- burnout risks
+- repetition risks
+- derailment triggers
+```
+
+The final assessment should name:
+
+```text
+overall compatibility
+best use case
+required adjustments
+```
+
+High compatibility does not mean low friction. A strong pairing may have sharp
+friction if the loop produces repair, growth, attraction, or useful tension.
+Low compatibility usually means the loop burns out, repeats destructively, or
+requires adjustments before it can sustain long-form roleplay.
+
+## Memory Compression Stabilizes Long Context
+
+Long-form roleplay should not remember everything equally. The memory layer
+separates identity, relationship continuity, and disposable scene noise.
+
+Use three tiers:
+
+```text
+Tier 1 - Core Identity:
+- character laws
+- core traits
+- speech profile
+- motivational drivers
+- never decays
+
+Tier 2 - Relationship Memory:
+- trust shifts
+- key emotional events
+- turning points
+- promises, betrayals, confessions
+- compressed and slow to decay
+
+Tier 3 - Contextual Memory:
+- locations
+- minor actions
+- temporary states
+- scene details
+- fast decay unless relevant again
+```
+
+Compression should convert raw history into:
+
+```text
+event -> meaning -> state impact
+```
+
+Example:
+
+```text
+Conflict about trust -> unresolved tension -> trust decreases
+```
+
+Recall should trigger only when the current scene meaningfully resembles a
+stored pattern: a similar situation, the same emotional trigger, a repeated
+behavior pattern, or a state threshold crossing.
+
+Good recall changes expectation, tone, and subtext. It should not dump old
+transcripts back into the prompt.
+
+Weak pattern:
+
+```text
+As you said twenty messages ago...
+```
+
+Stronger pattern:
+
+```text
+You have a habit of disappearing when things get complicated.
+```
+
+The rule is simple: do not remember everything. Remember what changes
+behavior.
+
+## Narrative Arc Control Guides Story Movement
+
+Narrative arc control is the route-level system that keeps story pressure from
+burning out early, stagnating in the middle, or escalating chaotically.
+
+It tracks:
+
+- current phase
+- allowed event type
+- emotional intensity
+- state movement speed
+- phase transition pressure
+- narrative fatigue
+
+The five core phases are:
+
+```text
+Phase 1 - Initiation:
+- establish tone, dynamics, and baseline states
+- use micro events, light friction, and environmental hooks
+- avoid confessions, extreme attachment, and major betrayal
+
+Phase 2 - Development:
+- build connection, repeated patterns, and tension loops
+- use micro and meso events, misunderstandings, and early vulnerability
+- avoid repetition loops
+
+Phase 3 - Escalation:
+- increase stakes and emotional intensity
+- use meso events and selective major events
+- avoid chaos without direction
+
+Phase 4 - Crisis / Turning Point:
+- force irreversible change
+- use major events only
+- avoid small talk loops and low-stakes filler
+
+Phase 5 - Resolution / Stabilization:
+- process consequences or redefine the relationship
+- use vulnerability, reflection, and soft interpersonal events
+- avoid dragging the aftermath too long
+```
+
+Pacing modes change how quickly the controller allows phase movement. Slow burn
+stays longer in initiation and development. Fast-paced routes inject earlier
+conflict. Chaotic routes can overlap phases, but they need stabilization after
+large spikes.
+
+Arc correction handles derailment:
+
+- Too calm: inject escalation.
+- Too chaotic: force stabilization.
+- Too repetitive: shift phase or add a new event category.
+- Premature crisis: downshift into development or escalation pressure.
+- Dragging resolution: lock the new baseline or seed the next arc.
+
+The golden rule is:
+
+```text
+Phase controls events.
+Events change states.
+States modify behavior.
+```
+
+Do not let states alone drive story, and do not let events alone drive story.
+The route should feel like things build, peak, and resolve.
+
+## Event Engine Creates Context-Aware Pressure
+
+The event engine is the system that injects pressures into the route. Events
+are not random incidents. They are context-aware, state-aware, and
+character-aware.
+
+Events should:
+
+- force state changes
+- reveal hidden traits
+- prevent repetition
+- create narrative momentum
+
+The core event categories are:
+
+```text
+Interpersonal:
+- conflict
+- vulnerability moments
+- misunderstandings
+- power shifts
+
+Environmental:
+- new location
+- external threat
+- resource limitation
+- time pressure
+
+Internal:
+- emotional spikes
+- memory triggers
+- moral dilemmas
+- identity conflict
+
+Relationship:
+- third-party interference
+- jealousy triggers
+- loyalty tests
+- betrayal opportunities
+```
+
+Events also have escalation tiers:
+
+```text
+Tier 1 - Micro:
+- tone change
+- slight misunderstanding
+- small reveal
+
+Tier 2 - Meso:
+- argument
+- emotional reveal
+- external complication
+
+Tier 3 - Major:
+- betrayal
+- confession
+- crisis
+- forced separation
+```
+
+Do not jump tiers too quickly unless the current phase, premise, or state
+pressure justifies it.
+
+Each event should compile through the same structure:
+
+```text
+Trigger:
+what happens externally
+
+Interpretation:
+how the character processes it based on sheet and state
+
+State impact:
+which states change and how
+
+Behavioral outcome:
+what the character does
+```
+
+The same event should not affect every character the same way. A late reply may
+be nothing to a secure character, but to an anxious character it can become a
+fear of replacement, loss, or abandonment.
+
+Inject events when a loop is detected, a state plateaus, the route becomes too
+predictable, or emotional intensity stays too stable. Avoid injecting when a
+strong moment is already unfolding or natural progression is happening.
+
+The event engine works best when it feels inevitable in context:
+
+```text
+Character Sheet
++ Dynamic State System
++ Persona Pressure
+= Emergent Story
+```
+
 ## Event-Driven Psychology
 
 Use events to drive behavior. A character can be guarded in many different

@@ -5,17 +5,24 @@ import { ACTS_OF_SERVICE_VOCABULARY_SEEDS } from "../../data/actsOfServiceVocabu
 import { ATTACHMENT_STYLE_VOCABULARY_STANDARD_SEEDS } from "../../data/attachmentStyleVocabularyPresets";
 import { BEHAVIOR_ARCHITECTURE_VOCABULARY_STANDARD_SEEDS } from "../../data/behaviorArchitectureVocabularyPresets";
 import { COMPLEMENT_VOCABULARY_SEEDS } from "../../data/complementPresets";
+import { COMPATIBILITY_MATRIX_VOCABULARY_STANDARD_SEEDS } from "../../data/compatibilityMatrixVocabularyPresets";
 import { CONFLICT_BEAT_VOCABULARY_STANDARD_SEEDS } from "../../data/conflictBeatVocabularyPresets";
 import { CONFLICT_STYLE_VOCABULARY_STANDARD_SEEDS } from "../../data/conflictStyleVocabularyPresets";
 import { CONSEQUENCE_VOCABULARY_STANDARD_SEEDS } from "../../data/consequenceVocabularyPresets";
+import { DIALOGUE_CONTROL_VOCABULARY_STANDARD_SEEDS } from "../../data/dialogueControlVocabularyPresets";
+import { DYNAMIC_STATE_SYSTEM_VOCABULARY_STANDARD_SEEDS } from "../../data/dynamicStateSystemVocabularyPresets";
 import { DESIRE_VOCABULARY_STANDARD_SEEDS } from "../../data/desireVocabularyPresets";
 import { EMOTIONAL_MEANING_VOCABULARY_STANDARD_SEEDS } from "../../data/emotionalMeaningVocabularyPresets";
+import { EVENT_ENGINE_VOCABULARY_STANDARD_SEEDS } from "../../data/eventEngineVocabularyPresets";
 import { FEAR_VOCABULARY_STANDARD_SEEDS } from "../../data/fearVocabularyPresets";
+import { FIRST_MESSAGE_GENERATOR_VOCABULARY_STANDARD_SEEDS } from "../../data/firstMessageGeneratorVocabularyPresets";
 import { GROWTH_ARC_VOCABULARY_STANDARD_SEEDS } from "../../data/growthArcVocabularyPresets";
 import { HIDDEN_NEED_VOCABULARY_STANDARD_SEEDS } from "../../data/hiddenNeedVocabularyPresets";
 import { IMAGE_PROMPT_VOCABULARY_SEEDS } from "../../data/imagePromptVocabPresets";
 import { LOVE_LANGUAGE_VOCABULARY_STANDARD_SEEDS } from "../../data/loveLanguageVocabularyPresets";
+import { MEMORY_COMPRESSION_RECALL_VOCABULARY_STANDARD_SEEDS } from "../../data/memoryCompressionRecallVocabularyPresets";
 import { MORAL_FRAMEWORK_VOCABULARY_SEEDS } from "../../data/moralFrameworkVocabularyPresets";
+import { NARRATIVE_ARC_CONTROLLER_VOCABULARY_STANDARD_SEEDS } from "../../data/narrativeArcControllerVocabularyPresets";
 import { ORIGIN_WOUND_VOCABULARY_SEEDS } from "../../data/originWoundVocabularyPresets";
 import { PAYOFF_FANTASY_VOCABULARY_STANDARD_SEEDS } from "../../data/payoffFantasyVocabularyPresets";
 import { PERSONALITY_ENGINE_VOCABULARY_SEEDS } from "../../data/personalityEngineVocabularyPresets";
@@ -32,6 +39,7 @@ import { RESPONSE_VOCABULARY_STANDARD_SEEDS } from "../../data/responseVocabular
 import { RUPTURE_TYPE_VOCABULARY_STANDARD_SEEDS } from "../../data/ruptureTypeVocabularyPresets";
 import { SEED_PRESET_REGISTRY } from "../../data/seedPresetRegistry";
 import { TRIGGER_VOCABULARY_STANDARD_SEEDS } from "../../data/triggerVocabularyPresets";
+import { USER_PERSONA_PROFILE_VOCABULARY_STANDARD_SEEDS } from "../../data/userPersonaProfileVocabularyPresets";
 import { VISIBLE_BEHAVIOR_VOCABULARY_STANDARD_SEEDS } from "../../data/visibleBehaviorVocabularyPresets";
 import {
   ALL_STANDARD_VOCABULARY_SEEDS,
@@ -87,17 +95,24 @@ test("collects rich vocabulary seed collections across explicit vocabulary modul
     ATTACHMENT_STYLE_VOCABULARY_STANDARD_SEEDS.length +
     BEHAVIOR_ARCHITECTURE_VOCABULARY_STANDARD_SEEDS.length +
     COMPLEMENT_VOCABULARY_SEEDS.length +
+    COMPATIBILITY_MATRIX_VOCABULARY_STANDARD_SEEDS.length +
     CONFLICT_BEAT_VOCABULARY_STANDARD_SEEDS.length +
     CONFLICT_STYLE_VOCABULARY_STANDARD_SEEDS.length +
     CONSEQUENCE_VOCABULARY_STANDARD_SEEDS.length +
+    DIALOGUE_CONTROL_VOCABULARY_STANDARD_SEEDS.length +
+    DYNAMIC_STATE_SYSTEM_VOCABULARY_STANDARD_SEEDS.length +
     DESIRE_VOCABULARY_STANDARD_SEEDS.length +
     EMOTIONAL_MEANING_VOCABULARY_STANDARD_SEEDS.length +
+    EVENT_ENGINE_VOCABULARY_STANDARD_SEEDS.length +
     FEAR_VOCABULARY_STANDARD_SEEDS.length +
+    FIRST_MESSAGE_GENERATOR_VOCABULARY_STANDARD_SEEDS.length +
     GROWTH_ARC_VOCABULARY_STANDARD_SEEDS.length +
     HIDDEN_NEED_VOCABULARY_STANDARD_SEEDS.length +
     IMAGE_PROMPT_VOCABULARY_SEEDS.length +
     LOVE_LANGUAGE_VOCABULARY_STANDARD_SEEDS.length +
+    MEMORY_COMPRESSION_RECALL_VOCABULARY_STANDARD_SEEDS.length +
     MORAL_FRAMEWORK_VOCABULARY_SEEDS.length +
+    NARRATIVE_ARC_CONTROLLER_VOCABULARY_STANDARD_SEEDS.length +
     ORIGIN_WOUND_VOCABULARY_SEEDS.length +
     PAYOFF_FANTASY_VOCABULARY_STANDARD_SEEDS.length +
     PERSONALITY_ENGINE_VOCABULARY_SEEDS.length +
@@ -113,6 +128,7 @@ test("collects rich vocabulary seed collections across explicit vocabulary modul
     RESPONSE_VOCABULARY_STANDARD_SEEDS.length +
     RUPTURE_TYPE_VOCABULARY_STANDARD_SEEDS.length +
     TRIGGER_VOCABULARY_STANDARD_SEEDS.length +
+    USER_PERSONA_PROFILE_VOCABULARY_STANDARD_SEEDS.length +
     VISIBLE_BEHAVIOR_VOCABULARY_STANDARD_SEEDS.length +
     VOICE_VOCABULARY_SEEDS.length +
     VOICE_SEED_VOCABULARY_SEEDS.length +
@@ -132,16 +148,23 @@ test("collects rich vocabulary seed collections across explicit vocabulary modul
       "attachment-style-vocabulary",
       "behavior-architecture-vocabulary",
       "complement-vocabulary",
+      "compatibility-matrix-vocabulary",
       "conflict-beat-vocabulary",
       "conflict-style-vocabulary",
       "consequence-vocabulary",
+      "dialogue-control-vocabulary",
+      "dynamic-state-system-vocabulary",
       "desire-vocabulary",
       "emotional-meaning-vocabulary",
+      "event-engine-vocabulary",
       "fear-vocabulary",
+      "first-message-generator-vocabulary",
       "hidden-need-vocabulary",
       "image-prompt-vocabulary",
       "love-language-vocabulary",
+      "memory-compression-recall-vocabulary",
       "moral-framework-vocabulary",
+      "narrative-arc-controller-vocabulary",
       "origin-wound-vocabulary",
       "wound-vocabulary",
       "response-vocabulary",
@@ -150,6 +173,7 @@ test("collects rich vocabulary seed collections across explicit vocabulary modul
       "repair-need-vocabulary",
       "rupture-type-vocabulary",
       "trigger-vocabulary",
+      "user-persona-profile-vocabulary",
       "visible-behavior-vocabulary",
       "personality-engine-vocabulary",
       "relationship-dynamic-vocabulary",
@@ -172,17 +196,24 @@ test("keeps canonical shape for explicit vocabulary seed exports", () => {
     ACTS_OF_SERVICE_VOCABULARY_SEEDS[0],
     ATTACHMENT_STYLE_VOCABULARY_STANDARD_SEEDS[0],
     BEHAVIOR_ARCHITECTURE_VOCABULARY_STANDARD_SEEDS[0],
+    COMPATIBILITY_MATRIX_VOCABULARY_STANDARD_SEEDS[0],
     CONFLICT_BEAT_VOCABULARY_STANDARD_SEEDS[0],
     CONFLICT_STYLE_VOCABULARY_STANDARD_SEEDS[0],
     CONSEQUENCE_VOCABULARY_STANDARD_SEEDS[0],
+    DIALOGUE_CONTROL_VOCABULARY_STANDARD_SEEDS[0],
+    DYNAMIC_STATE_SYSTEM_VOCABULARY_STANDARD_SEEDS[0],
     DESIRE_VOCABULARY_STANDARD_SEEDS[0],
     EMOTIONAL_MEANING_VOCABULARY_STANDARD_SEEDS[0],
+    EVENT_ENGINE_VOCABULARY_STANDARD_SEEDS[0],
     FEAR_VOCABULARY_STANDARD_SEEDS[0],
+    FIRST_MESSAGE_GENERATOR_VOCABULARY_STANDARD_SEEDS[0],
     HIDDEN_NEED_VOCABULARY_STANDARD_SEEDS[0],
     GROWTH_ARC_VOCABULARY_STANDARD_SEEDS[0],
     IMAGE_PROMPT_VOCABULARY_SEEDS[0],
     LOVE_LANGUAGE_VOCABULARY_STANDARD_SEEDS[0],
+    MEMORY_COMPRESSION_RECALL_VOCABULARY_STANDARD_SEEDS[0],
     MORAL_FRAMEWORK_VOCABULARY_SEEDS[0],
+    NARRATIVE_ARC_CONTROLLER_VOCABULARY_STANDARD_SEEDS[0],
     ORIGIN_WOUND_VOCABULARY_SEEDS[0],
     WOUND_VOCABULARY_STANDARD_SEEDS[0],
     RESPONSE_VOCABULARY_STANDARD_SEEDS[0],
@@ -199,6 +230,7 @@ test("keeps canonical shape for explicit vocabulary seed exports", () => {
     PAYOFF_FANTASY_VOCABULARY_STANDARD_SEEDS[0],
     REPAIR_BEAT_VOCABULARY_STANDARD_SEEDS[0],
     RUPTURE_TYPE_VOCABULARY_STANDARD_SEEDS[0],
+    USER_PERSONA_PROFILE_VOCABULARY_STANDARD_SEEDS[0],
     VISIBLE_BEHAVIOR_VOCABULARY_STANDARD_SEEDS[0],
     VOICE_VOCABULARY_SEEDS[0],
     VOICE_SEED_VOCABULARY_SEEDS[0],
@@ -217,9 +249,18 @@ test("filters and searches standard vocabulary seeds across all categories", () 
   const moralSeeds = getRichStandardVocabularySeedsBySource(
     "moral-framework-vocabulary",
   );
+  const narrativeArcControllerSeeds = getRichStandardVocabularySeedsBySource(
+    "narrative-arc-controller-vocabulary",
+  );
   const desireSeeds = getRichStandardVocabularySeedsBySource("desire-vocabulary");
   const emotionalMeaningSeeds = getRichStandardVocabularySeedsBySource(
     "emotional-meaning-vocabulary",
+  );
+  const eventEngineSeeds = getRichStandardVocabularySeedsBySource(
+    "event-engine-vocabulary",
+  );
+  const compatibilityMatrixSeeds = getRichStandardVocabularySeedsBySource(
+    "compatibility-matrix-vocabulary",
   );
   const conflictStyleSeeds = getRichStandardVocabularySeedsBySource(
     "conflict-style-vocabulary",
@@ -230,7 +271,16 @@ test("filters and searches standard vocabulary seeds across all categories", () 
   const consequenceSeeds = getRichStandardVocabularySeedsBySource(
     "consequence-vocabulary",
   );
+  const dialogueControlSeeds = getRichStandardVocabularySeedsBySource(
+    "dialogue-control-vocabulary",
+  );
+  const dynamicStateSystemSeeds = getRichStandardVocabularySeedsBySource(
+    "dynamic-state-system-vocabulary",
+  );
   const fearSeeds = getRichStandardVocabularySeedsBySource("fear-vocabulary");
+  const firstMessageGeneratorSeeds = getRichStandardVocabularySeedsBySource(
+    "first-message-generator-vocabulary",
+  );
   const growthArcSeeds = getRichStandardVocabularySeedsBySource(
     "growth-arc-vocabulary",
   );
@@ -239,6 +289,9 @@ test("filters and searches standard vocabulary seeds across all categories", () 
   );
   const loveLanguageSeeds = getRichStandardVocabularySeedsBySource(
     "love-language-vocabulary",
+  );
+  const memoryCompressionRecallSeeds = getRichStandardVocabularySeedsBySource(
+    "memory-compression-recall-vocabulary",
   );
   const responseSeeds = getRichStandardVocabularySeedsBySource("response-vocabulary");
   const repairStyleSeeds = getRichStandardVocabularySeedsBySource(
@@ -263,6 +316,9 @@ test("filters and searches standard vocabulary seeds across all categories", () 
     "behavior-architecture-vocabulary",
   );
   const triggerSeeds = getRichStandardVocabularySeedsBySource("trigger-vocabulary");
+  const userPersonaProfileSeeds = getRichStandardVocabularySeedsBySource(
+    "user-persona-profile-vocabulary",
+  );
   const visibleBehaviorSeeds = getRichStandardVocabularySeedsBySource(
     "visible-behavior-vocabulary",
   );
@@ -291,10 +347,24 @@ test("filters and searches standard vocabulary seeds across all categories", () 
     sourceIds: ["moral-framework-vocabulary"],
     limit: 3,
   });
+  const narrativeArcControllerResults = searchStandardVocabularySeeds(
+    "major tension unresolved",
+    {
+      sourceIds: ["narrative-arc-controller-vocabulary"],
+      limit: 3,
+    },
+  );
   const fearResults = searchStandardVocabularySeeds("People eventually leave", {
     sourceIds: ["fear-vocabulary"],
     limit: 3,
   });
+  const firstMessageGeneratorResults = searchStandardVocabularySeeds(
+    "No generic greetings such as hi or hello",
+    {
+      sourceIds: ["first-message-generator-vocabulary"],
+      limit: 3,
+    },
+  );
   const growthArcResults = searchStandardVocabularySeeds("trust can be earned", {
     sourceIds: ["growth-arc-vocabulary"],
     limit: 3,
@@ -314,6 +384,20 @@ test("filters and searches standard vocabulary seeds across all categories", () 
     "paying attention to small needs",
     {
       sourceIds: ["emotional-meaning-vocabulary"],
+      limit: 3,
+    },
+  );
+  const eventEngineResults = searchStandardVocabularySeeds(
+    "replacement fear may rise",
+    {
+      sourceIds: ["event-engine-vocabulary"],
+      limit: 3,
+    },
+  );
+  const compatibilityMatrixResults = searchStandardVocabularySeeds(
+    "who invests first",
+    {
+      sourceIds: ["compatibility-matrix-vocabulary"],
       limit: 3,
     },
   );
@@ -390,6 +474,20 @@ test("filters and searches standard vocabulary seeds across all categories", () 
       limit: 3,
     },
   );
+  const dialogueControlResults = searchStandardVocabularySeeds(
+    "harder to ignore than you should be",
+    {
+      sourceIds: ["dialogue-control-vocabulary"],
+      limit: 3,
+    },
+  );
+  const dynamicStateSystemResults = searchStandardVocabularySeeds(
+    "The baseline behavior remains visible",
+    {
+      sourceIds: ["dynamic-state-system-vocabulary"],
+      limit: 3,
+    },
+  );
   const loveLanguageResults = searchStandardVocabularySeeds(
     "I notice what burdens you",
     {
@@ -397,10 +495,24 @@ test("filters and searches standard vocabulary seeds across all categories", () 
       limit: 3,
     },
   );
+  const memoryCompressionRecallResults = searchStandardVocabularySeeds(
+    "Keep meaning, discard wording",
+    {
+      sourceIds: ["memory-compression-recall-vocabulary"],
+      limit: 3,
+    },
+  );
   const triggerResults = searchStandardVocabularySeeds("Silence feels like proof", {
     sourceIds: ["trigger-vocabulary"],
     limit: 3,
   });
+  const userPersonaProfileResults = searchStandardVocabularySeeds(
+    "trigger to interpretation",
+    {
+      sourceIds: ["user-persona-profile-vocabulary"],
+      limit: 3,
+    },
+  );
   const visibleBehaviorResults = searchStandardVocabularySeeds("warm drink", {
     sourceIds: ["visible-behavior-vocabulary"],
     limit: 3,
@@ -457,10 +569,19 @@ test("filters and searches standard vocabulary seeds across all categories", () 
 
   assert.equal(personalitySeeds.length > imageSeeds.length, true);
   assert.equal(moralSeeds.length, MORAL_FRAMEWORK_VOCABULARY_SEEDS.length);
+  assert.equal(
+    narrativeArcControllerSeeds.length,
+    NARRATIVE_ARC_CONTROLLER_VOCABULARY_STANDARD_SEEDS.length,
+  );
   assert.equal(desireSeeds.length, DESIRE_VOCABULARY_STANDARD_SEEDS.length);
   assert.equal(
     emotionalMeaningSeeds.length,
     EMOTIONAL_MEANING_VOCABULARY_STANDARD_SEEDS.length,
+  );
+  assert.equal(eventEngineSeeds.length, EVENT_ENGINE_VOCABULARY_STANDARD_SEEDS.length);
+  assert.equal(
+    compatibilityMatrixSeeds.length,
+    COMPATIBILITY_MATRIX_VOCABULARY_STANDARD_SEEDS.length,
   );
   assert.equal(
     conflictStyleSeeds.length,
@@ -471,13 +592,29 @@ test("filters and searches standard vocabulary seeds across all categories", () 
     CONFLICT_BEAT_VOCABULARY_STANDARD_SEEDS.length,
   );
   assert.equal(consequenceSeeds.length, CONSEQUENCE_VOCABULARY_STANDARD_SEEDS.length);
+  assert.equal(
+    dialogueControlSeeds.length,
+    DIALOGUE_CONTROL_VOCABULARY_STANDARD_SEEDS.length,
+  );
+  assert.equal(
+    dynamicStateSystemSeeds.length,
+    DYNAMIC_STATE_SYSTEM_VOCABULARY_STANDARD_SEEDS.length,
+  );
   assert.equal(fearSeeds.length, FEAR_VOCABULARY_STANDARD_SEEDS.length);
+  assert.equal(
+    firstMessageGeneratorSeeds.length,
+    FIRST_MESSAGE_GENERATOR_VOCABULARY_STANDARD_SEEDS.length,
+  );
   assert.equal(growthArcSeeds.length, GROWTH_ARC_VOCABULARY_STANDARD_SEEDS.length);
   assert.equal(
     hiddenNeedSeeds.length,
     HIDDEN_NEED_VOCABULARY_STANDARD_SEEDS.length,
   );
   assert.equal(loveLanguageSeeds.length, LOVE_LANGUAGE_VOCABULARY_STANDARD_SEEDS.length);
+  assert.equal(
+    memoryCompressionRecallSeeds.length,
+    MEMORY_COMPRESSION_RECALL_VOCABULARY_STANDARD_SEEDS.length,
+  );
   assert.equal(responseSeeds.length, RESPONSE_VOCABULARY_STANDARD_SEEDS.length);
   assert.equal(repairStyleSeeds.length, REPAIR_STYLE_VOCABULARY_STANDARD_SEEDS.length);
   assert.equal(repairBeatSeeds.length, REPAIR_BEAT_VOCABULARY_STANDARD_SEEDS.length);
@@ -493,6 +630,10 @@ test("filters and searches standard vocabulary seeds across all categories", () 
     BEHAVIOR_ARCHITECTURE_VOCABULARY_STANDARD_SEEDS.length,
   );
   assert.equal(triggerSeeds.length, TRIGGER_VOCABULARY_STANDARD_SEEDS.length);
+  assert.equal(
+    userPersonaProfileSeeds.length,
+    USER_PERSONA_PROFILE_VOCABULARY_STANDARD_SEEDS.length,
+  );
   assert.equal(
     visibleBehaviorSeeds.length,
     VISIBLE_BEHAVIOR_VOCABULARY_STANDARD_SEEDS.length,
@@ -517,12 +658,16 @@ test("filters and searches standard vocabulary seeds across all categories", () 
     PAYOFF_FANTASY_VOCABULARY_STANDARD_SEEDS.length,
   );
   assert.equal(careResults[0]?.label, "Care Ethics");
+  assert.equal(narrativeArcControllerResults[0]?.label, "Phase 3 - Escalation");
   assert.equal(conflictStyleResults[0]?.label, "Pursuer Conflict Style");
   assert.equal(conflictBeatResults[0]?.label, "Delayed Reply Spiral");
   assert.equal(consequenceResults[0]?.label, "Trust Damage Consequence");
   assert.equal(desireResults[0]?.label, "Desire to Be Chosen");
   assert.equal(emotionalMeaningResults[0]?.label, "I Notice You");
+  assert.equal(eventEngineResults[0]?.label, "Third-Party Flirtation Event");
+  assert.equal(compatibilityMatrixResults[0]?.label, "Emotional Economy Compatibility Section");
   assert.equal(fearResults[0]?.label, "Fear of Abandonment");
+  assert.equal(firstMessageGeneratorResults[0]?.label, "Dialogue First Message Structure");
   assert.equal(growthArcResults[0]?.label, "Learning to Trust");
   assert.equal(hiddenNeedResults[0]?.label, "Need for Reassurance");
   assert.equal(woundResults[0]?.label, "Everyone Leaves Wound");
@@ -534,8 +679,15 @@ test("filters and searches standard vocabulary seeds across all categories", () 
   assert.equal(actsOfServiceResults[0]?.label, "Quiet Devotion");
   assert.equal(attachmentStyleResults[0]?.label, "Anxious Attachment");
   assert.equal(behaviorArchitectureResults[0]?.label, "Agency Threat");
+  assert.equal(dialogueControlResults[0]?.label, "Subtext Layer");
+  assert.equal(dynamicStateSystemResults[0]?.label, "Being Helped - Baseline Suspicion");
   assert.equal(loveLanguageResults[0]?.label, "Acts of Service");
+  assert.equal(
+    memoryCompressionRecallResults[0]?.label,
+    "Event Meaning State Impact Memory Compression Rule",
+  );
   assert.equal(triggerResults[0]?.label, "Unanswered Message Trigger");
+  assert.equal(userPersonaProfileResults[0]?.label, "Behavior Patterns Profile Section");
   assert.equal(visibleBehaviorResults[0]?.label, "Makes Tea When Worried");
   assert.equal(relationshipDynamicResults[0]?.label, "Safe Haven Dynamic");
   assert.equal(relationshipIdentityResults[0]?.label, "Safe Haven Relationship");
