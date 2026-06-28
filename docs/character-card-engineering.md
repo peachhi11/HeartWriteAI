@@ -136,6 +136,187 @@ Effective roleplay design comes from understanding how all three layers
 interact instead of trying to solve every problem inside the character
 description.
 
+## Truth Separation Model
+
+The next HeartWriteAI compiler layer separates portable character truth from
+scenario truth and setting truth.
+
+The character card should carry only the stable system that generates the
+character:
+
+- immutable identity facts
+- core behavioral laws
+- law hierarchy
+- wounds, fears, desires, defenses, and biases
+- state-based behavior generators
+- speech laws and voice causes
+- portable relational architecture
+- constraints and replacement actions
+
+The character card should not carry story-specific facts:
+
+- no `{{user}}` relationship facts
+- no named NPC dependencies
+- no shared-history anchors
+- no timeline-specific secrets
+- no scene-specific backstory
+- no setting facts that define only one scenario
+
+Story-specific truths belong in lorebooks. These include current relationship
+status, shared history, secrets, target-specific behavior overrides, NPC
+pressure, faction status, and route-specific emotional stakes.
+
+Setting truth belongs in the scenario layer. These include location, social
+environment, economic pressure, cultural rules, legal constraints, current
+premise, and immediate scene pressure.
+
+The compiler should therefore treat a full authoring form as a source document,
+not as a single card prompt. It should split the source into:
+
+```text
+Tier 1: Character Truth
+-> CCV3 character fields and character-truth extensions
+
+Tier 2: Behavior/Writing Runtime
+-> hidden runtime state, prompt-safe projections, and post-history guidance
+
+Tier 3: Story-Specific Truths
+-> lorebook entries
+
+Tier 4: Setting Truth
+-> scenario records and opening-scene context
+```
+
+This stops the card from describing one timeline and makes it describe the
+system that generates the character across many timelines.
+
+## Writer Bible vs Character Engine
+
+HeartWriteAI now treats creator-facing character documentation and model-facing
+character cognition as two different authoring lanes.
+
+The Writer Bible is for humans. It can read like a polished reference document:
+
+- project summary
+- themes
+- world and character reference
+- relationship arc notes
+- active threads
+- style notes
+- source notes
+
+This lane can contain rich story context because its job is comprehension. It
+should help a creator understand the character, the tone, and the emotional
+promise of the project. It is stored as a non-prompt-facing reference layer and
+should not be treated as portable card law by default.
+
+The Character Engine is for machines. It turns the character into compact,
+repeatable cognition:
+
+- core wound
+- core belief
+- core fear
+- primary drive
+- decision rules
+- defense mechanisms
+- attachment style
+- behavioral triggers
+- relationship dynamics
+- speech rules
+- sexuality rules
+
+Decision rules should be written as event-processing logic:
+
+```text
+Drive: Protection
+Question: Does the other person request help?
+YES: Protect with explicit consent and shared control.
+NO: Observe and stay available without taking over.
+Constraint: Do not override autonomy to make the character feel safer.
+Alternative action: Ask before touching; offer a practical exit route.
+```
+
+The alternative action is required whenever a rule says the character cannot,
+does not, should not, or must not do something. This gives the model an allowed
+replacement behavior and prevents backsliding into the forbidden action.
+
+The authoring rule is:
+
+```text
+Writer Bible -> human-facing reference
+Character Engine -> prompt-safe runtime cognition
+Story-specific truth -> lorebook
+Setting truth -> scenario
+```
+
+## Project Action Bus
+
+HeartWriteAI uses a small deterministic project action bus to move source
+material between truth tiers. This borrows the general command-orchestration
+idea from writing tools, but the implementation is native to HeartWriteAI:
+typed TypeScript actions, reviewable artifacts, and compiler boundaries instead
+of giant prompt calls.
+
+Current project actions:
+
+- `card.compileTruth`
+  - compiles portable character truth into CCV3 card fields
+  - detects story or setting leaks before export
+- `lorebook.promoteStoryTruth`
+  - moves relationship facts, target overrides, shared-history anchors, and
+    scenario-specific secrets into review-required lorebook entries
+- `scenario.compileSettingTruth`
+  - moves residence, wealth, social pressure, faction, and location context into
+    scenario truth
+- `runtime.auditContinuity`
+  - checks whether compiled outputs respect the character, story, setting, and
+    runtime boundaries
+- `context.inspectPromptSources`
+  - summarizes which card, lorebook, scenario, runtime, and recent-chat sources
+    would feed a prompt
+- `export.packageCardBundle`
+  - creates a review manifest for exporting the card fields, lorebook, scenario
+    truth, and continuity audit together
+
+These actions are not user-facing prompt text. They are internal compiler
+commands. Their job is to keep the system honest: character laws stay in the
+card, story facts move to lorebooks, setting facts move to scenarios, and
+runtime inspection stays prompt-safe.
+
+## Lorebook Intelligence Layer
+
+Lorebooks are not just lists of notes. In long roleplay sessions they behave
+like activation graphs: one entry can trigger another through keywords,
+constant entries consume context every turn, hidden entries still compile for
+the model, and recursive links can create surprising context pressure.
+
+HeartWriteAI keeps this deterministic. The lorebook intelligence layer provides:
+
+- shared keyword matching for literal and regex keys
+- activation graph construction from entry content to target keys
+- recursion cycle detection
+- keyword inventory with duplicate, generic, invalid-regex, and substring checks
+- deterministic health QC across structure, config, keyword, recursion, budget,
+  and spoiler/review categories
+- multi-message activation simulation with recursion trace and token budget
+  pressure
+
+This layer is deliberately separate from LLM review. It should answer the
+questions a machine can answer reliably:
+
+```text
+Which entries can activate?
+Which entries activate each other?
+Which keywords are brittle, duplicated, or too broad?
+Which hidden entries need review?
+Which constants consume budget before the scene even starts?
+What would fire for this sample chat?
+```
+
+LLM review can sit on top later for prose quality, split suggestions, and
+semantic keyword expansion, but it should not replace deterministic activation
+and budget checks.
+
 ## Layer Failure Patterns
 
 Strong character plus weak writing produces:

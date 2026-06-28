@@ -25,6 +25,7 @@ import { MORAL_FRAMEWORK_VOCABULARY_SEEDS } from "../../data/moralFrameworkVocab
 import { NARRATIVE_ARC_CONTROLLER_VOCABULARY_STANDARD_SEEDS } from "../../data/narrativeArcControllerVocabularyPresets";
 import { ORIGIN_WOUND_VOCABULARY_SEEDS } from "../../data/originWoundVocabularyPresets";
 import { PAYOFF_FANTASY_VOCABULARY_STANDARD_SEEDS } from "../../data/payoffFantasyVocabularyPresets";
+import { PLOT_CONFLICT_VOCABULARY_STANDARD_SEEDS } from "../../data/plotConflictVocabularyPresets";
 import { PERSONALITY_ENGINE_VOCABULARY_SEEDS } from "../../data/personalityEngineVocabularyPresets";
 import { RELATIONSHIP_DYNAMIC_VOCABULARY_STANDARD_SEEDS } from "../../data/relationshipDynamicVocabularyPresets";
 import { RELATIONSHIP_IDENTITY_VOCABULARY_STANDARD_SEEDS } from "../../data/relationshipIdentityVocabularyPresets";
@@ -125,6 +126,7 @@ test("collects rich vocabulary seed collections across explicit vocabulary modul
     REPAIR_BEAT_VOCABULARY_STANDARD_SEEDS.length +
     REPAIR_NEED_VOCABULARY_STANDARD_SEEDS.length +
     REPAIR_STYLE_VOCABULARY_STANDARD_SEEDS.length +
+    PLOT_CONFLICT_VOCABULARY_STANDARD_SEEDS.length +
     RESPONSE_VOCABULARY_STANDARD_SEEDS.length +
     RUPTURE_TYPE_VOCABULARY_STANDARD_SEEDS.length +
     TRIGGER_VOCABULARY_STANDARD_SEEDS.length +
@@ -183,6 +185,7 @@ test("collects rich vocabulary seed collections across explicit vocabulary modul
       "route-gate-vocabulary",
       "route-phase-vocabulary",
       "payoff-fantasy-vocabulary",
+      "plot-conflict-vocabulary",
       "growth-arc-vocabulary",
       "voice-vocabulary",
       "voice-seed-vocabulary",
@@ -228,6 +231,7 @@ test("keeps canonical shape for explicit vocabulary seed exports", () => {
     ROUTE_GATE_VOCABULARY_STANDARD_SEEDS[0],
     ROUTE_PHASE_VOCABULARY_STANDARD_SEEDS[0],
     PAYOFF_FANTASY_VOCABULARY_STANDARD_SEEDS[0],
+    PLOT_CONFLICT_VOCABULARY_STANDARD_SEEDS[0],
     REPAIR_BEAT_VOCABULARY_STANDARD_SEEDS[0],
     RUPTURE_TYPE_VOCABULARY_STANDARD_SEEDS[0],
     USER_PERSONA_PROFILE_VOCABULARY_STANDARD_SEEDS[0],
@@ -342,6 +346,9 @@ test("filters and searches standard vocabulary seeds across all categories", () 
   );
   const payoffFantasySeeds = getRichStandardVocabularySeedsBySource(
     "payoff-fantasy-vocabulary",
+  );
+  const plotConflictSeeds = getRichStandardVocabularySeedsBySource(
+    "plot-conflict-vocabulary",
   );
   const careResults = searchStandardVocabularySeeds("reducing suffering", {
     sourceIds: ["moral-framework-vocabulary"],
@@ -566,6 +573,13 @@ test("filters and searches standard vocabulary seeds across all categories", () 
       limit: 3,
     },
   );
+  const plotConflictResults = searchStandardVocabularySeeds(
+    "pretending to belong",
+    {
+      sourceIds: ["plot-conflict-vocabulary"],
+      limit: 3,
+    },
+  );
 
   assert.equal(personalitySeeds.length > imageSeeds.length, true);
   assert.equal(moralSeeds.length, MORAL_FRAMEWORK_VOCABULARY_SEEDS.length);
@@ -657,6 +671,10 @@ test("filters and searches standard vocabulary seeds across all categories", () 
     payoffFantasySeeds.length,
     PAYOFF_FANTASY_VOCABULARY_STANDARD_SEEDS.length,
   );
+  assert.equal(
+    plotConflictSeeds.length,
+    PLOT_CONFLICT_VOCABULARY_STANDARD_SEEDS.length,
+  );
   assert.equal(careResults[0]?.label, "Care Ethics");
   assert.equal(narrativeArcControllerResults[0]?.label, "Phase 3 - Escalation");
   assert.equal(conflictStyleResults[0]?.label, "Pursuer Conflict Style");
@@ -696,6 +714,7 @@ test("filters and searches standard vocabulary seeds across all categories", () 
   assert.equal(routeGateResults[0]?.label, "First Reassurance Gate");
   assert.equal(routePhaseResults[0]?.label, "Initial Dynamic");
   assert.equal(payoffFantasyResults[0]?.label, "Chosen Above Everyone");
+  assert.equal(plotConflictResults[0]?.label, "Status Gap Mask");
   assert.equal(registryResults.some((seed) => seed.tags.includes("registry")), true);
   assert.equal(searchStandardVocabularySeeds("").length, 0);
 });

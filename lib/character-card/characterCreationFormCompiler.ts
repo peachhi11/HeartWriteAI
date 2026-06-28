@@ -1,8 +1,11 @@
 import {
   CharacterCreationForm,
   CharacterCreationFormSchema,
+  HEARTWRITE_CHARACTER_ENGINE_EXTENSION_KEY,
   HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY,
+  HEARTWRITE_CHARACTER_TRUTH_SEPARATION_EXTENSION_KEY,
   HEARTWRITE_PERSONALITY_ENGINE_EXTENSION_KEY,
+  HEARTWRITE_WRITER_BIBLE_EXTENSION_KEY,
 } from "../../types/character-card/CharacterCreationForm";
 import { CharacterCardDataV3 } from "../../types/character-card/CharacterCardDataV3";
 import { CharacterCardFormValues } from "../../types/character-card/CharacterCardFormValues";
@@ -16,6 +19,49 @@ import {
   compileSemanticSeedPromptAdditionsByLane,
   compileSemanticSeedVisibleTags,
 } from "./semanticSeedResolver";
+import {
+  compileCharacterEngineForRuntime,
+  createCharacterEngineAuthoringProjection,
+  createWriterBibleAuthoringProjection,
+} from "./characterAuthoringTabs";
+
+export interface CharacterCreationLorebookEntryDraft {
+  name: string;
+  content: string;
+  keys: string[];
+  extensions: {
+    heartwriteai: {
+      entryKind: "relationship" | "scenario" | "runtime";
+      source: "character_creation_story_truth";
+      hiddenFromUser: boolean;
+      reviewRequired: boolean;
+    };
+  };
+}
+
+export interface CharacterCreationLorebookDraft {
+  spec: "lorebook_v3";
+  data: {
+    name: string;
+    description: string;
+    entries: CharacterCreationLorebookEntryDraft[];
+    extensions: Record<string, unknown>;
+  };
+}
+
+export interface CharacterCreationScenarioTruthDraft {
+  title: string;
+  content: string;
+  settingTruths: string[];
+  source: "character_creation_setting_truth";
+}
+
+export interface CharacterCreationTruthSeparatedOutputs {
+  characterCardValues: CharacterCardFormValues;
+  storyLorebook: CharacterCreationLorebookDraft;
+  scenario: CharacterCreationScenarioTruthDraft;
+  leakIssues: string[];
+}
 
 export function createEmptyCharacterCreationForm(): CharacterCreationForm {
   return CharacterCreationFormSchema.parse({});
@@ -42,16 +88,122 @@ export function compileCharacterCreationFormToFormValues(
     ]),
     raceEthnicity: form.identity.nationalityEthnicity,
     species: form.identity.speciesHeritage,
-    birthplace: form.identity.birthplace,
+    birthplace: "",
     height: form.appearance.height,
-    description: compileDescriptionOverview(form),
-    physicalAppearance: compilePhysicalAppearance(form),
-    personalityPsychology: compilePersonalityEngine(form),
-    backgroundStory: compileBackgroundStory(form),
-    speechStyle: compileSpeechStyle(form),
-    relationshipsConnections: compileRelationships(form),
-    intimacyProfile: compileAdultAnatomy(form),
+    description: scrubCardTruthText(compileDescriptionOverview(form)),
+    physicalAppearance: scrubCardTruthText(compilePhysicalAppearance(form)),
+    personalityPsychology: scrubCardTruthText(compilePersonalityEngine(form)),
+    backgroundStory: scrubCardTruthText(compileInternalProcessing(form)),
+    speechStyle: scrubCardTruthText(compileSpeechStyle(form)),
+    relationshipsConnections: scrubCardTruthText(compileRelationalArchitecture(form)),
+    intimacyProfile: scrubCardTruthText(compileAdultAnatomy(form)),
     tagsText: mergeCommaSeparatedValues(baseValues.tagsText, semanticTags),
+  };
+}
+
+export function compileCharacterCreationFormToTruthSeparatedOutputs(
+  rawForm: CharacterCreationForm,
+  baseValues: CharacterCardFormValues = createEmptyCharacterCardFormValues(),
+): CharacterCreationTruthSeparatedOutputs {
+  const form = parseCharacterCreationForm(rawForm);
+  const characterCardValues = compileCharacterCreationFormToFormValues(
+    form,
+    baseValues,
+  );
+
+  return {
+    characterCardValues,
+    storyLorebook: compileCharacterCreationFormToStoryLorebook(form),
+    scenario: compileCharacterCreationFormToScenarioTruth(form),
+    leakIssues: findCharacterTruthLeakIssues(characterCardValues),
+  };
+}
+
+export function compileCharacterCreationFormToStoryLorebook(
+  rawForm: CharacterCreationForm,
+): CharacterCreationLorebookDraft {
+  const form = parseCharacterCreationForm(rawForm);
+  const characterName = form.identity.characterName.trim() || "Character";
+  const entries = [
+    createStoryLorebookEntry(
+      "Relationship Story Truths",
+      [
+        createLine(
+          "Faction or group",
+          form.relationships.affiliationCore.factionOrGroup,
+        ),
+        createLine(
+          "Hierarchical rank",
+          form.relationships.affiliationCore.hierarchicalRank,
+        ),
+        createLine("Public status", form.relationships.affiliationCore.publicStatus),
+        createLine(
+          "Shared history anchor",
+          form.relationships.emotionalBonds.sharedHistoryAnchor,
+        ),
+      ],
+      [characterName, "relationship", "story truth"],
+      "relationship",
+    ),
+    ...form.relationships.targetOverrides.map((override, index) =>
+      createStoryLorebookEntry(
+        override.targetId.trim()
+          ? `Target Override: ${override.targetId.trim()}`
+          : `Target Override ${index + 1}`,
+        [
+          createLine("Target", override.targetId),
+          createLine("Scenario-specific behavior", override.contextualPromptInjection),
+        ],
+        uniqueList([
+          characterName,
+          override.targetId,
+          "target override",
+          "story truth",
+        ]),
+        "runtime",
+      ),
+    ),
+  ].filter((entry) => entry.content.trim().length > 0);
+
+  return {
+    spec: "lorebook_v3",
+    data: {
+      name: `${characterName} Story Truths`,
+      description:
+        "Scenario-specific relationship and target facts kept out of the portable character card.",
+      entries,
+      extensions: {
+        heartwriteai: {
+          source: "character_creation_story_truth",
+          tier: "story_specific_truths",
+        },
+      },
+    },
+  };
+}
+
+export function compileCharacterCreationFormToScenarioTruth(
+  rawForm: CharacterCreationForm,
+): CharacterCreationScenarioTruthDraft {
+  const form = parseCharacterCreationForm(rawForm);
+  const characterName = form.identity.characterName.trim() || "Character";
+  const settingTruths = [
+    createLine("Birthplace", form.identity.birthplace),
+    createLine("Residence", form.lifestyle.residence),
+    createLine("Living style", form.lifestyle.livingStyle),
+    createLine("Wealth", form.lifestyle.wealth),
+    createLine("Work / life balance", form.lifestyle.workLifeBalance),
+    createLine(
+      "Affiliation",
+      form.relationships.affiliationCore.factionOrGroup,
+    ),
+  ].filter(Boolean);
+
+  return {
+    title: `${characterName} Setting Truths`,
+    content: createSection("Setting Truths", settingTruths),
+    settingTruths,
+    source: "character_creation_setting_truth",
   };
 }
 
@@ -115,11 +267,19 @@ export function createCharacterCreationExtensions(
   currentExtensions: Record<string, unknown>,
   form: CharacterCreationForm,
 ): Record<string, unknown> {
+  const characterTruthOnlyForm = createCharacterTruthOnlyForm(form);
+
   return {
     ...currentExtensions,
-    [HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY]: form,
+    [HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY]: characterTruthOnlyForm,
+    [HEARTWRITE_CHARACTER_TRUTH_SEPARATION_EXTENSION_KEY]:
+      createTruthSeparationExtension(form),
     [HEARTWRITE_PERSONALITY_ENGINE_EXTENSION_KEY]:
-      createPersonalityEngineExtension(form),
+      createPersonalityEngineExtension(characterTruthOnlyForm),
+    [HEARTWRITE_WRITER_BIBLE_EXTENSION_KEY]:
+      createWriterBibleAuthoringProjection(form),
+    [HEARTWRITE_CHARACTER_ENGINE_EXTENSION_KEY]:
+      createCharacterEngineAuthoringProjection(characterTruthOnlyForm),
   };
 }
 
@@ -131,12 +291,9 @@ function compileDescriptionOverview(form: CharacterCreationForm): string {
       createLine("Languages Spoken", form.identity.languagesSpoken),
       createLine("Occupation", form.identity.occupation),
     ]),
-    createSection("Lifestyle", [
-      createLine("Residence", form.lifestyle.residence),
-      createLine("Living Style", form.lifestyle.livingStyle),
+    createSection("Life Pattern Generator", [
       createLine("Routines", form.lifestyle.routines),
-      createLine("Wealth", form.lifestyle.wealth),
-      createLine("Work / Life Balance", form.lifestyle.workLifeBalance),
+      createLine("Work / Life Balance Pattern", form.lifestyle.workLifeBalance),
       createLine("Hobbies", form.lifestyle.hobbies),
     ]),
     createSection("Behaviour", [
@@ -174,8 +331,10 @@ function compilePersonalityEngine(form: CharacterCreationForm): string {
   const semanticAdditions = compileSemanticSeedPromptAdditionsByLane(
     form.semanticSeedIds,
   );
+  const characterEngine = compileCharacterEngineForRuntime(form);
 
   return createSections([
+    characterEngine,
     createSection("Personality", [
       createLine("Archetype", form.personality.archetype),
       createLine("Positive Traits", form.personality.positiveTraits),
@@ -228,7 +387,7 @@ function compilePersonalityEngine(form: CharacterCreationForm): string {
   ]);
 }
 
-function compileBackgroundStory(form: CharacterCreationForm): string {
+function compileInternalProcessing(form: CharacterCreationForm): string {
   return createSections([
     createSection("Internal Thoughts & Reactions", [
       createLine(
@@ -257,33 +416,18 @@ function compileSpeechStyle(form: CharacterCreationForm): string {
   ]);
 }
 
-function compileRelationships(form: CharacterCreationForm): string {
+function compileRelationalArchitecture(form: CharacterCreationForm): string {
   const semanticAdditions = compileSemanticSeedPromptAdditionsByLane(
     form.semanticSeedIds,
   );
 
   return createSections([
-    createSection("Societal Affiliation & Standing", [
-      createLine(
-        "Faction or Group",
-        form.relationships.affiliationCore.factionOrGroup,
-      ),
-      createLine(
-        "Hierarchical Rank",
-        form.relationships.affiliationCore.hierarchicalRank,
-      ),
-      createLine("Public Status", form.relationships.affiliationCore.publicStatus),
-    ]),
-    createSection("Rapport Ledger", [
+    createSection("Relational Architecture", [
       createLine(
         "Attachment Type",
         form.relationships.emotionalBonds.attachmentType,
       ),
       createLine("Trust Metric", form.relationships.emotionalBonds.trustMetric),
-      createLine(
-        "Shared History Anchor",
-        form.relationships.emotionalBonds.sharedHistoryAnchor,
-      ),
     ]),
     createSection("Interactive Friction", [
       createLine(
@@ -296,7 +440,6 @@ function compileRelationships(form: CharacterCreationForm): string {
         form.relationships.behavioralFriction.microAggressionsOrTells,
       ),
     ]),
-    createTargetOverrideSection(form),
     semanticAdditions.relationshipAddition,
   ]);
 }
@@ -324,6 +467,8 @@ function compileAdultAnatomy(form: CharacterCreationForm): string {
 function createPersonalityEngineExtension(form: CharacterCreationForm) {
   return {
     source: "character_creation_form",
+    tier: "character_truth",
+    characterEngineGuidance: compileCharacterEngineForRuntime(form),
     semanticSeedLabels: compileSemanticSeedVisibleTags(form.semanticSeedIds),
     semanticPromptGuidance: compileSemanticSeedPromptAdditions(
       form.semanticSeedIds,
@@ -334,23 +479,135 @@ function createPersonalityEngineExtension(form: CharacterCreationForm) {
     cognitiveDrivers: form.cognitiveDrivers,
     psychology: form.psychology,
     behaviour: form.behaviour,
-    relationships: form.relationships,
+    relationalArchitecture: {
+      emotionalBonds: {
+        attachmentType: form.relationships.emotionalBonds.attachmentType,
+        trustMetric: form.relationships.emotionalBonds.trustMetric,
+      },
+      behavioralFriction: form.relationships.behavioralFriction,
+    },
     speechCommunication: form.speechCommunication,
     internalThoughts: form.internalThoughts,
   };
 }
 
-function createTargetOverrideSection(form: CharacterCreationForm): string {
-  const lines = form.relationships.targetOverrides
-    .map((override) =>
-      createLine(
-        override.targetId || "Target",
-        override.contextualPromptInjection,
-      ),
-    )
-    .filter(Boolean);
+function createCharacterTruthOnlyForm(
+  rawForm: CharacterCreationForm,
+): CharacterCreationForm {
+  const form = parseCharacterCreationForm(rawForm);
 
-  return createSection("Generative Triggers & Dynamic Targets", lines);
+  const truthOnlyForm = {
+    ...form,
+    writerBible: {
+      ...form.writerBible,
+      projectTitle: "",
+      humanSummary: "",
+      themes: "",
+      worldReference: "",
+      characterReference: "",
+      relationshipArc: "",
+      styleNotes: "",
+      activeThreads: "",
+      sourceNotes: "",
+    },
+    identity: {
+      ...form.identity,
+      birthplace: "",
+    },
+    lifestyle: {
+      ...form.lifestyle,
+      residence: "",
+      livingStyle: "",
+      wealth: "",
+    },
+    relationships: {
+      ...form.relationships,
+      affiliationCore: {
+        factionOrGroup: "",
+        hierarchicalRank: "",
+        publicStatus: "",
+      },
+      emotionalBonds: {
+        ...form.relationships.emotionalBonds,
+        sharedHistoryAnchor: "",
+      },
+      targetOverrides: [],
+    },
+  };
+
+  return parseCharacterCreationForm(sanitizeCharacterTruthValue(truthOnlyForm));
+}
+
+function createTruthSeparationExtension(form: CharacterCreationForm) {
+  return {
+    source: "character_creation_form",
+    tierPolicy: {
+      characterCard:
+        "Core identity, behavioral laws, defenses, voice, and portable relational architecture only.",
+      storyLorebook:
+        "Scenario-specific relationship facts, target overrides, shared history, secrets, and NPC material.",
+      scenario:
+        "Setting, location, social pressure, economic context, and world facts.",
+    },
+    storyTruthEntryCount:
+      compileCharacterCreationFormToStoryLorebook(form).data.entries.length,
+    settingTruthCount:
+      compileCharacterCreationFormToScenarioTruth(form).settingTruths.length,
+  };
+}
+
+function createStoryLorebookEntry(
+  name: string,
+  lines: string[],
+  keys: string[],
+  entryKind: "relationship" | "scenario" | "runtime",
+): CharacterCreationLorebookEntryDraft {
+  return {
+    name,
+    content: lines.filter(Boolean).join("\n"),
+    keys: uniqueList(keys),
+    extensions: {
+      heartwriteai: {
+        entryKind,
+        source: "character_creation_story_truth",
+        hiddenFromUser: entryKind === "runtime",
+        reviewRequired: true,
+      },
+    },
+  };
+}
+
+export function findCharacterTruthLeakIssues(
+  valuesOrText: CharacterCardFormValues | string,
+): string[] {
+  const text =
+    typeof valuesOrText === "string"
+      ? valuesOrText
+      : [
+          valuesOrText.description,
+          valuesOrText.physicalAppearance,
+          valuesOrText.personalityPsychology,
+          valuesOrText.backgroundStory,
+          valuesOrText.speechStyle,
+          valuesOrText.relationshipsConnections,
+          valuesOrText.intimacyProfile,
+        ].join("\n");
+  const issues: string[] = [];
+
+  if (/\{\{user\}\}/i.test(text)) {
+    issues.push("Character truth projection references {{user}}.");
+  }
+  if (/\bNPCs?\b/.test(text)) {
+    issues.push("Character truth projection references NPCs.");
+  }
+  if (/shared history|kept each other's secrets|family inquiry/i.test(text)) {
+    issues.push("Character truth projection includes story-specific backstory.");
+  }
+  if (/publicly formal|privately protective|estate household/i.test(text)) {
+    issues.push("Character truth projection includes scenario relationship status.");
+  }
+
+  return issues;
 }
 
 function createSections(sections: string[]): string {
@@ -367,6 +624,52 @@ function createLine(label: string, value: string): string {
   const trimmedValue = value.trim();
 
   return trimmedValue ? `- ${label}: ${trimmedValue}` : "";
+}
+
+function scrubCardTruthText(value: string): string {
+  return value
+    .replaceAll("{{user}}", "the other person")
+    .replace(/\bNPCs?\b/g, "other people")
+    .replace(/\s+$/gm, "")
+    .trim();
+}
+
+function sanitizeCharacterTruthValue(value: unknown): unknown {
+  if (typeof value === "string") {
+    return scrubCardTruthText(value);
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(sanitizeCharacterTruthValue);
+  }
+
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, nestedValue]) => [
+        key,
+        sanitizeCharacterTruthValue(nestedValue),
+      ]),
+    );
+  }
+
+  return value;
+}
+
+function uniqueList(values: readonly (string | undefined)[]): string[] {
+  const seen = new Set<string>();
+  const output: string[] = [];
+
+  for (const value of values) {
+    const trimmed = value?.trim();
+    const key = trimmed?.toLowerCase();
+    if (!trimmed || !key || seen.has(key)) {
+      continue;
+    }
+    seen.add(key);
+    output.push(trimmed);
+  }
+
+  return output;
 }
 
 function joinInlineValues(values: string[]): string {

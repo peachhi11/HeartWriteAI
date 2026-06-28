@@ -2,6 +2,10 @@ import {
   createSensoryPerceptionContext,
   extractCardSensoryPerception,
 } from "./sensoryPerception";
+import {
+  compileNarrativeRuntimePromptContext,
+  type NarrativeRuntimeState,
+} from "./narrativeEngine";
 
 export interface RuntimeLoreEntry {
   name?: string;
@@ -41,6 +45,8 @@ export interface CompileChatPromptArgs {
   worldLore?: string;
   activeLoreEntries?: RuntimeLoreEntry[];
   retrievedMemories?: string[];
+  narrativeRuntime?: NarrativeRuntimeState;
+  narrativeRuntimeContext?: string;
   chatHistory?: RuntimeChatMessage[];
   contextGuard?: RuntimeContextGuardOptions;
 }
@@ -85,6 +91,8 @@ export function compileChatPrompt({
   worldLore,
   activeLoreEntries = [],
   retrievedMemories = [],
+  narrativeRuntime,
+  narrativeRuntimeContext,
   chatHistory = [],
   contextGuard,
 }: CompileChatPromptArgs): CompiledChatPrompt {
@@ -101,6 +109,11 @@ export function compileChatPrompt({
     chatHistory,
     contextGuard,
   );
+  const narrativeContext =
+    narrativeRuntimeContext?.trim() ||
+    (narrativeRuntime
+      ? compileNarrativeRuntimePromptContext(narrativeRuntime)
+      : "");
 
   const contextBlock = [
     section("Character", [
@@ -122,6 +135,7 @@ export function compileChatPrompt({
       ),
     ),
     section("Retrieved Memories", retrievedMemories),
+    narrativeContext ? section("Narrative Runtime", [narrativeContext]) : "",
     createSensoryPerceptionContext(sensoryPerception),
     guardedRecentChat,
     postHistoryInstructions

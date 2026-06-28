@@ -601,7 +601,7 @@ test("maps editable form values back to a ccv3 card", () => {
   assert.match(updatedCard.data.description, /Overview:\nA condensed hook./);
   assert.match(updatedCard.data.personality, /Physical Appearance/);
   assert.match(updatedCard.data.personality, /Speech Style/);
-  assert.match(updatedCard.data.personality, /Relationships \/ Connections/);
+  assert.match(updatedCard.data.personality, /Relational Architecture/);
   assert.match(updatedCard.data.personality, /Sexuality \/ Intimacy Profile/);
   assert.deepEqual(updatedCard.data.tags, ["slow burn", "modern"]);
   assert.deepEqual(updatedCard.data.alternate_greetings, [
@@ -952,11 +952,12 @@ STYLE: Dark academia wardrobe, black wool coats, antique rings, reading glasses,
   assert.equal(result.values.birthplace, "Old Prague");
   assert.equal(result.values.raceEthnicity, "Czech");
   assert.equal(result.values.species, "Vampire");
-  assert.match(result.values.description ?? "", /residence/i);
-  assert.match(result.values.description ?? "", /A locked townhouse/);
   assert.match(result.values.description ?? "", /pronouns/i);
   assert.match(result.values.description ?? "", /Demisexual/);
   assert.match(result.values.description ?? "", /information broker/);
+  assert.doesNotMatch(result.values.description ?? "", /A locked townhouse/);
+  assert.match(result.values.scenario ?? "", /Residence/i);
+  assert.match(result.values.scenario ?? "", /A locked townhouse/);
   assert.doesNotMatch(result.values.intimacyProfile ?? "", /Demisexual/);
   assert.match(result.values.physicalAppearance ?? "", /Silver hair/);
   assert.match(result.values.physicalAppearance ?? "", /narrow waist/);
@@ -977,7 +978,8 @@ test("routes macro-style appearance and residence classifiers", () => {
   assert.match(result.values.physicalAppearance ?? "", /Calloused palms/);
   assert.match(result.values.physicalAppearance ?? "", /Crossed arms/);
   assert.match(result.values.physicalAppearance ?? "", /Weather-Beaten/);
-  assert.match(result.values.description ?? "", /high-end loft/);
+  assert.match(result.values.scenario ?? "", /high-end loft/);
+  assert.doesNotMatch(result.values.description ?? "", /high-end loft/);
   assert.doesNotMatch(result.values.description ?? "", /Hand-stitched suits/);
 });
 
@@ -1099,7 +1101,8 @@ test("routes expanded basic identity and university macros", () => {
   assert.equal(result.values.raceEthnicity, "Korean");
   assert.match(result.values.description ?? "", /Bisexual/);
   assert.match(result.values.description ?? "", /Demiromantic/);
-  assert.match(result.values.description ?? "", /Recently divorced/);
+  assert.doesNotMatch(result.values.description ?? "", /Recently divorced/);
+  assert.match(result.values.scenario ?? "", /Recently divorced/);
   assert.match(result.values.description ?? "", /Night-shift paramedic/);
   assert.match(result.values.description ?? "", /Biomedical engineering/);
   assert.doesNotMatch(result.values.intimacyProfile ?? "", /Bisexual/);

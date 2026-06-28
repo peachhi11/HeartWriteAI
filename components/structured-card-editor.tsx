@@ -114,7 +114,9 @@ import {
 import { AppMacroExtensions } from "@/types/character-card/AppMacroExtensions";
 import {
   CharacterCreationForm,
+  HEARTWRITE_CHARACTER_ENGINE_EXTENSION_KEY,
   HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY,
+  HEARTWRITE_WRITER_BIBLE_EXTENSION_KEY,
 } from "@/types/character-card/CharacterCreationForm";
 import { ValidatedCharacterCardV3 } from "@/types/character-card/CharacterCardV3Schema";
 
@@ -354,6 +356,103 @@ const CHARACTER_CREATION_FORM_FIELD_GROUPS: Array<{
   fields: CharacterCreationFormTextField[];
   label: string;
 }> = [
+  {
+    label: "Writer Bible",
+    fields: [
+      { label: "Project Title", path: ["writerBible", "projectTitle"] },
+      {
+        label: "Human Summary",
+        path: ["writerBible", "humanSummary"],
+        kind: "textarea",
+      },
+      { label: "Themes", path: ["writerBible", "themes"], kind: "textarea" },
+      {
+        label: "World Reference",
+        path: ["writerBible", "worldReference"],
+        kind: "textarea",
+      },
+      {
+        label: "Character Reference",
+        path: ["writerBible", "characterReference"],
+        kind: "textarea",
+      },
+      {
+        label: "Relationship Arc",
+        path: ["writerBible", "relationshipArc"],
+        kind: "textarea",
+      },
+      {
+        label: "Style Notes",
+        path: ["writerBible", "styleNotes"],
+        kind: "textarea",
+      },
+      {
+        label: "Active Threads",
+        path: ["writerBible", "activeThreads"],
+        kind: "textarea",
+      },
+      {
+        label: "Source Notes",
+        path: ["writerBible", "sourceNotes"],
+        kind: "textarea",
+      },
+    ],
+  },
+  {
+    label: "Character Engine",
+    fields: [
+      {
+        label: "Core Wound",
+        path: ["characterEngine", "coreWound"],
+        kind: "textarea",
+      },
+      {
+        label: "Core Belief",
+        path: ["characterEngine", "coreBelief"],
+        kind: "textarea",
+      },
+      {
+        label: "Core Fear",
+        path: ["characterEngine", "coreFear"],
+        kind: "textarea",
+      },
+      {
+        label: "Primary Drive",
+        path: ["characterEngine", "primaryDrive"],
+        kind: "textarea",
+      },
+      {
+        label: "Defense Mechanisms",
+        path: ["characterEngine", "defenseMechanisms"],
+        kind: "textarea",
+      },
+      {
+        label: "Attachment Style",
+        path: ["characterEngine", "attachmentStyle"],
+        kind: "textarea",
+      },
+      {
+        label: "Behavioral Triggers",
+        path: ["characterEngine", "behavioralTriggers"],
+        kind: "textarea",
+      },
+      {
+        label: "Relationship Dynamics",
+        path: ["characterEngine", "relationshipDynamics"],
+        kind: "textarea",
+      },
+      {
+        label: "Speech Rules",
+        path: ["characterEngine", "speechRules"],
+        kind: "textarea",
+      },
+      {
+        label: "Sexuality Rules",
+        path: ["characterEngine", "sexualityRules"],
+        kind: "textarea",
+      },
+    ],
+  },
   {
     label: "Character Identity",
     fields: [
@@ -1717,6 +1816,40 @@ export default function StructuredCardEditor({
           characterCreationForm.relationships.targetOverrides.filter(
             (_override, overrideIndex) => overrideIndex !== index,
           ),
+      },
+    });
+  }
+
+  function addCharacterEngineDecisionRule() {
+    updateCharacterCreationForm({
+      ...characterCreationForm,
+      characterEngine: {
+        ...characterCreationForm.characterEngine,
+        decisionRules: [
+          ...characterCreationForm.characterEngine.decisionRules,
+          {
+            id: "",
+            drive: "",
+            question: "",
+            yes: "",
+            no: "",
+            constraints: "",
+            visibleBehaviors: "",
+            alternativeAction: "",
+          },
+        ],
+      },
+    });
+  }
+
+  function removeCharacterEngineDecisionRule(index: number) {
+    updateCharacterCreationForm({
+      ...characterCreationForm,
+      characterEngine: {
+        ...characterCreationForm.characterEngine,
+        decisionRules: characterCreationForm.characterEngine.decisionRules.filter(
+          (_rule, ruleIndex) => ruleIndex !== index,
+        ),
       },
     });
   }
@@ -3305,8 +3438,10 @@ export default function StructuredCardEditor({
 
             <CharacterCreationFormPanel
               form={characterCreationForm}
+              onAddDecisionRule={addCharacterEngineDecisionRule}
               onAddTargetOverride={addCharacterCreationTargetOverride}
               onBooleanChange={updateCharacterCreationBoolean}
+              onRemoveDecisionRule={removeCharacterEngineDecisionRule}
               onRemoveTargetOverride={removeCharacterCreationTargetOverride}
               onSeedSelect={applyCharacterCreationSeed}
               onTextChange={updateCharacterCreationText}
@@ -6012,15 +6147,19 @@ function Field({
 
 function CharacterCreationFormPanel({
   form,
+  onAddDecisionRule,
   onAddTargetOverride,
   onBooleanChange,
+  onRemoveDecisionRule,
   onRemoveTargetOverride,
   onSeedSelect,
   onTextChange,
 }: {
   form: CharacterCreationForm;
+  onAddDecisionRule: () => void;
   onAddTargetOverride: () => void;
   onBooleanChange: (path: CharacterCreationFormPath, value: boolean) => void;
+  onRemoveDecisionRule: (index: number) => void;
   onRemoveTargetOverride: (index: number) => void;
   onSeedSelect: (entry: SeedPickerEntry) => void;
   onTextChange: (path: CharacterCreationFormPath, value: string) => void;
@@ -6086,6 +6225,80 @@ function CharacterCreationFormPanel({
               />
             ))}
           </div>
+        </div>
+      </details>
+
+      <details className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-3" open>
+        <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-widest text-zinc-400">
+          Character Engine Decision Rules
+        </summary>
+        <div className="mt-4 space-y-3">
+          {form.characterEngine.decisionRules.length === 0 ? (
+            <p className="rounded-lg border border-dashed border-zinc-800 bg-zinc-950 p-3 text-xs text-zinc-500">
+              No machine-facing decision rules yet.
+            </p>
+          ) : null}
+
+          {form.characterEngine.decisionRules.map((rule, index) => (
+            <div
+              key={`${rule.id}-${index}`}
+              className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-950 p-3"
+            >
+              <div className="flex items-center justify-between gap-3">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                  Decision Rule {index + 1}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onRemoveDecisionRule(index)}
+                  className="inline-flex items-center gap-1 rounded-md border border-rose-500/30 bg-rose-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-rose-200 transition hover:bg-rose-500/20"
+                  title="Remove decision rule"
+                >
+                  <Trash2 className="size-3.5" />
+                  Remove
+                </button>
+              </div>
+
+              {[
+                { label: "Rule ID", key: "id", kind: "input" },
+                { label: "Drive", key: "drive", kind: "input" },
+                { label: "Decision Question", key: "question", kind: "textarea" },
+                { label: "YES Outcome", key: "yes", kind: "textarea" },
+                { label: "NO Outcome", key: "no", kind: "textarea" },
+                { label: "Constraints", key: "constraints", kind: "textarea" },
+                {
+                  label: "Visible Behaviors",
+                  key: "visibleBehaviors",
+                  kind: "textarea",
+                },
+                {
+                  label: "Alternative Action",
+                  key: "alternativeAction",
+                  kind: "textarea",
+                },
+              ].map((field) => (
+                <CharacterCreationTextControl
+                  key={field.key}
+                  field={{
+                    label: field.label,
+                    path: ["characterEngine", "decisionRules", index, field.key],
+                    kind: field.kind === "textarea" ? "textarea" : "input",
+                  }}
+                  form={form}
+                  onTextChange={onTextChange}
+                />
+              ))}
+            </div>
+          ))}
+
+          <button
+            type="button"
+            onClick={onAddDecisionRule}
+            className="inline-flex items-center gap-2 rounded-lg border border-violet-500/40 bg-violet-500/10 px-3 py-2 text-xs font-bold text-violet-200 transition hover:bg-violet-500/20"
+          >
+            <Plus className="size-4" />
+            Add Decision Rule
+          </button>
         </div>
       </details>
 
@@ -6572,9 +6785,28 @@ function readCharacterCreationFormExtension(
   card: ValidatedCharacterCardV3,
 ): CharacterCreationForm {
   try {
-    return parseCharacterCreationForm(
+    const form = parseCharacterCreationForm(
       card.data.extensions[HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY],
     );
+    const writerBibleProjection =
+      card.data.extensions[HEARTWRITE_WRITER_BIBLE_EXTENSION_KEY];
+    const characterEngineProjection =
+      card.data.extensions[HEARTWRITE_CHARACTER_ENGINE_EXTENSION_KEY];
+    const writerBible =
+      isRecord(writerBibleProjection) && isRecord(writerBibleProjection.writerBible)
+        ? writerBibleProjection.writerBible
+        : form.writerBible;
+    const characterEngine =
+      isRecord(characterEngineProjection) &&
+      isRecord(characterEngineProjection.characterEngine)
+        ? characterEngineProjection.characterEngine
+        : form.characterEngine;
+
+    return parseCharacterCreationForm({
+      ...form,
+      writerBible,
+      characterEngine,
+    });
   } catch {
     return createEmptyCharacterCreationForm();
   }

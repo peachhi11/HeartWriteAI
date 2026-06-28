@@ -40,6 +40,11 @@ import {
 } from "@/features/lorebooks/adapters";
 import { LoreTriggerTesterCard } from "@/features/lorebooks/components/LoreTriggerTesterCard";
 import { LorebookV3Editor } from "@/features/lorebooks/components/LorebookV3Editor";
+import {
+  getLorebookEntryPreview,
+  isLorebookEntryHiddenFromUser,
+  readHeartWriteLorebookRuntime,
+} from "@/features/lorebooks/runtime";
 import type { LorebookV3Document } from "@/features/lorebooks/schema";
 import {
   deleteLorebookLibraryItem,
@@ -512,9 +517,15 @@ export function LorebookGenerationPage() {
                     {entry.constant ? <Badge variant="secondary">constant</Badge> : null}
                     {!entry.enabled ? <Badge variant="outline">disabled</Badge> : null}
                     {entry.use_regex ? <Badge variant="outline">regex</Badge> : null}
+                    {isLorebookEntryHiddenFromUser(entry) ? (
+                      <Badge variant="outline">hidden preview</Badge>
+                    ) : null}
+                    {readHeartWriteLorebookRuntime(entry).reviewRequired ? (
+                      <Badge variant="outline">review</Badge>
+                    ) : null}
                   </div>
                   <p className="text-sm leading-6 text-muted-foreground">
-                    {entry.content}
+                    {getLorebookEntryPreview(entry)}
                   </p>
                   <p className="mt-2 text-xs text-muted-foreground">
                     Keys: {entry.keys.join(", ")}

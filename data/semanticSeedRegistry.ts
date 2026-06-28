@@ -11302,6 +11302,9 @@ function inferSemanticCategoryFromVocabularySeed(
   if (/narrative-arc-controller-vocabulary/.test(haystack)) {
     return "routes";
   }
+  if (/plot-conflict-vocabulary/.test(haystack)) {
+    return "routes";
+  }
   if (/complement-vocabulary/.test(haystack)) {
     return "relationship_dynamics";
   }

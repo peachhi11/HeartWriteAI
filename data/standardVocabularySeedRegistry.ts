@@ -71,6 +71,9 @@ import {
   PAYOFF_FANTASY_VOCABULARY_STANDARD_SEEDS,
 } from "./payoffFantasyVocabularyPresets";
 import {
+  PLOT_CONFLICT_VOCABULARY_STANDARD_SEEDS,
+} from "./plotConflictVocabularyPresets";
+import {
   PERSONALITY_ENGINE_VOCABULARY_SEEDS,
 } from "./personalityEngineVocabularyPresets";
 import {
@@ -158,6 +161,7 @@ export type StandardVocabularySeedSourceId =
   | "narrative-arc-controller-vocabulary"
   | "origin-wound-vocabulary"
   | "payoff-fantasy-vocabulary"
+  | "plot-conflict-vocabulary"
   | "personality-engine-vocabulary"
   | "relationship-dynamic-vocabulary"
   | "relationship-identity-vocabulary"
@@ -382,6 +386,11 @@ export const RICH_STANDARD_VOCABULARY_SEED_COLLECTIONS = Object.freeze([
     sourceId: "payoff-fantasy-vocabulary",
     label: "Payoff Fantasy Vocabulary",
     seeds: PAYOFF_FANTASY_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "plot-conflict-vocabulary",
+    label: "Plot Conflict Vocabulary",
+    seeds: PLOT_CONFLICT_VOCABULARY_STANDARD_SEEDS,
   },
   {
     sourceId: "growth-arc-vocabulary",

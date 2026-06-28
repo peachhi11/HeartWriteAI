@@ -44,9 +44,12 @@ export function generatedLorebookArtifactToV3Document(
       extensions: {
         heartwriteai: {
           blockedByEvents: [],
+          compilerNotes: [],
           emotionalTags: artifact.tags,
           entryKind: "world",
+          hiddenFromUser: false,
           requiredEvents: [],
+          reviewRequired: false,
           source: "generated_lorebook",
           tokenBudgetHint: entry.tokenReserveCost,
         } satisfies HeartWriteLorebookRuntime,

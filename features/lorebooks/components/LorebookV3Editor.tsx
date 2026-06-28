@@ -2,7 +2,7 @@
 
 import type * as React from "react";
 import { useMemo, useState } from "react";
-import { Plus, Search, Trash2 } from "lucide-react";
+import { EyeOff, ListChecks, Plus, Search, ShieldAlert, Trash2 } from "lucide-react";
 
 import CopyButton from "@/components/copy-button";
 import { Badge } from "@/components/ui/badge";
@@ -17,6 +17,17 @@ import {
   type LorebookV3Document,
   type LorebookV3Entry,
 } from "../schema";
+import {
+  applyLorebookQuickAction,
+  compileLorebookReview,
+  getLorebookEntryPreview,
+  isLorebookEntryHiddenFromUser,
+  LOREBOOK_QUICK_ACTIONS,
+  readHeartWriteLorebookRuntime,
+  updateHeartWriteLorebookRuntime,
+  type LorebookCompilerIssue,
+  type LorebookQuickActionId,
+} from "../runtime";
 
 const ENTRY_CHARACTER_WARNING = 1200;
 const TOTAL_TOKEN_WARNING = 1200;
@@ -63,6 +74,25 @@ export function LorebookV3Editor(props: {
       ),
     [props.document.data.entries],
   );
+  const compilerIssues = useMemo(
+    () => compileLorebookReview(props.document),
+    [props.document],
+  );
+  const selectedEntryIssues = selectedEntry
+    ? compilerIssues.filter(
+        (issue) =>
+          issue.entryId === String(selectedEntry.id ?? selectedEntry.insertion_order),
+      )
+    : [];
+  const hiddenEntryCount = props.document.data.entries.filter(
+    isLorebookEntryHiddenFromUser,
+  ).length;
+  const reviewRequiredCount = props.document.data.entries.filter(
+    (entry) => readHeartWriteLorebookRuntime(entry).reviewRequired,
+  ).length;
+  const selectedRuntime = selectedEntry
+    ? readHeartWriteLorebookRuntime(selectedEntry)
+    : null;
   const tokenBudget = props.document.data.token_budget ?? TOTAL_TOKEN_WARNING;
   const tokenBudgetPercent = Math.min(
     100,
@@ -96,6 +126,36 @@ export function LorebookV3Editor(props: {
         entry.id === selectedEntryKey ? updatedEntry : entry,
       ),
     });
+  }
+
+  function replaceSelectedEntry(updatedEntry: LorebookV3Entry) {
+    if (!selectedEntry) {
+      return;
+    }
+
+    updateDocument({
+      entries: props.document.data.entries.map((entry) =>
+        entry.id === selectedEntryKey ? LorebookV3EntrySchema.parse(updatedEntry) : entry,
+      ),
+    });
+  }
+
+  function updateSelectedRuntime(
+    patch: Parameters<typeof updateHeartWriteLorebookRuntime>[1],
+  ) {
+    if (!selectedEntry) {
+      return;
+    }
+
+    replaceSelectedEntry(updateHeartWriteLorebookRuntime(selectedEntry, patch));
+  }
+
+  function runQuickAction(actionId: LorebookQuickActionId) {
+    if (!selectedEntry) {
+      return;
+    }
+
+    replaceSelectedEntry(applyLorebookQuickAction(selectedEntry, actionId));
   }
 
   function addEntry() {
@@ -174,6 +234,12 @@ export function LorebookV3Editor(props: {
                   {entry.constant ? <Badge variant="secondary">constant</Badge> : null}
                   {entry.selective ? <Badge variant="outline">selective</Badge> : null}
                   {entry.use_regex ? <Badge variant="outline">regex</Badge> : null}
+                  {isLorebookEntryHiddenFromUser(entry) ? (
+                    <Badge variant="outline">hidden preview</Badge>
+                  ) : null}
+                  {readHeartWriteLorebookRuntime(entry).reviewRequired ? (
+                    <Badge variant="outline">review</Badge>
+                  ) : null}
                 </div>
               </button>
             ))}
@@ -212,6 +278,12 @@ export function LorebookV3Editor(props: {
                         : "after character"}
                     </Badge>
                   ) : null}
+                  {selectedRuntime?.hiddenFromUser ? (
+                    <Badge variant="outline">hidden from preview</Badge>
+                  ) : null}
+                  {selectedRuntime?.reviewRequired ? (
+                    <Badge variant="outline">review required</Badge>
+                  ) : null}
                 </div>
               </div>
               <Button
@@ -223,6 +295,27 @@ export function LorebookV3Editor(props: {
                 <Trash2 className="size-4" />
                 Delete
               </Button>
+            </div>
+
+            <div className="grid gap-3 rounded-md border bg-card/60 p-3">
+              <div className="flex items-center gap-2">
+                <ListChecks className="size-4 text-user-primary" />
+                <h4 className="text-sm font-semibold">Quick actions</h4>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {LOREBOOK_QUICK_ACTIONS.map((action) => (
+                  <Button
+                    key={action.id}
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    title={action.description}
+                    onClick={() => runQuickAction(action.id)}
+                  >
+                    {action.label}
+                  </Button>
+                ))}
+              </div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-[10rem_1fr]">
@@ -276,8 +369,43 @@ export function LorebookV3Editor(props: {
               />
             </Field>
 
+            <div className="grid gap-4 rounded-md border bg-card/60 p-3">
+              <div className="flex items-center gap-2">
+                <EyeOff className="size-4 text-user-primary" />
+                <h4 className="text-sm font-semibold">Spoiler-safe preview</h4>
+              </div>
+              <div className="grid gap-3 md:grid-cols-2">
+                <Field label="Spoiler label">
+                  <Input
+                    value={selectedRuntime?.spoilerLabel ?? ""}
+                    onChange={(event) =>
+                      updateSelectedRuntime({
+                        spoilerLabel: event.currentTarget.value || undefined,
+                      })
+                    }
+                  />
+                </Field>
+                <Field label="Preview shown when hidden">
+                  <Input
+                    value={selectedRuntime?.spoilerPreview ?? ""}
+                    onChange={(event) =>
+                      updateSelectedRuntime({
+                        spoilerPreview: event.currentTarget.value || undefined,
+                      })
+                    }
+                  />
+                </Field>
+              </div>
+              {selectedRuntime?.hiddenFromUser ? (
+                <p className="rounded-md border bg-background/70 p-3 text-sm leading-6 text-muted-foreground">
+                  Preview: {getLorebookEntryPreview(selectedEntry)}
+                </p>
+              ) : null}
+            </div>
+
             <EntryWarnings
               entry={selectedEntry}
+              issues={selectedEntryIssues}
               totalEstimatedTokens={totalEstimatedTokens}
             />
           </section>
@@ -411,6 +539,31 @@ export function LorebookV3Editor(props: {
             label="Require secondary key"
             onChange={(checked) => updateSelectedEntry({ selective: checked })}
           />
+          <Toggle
+            checked={selectedRuntime?.hiddenFromUser ?? false}
+            label="Hide from user preview"
+            onChange={(checked) => {
+              if (!selectedEntry) {
+                return;
+              }
+
+              if (checked) {
+                replaceSelectedEntry(
+                  applyLorebookQuickAction(selectedEntry, "mark_spoiler_hidden"),
+                );
+                return;
+              }
+
+              updateSelectedRuntime({ hiddenFromUser: false });
+            }}
+          />
+          <Toggle
+            checked={selectedRuntime?.reviewRequired ?? false}
+            label="Needs human review"
+            onChange={(checked) =>
+              updateSelectedRuntime({ reviewRequired: checked })
+            }
+          />
         </div>
 
         <div className="grid gap-3 rounded-md border bg-card/60 p-3 text-sm text-muted-foreground">
@@ -449,8 +602,12 @@ export function LorebookV3Editor(props: {
               Selective:{" "}
               {props.document.data.entries.filter((entry) => entry.selective).length}
             </p>
+            <p>Hidden: {hiddenEntryCount}</p>
+            <p>Review: {reviewRequiredCount}</p>
           </div>
         </div>
+
+        <CompilerIssuePanel issues={compilerIssues} />
 
         <details className="rounded-md border bg-card/60 p-3">
           <summary className="cursor-pointer text-sm font-semibold">
@@ -473,6 +630,7 @@ export function LorebookV3Editor(props: {
 
 function EntryWarnings(props: {
   entry: LorebookV3Entry;
+  issues: LorebookCompilerIssue[];
   totalEstimatedTokens: number;
 }) {
   const warnings = [
@@ -482,6 +640,7 @@ function EntryWarnings(props: {
     props.totalEstimatedTokens > TOTAL_TOKEN_WARNING
       ? `Lorebook is about ${props.totalEstimatedTokens} tokens. Consider lowering the active token budget or splitting books by purpose.`
       : null,
+    ...props.issues.map((issue) => issue.message),
   ].filter(Boolean);
 
   if (warnings.length === 0) {
@@ -493,6 +652,35 @@ function EntryWarnings(props: {
       {warnings.map((warning) => (
         <p key={warning}>{warning}</p>
       ))}
+    </div>
+  );
+}
+
+function CompilerIssuePanel(props: { issues: LorebookCompilerIssue[] }) {
+  if (props.issues.length === 0) {
+    return (
+      <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 p-3 text-sm text-emerald-900 dark:text-emerald-200">
+        Compiler review found no lorebook issues.
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid gap-2 rounded-md border bg-card/60 p-3">
+      <div className="flex items-center gap-2">
+        <ShieldAlert className="size-4 text-user-primary" />
+        <h4 className="text-sm font-semibold">
+          Compiler review ({props.issues.length})
+        </h4>
+      </div>
+      <div className="grid gap-1 text-xs text-muted-foreground">
+        {props.issues.slice(0, 8).map((issue, index) => (
+          <p key={`${issue.code}-${issue.entryId ?? "book"}-${index}`}>
+            [{issue.severity}] {issue.entryId ? `${issue.entryId}: ` : ""}
+            {issue.message}
+          </p>
+        ))}
+      </div>
     </div>
   );
 }

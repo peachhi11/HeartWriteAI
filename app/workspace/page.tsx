@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 
 import CardLibraryPanel from "@/components/card-library-panel";
+import { BotWaffleAuthoringStudioPanel } from "@/components/botwaffle-authoring-studio-panel";
 import { CharacterLibraryWorkspace } from "@/components/character-library-workspace";
 import { DevToolsPanel } from "@/components/dev-tools-panel";
 import DropZoneOverlay from "@/components/DropZoneOverlay";
@@ -1409,6 +1410,8 @@ export default function WorkspacePage() {
           {lastImportReview ? (
             <ImportReviewPanel review={lastImportReview} />
           ) : null}
+
+          <BotWaffleAuthoringStudioPanel />
 
           <section className="grid gap-5 xl:grid-cols-[minmax(22rem,0.72fr)_minmax(0,1fr)]">
             <div className="grid gap-5">

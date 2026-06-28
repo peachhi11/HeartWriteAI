@@ -4,6 +4,12 @@ export const HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY =
   "heartwriteai_character_creation_form";
 export const HEARTWRITE_PERSONALITY_ENGINE_EXTENSION_KEY =
   "heartwriteai_personality_engine";
+export const HEARTWRITE_CHARACTER_TRUTH_SEPARATION_EXTENSION_KEY =
+  "heartwriteai_character_truth_separation";
+export const HEARTWRITE_WRITER_BIBLE_EXTENSION_KEY =
+  "heartwriteai_writer_bible";
+export const HEARTWRITE_CHARACTER_ENGINE_EXTENSION_KEY =
+  "heartwriteai_character_engine";
 
 const textField = z.string().default("");
 const section = <Shape extends z.ZodRawShape>(shape: Shape) =>
@@ -14,8 +20,43 @@ export const CharacterCreationTargetOverrideSchema = z.object({
   contextualPromptInjection: textField,
 });
 
+export const CharacterEngineDecisionRuleSchema = z.object({
+  id: textField,
+  drive: textField,
+  question: textField,
+  yes: textField,
+  no: textField,
+  constraints: textField,
+  visibleBehaviors: textField,
+  alternativeAction: textField,
+});
+
 export const CharacterCreationFormSchema = z.object({
   semanticSeedIds: z.array(z.string()).default([]),
+  writerBible: section({
+    projectTitle: textField,
+    humanSummary: textField,
+    themes: textField,
+    worldReference: textField,
+    characterReference: textField,
+    relationshipArc: textField,
+    styleNotes: textField,
+    activeThreads: textField,
+    sourceNotes: textField,
+  }),
+  characterEngine: section({
+    coreWound: textField,
+    coreBelief: textField,
+    coreFear: textField,
+    primaryDrive: textField,
+    decisionRules: z.array(CharacterEngineDecisionRuleSchema).default([]),
+    defenseMechanisms: textField,
+    attachmentStyle: textField,
+    behavioralTriggers: textField,
+    relationshipDynamics: textField,
+    speechRules: textField,
+    sexualityRules: textField,
+  }),
   identity: section({
     characterName: textField,
     nicknamesAliases: textField,
@@ -139,6 +180,9 @@ export type CharacterCreationForm = z.infer<
 export type CharacterCreationTargetOverride = z.infer<
   typeof CharacterCreationTargetOverrideSchema
 >;
+export type CharacterEngineDecisionRule = z.infer<
+  typeof CharacterEngineDecisionRuleSchema
+>;
 
 export type CharacterCreationFormSectionKey = Exclude<
   keyof CharacterCreationForm,
@@ -149,6 +193,8 @@ export const CHARACTER_CREATION_FORM_SECTIONS: Array<{
   key: CharacterCreationFormSectionKey;
   label: string;
 }> = [
+  { key: "writerBible", label: "Writer Bible" },
+  { key: "characterEngine", label: "Character Engine" },
   { key: "identity", label: "Character Identity" },
   { key: "appearance", label: "Appearance" },
   { key: "adultAnatomy", label: "Adult Anatomy" },

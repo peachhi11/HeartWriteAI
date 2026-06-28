@@ -17,31 +17,40 @@ export function getActiveLorebookEntries(
   const activations: LorebookActivation[] = [];
 
   for (const entry of lorebook.entries.filter((item) => item.enabled)) {
-      if (entry.constant) {
-        activations.push({
-          entry,
-          matchedKeys: [],
-          reason: "constant",
-        });
-        continue;
-      }
-
-      const matchedKeys = entry.keys.filter((key) =>
-        keyMatches(text, key, {
-          caseSensitive: entry.case_sensitive ?? false,
-          useRegex: entry.use_regex,
-        }),
-      );
-
-      if (matchedKeys.length === 0) {
-        continue;
-      }
-
+    if (entry.constant) {
       activations.push({
         entry,
-        matchedKeys,
-        reason: "keyword",
+        matchedKeys: [],
+        reason: "constant",
       });
+      continue;
+    }
+
+    const options = {
+      caseSensitive: entry.case_sensitive ?? false,
+      useRegex: entry.use_regex,
+    };
+    const matchedKeys = entry.keys.filter((key) =>
+      keyMatches(text, key, options),
+    );
+
+    if (matchedKeys.length === 0) {
+      continue;
+    }
+
+    const matchedSecondaryKeys = (entry.secondary_keys ?? []).filter((key) =>
+      keyMatches(text, key, options),
+    );
+
+    if (entry.selective && matchedSecondaryKeys.length === 0) {
+      continue;
+    }
+
+    activations.push({
+      entry,
+      matchedKeys: [...matchedKeys, ...matchedSecondaryKeys],
+      reason: "keyword",
+    });
   }
 
   return applyTokenBudget(lorebook, activations);

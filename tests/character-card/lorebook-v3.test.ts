@@ -13,6 +13,13 @@ import {
   serializeLorebookV3Document,
 } from "../../features/lorebooks/adapters";
 import { getActiveLorebookEntries } from "../../features/lorebooks/processor";
+import {
+  applyLorebookQuickAction,
+  compileLorebookReview,
+  getLorebookEntryPreview,
+  isLorebookEntryHiddenFromUser,
+  readHeartWriteLorebookRuntime,
+} from "../../features/lorebooks/runtime";
 
 test("converts generated lorebook artifacts into standalone lorebook v3 documents", () => {
   const artifact = generateLorebookArtifact({
@@ -235,6 +242,112 @@ test("activates v3 lorebook entries by constants, keywords, regex, and budget", 
     ["Constant", "Keyword"],
   );
   assert.deepEqual(active[1]?.matchedKeys, ["archive"]);
+});
+
+test("requires secondary keys for selective lorebook activation", () => {
+  const document = normalizeLorebookV3Document({
+    data: {
+      entries: [
+        {
+          content: "The rivalry rules should activate only in the archive.",
+          insertion_order: 0,
+          keys: ["rivalry"],
+          name: "Selective Rivalry",
+          secondary_keys: ["archive"],
+          selective: true,
+        },
+      ],
+      name: "Selective Runtime",
+    },
+    spec: "lorebook_v3",
+  });
+
+  assert.equal(
+    getActiveLorebookEntries(document.data, ["The rivalry keeps escalating."])
+      .length,
+    0,
+  );
+
+  const active = getActiveLorebookEntries(document.data, [
+    "The rivalry keeps escalating inside the archive.",
+  ]);
+
+  assert.equal(active.length, 1);
+  assert.deepEqual(active[0]?.matchedKeys, ["rivalry", "archive"]);
+});
+
+test("supports spoiler-hidden lore previews without removing compiled content", () => {
+  const document = normalizeLorebookV3Document({
+    data: {
+      entries: [
+        {
+          content: "The mentor is secretly the lost heir.",
+          extensions: {
+            heartwriteai: {
+              hiddenFromUser: true,
+              reviewRequired: true,
+              spoilerPreview: "Hidden lineage twist.",
+            },
+          },
+          insertion_order: 0,
+          keys: ["mentor"],
+          name: "Lineage Reveal",
+        },
+      ],
+      name: "Spoiler Runtime",
+    },
+    spec: "lorebook_v3",
+  });
+
+  const entry = document.data.entries[0];
+  assert.ok(entry);
+  assert.equal(isLorebookEntryHiddenFromUser(entry), true);
+  assert.equal(getLorebookEntryPreview(entry), "Hidden lineage twist.");
+  assert.equal(entry.content, "The mentor is secretly the lost heir.");
+  assert.equal(readHeartWriteLorebookRuntime(entry).reviewRequired, true);
+});
+
+test("applies lorebook quick actions and compiler review metadata", () => {
+  const document = normalizeLorebookV3Document({
+    data: {
+      entries: [
+        {
+          content: "Spoiler fact about the city.",
+          insertion_order: 0,
+          keys: ["city", " city ", "CITY"],
+          name: "City Secret",
+        },
+      ],
+      name: "Quick Actions",
+    },
+    spec: "lorebook_v3",
+  });
+
+  const original = document.data.entries[0];
+  assert.ok(original);
+
+  const cleaned = applyLorebookQuickAction(original, "dedupe_keys");
+  assert.deepEqual(cleaned.keys, ["city", "CITY"]);
+
+  const hidden = applyLorebookQuickAction(cleaned, "mark_spoiler_hidden");
+  assert.equal(readHeartWriteLorebookRuntime(hidden).hiddenFromUser, true);
+  assert.equal(readHeartWriteLorebookRuntime(hidden).reviewRequired, true);
+  assert.match(getLorebookEntryPreview(hidden), /Spoiler fact/);
+
+  const selective = applyLorebookQuickAction(hidden, "make_selective");
+  assert.equal(selective.selective, true);
+  assert.ok(selective.secondary_keys?.length);
+
+  const review = compileLorebookReview({
+    ...document,
+    data: {
+      ...document.data,
+      entries: [selective],
+    },
+  });
+
+  assert.ok(review.some((issue) => issue.code === "hidden_entries_present"));
+  assert.ok(review.some((issue) => issue.code === "review_required"));
 });
 
 test("serializes canonical v3 exports and safe filenames", () => {

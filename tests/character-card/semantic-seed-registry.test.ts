@@ -1425,6 +1425,9 @@ test("keeps explicit standardized vocabulary sources ahead of generic prose heur
   const payoffFantasy = findSemanticSeedGraphNodeById(
     "payoff-fantasy-vocabulary:chosen_above_everyone",
   );
+  const plotConflict = findSemanticSeedGraphNodeById(
+    "plot-conflict-vocabulary:secret_pining_after_missed_chance",
+  );
   const growthArc = findSemanticSeedGraphNodeById(
     "growth-arc-vocabulary:learning_to_trust",
   );
@@ -1482,6 +1485,7 @@ test("keeps explicit standardized vocabulary sources ahead of generic prose heur
   assert.equal(romanceTrope?.category, "romance_tropes");
   assert.equal(routePhase?.category, "routes");
   assert.equal(payoffFantasy?.category, "routes");
+  assert.equal(plotConflict?.category, "routes");
   assert.equal(growthArc?.category, "goals_long");
   assert.equal(moral?.category, "motivations");
   assert.equal(narrativeArcController?.category, "routes");

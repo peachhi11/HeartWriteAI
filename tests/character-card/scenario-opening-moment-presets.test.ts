@@ -22,7 +22,7 @@ import {
 } from "../../data/scenarioOpeningMomentPresets";
 
 test("loads scenario opening moment presets across meeting, incident, conflict, domestic, danger, and emotional lanes", () => {
-  assert.equal(SCENARIO_OPENING_MOMENT_PRESETS.length, 278);
+  assert.equal(SCENARIO_OPENING_MOMENT_PRESETS.length, 478);
   assert.deepEqual(SCENARIO_OPENING_MOMENT_PRESET_CATEGORIES, [
     "Archetype",
     "Confession Trigger",
@@ -42,7 +42,7 @@ test("loads scenario opening moment presets across meeting, incident, conflict, 
   assert.equal(new Set(ids).size, ids.length);
   assert.equal(scenarioOpeningMomentPresets.length, 20);
   assert.equal(scenarioOpeningMomentSeeds.length, 20);
-  assert.equal(firstMeetingModeSeeds.length, 30);
+  assert.equal(firstMeetingModeSeeds.length, 230);
   assert.equal(incitingIncidentSeeds.length, 30);
   assert.equal(conflictStarterSeeds.length, 30);
   assert.equal(confessionTriggerSeeds.length, 25);
@@ -52,7 +52,7 @@ test("loads scenario opening moment presets across meeting, incident, conflict, 
   assert.equal(scenarioOpeningGates.length, 15);
   assert.equal(scenarioOpeningDialogueSeeds.length, 18);
   assert.equal(highValueScenarioOpeningMomentSeeds.length, 20);
-  assert.equal(getScenarioOpeningMomentPresetsByCategory("First Meeting Mode").length, 30);
+  assert.equal(getScenarioOpeningMomentPresetsByCategory("First Meeting Mode").length, 230);
   assert.equal(getScenarioOpeningMomentPresetsByCategory("Inciting Incident").length, 30);
   assert.equal(getScenarioOpeningMomentPresetsByCategory("Dialogue Seed").length, 18);
 });

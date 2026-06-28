@@ -27,12 +27,20 @@ export const HeartWriteLorebookEntryKindSchema = z.enum([
 
 export const HeartWriteLorebookRuntimeSchema = z
   .object({
+    activationTier: z
+      .enum(["anchor", "primary", "secondary", "ambient"])
+      .optional(),
     blockedByEvents: z.array(z.string()).default([]),
+    compilerNotes: z.array(z.string()).default([]),
     cooldownTurns: z.number().int().min(0).max(100).optional(),
     emotionalTags: z.array(z.string()).default([]),
     entryKind: HeartWriteLorebookEntryKindSchema.default("custom"),
+    hiddenFromUser: z.boolean().default(false),
     requiredEvents: z.array(z.string()).default([]),
+    reviewRequired: z.boolean().default(false),
     source: z.string().default("heartwriteai"),
+    spoilerLabel: z.string().optional(),
+    spoilerPreview: z.string().optional(),
     tokenBudgetHint: z.number().int().min(0).optional(),
     weight: z.number().min(0).max(1).optional(),
   })
@@ -95,4 +103,3 @@ export function createLorebookV3Document(data: LorebookV3): LorebookV3Document {
     spec: "lorebook_v3",
   });
 }
-

@@ -4,9 +4,16 @@ import test from "node:test";
 import {
   compileCharacterCreationFormToCardDataPatch,
   compileCharacterCreationFormToFormValues,
+  compileCharacterCreationFormToTruthSeparatedOutputs,
   createCharacterCardFromCreationForm,
   createEmptyCharacterCreationForm,
+  findCharacterTruthLeakIssues,
 } from "../../lib/character-card/characterCreationFormCompiler";
+import {
+  compileCharacterEngineForRuntime,
+  compileWriterBibleForHumanReference,
+  findCharacterEngineDecisionRuleIssues,
+} from "../../lib/character-card/characterAuthoringTabs";
 import {
   applySeedPickerEntryToCharacterCreationForm,
 } from "../../lib/character-card/characterCreationSeedTemplates";
@@ -15,8 +22,11 @@ import {
   searchSeedPickerEntries,
 } from "../../data/seedPickerRegistry";
 import {
+  HEARTWRITE_CHARACTER_ENGINE_EXTENSION_KEY,
   HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY,
+  HEARTWRITE_CHARACTER_TRUTH_SEPARATION_EXTENSION_KEY,
   HEARTWRITE_PERSONALITY_ENGINE_EXTENSION_KEY,
+  HEARTWRITE_WRITER_BIBLE_EXTENSION_KEY,
 } from "../../types/character-card/CharacterCreationForm";
 import { CharacterCardPayload } from "../../types/character-card/CharacterCardPayload";
 import { CharacterCardV3Schema } from "../../types/character-card/CharacterCardV3Schema";
@@ -114,23 +124,107 @@ test("folds split form input into one coherent editable CCv3 field set", () => {
   assert.equal(values.fullName, "Magnus Vanderbilt");
   assert.equal(values.ageBirthdate, "37 / 14 October");
   assert.equal(values.height, "6ft 2in / 188cm");
+  assert.equal(values.birthplace, "");
   assert.match(values.description, /Identity:/);
   assert.match(values.description, /Occupation: Estate attorney/);
-  assert.match(values.description, /Lifestyle:/);
+  assert.match(values.description, /Life Pattern Generator:/);
+  assert.doesNotMatch(values.description, /draughty inherited manor/);
   assert.match(values.physicalAppearance, /Eyes: Grey, heavy-lidded/);
   assert.match(values.personalityPsychology, /Cognitive Drivers:/);
+  assert.match(values.personalityPsychology, /Character Engine:/);
+  assert.match(values.personalityPsychology, /Core Belief: Care is safest/);
+  assert.match(values.personalityPsychology, /YES: Protect with explicit consent/);
+  assert.match(values.personalityPsychology, /NO: Observe and stay available/);
   assert.match(values.personalityPsychology, /Big Five:/);
   assert.match(values.personalityPsychology, /Semantic psychology guidance/);
   assert.match(values.personalityPsychology, /Fear of abandonment/);
   assert.doesNotMatch(values.personalityPsychology, /fear_of_abandonment/);
-  assert.match(values.relationshipsConnections, /Rapport Ledger:/);
-  assert.match(values.relationshipsConnections, /{{user}}:/);
+  assert.match(values.relationshipsConnections, /Relational Architecture:/);
+  assert.doesNotMatch(values.relationshipsConnections, /\{\{user\}\}/);
+  assert.doesNotMatch(values.relationshipsConnections, /kept each other's secrets/i);
+  assert.doesNotMatch(values.relationshipsConnections, /Vanderbilt estate household/);
   assert.match(values.relationshipsConnections, /Semantic relationship guidance/);
   assert.match(values.relationshipsConnections, /Slow burn/);
   assert.match(values.speechStyle, /Tone & Vocabulary:/);
   assert.match(values.backgroundStory, /Internal Thoughts & Reactions:/);
   assert.match(values.intimacyProfile, /Adult Anatomy:/);
   assert.equal(values.tagsText, "Fear of abandonment, Slow burn");
+  assert.deepEqual(findCharacterTruthLeakIssues(values), []);
+});
+
+test("keeps writer bible human-facing while compiling character engine for runtime", () => {
+  const form = createExampleCreationForm();
+  const writerBible = compileWriterBibleForHumanReference(form);
+  const characterEngine = compileCharacterEngineForRuntime(form);
+
+  assert.match(writerBible, /Writer Bible:/);
+  assert.match(writerBible, /Project Title: Winter Estate Romance/);
+  assert.match(writerBible, /family inquiry/);
+  assert.match(writerBible, /Source Notes: Human-facing reference notes/);
+  assert.doesNotMatch(writerBible, /YES Outcome|NO Outcome/);
+  assert.match(characterEngine, /Character Engine:/);
+  assert.match(characterEngine, /Decision Rules:/);
+  assert.match(characterEngine, /Alternative Action: Ask before touching/);
+  assert.doesNotMatch(characterEngine, /family inquiry/);
+  assert.deepEqual(findCharacterEngineDecisionRuleIssues(form), []);
+});
+
+test("flags engine decision rules that forbid behavior without alternative action", () => {
+  const form = {
+    ...createExampleCreationForm(),
+    characterEngine: {
+      ...createExampleCreationForm().characterEngine,
+      decisionRules: [
+        {
+          ...createExampleCreationForm().characterEngine.decisionRules[0],
+          id: "no_touch_without_consent",
+          constraints: "Never grab or restrain someone to help.",
+          alternativeAction: "",
+        },
+      ],
+    },
+  };
+
+  assert.deepEqual(findCharacterEngineDecisionRuleIssues(form), [
+    "no_touch_without_consent: constraints include a cannot/does-not rule but no alternative action.",
+  ]);
+});
+
+test("separates character truth from story lorebook and setting scenario truth", () => {
+  const separated = compileCharacterCreationFormToTruthSeparatedOutputs(
+    createExampleCreationForm(),
+  );
+  const cardText = [
+    separated.characterCardValues.description,
+    separated.characterCardValues.personalityPsychology,
+    separated.characterCardValues.relationshipsConnections,
+    separated.characterCardValues.backgroundStory,
+  ].join("\n");
+
+  assert.deepEqual(separated.leakIssues, []);
+  assert.doesNotMatch(cardText, /\{\{user\}\}/);
+  assert.doesNotMatch(cardText, /family inquiry/i);
+  assert.doesNotMatch(cardText, /inherited manor/i);
+  assert.equal(separated.storyLorebook.spec, "lorebook_v3");
+  assert.equal(separated.storyLorebook.data.entries.length, 2);
+  assert.match(
+    separated.storyLorebook.data.entries[0]?.content ?? "",
+    /Vanderbilt estate household/,
+  );
+  assert.match(
+    separated.storyLorebook.data.entries[0]?.content ?? "",
+    /They kept each other's secrets during a family inquiry/,
+  );
+  assert.match(
+    separated.storyLorebook.data.entries[1]?.content ?? "",
+    /\{\{user\}\}/,
+  );
+  assert.equal(
+    separated.storyLorebook.data.entries[1]?.extensions.heartwriteai.hiddenFromUser,
+    true,
+  );
+  assert.match(separated.scenario.content, /A draughty inherited manor/);
+  assert.match(separated.scenario.content, /Asset-rich, cash-careful/);
 });
 
 test("creates a valid CCv3 card with HeartWriteAI form extensions", () => {
@@ -169,7 +263,11 @@ test("creates a valid CCv3 card with HeartWriteAI form extensions", () => {
   assert.match(card.data.description, /Full Name: Magnus Vanderbilt/);
   assert.match(card.data.description, /Overview:\nIdentity:/);
   assert.match(card.data.personality, /Personality & Psychology:/);
-  assert.match(card.data.personality, /Relationships \/ Connections:/);
+  assert.match(card.data.personality, /Internal Processing:/);
+  assert.match(card.data.personality, /Relational Architecture:/);
+  assert.doesNotMatch(card.data.personality, /\{\{user\}\}/);
+  assert.doesNotMatch(card.data.personality, /family inquiry/i);
+  assert.doesNotMatch(card.data.description, /inherited manor/i);
   assert.equal(card.data.extensions.preserved, true);
   assert.deepEqual(
     (
@@ -179,6 +277,28 @@ test("creates a valid CCv3 card with HeartWriteAI form extensions", () => {
     ).identity.characterName,
     "Magnus Vanderbilt",
   );
+  assert.equal(
+    (
+      card.data.extensions[
+        HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY
+      ] as { identity: { birthplace?: string } }
+    ).identity.birthplace,
+    "",
+  );
+  assert.deepEqual(
+    (
+      card.data.extensions[
+        HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY
+      ] as { relationships: { targetOverrides?: unknown[] } }
+    ).relationships.targetOverrides,
+    [],
+  );
+  assert.doesNotMatch(
+    JSON.stringify(
+      card.data.extensions[HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY],
+    ),
+    /\{\{user\}\}|NPCs/,
+  );
   assert.deepEqual(
     (
       card.data.extensions[
@@ -186,6 +306,38 @@ test("creates a valid CCv3 card with HeartWriteAI form extensions", () => {
       ] as { semanticSeedIds?: string[] }
     ).semanticSeedIds,
     ["fear_of_abandonment", "slow_burn"],
+  );
+  assert.equal(
+    (
+      card.data.extensions[
+        HEARTWRITE_WRITER_BIBLE_EXTENSION_KEY
+      ] as { promptFacing: boolean; compiledReference: string }
+    ).promptFacing,
+    false,
+  );
+  assert.match(
+    (
+      card.data.extensions[
+        HEARTWRITE_WRITER_BIBLE_EXTENSION_KEY
+      ] as { compiledReference: string }
+    ).compiledReference,
+    /family inquiry/,
+  );
+  assert.equal(
+    (
+      card.data.extensions[
+        HEARTWRITE_CHARACTER_ENGINE_EXTENSION_KEY
+      ] as { promptFacing: boolean; compiledRuntimeGuidance: string }
+    ).promptFacing,
+    true,
+  );
+  assert.match(
+    (
+      card.data.extensions[
+        HEARTWRITE_CHARACTER_ENGINE_EXTENSION_KEY
+      ] as { compiledRuntimeGuidance: string }
+    ).compiledRuntimeGuidance,
+    /Question: Does the other person request help/,
   );
   assert.equal(
     (
@@ -203,11 +355,25 @@ test("creates a valid CCv3 card with HeartWriteAI form extensions", () => {
     ).semanticSeedLabels,
     ["Fear of abandonment", "Slow burn"],
   );
+  assert.equal(
+    (
+      card.data.extensions[
+        HEARTWRITE_CHARACTER_TRUTH_SEPARATION_EXTENSION_KEY
+      ] as { tierPolicy: { characterCard: string } }
+    ).tierPolicy.characterCard.includes("Core identity"),
+    true,
+  );
   assert.doesNotMatch(
     JSON.stringify(
       card.data.extensions[HEARTWRITE_PERSONALITY_ENGINE_EXTENSION_KEY],
     ),
-    /semanticSeedIds|fear_of_abandonment|slow_burn/,
+    /semanticSeedIds|fear_of_abandonment|slow_burn|\{\{user\}\}|family inquiry|Vanderbilt estate household/,
+  );
+  assert.doesNotMatch(
+    JSON.stringify(
+      card.data.extensions[HEARTWRITE_CHARACTER_ENGINE_EXTENSION_KEY],
+    ),
+    /family inquiry|Vanderbilt estate household|\{\{user\}\}/,
   );
   assert.equal("identity" in card, false);
 });
@@ -277,6 +443,52 @@ function createExampleCreationForm() {
   return {
     ...createEmptyCharacterCreationForm(),
     semanticSeedIds: ["fear_of_abandonment", "slow_burn"],
+    writerBible: {
+      ...createEmptyCharacterCreationForm().writerBible,
+      projectTitle: "Winter Estate Romance",
+      humanSummary:
+        "A human-facing bible for a guarded estate attorney and the relationship arc around a family inquiry.",
+      themes: "Duty, grief, inheritance, chosen love",
+      worldReference: "A draughty inherited manor and surrounding village",
+      characterReference:
+        "Magnus is readable to humans through contradictions, routines, and mood.",
+      relationshipArc:
+        "Grudging respect into devotion after they kept each other's secrets during a family inquiry.",
+      styleNotes: "Close third person past tense with restrained intimacy.",
+      activeThreads: "Estate pressure, family inquiry, unresolved grief",
+      sourceNotes: "Human-facing reference notes; not runtime prompt law.",
+    },
+    characterEngine: {
+      ...createEmptyCharacterCreationForm().characterEngine,
+      coreWound: "Being useful mattered more than being wanted",
+      coreBelief: "Care is safest when it is practical and earned",
+      coreFear: "Being needed only for what he can fix",
+      primaryDrive: "Protection without ownership",
+      decisionRules: [
+        {
+          id: "protection_with_autonomy",
+          drive: "Protection",
+          question: "Does the other person request help?",
+          yes: "Protect with explicit consent and shared control.",
+          no: "Observe and stay available without taking over.",
+          constraints: "Does not override autonomy to make himself feel safer.",
+          visibleBehaviors:
+            "Keeps his voice low, offers options, and checks consent before moving closer.",
+          alternativeAction: "Ask before touching; offer a practical exit route.",
+        },
+      ],
+      defenseMechanisms:
+        "Formality, practical problem-solving, restrained humor",
+      attachmentStyle: "Fearful avoidant with earned secure behavior",
+      behavioralTriggers:
+        "Broken promises, careless cruelty, public humiliation",
+      relationshipDynamics:
+        "Protective devotion must remain collaborative rather than managerial",
+      speechRules:
+        "Precise, dry, low-voiced; emotion often arrives as practical phrasing",
+      sexualityRules:
+        "Consent-forward intimacy; trust and autonomy matter more than control",
+    },
     identity: {
       ...createEmptyCharacterCreationForm().identity,
       characterName: "Magnus Vanderbilt",
@@ -377,8 +589,10 @@ function createExampleCreationForm() {
       },
       behavioralFriction: {
         ideologicalClash: "Duty versus self-preservation",
-        boundaries: "No public claims before consent is explicit",
-        microAggressionsOrTells: "Uses surnames when he feels exposed",
+        boundaries:
+          "No public claims before {{user}} gives explicit consent; do not use NPCs as pressure.",
+        microAggressionsOrTells:
+          "Uses surnames when he feels exposed around {{user}}.",
       },
       targetOverrides: [
         {

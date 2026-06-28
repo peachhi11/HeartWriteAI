@@ -9,9 +9,9 @@ export function createCompiledPersonalityPrompt(
       "Personality & Psychology",
       values.personalityPsychology,
     ),
-    createPromptSection("Background & Story", values.backgroundStory),
+    createPromptSection("Internal Processing", values.backgroundStory),
     createPromptSection("Speech Style", values.speechStyle),
-    createPromptSection("Relationships / Connections", values.relationshipsConnections),
+    createPromptSection("Relational Architecture", values.relationshipsConnections),
     createPromptSection("Sexuality / Intimacy Profile", values.intimacyProfile),
   ]
     .filter(Boolean)
