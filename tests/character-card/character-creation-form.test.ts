@@ -15,6 +15,13 @@ import {
   findCharacterEngineDecisionRuleIssues,
 } from "../../lib/character-card/characterAuthoringTabs";
 import {
+  applyCharacterCauseChainToCharacterCreationForm,
+  compileCharacterCauseChainRouting,
+} from "../../lib/character-card/characterCauseChainCompiler";
+import {
+  createCharacterCreationNpcMiniProfile,
+} from "../../lib/character-card/characterCreationNpcProfiles";
+import {
   applySeedPickerEntryToCharacterCreationForm,
 } from "../../lib/character-card/characterCreationSeedTemplates";
 import {
@@ -38,6 +45,8 @@ test("hydrates an empty sectioned character creation form", () => {
   assert.equal(form.appearance.eyeColourShape, "");
   assert.equal(form.psychology.bigFive.openness, "");
   assert.deepEqual(form.relationships.targetOverrides, []);
+  assert.equal(form.npcNetwork.discoveryNotes, "");
+  assert.deepEqual(form.npcNetwork.miniProfiles, []);
   assert.deepEqual(form.semanticSeedIds, []);
 });
 
@@ -117,6 +126,44 @@ test("routes preset seed picker entries without exposing internal semantic IDs",
   assert.match(nextForm.lifestyle.routines, new RegExp(preset.label));
 });
 
+test("routes NPC network seed picker entries into story-web discovery notes", () => {
+  const form = createEmptyCharacterCreationForm();
+  const preset = SEED_PICKER_ENTRIES.find(
+    (entry) =>
+      entry.kind === "preset" &&
+      entry.registryKey.includes("npc-network") &&
+      entry.id === "npc_network_friend_best_friend" &&
+      entry.label === "best friend",
+  );
+
+  assert.ok(preset);
+
+  const nextForm = applySeedPickerEntryToCharacterCreationForm(form, preset);
+
+  assert.match(nextForm.npcNetwork.discoveryNotes, /best friend/);
+  assert.equal(nextForm.relationships.affiliationCore.factionOrGroup, "");
+  assert.deepEqual(nextForm.semanticSeedIds, []);
+});
+
+test("routes character archetype seed picker entries into the archetype form field", () => {
+  const form = createEmptyCharacterCreationForm();
+  const preset = SEED_PICKER_ENTRIES.find(
+    (entry) =>
+      entry.kind === "preset" &&
+      entry.registryKey ===
+        "personality:character-archetype:character_archetype_tsundere",
+  );
+
+  assert.ok(preset);
+
+  const nextForm = applySeedPickerEntryToCharacterCreationForm(form, preset);
+
+  assert.match(nextForm.personality.archetype, /Tsundere/);
+  assert.match(nextForm.personality.archetype, /Defensive sharpness/);
+  assert.equal(nextForm.relationships.emotionalBonds.attachmentType, "");
+  assert.deepEqual(nextForm.semanticSeedIds, []);
+});
+
 test("folds split form input into one coherent editable CCv3 field set", () => {
   const form = createExampleCreationForm();
   const values = compileCharacterCreationFormToFormValues(form);
@@ -131,10 +178,20 @@ test("folds split form input into one coherent editable CCv3 field set", () => {
   assert.doesNotMatch(values.description, /draughty inherited manor/);
   assert.match(values.physicalAppearance, /Eyes: Grey, heavy-lidded/);
   assert.match(values.personalityPsychology, /Cognitive Drivers:/);
-  assert.match(values.personalityPsychology, /Character Engine:/);
-  assert.match(values.personalityPsychology, /Core Belief: Care is safest/);
-  assert.match(values.personalityPsychology, /YES: Protect with explicit consent/);
-  assert.match(values.personalityPsychology, /NO: Observe and stay available/);
+  assert.doesNotMatch(values.personalityPsychology, /Character Engine:/);
+  assert.doesNotMatch(values.personalityPsychology, /Core Belief:/);
+  assert.match(
+    values.personalityPsychology,
+    /The character believes care is safest/,
+  );
+  assert.match(
+    values.personalityPsychology,
+    /If the answer is yes, protect with explicit consent/,
+  );
+  assert.match(
+    values.personalityPsychology,
+    /If the answer is no, observe and stay available/,
+  );
   assert.match(values.personalityPsychology, /Big Five:/);
   assert.match(values.personalityPsychology, /Semantic psychology guidance/);
   assert.match(values.personalityPsychology, /Fear of abandonment/);
@@ -162,9 +219,11 @@ test("keeps writer bible human-facing while compiling character engine for runti
   assert.match(writerBible, /family inquiry/);
   assert.match(writerBible, /Source Notes: Human-facing reference notes/);
   assert.doesNotMatch(writerBible, /YES Outcome|NO Outcome/);
-  assert.match(characterEngine, /Character Engine:/);
-  assert.match(characterEngine, /Decision Rules:/);
-  assert.match(characterEngine, /Alternative Action: Ask before touching/);
+  assert.doesNotMatch(characterEngine, /Character Engine:/);
+  assert.doesNotMatch(characterEngine, /Decision Rules:/);
+  assert.doesNotMatch(characterEngine, /Alternative Action:/);
+  assert.match(characterEngine, /Protection asks, "Does the other person request help\?"/);
+  assert.match(characterEngine, /When blocked, the character should ask before touching/);
   assert.doesNotMatch(characterEngine, /family inquiry/);
   assert.deepEqual(findCharacterEngineDecisionRuleIssues(form), []);
 });
@@ -188,6 +247,55 @@ test("flags engine decision rules that forbid behavior without alternative actio
   assert.deepEqual(findCharacterEngineDecisionRuleIssues(form), [
     "no_touch_without_consent: constraints include a cannot/does-not rule but no alternative action.",
   ]);
+});
+
+test("routes cause-chain intake into biography, psychology, and character engine", () => {
+  const form = createEmptyCharacterCreationForm();
+  const nextForm = applyCharacterCauseChainToCharacterCreationForm(form, {
+    whatHappened:
+      "During a childhood evacuation, she learned that exits mattered more than promises.",
+    createdBelief: "Safety depends on knowing the way out before anyone panics.",
+    decisionEffect:
+      "She chooses routes with exits, keeps spare plans, and resists being trapped in one option.",
+    visibleSignals:
+      "She checks doors before sitting and relaxes only after mapping the room.",
+    recoveryPath:
+      "Name the exit, offer a choice, and let the other person move first.",
+  });
+  const values = compileCharacterCreationFormToFormValues(nextForm);
+  const characterEngine = compileCharacterEngineForRuntime(nextForm);
+
+  assert.match(nextForm.writerBible.characterReference, /childhood evacuation/);
+  assert.match(nextForm.psychology.beliefs, /Safety depends on knowing the way out/);
+  assert.equal(nextForm.characterEngine.decisionRules.length, 1);
+  assert.match(
+    nextForm.characterEngine.decisionRules[0].question,
+    /activate the belief/,
+  );
+  assert.match(
+    nextForm.characterEngine.decisionRules[0].yes,
+    /chooses routes with exits/,
+  );
+  assert.match(characterEngine, /Belief-driven decision asks/);
+  assert.match(characterEngine, /If the answer is yes, she chooses routes with exits/);
+  assert.match(characterEngine, /When blocked, the character should name the exit/);
+  assert.match(values.personalityPsychology, /Safety depends on knowing the way out/);
+  assert.doesNotMatch(values.personalityPsychology, /childhood evacuation/);
+});
+
+test("previews cause-chain routing without requiring a full form update", () => {
+  const preview = compileCharacterCauseChainRouting({
+    whatHappened: "An old mentor vanished after promising to return.",
+    createdBelief: "Consistency matters more than intensity.",
+    decisionEffect: "They trust repeated actions before emotional speeches.",
+  });
+
+  assert.equal(preview.biography, "An old mentor vanished after promising to return.");
+  assert.equal(preview.psychology, "Consistency matters more than intensity.");
+  assert.ok(preview.characterEngineRule);
+  assert.match(preview.characterEngineRule.question, /consistency matters/);
+  assert.match(preview.characterEngineRule.constraints, /Do not repeat the biography/);
+  assert.match(preview.characterEngineRule.alternativeAction, /present-scene agency/);
 });
 
 test("separates character truth from story lorebook and setting scenario truth", () => {
@@ -225,6 +333,49 @@ test("separates character truth from story lorebook and setting scenario truth",
   );
   assert.match(separated.scenario.content, /A draughty inherited manor/);
   assert.match(separated.scenario.content, /Asset-rich, cash-careful/);
+});
+
+test("compiles linked NPC mini profiles into lorebook story truth only", () => {
+  const form = {
+    ...createExampleCreationForm(),
+    npcNetwork: {
+      discoveryNotes:
+        "The cast should reveal Magnus through pressure, not through exposition.",
+      miniProfiles: [
+        createCharacterCreationNpcMiniProfile({
+          characterName: "Magnus Vanderbilt",
+          index: 0,
+          name: "Eleanor Vanderbilt",
+          profileType: "family",
+        }),
+        createCharacterCreationNpcMiniProfile({
+          characterName: "Magnus Vanderbilt",
+          index: 1,
+          name: "Julian Cross",
+          profileType: "rival",
+        }),
+      ],
+    },
+  };
+  const separated = compileCharacterCreationFormToTruthSeparatedOutputs(form);
+  const cardText = [
+    separated.characterCardValues.description,
+    separated.characterCardValues.personalityPsychology,
+    separated.characterCardValues.relationshipsConnections,
+    separated.characterCardValues.backgroundStory,
+  ].join("\n");
+  const lorebookText = separated.storyLorebook.data.entries
+    .map((entry) => `${entry.name}\n${entry.content}`)
+    .join("\n");
+
+  assert.deepEqual(separated.leakIssues, []);
+  assert.doesNotMatch(cardText, /Eleanor Vanderbilt|Julian Cross|NPC Mini Profile/);
+  assert.equal(separated.storyLorebook.data.entries.length, 5);
+  assert.match(lorebookText, /NPC Mini Profile: Eleanor Vanderbilt/);
+  assert.match(lorebookText, /Profile type: Family/);
+  assert.match(lorebookText, /NPC Mini Profile: Julian Cross/);
+  assert.match(lorebookText, /Profile type: Rival/);
+  assert.match(lorebookText, /relationship web/i);
 });
 
 test("creates a valid CCv3 card with HeartWriteAI form extensions", () => {
@@ -293,6 +444,14 @@ test("creates a valid CCv3 card with HeartWriteAI form extensions", () => {
     ).relationships.targetOverrides,
     [],
   );
+  assert.deepEqual(
+    (
+      card.data.extensions[
+        HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY
+      ] as { npcNetwork: { miniProfiles?: unknown[] } }
+    ).npcNetwork.miniProfiles,
+    [],
+  );
   assert.doesNotMatch(
     JSON.stringify(
       card.data.extensions[HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY],
@@ -337,7 +496,7 @@ test("creates a valid CCv3 card with HeartWriteAI form extensions", () => {
         HEARTWRITE_CHARACTER_ENGINE_EXTENSION_KEY
       ] as { compiledRuntimeGuidance: string }
     ).compiledRuntimeGuidance,
-    /Question: Does the other person request help/,
+    /Protection asks, "Does the other person request help\?"/,
   );
   assert.equal(
     (

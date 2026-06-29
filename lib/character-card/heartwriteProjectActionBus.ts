@@ -8,13 +8,25 @@ import {
   compileCharacterCreationFormToStoryLorebook,
   compileCharacterCreationFormToTruthSeparatedOutputs,
   findCharacterTruthLeakIssues,
+  parseCharacterCreationForm,
 } from "./characterCreationFormCompiler";
+import {
+  CanonFact,
+  CanonHardConstraint,
+  CanonMemoryAnchor,
+  ContinuityCanonLedger,
+  auditContinuityCanonLedger,
+  createContinuityCanonLedger,
+  createContinuityCanonLedgerFromNarrativeRuntime,
+} from "./continuityCanonLedger";
+import type { NarrativeRuntimeState } from "./narrativeEngine";
 
 export type HeartWriteProjectActionId =
   | "card.compileTruth"
   | "lorebook.promoteStoryTruth"
   | "scenario.compileSettingTruth"
   | "runtime.auditContinuity"
+  | "runtime.compileCanonLedger"
   | "context.inspectPromptSources"
   | "export.packageCardBundle";
 
@@ -38,6 +50,7 @@ export type HeartWriteProjectArtifactKind =
   | "lorebook_v3"
   | "scenario_truth"
   | "continuity_audit"
+  | "continuity_canon_ledger"
   | "context_source_report"
   | "export_manifest";
 
@@ -90,6 +103,8 @@ export interface HeartWriteProjectActionInput {
   recentMessages?: string[];
   runtimeNotes?: string[];
   activeLorebooks?: HeartWriteProjectLorebookSource[];
+  narrativeRuntime?: NarrativeRuntimeState;
+  continuityLedger?: ContinuityCanonLedger;
   exportTargets?: string[];
 }
 
@@ -179,6 +194,22 @@ export const HEARTWRITE_PROJECT_ACTIONS = [
     reviewRequired: false,
   },
   {
+    id: "runtime.compileCanonLedger",
+    label: "Compile Canon Ledger",
+    description:
+      "Compile character, story, setting, runtime, and memory sources into one prompt-safe continuity canon ledger.",
+    role: "continuity_auditor",
+    commandToken: "!runtime compile-canon-ledger",
+    sourceTiers: [
+      "character_truth",
+      "story_truth",
+      "setting_truth",
+      "runtime_context",
+    ],
+    outputTiers: ["runtime_context"],
+    reviewRequired: true,
+  },
+  {
     id: "context.inspectPromptSources",
     label: "Inspect Prompt Sources",
     description:
@@ -242,6 +273,8 @@ export function runHeartWriteProjectAction(
       return runScenarioCompileSettingTruth(action, input);
     case "runtime.auditContinuity":
       return runRuntimeAuditContinuity(action, input);
+    case "runtime.compileCanonLedger":
+      return runRuntimeCompileCanonLedger(action, input);
     case "context.inspectPromptSources":
       return runContextInspectPromptSources(action, input);
     case "export.packageCardBundle":
@@ -458,6 +491,64 @@ function runRuntimeAuditContinuity(
   };
 }
 
+function runRuntimeCompileCanonLedger(
+  action: HeartWriteProjectActionSpec,
+  input: HeartWriteProjectActionInput,
+): HeartWriteProjectActionResult {
+  if (!input.form && !input.narrativeRuntime && !input.continuityLedger) {
+    return {
+      action,
+      status: "blocked",
+      promptSafeSummary:
+        "Action blocked because no creation form, narrative runtime, or existing canon ledger was provided.",
+      artifacts: [],
+      issues: [
+        {
+          severity: "error",
+          message:
+            "A form, narrative runtime, or existing canon ledger is required to compile continuity canon.",
+          source: "runtime_context",
+        },
+      ],
+      nextActions: [],
+    };
+  }
+
+  const ledger = buildContinuityCanonLedgerForActionInput(input);
+  const ledgerIssues = auditContinuityCanonLedger(ledger).map((issue) => ({
+    severity: issue.severity,
+    message: issue.message,
+    source: issue.field,
+  }));
+
+  return {
+    action,
+    status: ledgerIssues.some((issue) => issue.severity === "error")
+      ? "needs_review"
+      : ledgerIssues.length
+        ? "needs_review"
+        : "ok",
+    promptSafeSummary:
+      `Compiled continuity canon with ${ledger.facts.length} facts, ` +
+      `${ledger.timeline.length} timeline anchors, ` +
+      `${ledger.memoryAnchors.length} memory anchors, and ` +
+      `${ledger.hardConstraints.length} hard constraints.`,
+    artifacts: [
+      createArtifact(
+        action.id,
+        "continuity-canon-ledger",
+        "Continuity Canon Ledger",
+        "continuity_canon_ledger",
+        "runtime_context",
+        ledger,
+        ledgerIssues.length > 0,
+      ),
+    ],
+    issues: ledgerIssues,
+    nextActions: ["context.inspectPromptSources", "export.packageCardBundle"],
+  };
+}
+
 function runContextInspectPromptSources(
   action: HeartWriteProjectActionSpec,
   input: HeartWriteProjectActionInput,
@@ -512,6 +603,8 @@ function runExportPackageCardBundle(
     getHeartWriteProjectActionSpec("runtime.auditContinuity"),
     input,
   );
+  const canonLedger = buildContinuityCanonLedgerForActionInput(input);
+  const canonLedgerIssues = auditContinuityCanonLedger(canonLedger);
   const targets = [
     {
       id: "ccv3-card-fields",
@@ -538,6 +631,12 @@ function runExportPackageCardBundle(
       reviewRequired: audit.issues.length > 0,
     },
     {
+      id: "continuity-canon-ledger",
+      label: "Continuity Canon Ledger",
+      tier: "runtime_context" as const,
+      reviewRequired: canonLedgerIssues.length > 0,
+    },
+    {
       id: "prompt-source-report",
       label: "Prompt Source Report",
       tier: "runtime_context" as const,
@@ -550,13 +649,16 @@ function runExportPackageCardBundle(
       "Confirm card fields contain only portable character truth.",
       "Review hidden lorebook entries before shipping target-specific overrides.",
       "Confirm scenario truth can be swapped without rewriting the card.",
+      "Review the continuity canon ledger for runtime-only state before export.",
       "Run continuity audit before export.",
     ],
   };
 
   return {
     action,
-    status: audit.issues.some((issue) => issue.severity === "error")
+    status:
+      audit.issues.some((issue) => issue.severity === "error") ||
+      canonLedgerIssues.length > 0
       ? "needs_review"
       : "ok",
     promptSafeSummary: `Prepared a bundle manifest with ${targets.length} export targets.`,
@@ -597,8 +699,24 @@ function runExportPackageCardBundle(
         separated.scenario,
         separated.scenario.settingTruths.length === 0,
       ),
+      createArtifact(
+        action.id,
+        "card-bundle-continuity-canon-ledger",
+        "Bundled Continuity Canon Ledger",
+        "continuity_canon_ledger",
+        "runtime_context",
+        canonLedger,
+        canonLedgerIssues.length > 0,
+      ),
     ],
-    issues: audit.issues,
+    issues: [
+      ...audit.issues,
+      ...canonLedgerIssues.map((issue) => ({
+        severity: issue.severity,
+        message: issue.message,
+        source: issue.field,
+      })),
+    ],
     nextActions: [],
   };
 }
@@ -654,6 +772,249 @@ function createArtifact<TData>(
   };
 }
 
+function buildContinuityCanonLedgerForActionInput(
+  input: HeartWriteProjectActionInput,
+): ContinuityCanonLedger {
+  const form = input.form ? parseCharacterCreationForm(input.form) : undefined;
+  const characterName = form?.identity.characterName.trim() || "Character";
+  const characterId = slugProjectId(characterName);
+  const baseLedger = input.narrativeRuntime
+    ? createContinuityCanonLedgerFromNarrativeRuntime(input.narrativeRuntime, {
+        id: input.continuityLedger?.id,
+        characterId,
+      })
+    : createContinuityCanonLedger({
+        id:
+          input.continuityLedger?.id ??
+          `canon-ledger:${characterId || "character"}`,
+        characterId,
+      });
+  const facts: CanonFact[] = [...baseLedger.facts];
+  const hardConstraints: CanonHardConstraint[] = [
+    ...baseLedger.hardConstraints,
+  ];
+  const memoryAnchors: CanonMemoryAnchor[] = [
+    ...baseLedger.memoryAnchors,
+  ];
+
+  if (input.continuityLedger) {
+    facts.push(...input.continuityLedger.facts);
+    hardConstraints.push(...input.continuityLedger.hardConstraints);
+    memoryAnchors.push(...input.continuityLedger.memoryAnchors);
+  }
+
+  if (form) {
+    const separated = compileCharacterCreationFormToTruthSeparatedOutputs(
+      form,
+      input.baseValues,
+    );
+    facts.push(
+      ...separated.storyLorebook.data.entries.map((entry, index) =>
+        createCanonFact({
+          id: `story-lorebook:${index + 1}`,
+          category: "relationship",
+          scope: entry.extensions.heartwriteai.hiddenFromUser
+            ? "runtime_context"
+            : "story_truth",
+          statement: entry.content,
+          sourceLabel: `Story Lorebook: ${entry.name}`,
+          reviewRequired: entry.extensions.heartwriteai.reviewRequired,
+          hiddenFromUser: entry.extensions.heartwriteai.hiddenFromUser,
+          promptVisibility: "review_required",
+          tags: entry.keys,
+        }),
+      ),
+      ...separated.scenario.settingTruths.map((truth, index) =>
+        createCanonFact({
+          id: `setting-truth:${index + 1}`,
+          category: "world",
+          scope: "setting_truth",
+          statement: truth,
+          sourceLabel: separated.scenario.title,
+          reviewRequired: false,
+          hiddenFromUser: false,
+          promptVisibility: "prompt_safe",
+          tags: ["setting_truth"],
+        }),
+      ),
+    );
+
+    hardConstraints.push(
+      ...form.characterEngine.decisionRules
+        .filter((rule) => rule.constraints.trim() || rule.question.trim())
+        .map((rule, index) => ({
+          id: rule.id.trim()
+            ? `engine-rule:${slugProjectId(rule.id)}`
+            : `engine-rule:${index + 1}`,
+          label: rule.drive.trim() || rule.question.trim() || `Decision Rule ${index + 1}`,
+          rule: [
+            rule.question.trim(),
+            rule.constraints.trim(),
+          ]
+            .filter(Boolean)
+            .join(" Constraint: "),
+          alternativeAction:
+            rule.alternativeAction.trim() ||
+            rule.visibleBehaviors.trim() ||
+            undefined,
+          source: {
+            tier: "character_truth" as const,
+            label: "Character Engine",
+            reviewRequired: false,
+            hiddenFromUser: false,
+          },
+          scope: "character_truth" as const,
+          tags: ["character_engine", "decision_rule"],
+          promptVisibility: "prompt_safe" as const,
+        })),
+    );
+  }
+
+  for (const [lorebookIndex, lorebook] of (input.activeLorebooks ?? []).entries()) {
+    for (const [entryIndex, entry] of lorebook.entries.entries()) {
+      facts.push(
+        createCanonFact({
+          id: `active-lorebook:${lorebookIndex + 1}:${entryIndex + 1}`,
+          category: "relationship",
+          scope: entry.hiddenFromUser ? "runtime_context" : "story_truth",
+          statement: entry.content,
+          sourceLabel: `${lorebook.name?.trim() || "Active Lorebook"}: ${
+            entry.name?.trim() || `Entry ${entryIndex + 1}`
+          }`,
+          reviewRequired: entry.reviewRequired ?? false,
+          hiddenFromUser: entry.hiddenFromUser ?? false,
+          promptVisibility: entry.reviewRequired
+            ? "review_required"
+            : "prompt_safe",
+          tags: entry.keys ?? [],
+        }),
+      );
+    }
+  }
+
+  for (const [index, note] of (input.runtimeNotes ?? []).entries()) {
+    memoryAnchors.push({
+      id: `runtime-note:${index + 1}`,
+      tier: "relationship_memory",
+      summary: note,
+      meaning: "Creator-supplied runtime note.",
+      stateImpact: "Use only as private continuity guidance.",
+      emotionalWeight: 55,
+      turn: baseLedger.currentTurn,
+      tags: ["runtime_note"],
+      pinned: false,
+      promptVisibility: "review_required",
+    });
+  }
+
+  return createContinuityCanonLedger({
+    ...baseLedger,
+    currentTurn: input.narrativeRuntime?.turn ?? baseLedger.currentTurn,
+    characterStates: [
+      ...baseLedger.characterStates,
+      ...(form
+        ? [
+            {
+              characterId,
+              displayName: characterName,
+              location:
+                form.lifestyle.residence.trim() ||
+                form.identity.birthplace.trim() ||
+                undefined,
+              mentalState:
+                form.psychology.baselineAffect.trim() ||
+                form.characterEngine.coreBelief.trim() ||
+                undefined,
+              currentGoal:
+                form.cognitiveDrivers.motivation.trim() ||
+                form.behaviour.goalOrientedActions.trim() ||
+                undefined,
+              knowledge: form.semanticSeedIds,
+              constraints: [
+                form.relationships.behavioralFriction.boundaries,
+                form.characterEngine.behavioralTriggers,
+              ]
+                .map((value) => value.trim())
+                .filter(Boolean),
+              updatedAtTurn: baseLedger.currentTurn,
+            },
+          ]
+        : []),
+    ],
+    relationshipStates: [
+      ...baseLedger.relationshipStates,
+      ...(form
+        ? [
+            {
+              id: `relationship:${characterId}:primary`,
+              participantIds: [characterName, "{{user}}"],
+              publicStatus:
+                form.relationships.affiliationCore.publicStatus.trim() ||
+                undefined,
+              privateStatus:
+                form.relationships.emotionalBonds.attachmentType.trim() ||
+                undefined,
+              stage: input.narrativeRuntime?.relationshipStage,
+              trustLevel:
+                form.relationships.emotionalBonds.trustMetric.trim() ||
+                undefined,
+              tensionLevel:
+                form.relationships.behavioralFriction.ideologicalClash.trim() ||
+                undefined,
+              openLoops: [
+                form.relationships.emotionalBonds.sharedHistoryAnchor,
+                form.relationships.behavioralFriction.microAggressionsOrTells,
+              ]
+                .map((value) => value.trim())
+                .filter(Boolean),
+              boundaries: [
+                form.relationships.behavioralFriction.boundaries,
+              ]
+                .map((value) => value.trim())
+                .filter(Boolean),
+              updatedAtTurn: baseLedger.currentTurn,
+            },
+          ]
+        : []),
+    ],
+    facts,
+    memoryAnchors,
+    hardConstraints,
+    tags: ["continuity_canon", ...baseLedger.tags],
+  });
+}
+
+function createCanonFact(input: {
+  id: string;
+  category: CanonFact["category"];
+  scope: CanonFact["scope"];
+  statement: string;
+  sourceLabel: string;
+  reviewRequired: boolean;
+  hiddenFromUser: boolean;
+  promptVisibility: CanonFact["promptVisibility"];
+  tags: readonly string[];
+}): CanonFact {
+  return {
+    id: input.id,
+    category: input.category,
+    scope: input.scope,
+    statement: input.statement,
+    source: {
+      tier: input.scope,
+      label: input.sourceLabel,
+      reviewRequired: input.reviewRequired,
+      hiddenFromUser: input.hiddenFromUser,
+    },
+    evidence: [],
+    tags: [...input.tags],
+    active: input.statement.trim().length > 0,
+    confidence: 80,
+    promptVisibility: input.promptVisibility,
+    hiddenFromUser: input.hiddenFromUser,
+  };
+}
+
 function buildContextSourceSummaries(
   input: HeartWriteProjectActionInput,
 ): HeartWriteContextSourceSummary[] {
@@ -705,6 +1066,20 @@ function buildContextSourceSummaries(
       reviewRequired: true,
       hiddenFromUser: true,
       reason: "Internal runtime notes need review before export.",
+    });
+  }
+
+  if (input.continuityLedger) {
+    sources.push({
+      id: "continuity-canon-ledger",
+      tier: "runtime_context",
+      label: "Continuity Canon Ledger",
+      tokenEstimate: estimateTokens(JSON.stringify(input.continuityLedger)),
+      reviewRequired:
+        auditContinuityCanonLedger(input.continuityLedger).length > 0,
+      hiddenFromUser: true,
+      reason:
+        "Compiled continuity canon for character state, relationship history, timeline anchors, facts, and constraints.",
     });
   }
 
@@ -778,4 +1153,13 @@ function addScenarioSource(
 
 function estimateTokens(text: string): number {
   return Math.max(1, Math.ceil(text.trim().length / 4));
+}
+
+function slugProjectId(value: string): string {
+  return value
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9{}]+/g, "-")
+    .replace(/^-+|-+$/g, "") || "character";
 }

@@ -92,6 +92,8 @@ export function buildCharacterGenPrompt(
     ...negativePromptContentRatingLines(options.contentRating, useDefaultNegativePrompt),
     ...povRuleLines(),
     "",
+    ...characterArchitectureQualityLines(options.contentRating),
+    "",
     "FIELD LENGTH & STRUCTURE PRESET (MANDATORY):",
     ...buildFieldDetailLines(options.fieldDetail, CARD_TEXT_FIELD_KEYS),
     "",
@@ -133,6 +135,8 @@ export function buildCharacterGenPromptTagged(
     ...negativePromptContentRatingLines(options.contentRating, useDefaultNegativePrompt),
     ...povRuleLines(),
     "",
+    ...characterArchitectureQualityLines(options.contentRating),
+    "",
     "FIELD LENGTH & STRUCTURE PRESET (MANDATORY):",
     ...buildFieldDetailLines(options.fieldDetail, CARD_TEXT_FIELD_KEYS),
     "",
@@ -167,6 +171,8 @@ export function buildFillMissingPrompt(
     "- Use standard JSON escaping for newlines (\\n). No trailing commas.",
     "- mes_example must use {{user}} and {{char}} labels if requested.",
     ...povRuleLines(),
+    "",
+    ...characterArchitectureRepairLines(),
     "",
     "FIELD LENGTH & STRUCTURE PRESET (MANDATORY):",
     ...buildFieldDetailLines(options.fieldDetail, missingFieldKeys),
@@ -238,6 +244,8 @@ export function buildRegeneratePrompt(
     input.regenNonce ?? "(none)",
     "",
     ...povRuleLines(),
+    "",
+    ...characterArchitectureRepairLines(),
     "",
     "FIELD LENGTH & STRUCTURE PRESET (MANDATORY):",
     ...buildFieldDetailLines(options.fieldDetail, targetFieldKeys),
@@ -345,6 +353,39 @@ function povRuleLines() {
     "- first: {{char}} speaks in first person.",
     "- second: address {{user}} in second person without controlling their actions.",
     "- third: write in third person, acknowledge {{user}} presence without controlling them.",
+  ];
+}
+
+function characterArchitectureQualityLines(
+  contentRating: CharacterGenContentRating,
+) {
+  return [
+    "CHARACTER ARCHITECTURE QUALITY BAR (MANDATORY):",
+    "- Build a portable behavioral architecture, not a one-scene roleplay profile.",
+    "- Use the structured input to plan, but write final model-facing card fields as compact natural prose.",
+    "- Avoid markdown headings, schema labels, and category headers in final prompt-facing character text unless a field truly needs a list.",
+    "- Separate immutable character truth from story truth and setting truth.",
+    "- description/personality should carry stable identity, immutable physical traits, behavioral laws, psychology, cognition, relationship defaults, and speech laws.",
+    "- scenario should carry replaceable current situation, setting, plot pressure, and any {{user}} relationship premise supplied by the brief.",
+    "- Avoid personality labels by themselves; convert each label into a rule that explains what causes the behavior.",
+    "- Use cause/effect logic: When [event or pressure] -> generated behavior, visible signal, hidden need, and recovery path.",
+    "- If a rule says the character cannot, does not, should not, or must not do something, state the alternative action they use instead.",
+    "- Keep named NPC dependencies, unsupported shared history, timeline secrets, and setting-only facts out of portable character truth.",
+    "- Speech should be defined through voice causes: pace, rhythm, vocabulary, syntax, restraint, disfluency, and stress shifts.",
+    contentRating === "sfw"
+      ? "- SFW mode: do not generate explicit sexuality, erotic anatomy, kink, or adult-only presentation."
+      : "- NSFW allowed mode: sexuality must still emerge from psychology, consent, boundaries, safety needs, and trust; do not create random preference lists.",
+  ];
+}
+
+function characterArchitectureRepairLines() {
+  return [
+    "CHARACTER ARCHITECTURE CONSISTENCY:",
+    "- Preserve the split between portable character truth, story truth, and setting truth.",
+    "- Keep model-facing text flattened into prose; do not add new markdown headings or schema labels unless the existing field already uses them.",
+    "- Keep immutable identity and behavioral laws stable unless the requested field explicitly asks to rewrite them.",
+    "- Do not smuggle unsupported {{user}} relationship facts, named NPC dependencies, timeline secrets, or setting-only facts into portable character truth.",
+    "- If adding a constraint, include the alternative action the character uses instead.",
   ];
 }
 

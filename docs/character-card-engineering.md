@@ -190,6 +190,154 @@ Tier 4: Setting Truth
 This stops the card from describing one timeline and makes it describe the
 system that generates the character across many timelines.
 
+## Character Architecture Generation Prompt
+
+The character-generation prompt should not ask the model to write a pretty
+roleplay profile first. It should ask for a portable behavioral architecture:
+the stable source code that generates the character across many scenes.
+
+The prompt should therefore prefer:
+
+- immutable character laws over personality labels
+- cause-based psychology over decorative backstory
+- stable physical traits over scene-specific styling
+- speech laws over repeated catchphrases
+- event-processing rules over vague mood descriptions
+- replacement actions whenever a constraint forbids an action
+
+For example:
+
+```text
+Weak: {{char}} is loyal and protective.
+
+Stronger:
+Once a person is classified as safe, {{char}} evaluates threats to them under a
+different standard than threats to strangers. Protection must respect consent;
+if help is not requested, {{char}} stays nearby, watches the room, and offers a
+clear exit instead of taking control.
+```
+
+The generation prompt should also enforce truth placement:
+
+```text
+Portable character truth -> card fields and character engine
+Story-specific truth -> lorebook or runtime canon ledger
+Setting truth -> scenario
+Opening prose -> first_mes only
+```
+
+Adult-only character material follows the same rule. It should be generated
+from psychology, trust, safety needs, consent style, shame, confidence, and
+boundaries. It should not become a random preference list, and it should not be
+included at all unless adult field mode is explicitly enabled for adult
+fictional characters.
+
+## Human View vs LLM View
+
+The creator UI and the model prompt should not use the same formatting.
+
+The human view should stay structured:
+
+```text
+Identity
+Psychology
+Character Engine
+Runtime
+Scene Directives
+Response
+```
+
+Tabs, headings, labels, collapsible fields, and clean categories help humans
+edit complex characters without losing the plot.
+
+The LLM view should be flattened. Headings and schema labels usually cost
+tokens without improving behavior once the compiler already knows what each
+source means. Model-facing output should read like compact executable prose:
+
+```text
+Levi Hayes notices exits before he notices decor.
+
+When someone vulnerable is being harmed, remaining passive creates immediate
+internal discomfort. He intervenes first with words, then with presence, and
+only uses force when other options have failed.
+
+During conflict, Levi becomes quieter rather than louder. He attempts
+conversation first. If violence becomes necessary, he ends it quickly.
+```
+
+The compiler rule is:
+
+```text
+Structured data for editing.
+Flattened prose for prompting.
+Beautiful headings for humans.
+No unnecessary headings for the LLM.
+```
+
+This makes debugging easier. If behavior breaks, ask which layer generated the
+problem:
+
+- identity or psychology if the person feels wrong
+- character engine if the reaction logic feels wrong
+- runtime if the relationship or scene state feels wrong
+- scene directives if the immediate response shape feels wrong
+- writing layer if the prose, POV, or agency handling feels wrong
+
+## Cause Chain Intake
+
+The app can reduce creator friction by asking for causal material once and
+routing it into the right layer automatically:
+
+```text
+What happened?
+-> Biography / Writer Bible
+
+What belief did this create?
+-> Psychology
+
+How does that belief affect decisions?
+-> Character Engine
+```
+
+The important boundary is that the formative event itself does not need to
+become prompt-facing law. It can stay in the Writer Bible as human-readable
+biography or source context. The belief becomes the durable psychological
+truth. The decision effect becomes executable behavior.
+
+Example:
+
+```text
+What happened?
+During a childhood evacuation, she learned that exits mattered more than
+promises.
+
+What belief did this create?
+Safety depends on knowing the way out before anyone panics.
+
+How does that belief affect decisions?
+She chooses routes with exits, keeps spare plans, and resists being trapped in
+one option.
+```
+
+Compiled placement:
+
+```text
+Writer Bible:
+During a childhood evacuation, she learned that exits mattered more than
+promises.
+
+Psychology:
+Safety depends on knowing the way out before anyone panics.
+
+Character Engine:
+When the current situation activates this belief, she chooses routes with exits,
+keeps spare plans, and resists being trapped in one option. When blocked, she
+names the exit, offers a choice, and lets the other person move first.
+```
+
+This preserves the cause without forcing the model to repeat biography as
+exposition every time the behavior appears.
+
 ## Writer Bible vs Character Engine
 
 HeartWriteAI now treats creator-facing character documentation and model-facing
@@ -228,12 +376,11 @@ repeatable cognition:
 Decision rules should be written as event-processing logic:
 
 ```text
-Drive: Protection
-Question: Does the other person request help?
-YES: Protect with explicit consent and shared control.
-NO: Observe and stay available without taking over.
-Constraint: Do not override autonomy to make the character feel safer.
-Alternative action: Ask before touching; offer a practical exit route.
+Protection asks, "Does the other person request help?"
+If the answer is yes, protect with explicit consent and shared control.
+If the answer is no, observe and stay available without taking over.
+Do not override autonomy to make the character feel safer.
+When blocked, ask before touching and offer a practical exit route.
 ```
 
 The alternative action is required whenever a rule says the character cannot,
@@ -271,6 +418,10 @@ Current project actions:
 - `runtime.auditContinuity`
   - checks whether compiled outputs respect the character, story, setting, and
     runtime boundaries
+- `runtime.compileCanonLedger`
+  - compiles character state, relationship state, known facts, timeline anchors,
+    memory anchors, plotlines, and hard constraints into one reviewable runtime
+    canon ledger
 - `context.inspectPromptSources`
   - summarizes which card, lorebook, scenario, runtime, and recent-chat sources
     would feed a prompt
@@ -282,6 +433,41 @@ These actions are not user-facing prompt text. They are internal compiler
 commands. Their job is to keep the system honest: character laws stay in the
 card, story facts move to lorebooks, setting facts move to scenarios, and
 runtime inspection stays prompt-safe.
+
+## Continuity Canon Ledger
+
+The continuity canon ledger is the first durable runtime container for the
+material that should affect future turns without being baked permanently into a
+portable character card.
+
+It stores:
+
+- character state
+- relationship state
+- known facts
+- timeline anchors
+- open plotlines
+- memory anchors
+- hard constraints and replacement actions
+
+This layer answers: what has become true in this project or session, and how
+should it affect the next generation pass?
+
+The ledger is deliberately separate from the Writer Bible and the Character
+Engine. The Writer Bible stays human-facing. The Character Engine describes the
+portable system that generates behavior. The canon ledger stores evolving
+runtime continuity: what happened, what it meant, what remains unresolved, what
+must not be contradicted, and what the model should do instead when a constraint
+blocks an action.
+
+Prompt projection from the ledger must stay compact and prompt-safe:
+
+- expose prose guidance, not internal IDs
+- expose qualitative state, not raw scores
+- keep review-required facts out of default prompt context
+- include replacement actions for physical, protocol, ethical, or behavioral
+  constraints
+- never treat the ledger as a replacement for user agency
 
 ## Lorebook Intelligence Layer
 

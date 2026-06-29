@@ -73,30 +73,54 @@ export function compileCharacterEngineForRuntime(
   form: CharacterCreationForm,
 ): string {
   const engine = form.characterEngine;
+  const decisionRules = engine.decisionRules
+    .map((rule, index) =>
+      compileCharacterEngineDecisionRuleForRuntime(rule, index),
+    )
+    .filter(Boolean);
 
-  return createSections([
-    createSection("Character Engine", [
-      createLine("Core Wound", engine.coreWound),
-      createLine("Core Belief", engine.coreBelief),
-      createLine("Core Fear", engine.coreFear),
-      createLine("Primary Drive", engine.primaryDrive),
-    ]),
-    createSection(
-      "Decision Rules",
-      engine.decisionRules
-        .map((rule, index) => compileCharacterEngineDecisionRule(rule, index))
-        .filter(Boolean),
+  return createPromptParagraph([
+    createPromptSentence(
+      engine.coreWound,
+      (value) => `${value} remains part of the character's emotional operating system.`,
     ),
-    createSection("Defense & Attachment", [
-      createLine("Defense Mechanisms", engine.defenseMechanisms),
-      createLine("Attachment Style", engine.attachmentStyle),
-      createLine("Behavioral Triggers", engine.behavioralTriggers),
-    ]),
-    createSection("Relationship & Expression", [
-      createLine("Relationship Dynamics", engine.relationshipDynamics),
-      createLine("Speech Rules", engine.speechRules),
-      createLine("Sexuality Rules", engine.sexualityRules),
-    ]),
+    createPromptSentence(
+      engine.coreBelief,
+      (value) => `The character believes ${lowercaseFirst(value)}`,
+    ),
+    createPromptSentence(
+      engine.coreFear,
+      (value) => `${value} is one of the character's central fears.`,
+    ),
+    createPromptSentence(
+      engine.primaryDrive,
+      (value) => `${value} drives the character's choices when pressure rises.`,
+    ),
+    ...decisionRules,
+    createPromptSentence(
+      engine.defenseMechanisms,
+      (value) => `Under stress, the character tends to use ${lowercaseFirst(value)}`,
+    ),
+    createPromptSentence(
+      engine.attachmentStyle,
+      (value) => `Attachment forms through ${lowercaseFirst(value)}`,
+    ),
+    createPromptSentence(
+      engine.behavioralTriggers,
+      (value) => `${value} can shift the character's behavior quickly.`,
+    ),
+    createPromptSentence(
+      engine.relationshipDynamics,
+      (value) => `Relationships tend to organize around ${lowercaseFirst(value)}`,
+    ),
+    createPromptSentence(
+      engine.speechRules,
+      (value) => `Speech follows this rule: ${lowercaseFirst(value)}`,
+    ),
+    createPromptSentence(
+      engine.sexualityRules,
+      (value) => `Intimacy follows this rule: ${lowercaseFirst(value)}`,
+    ),
   ]);
 }
 
@@ -116,6 +140,38 @@ export function compileCharacterEngineDecisionRule(
   ].filter(Boolean);
 
   return lines.length > 0 ? `${label}:\n${lines.join("\n")}` : "";
+}
+
+export function compileCharacterEngineDecisionRuleForRuntime(
+  rule: CharacterEngineDecisionRule,
+  index = 0,
+): string {
+  const drive = normalizeWhitespace(rule.drive);
+  const question = normalizeWhitespace(rule.question);
+  const yes = normalizeWhitespace(rule.yes);
+  const no = normalizeWhitespace(rule.no);
+  const constraints = normalizeWhitespace(rule.constraints);
+  const visibleBehaviors = normalizeWhitespace(rule.visibleBehaviors);
+  const alternativeAction = normalizeWhitespace(rule.alternativeAction);
+  const label = normalizeWhitespace(rule.id) || `decision rule ${index + 1}`;
+  const parts = [
+    drive && question
+      ? `${drive} asks, "${stripTerminalPunctuation(question)}?"`
+      : drive || question,
+    yes ? `If the answer is yes, ${lowercaseFirst(yes)}` : "",
+    no ? `If the answer is no, ${lowercaseFirst(no)}` : "",
+    constraints ? `This is constrained by ${lowercaseFirst(constraints)}` : "",
+    visibleBehaviors
+      ? `This shows through ${lowercaseFirst(visibleBehaviors)}`
+      : "",
+    alternativeAction
+      ? `When blocked, the character should ${lowercaseFirst(alternativeAction)}`
+      : "",
+  ].filter(Boolean);
+
+  return parts.length
+    ? ensureSentence(parts.join(" "))
+    : `${label} is present but needs more behavioral detail.`;
 }
 
 export function findCharacterEngineDecisionRuleIssues(
@@ -165,6 +221,36 @@ function createLine(label: string, value: string): string {
   const trimmedValue = normalizeWhitespace(value);
 
   return trimmedValue ? `- ${label}: ${trimmedValue}` : "";
+}
+
+function createPromptParagraph(lines: string[]): string {
+  return lines.filter(Boolean).join("\n");
+}
+
+function createPromptSentence(
+  value: string,
+  format: (value: string) => string,
+): string {
+  const trimmedValue = normalizeWhitespace(value);
+
+  return trimmedValue ? ensureSentence(format(trimmedValue)) : "";
+}
+
+function ensureSentence(value: string): string {
+  const trimmedValue = normalizeWhitespace(value);
+
+  if (!trimmedValue) return "";
+  return /[.!?]"?$/.test(trimmedValue) ? trimmedValue : `${trimmedValue}.`;
+}
+
+function lowercaseFirst(value: string): string {
+  return value.replace(/^(\s*)([A-Z])/, (_match, prefix, letter: string) =>
+    `${prefix}${letter.toLowerCase()}`,
+  );
+}
+
+function stripTerminalPunctuation(value: string): string {
+  return value.replace(/[.!?]+$/g, "").trim();
 }
 
 function normalizeWhitespace(value: string): string {

@@ -4,6 +4,9 @@ import test from "node:test";
 import {
   compileChatPrompt,
 } from "../../lib/character-card/promptRuntime";
+import {
+  createContinuityCanonLedger,
+} from "../../lib/continuityCanonLedger";
 import { NarrativeRuntimeStateSchema } from "../../lib/narrativeEngine";
 import {
   compileNarrativeRuntimePromptContext,
@@ -255,4 +258,45 @@ test("chat prompt compiler can include narrative runtime context", () => {
   assert.match(compiled.contextBlock, /\[NARRATIVE RUNTIME\]/);
   assert.match(compiled.contextBlock, /Reluctant partners/);
   assert.match(compiled.contextBlock, /\[RECENT CHAT\]/);
+});
+
+test("chat prompt compiler can include continuity canon context", () => {
+  const ledger = createContinuityCanonLedger({
+    characterId: "mara",
+    facts: [
+      {
+        id: "fact:promise",
+        category: "relationship",
+        scope: "story_truth",
+        statement: "Mara remembers the promise made at the clinic door.",
+        source: {
+          tier: "story_truth",
+          label: "Canon Ledger Test",
+          reviewRequired: false,
+          hiddenFromUser: false,
+        },
+        evidence: [],
+        tags: ["promise"],
+        active: true,
+        confidence: 80,
+        promptVisibility: "prompt_safe",
+        hiddenFromUser: false,
+      },
+    ],
+  });
+
+  const compiled = compileChatPrompt({
+    appSystemPrompt: "Write the next reply.",
+    card: {
+      data: {
+        name: "Mara",
+        description: "A guarded medic.",
+      },
+    },
+    continuityCanonLedger: ledger,
+  });
+
+  assert.match(compiled.contextBlock, /\[CONTINUITY CANON\]/);
+  assert.match(compiled.contextBlock, /clinic door/);
+  assert.doesNotMatch(compiled.contextBlock, /fact:promise/);
 });

@@ -8,6 +8,7 @@ import {
   HeartWriteContextSourceSummary,
   runHeartWriteProjectAction,
 } from "../../lib/character-card/heartwriteProjectActionBus";
+import type { ContinuityCanonLedger } from "../../lib/continuityCanonLedger";
 import {
   createEmptyCharacterCreationForm,
 } from "../../lib/character-card/characterCreationFormCompiler";
@@ -20,6 +21,7 @@ test("registers a compact HeartWriteAI project action bus", () => {
       "lorebook.promoteStoryTruth",
       "scenario.compileSettingTruth",
       "runtime.auditContinuity",
+      "runtime.compileCanonLedger",
       "context.inspectPromptSources",
       "export.packageCardBundle",
     ],
@@ -95,6 +97,26 @@ test("audits continuity boundaries across card, lorebook, scenario, and runtime 
   assert.equal(audit.issues.length, 0);
 });
 
+test("compiles a continuity canon ledger from separated project truth", () => {
+  const result = runHeartWriteProjectAction("runtime.compileCanonLedger", {
+    form: createActionBusExampleForm(),
+  });
+  const ledger = result.artifacts[0]?.data as ContinuityCanonLedger;
+
+  assert.equal(result.status, "ok");
+  assert.equal(result.artifacts[0]?.kind, "continuity_canon_ledger");
+  assert.equal(result.artifacts[0]?.tier, "runtime_context");
+  assert.ok(ledger.facts.some((fact) => /harbor city/i.test(fact.statement)));
+  assert.ok(
+    ledger.facts.some((fact) => /auction scandal/i.test(fact.statement)),
+  );
+  assert.ok(
+    ledger.relationshipStates.some((state) =>
+      state.participantIds.includes("Avery Vale"),
+    ),
+  );
+});
+
 test("reports prompt sources without requiring every section to know every artifact", () => {
   const result = runHeartWriteProjectAction("context.inspectPromptSources", {
     form: createActionBusExampleForm(),
@@ -159,12 +181,13 @@ test("packages export targets as a reviewable card bundle manifest", () => {
       "story-lorebook-v3",
       "scenario-truth",
       "continuity-audit",
+      "continuity-canon-ledger",
       "prompt-source-report",
     ],
   );
   assert.ok(
     manifest.reviewChecklist.some((item) =>
-      /portable character truth/i.test(item),
+      /continuity canon ledger/i.test(item),
     ),
   );
 });

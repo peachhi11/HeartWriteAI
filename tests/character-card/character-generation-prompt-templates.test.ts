@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  HEARTWRITE_ADULT_CHARACTER_ARCHITECTURE_PROMPT,
+  HEARTWRITE_CHARACTER_ARCHITECTURE_PROMPT,
   HEARTWRITE_CHARACTER_GENERATION_CARD_PROMPT,
   HEARTWRITE_CHARACTER_GENERATION_OPENING_PROMPT,
   HEARTWRITE_CHARACTER_GENERATION_SCENARIO_PROMPT,
@@ -25,6 +27,64 @@ test("defines a CCv3-ready character generation prompt without legacy source-cou
   assert.match(HEARTWRITE_CHARACTER_GENERATION_CARD_PROMPT, /post_history_instructions/);
   assert.doesNotMatch(HEARTWRITE_CHARACTER_GENERATION_CARD_PROMPT, /Use exactly four different sources/);
   assert.doesNotMatch(HEARTWRITE_CHARACTER_GENERATION_CARD_PROMPT, /fandom\.com/);
+});
+
+test("defines portable character architecture guidance for card generation", () => {
+  assert.match(
+    HEARTWRITE_CHARACTER_ARCHITECTURE_PROMPT,
+    /portable behavioral architecture/,
+  );
+  assert.match(
+    HEARTWRITE_CHARACTER_ARCHITECTURE_PROMPT,
+    /write model-facing card fields as compact natural prose/,
+  );
+  assert.match(
+    HEARTWRITE_CHARACTER_ARCHITECTURE_PROMPT,
+    /Avoid markdown headings, schema labels, and category headers/,
+  );
+  assert.match(
+    HEARTWRITE_CHARACTER_ARCHITECTURE_PROMPT,
+    /Separate immutable character truth from story truth and setting truth/,
+  );
+  assert.match(
+    HEARTWRITE_CHARACTER_ARCHITECTURE_PROMPT,
+    /Avoid personality labels by themselves/,
+  );
+  assert.match(
+    HEARTWRITE_CHARACTER_ARCHITECTURE_PROMPT,
+    /When \[cause\] -> effect: \[generated behavior\]/,
+  );
+  assert.match(
+    HEARTWRITE_CHARACTER_ARCHITECTURE_PROMPT,
+    /do not leave labels like Core Fear, Current Relationship State, or Conflict Engine/,
+  );
+  assert.match(
+    HEARTWRITE_CHARACTER_ARCHITECTURE_PROMPT,
+    /include what they do instead/,
+  );
+  assert.match(
+    HEARTWRITE_CHARACTER_ARCHITECTURE_PROMPT,
+    /\{\{user\}\} may appear as a roleplay placeholder/,
+  );
+});
+
+test("defines adult-only architecture as psychological and consent-bound", () => {
+  assert.match(
+    HEARTWRITE_ADULT_CHARACTER_ARCHITECTURE_PROMPT,
+    /Sexuality is treated as part of psychology/,
+  );
+  assert.match(
+    HEARTWRITE_ADULT_CHARACTER_ARCHITECTURE_PROMPT,
+    /clearly adult fictional characters/,
+  );
+  assert.match(
+    HEARTWRITE_ADULT_CHARACTER_ARCHITECTURE_PROMPT,
+    /consent boundaries/,
+  );
+  assert.match(
+    HEARTWRITE_ADULT_CHARACTER_ARCHITECTURE_PROMPT,
+    /when adult field mode is off/,
+  );
 });
 
 test("keeps scenario generation instructional and separate from the opening scene", () => {
@@ -128,7 +188,10 @@ test("compiles default generation prompt with explicit non-NSFW adult field boun
 
   assert.match(prompt, /Source mode: use only the provided character brief/);
   assert.match(prompt, /Adult field mode: omit explicit anatomy/);
+  assert.match(prompt, /Adult architecture mode: keep sexuality non-explicit/);
   assert.match(prompt, /Generate a CCv3-ready/);
+  assert.match(prompt, /portable behavioral architecture/);
+  assert.match(prompt, /source code that generates a person/);
   assert.match(prompt, /Write the scenario field/);
   assert.match(prompt, /Write \{\{char\}\}'s starting message/);
   assert.doesNotMatch(prompt, /adult-only NSFW details may be generated/);
@@ -143,6 +206,8 @@ test("compiles research-note and adult-only variants only when requested", () =>
 
   assert.match(prompt, /Source mode: use supplied research notes as evidence/);
   assert.match(prompt, /adult-only NSFW details may be generated when explicitly supported/);
+  assert.match(prompt, /Adult-only character architecture/);
+  assert.match(prompt, /Sexuality is treated as part of psychology/);
   assert.match(prompt, /Do not force binary anatomy assumptions/);
   assert.doesNotMatch(prompt, /Write the scenario field/);
   assert.doesNotMatch(prompt, /Write \{\{char\}\}'s starting message/);

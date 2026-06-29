@@ -1,6 +1,7 @@
 import { APPEARANCE_PRESETS } from "./appearancePresets";
 import { BACKSTORY_EVENT_PRESETS } from "./backstoryEventPresets";
 import { CARD_METADATA_TAXONOMY_PRESETS } from "./cardMetadataTaxonomyPresets";
+import { CHARACTER_ARCHETYPE_PRESETS } from "./characterArchetypePresets";
 import { COGNITIVE_DRIVER_PRESETS } from "./cognitiveDriverPresets";
 import { DESCRIPTIVE_WRITING_SEEDS } from "./descriptiveWritingSeedPresets";
 import { GENRE_SETTING_PACK_PRESETS } from "./genreSettingPackPresets";
@@ -28,6 +29,7 @@ export type SeedPresetRegistrySourceId =
   | "appearance"
   | "backstory-event"
   | "card-metadata-taxonomy"
+  | "character-archetype"
   | "cognitive-driver"
   | "descriptive-writing"
   | "genre-setting-pack"
@@ -102,6 +104,13 @@ export const SEED_PRESET_REGISTRY_SOURCES = Object.freeze([
     label: "Descriptive Writing",
     description: "Concrete prose texture for appearance, emotion, personality, body language, and speech.",
     presets: DESCRIPTIVE_WRITING_SEEDS.filter((seed) => seed.lane === "appearance"),
+  },
+  {
+    id: "character-archetype",
+    lane: "personality",
+    label: "Character Archetype",
+    description: "Broad character archetypes with behavioral rules, emotional defenses, dialogue pressure, romance hooks, and growth-safe routing.",
+    presets: CHARACTER_ARCHETYPE_PRESETS,
   },
   {
     id: "personality-engine",

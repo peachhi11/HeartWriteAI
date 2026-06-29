@@ -4,6 +4,7 @@ import test from "node:test";
 import { APPEARANCE_PRESETS } from "../../data/appearancePresets";
 import { BACKSTORY_EVENT_PRESETS } from "../../data/backstoryEventPresets";
 import { CARD_METADATA_TAXONOMY_PRESETS } from "../../data/cardMetadataTaxonomyPresets";
+import { CHARACTER_ARCHETYPE_PRESETS } from "../../data/characterArchetypePresets";
 import { COGNITIVE_DRIVER_PRESETS } from "../../data/cognitiveDriverPresets";
 import { DESCRIPTIVE_WRITING_SEEDS } from "../../data/descriptiveWritingSeedPresets";
 import { GENRE_SETTING_PACK_PRESETS } from "../../data/genreSettingPackPresets";
@@ -60,6 +61,7 @@ test("collects high-level seed lanes from shared preset modules", () => {
   assert.equal(
     getSeedPresetRegistryEntriesByLane("personality").length,
     PERSONALITY_ENGINE_VOCABULARY_PRESETS.length +
+      CHARACTER_ARCHETYPE_PRESETS.length +
       MENTAL_EMOTIONAL_PATTERN_PRESETS.length +
       PERSONALITY_TYPOLOGY_PRESETS.length +
       COGNITIVE_DRIVER_PRESETS.length +
@@ -125,6 +127,12 @@ test("keeps source and registry keys stable and unique", () => {
   );
   assert.equal(
     SEED_PRESET_REGISTRY_SOURCE_COUNTS[
+      "personality:character-archetype"
+    ],
+    CHARACTER_ARCHETYPE_PRESETS.length,
+  );
+  assert.equal(
+    SEED_PRESET_REGISTRY_SOURCE_COUNTS[
       "personality:moral-framework-vocabulary"
     ],
     MORAL_FRAMEWORK_VOCABULARY_REGISTRY_PRESETS.length,
@@ -162,6 +170,10 @@ test("finds registry entries by key or source id without each form knowing modul
     "cognitive-driver",
     "cognitive_driver_internal_belief_everyone_leaves",
   );
+  const characterArchetype = findSeedPresetRegistryEntryById(
+    "character-archetype",
+    "character_archetype_tsundere",
+  );
   const moralFramework = findSeedPresetRegistryEntryById(
     "moral-framework-vocabulary",
     "moral_framework_vocabulary_mercy_ethics",
@@ -184,6 +196,9 @@ test("finds registry entries by key or source id without each form knowing modul
   assert.equal(typology?.value, "INFJ advocate");
   assert.equal(cognitiveDriver?.lane, "personality");
   assert.equal(cognitiveDriver?.value, "everyone leaves");
+  assert.equal(characterArchetype?.lane, "personality");
+  assert.equal(characterArchetype?.value, "Tsundere");
+  assert.match(characterArchetype?.guidance ?? "", /Defensive sharpness/);
   assert.equal(moralFramework?.lane, "personality");
   assert.equal(moralFramework?.value, "Mercy Ethics");
   assert.equal(moralFramework?.triggerKeys.includes("redemption_romance"), true);

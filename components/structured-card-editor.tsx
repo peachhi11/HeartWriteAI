@@ -37,6 +37,15 @@ import {
   parseCharacterCreationForm,
 } from "@/lib/character-card/characterCreationFormCompiler";
 import {
+  applyCharacterCauseChainToCharacterCreationForm,
+  type CharacterCauseChainInput,
+} from "@/lib/character-card/characterCauseChainCompiler";
+import {
+  createCharacterCreationNpcMiniProfile,
+  NPC_MINI_PROFILE_TYPE_LABELS,
+  NPC_MINI_PROFILE_TYPES,
+} from "@/lib/character-card/characterCreationNpcProfiles";
+import {
   applySeedPickerEntryToCharacterCreationForm,
   readCharacterCreationFormTextPath,
   updateCharacterCreationFormPath,
@@ -114,6 +123,7 @@ import {
 import { AppMacroExtensions } from "@/types/character-card/AppMacroExtensions";
 import {
   CharacterCreationForm,
+  type CharacterCreationNpcProfileType,
   HEARTWRITE_CHARACTER_ENGINE_EXTENSION_KEY,
   HEARTWRITE_CHARACTER_CREATION_EXTENSION_KEY,
   HEARTWRITE_WRITER_BIBLE_EXTENSION_KEY,
@@ -763,6 +773,31 @@ const CHARACTER_CREATION_FORM_FIELD_GROUPS: Array<{
       },
     ],
   },
+];
+const NPC_MINI_PROFILE_FIELDS: Array<{
+  key: Exclude<
+    keyof CharacterCreationForm["npcNetwork"]["miniProfiles"][number],
+    "profileType"
+  >;
+  kind?: "input" | "textarea";
+  label: string;
+}> = [
+  { key: "name", label: "Name" },
+  { key: "role", label: "Role / Web Position" },
+  {
+    key: "relationshipToCharacter",
+    label: "Relationship to Character",
+    kind: "textarea",
+  },
+  { key: "publicRole", label: "Public Role" },
+  { key: "privateHistory", label: "Private History", kind: "textarea" },
+  { key: "storyFunction", label: "Story Function", kind: "textarea" },
+  { key: "emotionalPressure", label: "Emotional Pressure", kind: "textarea" },
+  { key: "behaviorShift", label: "Behavior Shift", kind: "textarea" },
+  { key: "conflictHook", label: "Conflict Hook", kind: "textarea" },
+  { key: "supportHook", label: "Support Hook", kind: "textarea" },
+  { key: "boundaries", label: "Boundaries / Use Rules", kind: "textarea" },
+  { key: "lorebookKeys", label: "Lorebook Keys", kind: "textarea" },
 ];
 const CHARACTER_CREATION_ADULT_ANATOMY_FIELDS: CharacterCreationFormTextField[] =
   [
@@ -1794,6 +1829,12 @@ export default function StructuredCardEditor({
     );
   }
 
+  function applyCharacterCauseChain(input: CharacterCauseChainInput) {
+    updateCharacterCreationForm(
+      applyCharacterCauseChainToCharacterCreationForm(characterCreationForm, input),
+    );
+  }
+
   function addCharacterCreationTargetOverride() {
     updateCharacterCreationForm({
       ...characterCreationForm,
@@ -1816,6 +1857,37 @@ export default function StructuredCardEditor({
           characterCreationForm.relationships.targetOverrides.filter(
             (_override, overrideIndex) => overrideIndex !== index,
           ),
+      },
+    });
+  }
+
+  function addCharacterCreationNpcMiniProfile(
+    profileType: CharacterCreationNpcProfileType,
+  ) {
+    updateCharacterCreationForm({
+      ...characterCreationForm,
+      npcNetwork: {
+        ...characterCreationForm.npcNetwork,
+        miniProfiles: [
+          ...characterCreationForm.npcNetwork.miniProfiles,
+          createCharacterCreationNpcMiniProfile({
+            characterName: characterCreationForm.identity.characterName,
+            index: characterCreationForm.npcNetwork.miniProfiles.length,
+            profileType,
+          }),
+        ],
+      },
+    });
+  }
+
+  function removeCharacterCreationNpcMiniProfile(index: number) {
+    updateCharacterCreationForm({
+      ...characterCreationForm,
+      npcNetwork: {
+        ...characterCreationForm.npcNetwork,
+        miniProfiles: characterCreationForm.npcNetwork.miniProfiles.filter(
+          (_profile, profileIndex) => profileIndex !== index,
+        ),
       },
     });
   }
@@ -3439,9 +3511,12 @@ export default function StructuredCardEditor({
             <CharacterCreationFormPanel
               form={characterCreationForm}
               onAddDecisionRule={addCharacterEngineDecisionRule}
+              onAddNpcMiniProfile={addCharacterCreationNpcMiniProfile}
               onAddTargetOverride={addCharacterCreationTargetOverride}
+              onApplyCauseChain={applyCharacterCauseChain}
               onBooleanChange={updateCharacterCreationBoolean}
               onRemoveDecisionRule={removeCharacterEngineDecisionRule}
+              onRemoveNpcMiniProfile={removeCharacterCreationNpcMiniProfile}
               onRemoveTargetOverride={removeCharacterCreationTargetOverride}
               onSeedSelect={applyCharacterCreationSeed}
               onTextChange={updateCharacterCreationText}
@@ -6148,18 +6223,24 @@ function Field({
 function CharacterCreationFormPanel({
   form,
   onAddDecisionRule,
+  onAddNpcMiniProfile,
   onAddTargetOverride,
+  onApplyCauseChain,
   onBooleanChange,
   onRemoveDecisionRule,
+  onRemoveNpcMiniProfile,
   onRemoveTargetOverride,
   onSeedSelect,
   onTextChange,
 }: {
   form: CharacterCreationForm;
   onAddDecisionRule: () => void;
+  onAddNpcMiniProfile: (profileType: CharacterCreationNpcProfileType) => void;
   onAddTargetOverride: () => void;
+  onApplyCauseChain: (input: CharacterCauseChainInput) => void;
   onBooleanChange: (path: CharacterCreationFormPath, value: boolean) => void;
   onRemoveDecisionRule: (index: number) => void;
+  onRemoveNpcMiniProfile: (index: number) => void;
   onRemoveTargetOverride: (index: number) => void;
   onSeedSelect: (entry: SeedPickerEntry) => void;
   onTextChange: (path: CharacterCreationFormPath, value: string) => void;
@@ -6182,6 +6263,15 @@ function CharacterCreationFormPanel({
         onSelect={onSeedSelect}
         placeholder="Try fear of replacement, copper curls, slow burn, vampire..."
         selectedKeys={form.semanticSeedIds}
+      />
+
+      <CauseChainIntakePanel onApply={onApplyCauseChain} />
+
+      <NpcMiniProfilePanel
+        form={form}
+        onAddProfile={onAddNpcMiniProfile}
+        onRemoveProfile={onRemoveNpcMiniProfile}
+        onTextChange={onTextChange}
       />
 
       {CHARACTER_CREATION_FORM_FIELD_GROUPS.map((group, index) => (
@@ -6369,6 +6459,215 @@ function CharacterCreationFormPanel({
         </div>
       </details>
     </div>
+  );
+}
+
+function CauseChainIntakePanel({
+  onApply,
+}: {
+  onApply: (input: CharacterCauseChainInput) => void;
+}) {
+  const [draft, setDraft] = useState<CharacterCauseChainInput>({
+    whatHappened: "",
+    createdBelief: "",
+    decisionEffect: "",
+    visibleSignals: "",
+    recoveryPath: "",
+  });
+  const canApply = Boolean(
+    draft.whatHappened.trim() ||
+      draft.createdBelief.trim() ||
+      draft.decisionEffect.trim(),
+  );
+
+  function updateDraft(
+    key: keyof CharacterCauseChainInput,
+    value: string,
+  ) {
+    setDraft((current) => ({ ...current, [key]: value }));
+  }
+
+  function applyDraft() {
+    if (!canApply) return;
+
+    onApply(draft);
+    setDraft({
+      whatHappened: "",
+      createdBelief: "",
+      decisionEffect: "",
+      visibleSignals: "",
+      recoveryPath: "",
+    });
+  }
+
+  return (
+    <details className="rounded-lg border border-cyan-500/20 bg-cyan-500/5 p-3">
+      <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-widest text-cyan-200">
+        Cause Chain Intake
+      </summary>
+      <div className="mt-4 space-y-3">
+        <p className="text-xs leading-5 text-zinc-400">
+          Answer the causal chain once. The app routes biography to the Writer
+          Bible, belief to Psychology, and decision logic to the Character
+          Engine.
+        </p>
+
+        <CauseChainTextArea
+          label="What happened?"
+          value={draft.whatHappened}
+          onChange={(value) => updateDraft("whatHappened", value)}
+        />
+        <CauseChainTextArea
+          label="What belief did this create?"
+          value={draft.createdBelief}
+          onChange={(value) => updateDraft("createdBelief", value)}
+        />
+        <CauseChainTextArea
+          label="How does that belief affect decisions?"
+          value={draft.decisionEffect}
+          onChange={(value) => updateDraft("decisionEffect", value)}
+        />
+        <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+          <CauseChainTextArea
+            label="Visible signals"
+            value={draft.visibleSignals ?? ""}
+            onChange={(value) => updateDraft("visibleSignals", value)}
+          />
+          <CauseChainTextArea
+            label="Recovery / alternative action"
+            value={draft.recoveryPath ?? ""}
+            onChange={(value) => updateDraft("recoveryPath", value)}
+          />
+        </div>
+
+        <button
+          type="button"
+          onClick={applyDraft}
+          disabled={!canApply}
+          className="inline-flex items-center gap-2 rounded-lg border border-cyan-400/40 bg-cyan-500/10 px-3 py-2 text-xs font-bold text-cyan-100 transition hover:bg-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <WandSparkles className="size-4" />
+          Compile Cause Chain
+        </button>
+      </div>
+    </details>
+  );
+}
+
+function NpcMiniProfilePanel({
+  form,
+  onAddProfile,
+  onRemoveProfile,
+  onTextChange,
+}: {
+  form: CharacterCreationForm;
+  onAddProfile: (profileType: CharacterCreationNpcProfileType) => void;
+  onRemoveProfile: (index: number) => void;
+  onTextChange: (path: CharacterCreationFormPath, value: string) => void;
+}) {
+  return (
+    <details className="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-3">
+      <summary className="cursor-pointer text-[10px] font-bold uppercase tracking-widest text-emerald-200">
+        NPC Mini Profiles
+      </summary>
+      <div className="mt-4 space-y-4">
+        <CharacterCreationTextControl
+          field={{
+            label: "NPC Discovery Notes",
+            path: ["npcNetwork", "discoveryNotes"],
+            kind: "textarea",
+          }}
+          form={form}
+          onTextChange={onTextChange}
+        />
+
+        <div className="grid grid-cols-2 gap-2 md:grid-cols-4 xl:grid-cols-6">
+          {NPC_MINI_PROFILE_TYPES.map((profileType) => (
+            <button
+              key={profileType}
+              type="button"
+              onClick={() => onAddProfile(profileType)}
+              className="inline-flex min-h-9 items-center justify-center rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-2 py-1.5 text-[10px] font-bold uppercase tracking-wider text-emerald-100 transition hover:bg-emerald-500/20"
+              title={`Create ${NPC_MINI_PROFILE_TYPE_LABELS[profileType]} mini profile`}
+            >
+              <Plus className="mr-1 size-3.5" />
+              {NPC_MINI_PROFILE_TYPE_LABELS[profileType]}
+            </button>
+          ))}
+        </div>
+
+        {form.npcNetwork.miniProfiles.length === 0 ? (
+          <p className="rounded-lg border border-dashed border-zinc-800 bg-zinc-950 p-3 text-xs text-zinc-500">
+            No linked NPC profiles yet.
+          </p>
+        ) : null}
+
+        {form.npcNetwork.miniProfiles.map((profile, index) => (
+          <div
+            key={`${profile.id}-${index}`}
+            className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-950 p-3"
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="rounded-md border border-emerald-500/30 bg-emerald-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-emerald-100">
+                  {NPC_MINI_PROFILE_TYPE_LABELS[profile.profileType]}
+                </span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+                  Profile {index + 1}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => onRemoveProfile(index)}
+                className="inline-flex items-center gap-1 rounded-md border border-rose-500/30 bg-rose-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-rose-200 transition hover:bg-rose-500/20"
+                title="Remove NPC mini profile"
+              >
+                <Trash2 className="size-3.5" />
+                Remove
+              </button>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+              {NPC_MINI_PROFILE_FIELDS.map((field) => (
+                <CharacterCreationTextControl
+                  key={field.key}
+                  field={{
+                    label: field.label,
+                    path: ["npcNetwork", "miniProfiles", index, field.key],
+                    kind: field.kind,
+                  }}
+                  form={form}
+                  onTextChange={onTextChange}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </details>
+  );
+}
+
+function CauseChainTextArea({
+  label,
+  onChange,
+  value,
+}: {
+  label: string;
+  onChange: (value: string) => void;
+  value: string;
+}) {
+  return (
+    <label className="flex flex-col gap-1.5">
+      <span className="text-[10px] font-bold uppercase tracking-widest text-zinc-500">
+        {label}
+      </span>
+      <textarea
+        value={value}
+        onChange={(event) => onChange(event.currentTarget.value)}
+        className="min-h-20 rounded-lg border border-zinc-800 bg-zinc-950 px-3 py-2 text-xs leading-5 text-zinc-200 outline-none transition focus:border-cyan-400"
+      />
+    </label>
   );
 }
 

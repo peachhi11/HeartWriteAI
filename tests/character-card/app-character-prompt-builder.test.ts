@@ -56,6 +56,33 @@ test("keeps first message requirements agency-safe and story-opening oriented", 
   assert.match(prompt, /End with a hook that demands a response/);
 });
 
+test("adds portable character architecture rules to JSON generation prompts", () => {
+  const prompt = buildCharacterGenPrompt(baseInput, {
+    contentRating: "sfw",
+  });
+
+  assert.match(prompt, /CHARACTER ARCHITECTURE QUALITY BAR/);
+  assert.match(prompt, /portable behavioral architecture/);
+  assert.match(prompt, /write final model-facing card fields as compact natural prose/);
+  assert.match(prompt, /Avoid markdown headings, schema labels, and category headers/);
+  assert.match(prompt, /Separate immutable character truth from story truth and setting truth/);
+  assert.match(prompt, /Avoid personality labels by themselves/);
+  assert.match(prompt, /When \[event or pressure\] -> generated behavior/);
+  assert.match(prompt, /state the alternative action they use instead/);
+  assert.match(prompt, /SFW mode: do not generate explicit sexuality/);
+});
+
+test("keeps NSFW generation architecture psychological instead of preference-list driven", () => {
+  const prompt = buildCharacterGenPrompt(baseInput, {
+    contentRating: "nsfw_allowed",
+  });
+
+  assert.match(prompt, /NSFW allowed mode/);
+  assert.match(prompt, /sexuality must still emerge from psychology/);
+  assert.match(prompt, /consent, boundaries, safety needs, and trust/);
+  assert.doesNotMatch(prompt, /SFW mode: do not generate explicit sexuality/);
+});
+
 test("builds tagged prompts without mojibake and with the full template", () => {
   const prompt = buildCharacterGenPromptTagged(baseInput, {
     contentRating: "sfw",
@@ -66,6 +93,7 @@ test("builds tagged prompts without mojibake and with the full template", () => 
   assert.match(prompt, /#NEGATIVE_PROMPT#/);
   assert.match(prompt, /350-500 characters/);
   assert.match(prompt, /\{\{user\}\}'s presence/);
+  assert.match(prompt, /CHARACTER ARCHITECTURE QUALITY BAR/);
   assert.doesNotMatch(prompt, /\u00e2/);
 });
 
@@ -81,6 +109,8 @@ test("builds fill-missing prompts for only requested missing fields", () => {
   });
 
   assert.match(prompt, /containing ONLY the missing keys/);
+  assert.match(prompt, /CHARACTER ARCHITECTURE CONSISTENCY/);
+  assert.match(prompt, /Keep model-facing text flattened into prose/);
   assert.match(prompt, /Missing keys:\nfirst_mes, tags, negative_prompt/);
   assert.match(prompt, /If first_mes is among the missing keys/);
   assert.match(prompt, /first_mes:/);
@@ -115,6 +145,8 @@ test("builds regenerate prompts with nonce and target-field field detail only", 
   );
 
   assert.match(prompt, /Regeneration nonce/);
+  assert.match(prompt, /CHARACTER ARCHITECTURE CONSISTENCY/);
+  assert.match(prompt, /do not add new markdown headings or schema labels/);
   assert.match(prompt, /abc123/);
   assert.match(prompt, /Target keys:\npersonality, first_mes, image_prompt/);
   assert.match(prompt, /If first_mes is among the target keys/);

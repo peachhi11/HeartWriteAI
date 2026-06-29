@@ -24,6 +24,7 @@ import {
   createCharacterEngineAuthoringProjection,
   createWriterBibleAuthoringProjection,
 } from "./characterAuthoringTabs";
+import { NPC_MINI_PROFILE_TYPE_LABELS } from "./characterCreationNpcProfiles";
 
 export interface CharacterCreationLorebookEntryDraft {
   name: string;
@@ -31,7 +32,7 @@ export interface CharacterCreationLorebookEntryDraft {
   keys: string[];
   extensions: {
     heartwriteai: {
-      entryKind: "relationship" | "scenario" | "runtime";
+      entryKind: "relationship" | "scenario" | "runtime" | "npc";
       source: "character_creation_story_truth";
       hiddenFromUser: boolean;
       reviewRequired: boolean;
@@ -162,6 +163,15 @@ export function compileCharacterCreationFormToStoryLorebook(
         ]),
         "runtime",
       ),
+    ),
+    createStoryLorebookEntry(
+      "NPC Discovery Notes",
+      [form.npcNetwork.discoveryNotes.trim()],
+      [characterName, "npc network", "relationship web", "story truth"],
+      "npc",
+    ),
+    ...form.npcNetwork.miniProfiles.map((profile, index) =>
+      createNpcMiniProfileLorebookEntry(profile, index, characterName),
     ),
   ].filter((entry) => entry.content.trim().length > 0);
 
@@ -533,6 +543,10 @@ function createCharacterTruthOnlyForm(
       },
       targetOverrides: [],
     },
+    npcNetwork: {
+      discoveryNotes: "",
+      miniProfiles: [],
+    },
   };
 
   return parseCharacterCreationForm(sanitizeCharacterTruthValue(truthOnlyForm));
@@ -560,7 +574,7 @@ function createStoryLorebookEntry(
   name: string,
   lines: string[],
   keys: string[],
-  entryKind: "relationship" | "scenario" | "runtime",
+  entryKind: "relationship" | "scenario" | "runtime" | "npc",
 ): CharacterCreationLorebookEntryDraft {
   return {
     name,
@@ -575,6 +589,45 @@ function createStoryLorebookEntry(
       },
     },
   };
+}
+
+function createNpcMiniProfileLorebookEntry(
+  profile: CharacterCreationForm["npcNetwork"]["miniProfiles"][number],
+  index: number,
+  characterName: string,
+): CharacterCreationLorebookEntryDraft {
+  const profileTypeLabel = NPC_MINI_PROFILE_TYPE_LABELS[profile.profileType];
+  const profileName = profile.name.trim() || `${profileTypeLabel} ${index + 1}`;
+
+  return createStoryLorebookEntry(
+    `NPC Mini Profile: ${profileName}`,
+    [
+      createLine("Profile type", profileTypeLabel),
+      createLine("Name", profileName),
+      createLine("Role", profile.role),
+      createLine("Relationship to character", profile.relationshipToCharacter),
+      createLine("Public role", profile.publicRole),
+      createLine("Private history", profile.privateHistory),
+      createLine("Story function", profile.storyFunction),
+      createLine("Emotional pressure", profile.emotionalPressure),
+      createLine("Behavior shift", profile.behaviorShift),
+      createLine("Conflict hook", profile.conflictHook),
+      createLine("Support hook", profile.supportHook),
+      createLine("Boundaries / use rules", profile.boundaries),
+      createLine("Lorebook keys", profile.lorebookKeys),
+    ],
+    uniqueList([
+      characterName,
+      profileName,
+      profileTypeLabel,
+      profile.role,
+      ...splitList(profile.lorebookKeys),
+      "npc network",
+      "relationship web",
+      "story truth",
+    ]),
+    "npc",
+  );
 }
 
 export function findCharacterTruthLeakIssues(
@@ -670,6 +723,13 @@ function uniqueList(values: readonly (string | undefined)[]): string[] {
   }
 
   return output;
+}
+
+function splitList(value: string): string[] {
+  return value
+    .split(/,|\n/)
+    .map((item) => item.trim())
+    .filter(Boolean);
 }
 
 function joinInlineValues(values: string[]): string {

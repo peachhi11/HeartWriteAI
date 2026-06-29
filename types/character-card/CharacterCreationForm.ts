@@ -20,6 +20,41 @@ export const CharacterCreationTargetOverrideSchema = z.object({
   contextualPromptInjection: textField,
 });
 
+export const CHARACTER_CREATION_NPC_PROFILE_TYPES = [
+  "family",
+  "ex",
+  "rival",
+  "love_interest",
+  "friend",
+  "mentor",
+  "dependant",
+  "enemy",
+  "patron",
+  "employer",
+  "wildcard",
+] as const;
+
+export const CharacterCreationNpcProfileTypeSchema = z.enum(
+  CHARACTER_CREATION_NPC_PROFILE_TYPES,
+);
+
+export const CharacterCreationNpcMiniProfileSchema = z.object({
+  id: textField,
+  profileType: CharacterCreationNpcProfileTypeSchema.default("friend"),
+  name: textField,
+  role: textField,
+  relationshipToCharacter: textField,
+  publicRole: textField,
+  privateHistory: textField,
+  storyFunction: textField,
+  emotionalPressure: textField,
+  behaviorShift: textField,
+  conflictHook: textField,
+  supportHook: textField,
+  boundaries: textField,
+  lorebookKeys: textField,
+});
+
 export const CharacterEngineDecisionRuleSchema = z.object({
   id: textField,
   drive: textField,
@@ -162,6 +197,10 @@ export const CharacterCreationFormSchema = z.object({
     }),
     targetOverrides: z.array(CharacterCreationTargetOverrideSchema).default([]),
   }),
+  npcNetwork: section({
+    discoveryNotes: textField,
+    miniProfiles: z.array(CharacterCreationNpcMiniProfileSchema).default([]),
+  }),
   speechCommunication: section({
     toneVocabulary: textField,
     subtext: textField,
@@ -179,6 +218,12 @@ export type CharacterCreationForm = z.infer<
 >;
 export type CharacterCreationTargetOverride = z.infer<
   typeof CharacterCreationTargetOverrideSchema
+>;
+export type CharacterCreationNpcProfileType = z.infer<
+  typeof CharacterCreationNpcProfileTypeSchema
+>;
+export type CharacterCreationNpcMiniProfile = z.infer<
+  typeof CharacterCreationNpcMiniProfileSchema
 >;
 export type CharacterEngineDecisionRule = z.infer<
   typeof CharacterEngineDecisionRuleSchema
@@ -204,6 +249,7 @@ export const CHARACTER_CREATION_FORM_SECTIONS: Array<{
   { key: "behaviour", label: "Behaviour" },
   { key: "lifestyle", label: "Lifestyle" },
   { key: "relationships", label: "Relationships" },
+  { key: "npcNetwork", label: "NPC Mini Profiles" },
   { key: "speechCommunication", label: "Speech & Communication" },
   { key: "internalThoughts", label: "Internal Thoughts & Reactions" },
 ];

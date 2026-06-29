@@ -121,7 +121,7 @@ function resolveCharacterCreationSeedTargetPath(
       case "scenario_tags":
         return ["lifestyle", "residence"];
       case "npc_roles":
-        return ["relationships", "affiliationCore", "factionOrGroup"];
+        return ["npcNetwork", "discoveryNotes"];
       case "metadata_tags":
         return ["internalThoughts", "internalMonologues"];
       default:
@@ -147,6 +147,9 @@ function resolvePresetCharacterCreationSeedTargetPath(
         ? ["appearance", "facialFeatures"]
         : ["appearance", "outfit"];
     case "personality":
+      if (/character-archetype|character archetype|archetype/.test(haystack)) {
+        return ["personality", "archetype"];
+      }
       if (/voice|speech|dialogue|accent|tone|vocabulary/.test(haystack)) {
         return ["speechCommunication", "toneVocabulary"];
       }
@@ -167,8 +170,10 @@ function resolvePresetCharacterCreationSeedTargetPath(
       if (/routine|daily|workday|domestic|schedule/.test(haystack)) {
         return ["lifestyle", "routines"];
       }
-      if (/npc|faction|group|network|family|rival|mentor/.test(haystack)) {
-        return ["relationships", "affiliationCore", "factionOrGroup"];
+      if (/\b(npc|faction|group|network|family|rival|mentor)\b/.test(haystack)) {
+        return /\b(npc|network|family|rival|mentor|friend|ex|exes)\b/.test(haystack)
+          ? ["npcNetwork", "discoveryNotes"]
+          : ["relationships", "affiliationCore", "factionOrGroup"];
       }
       return ["lifestyle", "residence"];
     case "metadata":
@@ -211,6 +216,10 @@ function resolveVocabularyCharacterCreationSeedTargetPath(
 
   if (/moral|ethic|justice|mercy|truth|loyalty|honou?r|duty/.test(haystack)) {
     return ["behaviour", "moralityInAction"];
+  }
+
+  if (/\b(npc|network|family|rival|mentor|friend|ex|exes)\b/.test(haystack)) {
+    return ["npcNetwork", "discoveryNotes"];
   }
 
   if (/relationship|romance|dynamic|complement|trope|gate|route|payoff|identity/.test(haystack)) {
