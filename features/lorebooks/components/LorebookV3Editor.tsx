@@ -2,7 +2,15 @@
 
 import type * as React from "react";
 import { useMemo, useState } from "react";
-import { EyeOff, ListChecks, Plus, Search, ShieldAlert, Trash2 } from "lucide-react";
+import {
+  EyeOff,
+  ListChecks,
+  Plus,
+  Search,
+  ShieldAlert,
+  Trash2,
+  Workflow,
+} from "lucide-react";
 
 import CopyButton from "@/components/copy-button";
 import { Badge } from "@/components/ui/badge";
@@ -28,6 +36,13 @@ import {
   type LorebookCompilerIssue,
   type LorebookQuickActionId,
 } from "../runtime";
+import {
+  createLorebookPlanFromDocument,
+  qcLorebookPlan,
+  summarizeLorebookPlan,
+  type LorebookPlan,
+  type LorebookPlanIssue,
+} from "../planning";
 
 const ENTRY_CHARACTER_WARNING = 1200;
 const TOTAL_TOKEN_WARNING = 1200;
@@ -77,6 +92,18 @@ export function LorebookV3Editor(props: {
   const compilerIssues = useMemo(
     () => compileLorebookReview(props.document),
     [props.document],
+  );
+  const lorebookPlan = useMemo(
+    () => createLorebookPlanFromDocument(props.document),
+    [props.document],
+  );
+  const planIssues = useMemo(
+    () => qcLorebookPlan(lorebookPlan),
+    [lorebookPlan],
+  );
+  const planSummary = useMemo(
+    () => summarizeLorebookPlan(lorebookPlan),
+    [lorebookPlan],
   );
   const selectedEntryIssues = selectedEntry
     ? compilerIssues.filter(
@@ -608,6 +635,11 @@ export function LorebookV3Editor(props: {
         </div>
 
         <CompilerIssuePanel issues={compilerIssues} />
+        <LorebookPlanPanel
+          issues={planIssues}
+          plan={lorebookPlan}
+          summary={planSummary}
+        />
 
         <details className="rounded-md border bg-card/60 p-3">
           <summary className="cursor-pointer text-sm font-semibold">
@@ -685,6 +717,83 @@ function CompilerIssuePanel(props: { issues: LorebookCompilerIssue[] }) {
   );
 }
 
+function LorebookPlanPanel(props: {
+  issues: LorebookPlanIssue[];
+  plan: LorebookPlan;
+  summary: ReturnType<typeof summarizeLorebookPlan>;
+}) {
+  const blockingIssueCount = props.issues.filter(
+    (issue) => issue.severity === "error",
+  ).length;
+
+  return (
+    <details className="rounded-md border bg-card/60 p-3" open>
+      <summary className="flex cursor-pointer items-center gap-2 text-sm font-semibold">
+        <Workflow className="size-4 text-user-primary" />
+        Activation plan
+      </summary>
+
+      <div className="mt-3 grid gap-3">
+        <div className="grid grid-cols-2 gap-2 text-xs text-muted-foreground">
+          <p>Mode: {formatPlanLabel(props.plan.sourceMode)}</p>
+          <p>Entries: {props.summary.totalEntries}</p>
+          <p>Enabled: {props.summary.enabledEntries}</p>
+          <p>Review: {props.summary.reviewRequiredEntries}</p>
+          <p>Anchor: {props.summary.tiers.anchor}</p>
+          <p>Primary: {props.summary.tiers.primary}</p>
+          <p>Secondary: {props.summary.tiers.secondary}</p>
+          <p>Ambient: {props.summary.tiers.ambient}</p>
+          <p className="col-span-2">
+            Planned tokens: ~{props.summary.estimatedTokens}
+          </p>
+        </div>
+
+        {props.issues.length === 0 ? (
+          <div className="rounded-md border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-900 dark:text-emerald-200">
+            Plan QC found no activation-structure issues.
+          </div>
+        ) : (
+          <div
+            className={cn(
+              "grid gap-1 rounded-md border p-3 text-xs",
+              blockingIssueCount > 0
+                ? "border-destructive/30 bg-destructive/10 text-destructive"
+                : "bg-background/70 text-muted-foreground",
+            )}
+          >
+            {props.issues.slice(0, 8).map((issue, index) => (
+              <p key={`${issue.code}-${issue.entryId ?? "book"}-${index}`}>
+                [{issue.severity}] {issue.entryId ? `${issue.entryId}: ` : ""}
+                {issue.message}
+              </p>
+            ))}
+          </div>
+        )}
+
+        <div className="grid gap-2">
+          {props.plan.entries.slice(0, 5).map((entry) => (
+            <div
+              key={String(entry.id)}
+              className="rounded-md border bg-background/60 p-2 text-xs"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <p className="truncate font-medium">{entry.title}</p>
+                <Badge variant="outline">{entry.activationTier}</Badge>
+              </div>
+              <p className="mt-1 truncate text-muted-foreground">
+                {entry.entryKind} · {entry.position} ·{" "}
+                {entry.keys.length || entry.constant
+                  ? `${entry.keys.length} keys`
+                  : "needs keys"}
+              </p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </details>
+  );
+}
+
 function Field(props: { children: React.ReactNode; label: string }) {
   return (
     <label className="grid gap-1.5 text-sm font-medium">
@@ -733,4 +842,8 @@ function numberFromInput(value: string) {
 
 function estimateTokens(text: string) {
   return Math.max(1, Math.ceil(text.length / 4));
+}
+
+function formatPlanLabel(value: string) {
+  return value.replace(/_/g, " ");
 }

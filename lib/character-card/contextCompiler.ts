@@ -53,6 +53,7 @@ export interface ContextCompilationInput {
   groupChat?: ContextGroupChat;
   v3Scenario?: ContextScenarioState;
   activeLorebookEntries?: ContextLorebookEntry[];
+  contextDigest?: string;
   chatHistory?: ContextChatMessage[];
   maxTokens: number;
   regexMacroContext?: RegexMacroContext;
@@ -190,6 +191,11 @@ function buildSystemLayers(input: ContextCompilationInput): ContextChatMessage[]
     messages.push({ role: "system", content: loreBlock });
   }
 
+  const digestBlock = buildContextDigestBlock(input.contextDigest);
+  if (digestBlock) {
+    messages.push({ role: "system", content: digestBlock });
+  }
+
   return messages;
 }
 
@@ -265,6 +271,16 @@ function buildLorebookBlock(entries: ContextLorebookEntry[]): string {
     "[WORLD LORE & ACTIVE CONTEXT]",
     ...sortedEntries.map((entry) => `Concept (${entry.key}): ${entry.content}`),
   ].join("\n");
+}
+
+function buildContextDigestBlock(contextDigest?: string): string {
+  const digest = contextDigest?.trim();
+
+  if (!digest) {
+    return "";
+  }
+
+  return `[CONTEXT DIGEST]\n${digest}`;
 }
 
 interface HistorySelection {

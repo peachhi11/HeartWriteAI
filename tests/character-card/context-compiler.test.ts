@@ -109,6 +109,21 @@ test("supports an async native token counter hook for precise budgeting", async 
   assert.equal(result.diagnostics.includedHistoryMessages, 1);
 });
 
+test("can include a compact context digest as a static system layer", () => {
+  const compiled = ContextCompiler.compileDetailed({
+    contextDigest:
+      "Scene memory: A promise was made at the clinic door.\n- The promise should still color trust.",
+    maxTokens: 512,
+    reserveTokens: 0,
+    systemPrompt: "Base.",
+  });
+  const content = compiled.messages.map((message) => message.content).join("\n");
+
+  assert.match(content, /\[CONTEXT DIGEST\]/);
+  assert.match(content, /clinic door/);
+  assert.equal(compiled.diagnostics.includedHistoryMessages, 0);
+});
+
 test("exposes a stable fallback token estimator", () => {
   assert.equal(estimateContextTokens("1234"), 1);
   assert.equal(estimateContextTokens("12345"), 2);

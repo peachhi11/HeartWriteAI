@@ -64,6 +64,10 @@ import {
   type ContextCompilationResult,
   type ContextLorebookEntry,
 } from "@/lib/character-card/contextCompiler";
+import {
+  buildContextDigest,
+  type ContextDigest,
+} from "@/lib/character-card/contextDigest";
 import { classifyTropeInput } from "@/lib/character-card/tropeMatcher";
 import {
   type LlmProviderConfig,
@@ -276,6 +280,14 @@ export default function RoleplayChat() {
       inferenceConfig.contextLength,
       messages,
     ],
+  );
+  const contextDigestPreview = useMemo(
+    () =>
+      createLiveChatContextDigest({
+        history: messages,
+        maxTokens: inferenceConfig.contextLength,
+      }),
+    [inferenceConfig.contextLength, messages],
   );
 
   useEffect(() => {
@@ -1316,7 +1328,10 @@ export default function RoleplayChat() {
                 onClearAuditLog={() => setLoreRecallLogs([])}
                 recallLogs={loreRecallLogs}
               />
-              <RuntimeContextInspector compilation={contextPreview} />
+              <RuntimeContextInspector
+                compilation={contextPreview}
+                contextDigest={contextDigestPreview}
+              />
             </div>
           </aside>
         ) : null}
@@ -1552,12 +1567,18 @@ function createLiveChatContextCompileInput(input: {
   maxTokens: number;
   override: ScenarioOverride;
 }) {
+  const contextDigest = createLiveChatContextDigest({
+    history: input.history,
+    maxTokens: input.maxTokens,
+  });
+
   return {
     activeLorebookEntries: input.activeLorebookEntries,
     chatHistory: toOllamaMessages(input.history).map((message) => ({
       content: message.content,
       role: message.role,
     })),
+    contextDigest: contextDigest.promptContext,
     maxTokens: input.maxTokens,
     reserveTokens: 500,
     systemPrompt: [
@@ -1569,6 +1590,55 @@ function createLiveChatContextCompileInput(input: {
     ].filter(Boolean).join("\n"),
     v3Scenario: scenarioOverrideToContextScenario(input.override),
   };
+}
+
+function createLiveChatContextDigest(input: {
+  history: RoleplayMessage[];
+  maxTokens: number;
+}): ContextDigest {
+  return buildContextDigest(
+    {
+      chatHistory: input.history.map((message) => ({
+        content: getMessageText(message),
+        important: Boolean(
+          message.detectedTrope && message.detectedTrope !== "casual",
+        ),
+        milestone: isDigestMilestone(message),
+        name: message.speakerName,
+        protected: Boolean(message.swipedVariants?.length),
+        role: message.role,
+        tags: [
+          message.detectedTrope ?? "casual",
+          message.swipedVariants?.length ? "variant_history" : "",
+        ].filter((tag): tag is string => Boolean(tag)),
+      })),
+      currentTurn: input.history.length,
+      id: `live-chat-digest:${input.history.length}`,
+      tokenBudget: Math.min(900, Math.max(360, Math.floor(input.maxTokens * 0.12))),
+    },
+    {
+      maxEntriesPerLane: 4,
+      maxPromptTokens: Math.min(
+        900,
+        Math.max(360, Math.floor(input.maxTokens * 0.12)),
+      ),
+    },
+  );
+}
+
+function isDigestMilestone(message: RoleplayMessage): boolean {
+  const content = getMessageText(message).toLowerCase();
+
+  return [
+    "betrayal",
+    "boundary",
+    "confession",
+    "forgive",
+    "promise",
+    "repair",
+    "secret",
+    "trust",
+  ].some((keyword) => content.includes(keyword));
 }
 
 function toLlmConnectorMessages(messages: ContextChatMessage[]) {

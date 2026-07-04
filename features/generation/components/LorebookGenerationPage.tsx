@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import CopyButton from "@/components/copy-button";
+import { LorebookRevisePanel } from "@/components/revise-session-panel";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -470,6 +471,10 @@ export function LorebookGenerationPage() {
                 </Badge>
               ))}
             </div>
+            <LorebookRevisePanel
+              document={v3Document}
+              onApply={editDocument}
+            />
             <LorebookV3Editor
               document={v3Document}
               onChange={editDocument}

@@ -3,17 +3,21 @@
 import { Activity, BookOpenText, Gauge, MessageSquareText } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
+import { ContextDigestInspector } from "@/components/context-digest-inspector";
 import type { ContextCompilationResult } from "@/lib/character-card/contextCompiler";
+import type { ContextDigest } from "@/lib/character-card/contextDigest";
 import { cn } from "@/lib/utils";
 
 export interface RuntimeContextInspectorProps {
   compilation: ContextCompilationResult;
+  contextDigest?: ContextDigest;
   className?: string;
 }
 
 export function RuntimeContextInspector({
   className,
   compilation,
+  contextDigest,
 }: RuntimeContextInspectorProps) {
   const { diagnostics, messages } = compilation;
   const usagePercent =
@@ -128,6 +132,10 @@ export function RuntimeContextInspector({
           currently being pruned.
         </p>
       )}
+
+      {contextDigest ? (
+        <ContextDigestInspector contextDigest={contextDigest} />
+      ) : null}
     </section>
   );
 }

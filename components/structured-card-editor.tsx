@@ -14,6 +14,7 @@ import CharacterCardPreview from "@/components/character-card-preview";
 import ProsePixieModal, {
   type ProsePixieTarget,
 } from "@/components/prose-pixie-modal";
+import { CharacterCreationRevisePanel } from "@/components/revise-session-panel";
 import { SearchableSeedPicker } from "@/components/searchable-seed-picker";
 import type { SeedPickerEntry } from "@/data/seedPickerRegistry";
 import {
@@ -3513,6 +3514,7 @@ export default function StructuredCardEditor({
               onAddDecisionRule={addCharacterEngineDecisionRule}
               onAddNpcMiniProfile={addCharacterCreationNpcMiniProfile}
               onAddTargetOverride={addCharacterCreationTargetOverride}
+              onApplyRevision={updateCharacterCreationForm}
               onApplyCauseChain={applyCharacterCauseChain}
               onBooleanChange={updateCharacterCreationBoolean}
               onRemoveDecisionRule={removeCharacterEngineDecisionRule}
@@ -6226,6 +6228,7 @@ function CharacterCreationFormPanel({
   onAddNpcMiniProfile,
   onAddTargetOverride,
   onApplyCauseChain,
+  onApplyRevision,
   onBooleanChange,
   onRemoveDecisionRule,
   onRemoveNpcMiniProfile,
@@ -6238,6 +6241,7 @@ function CharacterCreationFormPanel({
   onAddNpcMiniProfile: (profileType: CharacterCreationNpcProfileType) => void;
   onAddTargetOverride: () => void;
   onApplyCauseChain: (input: CharacterCauseChainInput) => void;
+  onApplyRevision: (form: CharacterCreationForm) => void;
   onBooleanChange: (path: CharacterCreationFormPath, value: boolean) => void;
   onRemoveDecisionRule: (index: number) => void;
   onRemoveNpcMiniProfile: (index: number) => void;
@@ -6266,6 +6270,8 @@ function CharacterCreationFormPanel({
       />
 
       <CauseChainIntakePanel onApply={onApplyCauseChain} />
+
+      <CharacterCreationRevisePanel form={form} onApply={onApplyRevision} />
 
       <NpcMiniProfilePanel
         form={form}

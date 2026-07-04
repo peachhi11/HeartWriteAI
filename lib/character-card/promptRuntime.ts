@@ -10,6 +10,10 @@ import {
   compileContinuityCanonPromptContext,
   type ContinuityCanonLedger,
 } from "./continuityCanonLedger";
+import {
+  compileContextDigestPromptContext,
+  type ContextDigest,
+} from "./contextDigest";
 
 export interface RuntimeLoreEntry {
   name?: string;
@@ -49,6 +53,8 @@ export interface CompileChatPromptArgs {
   worldLore?: string;
   activeLoreEntries?: RuntimeLoreEntry[];
   retrievedMemories?: string[];
+  contextDigest?: ContextDigest;
+  contextDigestContext?: string;
   continuityCanonLedger?: ContinuityCanonLedger;
   continuityCanonContext?: string;
   narrativeRuntime?: NarrativeRuntimeState;
@@ -97,6 +103,8 @@ export function compileChatPrompt({
   worldLore,
   activeLoreEntries = [],
   retrievedMemories = [],
+  contextDigest,
+  contextDigestContext,
   continuityCanonLedger,
   continuityCanonContext,
   narrativeRuntime,
@@ -127,6 +135,9 @@ export function compileChatPrompt({
     (continuityCanonLedger
       ? compileContinuityCanonPromptContext(continuityCanonLedger)
       : "");
+  const digestContext =
+    contextDigestContext?.trim() ||
+    (contextDigest ? compileContextDigestPromptContext(contextDigest) : "");
 
   const contextBlock = [
     section("Character", [
@@ -148,6 +159,7 @@ export function compileChatPrompt({
       ),
     ),
     section("Retrieved Memories", retrievedMemories),
+    digestContext ? section("Context Digest", [digestContext]) : "",
     canonContext ? section("Continuity Canon", [canonContext]) : "",
     narrativeContext ? section("Narrative Runtime", [narrativeContext]) : "",
     createSensoryPerceptionContext(sensoryPerception),

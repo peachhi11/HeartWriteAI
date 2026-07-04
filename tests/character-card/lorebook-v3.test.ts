@@ -14,6 +14,13 @@ import {
 } from "../../features/lorebooks/adapters";
 import { getActiveLorebookEntries } from "../../features/lorebooks/processor";
 import {
+  compileLorebookPlanToV3Document,
+  createLorebookPlanFromDocument,
+  qcLorebookDocument,
+  qcLorebookPlan,
+  summarizeLorebookPlan,
+} from "../../features/lorebooks/planning";
+import {
   applyLorebookQuickAction,
   compileLorebookReview,
   getLorebookEntryPreview,
@@ -348,6 +355,249 @@ test("applies lorebook quick actions and compiler review metadata", () => {
 
   assert.ok(review.some((issue) => issue.code === "hidden_entries_present"));
   assert.ok(review.some((issue) => issue.code === "review_required"));
+});
+
+test("creates an activation plan from lorebook v3 runtime metadata", () => {
+  const document = normalizeLorebookV3Document({
+    data: {
+      entries: [
+        {
+          constant: true,
+          content: "The city is governed by reputation rules.",
+          extensions: {
+            heartwriteai: {
+              activationTier: "anchor",
+              entryKind: "world",
+              sourceRefs: ["reference.md#reputation"],
+              tokenBudgetHint: 80,
+            },
+          },
+          insertion_order: 0,
+          keys: [],
+          name: "City Reputation",
+          position: "before_char",
+          priority: 100,
+        },
+        {
+          content: "The rival family has old leverage.",
+          extensions: {
+            heartwriteai: {
+              entryKind: "relationship",
+            },
+          },
+          insertion_order: 1,
+          keys: ["rival family"],
+          name: "Rival Family",
+          secondary_keys: ["leverage"],
+          selective: true,
+        },
+      ],
+      extensions: {
+        heartwriteai: {
+          planId: "court_plan",
+          sourceMode: "source_derived",
+          tags: ["court", "reputation"],
+        },
+      },
+      name: "Court Plan",
+      token_budget: 500,
+    },
+    spec: "lorebook_v3",
+  });
+
+  const plan = createLorebookPlanFromDocument(document);
+
+  assert.equal(plan.id, "court_plan");
+  assert.equal(plan.sourceMode, "source_derived");
+  assert.deepEqual(plan.tags, ["court", "reputation"]);
+  assert.equal(plan.entries[0]?.activationTier, "anchor");
+  assert.equal(plan.entries[0]?.entryKind, "world");
+  assert.deepEqual(plan.entries[0]?.sourceRefs, ["reference.md#reputation"]);
+  assert.equal(plan.entries[1]?.activationTier, "secondary");
+  assert.deepEqual(plan.entries[1]?.secondaryKeys, ["leverage"]);
+});
+
+test("compiles lorebook activation plans into valid v3 documents", () => {
+  const document = compileLorebookPlanToV3Document({
+    entries: [
+      {
+        activationTier: "anchor",
+        constant: false,
+        content: "Always keep the campus honor code in mind.",
+        enabled: true,
+        entryKind: "world",
+        hiddenFromUser: false,
+        id: "honor_code",
+        keys: [],
+        notes: ["Source checked."],
+        position: "before_char",
+        reviewRequired: false,
+        secondaryKeys: [],
+        selective: false,
+        source: "manual",
+        sourceRefs: ["source#honor"],
+        title: "Honor Code",
+        tokenBudget: 40,
+        useRegex: false,
+      },
+      {
+        activationTier: "secondary",
+        constant: false,
+        content: "The archive rivalry only matters when both archive and rivalry appear.",
+        enabled: true,
+        entryKind: "relationship",
+        hiddenFromUser: true,
+        id: "archive_rivalry",
+        keys: ["rivalry"],
+        notes: [],
+        position: "after_char",
+        reviewRequired: false,
+        secondaryKeys: ["archive"],
+        selective: true,
+        source: "manual",
+        sourceRefs: ["source#rivalry"],
+        title: "Archive Rivalry",
+        useRegex: false,
+      },
+    ],
+    id: "campus_plan",
+    sourceMode: "source_derived",
+    summary: "A planned campus lorebook.",
+    tags: ["campus"],
+    title: "Campus Lore Plan",
+    tokenBudget: 300,
+  });
+
+  assert.equal(document.spec, "lorebook_v3");
+  assert.equal(document.data.name, "Campus Lore Plan");
+  assert.equal(document.data.entries[0]?.constant, true);
+  assert.equal(document.data.entries[0]?.priority, 100);
+  assert.equal(document.data.entries[0]?.position, "before_char");
+  assert.equal(
+    readHeartWriteLorebookRuntime(document.data.entries[0]).activationTier,
+    "anchor",
+  );
+  assert.equal(
+    readHeartWriteLorebookRuntime(document.data.entries[1]).hiddenFromUser,
+    true,
+  );
+  assert.equal(
+    readHeartWriteLorebookRuntime(document.data.entries[1]).reviewRequired,
+    true,
+  );
+});
+
+test("reviews lorebook plans for activation and source structure issues", () => {
+  const issues = qcLorebookPlan({
+    entries: [
+      {
+        activationTier: "anchor",
+        constant: false,
+        content: "Anchor content.",
+        enabled: true,
+        entryKind: "world",
+        hiddenFromUser: false,
+        id: "world_anchor",
+        keys: [],
+        notes: [],
+        position: "after_char",
+        reviewRequired: false,
+        secondaryKeys: [],
+        selective: false,
+        source: "manual",
+        sourceRefs: [],
+        title: "World Anchor",
+        useRegex: false,
+      },
+      {
+        activationTier: "ambient",
+        constant: false,
+        content: "Ambient content.",
+        enabled: true,
+        entryKind: "relationship",
+        hiddenFromUser: true,
+        id: "ambient_relationship",
+        keys: [],
+        notes: [],
+        position: "after_char",
+        reviewRequired: false,
+        secondaryKeys: [],
+        selective: true,
+        source: "manual",
+        sourceRefs: [],
+        title: "Ambient Relationship",
+        useRegex: false,
+      },
+    ],
+    id: "review_plan",
+    sourceMode: "source_derived",
+    summary: "Needs review.",
+    tags: [],
+    title: "Review Plan",
+  });
+
+  assert.ok(issues.some((issue) => issue.code === "anchor_not_constant"));
+  assert.ok(issues.some((issue) => issue.code === "missing_source_refs"));
+  assert.ok(issues.some((issue) => issue.code === "missing_activation_keys"));
+  assert.ok(
+    issues.some((issue) => issue.code === "selective_without_secondary_keys"),
+  );
+  assert.ok(issues.some((issue) => issue.code === "hidden_without_review"));
+});
+
+test("runs lorebook document plan qc from existing v3 documents", () => {
+  const document = normalizeLorebookV3Document({
+    data: {
+      entries: [
+        {
+          content: "This entry is enabled but cannot trigger.",
+          insertion_order: 0,
+          keys: [],
+          name: "Missing Trigger",
+        },
+      ],
+      name: "QC Document",
+    },
+    spec: "lorebook_v3",
+  });
+
+  const issues = qcLorebookDocument(document);
+
+  assert.ok(issues.some((issue) => issue.code === "missing_activation_keys"));
+});
+
+test("counts hidden lorebook plan entries as review-bound in summaries", () => {
+  const document = normalizeLorebookV3Document({
+    data: {
+      entries: [
+        {
+          content: "Hidden relationship truth.",
+          extensions: {
+            heartwriteai: {
+              hiddenFromUser: true,
+              reviewRequired: false,
+            },
+          },
+          insertion_order: 0,
+          keys: ["relationship truth"],
+          name: "Hidden Relationship Truth",
+        },
+      ],
+      extensions: {
+        heartwriteai: {
+          tags: [" ", "relationship"],
+        },
+      },
+      name: "Hidden Truth Plan",
+    },
+    spec: "lorebook_v3",
+  });
+
+  const plan = createLorebookPlanFromDocument(document);
+  const summary = summarizeLorebookPlan(plan);
+
+  assert.deepEqual(plan.tags, ["relationship"]);
+  assert.equal(summary.reviewRequiredEntries, 1);
 });
 
 test("serializes canonical v3 exports and safe filenames", () => {
