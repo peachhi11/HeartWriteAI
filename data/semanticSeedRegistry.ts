@@ -11248,6 +11248,9 @@ function inferSemanticCategoryFromVocabularySeed(
   if (/memory-compression-recall-vocabulary/.test(haystack)) {
     return "metadata_tags";
   }
+  if (/runtime-story-state-vocabulary/.test(haystack)) {
+    return "states";
+  }
   if (/visible-behavior-vocabulary/.test(haystack)) {
     return "visible_behaviors";
   }
@@ -11300,6 +11303,12 @@ function inferSemanticCategoryFromVocabularySeed(
     return "motivations";
   }
   if (/narrative-arc-controller-vocabulary/.test(haystack)) {
+    return "routes";
+  }
+  if (/story-structure-arc-match-vocabulary/.test(haystack)) {
+    return "routes";
+  }
+  if (/trope-stage-route-vocabulary/.test(haystack)) {
     return "routes";
   }
   if (/plot-conflict-vocabulary/.test(haystack)) {

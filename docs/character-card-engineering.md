@@ -190,6 +190,76 @@ Tier 4: Setting Truth
 This stops the card from describing one timeline and makes it describe the
 system that generates the character across many timelines.
 
+## Twelve-Module Character Template
+
+HeartWriteAI now treats the supplied character template as a structured
+authoring scaffold rather than one large prompt blob. The modules route into
+separate fields and truth tiers:
+
+- Module 12: Overview
+  - generated last, placed first
+  - storyless summary of who the character is, what they do to a narrative, the
+    dominant wound, the lie, the truth, use cases, and flattening risks
+- Module 1: Identity
+  - feeds `personaDescription`
+  - stable identity, physical appearance, presence, and style
+- Modules 2-7: Personality, Cognition, Psychology, Relationships, Sexuality,
+  and Speech
+  - feed `personaPersonality`
+  - portable character truth, behavioral law, intimacy architecture, and voice
+    law
+- Module 8: Runtime
+  - feeds `personaScenario`
+  - mutable now-state and relationship/story runtime
+- Modules 9-11: World, Relational Infrastructure, and Director / Arc Engine
+  - feed `personaBackstory`
+  - setting pressure, NPC infrastructure, and earned arc progression logic
+
+The important rule is that module routing does not weaken truth separation.
+Modules 1-7 can feed portable character truth. Module 8 is runtime context.
+Module 9 is setting truth. Module 10 is story/NPC infrastructure. Module 11 is
+arc-engine guidance that can pressure character law but cannot overwrite it.
+
+## Template Token Budgeting
+
+The twelve-module profile is an authoring scaffold, not a runtime prompt. The
+creator can fill the whole structure, but the compiler must estimate its prompt
+cost and condense it before sending it to an LLM.
+
+HeartWriteAI currently uses the same local heuristic as the context digest:
+roughly four characters per token. Desktop builds can still call the native
+Tauri token counter for exact model-specific counts, but the deterministic
+heuristic is fast enough for UI previews, tests, and offline routing.
+
+The compiler supports four condensation levels:
+
+- `full`
+  - complete planning view with section prompts
+  - useful for authoring, review, and debugging
+- `standard`
+  - module descriptions, targets, truth tiers, and section titles
+  - useful for generation planning when there is a generous context window
+- `compact`
+  - field map plus one-line module routing
+  - preferred prompt-facing scaffold for most character generation calls
+- `runtime_minimal`
+  - guardrails only: truth-tier routing, field map, and replacement-action rule
+  - used when the prompt budget is tight
+
+The budget rule is:
+
+```text
+Fill richly for the human.
+Compile selectively for the model.
+Reserve tokens for source material, generated prose, runtime memory, and the
+user's actual task.
+```
+
+If the full template does not fit, the compiler should not delete the whole
+architecture. It should preserve the routing rules first, then collapse module
+detail. This keeps the model aware of truth separation even when the profile is
+too large for the current context window.
+
 ## Character Architecture Generation Prompt
 
 The character-generation prompt should not ask the model to write a pretty
@@ -433,6 +503,49 @@ These actions are not user-facing prompt text. They are internal compiler
 commands. Their job is to keep the system honest: character laws stay in the
 card, story facts move to lorebooks, setting facts move to scenarios, and
 runtime inspection stays prompt-safe.
+
+## Reviewable Orchestration Policies
+
+AI helpers should operate inside explicit orchestration policies. HeartWriteAI
+uses these policies to separate reading, proposing, applying, retrieval, and
+export behavior.
+
+Write policies:
+
+- `open`
+  - AI helpers may apply low-risk maintenance changes directly
+  - suitable for generated tags, formatting cleanup, and scratchpad material
+- `review`
+  - AI helpers may propose changes, but the artifact stays unchanged until a
+    human accepts the proposal
+  - suitable for lorebook enrichment, canon summaries, prompt templates, and
+    character-engine prose
+- `locked`
+  - AI helpers may read the source for context but must not alter it
+  - suitable for approved character laws, consent boundaries, canonical facts,
+    and writer-locked material
+
+Knowledge routing strategies:
+
+- `constant_context`
+  - compact laws that must remain active every turn
+- `semantic_retrieval`
+  - memories, lore, and graph nodes that activate only when the scene meaning
+    matches
+- `manual_only`
+  - context that appears only when a writer or workflow selects it
+- `disabled`
+  - draft or deprecated material that stays out of prompt context
+
+Semantic tag boosts are only ranking helpers. Tags may reorder candidates that
+already passed the semantic match floor; they must not inject unrelated context
+just because a tag matches.
+
+Portable package manifests should name what an export includes and what it
+omits. By default exports should omit API keys, local file paths, raw runtime
+scores, unreviewed drafts, and private agent notes. This lets card bundles,
+lorebooks, scenarios, runtime snapshots, and semantic graphs travel without
+leaking desktop-only or review-only internals.
 
 ## Continuity Canon Ledger
 

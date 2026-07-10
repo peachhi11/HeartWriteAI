@@ -23,6 +23,7 @@ import { LOVE_LANGUAGE_VOCABULARY_STANDARD_SEEDS } from "../../data/loveLanguage
 import { MEMORY_COMPRESSION_RECALL_VOCABULARY_STANDARD_SEEDS } from "../../data/memoryCompressionRecallVocabularyPresets";
 import { MORAL_FRAMEWORK_VOCABULARY_SEEDS } from "../../data/moralFrameworkVocabularyPresets";
 import { NARRATIVE_ARC_CONTROLLER_VOCABULARY_STANDARD_SEEDS } from "../../data/narrativeArcControllerVocabularyPresets";
+import { ORCHESTRATION_POLICY_VOCABULARY_STANDARD_SEEDS } from "../../data/orchestrationPolicyVocabularyPresets";
 import { ORIGIN_WOUND_VOCABULARY_SEEDS } from "../../data/originWoundVocabularyPresets";
 import { PAYOFF_FANTASY_VOCABULARY_STANDARD_SEEDS } from "../../data/payoffFantasyVocabularyPresets";
 import { PLOT_CONFLICT_VOCABULARY_STANDARD_SEEDS } from "../../data/plotConflictVocabularyPresets";
@@ -38,6 +39,9 @@ import { REPAIR_NEED_VOCABULARY_STANDARD_SEEDS } from "../../data/repairNeedVoca
 import { REPAIR_STYLE_VOCABULARY_STANDARD_SEEDS } from "../../data/repairStyleVocabularyPresets";
 import { RESPONSE_VOCABULARY_STANDARD_SEEDS } from "../../data/responseVocabularyPresets";
 import { RUPTURE_TYPE_VOCABULARY_STANDARD_SEEDS } from "../../data/ruptureTypeVocabularyPresets";
+import { RUNTIME_STORY_STATE_VOCABULARY_STANDARD_SEEDS } from "../../data/runtimeStoryStateVocabularyPresets";
+import { STORY_STRUCTURE_ARC_MATCH_STANDARD_SEEDS } from "../../data/storyStructureArcMatchPresets";
+import { TROPE_STAGE_ROUTE_VOCABULARY_STANDARD_SEEDS } from "../../data/tropeStageRoutePresets";
 import { SEED_PRESET_REGISTRY } from "../../data/seedPresetRegistry";
 import { TRIGGER_VOCABULARY_STANDARD_SEEDS } from "../../data/triggerVocabularyPresets";
 import { USER_PERSONA_PROFILE_VOCABULARY_STANDARD_SEEDS } from "../../data/userPersonaProfileVocabularyPresets";
@@ -114,6 +118,7 @@ test("collects rich vocabulary seed collections across explicit vocabulary modul
     MEMORY_COMPRESSION_RECALL_VOCABULARY_STANDARD_SEEDS.length +
     MORAL_FRAMEWORK_VOCABULARY_SEEDS.length +
     NARRATIVE_ARC_CONTROLLER_VOCABULARY_STANDARD_SEEDS.length +
+    ORCHESTRATION_POLICY_VOCABULARY_STANDARD_SEEDS.length +
     ORIGIN_WOUND_VOCABULARY_SEEDS.length +
     PAYOFF_FANTASY_VOCABULARY_STANDARD_SEEDS.length +
     PERSONALITY_ENGINE_VOCABULARY_SEEDS.length +
@@ -129,6 +134,9 @@ test("collects rich vocabulary seed collections across explicit vocabulary modul
     PLOT_CONFLICT_VOCABULARY_STANDARD_SEEDS.length +
     RESPONSE_VOCABULARY_STANDARD_SEEDS.length +
     RUPTURE_TYPE_VOCABULARY_STANDARD_SEEDS.length +
+    RUNTIME_STORY_STATE_VOCABULARY_STANDARD_SEEDS.length +
+    STORY_STRUCTURE_ARC_MATCH_STANDARD_SEEDS.length +
+    TROPE_STAGE_ROUTE_VOCABULARY_STANDARD_SEEDS.length +
     TRIGGER_VOCABULARY_STANDARD_SEEDS.length +
     USER_PERSONA_PROFILE_VOCABULARY_STANDARD_SEEDS.length +
     VISIBLE_BEHAVIOR_VOCABULARY_STANDARD_SEEDS.length +
@@ -167,6 +175,7 @@ test("collects rich vocabulary seed collections across explicit vocabulary modul
       "memory-compression-recall-vocabulary",
       "moral-framework-vocabulary",
       "narrative-arc-controller-vocabulary",
+      "orchestration-policy-vocabulary",
       "origin-wound-vocabulary",
       "wound-vocabulary",
       "response-vocabulary",
@@ -174,6 +183,9 @@ test("collects rich vocabulary seed collections across explicit vocabulary modul
       "repair-beat-vocabulary",
       "repair-need-vocabulary",
       "rupture-type-vocabulary",
+      "runtime-story-state-vocabulary",
+      "story-structure-arc-match-vocabulary",
+      "trope-stage-route-vocabulary",
       "trigger-vocabulary",
       "user-persona-profile-vocabulary",
       "visible-behavior-vocabulary",
@@ -217,6 +229,7 @@ test("keeps canonical shape for explicit vocabulary seed exports", () => {
     MEMORY_COMPRESSION_RECALL_VOCABULARY_STANDARD_SEEDS[0],
     MORAL_FRAMEWORK_VOCABULARY_SEEDS[0],
     NARRATIVE_ARC_CONTROLLER_VOCABULARY_STANDARD_SEEDS[0],
+    ORCHESTRATION_POLICY_VOCABULARY_STANDARD_SEEDS[0],
     ORIGIN_WOUND_VOCABULARY_SEEDS[0],
     WOUND_VOCABULARY_STANDARD_SEEDS[0],
     RESPONSE_VOCABULARY_STANDARD_SEEDS[0],
@@ -234,6 +247,9 @@ test("keeps canonical shape for explicit vocabulary seed exports", () => {
     PLOT_CONFLICT_VOCABULARY_STANDARD_SEEDS[0],
     REPAIR_BEAT_VOCABULARY_STANDARD_SEEDS[0],
     RUPTURE_TYPE_VOCABULARY_STANDARD_SEEDS[0],
+    RUNTIME_STORY_STATE_VOCABULARY_STANDARD_SEEDS[0],
+    STORY_STRUCTURE_ARC_MATCH_STANDARD_SEEDS[0],
+    TROPE_STAGE_ROUTE_VOCABULARY_STANDARD_SEEDS[0],
     USER_PERSONA_PROFILE_VOCABULARY_STANDARD_SEEDS[0],
     VISIBLE_BEHAVIOR_VOCABULARY_STANDARD_SEEDS[0],
     VOICE_VOCABULARY_SEEDS[0],
@@ -255,6 +271,9 @@ test("filters and searches standard vocabulary seeds across all categories", () 
   );
   const narrativeArcControllerSeeds = getRichStandardVocabularySeedsBySource(
     "narrative-arc-controller-vocabulary",
+  );
+  const orchestrationPolicySeeds = getRichStandardVocabularySeedsBySource(
+    "orchestration-policy-vocabulary",
   );
   const desireSeeds = getRichStandardVocabularySeedsBySource("desire-vocabulary");
   const emotionalMeaningSeeds = getRichStandardVocabularySeedsBySource(
@@ -310,6 +329,15 @@ test("filters and searches standard vocabulary seeds across all categories", () 
   const ruptureTypeSeeds = getRichStandardVocabularySeedsBySource(
     "rupture-type-vocabulary",
   );
+  const runtimeStoryStateSeeds = getRichStandardVocabularySeedsBySource(
+    "runtime-story-state-vocabulary",
+  );
+  const storyStructureArcMatchSeeds = getRichStandardVocabularySeedsBySource(
+    "story-structure-arc-match-vocabulary",
+  );
+  const tropeStageRouteSeeds = getRichStandardVocabularySeedsBySource(
+    "trope-stage-route-vocabulary",
+  );
   const actsOfServiceSeeds = getRichStandardVocabularySeedsBySource(
     "acts-of-service-vocabulary",
   );
@@ -358,6 +386,13 @@ test("filters and searches standard vocabulary seeds across all categories", () 
     "major tension unresolved",
     {
       sourceIds: ["narrative-arc-controller-vocabulary"],
+      limit: 3,
+    },
+  );
+  const orchestrationPolicyResults = searchStandardVocabularySeeds(
+    "tag match alone cannot",
+    {
+      sourceIds: ["orchestration-policy-vocabulary"],
       limit: 3,
     },
   );
@@ -460,6 +495,24 @@ test("filters and searches standard vocabulary seeds across all categories", () 
     "leaving, disappearing",
     {
       sourceIds: ["rupture-type-vocabulary"],
+      limit: 3,
+    },
+  );
+  const runtimeStoryStateResults = searchStandardVocabularySeeds("OOC: AUDIT", {
+    sourceIds: ["runtime-story-state-vocabulary"],
+    limit: 3,
+  });
+  const storyStructureArcMatchResults = searchStandardVocabularySeeds(
+    "fake to real",
+    {
+      sourceIds: ["story-structure-arc-match-vocabulary"],
+      limit: 3,
+    },
+  );
+  const tropeStageRouteResults = searchStandardVocabularySeeds(
+    "cracked armour",
+    {
+      sourceIds: ["trope-stage-route-vocabulary"],
       limit: 3,
     },
   );
@@ -587,6 +640,10 @@ test("filters and searches standard vocabulary seeds across all categories", () 
     narrativeArcControllerSeeds.length,
     NARRATIVE_ARC_CONTROLLER_VOCABULARY_STANDARD_SEEDS.length,
   );
+  assert.equal(
+    orchestrationPolicySeeds.length,
+    ORCHESTRATION_POLICY_VOCABULARY_STANDARD_SEEDS.length,
+  );
   assert.equal(desireSeeds.length, DESIRE_VOCABULARY_STANDARD_SEEDS.length);
   assert.equal(
     emotionalMeaningSeeds.length,
@@ -634,6 +691,18 @@ test("filters and searches standard vocabulary seeds across all categories", () 
   assert.equal(repairBeatSeeds.length, REPAIR_BEAT_VOCABULARY_STANDARD_SEEDS.length);
   assert.equal(repairNeedSeeds.length, REPAIR_NEED_VOCABULARY_STANDARD_SEEDS.length);
   assert.equal(ruptureTypeSeeds.length, RUPTURE_TYPE_VOCABULARY_STANDARD_SEEDS.length);
+  assert.equal(
+    runtimeStoryStateSeeds.length,
+    RUNTIME_STORY_STATE_VOCABULARY_STANDARD_SEEDS.length,
+  );
+  assert.equal(
+    storyStructureArcMatchSeeds.length,
+    STORY_STRUCTURE_ARC_MATCH_STANDARD_SEEDS.length,
+  );
+  assert.equal(
+    tropeStageRouteSeeds.length,
+    TROPE_STAGE_ROUTE_VOCABULARY_STANDARD_SEEDS.length,
+  );
   assert.equal(actsOfServiceSeeds.length, ACTS_OF_SERVICE_VOCABULARY_SEEDS.length);
   assert.equal(
     attachmentStyleSeeds.length,
@@ -677,6 +746,7 @@ test("filters and searches standard vocabulary seeds across all categories", () 
   );
   assert.equal(careResults[0]?.label, "Care Ethics");
   assert.equal(narrativeArcControllerResults[0]?.label, "Phase 3 - Escalation");
+  assert.equal(orchestrationPolicyResults[0]?.label, "Semantic Tag Boost");
   assert.equal(conflictStyleResults[0]?.label, "Pursuer Conflict Style");
   assert.equal(conflictBeatResults[0]?.label, "Delayed Reply Spiral");
   assert.equal(consequenceResults[0]?.label, "Trust Damage Consequence");
@@ -694,6 +764,9 @@ test("filters and searches standard vocabulary seeds across all categories", () 
   assert.equal(repairBeatResults[0]?.label, "Accountability Beat");
   assert.equal(repairNeedResults[0]?.label, "Need for Accountability");
   assert.equal(ruptureTypeResults[0]?.label, "Abandonment Rupture");
+  assert.equal(runtimeStoryStateResults[0]?.label, "Runtime Debugger OOC Commands");
+  assert.equal(storyStructureArcMatchResults[0]?.label, "Romance Route Structure");
+  assert.equal(tropeStageRouteResults[0]?.label, "Grumpy x Sunshine Stage Route");
   assert.equal(actsOfServiceResults[0]?.label, "Quiet Devotion");
   assert.equal(attachmentStyleResults[0]?.label, "Anxious Attachment");
   assert.equal(behaviorArchitectureResults[0]?.label, "Agency Threat");

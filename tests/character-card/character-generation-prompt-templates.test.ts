@@ -7,6 +7,8 @@ import {
   HEARTWRITE_CHARACTER_GENERATION_CARD_PROMPT,
   HEARTWRITE_CHARACTER_GENERATION_OPENING_PROMPT,
   HEARTWRITE_CHARACTER_GENERATION_SCENARIO_PROMPT,
+  HEARTWRITE_CHARACTER_TEMPLATE_COMPACT_PROMPT,
+  HEARTWRITE_CHARACTER_TEMPLATE_FIELD_MAP_PROMPT,
   HEARTWRITE_INITIAL_STARTER_PROMPT,
   HEARTWRITE_STRUCTURED_SCENARIO_GENERATION_PROMPT,
   compileCharacterGenerationPromptTemplate,
@@ -65,6 +67,41 @@ test("defines portable character architecture guidance for card generation", () 
   assert.match(
     HEARTWRITE_CHARACTER_ARCHITECTURE_PROMPT,
     /\{\{user\}\} may appear as a roleplay placeholder/,
+  );
+});
+
+test("defines the twelve-module character template field map for card generation", () => {
+  assert.match(
+    HEARTWRITE_CHARACTER_TEMPLATE_FIELD_MAP_PROMPT,
+    /personaDescription: Module 1: Identity/,
+  );
+  assert.match(
+    HEARTWRITE_CHARACTER_TEMPLATE_FIELD_MAP_PROMPT,
+    /personaPersonality: Module 2: Personality, Module 3: Cognition/,
+  );
+  assert.match(
+    HEARTWRITE_CHARACTER_TEMPLATE_FIELD_MAP_PROMPT,
+    /personaScenario: Module 8: Runtime/,
+  );
+  assert.match(
+    HEARTWRITE_CHARACTER_TEMPLATE_FIELD_MAP_PROMPT,
+    /personaBackstory: Module 9: World, Module 10: Relational Infrastructure, Module 11: Director \/ Arc Engine/,
+  );
+  assert.match(
+    HEARTWRITE_CHARACTER_TEMPLATE_FIELD_MAP_PROMPT,
+    /Generate Module 12 last, then place its compact overview first/,
+  );
+  assert.match(
+    HEARTWRITE_CHARACTER_GENERATION_CARD_PROMPT,
+    /Character template field map:/,
+  );
+  assert.match(
+    HEARTWRITE_CHARACTER_TEMPLATE_COMPACT_PROMPT,
+    /Character template scaffold: compact prompt view/,
+  );
+  assert.match(
+    HEARTWRITE_CHARACTER_TEMPLATE_COMPACT_PROMPT,
+    /Module 12 - Overview/,
   );
 });
 

@@ -65,6 +65,9 @@ import {
   NARRATIVE_ARC_CONTROLLER_VOCABULARY_STANDARD_SEEDS,
 } from "./narrativeArcControllerVocabularyPresets";
 import {
+  ORCHESTRATION_POLICY_VOCABULARY_STANDARD_SEEDS,
+} from "./orchestrationPolicyVocabularyPresets";
+import {
   ORIGIN_WOUND_VOCABULARY_SEEDS,
 } from "./originWoundVocabularyPresets";
 import {
@@ -109,6 +112,15 @@ import {
 import {
   RUPTURE_TYPE_VOCABULARY_STANDARD_SEEDS,
 } from "./ruptureTypeVocabularyPresets";
+import {
+  RUNTIME_STORY_STATE_VOCABULARY_STANDARD_SEEDS,
+} from "./runtimeStoryStateVocabularyPresets";
+import {
+  STORY_STRUCTURE_ARC_MATCH_STANDARD_SEEDS,
+} from "./storyStructureArcMatchPresets";
+import {
+  TROPE_STAGE_ROUTE_VOCABULARY_STANDARD_SEEDS,
+} from "./tropeStageRoutePresets";
 import {
   SEED_PRESET_REGISTRY,
   type SeedPresetRegistryEntry,
@@ -159,6 +171,7 @@ export type StandardVocabularySeedSourceId =
   | "memory-compression-recall-vocabulary"
   | "moral-framework-vocabulary"
   | "narrative-arc-controller-vocabulary"
+  | "orchestration-policy-vocabulary"
   | "origin-wound-vocabulary"
   | "payoff-fantasy-vocabulary"
   | "plot-conflict-vocabulary"
@@ -174,7 +187,10 @@ export type StandardVocabularySeedSourceId =
   | "repair-need-vocabulary"
   | "response-vocabulary"
   | "rupture-type-vocabulary"
+  | "runtime-story-state-vocabulary"
+  | "story-structure-arc-match-vocabulary"
   | "trigger-vocabulary"
+  | "trope-stage-route-vocabulary"
   | "user-persona-profile-vocabulary"
   | "visible-behavior-vocabulary"
   | "voice-vocabulary"
@@ -298,6 +314,11 @@ export const RICH_STANDARD_VOCABULARY_SEED_COLLECTIONS = Object.freeze([
     seeds: NARRATIVE_ARC_CONTROLLER_VOCABULARY_STANDARD_SEEDS,
   },
   {
+    sourceId: "orchestration-policy-vocabulary",
+    label: "Orchestration Policy Vocabulary",
+    seeds: ORCHESTRATION_POLICY_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
     sourceId: "origin-wound-vocabulary",
     label: "Origin Wound Vocabulary",
     seeds: ORIGIN_WOUND_VOCABULARY_SEEDS,
@@ -331,6 +352,21 @@ export const RICH_STANDARD_VOCABULARY_SEED_COLLECTIONS = Object.freeze([
     sourceId: "rupture-type-vocabulary",
     label: "Rupture Type Vocabulary",
     seeds: RUPTURE_TYPE_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "runtime-story-state-vocabulary",
+    label: "Runtime Story State Vocabulary",
+    seeds: RUNTIME_STORY_STATE_VOCABULARY_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "story-structure-arc-match-vocabulary",
+    label: "Story Structure Arc Match Vocabulary",
+    seeds: STORY_STRUCTURE_ARC_MATCH_STANDARD_SEEDS,
+  },
+  {
+    sourceId: "trope-stage-route-vocabulary",
+    label: "Trope Stage Route Vocabulary",
+    seeds: TROPE_STAGE_ROUTE_VOCABULARY_STANDARD_SEEDS,
   },
   {
     sourceId: "trigger-vocabulary",

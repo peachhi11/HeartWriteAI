@@ -1,3 +1,10 @@
+import {
+  compileCharacterTemplateCompactFieldMap,
+} from "./characterTemplateModules";
+import {
+  compileCharacterTemplateCondensedOutline,
+} from "./characterTemplateTokenBudget";
+
 export type CharacterGenerationPromptSection =
   | "character"
   | "scenario"
@@ -64,6 +71,20 @@ export const HEARTWRITE_ADULT_CHARACTER_ARCHITECTURE_PROMPT = [
   "- Do not output explicit anatomy, erotic presentation, or kink content when adult field mode is off.",
 ].join("\n");
 
+export const HEARTWRITE_CHARACTER_TEMPLATE_FIELD_MAP_PROMPT = [
+  "Character template field map:",
+  compileCharacterTemplateCompactFieldMap(),
+  "- Generate Module 12 last, then place its compact overview first.",
+  "- Modules 1-7 are portable character truth.",
+  "- Module 8 is mutable runtime context.",
+  "- Module 9 is setting truth.",
+  "- Module 10 is story/NPC infrastructure.",
+  "- Module 11 is arc-engine guidance.",
+].join("\n");
+
+export const HEARTWRITE_CHARACTER_TEMPLATE_COMPACT_PROMPT =
+  compileCharacterTemplateCondensedOutline("compact");
+
 export const HEARTWRITE_CHARACTER_GENERATION_CARD_PROMPT = [
   "Generate a CCv3-ready {{char}} character card from the provided description and context.",
   "",
@@ -94,6 +115,8 @@ export const HEARTWRITE_CHARACTER_GENERATION_CARD_PROMPT = [
   "- Do not force binary anatomy assumptions onto trans, intersex, synthetic, alien, shapeshifter, or nonhuman characters.",
   "",
   HEARTWRITE_CHARACTER_ARCHITECTURE_PROMPT,
+  "",
+  HEARTWRITE_CHARACTER_TEMPLATE_FIELD_MAP_PROMPT,
   "",
   "Prompt safety and continuity:",
   "- Do not write {{user}}'s thoughts, actions, decisions, or dialogue.",
