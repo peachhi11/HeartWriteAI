@@ -1,26 +1,14 @@
 import { StoryMemoryDashboard } from "@/features/story-memory/components/story-memory-dashboard";
-import {
-  activeStory,
-  corePromptPacks,
-  groupedCategoryTags,
-  sampleCharacters,
-  samplePromptPacks,
-  sampleRelationships,
-  sampleScenes,
-  sampleSecrets,
-} from "@/features/story-memory/data/dashboard-seed";
+import { loadStoryMemoryWorkspace } from "@/features/story-memory/persistence/workspace";
 
-export default function Home() {
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const workspace = await loadStoryMemoryWorkspace();
+
   return (
     <StoryMemoryDashboard
-      categoryTags={groupedCategoryTags}
-      corePromptPacks={corePromptPacks}
-      initialCharacters={sampleCharacters}
-      initialPromptPacks={samplePromptPacks}
-      initialRelationships={sampleRelationships}
-      initialScenes={sampleScenes}
-      initialSecrets={sampleSecrets}
-      story={activeStory}
+      {...workspace}
     />
   );
 }

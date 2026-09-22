@@ -1,7 +1,7 @@
 "use client";
 
 import type { FormEvent, ReactNode } from "react";
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   BookOpenText,
@@ -22,6 +22,15 @@ import {
   UsersRound,
 } from "lucide-react";
 
+import {
+  mapCharacterRow,
+  mapRelationshipThreadRow,
+  mapSavedPromptPackRow,
+  mapSceneMemoryRow,
+  mapSecretRow,
+} from "@/features/story-memory/persistence/mappers";
+import { saveGeneratedPromptPack } from "@/features/story-memory/persistence/saved-prompt-packs";
+import type { StoryMemoryAuthState } from "@/features/story-memory/persistence/workspace";
 import type {
   CategoryTag,
   Character,
@@ -35,6 +44,7 @@ import type {
   SpiceVisibility,
   Story,
 } from "@/features/story-memory/types/story-memory";
+import { createClient } from "@/lib/supabase/browser";
 
 const navItems = [
   { label: "Story", icon: BookOpenText },
@@ -67,26 +77,33 @@ const groupLabels: Record<CategoryTag["group"], string> = {
 };
 
 type StoryMemoryDashboardProps = {
+  auth: StoryMemoryAuthState;
   story: Story;
   initialCharacters: Character[];
   initialScenes: SceneMemory[];
   initialRelationships: RelationshipThread[];
   initialSecrets: SecretOrReveal[];
   initialPromptPacks: GeneratedPromptPack[];
+  initialSelectedTagSlugs: string[];
+  isPersisted: boolean;
   categoryTags: CategoryTag[];
   corePromptPacks: CorePromptPack[];
 };
 
 export function StoryMemoryDashboard({
+  auth,
   story,
   initialCharacters,
   initialScenes,
   initialRelationships,
   initialSecrets,
   initialPromptPacks,
+  initialSelectedTagSlugs,
+  isPersisted,
   categoryTags,
   corePromptPacks,
 }: StoryMemoryDashboardProps) {
+  const [isPending, startTransition] = useTransition();
   const [characters, setCharacters] = useState(initialCharacters);
   const [scenes, setScenes] = useState(initialScenes);
   const [relationships, setRelationships] = useState(initialRelationships);
@@ -96,9 +113,16 @@ export function StoryMemoryDashboard({
   const [spiceVisibility, setSpiceVisibility] = useState<SpiceVisibility>("censored");
   const [povMode, setPovMode] = useState<PovMode>(story.default_pov_mode ?? "narrator_pov");
   const [platform, setPlatform] = useState(story.export_targets?.[0] ?? "JanitorAI");
-  const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>(["situationship"]);
+  const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>(initialSelectedTagSlugs);
   const [activeCorePackId, setActiveCorePackId] = useState(corePromptPacks[0]?.id ?? "");
-  const [notice, setNotice] = useState("Local session ready.");
+  const [notice, setNotice] = useState(
+    isPersisted ? "Supabase workspace ready." : getAuthMessage(auth),
+  );
+  const supabase = useMemo(() => (isPersisted || auth.status === "signed_out" ? createClient() : null), [
+    auth.status,
+    isPersisted,
+  ]);
+  const userId = auth.status === "signed_in" ? auth.userId : null;
 
   const activeRelationship = relationships.at(-1);
   const activeSecret = secrets.at(-1);
@@ -125,13 +149,112 @@ export function StoryMemoryDashboard({
     { label: "Secrets", value: secrets.length, tone: "border-amber-200 bg-amber-50 text-amber-900" },
   ];
 
-  function toggleTag(slug: string) {
-    setSelectedTagSlugs((current) =>
-      current.includes(slug) ? current.filter((tagSlug) => tagSlug !== slug) : [...current, slug],
-    );
+  function requestMagicLink(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const email = getFormValue(event.currentTarget, "email");
+
+    if (!email || !supabase) return;
+
+    startTransition(async () => {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: {
+          emailRedirectTo: window.location.origin,
+        },
+      });
+
+      setNotice(error ? error.message : "Magic link sent. Check your email to open the saved workspace.");
+    });
   }
 
-  function addCharacter(event: FormEvent<HTMLFormElement>) {
+  function signOut() {
+    if (!supabase) return;
+
+    startTransition(async () => {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      window.location.reload();
+    });
+  }
+
+  function toggleTag(slug: string) {
+    const tag = categoryTags.find((candidate) => candidate.slug === slug);
+    const shouldSelect = !selectedTagSlugs.includes(slug);
+
+    setSelectedTagSlugs((current) =>
+      shouldSelect ? [...current, slug] : current.filter((tagSlug) => tagSlug !== slug),
+    );
+
+    if (!isPersisted || !supabase || !userId || !tag) {
+      return;
+    }
+
+    startTransition(async () => {
+      const result = shouldSelect
+        ? await supabase.from("story_tag_selections").upsert(
+            {
+              owner_id: userId,
+              story_id: story.id,
+              tag_id: tag.id,
+            },
+            { onConflict: "story_id,tag_id" },
+          )
+        : await supabase
+            .from("story_tag_selections")
+            .delete()
+            .eq("story_id", story.id)
+            .eq("tag_id", tag.id);
+
+      if (result.error) {
+        setSelectedTagSlugs((current) =>
+          shouldSelect ? current.filter((tagSlug) => tagSlug !== slug) : [...current, slug],
+        );
+        setNotice(result.error.message);
+        return;
+      }
+
+      setNotice(shouldSelect ? `Saved tag: ${tag.label}.` : `Removed tag: ${tag.label}.`);
+    });
+  }
+
+  function updateHeatLevel(value: HeatLevelLabel) {
+    setHeatLevel(value);
+    void persistStoryPatch({ heat_level: value });
+  }
+
+  function updatePovMode(value: PovMode) {
+    setPovMode(value);
+    void persistStoryPatch({ default_pov_mode: value });
+  }
+
+  function updatePlatform(value: string) {
+    setPlatform(value);
+    void persistStoryPatch({ export_targets: [value] });
+  }
+
+  async function persistStoryPatch(patch: {
+    default_pov_mode?: PovMode;
+    export_targets?: string[];
+    heat_level?: HeatLevelLabel;
+  }) {
+    if (!isPersisted || !supabase || !userId) return;
+
+    const { error } = await supabase
+      .from("stories")
+      .update({
+        ...patch,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", story.id);
+
+    setNotice(error ? error.message : "Saved story setting.");
+  }
+
+  async function addCharacter(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const name = getFormValue(form, "name");
@@ -142,30 +265,52 @@ export function StoryMemoryDashboard({
     if (!name) return;
 
     const now = new Date().toISOString();
-    setCharacters((current) => [
-      ...current,
-      {
-        id: makeId("char"),
-        story_id: story.id,
-        name,
-        aliases: [],
-        role,
-        public_facts: role ? [`Known role: ${role}`] : [],
-        private_truths: privateTruth ? [privateTruth] : [],
-        self_beliefs: selfBelief ? [selfBelief] : [],
-        false_beliefs: [],
-        wants: [],
-        fears: [],
-        boundaries: ["Do not write this participant with omniscient knowledge."],
-        created_at: now,
-        updated_at: now,
-      },
-    ]);
+    const draft: Character = {
+      id: makeId("char"),
+      story_id: story.id,
+      name,
+      aliases: [],
+      role,
+      public_facts: role ? [`Known role: ${role}`] : [],
+      private_truths: privateTruth ? [privateTruth] : [],
+      self_beliefs: selfBelief ? [selfBelief] : [],
+      false_beliefs: [],
+      wants: [],
+      fears: [],
+      boundaries: ["Do not write this participant with omniscient knowledge."],
+      created_at: now,
+      updated_at: now,
+    };
+
+    if (isPersisted && supabase && userId) {
+      const { data, error } = await supabase
+        .from("characters")
+        .insert({
+          ...draft,
+          owner_id: userId,
+          role: draft.role ?? null,
+          voice_notes: draft.voice_notes ?? null,
+          current_emotional_state: draft.current_emotional_state ?? null,
+          author_only_notes: draft.author_only_notes ?? null,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      setCharacters((current) => [...current, mapCharacterRow(data)]);
+    } else {
+      setCharacters((current) => [...current, draft]);
+    }
+
     form.reset();
-    setNotice(`Added ${name} to story memory.`);
+    setNotice(`Added ${name} to story memory${isPersisted ? " and saved it" : ""}.`);
   }
 
-  function addRelationship(event: FormEvent<HTMLFormElement>) {
+  async function addRelationship(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const first = getFormValue(form, "participantA") || characters[0]?.id;
@@ -175,29 +320,55 @@ export function StoryMemoryDashboard({
     const conflict = getFormValue(form, "conflict");
     const nextPressure = getFormValue(form, "nextPressure");
     const now = new Date().toISOString();
+    const draft: RelationshipThread = {
+      id: makeId("rel"),
+      story_id: story.id,
+      participants: [first, second].filter(Boolean),
+      dynamic_label: dynamic,
+      current_state: state,
+      conflict_notes: conflict,
+      attraction_notes: "Attraction notes pending.",
+      boundaries: ["Export only what the active POV can know."],
+      linked_secret_ids: [],
+      next_pressure_point: nextPressure,
+      created_at: now,
+      updated_at: now,
+    };
 
-    setRelationships((current) => [
-      ...current,
-      {
-        id: makeId("rel"),
-        story_id: story.id,
-        participants: [first, second].filter(Boolean),
-        dynamic_label: dynamic,
-        current_state: state,
-        conflict_notes: conflict,
-        attraction_notes: "Attraction notes pending.",
-        boundaries: ["Export only what the active POV can know."],
-        linked_secret_ids: [],
-        next_pressure_point: nextPressure,
-        created_at: now,
-        updated_at: now,
-      },
-    ]);
+    if (isPersisted && supabase && userId) {
+      const { data, error } = await supabase
+        .from("relationship_threads")
+        .insert({
+          ...draft,
+          owner_id: userId,
+          current_state: draft.current_state ?? null,
+          attraction_notes: draft.attraction_notes ?? null,
+          trust_notes: draft.trust_notes ?? null,
+          conflict_notes: draft.conflict_notes ?? null,
+          intimacy_history: draft.intimacy_history ?? null,
+          power_dynamic_notes: draft.power_dynamic_notes ?? null,
+          last_major_change: draft.last_major_change ?? null,
+          unresolved_tension: draft.unresolved_tension ?? null,
+          next_pressure_point: draft.next_pressure_point ?? null,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      setRelationships((current) => [...current, mapRelationshipThreadRow(data)]);
+    } else {
+      setRelationships((current) => [...current, draft]);
+    }
+
     form.reset();
-    setNotice(`Added relationship thread: ${dynamic}.`);
+    setNotice(`Added relationship thread: ${dynamic}${isPersisted ? " and saved it" : ""}.`);
   }
 
-  function addSecret(event: FormEvent<HTMLFormElement>) {
+  async function addSecret(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const title = getFormValue(form, "title") || "Untitled secret";
@@ -210,33 +381,57 @@ export function StoryMemoryDashboard({
     if (!secretText) return;
 
     const now = new Date().toISOString();
-    setSecrets((current) => [
-      ...current,
-      {
-        id: makeId("secret"),
-        story_id: story.id,
-        title,
-        secret_text: secretText,
-        who_knows: whoKnows ? [whoKnows] : [],
-        who_suspects: [],
-        who_is_wrong: [],
-        who_is_hiding_it: whoHides ? [whoHides] : [],
-        who_knows_that_someone_knows: [],
-        who_falsely_believes_they_are_safe: whoHides ? [whoHides] : [],
-        who_is_pretending_not_to_know: whoPretends ? [whoPretends] : [],
-        reveal_status: "hidden",
-        related_scene_ids: [],
-        related_relationship_thread_ids: activeRelationship ? [activeRelationship.id] : [],
-        current_pressure: pressure || "Dormant",
-        created_at: now,
-        updated_at: now,
-      },
-    ]);
+    const draft: SecretOrReveal = {
+      id: makeId("secret"),
+      story_id: story.id,
+      title,
+      secret_text: secretText,
+      who_knows: whoKnows ? [whoKnows] : [],
+      who_suspects: [],
+      who_is_wrong: [],
+      who_is_hiding_it: whoHides ? [whoHides] : [],
+      who_knows_that_someone_knows: [],
+      who_falsely_believes_they_are_safe: whoHides ? [whoHides] : [],
+      who_is_pretending_not_to_know: whoPretends ? [whoPretends] : [],
+      reveal_status: "hidden",
+      related_scene_ids: [],
+      related_relationship_thread_ids: activeRelationship ? [activeRelationship.id] : [],
+      current_pressure: pressure || "Dormant",
+      created_at: now,
+      updated_at: now,
+    };
+
+    if (isPersisted && supabase && userId) {
+      const { data, error } = await supabase
+        .from("secrets")
+        .insert({
+          ...draft,
+          owner_id: userId,
+          title: draft.title ?? null,
+          truth_status: draft.truth_status ?? null,
+          reveal_scene_id: draft.reveal_scene_id ?? null,
+          consequences_if_revealed: draft.consequences_if_revealed ?? null,
+          current_pressure: draft.current_pressure ?? null,
+          author_notes: draft.author_notes ?? null,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      setSecrets((current) => [...current, mapSecretRow(data)]);
+    } else {
+      setSecrets((current) => [...current, draft]);
+    }
+
     form.reset();
-    setNotice(`Added secret: ${title}.`);
+    setNotice(`Added secret: ${title}${isPersisted ? " and saved it" : ""}.`);
   }
 
-  function addScene(event: FormEvent<HTMLFormElement>) {
+  async function addScene(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const form = event.currentTarget;
     const title = getFormValue(form, "title") || "Untitled scene";
@@ -248,28 +443,54 @@ export function StoryMemoryDashboard({
     if (!summary) return;
 
     const now = new Date().toISOString();
-    setScenes((current) => [
-      ...current,
-      {
-        id: makeId("scene"),
-        story_id: story.id,
-        title,
-        sequence_index: current.length + 1,
-        location,
-        pov_mode: povMode,
-        participants: participant ? [participant] : [],
-        summary,
-        key_actions: [],
-        new_information: [],
-        unresolved_hooks: [],
-        continuity_flags: continuityFlag ? [continuityFlag] : ["Respect active POV knowledge."],
-        canon_status: "draft",
-        created_at: now,
-        updated_at: now,
-      },
-    ]);
+    const draft: SceneMemory = {
+      id: makeId("scene"),
+      story_id: story.id,
+      title,
+      sequence_index: scenes.length + 1,
+      location,
+      pov_mode: povMode,
+      participants: participant ? [participant] : [],
+      summary,
+      key_actions: [],
+      new_information: [],
+      unresolved_hooks: [],
+      continuity_flags: continuityFlag ? [continuityFlag] : ["Respect active POV knowledge."],
+      canon_status: "draft",
+      created_at: now,
+      updated_at: now,
+    };
+
+    if (isPersisted && supabase && userId) {
+      const { data, error } = await supabase
+        .from("scene_memories")
+        .insert({
+          ...draft,
+          owner_id: userId,
+          title: draft.title ?? null,
+          sequence_index: draft.sequence_index ?? null,
+          scene_date_or_time: draft.scene_date_or_time ?? null,
+          location: draft.location ?? null,
+          emotional_shift: draft.emotional_shift ?? null,
+          relationship_shift: draft.relationship_shift ?? null,
+          intimacy_shift: draft.intimacy_shift ?? null,
+          conflict_shift: draft.conflict_shift ?? null,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      setScenes((current) => [...current, mapSceneMemoryRow(data)]);
+    } else {
+      setScenes((current) => [...current, draft]);
+    }
+
     form.reset();
-    setNotice(`Added scene memory: ${title}.`);
+    setNotice(`Added scene memory: ${title}${isPersisted ? " and saved it" : ""}.`);
   }
 
   function generatePromptPack() {
@@ -326,9 +547,30 @@ export function StoryMemoryDashboard({
     setNotice("Generated a fresh session prompt pack.");
   }
 
-  function saveLatestPromptPack() {
+  async function saveLatestPromptPack() {
     if (!latestPromptPack) return;
     const now = new Date().toISOString();
+
+    if (isPersisted && supabase && userId) {
+      const { data, error } = await saveGeneratedPromptPack({
+        ownerId: userId,
+        pack: latestPromptPack,
+        supabase,
+      });
+
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      setPromptPacks((current) =>
+        current.map((pack) =>
+          pack.id === latestPromptPack.id ? mapSavedPromptPackRow(data) : pack,
+        ),
+      );
+      setNotice(`Saved prompt pack: ${latestPromptPack.title}.`);
+      return;
+    }
 
     setPromptPacks((current) =>
       current.map((pack) =>
@@ -377,6 +619,47 @@ export function StoryMemoryDashboard({
               })}
             </nav>
 
+            <div className="mt-6 rounded-lg border border-zinc-200 bg-zinc-50 p-3">
+              <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                <ShieldCheck className="size-3.5" aria-hidden="true" />
+                Workspace
+              </div>
+              {auth.status === "signed_in" ? (
+                <div className="mt-3 grid gap-3">
+                  <p className="truncate text-sm font-medium text-zinc-900">
+                    {auth.email ?? "Signed in"}
+                  </p>
+                  <button
+                    className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={isPending}
+                    onClick={signOut}
+                    type="button"
+                  >
+                    Sign out
+                  </button>
+                </div>
+              ) : (
+                <form className="mt-3 grid gap-2" onSubmit={requestMagicLink}>
+                  <input
+                    className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950"
+                    name="email"
+                    placeholder="Email for saved mode"
+                    type="email"
+                  />
+                  <button
+                    className="h-9 rounded-md bg-zinc-950 px-3 text-sm font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={isPending || !supabase}
+                    type="submit"
+                  >
+                    Send magic link
+                  </button>
+                </form>
+              )}
+              <p className="mt-3 text-xs leading-5 text-zinc-500">
+                {isPersisted ? "Changes save to Supabase." : "Demo changes stay in this session."}
+              </p>
+            </div>
+
             <div className="mt-auto hidden text-sm text-zinc-600 lg:block">
               <p className="font-medium text-zinc-900">V1 boundary</p>
               <p className="mt-2 leading-6">
@@ -405,7 +688,7 @@ export function StoryMemoryDashboard({
                   label="Heat"
                   value={heatLevel}
                   options={heatOptions}
-                  onChange={(value) => setHeatLevel(value as HeatLevelLabel)}
+                  onChange={(value) => updateHeatLevel(value as HeatLevelLabel)}
                 />
                 <ControlSegment
                   icon={ShieldCheck}
@@ -420,14 +703,14 @@ export function StoryMemoryDashboard({
                   value={povMode}
                   options={story.supported_pov_modes}
                   optionLabels={povLabels}
-                  onChange={(value) => setPovMode(value as PovMode)}
+                  onChange={(value) => updatePovMode(value as PovMode)}
                 />
                 <ControlSelect
                   icon={Sparkles}
                   label="Platform"
                   value={platform}
                   options={platformOptions}
-                  onChange={setPlatform}
+                  onChange={updatePlatform}
                 />
               </div>
             </div>
@@ -573,6 +856,7 @@ export function StoryMemoryDashboard({
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       className="flex h-10 items-center justify-center gap-2 rounded-md bg-zinc-950 px-3 text-sm font-medium text-white hover:bg-zinc-800"
+                      disabled={isPending}
                       onClick={generatePromptPack}
                       type="button"
                     >
@@ -581,7 +865,7 @@ export function StoryMemoryDashboard({
                     </button>
                     <button
                       className="flex h-10 items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 hover:bg-zinc-50"
-                      disabled={!latestPromptPack}
+                      disabled={!latestPromptPack || latestPromptPack.persistence_state === "saved" || isPending}
                       onClick={saveLatestPromptPack}
                       type="button"
                     >
@@ -856,4 +1140,8 @@ function displayLabel(value: string) {
     .replaceAll("_", " ")
     .replaceAll("-", " ")
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function getAuthMessage(auth: StoryMemoryAuthState) {
+  return auth.status === "signed_in" ? "Supabase workspace ready." : auth.message;
 }
