@@ -66,6 +66,13 @@ type PlatformProfile = {
   stackStatus: string;
 };
 
+type PromptSlot = {
+  body: string;
+  helper: string;
+  id: string;
+  label: string;
+};
+
 const platformProfiles: Record<string, PlatformProfile> = {
   JanitorAI: {
     builderNote:
@@ -233,6 +240,7 @@ export function StoryMemoryDashboard({
   const activeSecret = secrets.at(-1);
   const activeScene = scenes.at(-1);
   const latestPromptPack = promptPacks.at(-1);
+  const latestPromptSlots = latestPromptPack ? getPromptPackSlots(latestPromptPack) : [];
   const activeCorePack = corePromptPacks.find((pack) => pack.id === activeCorePackId) ?? corePromptPacks[0];
   const activePlatformProfile = platformProfiles[platform] ?? platformProfiles.JanitorAI;
 
@@ -734,6 +742,17 @@ export function StoryMemoryDashboard({
     const tagLine = selectedLabels.length
       ? `Active tags: ${selectedLabels.join(", ")}.`
       : "Active tags: none selected.";
+    const promptSlots = buildPlatformPromptSlots({
+      activeCorePack,
+      heatLine,
+      platform,
+      platformProfile: activePlatformProfile,
+      povLine,
+      relationshipLine,
+      sceneLine,
+      secretLine,
+      tagLine,
+    });
 
     setPromptPacks((current) => [
       ...current,
@@ -753,16 +772,10 @@ export function StoryMemoryDashboard({
         selected_relationship_threads: activeRelationship ? [activeRelationship.id] : [],
         selected_scene_memories: activeScene ? [activeScene.id] : [],
         selected_secrets_policy: "active_pov_only",
-        generated_text: buildPlatformPromptText({
-          activeCorePack,
-          heatLine,
+        generated_text: formatPromptSlots({
           platform,
           platformProfile: activePlatformProfile,
-          povLine,
-          relationshipLine,
-          sceneLine,
-          secretLine,
-          tagLine,
+          slots: promptSlots,
         }),
         persistence_state: "session",
         created_at: now,
@@ -770,6 +783,20 @@ export function StoryMemoryDashboard({
       },
     ]);
     setNotice("Generated a fresh session prompt pack.");
+  }
+
+  async function copyPromptSlot(slot: PromptSlot) {
+    if (!navigator.clipboard) {
+      setNotice("Copy is not available in this browser.");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(slot.body);
+      setNotice(`Copied ${slot.label}.`);
+    } catch {
+      setNotice("Copy failed. Select the text manually for now.");
+    }
   }
 
   async function saveLatestPromptPack() {
@@ -1188,9 +1215,17 @@ export function StoryMemoryDashboard({
                       <p className="mt-2 text-sm leading-6 text-zinc-600">{latestPromptPack.tailoring_goal}</p>
                     </div>
 
-                    <pre className="max-h-[360px] overflow-auto whitespace-pre-wrap rounded-lg bg-zinc-950 p-4 text-sm leading-6 text-zinc-100">
-                      {latestPromptPack.generated_text}
-                    </pre>
+                    <div className="grid gap-3">
+                      {latestPromptSlots.map((slot) => (
+                        <PromptSlotCard
+                          key={slot.id}
+                          onCopy={() => {
+                            void copyPromptSlot(slot);
+                          }}
+                          slot={slot}
+                        />
+                      ))}
+                    </div>
                   </div>
                 ) : (
                   <p className="text-sm leading-6 text-zinc-600">
@@ -1215,7 +1250,7 @@ export function StoryMemoryDashboard({
   );
 }
 
-function buildPlatformPromptText({
+function buildPlatformPromptSlots({
   activeCorePack,
   heatLine,
   platform,
@@ -1235,71 +1270,174 @@ function buildPlatformPromptText({
   sceneLine: string;
   secretLine: string;
   tagLine: string;
-}) {
+}): PromptSlot[] {
   if (platform === "SillyTavern") {
     return [
-      "[SillyTavern Stack Map]",
-      platformProfile.generatedFrame,
-      "",
-      "[Core Prompt Source]",
-      activeCorePack.base_prompt,
-      "",
-      "[Prompt Areas To Configure]",
-      platformProfile.promptAreas.map((area) => `- ${area}`).join("\n"),
-      "",
-      "[Current Story Inputs]",
-      povLine,
-      heatLine,
-      tagLine,
-      relationshipLine,
-      secretLine,
-      sceneLine,
-    ].join("\n");
+      {
+        id: "sillytavern-stack-map",
+        label: "SillyTavern Stack Map",
+        helper: "Planning map for the larger SillyTavern prompt stack.",
+        body: [
+          platformProfile.generatedFrame,
+          "",
+          "[Core Prompt Source]",
+          activeCorePack.base_prompt,
+          "",
+          "[Prompt Areas To Configure]",
+          platformProfile.promptAreas.map((area) => `- ${area}`).join("\n"),
+          "",
+          "[Current Story Inputs]",
+          povLine,
+          heatLine,
+          tagLine,
+          relationshipLine,
+          secretLine,
+          sceneLine,
+        ].join("\n"),
+      },
+    ];
   }
 
   if (platform === "MarinaraTavern") {
     return [
-      "<agentic-stack-map>",
-      platformProfile.generatedFrame,
-      "</agentic-stack-map>",
-      "",
-      "<core-prompt-source>",
-      activeCorePack.base_prompt,
-      "</core-prompt-source>",
-      "",
-      "<prompt-areas-to-configure>",
-      platformProfile.promptAreas.map((area) => `- ${area}`).join("\n"),
-      "</prompt-areas-to-configure>",
-      "",
-      "<current-story-inputs>",
-      povLine,
-      heatLine,
-      tagLine,
-      relationshipLine,
-      secretLine,
-      sceneLine,
-      "</current-story-inputs>",
-    ].join("\n");
+      {
+        id: "marinaratavern-agentic-stack-map",
+        label: "MarinaraTavern Agentic Stack Map",
+        helper: "Planning map for Marinara's modular prompt and workflow stack.",
+        body: [
+          "<agentic-stack-map>",
+          platformProfile.generatedFrame,
+          "</agentic-stack-map>",
+          "",
+          "<core-prompt-source>",
+          activeCorePack.base_prompt,
+          "</core-prompt-source>",
+          "",
+          "<prompt-areas-to-configure>",
+          platformProfile.promptAreas.map((area) => `- ${area}`).join("\n"),
+          "</prompt-areas-to-configure>",
+          "",
+          "<current-story-inputs>",
+          povLine,
+          heatLine,
+          tagLine,
+          relationshipLine,
+          secretLine,
+          sceneLine,
+          "</current-story-inputs>",
+        ].join("\n"),
+      },
+    ];
   }
 
   return [
-    "[JanitorAI Export]",
+    {
+      id: "janitorai-global-prompt",
+      label: "Global Prompt",
+      helper: "Paste into JanitorAI's global prompt slot.",
+      body: [activeCorePack.base_prompt, "", povLine, heatLine, tagLine].join("\n"),
+    },
+    {
+      id: "janitorai-proxy-prompt",
+      label: "Proxy Prompt",
+      helper: "Paste into JanitorAI's proxy prompt slot for the active session layer.",
+      body: [
+        "Use this for the active session layer: immediate POV control, current relationship pressure, secrets, and latest continuity.",
+        "",
+        relationshipLine,
+        secretLine,
+        sceneLine,
+      ].join("\n"),
+    },
+  ];
+}
+
+function formatPromptSlots({
+  platform,
+  platformProfile,
+  slots,
+}: {
+  platform: string;
+  platformProfile: PlatformProfile;
+  slots: PromptSlot[];
+}) {
+  return [
+    `[${platform} Export]`,
     platformProfile.generatedFrame,
     "",
-    "[Global Prompt]",
-    activeCorePack.base_prompt,
-    "",
-    povLine,
-    heatLine,
-    tagLine,
-    "",
-    "[Proxy Prompt]",
-    "Use this for the active session layer: immediate POV control, current relationship pressure, secrets, and latest continuity.",
-    "",
-    relationshipLine,
-    secretLine,
-    sceneLine,
-  ].join("\n");
+    ...slots.flatMap((slot) => [`[${slot.label}]`, slot.body, ""]),
+  ]
+    .join("\n")
+    .trim();
+}
+
+function getPromptPackSlots(pack: GeneratedPromptPack): PromptSlot[] {
+  if (pack.target_platform === "JanitorAI") {
+    const globalPrompt = getSectionBody(pack.generated_text, "Global Prompt", "Proxy Prompt");
+    const proxyPrompt = getSectionBody(pack.generated_text, "Proxy Prompt");
+
+    if (globalPrompt && proxyPrompt) {
+      return [
+        {
+          id: "janitorai-global-prompt",
+          label: "Global Prompt",
+          helper: "Paste into JanitorAI's global prompt slot.",
+          body: globalPrompt,
+        },
+        {
+          id: "janitorai-proxy-prompt",
+          label: "Proxy Prompt",
+          helper: "Paste into JanitorAI's proxy prompt slot.",
+          body: proxyPrompt,
+        },
+      ];
+    }
+  }
+
+  return [
+    {
+      id: "full-export",
+      label: `${pack.target_platform} Export`,
+      helper: "Copy the generated pack.",
+      body: pack.generated_text,
+    },
+  ];
+}
+
+function getSectionBody(text: string, startLabel: string, endLabel?: string) {
+  const startMarker = `[${startLabel}]`;
+  const startIndex = text.indexOf(startMarker);
+  if (startIndex === -1) return "";
+
+  const bodyStart = startIndex + startMarker.length;
+  const endIndex = endLabel ? text.indexOf(`[${endLabel}]`, bodyStart) : -1;
+  const rawBody = text.slice(bodyStart, endIndex === -1 ? undefined : endIndex);
+
+  return rawBody.trim();
+}
+
+function PromptSlotCard({ onCopy, slot }: { onCopy: () => void; slot: PromptSlot }) {
+  return (
+    <article className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
+      <div className="flex items-start justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-3 py-3">
+        <div>
+          <h3 className="text-sm font-semibold text-zinc-950">{slot.label}</h3>
+          <p className="mt-1 text-xs leading-5 text-zinc-500">{slot.helper}</p>
+        </div>
+        <button
+          className="inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-md border border-zinc-300 bg-white px-2.5 text-xs font-medium text-zinc-800 hover:bg-zinc-100"
+          onClick={onCopy}
+          type="button"
+        >
+          <Copy className="size-3.5" aria-hidden="true" />
+          Copy
+        </button>
+      </div>
+      <pre className="max-h-64 overflow-auto whitespace-pre-wrap bg-zinc-950 p-3 text-sm leading-6 text-zinc-100">
+        {slot.body}
+      </pre>
+    </article>
+  );
 }
 
 function ControlSelect({
