@@ -62,52 +62,99 @@ type PlatformProfile = {
   builderNote: string;
   generatedFrame: string;
   includedSections: string[];
+  promptAreas: string[];
+  stackStatus: string;
 };
 
 const platformProfiles: Record<string, PlatformProfile> = {
   JanitorAI: {
     builderNote:
-      "Builds a compact character-bot preset where behavior, POV limits, relationship pressure, and secrets need to be immediately visible.",
+      "Best first target. JanitorAI mainly needs a Global Prompt and Proxy Prompt, so this builder can produce a usable preset quickly.",
     generatedFrame:
-      "Compact bot prompt. Keep the active character behavior-first, keep {{user}} as the user player, and avoid hidden omniscience.",
+      "JanitorAI export. Split broad behavior rules into the Global Prompt and active scene control into the Proxy Prompt.",
     includedSections: [
-      "Platform frame",
-      "Core prompt",
+      "Global Prompt",
+      "Proxy Prompt",
       "POV policy",
+      "Heat and spice state",
       "Tags",
       "Relationship pressure",
       "Secret policy",
-      "Latest scene",
     ],
+    promptAreas: ["Global Prompt", "Proxy Prompt"],
+    stackStatus: "V1 build target",
   },
   SillyTavern: {
     builderNote:
-      "Builds a sectioned preset that can be pasted into a card, author note, or lorebook-style memory block.",
+      "Advanced stack. This needs follow-up controls for prompt modules, generation behavior, trackers, and summaries.",
     generatedFrame:
-      "Sectioned tavern preset. Keep reusable rules in the main prompt and keep scene-specific continuity in memory notes.",
+      "SillyTavern planning export. Use this as a stack map until module selection is added.",
     includedSections: [
-      "Platform frame",
+      "Stack map",
       "Main prompt",
-      "Authorship rules",
-      "Active tags",
-      "Memory notes",
-      "Secret handling",
+      "AI role",
+      "AI guidelines",
+      "Prompt modules",
+      "Trackers",
+      "Generation controls",
     ],
+    promptAreas: [
+      "Main system prompt",
+      "AI role",
+      "AI guidelines",
+      "Writing style",
+      "World style",
+      "Character style",
+      "Persona style",
+      "Impersonation style",
+      "Enhance definitions",
+      "Scenario",
+      "NSFW",
+      "Post-history",
+      "Auxiliary",
+      "Shorten, lengthen, and custom prompts",
+      "CFG scales",
+      "Trackers and scene trackers",
+      "Guided generation prompts",
+      "Summary prompts",
+    ],
+    stackStatus: "Needs advanced module selection",
   },
   MarinaraTavern: {
     builderNote:
-      "Builds a modular runtime preset with clear blocks for core behavior, POV policy, relationship memory, and secret handling.",
+      "Advanced agentic stack. It should inherit the SillyTavern-style modules, then add workflow and agent routing choices.",
     generatedFrame:
-      "Modular runtime preset. Keep each block swappable so the app can later route memory, tags, and exports independently.",
+      "MarinaraTavern planning export. Keep the prompt stack modular and reserve room for agentic workflow routing.",
     includedSections: [
-      "Platform frame",
-      "Core block",
-      "POV block",
-      "Tags block",
-      "Relationship block",
-      "Secrets block",
-      "Scene block",
+      "Agentic stack map",
+      "Prompt modules",
+      "Workflow roles",
+      "Memory routing",
+      "Trackers",
+      "Generation controls",
     ],
+    promptAreas: [
+      "Main system prompt",
+      "AI role",
+      "AI guidelines",
+      "Writing style",
+      "World style",
+      "Character style",
+      "Persona style",
+      "Impersonation style",
+      "Enhance definitions",
+      "Scenario",
+      "NSFW",
+      "Post-history",
+      "Auxiliary",
+      "Trackers and scene trackers",
+      "Guided generation prompts",
+      "Summary prompts",
+      "Agentic workflow",
+      "Memory routing",
+      "Tool or agent handoff rules",
+    ],
+    stackStatus: "Needs agentic workflow design",
   },
 };
 
@@ -1067,6 +1114,27 @@ export function StoryMemoryDashboard({
                     {activePlatformProfile.builderNote}
                   </p>
 
+                  <div className="rounded-md border border-zinc-200 bg-white px-3 py-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                        Export shape
+                      </p>
+                      <span className="rounded bg-zinc-100 px-2 py-1 text-xs font-medium text-zinc-700">
+                        {activePlatformProfile.stackStatus}
+                      </span>
+                    </div>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      {activePlatformProfile.promptAreas.map((area) => (
+                        <span
+                          className="rounded-md border border-zinc-200 bg-zinc-50 px-2 py-1 text-xs font-medium text-zinc-700"
+                          key={area}
+                        >
+                          {area}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
                   <label className="grid gap-1.5 text-sm">
                     <span className="font-medium text-zinc-700">Core pack</span>
                     <select
@@ -1170,84 +1238,66 @@ function buildPlatformPromptText({
 }) {
   if (platform === "SillyTavern") {
     return [
-      "[SillyTavern Preset Frame]",
+      "[SillyTavern Stack Map]",
       platformProfile.generatedFrame,
       "",
-      "[Main Prompt]",
+      "[Core Prompt Source]",
       activeCorePack.base_prompt,
       "",
-      "[Authorship Rules]",
+      "[Prompt Areas To Configure]",
+      platformProfile.promptAreas.map((area) => `- ${area}`).join("\n"),
+      "",
+      "[Current Story Inputs]",
       povLine,
       heatLine,
-      "",
-      "[Active Tags]",
       tagLine,
-      "",
-      "[Memory Notes]",
       relationshipLine,
-      sceneLine,
-      "",
-      "[Secret Handling]",
       secretLine,
+      sceneLine,
     ].join("\n");
   }
 
   if (platform === "MarinaraTavern") {
     return [
-      "<platform-frame>",
+      "<agentic-stack-map>",
       platformProfile.generatedFrame,
-      "</platform-frame>",
+      "</agentic-stack-map>",
       "",
-      "<core>",
+      "<core-prompt-source>",
       activeCorePack.base_prompt,
-      "</core>",
+      "</core-prompt-source>",
       "",
-      "<pov-policy>",
+      "<prompt-areas-to-configure>",
+      platformProfile.promptAreas.map((area) => `- ${area}`).join("\n"),
+      "</prompt-areas-to-configure>",
+      "",
+      "<current-story-inputs>",
       povLine,
-      "</pov-policy>",
-      "",
-      "<heat-and-tags>",
       heatLine,
       tagLine,
-      "</heat-and-tags>",
-      "",
-      "<relationship-memory>",
       relationshipLine,
-      "</relationship-memory>",
-      "",
-      "<secret-policy>",
       secretLine,
-      "</secret-policy>",
-      "",
-      "<scene-memory>",
       sceneLine,
-      "</scene-memory>",
+      "</current-story-inputs>",
     ].join("\n");
   }
 
   return [
-    "[JanitorAI Preset Frame]",
+    "[JanitorAI Export]",
     platformProfile.generatedFrame,
     "",
-    "Core prompt:",
+    "[Global Prompt]",
     activeCorePack.base_prompt,
     "",
-    "POV / authorship:",
     povLine,
-    "",
-    "Heat / spice:",
     heatLine,
-    "",
-    "Tags:",
     tagLine,
     "",
-    "Relationship pressure:",
+    "[Proxy Prompt]",
+    "Use this for the active session layer: immediate POV control, current relationship pressure, secrets, and latest continuity.",
+    "",
     relationshipLine,
-    "",
-    "Secret policy:",
     secretLine,
-    "",
-    "Latest scene:",
     sceneLine,
   ].join("\n");
 }
