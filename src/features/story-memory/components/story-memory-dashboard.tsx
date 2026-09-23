@@ -90,7 +90,7 @@ type StoryMemoryDashboardProps = {
   corePromptPacks: CorePromptPack[];
 };
 
-type AuthAction = "sign-in" | "create-account" | "magic-link";
+type AuthAction = "sign-in" | "create-account" | "magic-link" | "reset-password";
 
 export function StoryMemoryDashboard({
   auth,
@@ -180,6 +180,11 @@ export function StoryMemoryDashboard({
       return;
     }
 
+    if (action === "reset-password") {
+      requestPasswordReset(email);
+      return;
+    }
+
     if (!password) {
       setAuthNotice("Enter a password to use saved workspace sign-in.");
       return;
@@ -207,6 +212,22 @@ export function StoryMemoryDashboard({
       });
 
       const message = error ? error.message : "Magic link sent. Check your email.";
+      setAuthNotice(message);
+      setNotice(message);
+    });
+  }
+
+  function requestPasswordReset(email: string) {
+    if (!supabase) return;
+
+    setAuthNotice("Sending password setup link...");
+
+    startTransition(async () => {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/callback?next=/auth/update-password`,
+      });
+
+      const message = error ? error.message : "Password setup link sent. Check your email.";
       setAuthNotice(message);
       setNotice(message);
     });
@@ -778,6 +799,14 @@ export function StoryMemoryDashboard({
                     type="button"
                   >
                     Email me a link instead
+                  </button>
+                  <button
+                    onClick={(event) => handleAuthButtonClick(event, "reset-password")}
+                    className="h-9 rounded-md border border-transparent px-3 text-sm font-medium text-zinc-600 hover:bg-white hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={isPending || !supabase}
+                    type="button"
+                  >
+                    Set or reset password
                   </button>
                   <p className="text-xs leading-5 text-zinc-500" aria-live="polite">
                     {authNotice}
