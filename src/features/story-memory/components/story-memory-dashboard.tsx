@@ -149,11 +149,37 @@ export function StoryMemoryDashboard({
     { label: "Secrets", value: secrets.length, tone: "border-amber-200 bg-amber-50 text-amber-900" },
   ];
 
-  function requestMagicLink(event: FormEvent<HTMLFormElement>) {
+  function handleAuthSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const email = getFormValue(event.currentTarget, "email");
+    const form = event.currentTarget;
+    const submitter = (event.nativeEvent as SubmitEvent).submitter;
+    const action =
+      submitter instanceof HTMLButtonElement ? submitter.value : "sign-in";
+    const email = getFormValue(form, "email");
+    const password = getFormValue(form, "password");
 
     if (!email || !supabase) return;
+
+    if (action === "magic-link") {
+      requestMagicLink(email);
+      return;
+    }
+
+    if (!password) {
+      setNotice("Enter a password to use saved workspace sign-in.");
+      return;
+    }
+
+    if (action === "create-account") {
+      createPasswordAccount(email, password);
+      return;
+    }
+
+    signInWithPassword(email, password);
+  }
+
+  function requestMagicLink(email: string) {
+    if (!supabase) return;
 
     startTransition(async () => {
       const { error } = await supabase.auth.signInWithOtp({
@@ -164,6 +190,50 @@ export function StoryMemoryDashboard({
       });
 
       setNotice(error ? error.message : "Magic link sent. Check your email to open the saved workspace.");
+    });
+  }
+
+  function signInWithPassword(email: string, password: string) {
+    if (!supabase) return;
+
+    startTransition(async () => {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      window.location.reload();
+    });
+  }
+
+  function createPasswordAccount(email: string, password: string) {
+    if (!supabase) return;
+
+    startTransition(async () => {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      if (data.session) {
+        window.location.reload();
+        return;
+      }
+
+      setNotice("Account created. Check your email if Supabase asks you to confirm it.");
     });
   }
 
@@ -639,19 +709,51 @@ export function StoryMemoryDashboard({
                   </button>
                 </div>
               ) : (
-                <form className="mt-3 grid gap-2" onSubmit={requestMagicLink}>
+                <form className="mt-3 grid gap-2" onSubmit={handleAuthSubmit}>
                   <input
+                    aria-label="Email"
+                    autoComplete="email"
                     className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950"
                     name="email"
-                    placeholder="Email for saved mode"
+                    placeholder="Email"
                     type="email"
                   />
+                  <input
+                    aria-label="Password"
+                    autoComplete="current-password"
+                    className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950"
+                    name="password"
+                    placeholder="Password"
+                    type="password"
+                  />
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      className="h-9 rounded-md bg-zinc-950 px-3 text-sm font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+                      disabled={isPending || !supabase}
+                      name="authAction"
+                      type="submit"
+                      value="sign-in"
+                    >
+                      Sign in
+                    </button>
+                    <button
+                      className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60"
+                      disabled={isPending || !supabase}
+                      name="authAction"
+                      type="submit"
+                      value="create-account"
+                    >
+                      Create
+                    </button>
+                  </div>
                   <button
-                    className="h-9 rounded-md bg-zinc-950 px-3 text-sm font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="h-9 rounded-md border border-transparent px-3 text-sm font-medium text-zinc-600 hover:bg-white hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-60"
                     disabled={isPending || !supabase}
+                    name="authAction"
                     type="submit"
+                    value="magic-link"
                   >
-                    Send magic link
+                    Email me a link instead
                   </button>
                 </form>
               )}
