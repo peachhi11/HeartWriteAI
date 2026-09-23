@@ -73,7 +73,7 @@ type PromptSlot = {
   label: string;
 };
 
-type PromptIncludeKey =
+type PromptModuleKey =
   | "activeTags"
   | "activeSecrets"
   | "heatSpice"
@@ -81,31 +81,64 @@ type PromptIncludeKey =
   | "povGuardrails"
   | "relationshipPressure";
 
-type PromptIncludes = Record<PromptIncludeKey, boolean>;
+type PromptModuleDrafts = Partial<Record<PromptModuleKey, string>>;
+type PromptModuleExpanded = Record<PromptModuleKey, boolean>;
+type PromptModuleText = Record<PromptModuleKey, string>;
 
-const defaultPromptIncludes: PromptIncludes = {
-  activeTags: true,
-  activeSecrets: true,
-  heatSpice: true,
-  latestScene: true,
+const defaultPromptModuleExpanded: PromptModuleExpanded = {
+  activeTags: false,
+  activeSecrets: false,
+  heatSpice: false,
+  latestScene: false,
   povGuardrails: true,
-  relationshipPressure: true,
+  relationshipPressure: false,
 };
 
-const promptIncludeOptions: {
-  key: PromptIncludeKey;
+const promptModuleOptions: {
+  helper: string;
+  key: PromptModuleKey;
   label: string;
   slot: "Global" | "Proxy";
 }[] = [
-  { key: "povGuardrails", label: "POV guardrails", slot: "Global" },
-  { key: "heatSpice", label: "Heat / spice state", slot: "Global" },
-  { key: "activeTags", label: "Active tags", slot: "Global" },
-  { key: "relationshipPressure", label: "Relationship pressure", slot: "Proxy" },
-  { key: "activeSecrets", label: "Active secrets", slot: "Proxy" },
-  { key: "latestScene", label: "Latest scene", slot: "Proxy" },
+  {
+    helper: "Authorship and POV boundary text for the stable global prompt.",
+    key: "povGuardrails",
+    label: "POV guardrails",
+    slot: "Global",
+  },
+  {
+    helper: "Current heat label and censored/uncensored export language.",
+    key: "heatSpice",
+    label: "Heat / spice state",
+    slot: "Global",
+  },
+  {
+    helper: "Selected trope and platform tags that should shape the pack.",
+    key: "activeTags",
+    label: "Active tags",
+    slot: "Global",
+  },
+  {
+    helper: "Current relationship tension for the active session layer.",
+    key: "relationshipPressure",
+    label: "Relationship pressure",
+    slot: "Proxy",
+  },
+  {
+    helper: "Active secret/reveal policy for the selected POV.",
+    key: "activeSecrets",
+    label: "Active secrets",
+    slot: "Proxy",
+  },
+  {
+    helper: "Latest continuity note or scene memory for the active session.",
+    key: "latestScene",
+    label: "Latest scene",
+    slot: "Proxy",
+  },
 ];
 
-const promptIncludeSectionLabels: Record<PromptIncludeKey, string> = {
+const promptModuleSectionLabels: Record<PromptModuleKey, string> = {
   activeTags: "Tags",
   activeSecrets: "Secret policy",
   heatSpice: "Heat and spice state",
@@ -265,7 +298,10 @@ export function StoryMemoryDashboard({
   const [platform, setPlatform] = useState(story.export_targets?.[0] ?? "JanitorAI");
   const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>(initialSelectedTagSlugs);
   const [activeCorePackId, setActiveCorePackId] = useState(corePromptPacks[0]?.id ?? "");
-  const [promptIncludes, setPromptIncludes] = useState<PromptIncludes>(defaultPromptIncludes);
+  const [promptModuleDrafts, setPromptModuleDrafts] = useState<PromptModuleDrafts>({});
+  const [promptModuleExpanded, setPromptModuleExpanded] = useState<PromptModuleExpanded>(
+    defaultPromptModuleExpanded,
+  );
   const [notice, setNotice] = useState(
     isPersisted ? "Supabase workspace ready." : getAuthMessage(auth),
   );
@@ -285,6 +321,40 @@ export function StoryMemoryDashboard({
   const latestPromptSlots = latestPromptPack ? getPromptPackSlots(latestPromptPack) : [];
   const activeCorePack = corePromptPacks.find((pack) => pack.id === activeCorePackId) ?? corePromptPacks[0];
   const activePlatformProfile = platformProfiles[platform] ?? platformProfiles.JanitorAI;
+  const selectedTagLabels = useMemo(
+    () =>
+      selectedTagSlugs
+        .map((slug) => categoryTags.find((tag) => tag.slug === slug)?.label)
+        .filter((label): label is string => Boolean(label)),
+    [categoryTags, selectedTagSlugs],
+  );
+  const promptModuleSuggestions = useMemo(
+    () =>
+      getPromptModuleSuggestions({
+        activeRelationship,
+        activeScene,
+        activeSecret,
+        characters,
+        heatLevel,
+        povMode,
+        selectedTagLabels,
+        spiceVisibility,
+      }),
+    [
+      activeRelationship,
+      activeScene,
+      activeSecret,
+      characters,
+      heatLevel,
+      povMode,
+      selectedTagLabels,
+      spiceVisibility,
+    ],
+  );
+  const promptModuleValues = useMemo(
+    () => getPromptModuleValues(promptModuleSuggestions, promptModuleDrafts),
+    [promptModuleDrafts, promptModuleSuggestions],
+  );
 
   const groupedTags = useMemo(() => {
     return categoryTags.reduce<Record<string, CategoryTag[]>>((groups, tag) => {
@@ -765,36 +835,11 @@ export function StoryMemoryDashboard({
     if (!activeCorePack) return;
 
     const now = new Date().toISOString();
-    const selectedLabels = selectedTagSlugs
-      .map((slug) => categoryTags.find((tag) => tag.slug === slug)?.label)
-      .filter((label): label is string => Boolean(label));
-    const secretLine = activeSecret
-      ? `Secret policy: ${activeSecret.title ?? "Active secret"} stays ${activeSecret.reveal_status}; known by ${formatNames(activeSecret.who_knows, characters) || "no one listed"}.`
-      : "Secret policy: no active secrets selected.";
-    const relationshipLine = activeRelationship
-      ? `Relationship pressure: ${activeRelationship.dynamic_label}. ${activeRelationship.next_pressure_point ?? ""}`.trim()
-      : "Relationship pressure: not selected.";
-    const sceneLine = activeScene ? `Latest scene: ${activeScene.summary}` : "Latest scene: no scene memory yet.";
-    const spiceLine =
-      spiceVisibility === "censored"
-        ? "Spice visibility: censored language for exports."
-        : "Spice visibility: uncensored language is allowed where the target platform and story boundaries allow it.";
-    const povLine = `POV: ${povLabels[povMode]}. Do not write {{user}} thoughts, dialogue, consent, or choices.`;
-    const heatLine = `Heat label: ${displayLabel(heatLevel)}. ${spiceLine}`;
-    const tagLine = selectedLabels.length
-      ? `Active tags: ${selectedLabels.join(", ")}.`
-      : "Active tags: none selected.";
     const promptSlots = buildPlatformPromptSlots({
       activeCorePack,
-      heatLine,
       platform,
       platformProfile: activePlatformProfile,
-      promptIncludes,
-      povLine,
-      relationshipLine,
-      sceneLine,
-      secretLine,
-      tagLine,
+      promptModules: promptModuleValues,
     });
 
     setPromptPacks((current) => [
@@ -808,9 +853,9 @@ export function StoryMemoryDashboard({
         tailoring_goal: "Freshly generated from the active story memory session.",
         active_pov_mode: povMode,
         spice_visibility_snapshot: spiceVisibility,
-        included_sections: getIncludedPromptSections(activePlatformProfile, promptIncludes),
+        included_sections: getIncludedPromptSections(activePlatformProfile, promptModuleValues),
         max_length_preference: "compact",
-        selected_tropes: selectedLabels,
+        selected_tropes: selectedTagLabels,
         selected_characters: characters.map((character) => character.id),
         selected_relationship_threads: activeRelationship ? [activeRelationship.id] : [],
         selected_scene_memories: activeScene ? [activeScene.id] : [],
@@ -828,8 +873,23 @@ export function StoryMemoryDashboard({
     setNotice("Generated a fresh session prompt pack.");
   }
 
-  function togglePromptInclude(key: PromptIncludeKey) {
-    setPromptIncludes((current) => ({ ...current, [key]: !current[key] }));
+  function clearPromptModule(key: PromptModuleKey) {
+    setPromptModuleDrafts((current) => ({ ...current, [key]: "" }));
+    setPromptModuleExpanded((current) => ({ ...current, [key]: true }));
+  }
+
+  function generatePromptModule(key: PromptModuleKey) {
+    setPromptModuleDrafts((current) => ({ ...current, [key]: promptModuleSuggestions[key] }));
+    setPromptModuleExpanded((current) => ({ ...current, [key]: true }));
+    setNotice(`Generated ${promptModuleSectionLabels[key]}.`);
+  }
+
+  function setPromptModuleText(key: PromptModuleKey, value: string) {
+    setPromptModuleDrafts((current) => ({ ...current, [key]: value }));
+  }
+
+  function togglePromptModuleExpanded(key: PromptModuleKey) {
+    setPromptModuleExpanded((current) => ({ ...current, [key]: !current[key] }));
   }
 
   async function copyPromptSlot(slot: PromptSlot) {
@@ -1228,40 +1288,21 @@ export function StoryMemoryDashboard({
 
                   <div className="rounded-md border border-zinc-200 bg-white px-3 py-3">
                     <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
-                      Prompt contents
+                      Prompt modules
                     </p>
-                    <div className="mt-3 grid gap-2">
-                      {promptIncludeOptions.map((option) => {
-                        const enabled = promptIncludes[option.key];
-
-                        return (
-                          <button
-                            aria-pressed={enabled}
-                            className={`flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-left text-sm transition ${
-                              enabled
-                                ? "border-zinc-950 bg-zinc-950 text-white"
-                                : "border-zinc-200 bg-zinc-50 text-zinc-700 hover:border-zinc-400"
-                            }`}
-                            key={option.key}
-                            onClick={() => togglePromptInclude(option.key)}
-                            type="button"
-                          >
-                            <span>
-                              <span className="block font-medium">{option.label}</span>
-                              <span className={`mt-0.5 block text-xs ${enabled ? "text-zinc-300" : "text-zinc-500"}`}>
-                                {option.slot} Prompt
-                              </span>
-                            </span>
-                            <span
-                              className={`flex size-5 shrink-0 items-center justify-center rounded border ${
-                                enabled ? "border-white bg-white text-zinc-950" : "border-zinc-300 bg-white"
-                              }`}
-                            >
-                              {enabled ? <Check className="size-3.5" aria-hidden="true" /> : null}
-                            </span>
-                          </button>
-                        );
-                      })}
+                    <div className="mt-3 grid gap-3">
+                      {promptModuleOptions.map((option) => (
+                        <PromptModuleEditor
+                          expanded={promptModuleExpanded[option.key]}
+                          key={option.key}
+                          onChange={(value) => setPromptModuleText(option.key, value)}
+                          onClear={() => clearPromptModule(option.key)}
+                          onGenerate={() => generatePromptModule(option.key)}
+                          onToggle={() => togglePromptModuleExpanded(option.key)}
+                          option={option}
+                          value={promptModuleValues[option.key]}
+                        />
+                      ))}
                     </div>
                   </div>
 
@@ -1338,36 +1379,24 @@ export function StoryMemoryDashboard({
 
 function buildPlatformPromptSlots({
   activeCorePack,
-  heatLine,
   platform,
   platformProfile,
-  promptIncludes,
-  povLine,
-  relationshipLine,
-  sceneLine,
-  secretLine,
-  tagLine,
+  promptModules,
 }: {
   activeCorePack: CorePromptPack;
-  heatLine: string;
   platform: string;
   platformProfile: PlatformProfile;
-  promptIncludes: PromptIncludes;
-  povLine: string;
-  relationshipLine: string;
-  sceneLine: string;
-  secretLine: string;
-  tagLine: string;
+  promptModules: PromptModuleText;
 }): PromptSlot[] {
   const globalLines = compactLines([
-    promptIncludes.povGuardrails ? povLine : "",
-    promptIncludes.heatSpice ? heatLine : "",
-    promptIncludes.activeTags ? tagLine : "",
+    promptModules.povGuardrails,
+    promptModules.heatSpice,
+    promptModules.activeTags,
   ]);
   const proxyLines = compactLines([
-    promptIncludes.relationshipPressure ? relationshipLine : "",
-    promptIncludes.activeSecrets ? secretLine : "",
-    promptIncludes.latestScene ? sceneLine : "",
+    promptModules.relationshipPressure,
+    promptModules.activeSecrets,
+    promptModules.latestScene,
   ]);
   const currentStoryInputs = compactLines([...globalLines, ...proxyLines]);
   const currentStoryInputText = currentStoryInputs.length
@@ -1464,12 +1493,63 @@ function formatPromptSlots({
     .trim();
 }
 
-function getIncludedPromptSections(platformProfile: PlatformProfile, promptIncludes: PromptIncludes) {
-  const optionalSections = new Set(Object.values(promptIncludeSectionLabels));
+function getPromptModuleSuggestions({
+  activeRelationship,
+  activeScene,
+  activeSecret,
+  characters,
+  heatLevel,
+  povMode,
+  selectedTagLabels,
+  spiceVisibility,
+}: {
+  activeRelationship?: RelationshipThread;
+  activeScene?: SceneMemory;
+  activeSecret?: SecretOrReveal;
+  characters: Character[];
+  heatLevel: HeatLevelLabel;
+  povMode: PovMode;
+  selectedTagLabels: string[];
+  spiceVisibility: SpiceVisibility;
+}): PromptModuleText {
+  const spiceLine =
+    spiceVisibility === "censored"
+      ? "Spice visibility: censored language for exports."
+      : "Spice visibility: uncensored language is allowed where the target platform and story boundaries allow it.";
+
+  return {
+    activeTags: selectedTagLabels.length
+      ? `Active tags: ${selectedTagLabels.join(", ")}.`
+      : "Active tags: none selected.",
+    activeSecrets: activeSecret
+      ? `Secret policy: ${activeSecret.title ?? "Active secret"} stays ${activeSecret.reveal_status}; known by ${formatNames(activeSecret.who_knows, characters) || "no one listed"}.`
+      : "Secret policy: no active secrets selected.",
+    heatSpice: `Heat label: ${displayLabel(heatLevel)}. ${spiceLine}`,
+    latestScene: activeScene ? `Latest scene: ${activeScene.summary}` : "Latest scene: no scene memory yet.",
+    povGuardrails: `POV: ${povLabels[povMode]}. Do not write {{user}} thoughts, dialogue, consent, or choices.`,
+    relationshipPressure: activeRelationship
+      ? `Relationship pressure: ${activeRelationship.dynamic_label}. ${activeRelationship.next_pressure_point ?? ""}`.trim()
+      : "Relationship pressure: not selected.",
+  };
+}
+
+function getPromptModuleValues(suggestions: PromptModuleText, drafts: PromptModuleDrafts): PromptModuleText {
+  return {
+    activeTags: drafts.activeTags ?? suggestions.activeTags,
+    activeSecrets: drafts.activeSecrets ?? suggestions.activeSecrets,
+    heatSpice: drafts.heatSpice ?? suggestions.heatSpice,
+    latestScene: drafts.latestScene ?? suggestions.latestScene,
+    povGuardrails: drafts.povGuardrails ?? suggestions.povGuardrails,
+    relationshipPressure: drafts.relationshipPressure ?? suggestions.relationshipPressure,
+  };
+}
+
+function getIncludedPromptSections(platformProfile: PlatformProfile, promptModules: PromptModuleText) {
+  const optionalSections = new Set(Object.values(promptModuleSectionLabels));
   const baseSections = platformProfile.includedSections.filter((section) => !optionalSections.has(section));
-  const enabledSections = promptIncludeOptions
-    .filter((option) => promptIncludes[option.key])
-    .map((option) => promptIncludeSectionLabels[option.key]);
+  const enabledSections = promptModuleOptions
+    .filter((option) => promptModules[option.key].trim().length > 0)
+    .map((option) => promptModuleSectionLabels[option.key]);
 
   return [...baseSections, ...enabledSections];
 }
@@ -1521,6 +1601,74 @@ function getSectionBody(text: string, startLabel: string, endLabel?: string) {
 
 function compactLines(lines: string[]) {
   return lines.filter((line) => line.trim().length > 0);
+}
+
+function PromptModuleEditor({
+  expanded,
+  onChange,
+  onClear,
+  onGenerate,
+  onToggle,
+  option,
+  value,
+}: {
+  expanded: boolean;
+  onChange: (value: string) => void;
+  onClear: () => void;
+  onGenerate: () => void;
+  onToggle: () => void;
+  option: (typeof promptModuleOptions)[number];
+  value: string;
+}) {
+  const isEmpty = value.trim().length === 0;
+
+  return (
+    <article className="overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50">
+      <button
+        aria-expanded={expanded}
+        className="flex w-full items-start justify-between gap-3 px-3 py-3 text-left"
+        onClick={onToggle}
+        type="button"
+      >
+        <span>
+          <span className="block text-sm font-semibold text-zinc-950">{option.label}</span>
+          <span className="mt-1 block text-xs leading-5 text-zinc-500">
+            {option.slot} Prompt · {isEmpty ? "Empty, skipped on export" : option.helper}
+          </span>
+        </span>
+        <span className="rounded bg-white px-2 py-1 text-xs font-medium text-zinc-600">
+          {expanded ? "Close" : "Edit"}
+        </span>
+      </button>
+
+      {expanded ? (
+        <div className="grid gap-3 border-t border-zinc-200 bg-white px-3 py-3">
+          <textarea
+            className="min-h-28 resize-y rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm leading-6 text-zinc-900 outline-none focus:border-zinc-950"
+            onChange={(event) => onChange(event.target.value)}
+            value={value}
+          />
+          <div className="grid grid-cols-2 gap-2">
+            <button
+              className="flex h-9 items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-xs font-medium text-zinc-800 hover:bg-zinc-50"
+              onClick={onGenerate}
+              type="button"
+            >
+              <Sparkles className="size-3.5" aria-hidden="true" />
+              Generate
+            </button>
+            <button
+              className="flex h-9 items-center justify-center rounded-md border border-zinc-300 bg-white px-3 text-xs font-medium text-zinc-600 hover:bg-zinc-50"
+              onClick={onClear}
+              type="button"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </article>
+  );
 }
 
 function PromptSlotCard({ onCopy, slot }: { onCopy: () => void; slot: PromptSlot }) {
