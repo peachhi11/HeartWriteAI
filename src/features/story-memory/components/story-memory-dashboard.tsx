@@ -58,6 +58,59 @@ const navItems = [
 const heatOptions: HeatLevelLabel[] = ["sweet", "sensual", "spicy", "explicit", "extreme"];
 const platformOptions = ["JanitorAI", "SillyTavern", "MarinaraTavern"];
 
+type PlatformProfile = {
+  builderNote: string;
+  generatedFrame: string;
+  includedSections: string[];
+};
+
+const platformProfiles: Record<string, PlatformProfile> = {
+  JanitorAI: {
+    builderNote:
+      "Builds a compact character-bot preset where behavior, POV limits, relationship pressure, and secrets need to be immediately visible.",
+    generatedFrame:
+      "Compact bot prompt. Keep the active character behavior-first, keep {{user}} as the user player, and avoid hidden omniscience.",
+    includedSections: [
+      "Platform frame",
+      "Core prompt",
+      "POV policy",
+      "Tags",
+      "Relationship pressure",
+      "Secret policy",
+      "Latest scene",
+    ],
+  },
+  SillyTavern: {
+    builderNote:
+      "Builds a sectioned preset that can be pasted into a card, author note, or lorebook-style memory block.",
+    generatedFrame:
+      "Sectioned tavern preset. Keep reusable rules in the main prompt and keep scene-specific continuity in memory notes.",
+    includedSections: [
+      "Platform frame",
+      "Main prompt",
+      "Authorship rules",
+      "Active tags",
+      "Memory notes",
+      "Secret handling",
+    ],
+  },
+  MarinaraTavern: {
+    builderNote:
+      "Builds a modular runtime preset with clear blocks for core behavior, POV policy, relationship memory, and secret handling.",
+    generatedFrame:
+      "Modular runtime preset. Keep each block swappable so the app can later route memory, tags, and exports independently.",
+    includedSections: [
+      "Platform frame",
+      "Core block",
+      "POV block",
+      "Tags block",
+      "Relationship block",
+      "Secrets block",
+      "Scene block",
+    ],
+  },
+};
+
 const povLabels: Record<PovMode, string> = {
   char_pov: "{{char}} POV",
   user_pov: "{{user}} POV",
@@ -134,6 +187,7 @@ export function StoryMemoryDashboard({
   const activeScene = scenes.at(-1);
   const latestPromptPack = promptPacks.at(-1);
   const activeCorePack = corePromptPacks.find((pack) => pack.id === activeCorePackId) ?? corePromptPacks[0];
+  const activePlatformProfile = platformProfiles[platform] ?? platformProfiles.JanitorAI;
 
   const groupedTags = useMemo(() => {
     return categoryTags.reduce<Record<string, CategoryTag[]>>((groups, tag) => {
@@ -628,6 +682,11 @@ export function StoryMemoryDashboard({
       spiceVisibility === "censored"
         ? "Spice visibility: censored language for exports."
         : "Spice visibility: uncensored language is allowed where the target platform and story boundaries allow it.";
+    const povLine = `POV: ${povLabels[povMode]}. Do not write {{user}} thoughts, dialogue, consent, or choices.`;
+    const heatLine = `Heat label: ${displayLabel(heatLevel)}. ${spiceLine}`;
+    const tagLine = selectedLabels.length
+      ? `Active tags: ${selectedLabels.join(", ")}.`
+      : "Active tags: none selected.";
 
     setPromptPacks((current) => [
       ...current,
@@ -635,27 +694,29 @@ export function StoryMemoryDashboard({
         id: makeId("prompt"),
         story_id: story.id,
         source_core_pack_id: activeCorePack.id,
-        title: `${activeCorePack.title} tailored pack`,
+        title: `${activeCorePack.title} for ${platform}`,
         target_platform: platform,
         tailoring_goal: "Freshly generated from the active story memory session.",
         active_pov_mode: povMode,
         spice_visibility_snapshot: spiceVisibility,
-        included_sections: ["Core prompt", "Tags", "POV policy", "Relationship state", "Secret state"],
+        included_sections: activePlatformProfile.includedSections,
         max_length_preference: "compact",
         selected_tropes: selectedLabels,
         selected_characters: characters.map((character) => character.id),
         selected_relationship_threads: activeRelationship ? [activeRelationship.id] : [],
         selected_scene_memories: activeScene ? [activeScene.id] : [],
         selected_secrets_policy: "active_pov_only",
-        generated_text: [
-          activeCorePack.base_prompt,
-          `POV: ${povLabels[povMode]}. Do not write user thoughts, dialogue, consent, or choices.`,
-          `Heat label: ${displayLabel(heatLevel)}. ${spiceLine}`,
-          selectedLabels.length ? `Active tags: ${selectedLabels.join(", ")}.` : "Active tags: none selected.",
+        generated_text: buildPlatformPromptText({
+          activeCorePack,
+          heatLine,
+          platform,
+          platformProfile: activePlatformProfile,
+          povLine,
           relationshipLine,
-          secretLine,
           sceneLine,
-        ].join("\n"),
+          secretLine,
+          tagLine,
+        }),
         persistence_state: "session",
         created_at: now,
         updated_at: now,
@@ -840,7 +901,7 @@ export function StoryMemoryDashboard({
                 </p>
               </div>
 
-              <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                 <ControlSelect
                   icon={Flame}
                   label="Heat"
@@ -862,13 +923,6 @@ export function StoryMemoryDashboard({
                   options={story.supported_pov_modes}
                   optionLabels={povLabels}
                   onChange={(value) => updatePovMode(value as PovMode)}
-                />
-                <ControlSelect
-                  icon={Sparkles}
-                  label="Platform"
-                  value={platform}
-                  options={platformOptions}
-                  onChange={updatePlatform}
                 />
               </div>
             </div>
@@ -992,8 +1046,27 @@ export function StoryMemoryDashboard({
             </div>
 
             <aside className="grid content-start gap-5">
-              <Panel title="Generate Prompt Pack" icon={MessageSquareText}>
+              <Panel title="Prompt Pack Builder" icon={MessageSquareText}>
                 <div className="grid gap-4">
+                  <label className="grid gap-1.5 text-sm">
+                    <span className="font-medium text-zinc-700">Platform</span>
+                    <select
+                      className="h-10 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none focus:border-zinc-950"
+                      onChange={(event) => updatePlatform(event.target.value)}
+                      value={platform}
+                    >
+                      {platformOptions.map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+
+                  <p className="rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm leading-6 text-zinc-600">
+                    {activePlatformProfile.builderNote}
+                  </p>
+
                   <label className="grid gap-1.5 text-sm">
                     <span className="font-medium text-zinc-700">Core pack</span>
                     <select
@@ -1072,6 +1145,111 @@ export function StoryMemoryDashboard({
       </div>
     </main>
   );
+}
+
+function buildPlatformPromptText({
+  activeCorePack,
+  heatLine,
+  platform,
+  platformProfile,
+  povLine,
+  relationshipLine,
+  sceneLine,
+  secretLine,
+  tagLine,
+}: {
+  activeCorePack: CorePromptPack;
+  heatLine: string;
+  platform: string;
+  platformProfile: PlatformProfile;
+  povLine: string;
+  relationshipLine: string;
+  sceneLine: string;
+  secretLine: string;
+  tagLine: string;
+}) {
+  if (platform === "SillyTavern") {
+    return [
+      "[SillyTavern Preset Frame]",
+      platformProfile.generatedFrame,
+      "",
+      "[Main Prompt]",
+      activeCorePack.base_prompt,
+      "",
+      "[Authorship Rules]",
+      povLine,
+      heatLine,
+      "",
+      "[Active Tags]",
+      tagLine,
+      "",
+      "[Memory Notes]",
+      relationshipLine,
+      sceneLine,
+      "",
+      "[Secret Handling]",
+      secretLine,
+    ].join("\n");
+  }
+
+  if (platform === "MarinaraTavern") {
+    return [
+      "<platform-frame>",
+      platformProfile.generatedFrame,
+      "</platform-frame>",
+      "",
+      "<core>",
+      activeCorePack.base_prompt,
+      "</core>",
+      "",
+      "<pov-policy>",
+      povLine,
+      "</pov-policy>",
+      "",
+      "<heat-and-tags>",
+      heatLine,
+      tagLine,
+      "</heat-and-tags>",
+      "",
+      "<relationship-memory>",
+      relationshipLine,
+      "</relationship-memory>",
+      "",
+      "<secret-policy>",
+      secretLine,
+      "</secret-policy>",
+      "",
+      "<scene-memory>",
+      sceneLine,
+      "</scene-memory>",
+    ].join("\n");
+  }
+
+  return [
+    "[JanitorAI Preset Frame]",
+    platformProfile.generatedFrame,
+    "",
+    "Core prompt:",
+    activeCorePack.base_prompt,
+    "",
+    "POV / authorship:",
+    povLine,
+    "",
+    "Heat / spice:",
+    heatLine,
+    "",
+    "Tags:",
+    tagLine,
+    "",
+    "Relationship pressure:",
+    relationshipLine,
+    "",
+    "Secret policy:",
+    secretLine,
+    "",
+    "Latest scene:",
+    sceneLine,
+  ].join("\n");
 }
 
 function ControlSelect({
