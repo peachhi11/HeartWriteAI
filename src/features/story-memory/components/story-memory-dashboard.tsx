@@ -1,6 +1,6 @@
 "use client";
 
-import type { FormEvent, ReactNode } from "react";
+import type { FormEvent, MouseEvent, ReactNode } from "react";
 import { useMemo, useState, useTransition } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -90,6 +90,8 @@ type StoryMemoryDashboardProps = {
   corePromptPacks: CorePromptPack[];
 };
 
+type AuthAction = "sign-in" | "create-account" | "magic-link";
+
 export function StoryMemoryDashboard({
   auth,
   story,
@@ -117,6 +119,9 @@ export function StoryMemoryDashboard({
   const [activeCorePackId, setActiveCorePackId] = useState(corePromptPacks[0]?.id ?? "");
   const [notice, setNotice] = useState(
     isPersisted ? "Supabase workspace ready." : getAuthMessage(auth),
+  );
+  const [authNotice, setAuthNotice] = useState(
+    auth.status === "signed_in" ? "Signed in." : "Use your saved workspace login here.",
   );
   const supabase = useMemo(() => (isPersisted || auth.status === "signed_out" ? createClient() : null), [
     auth.status,
@@ -151,14 +156,24 @@ export function StoryMemoryDashboard({
 
   function handleAuthSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const form = event.currentTarget;
-    const submitter = (event.nativeEvent as SubmitEvent).submitter;
-    const action =
-      submitter instanceof HTMLButtonElement ? submitter.value : "sign-in";
+    runAuthAction(event.currentTarget, "sign-in");
+  }
+
+  function handleAuthButtonClick(event: MouseEvent<HTMLButtonElement>, action: AuthAction) {
+    const form = event.currentTarget.form;
+    if (!form) return;
+
+    runAuthAction(form, action);
+  }
+
+  function runAuthAction(form: HTMLFormElement, action: AuthAction) {
     const email = getFormValue(form, "email");
     const password = getFormValue(form, "password");
 
-    if (!email || !supabase) return;
+    if (!email || !supabase) {
+      setAuthNotice("Enter an email address first.");
+      return;
+    }
 
     if (action === "magic-link") {
       requestMagicLink(email);
@@ -166,7 +181,7 @@ export function StoryMemoryDashboard({
     }
 
     if (!password) {
-      setNotice("Enter a password to use saved workspace sign-in.");
+      setAuthNotice("Enter a password to use saved workspace sign-in.");
       return;
     }
 
@@ -181,6 +196,8 @@ export function StoryMemoryDashboard({
   function requestMagicLink(email: string) {
     if (!supabase) return;
 
+    setAuthNotice("Sending magic link...");
+
     startTransition(async () => {
       const { error } = await supabase.auth.signInWithOtp({
         email,
@@ -189,12 +206,16 @@ export function StoryMemoryDashboard({
         },
       });
 
-      setNotice(error ? error.message : "Magic link sent. Check your email to open the saved workspace.");
+      const message = error ? error.message : "Magic link sent. Check your email.";
+      setAuthNotice(message);
+      setNotice(message);
     });
   }
 
   function signInWithPassword(email: string, password: string) {
     if (!supabase) return;
+
+    setAuthNotice("Signing in...");
 
     startTransition(async () => {
       const { error } = await supabase.auth.signInWithPassword({
@@ -203,6 +224,7 @@ export function StoryMemoryDashboard({
       });
 
       if (error) {
+        setAuthNotice(error.message);
         setNotice(error.message);
         return;
       }
@@ -214,6 +236,8 @@ export function StoryMemoryDashboard({
   function createPasswordAccount(email: string, password: string) {
     if (!supabase) return;
 
+    setAuthNotice("Creating account...");
+
     startTransition(async () => {
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -224,6 +248,7 @@ export function StoryMemoryDashboard({
       });
 
       if (error) {
+        setAuthNotice(error.message);
         setNotice(error.message);
         return;
       }
@@ -233,6 +258,7 @@ export function StoryMemoryDashboard({
         return;
       }
 
+      setAuthNotice("Account created. Check your email if Supabase asks you to confirm it.");
       setNotice("Account created. Check your email if Supabase asks you to confirm it.");
     });
   }
@@ -707,6 +733,7 @@ export function StoryMemoryDashboard({
                   >
                     Sign out
                   </button>
+                  <p className="text-xs leading-5 text-zinc-500">{authNotice}</p>
                 </div>
               ) : (
                 <form className="mt-3 grid gap-2" onSubmit={handleAuthSubmit}>
@@ -728,33 +755,33 @@ export function StoryMemoryDashboard({
                   />
                   <div className="grid grid-cols-2 gap-2">
                     <button
+                      onClick={(event) => handleAuthButtonClick(event, "sign-in")}
                       className="h-9 rounded-md bg-zinc-950 px-3 text-sm font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
                       disabled={isPending || !supabase}
-                      name="authAction"
-                      type="submit"
-                      value="sign-in"
+                      type="button"
                     >
                       Sign in
                     </button>
                     <button
+                      onClick={(event) => handleAuthButtonClick(event, "create-account")}
                       className="h-9 rounded-md border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60"
                       disabled={isPending || !supabase}
-                      name="authAction"
-                      type="submit"
-                      value="create-account"
+                      type="button"
                     >
                       Create
                     </button>
                   </div>
                   <button
+                    onClick={(event) => handleAuthButtonClick(event, "magic-link")}
                     className="h-9 rounded-md border border-transparent px-3 text-sm font-medium text-zinc-600 hover:bg-white hover:text-zinc-950 disabled:cursor-not-allowed disabled:opacity-60"
                     disabled={isPending || !supabase}
-                    name="authAction"
-                    type="submit"
-                    value="magic-link"
+                    type="button"
                   >
                     Email me a link instead
                   </button>
+                  <p className="text-xs leading-5 text-zinc-500" aria-live="polite">
+                    {authNotice}
+                  </p>
                 </form>
               )}
               <p className="mt-3 text-xs leading-5 text-zinc-500">
