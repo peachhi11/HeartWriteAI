@@ -73,6 +73,47 @@ type PromptSlot = {
   label: string;
 };
 
+type PromptIncludeKey =
+  | "activeTags"
+  | "activeSecrets"
+  | "heatSpice"
+  | "latestScene"
+  | "povGuardrails"
+  | "relationshipPressure";
+
+type PromptIncludes = Record<PromptIncludeKey, boolean>;
+
+const defaultPromptIncludes: PromptIncludes = {
+  activeTags: true,
+  activeSecrets: true,
+  heatSpice: true,
+  latestScene: true,
+  povGuardrails: true,
+  relationshipPressure: true,
+};
+
+const promptIncludeOptions: {
+  key: PromptIncludeKey;
+  label: string;
+  slot: "Global" | "Proxy";
+}[] = [
+  { key: "povGuardrails", label: "POV guardrails", slot: "Global" },
+  { key: "heatSpice", label: "Heat / spice state", slot: "Global" },
+  { key: "activeTags", label: "Active tags", slot: "Global" },
+  { key: "relationshipPressure", label: "Relationship pressure", slot: "Proxy" },
+  { key: "activeSecrets", label: "Active secrets", slot: "Proxy" },
+  { key: "latestScene", label: "Latest scene", slot: "Proxy" },
+];
+
+const promptIncludeSectionLabels: Record<PromptIncludeKey, string> = {
+  activeTags: "Tags",
+  activeSecrets: "Secret policy",
+  heatSpice: "Heat and spice state",
+  latestScene: "Latest scene",
+  povGuardrails: "POV policy",
+  relationshipPressure: "Relationship pressure",
+};
+
 const platformProfiles: Record<string, PlatformProfile> = {
   JanitorAI: {
     builderNote:
@@ -224,6 +265,7 @@ export function StoryMemoryDashboard({
   const [platform, setPlatform] = useState(story.export_targets?.[0] ?? "JanitorAI");
   const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>(initialSelectedTagSlugs);
   const [activeCorePackId, setActiveCorePackId] = useState(corePromptPacks[0]?.id ?? "");
+  const [promptIncludes, setPromptIncludes] = useState<PromptIncludes>(defaultPromptIncludes);
   const [notice, setNotice] = useState(
     isPersisted ? "Supabase workspace ready." : getAuthMessage(auth),
   );
@@ -747,6 +789,7 @@ export function StoryMemoryDashboard({
       heatLine,
       platform,
       platformProfile: activePlatformProfile,
+      promptIncludes,
       povLine,
       relationshipLine,
       sceneLine,
@@ -765,7 +808,7 @@ export function StoryMemoryDashboard({
         tailoring_goal: "Freshly generated from the active story memory session.",
         active_pov_mode: povMode,
         spice_visibility_snapshot: spiceVisibility,
-        included_sections: activePlatformProfile.includedSections,
+        included_sections: getIncludedPromptSections(activePlatformProfile, promptIncludes),
         max_length_preference: "compact",
         selected_tropes: selectedLabels,
         selected_characters: characters.map((character) => character.id),
@@ -783,6 +826,10 @@ export function StoryMemoryDashboard({
       },
     ]);
     setNotice("Generated a fresh session prompt pack.");
+  }
+
+  function togglePromptInclude(key: PromptIncludeKey) {
+    setPromptIncludes((current) => ({ ...current, [key]: !current[key] }));
   }
 
   async function copyPromptSlot(slot: PromptSlot) {
@@ -1179,6 +1226,45 @@ export function StoryMemoryDashboard({
 
                   <p className="text-sm leading-6 text-zinc-600">{activeCorePack?.description}</p>
 
+                  <div className="rounded-md border border-zinc-200 bg-white px-3 py-3">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                      Prompt contents
+                    </p>
+                    <div className="mt-3 grid gap-2">
+                      {promptIncludeOptions.map((option) => {
+                        const enabled = promptIncludes[option.key];
+
+                        return (
+                          <button
+                            aria-pressed={enabled}
+                            className={`flex items-center justify-between gap-3 rounded-md border px-3 py-2 text-left text-sm transition ${
+                              enabled
+                                ? "border-zinc-950 bg-zinc-950 text-white"
+                                : "border-zinc-200 bg-zinc-50 text-zinc-700 hover:border-zinc-400"
+                            }`}
+                            key={option.key}
+                            onClick={() => togglePromptInclude(option.key)}
+                            type="button"
+                          >
+                            <span>
+                              <span className="block font-medium">{option.label}</span>
+                              <span className={`mt-0.5 block text-xs ${enabled ? "text-zinc-300" : "text-zinc-500"}`}>
+                                {option.slot} Prompt
+                              </span>
+                            </span>
+                            <span
+                              className={`flex size-5 shrink-0 items-center justify-center rounded border ${
+                                enabled ? "border-white bg-white text-zinc-950" : "border-zinc-300 bg-white"
+                              }`}
+                            >
+                              {enabled ? <Check className="size-3.5" aria-hidden="true" /> : null}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       className="flex h-10 items-center justify-center gap-2 rounded-md bg-zinc-950 px-3 text-sm font-medium text-white hover:bg-zinc-800"
@@ -1255,6 +1341,7 @@ function buildPlatformPromptSlots({
   heatLine,
   platform,
   platformProfile,
+  promptIncludes,
   povLine,
   relationshipLine,
   sceneLine,
@@ -1265,12 +1352,28 @@ function buildPlatformPromptSlots({
   heatLine: string;
   platform: string;
   platformProfile: PlatformProfile;
+  promptIncludes: PromptIncludes;
   povLine: string;
   relationshipLine: string;
   sceneLine: string;
   secretLine: string;
   tagLine: string;
 }): PromptSlot[] {
+  const globalLines = compactLines([
+    promptIncludes.povGuardrails ? povLine : "",
+    promptIncludes.heatSpice ? heatLine : "",
+    promptIncludes.activeTags ? tagLine : "",
+  ]);
+  const proxyLines = compactLines([
+    promptIncludes.relationshipPressure ? relationshipLine : "",
+    promptIncludes.activeSecrets ? secretLine : "",
+    promptIncludes.latestScene ? sceneLine : "",
+  ]);
+  const currentStoryInputs = compactLines([...globalLines, ...proxyLines]);
+  const currentStoryInputText = currentStoryInputs.length
+    ? currentStoryInputs.join("\n")
+    : "No current story inputs selected.";
+
   if (platform === "SillyTavern") {
     return [
       {
@@ -1287,12 +1390,7 @@ function buildPlatformPromptSlots({
           platformProfile.promptAreas.map((area) => `- ${area}`).join("\n"),
           "",
           "[Current Story Inputs]",
-          povLine,
-          heatLine,
-          tagLine,
-          relationshipLine,
-          secretLine,
-          sceneLine,
+          currentStoryInputText,
         ].join("\n"),
       },
     ];
@@ -1318,12 +1416,7 @@ function buildPlatformPromptSlots({
           "</prompt-areas-to-configure>",
           "",
           "<current-story-inputs>",
-          povLine,
-          heatLine,
-          tagLine,
-          relationshipLine,
-          secretLine,
-          sceneLine,
+          currentStoryInputText,
           "</current-story-inputs>",
         ].join("\n"),
       },
@@ -1335,19 +1428,19 @@ function buildPlatformPromptSlots({
       id: "janitorai-global-prompt",
       label: "Global Prompt",
       helper: "Paste into JanitorAI's global prompt slot.",
-      body: [activeCorePack.base_prompt, "", povLine, heatLine, tagLine].join("\n"),
+      body: [activeCorePack.base_prompt, ...(globalLines.length ? ["", ...globalLines] : [])].join("\n"),
     },
     {
       id: "janitorai-proxy-prompt",
       label: "Proxy Prompt",
       helper: "Paste into JanitorAI's proxy prompt slot for the active session layer.",
-      body: [
-        "Use this for the active session layer: immediate POV control, current relationship pressure, secrets, and latest continuity.",
-        "",
-        relationshipLine,
-        secretLine,
-        sceneLine,
-      ].join("\n"),
+      body: proxyLines.length
+        ? [
+            "Use this for the active session layer: immediate POV control, current relationship pressure, secrets, and latest continuity.",
+            "",
+            ...proxyLines,
+          ].join("\n")
+        : "No proxy prompt modules selected.",
     },
   ];
 }
@@ -1369,6 +1462,16 @@ function formatPromptSlots({
   ]
     .join("\n")
     .trim();
+}
+
+function getIncludedPromptSections(platformProfile: PlatformProfile, promptIncludes: PromptIncludes) {
+  const optionalSections = new Set(Object.values(promptIncludeSectionLabels));
+  const baseSections = platformProfile.includedSections.filter((section) => !optionalSections.has(section));
+  const enabledSections = promptIncludeOptions
+    .filter((option) => promptIncludes[option.key])
+    .map((option) => promptIncludeSectionLabels[option.key]);
+
+  return [...baseSections, ...enabledSections];
 }
 
 function getPromptPackSlots(pack: GeneratedPromptPack): PromptSlot[] {
@@ -1414,6 +1517,10 @@ function getSectionBody(text: string, startLabel: string, endLabel?: string) {
   const rawBody = text.slice(bodyStart, endIndex === -1 ? undefined : endIndex);
 
   return rawBody.trim();
+}
+
+function compactLines(lines: string[]) {
+  return lines.filter((line) => line.trim().length > 0);
 }
 
 function PromptSlotCard({ onCopy, slot }: { onCopy: () => void; slot: PromptSlot }) {
