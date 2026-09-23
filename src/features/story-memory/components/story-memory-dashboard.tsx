@@ -79,7 +79,12 @@ type PromptModuleKey =
   | "heatSpice"
   | "latestScene"
   | "povGuardrails"
-  | "relationshipPressure";
+  | "relationshipPressure"
+  | "styleDialogueVoice"
+  | "stylePerspectiveLens"
+  | "styleRhythmDensity"
+  | "styleSubtextEmotion"
+  | "styleToneSensory";
 
 type PromptModuleDrafts = Partial<Record<PromptModuleKey, string>>;
 type PromptModuleExpanded = Record<PromptModuleKey, boolean>;
@@ -92,51 +97,109 @@ const defaultPromptModuleExpanded: PromptModuleExpanded = {
   latestScene: false,
   povGuardrails: true,
   relationshipPressure: false,
+  styleDialogueVoice: false,
+  stylePerspectiveLens: true,
+  styleRhythmDensity: false,
+  styleSubtextEmotion: false,
+  styleToneSensory: false,
 };
 
 const promptModuleOptions: {
+  group: "Story state" | "Writing style";
   helper: string;
   key: PromptModuleKey;
   label: string;
   slot: "Global" | "Proxy";
 }[] = [
   {
+    group: "Story state",
     helper: "Authorship and POV boundary text for the stable global prompt.",
     key: "povGuardrails",
     label: "POV guardrails",
     slot: "Global",
   },
   {
+    group: "Story state",
     helper: "Current heat label and censored/uncensored export language.",
     key: "heatSpice",
     label: "Heat / spice state",
     slot: "Global",
   },
   {
+    group: "Story state",
     helper: "Selected trope and platform tags that should shape the pack.",
     key: "activeTags",
     label: "Active tags",
     slot: "Global",
   },
   {
+    group: "Story state",
     helper: "Current relationship tension for the active session layer.",
     key: "relationshipPressure",
     label: "Relationship pressure",
     slot: "Proxy",
   },
   {
+    group: "Story state",
     helper: "Active secret/reveal policy for the selected POV.",
     key: "activeSecrets",
     label: "Active secrets",
     slot: "Proxy",
   },
   {
+    group: "Story state",
     helper: "Latest continuity note or scene memory for the active session.",
     key: "latestScene",
     label: "Latest scene",
     slot: "Proxy",
   },
+  {
+    group: "Writing style",
+    helper: "Groups POV lens, camera angle, and narrative distance.",
+    key: "stylePerspectiveLens",
+    label: "POV, lens + narrative distance",
+    slot: "Global",
+  },
+  {
+    group: "Writing style",
+    helper: "Groups sentence rhythm, paragraph length, pacing, and description density.",
+    key: "styleRhythmDensity",
+    label: "Sentence rhythm + density",
+    slot: "Global",
+  },
+  {
+    group: "Writing style",
+    helper: "Groups tonal direction, atmosphere, and sensory texture.",
+    key: "styleToneSensory",
+    label: "Tone, atmosphere + sensory",
+    slot: "Global",
+  },
+  {
+    group: "Writing style",
+    helper: "Groups dialogue style, interiority, and character voice pressure.",
+    key: "styleDialogueVoice",
+    label: "Dialogue, voice + interiority",
+    slot: "Global",
+  },
+  {
+    group: "Writing style",
+    helper: "Groups subtext, emotional logic, and show-don't-tell behavior.",
+    key: "styleSubtextEmotion",
+    label: "Subtext + emotional logic",
+    slot: "Global",
+  },
 ];
+
+const promptModuleGroups = [
+  {
+    description: "Facts from the current story memory that can change between sessions.",
+    label: "Story state",
+  },
+  {
+    description: "Short prose-mechanics stacks for how the generated writing should feel on the page.",
+    label: "Writing style",
+  },
+] as const;
 
 const promptModuleSectionLabels: Record<PromptModuleKey, string> = {
   activeTags: "Tags",
@@ -145,6 +208,11 @@ const promptModuleSectionLabels: Record<PromptModuleKey, string> = {
   latestScene: "Latest scene",
   povGuardrails: "POV policy",
   relationshipPressure: "Relationship pressure",
+  styleDialogueVoice: "Dialogue, voice, and interiority",
+  stylePerspectiveLens: "POV, lens, and narrative distance",
+  styleRhythmDensity: "Sentence rhythm and description density",
+  styleSubtextEmotion: "Subtext and emotional logic",
+  styleToneSensory: "Tone, atmosphere, and sensory description",
 };
 
 const platformProfiles: Record<string, PlatformProfile> = {
@@ -1290,18 +1358,28 @@ export function StoryMemoryDashboard({
                     <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
                       Prompt modules
                     </p>
-                    <div className="mt-3 grid gap-3">
-                      {promptModuleOptions.map((option) => (
-                        <PromptModuleEditor
-                          expanded={promptModuleExpanded[option.key]}
-                          key={option.key}
-                          onChange={(value) => setPromptModuleText(option.key, value)}
-                          onClear={() => clearPromptModule(option.key)}
-                          onGenerate={() => generatePromptModule(option.key)}
-                          onToggle={() => togglePromptModuleExpanded(option.key)}
-                          option={option}
-                          value={promptModuleValues[option.key]}
-                        />
+                    <div className="mt-3 grid gap-5">
+                      {promptModuleGroups.map((group) => (
+                        <div className="grid gap-3" key={group.label}>
+                          <div>
+                            <p className="text-sm font-semibold text-zinc-950">{group.label}</p>
+                            <p className="mt-1 text-xs leading-5 text-zinc-500">{group.description}</p>
+                          </div>
+                          {promptModuleOptions
+                            .filter((option) => option.group === group.label)
+                            .map((option) => (
+                              <PromptModuleEditor
+                                expanded={promptModuleExpanded[option.key]}
+                                key={option.key}
+                                onChange={(value) => setPromptModuleText(option.key, value)}
+                                onClear={() => clearPromptModule(option.key)}
+                                onGenerate={() => generatePromptModule(option.key)}
+                                onToggle={() => togglePromptModuleExpanded(option.key)}
+                                option={option}
+                                value={promptModuleValues[option.key]}
+                              />
+                            ))}
+                        </div>
                       ))}
                     </div>
                   </div>
@@ -1390,6 +1468,11 @@ function buildPlatformPromptSlots({
 }): PromptSlot[] {
   const globalLines = compactLines([
     promptModules.povGuardrails,
+    promptModules.stylePerspectiveLens,
+    promptModules.styleRhythmDensity,
+    promptModules.styleToneSensory,
+    promptModules.styleDialogueVoice,
+    promptModules.styleSubtextEmotion,
     promptModules.heatSpice,
     promptModules.activeTags,
   ]);
@@ -1530,6 +1613,16 @@ function getPromptModuleSuggestions({
     relationshipPressure: activeRelationship
       ? `Relationship pressure: ${activeRelationship.dynamic_label}. ${activeRelationship.next_pressure_point ?? ""}`.trim()
       : "Relationship pressure: not selected.",
+    styleDialogueVoice:
+      "Dialogue should carry pressure, avoidance, desire, and character-specific voice. Use interiority sparingly and keep it tied to what the active POV can actually perceive or admit.",
+    stylePerspectiveLens:
+      "Keep the prose in a close, limited lens. Filter description through the active POV's attention, bias, and emotional stakes instead of using distant omniscient summary.",
+    styleRhythmDensity:
+      "Use varied sentence and paragraph length. Keep action beats clean, let high-tension moments breathe, and increase description density only when it sharpens mood, attraction, threat, or consequence.",
+    styleSubtextEmotion:
+      "Let emotions surface through choices, pauses, misdirection, physical tells, and what characters refuse to say. Avoid explaining the whole feeling when behavior can carry it.",
+    styleToneSensory:
+      "Maintain an intimate, charged atmosphere with concrete sensory details. Prioritize touch, breath, sound, proximity, temperature, texture, and setting details that affect the characters' choices.",
   };
 }
 
@@ -1541,6 +1634,11 @@ function getPromptModuleValues(suggestions: PromptModuleText, drafts: PromptModu
     latestScene: drafts.latestScene ?? suggestions.latestScene,
     povGuardrails: drafts.povGuardrails ?? suggestions.povGuardrails,
     relationshipPressure: drafts.relationshipPressure ?? suggestions.relationshipPressure,
+    styleDialogueVoice: drafts.styleDialogueVoice ?? suggestions.styleDialogueVoice,
+    stylePerspectiveLens: drafts.stylePerspectiveLens ?? suggestions.stylePerspectiveLens,
+    styleRhythmDensity: drafts.styleRhythmDensity ?? suggestions.styleRhythmDensity,
+    styleSubtextEmotion: drafts.styleSubtextEmotion ?? suggestions.styleSubtextEmotion,
+    styleToneSensory: drafts.styleToneSensory ?? suggestions.styleToneSensory,
   };
 }
 
