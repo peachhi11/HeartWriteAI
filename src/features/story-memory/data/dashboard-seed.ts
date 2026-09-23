@@ -110,7 +110,7 @@ export const sampleSecrets: SecretOrReveal[] = [
   {
     id: "secret-1",
     story_id: activeStory.id,
-    title: "The known unknown",
+    title: "The Secret Leverage",
     secret_text:
       "{{char}} thinks {{user}} does not know about the betrayal; {{user}} knows and is pretending not to.",
     who_knows: ["user"],

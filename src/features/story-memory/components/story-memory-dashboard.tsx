@@ -756,7 +756,7 @@ export function StoryMemoryDashboard({
               <section className="grid gap-5 2xl:grid-cols-2">
                 <Panel title="Add Secret" icon={KeyRound}>
                   <form className="grid gap-3" onSubmit={addSecret}>
-                    <Field label="Title" name="title" placeholder="The known unknown" />
+                    <Field label="Title" name="title" placeholder="The secret leverage" />
                     <TextArea label="Secret" name="secretText" placeholder="Who believes what, who is wrong, who is pretending" required />
                     <div className="grid gap-3 sm:grid-cols-3">
                       <SelectField label="Knows" name="whoKnows" options={characterOptions(characters)} />
