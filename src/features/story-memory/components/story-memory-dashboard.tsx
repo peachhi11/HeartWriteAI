@@ -89,6 +89,19 @@ type PromptModuleKey =
 type PromptModuleDrafts = Partial<Record<PromptModuleKey, string>>;
 type PromptModuleExpanded = Record<PromptModuleKey, boolean>;
 type PromptModuleText = Record<PromptModuleKey, string>;
+type WritingStylePreset = {
+  description: string;
+  id: string;
+  label: string;
+  modules: Pick<
+    PromptModuleText,
+    | "styleDialogueVoice"
+    | "stylePerspectiveLens"
+    | "styleRhythmDensity"
+    | "styleSubtextEmotion"
+    | "styleToneSensory"
+  >;
+};
 
 const defaultPromptModuleExpanded: PromptModuleExpanded = {
   activeTags: false,
@@ -214,6 +227,111 @@ const promptModuleSectionLabels: Record<PromptModuleKey, string> = {
   styleSubtextEmotion: "Subtext and emotional logic",
   styleToneSensory: "Tone, atmosphere, and sensory description",
 };
+
+const writingStylePresets: WritingStylePreset[] = [
+  {
+    description: "Close, emotionally present prose with a warm sensory lens.",
+    id: "close-intimate",
+    label: "Close Intimate",
+    modules: {
+      styleDialogueVoice:
+        "Dialogue should feel private, responsive, and character-specific. Let small admissions, evasions, and half-finished thoughts reveal intimacy before anyone explains it outright.",
+      stylePerspectiveLens:
+        "Keep the prose close to the active POV's body, attention, and emotional bias. Description should feel filtered through what they notice because it matters to them.",
+      styleRhythmDensity:
+        "Use a flexible rhythm: clean action beats, longer interior or sensory sentences when vulnerability rises, and shorter paragraphs when tension needs air.",
+      styleSubtextEmotion:
+        "Let emotional shifts surface through pauses, restraint, physical tells, and choices that cost something. Avoid over-explaining feelings the scene can dramatize.",
+      styleToneSensory:
+        "Keep the atmosphere intimate and tactile. Prioritize breath, proximity, touch, warmth, texture, and sensory details that make the emotional stakes feel immediate.",
+    },
+  },
+  {
+    description: "Modern, punchy, voice-forward prose with crisp pacing.",
+    id: "sharp-contemporary",
+    label: "Sharp Contemporary",
+    modules: {
+      styleDialogueVoice:
+        "Dialogue should be quick, specific, and voice-led. Use banter, interruption, contradiction, and precise word choice to show power shifts without bloating the scene.",
+      stylePerspectiveLens:
+        "Keep the lens close but unsentimental. Let the active POV notice concrete details, social pressure, micro-reactions, and contradictions in what people say versus do.",
+      styleRhythmDensity:
+        "Favor clean paragraphs, varied sentence length, and fast readable movement. Keep description selective: one sharp detail beats a paragraph of static scenery.",
+      styleSubtextEmotion:
+        "Play emotion through friction: deflection, jokes that land too hard, withheld honesty, and behavior that betrays more than the character intended.",
+      styleToneSensory:
+        "Use sensory detail like a camera snap: vivid, modern, and immediate. Keep atmosphere grounded in place, body language, and social tension.",
+    },
+  },
+  {
+    description: "Moody, atmospheric prose with desire, dread, and texture.",
+    id: "atmospheric-gothic",
+    label: "Atmospheric Gothic",
+    modules: {
+      styleDialogueVoice:
+        "Dialogue should carry restraint, implication, threat, longing, and old wounds. Let characters say less than they mean and make silence feel consequential.",
+      stylePerspectiveLens:
+        "Keep the lens close but shadowed by memory, suspicion, and sensory unease. The active POV should interpret setting and gesture through desire, fear, and history.",
+      styleRhythmDensity:
+        "Use slower, weightier sentences for atmosphere and shorter ruptures when danger, revelation, or intimacy cuts through the scene.",
+      styleSubtextEmotion:
+        "Let secrets, dread, yearning, and guilt move under the surface. Emotional truth should leak through symbols, avoidance, ritual, setting, and charged misreadings.",
+      styleToneSensory:
+        "Build atmosphere through weather, darkness, texture, sound, scent, threshold spaces, and the physical sense of being watched, wanted, or trapped.",
+    },
+  },
+  {
+    description: "Taut, spare prose for pressure-cooker scenes.",
+    id: "high-tension-sparse",
+    label: "High Tension / Sparse",
+    modules: {
+      styleDialogueVoice:
+        "Dialogue should be clipped, loaded, and difficult to misread. Use silence, repeated questions, corrections, and direct challenges to keep pressure high.",
+      stylePerspectiveLens:
+        "Keep the lens narrow and immediate. Focus on what the active POV tracks under pressure: hands, exits, breath, voice changes, distance, and risk.",
+      styleRhythmDensity:
+        "Use short paragraphs and lean sentences. Cut decorative description unless it increases threat, attraction, urgency, or consequence.",
+      styleSubtextEmotion:
+        "Let emotion show through control breaking: hesitation, stillness, anger, denial, bad timing, and choices made too quickly.",
+      styleToneSensory:
+        "Keep sensory details sharp and minimal: pulse, heat, sound, contact, silence, space, and the physical cost of waiting too long.",
+    },
+  },
+  {
+    description: "Rich, immersive prose with heavier sensory description.",
+    id: "sensory-lush",
+    label: "Sensory Lush",
+    modules: {
+      styleDialogueVoice:
+        "Dialogue should remain character-specific, but let pauses, breath, touch, and sensory reaction surround the spoken line so the exchange feels embodied.",
+      stylePerspectiveLens:
+        "Keep the lens close and immersive. Let the active POV experience setting, body, memory, and attraction as layered sensations rather than distant summary.",
+      styleRhythmDensity:
+        "Allow longer sentences and fuller paragraphs when sensation, longing, or atmosphere is doing real work. Vary with shorter beats for impact.",
+      styleSubtextEmotion:
+        "Let emotion gather through sensory accumulation: what the character notices, avoids touching, cannot stop hearing, or remembers at the wrong moment.",
+      styleToneSensory:
+        "Use lush concrete sensory detail across touch, sound, scent, taste, temperature, texture, light, pressure, and movement. Keep every detail tied to mood or choice.",
+    },
+  },
+  {
+    description: "Witty, kinetic prose where banter masks stakes.",
+    id: "comedic-banter",
+    label: "Comedic Banter",
+    modules: {
+      styleDialogueVoice:
+        "Dialogue should be quick, playful, and character-specific, with jokes revealing attraction, insecurity, competition, or avoidance rather than deflating stakes.",
+      stylePerspectiveLens:
+        "Keep the lens close to the active POV's timing, embarrassment, desire, and social read of the room. Let observations be witty without becoming detached.",
+      styleRhythmDensity:
+        "Use brisk paragraphing, fast exchanges, and well-placed beats of physical comedy or awkward logistics. Slow down only when the joke exposes a real feeling.",
+      styleSubtextEmotion:
+        "Let humor act as cover. The funniest line should often reveal what the character is trying not to confess, want, fear, or notice.",
+      styleToneSensory:
+        "Keep sensory detail lively and specific: expressions, timing, proximity, accidental contact, environment interruptions, and the bodily comedy of wanting someone.",
+    },
+  },
+];
 
 const platformProfiles: Record<string, PlatformProfile> = {
   JanitorAI: {
@@ -366,6 +484,7 @@ export function StoryMemoryDashboard({
   const [platform, setPlatform] = useState(story.export_targets?.[0] ?? "JanitorAI");
   const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>(initialSelectedTagSlugs);
   const [activeCorePackId, setActiveCorePackId] = useState(corePromptPacks[0]?.id ?? "");
+  const [activeWritingStylePresetId, setActiveWritingStylePresetId] = useState(writingStylePresets[0].id);
   const [promptModuleDrafts, setPromptModuleDrafts] = useState<PromptModuleDrafts>({});
   const [promptModuleExpanded, setPromptModuleExpanded] = useState<PromptModuleExpanded>(
     defaultPromptModuleExpanded,
@@ -952,6 +1071,22 @@ export function StoryMemoryDashboard({
     setNotice(`Generated ${promptModuleSectionLabels[key]}.`);
   }
 
+  function applyWritingStylePreset(presetId: string) {
+    const preset = writingStylePresets.find((candidate) => candidate.id === presetId) ?? writingStylePresets[0];
+
+    setActiveWritingStylePresetId(preset.id);
+    setPromptModuleDrafts((current) => ({ ...current, ...preset.modules }));
+    setPromptModuleExpanded((current) => ({
+      ...current,
+      styleDialogueVoice: false,
+      stylePerspectiveLens: true,
+      styleRhythmDensity: false,
+      styleSubtextEmotion: false,
+      styleToneSensory: false,
+    }));
+    setNotice(`Applied writing style: ${preset.label}.`);
+  }
+
   function setPromptModuleText(key: PromptModuleKey, value: string) {
     setPromptModuleDrafts((current) => ({ ...current, [key]: value }));
   }
@@ -1365,6 +1500,39 @@ export function StoryMemoryDashboard({
                             <p className="text-sm font-semibold text-zinc-950">{group.label}</p>
                             <p className="mt-1 text-xs leading-5 text-zinc-500">{group.description}</p>
                           </div>
+                          {group.label === "Writing style" ? (
+                            <div className="grid gap-2 rounded-md border border-zinc-200 bg-zinc-50 p-3">
+                              <label className="grid gap-1.5 text-sm">
+                                <span className="font-medium text-zinc-700">Style preset</span>
+                                <select
+                                  className="h-10 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none focus:border-zinc-950"
+                                  onChange={(event) => setActiveWritingStylePresetId(event.target.value)}
+                                  value={activeWritingStylePresetId}
+                                >
+                                  {writingStylePresets.map((preset) => (
+                                    <option key={preset.id} value={preset.id}>
+                                      {preset.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              </label>
+                              <p className="text-xs leading-5 text-zinc-500">
+                                {
+                                  writingStylePresets.find(
+                                    (preset) => preset.id === activeWritingStylePresetId,
+                                  )?.description
+                                }
+                              </p>
+                              <button
+                                className="flex h-9 items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-xs font-medium text-zinc-800 hover:bg-zinc-100"
+                                onClick={() => applyWritingStylePreset(activeWritingStylePresetId)}
+                                type="button"
+                              >
+                                <Sparkles className="size-3.5" aria-hidden="true" />
+                                Apply Style
+                              </button>
+                            </div>
+                          ) : null}
                           {promptModuleOptions
                             .filter((option) => option.group === group.label)
                             .map((option) => (
