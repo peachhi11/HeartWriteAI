@@ -76,10 +76,14 @@ type PromptSlot = {
 type PromptModuleKey =
   | "activeTags"
   | "activeSecrets"
+  | "chapterArc"
+  | "continuityBranch"
   | "heatSpice"
   | "latestScene"
   | "povGuardrails"
   | "relationshipPressure"
+  | "scenarioSetup"
+  | "settingFrame"
   | "styleDialogueVoice"
   | "stylePerspectiveLens"
   | "styleRhythmDensity"
@@ -106,10 +110,14 @@ type WritingStylePreset = {
 const defaultPromptModuleExpanded: PromptModuleExpanded = {
   activeTags: false,
   activeSecrets: false,
+  chapterArc: false,
+  continuityBranch: false,
   heatSpice: false,
   latestScene: false,
   povGuardrails: true,
   relationshipPressure: false,
+  scenarioSetup: true,
+  settingFrame: false,
   styleDialogueVoice: false,
   stylePerspectiveLens: true,
   styleRhythmDensity: false,
@@ -154,6 +162,34 @@ const promptModuleOptions: {
   },
   {
     group: "Story state",
+    helper: "The premise or situation the characters are inside.",
+    key: "scenarioSetup",
+    label: "Scenario setup",
+    slot: "Proxy",
+  },
+  {
+    group: "Story state",
+    helper: "The location, world context, and situational frame around the scene.",
+    key: "settingFrame",
+    label: "Setting frame",
+    slot: "Proxy",
+  },
+  {
+    group: "Story state",
+    helper: "Marks whether this is canon continuity or an Alt branch.",
+    key: "continuityBranch",
+    label: "Continuity branch",
+    slot: "Proxy",
+  },
+  {
+    group: "Story state",
+    helper: "Optional opener, chapter, season, or narrative arc guidance.",
+    key: "chapterArc",
+    label: "Chapter / arc",
+    slot: "Proxy",
+  },
+  {
+    group: "Story state",
     helper: "Active secret/reveal policy for the selected POV.",
     key: "activeSecrets",
     label: "Active secrets",
@@ -161,9 +197,9 @@ const promptModuleOptions: {
   },
   {
     group: "Story state",
-    helper: "Latest continuity note or scene memory for the active session.",
+    helper: "What is happening right now in the active exchange.",
     key: "latestScene",
-    label: "Latest scene",
+    label: "Current scene",
     slot: "Proxy",
   },
   {
@@ -217,10 +253,14 @@ const promptModuleGroups = [
 const promptModuleSectionLabels: Record<PromptModuleKey, string> = {
   activeTags: "Tags",
   activeSecrets: "Secret policy",
+  chapterArc: "Chapter and narrative arc",
+  continuityBranch: "Continuity branch",
   heatSpice: "Heat and spice state",
-  latestScene: "Latest scene",
+  latestScene: "Current scene",
   povGuardrails: "POV policy",
   relationshipPressure: "Relationship pressure",
+  scenarioSetup: "Scenario setup",
+  settingFrame: "Setting frame",
   styleDialogueVoice: "Dialogue, voice, and interiority",
   stylePerspectiveLens: "POV, lens, and narrative distance",
   styleRhythmDensity: "Sentence rhythm and description density",
@@ -532,6 +572,7 @@ export function StoryMemoryDashboard({
         povMode,
         selectedTagLabels,
         spiceVisibility,
+        story,
       }),
     [
       activeRelationship,
@@ -542,6 +583,7 @@ export function StoryMemoryDashboard({
       povMode,
       selectedTagLabels,
       spiceVisibility,
+      story,
     ],
   );
   const promptModuleValues = useMemo(
@@ -1399,16 +1441,16 @@ export function StoryMemoryDashboard({
                   </form>
                 </Panel>
 
-                <Panel title="Add Scene Memory" icon={BookOpenText}>
+                <Panel title="Add Current Scene" icon={BookOpenText}>
                   <form className="grid gap-3" onSubmit={addScene}>
                     <div className="grid gap-3 sm:grid-cols-2">
                       <Field label="Title" name="title" placeholder="After the party" />
                       <Field label="Location" name="location" placeholder="Kitchen doorway" />
                     </div>
                     <SelectField label="Main participant" name="participant" options={characterOptions(characters)} />
-                    <TextArea label="Summary" name="summary" placeholder="What changed on the page" required />
+                    <TextArea label="Scene" name="summary" placeholder="What is happening right now" required />
                     <Field label="Continuity flag" name="continuityFlag" placeholder="What must not be forgotten next time" />
-                    <SubmitButton label="Add scene memory" />
+                    <SubmitButton label="Add current scene" />
                   </form>
                 </Panel>
               </section>
@@ -1456,9 +1498,9 @@ export function StoryMemoryDashboard({
                     <p className="font-semibold text-zinc-950">{activeSecret?.title ?? "No secret yet"}</p>
                     <p className="mt-2 leading-6">{activeSecret?.secret_text ?? "Secrets can track who knows, who suspects, and who is pretending."}</p>
                   </MemoryColumn>
-                  <MemoryColumn title="Latest scene">
+                  <MemoryColumn title="Current scene">
                     <p className="font-semibold text-zinc-950">{activeScene?.title ?? "No scene yet"}</p>
-                    <p className="mt-2 leading-6">{activeScene?.summary ?? "Scene memory keeps continuity visible between writing sessions."}</p>
+                    <p className="mt-2 leading-6">{activeScene?.summary ?? "Scene tracks what is happening right now in the active exchange."}</p>
                   </MemoryColumn>
                 </div>
               </Panel>
@@ -1699,6 +1741,10 @@ function buildPlatformPromptSlots({
     promptModules.activeTags,
   ]);
   const proxyLines = compactLines([
+    promptModules.scenarioSetup,
+    promptModules.settingFrame,
+    promptModules.continuityBranch,
+    promptModules.chapterArc,
     promptModules.relationshipPressure,
     promptModules.activeSecrets,
     promptModules.latestScene,
@@ -1770,7 +1816,7 @@ function buildPlatformPromptSlots({
       helper: "Paste into JanitorAI's proxy prompt slot for the active session layer.",
       body: proxyLines.length
         ? [
-            "Use this for the active session layer: immediate POV control, current relationship pressure, secrets, and latest continuity.",
+            "Use this for the active session layer: scenario, setting, continuity branch, current relationship pressure, secrets, and current scene.",
             "",
             ...proxyLines,
           ].join("\n")
@@ -1807,6 +1853,7 @@ function getPromptModuleSuggestions({
   povMode,
   selectedTagLabels,
   spiceVisibility,
+  story,
 }: {
   activeRelationship?: RelationshipThread;
   activeScene?: SceneMemory;
@@ -1816,6 +1863,7 @@ function getPromptModuleSuggestions({
   povMode: PovMode;
   selectedTagLabels: string[];
   spiceVisibility: SpiceVisibility;
+  story: Story;
 }): PromptModuleText {
   const spiceLine =
     spiceVisibility === "censored"
@@ -1829,12 +1877,22 @@ function getPromptModuleSuggestions({
     activeSecrets: activeSecret
       ? `Secret policy: ${activeSecret.title ?? "Active secret"} stays ${activeSecret.reveal_status}; known by ${formatNames(activeSecret.who_knows, characters) || "no one listed"}.`
       : "Secret policy: no active secrets selected.",
+    chapterArc:
+      "Chapter / arc: treat this as the active opener or phase of the larger story. Do not reset the relationship history unless the prompt explicitly marks a new branch.",
+    continuityBranch:
+      "Continuity: canon by default. If this is marked as an Alt, keep branch-specific changes separate from the main canon instead of overwriting established memory.",
     heatSpice: `Heat label: ${displayLabel(heatLevel)}. ${spiceLine}`,
-    latestScene: activeScene ? `Latest scene: ${activeScene.summary}` : "Latest scene: no scene memory yet.",
+    latestScene: activeScene ? `Current scene: ${activeScene.summary}` : "Current scene: no active scene memory yet.",
     povGuardrails: `POV: ${povLabels[povMode]}. Do not write {{user}} thoughts, dialogue, consent, or choices.`,
     relationshipPressure: activeRelationship
       ? `Relationship pressure: ${activeRelationship.dynamic_label}. ${activeRelationship.next_pressure_point ?? ""}`.trim()
       : "Relationship pressure: not selected.",
+    scenarioSetup: story.description
+      ? `Scenario: ${story.description}`
+      : "Scenario: define the setup, situation, or premise the characters are currently caught inside.",
+    settingFrame: activeScene?.location
+      ? `Setting: ${activeScene.location}. Use setting as the combined location, world context, and situation frame.`
+      : "Setting: define the location, world context, and situational frame around the scene.",
     styleDialogueVoice:
       "Dialogue should carry pressure, avoidance, desire, and character-specific voice. Use interiority sparingly and keep it tied to what the active POV can actually perceive or admit.",
     stylePerspectiveLens:
@@ -1852,10 +1910,14 @@ function getPromptModuleValues(suggestions: PromptModuleText, drafts: PromptModu
   return {
     activeTags: drafts.activeTags ?? suggestions.activeTags,
     activeSecrets: drafts.activeSecrets ?? suggestions.activeSecrets,
+    chapterArc: drafts.chapterArc ?? suggestions.chapterArc,
+    continuityBranch: drafts.continuityBranch ?? suggestions.continuityBranch,
     heatSpice: drafts.heatSpice ?? suggestions.heatSpice,
     latestScene: drafts.latestScene ?? suggestions.latestScene,
     povGuardrails: drafts.povGuardrails ?? suggestions.povGuardrails,
     relationshipPressure: drafts.relationshipPressure ?? suggestions.relationshipPressure,
+    scenarioSetup: drafts.scenarioSetup ?? suggestions.scenarioSetup,
+    settingFrame: drafts.settingFrame ?? suggestions.settingFrame,
     styleDialogueVoice: drafts.styleDialogueVoice ?? suggestions.styleDialogueVoice,
     stylePerspectiveLens: drafts.stylePerspectiveLens ?? suggestions.stylePerspectiveLens,
     styleRhythmDensity: drafts.styleRhythmDensity ?? suggestions.styleRhythmDensity,
