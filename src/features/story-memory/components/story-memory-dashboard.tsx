@@ -34,6 +34,7 @@ import type { StoryMemoryAuthState } from "@/features/story-memory/persistence/w
 import type {
   CategoryTag,
   Character,
+  ContinuityMode,
   CorePromptPack,
   GeneratedPromptPack,
   HeatLevelLabel,
@@ -56,6 +57,7 @@ const navItems = [
 ];
 
 const heatOptions: HeatLevelLabel[] = ["sweet", "sensual", "spicy", "explicit", "extreme"];
+const continuityModeOptions: ContinuityMode[] = ["canon", "alt"];
 const platformOptions = ["JanitorAI", "SillyTavern", "MarinaraTavern"];
 
 type PlatformProfile = {
@@ -469,6 +471,11 @@ const povLabels: Record<PovMode, string> = {
   char_pov: "{{char}} POV",
   user_pov: "{{user}} POV",
   narrator_pov: "Narrator POV",
+};
+
+const continuityModeLabels: Record<ContinuityMode, string> = {
+  canon: "Canon",
+  alt: "Alt",
 };
 
 const groupLabels: Record<CategoryTag["group"], string> = {
@@ -1009,6 +1016,11 @@ export function StoryMemoryDashboard({
     const form = event.currentTarget;
     const title = getFormValue(form, "title") || "Untitled scene";
     const location = getFormValue(form, "location");
+    const scenario = getFormValue(form, "scenario");
+    const setting = getFormValue(form, "setting");
+    const continuityMode = (getFormValue(form, "continuityMode") || "canon") as ContinuityMode;
+    const chapterLabel = getFormValue(form, "chapterLabel");
+    const narrativeArc = getFormValue(form, "narrativeArc");
     const summary = getFormValue(form, "summary");
     const participant = getFormValue(form, "participant");
     const continuityFlag = getFormValue(form, "continuityFlag");
@@ -1022,6 +1034,11 @@ export function StoryMemoryDashboard({
       title,
       sequence_index: scenes.length + 1,
       location,
+      scenario,
+      setting,
+      continuity_mode: continuityMode,
+      chapter_label: chapterLabel,
+      narrative_arc: narrativeArc,
       pov_mode: povMode,
       participants: participant ? [participant] : [],
       summary,
@@ -1044,6 +1061,11 @@ export function StoryMemoryDashboard({
           sequence_index: draft.sequence_index ?? null,
           scene_date_or_time: draft.scene_date_or_time ?? null,
           location: draft.location ?? null,
+          scenario: draft.scenario ?? null,
+          setting: draft.setting ?? null,
+          continuity_mode: draft.continuity_mode,
+          chapter_label: draft.chapter_label ?? null,
+          narrative_arc: draft.narrative_arc ?? null,
           emotional_shift: draft.emotional_shift ?? null,
           relationship_shift: draft.relationship_shift ?? null,
           intimacy_shift: draft.intimacy_shift ?? null,
@@ -1447,6 +1469,18 @@ export function StoryMemoryDashboard({
                       <Field label="Title" name="title" placeholder="After the party" />
                       <Field label="Location" name="location" placeholder="Kitchen doorway" />
                     </div>
+                    <TextArea label="Scenario" name="scenario" placeholder="The setup or situation the characters are caught inside" />
+                    <Field label="Setting" name="setting" placeholder="Location, world context, and situational frame" />
+                    <div className="grid gap-3 sm:grid-cols-3">
+                      <SelectField
+                        label="Continuity"
+                        name="continuityMode"
+                        optionLabels={continuityModeLabels}
+                        options={continuityModeOptions}
+                      />
+                      <Field label="Chapter" name="chapterLabel" placeholder="Opening, chapter 3, alt opener..." />
+                      <Field label="Arc" name="narrativeArc" placeholder="Mutual suspicion, forced proximity..." />
+                    </div>
                     <SelectField label="Main participant" name="participant" options={characterOptions(characters)} />
                     <TextArea label="Scene" name="summary" placeholder="What is happening right now" required />
                     <Field label="Continuity flag" name="continuityFlag" placeholder="What must not be forgotten next time" />
@@ -1501,6 +1535,13 @@ export function StoryMemoryDashboard({
                   <MemoryColumn title="Current scene">
                     <p className="font-semibold text-zinc-950">{activeScene?.title ?? "No scene yet"}</p>
                     <p className="mt-2 leading-6">{activeScene?.summary ?? "Scene tracks what is happening right now in the active exchange."}</p>
+                    {activeScene ? (
+                      <p className="mt-2 text-xs leading-5 text-zinc-500">
+                        {continuityModeLabels[activeScene.continuity_mode]}
+                        {activeScene.chapter_label ? ` · ${activeScene.chapter_label}` : ""}
+                        {activeScene.narrative_arc ? ` · ${activeScene.narrative_arc}` : ""}
+                      </p>
+                    ) : null}
                   </MemoryColumn>
                 </div>
               </Panel>
@@ -1878,19 +1919,32 @@ function getPromptModuleSuggestions({
       ? `Secret policy: ${activeSecret.title ?? "Active secret"} stays ${activeSecret.reveal_status}; known by ${formatNames(activeSecret.who_knows, characters) || "no one listed"}.`
       : "Secret policy: no active secrets selected.",
     chapterArc:
+      compactLines([
+        activeScene?.chapter_label ? `Chapter: ${withTerminalPunctuation(activeScene.chapter_label)}` : "",
+        activeScene?.narrative_arc ? `Arc: ${withTerminalPunctuation(activeScene.narrative_arc)}` : "",
+      ]).join(" ") ||
       "Chapter / arc: treat this as the active opener or phase of the larger story. Do not reset the relationship history unless the prompt explicitly marks a new branch.",
-    continuityBranch:
-      "Continuity: canon by default. If this is marked as an Alt, keep branch-specific changes separate from the main canon instead of overwriting established memory.",
+    continuityBranch: activeScene
+      ? `Continuity: ${continuityModeLabels[activeScene.continuity_mode]}. ${
+          activeScene.continuity_mode === "alt"
+            ? "Keep branch-specific changes separate from the main canon instead of overwriting established memory."
+            : "Treat this as the main continuity unless a later scene explicitly branches into an Alt."
+        }`
+      : "Continuity: canon by default. If this is marked as an Alt, keep branch-specific changes separate from the main canon instead of overwriting established memory.",
     heatSpice: `Heat label: ${displayLabel(heatLevel)}. ${spiceLine}`,
     latestScene: activeScene ? `Current scene: ${activeScene.summary}` : "Current scene: no active scene memory yet.",
     povGuardrails: `POV: ${povLabels[povMode]}. Do not write {{user}} thoughts, dialogue, consent, or choices.`,
     relationshipPressure: activeRelationship
       ? `Relationship pressure: ${activeRelationship.dynamic_label}. ${activeRelationship.next_pressure_point ?? ""}`.trim()
       : "Relationship pressure: not selected.",
-    scenarioSetup: story.description
+    scenarioSetup: activeScene?.scenario
+      ? `Scenario: ${activeScene.scenario}`
+      : story.description
       ? `Scenario: ${story.description}`
       : "Scenario: define the setup, situation, or premise the characters are currently caught inside.",
-    settingFrame: activeScene?.location
+    settingFrame: activeScene?.setting
+      ? `Setting: ${activeScene.setting}`
+      : activeScene?.location
       ? `Setting: ${activeScene.location}. Use setting as the combined location, world context, and situation frame.`
       : "Setting: define the location, world context, and situational frame around the scene.",
     styleDialogueVoice:
@@ -1983,6 +2037,11 @@ function getSectionBody(text: string, startLabel: string, endLabel?: string) {
 
 function compactLines(lines: string[]) {
   return lines.filter((line) => line.trim().length > 0);
+}
+
+function withTerminalPunctuation(text: string) {
+  const trimmed = text.trim();
+  return /[.!?]$/.test(trimmed) ? trimmed : `${trimmed}.`;
 }
 
 function PromptModuleEditor({
@@ -2213,11 +2272,13 @@ function TextArea({
 function SelectField({
   label,
   name,
+  optionLabels,
   options,
 }: {
   label: string;
   name: string;
-  options: { label: string; value: string }[];
+  optionLabels?: Partial<Record<string, string>>;
+  options: { label: string; value: string }[] | string[];
 }) {
   return (
     <label className="grid gap-1.5 text-sm">
@@ -2227,8 +2288,11 @@ function SelectField({
         name={name}
       >
         {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
+          <option
+            key={typeof option === "string" ? option : option.value}
+            value={typeof option === "string" ? option : option.value}
+          >
+            {typeof option === "string" ? optionLabels?.[option] ?? displayLabel(option) : option.label}
           </option>
         ))}
       </select>

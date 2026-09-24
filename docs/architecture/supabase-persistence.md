@@ -55,6 +55,16 @@ Only the Save action should write into `saved_prompt_packs`.
 
 This prevents fresh generated prompt variants from filling persistent storage unless the user deliberately keeps them.
 
+## Scene Terminology
+
+Scene memory separates roleplay setup terms so prompt exports can preserve the user's intent:
+
+- `scenario`: the setup, situation, or premise the characters are in.
+- `scene`: the current active exchange, stored as `summary`.
+- `setting`: the location, world context, and situation frame.
+- `continuity_mode`: `canon` for main continuity or `alt` for branch alternatives.
+- `chapter_label` and `narrative_arc`: optional labels for openings, chapters, seasons, or broader story phases.
+
 ## Data API Note
 
 Supabase may require explicit grants for SQL-created tables before they are reachable through the Data API. The schema includes grants for the authenticated role, and every exposed table has RLS enabled.

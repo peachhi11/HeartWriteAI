@@ -71,6 +71,11 @@ export const sampleScenes: SceneMemory[] = [
     title: "After the party",
     sequence_index: 1,
     location: "Kitchen doorway",
+    scenario: "{{char}} and {{user}} are circling a secret after a public party left them both with leverage.",
+    setting: "A private kitchen doorway after the party, close enough to the crowd that privacy feels temporary.",
+    continuity_mode: "canon",
+    chapter_label: "Opening pressure point",
+    narrative_arc: "Mutual suspicion becomes reluctant intimacy.",
     pov_mode: "narrator_pov",
     participants: ["char", "user"],
     summary:

@@ -143,6 +143,11 @@ type SceneMemoryRow = OwnedRow & {
   sequence_index: number | null;
   scene_date_or_time: string | null;
   location: string | null;
+  scenario: string | null;
+  setting: string | null;
+  continuity_mode: string;
+  chapter_label: string | null;
+  narrative_arc: string | null;
   pov_mode: string;
   participants: string[];
   summary: string;

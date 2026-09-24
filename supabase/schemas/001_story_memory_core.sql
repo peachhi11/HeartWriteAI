@@ -51,6 +51,12 @@ create table if not exists public.scene_memories (
   sequence_index integer,
   scene_date_or_time text,
   location text,
+  scenario text,
+  setting text,
+  continuity_mode text not null default 'canon'
+    check (continuity_mode in ('canon', 'alt')),
+  chapter_label text,
+  narrative_arc text,
   pov_mode text not null check (pov_mode in ('char_pov', 'user_pov', 'narrator_pov')),
   participants text[] not null default array[]::text[],
   summary text not null,
@@ -67,6 +73,27 @@ create table if not exists public.scene_memories (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+alter table public.scene_memories
+  add column if not exists scenario text,
+  add column if not exists setting text,
+  add column if not exists continuity_mode text not null default 'canon',
+  add column if not exists chapter_label text,
+  add column if not exists narrative_arc text;
+
+do $$
+begin
+  if not exists (
+    select 1
+    from pg_constraint
+    where conname = 'scene_memories_continuity_mode_check'
+      and conrelid = 'public.scene_memories'::regclass
+  ) then
+    alter table public.scene_memories
+      add constraint scene_memories_continuity_mode_check
+      check (continuity_mode in ('canon', 'alt'));
+  end if;
+end $$;
 
 create table if not exists public.relationship_threads (
   id text primary key default gen_random_uuid()::text,

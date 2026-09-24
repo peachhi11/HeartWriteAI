@@ -5,6 +5,7 @@ export type SpiceVisibility = "censored" | "uncensored";
 export type PovMode = "char_pov" | "user_pov" | "narrator_pov";
 export type StoryStatus = "active" | "paused" | "archived";
 export type CanonStatus = "canon" | "draft" | "contradicted" | "retconned";
+export type ContinuityMode = "canon" | "alt";
 export type RevealStatus =
   | "hidden"
   | "suspected"
@@ -73,6 +74,11 @@ export interface SceneMemory extends TimestampedEntity {
   sequence_index?: number;
   scene_date_or_time?: string;
   location?: string;
+  scenario?: string;
+  setting?: string;
+  continuity_mode: ContinuityMode;
+  chapter_label?: string;
+  narrative_arc?: string;
   pov_mode: PovMode;
   participants: EntityId[];
   summary: string;
