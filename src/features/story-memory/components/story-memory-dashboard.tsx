@@ -1,6 +1,6 @@
 "use client";
 
-import type { FormEvent, MouseEvent, ReactNode } from "react";
+import type { ChangeEvent, FormEvent, MouseEvent, ReactNode } from "react";
 import { useMemo, useState, useTransition } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -47,13 +47,29 @@ import type {
 } from "@/features/story-memory/types/story-memory";
 import { createClient } from "@/lib/supabase/browser";
 
-const navItems = [
-  { label: "Story", icon: BookOpenText },
-  { label: "Participants", icon: UsersRound },
-  { label: "Relationships", icon: Layers3 },
-  { label: "Secrets", icon: LockKeyhole },
-  { label: "Prompt Packs", icon: MessageSquareText },
-  { label: "Exports", icon: Download },
+type WorkspaceSection =
+  | "story"
+  | "character-card"
+  | "user-persona"
+  | "participants"
+  | "relationships"
+  | "secrets"
+  | "prompt-packs"
+  | "exports";
+
+const navItems: {
+  icon: LucideIcon;
+  id: WorkspaceSection;
+  label: string;
+}[] = [
+  { id: "story", label: "Story", icon: BookOpenText },
+  { id: "character-card", label: "Character Card", icon: BookOpenText },
+  { id: "user-persona", label: "User Persona", icon: UsersRound },
+  { id: "participants", label: "Participants", icon: UsersRound },
+  { id: "relationships", label: "Relationships", icon: Layers3 },
+  { id: "secrets", label: "Secrets", icon: LockKeyhole },
+  { id: "prompt-packs", label: "Prompt Packs", icon: MessageSquareText },
+  { id: "exports", label: "Exports", icon: Download },
 ];
 
 const heatOptions: HeatLevelLabel[] = ["sweet", "sensual", "spicy", "explicit", "extreme"];
@@ -73,6 +89,46 @@ type PromptSlot = {
   helper: string;
   id: string;
   label: string;
+};
+
+type LoadedCharacterCard = {
+  alternateGreetings: string[];
+  creatorNotes?: string;
+  description?: string;
+  exampleDialog?: string;
+  firstMessage?: string;
+  format: string;
+  importedAt: string;
+  name?: string;
+  personality?: string;
+  postHistoryInstructions?: string;
+  rawText: string;
+  scenario?: string;
+  systemPrompt?: string;
+  tags: string[];
+  warnings: string[];
+};
+
+type UserPersonaDraft = {
+  boundaries: string;
+  cardFitNotes: string;
+  connectionToCharacter: string;
+  displayName: string;
+  openingAngle: string;
+  roleInStory: string;
+  selfConcept: string;
+  whatUserKnows: string;
+};
+
+const emptyUserPersonaDraft: UserPersonaDraft = {
+  boundaries: "",
+  cardFitNotes: "",
+  connectionToCharacter: "",
+  displayName: "{{user}}",
+  openingAngle: "",
+  roleInStory: "",
+  selfConcept: "",
+  whatUserKnows: "",
 };
 
 type PromptModuleKey =
@@ -529,6 +585,10 @@ export function StoryMemoryDashboard({
   const [spiceVisibility, setSpiceVisibility] = useState<SpiceVisibility>("censored");
   const [povMode, setPovMode] = useState<PovMode>(story.default_pov_mode ?? "narrator_pov");
   const [platform, setPlatform] = useState(story.export_targets?.[0] ?? "JanitorAI");
+  const [activeWorkspaceSection, setActiveWorkspaceSection] = useState<WorkspaceSection>("story");
+  const [characterCardInput, setCharacterCardInput] = useState("");
+  const [loadedCharacterCard, setLoadedCharacterCard] = useState<LoadedCharacterCard | null>(null);
+  const [userPersonaDraft, setUserPersonaDraft] = useState<UserPersonaDraft>(emptyUserPersonaDraft);
   const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>(initialSelectedTagSlugs);
   const [activeCorePackId, setActiveCorePackId] = useState(corePromptPacks[0]?.id ?? "");
   const [activeWritingStylePresetId, setActiveWritingStylePresetId] = useState(writingStylePresets[0].id);
@@ -538,6 +598,8 @@ export function StoryMemoryDashboard({
   const [promptModuleExpanded, setPromptModuleExpanded] = useState<PromptModuleExpanded>(
     defaultPromptModuleExpanded,
   );
+  const [copiedSlotId, setCopiedSlotId] = useState<string | null>(null);
+  const [copiedPersonaDraft, setCopiedPersonaDraft] = useState(false);
   const [notice, setNotice] = useState(
     isPersisted ? "Supabase workspace ready." : getAuthMessage(auth),
   );
@@ -1088,6 +1150,132 @@ export function StoryMemoryDashboard({
     setNotice(`Added scene memory: ${title}${isPersisted ? " and saved it" : ""}.`);
   }
 
+  async function loadCharacterCardFile(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      const source =
+        file.type === "image/png" || file.name.toLowerCase().endsWith(".png")
+          ? await extractCharacterCardSourceFromPng(file)
+          : await file.text();
+
+      if (!source) {
+        setNotice("No embedded character card metadata was found in that PNG.");
+        event.target.value = "";
+        return;
+      }
+
+      setCharacterCardInput(source);
+      loadCharacterCard(source, file.name);
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : "Could not load that character card file.");
+    } finally {
+      event.target.value = "";
+    }
+  }
+
+  function loadCharacterCard(source = characterCardInput, sourceName?: string) {
+    const trimmed = source.trim();
+
+    if (!trimmed) {
+      setNotice("Paste or choose a character card first.");
+      return;
+    }
+
+    const parsedCard = parseCharacterCard(trimmed, sourceName);
+    setLoadedCharacterCard(parsedCard);
+    setCharacterCardInput(trimmed);
+    setUserPersonaDraft(emptyUserPersonaDraft);
+    setCopiedPersonaDraft(false);
+    setNotice(`Loaded character card${parsedCard.name ? `: ${parsedCard.name}` : ""}.`);
+  }
+
+  function clearCharacterCard() {
+    setCharacterCardInput("");
+    setLoadedCharacterCard(null);
+    setUserPersonaDraft(emptyUserPersonaDraft);
+    setCopiedPersonaDraft(false);
+    setNotice("Cleared character card intake.");
+  }
+
+  function updateUserPersonaDraft(field: keyof UserPersonaDraft, value: string) {
+    setUserPersonaDraft((current) => ({ ...current, [field]: value }));
+  }
+
+  function generateUserPersonaFromCard() {
+    if (!loadedCharacterCard) {
+      setNotice("Load a character card before generating a user persona draft.");
+      return;
+    }
+
+    const characterName = loadedCharacterCard.name ?? "{{char}}";
+    const scenarioSource =
+      loadedCharacterCard.scenario ??
+      loadedCharacterCard.firstMessage ??
+      loadedCharacterCard.description ??
+      "the card's established scenario";
+    const tagText = loadedCharacterCard.tags.length
+      ? `Relevant card tags: ${loadedCharacterCard.tags.join(", ")}.`
+      : "No card tags were imported.";
+
+    setUserPersonaDraft({
+      boundaries: [
+        "Do not write {{user}}'s thoughts, dialogue, consent, or choices.",
+        "{{user}} should reveal personal history through play, not through omniscient preload.",
+        `Keep ${characterName}'s established autonomy intact.`,
+      ].join("\n"),
+      cardFitNotes: [
+        `${characterName}'s card already controls: ${compactSentence(
+          loadedCharacterCard.description,
+          "character definition and behavior",
+        )}`,
+        loadedCharacterCard.personality
+          ? `Personality pressure to fit around: ${loadedCharacterCard.personality}`
+          : "",
+        tagText,
+      ]
+        .filter(Boolean)
+        .join("\n"),
+      connectionToCharacter: `{{user}} belongs in ${characterName}'s orbit because the card scenario gives them a reason to matter without making them automatically special: ${scenarioSource}`,
+      displayName: "{{user}}",
+      openingAngle: loadedCharacterCard.firstMessage
+        ? `Build {{user}} to answer this opener with agency: ${loadedCharacterCard.firstMessage}`
+        : `Build {{user}} to enter the scenario with a concrete want, a reason to stay, and a pressure point ${characterName} can notice.`,
+      roleInStory: `User player designed to fit ${characterName}'s established card, scenario, and prompt boundaries.`,
+      selfConcept:
+        "{{user}}'s persona should describe what they believe about themself on page one, not the author's full diagnosis of them.",
+      whatUserKnows:
+        "List only what {{user}} can honestly know at the start: their own history, what they have observed, what they suspect, and what they are hiding.",
+    });
+    setNotice(`Generated a user persona draft for ${characterName}.`);
+  }
+
+  async function copyUserPersonaDraft() {
+    const personaPreview = formatUserPersonaDraft(userPersonaDraft);
+
+    if (!personaPreview.trim()) {
+      setNotice("Generate or edit the user persona before copying.");
+      return;
+    }
+
+    if (!navigator.clipboard) {
+      setNotice("Copy is not available in this browser.");
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(personaPreview);
+      setCopiedPersonaDraft(true);
+      window.setTimeout(() => {
+        setCopiedPersonaDraft(false);
+      }, 1800);
+      setNotice("Copied user persona draft.");
+    } catch {
+      setNotice("Copy failed. Select the persona preview manually for now.");
+    }
+  }
+
   function generatePromptPack() {
     if (!activeCorePack) return;
 
@@ -1202,7 +1390,11 @@ export function StoryMemoryDashboard({
 
     try {
       await navigator.clipboard.writeText(slot.body);
+      setCopiedSlotId(slot.id);
       setNotice(`Copied ${slot.label}.`);
+      window.setTimeout(() => {
+        setCopiedSlotId((current) => (current === slot.id ? null : current));
+      }, 1800);
     } catch {
       setNotice("Copy failed. Select the text manually for now.");
     }
@@ -1259,17 +1451,19 @@ export function StoryMemoryDashboard({
             </div>
 
             <nav className="mt-8 grid gap-1" aria-label="Workspace">
-              {navItems.map((item, index) => {
+              {navItems.map((item) => {
                 const Icon = item.icon;
-                const isActive = index === 0;
+                const isActive = item.id === activeWorkspaceSection;
 
                 return (
                   <button
+                    aria-current={isActive ? "page" : undefined}
                     className={`flex h-10 items-center gap-3 rounded-md px-3 text-left text-sm transition ${
                       isActive
                         ? "bg-zinc-950 text-white"
                         : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-950"
                     }`}
+                    onClick={() => setActiveWorkspaceSection(item.id)}
                     key={item.label}
                     type="button"
                   >
@@ -1411,19 +1605,55 @@ export function StoryMemoryDashboard({
             </div>
           </header>
 
-          <div className="grid gap-5 px-5 py-5 xl:grid-cols-[minmax(0,1.25fr)_400px] xl:px-8">
+          <div
+            className={`grid gap-5 px-5 py-5 xl:px-8 ${
+              activeWorkspaceSection === "prompt-packs" || activeWorkspaceSection === "exports"
+                ? "xl:grid-cols-1"
+                : "xl:grid-cols-[minmax(0,1.25fr)_400px]"
+            }`}
+          >
             <div className="grid gap-5">
-              <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Story memory counts">
-                {stats.map((stat) => (
-                  <article className={`rounded-lg border p-4 ${stat.tone}`} key={stat.label}>
-                    <p className="text-sm font-medium">{stat.label}</p>
-                    <p className="mt-3 text-3xl font-semibold">{stat.value}</p>
-                  </article>
-                ))}
-              </section>
+              {activeWorkspaceSection === "character-card" ? (
+                <CharacterCardIntakePanel
+                  cardInput={characterCardInput}
+                  loadedCard={loadedCharacterCard}
+                  onChange={setCharacterCardInput}
+                  onClear={clearCharacterCard}
+                  onFileLoad={(event) => {
+                    void loadCharacterCardFile(event);
+                  }}
+                  onLoad={() => loadCharacterCard()}
+                />
+              ) : null}
 
-              <section className="grid gap-5 2xl:grid-cols-2">
-                <Panel title="Add Participant" icon={UsersRound}>
+              {activeWorkspaceSection === "user-persona" ? (
+                <UserPersonaBuilderPanel
+                  copied={copiedPersonaDraft}
+                  draft={userPersonaDraft}
+                  loadedCard={loadedCharacterCard}
+                  onChange={updateUserPersonaDraft}
+                  onCopy={() => {
+                    void copyUserPersonaDraft();
+                  }}
+                  onGenerate={generateUserPersonaFromCard}
+                />
+              ) : null}
+
+              {activeWorkspaceSection === "story" ? (
+                <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Story memory counts">
+                  {stats.map((stat) => (
+                    <article className={`rounded-lg border p-4 ${stat.tone}`} key={stat.label}>
+                      <p className="text-sm font-medium">{stat.label}</p>
+                      <p className="mt-3 text-3xl font-semibold">{stat.value}</p>
+                    </article>
+                  ))}
+                </section>
+              ) : null}
+
+              {activeWorkspaceSection === "participants" || activeWorkspaceSection === "relationships" ? (
+                <section className="grid gap-5">
+                  {activeWorkspaceSection === "participants" ? (
+                    <Panel title="Add Participant" icon={UsersRound}>
                   <form className="grid gap-3" onSubmit={addCharacter}>
                     <Field label="Name" name="name" placeholder="Character name" required />
                     <Field label="Role" name="role" placeholder="AI-controlled character, user player, rival..." />
@@ -1431,9 +1661,11 @@ export function StoryMemoryDashboard({
                     <TextArea label="Private truth" name="privateTruth" placeholder="Author-known truth, not automatically exported" />
                     <SubmitButton label="Add participant" />
                   </form>
-                </Panel>
+                    </Panel>
+                  ) : null}
 
-                <Panel title="Add Relationship" icon={Layers3}>
+                  {activeWorkspaceSection === "relationships" ? (
+                    <Panel title="Add Relationship" icon={Layers3}>
                   <form className="grid gap-3" onSubmit={addRelationship}>
                     <div className="grid gap-3 sm:grid-cols-2">
                       <SelectField label="First participant" name="participantA" options={characterOptions(characters)} />
@@ -1445,11 +1677,15 @@ export function StoryMemoryDashboard({
                     <Field label="Next pressure point" name="nextPressure" placeholder="Force proximity, overheard secret..." />
                     <SubmitButton label="Add relationship" />
                   </form>
-                </Panel>
-              </section>
+                    </Panel>
+                  ) : null}
+                </section>
+              ) : null}
 
-              <section className="grid gap-5 2xl:grid-cols-2">
-                <Panel title="Add Secret" icon={KeyRound}>
+              {activeWorkspaceSection === "story" || activeWorkspaceSection === "secrets" ? (
+                <section className="grid gap-5">
+                  {activeWorkspaceSection === "secrets" ? (
+                    <Panel title="Add Secret" icon={KeyRound}>
                   <form className="grid gap-3" onSubmit={addSecret}>
                     <Field label="Title" name="title" placeholder="The secret leverage" />
                     <TextArea label="Secret" name="secretText" placeholder="Who believes what, who is wrong, who is pretending" required />
@@ -1461,9 +1697,11 @@ export function StoryMemoryDashboard({
                     <Field label="Pressure" name="pressure" placeholder="Dormant, rising, dangerous..." />
                     <SubmitButton label="Add secret" />
                   </form>
-                </Panel>
+                    </Panel>
+                  ) : null}
 
-                <Panel title="Add Current Scene" icon={BookOpenText}>
+                  {activeWorkspaceSection === "story" ? (
+                    <Panel title="Add Current Scene" icon={BookOpenText}>
                   <form className="grid gap-3" onSubmit={addScene}>
                     <div className="grid gap-3 sm:grid-cols-2">
                       <Field label="Title" name="title" placeholder="After the party" />
@@ -1486,10 +1724,13 @@ export function StoryMemoryDashboard({
                     <Field label="Continuity flag" name="continuityFlag" placeholder="What must not be forgotten next time" />
                     <SubmitButton label="Add current scene" />
                   </form>
-                </Panel>
-              </section>
+                    </Panel>
+                  ) : null}
+                </section>
+              ) : null}
 
-              <Panel title="Grouped Tags" icon={Tags}>
+              {activeWorkspaceSection === "story" ? (
+                <Panel title="Grouped Tags" icon={Tags}>
                 <div className="grid gap-5 lg:grid-cols-2">
                   {Object.entries(groupedTags).map(([group, tags]) => (
                     <div key={group}>
@@ -1518,9 +1759,14 @@ export function StoryMemoryDashboard({
                     </div>
                   ))}
                 </div>
-              </Panel>
+                </Panel>
+              ) : null}
 
-              <Panel title="Current Story State" icon={Brain}>
+              {activeWorkspaceSection === "story" ||
+              activeWorkspaceSection === "participants" ||
+              activeWorkspaceSection === "relationships" ||
+              activeWorkspaceSection === "secrets" ? (
+                <Panel title="Current Story State" icon={Brain}>
                 <div className="grid gap-6 lg:grid-cols-3">
                   <MemoryColumn title="Latest relationship">
                     <p className="font-semibold text-zinc-950">
@@ -1544,11 +1790,13 @@ export function StoryMemoryDashboard({
                     ) : null}
                   </MemoryColumn>
                 </div>
-              </Panel>
+                </Panel>
+              ) : null}
             </div>
 
             <aside className="grid content-start gap-5">
-              <Panel title="Prompt Pack Builder" icon={MessageSquareText}>
+              {activeWorkspaceSection === "prompt-packs" ? (
+                <Panel title="Prompt Pack Builder" icon={MessageSquareText}>
                 <div className="grid gap-4">
                   <label className="grid gap-1.5 text-sm">
                     <span className="font-medium text-zinc-700">Platform</span>
@@ -1712,37 +1960,25 @@ export function StoryMemoryDashboard({
 
                   <p className="text-xs font-medium text-zinc-500">{notice}</p>
                 </div>
-              </Panel>
+                </Panel>
+              ) : null}
 
-              <Panel title="Latest Prompt Pack" icon={Copy}>
-                {latestPromptPack ? (
-                  <div className="grid gap-4">
-                    <div>
-                      <div className="flex items-center justify-between gap-3">
-                        <p className="text-sm font-semibold text-zinc-950">{latestPromptPack.title}</p>
-                        <StatusBadge saved={latestPromptPack.persistence_state === "saved"} />
-                      </div>
-                      <p className="mt-2 text-sm leading-6 text-zinc-600">{latestPromptPack.tailoring_goal}</p>
-                    </div>
-
-                    <div className="grid gap-3">
-                      {latestPromptSlots.map((slot) => (
-                        <PromptSlotCard
-                          key={slot.id}
-                          onCopy={() => {
-                            void copyPromptSlot(slot);
-                          }}
-                          slot={slot}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-sm leading-6 text-zinc-600">
-                    Generate a session pack from the current story memory state.
-                  </p>
-                )}
-              </Panel>
+              {activeWorkspaceSection === "exports" ? (
+                <JanitorExportPanel
+                  copiedSlotId={copiedSlotId}
+                  isPending={isPending}
+                  isPersisted={isPersisted}
+                  latestPromptPack={latestPromptPack}
+                  onCopySlot={(slot) => {
+                    void copyPromptSlot(slot);
+                  }}
+                  onGenerate={generatePromptPack}
+                  onSave={() => {
+                    void saveLatestPromptPack();
+                  }}
+                  slots={latestPromptSlots}
+                />
+              ) : null}
 
               <Panel title="Authorship Guardrails" icon={ShieldCheck}>
                 <ul className="space-y-3 text-sm leading-6 text-zinc-600">
@@ -2035,8 +2271,601 @@ function getSectionBody(text: string, startLabel: string, endLabel?: string) {
   return rawBody.trim();
 }
 
+function CharacterCardIntakePanel({
+  cardInput,
+  loadedCard,
+  onChange,
+  onClear,
+  onFileLoad,
+  onLoad,
+}: {
+  cardInput: string;
+  loadedCard: LoadedCharacterCard | null;
+  onChange: (value: string) => void;
+  onClear: () => void;
+  onFileLoad: (event: ChangeEvent<HTMLInputElement>) => void;
+  onLoad: () => void;
+}) {
+  return (
+    <Panel title="Load Character Card" icon={BookOpenText}>
+      <div className="grid gap-4">
+        <div className="rounded-md border border-zinc-200 bg-zinc-50 px-3 py-3 text-sm leading-6 text-zinc-600">
+          Load the established card first, then use its sections to build a user persona that fits
+          the character instead of rewriting the character from scratch.
+        </div>
+
+        <label className="grid gap-1.5 text-sm">
+          <span className="font-medium text-zinc-700">Choose card file</span>
+          <input
+            accept=".json,.txt,.png,application/json,text/plain,image/png"
+            className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm file:mr-3 file:rounded file:border-0 file:bg-zinc-950 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-white"
+            onChange={onFileLoad}
+            type="file"
+          />
+        </label>
+
+        <label className="grid gap-1.5 text-sm">
+          <span className="font-medium text-zinc-700">Paste character card JSON or notes</span>
+          <textarea
+            className="min-h-52 resize-y rounded-md border border-zinc-300 bg-white px-3 py-2 font-mono text-xs leading-5 text-zinc-900 outline-none focus:border-zinc-950"
+            onChange={(event) => onChange(event.target.value)}
+            placeholder='Paste JanitorAI or SillyTavern card JSON here, e.g. {"name":"...","description":"...","scenario":"..."}'
+            value={cardInput}
+          />
+        </label>
+
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            className="flex h-10 items-center justify-center gap-2 rounded-md bg-zinc-950 px-3 text-sm font-medium text-white hover:bg-zinc-800"
+            onClick={onLoad}
+            type="button"
+          >
+            <Sparkles className="size-4" aria-hidden="true" />
+            Load Card
+          </button>
+          <button
+            className="flex h-10 items-center justify-center rounded-md border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+            onClick={onClear}
+            type="button"
+          >
+            Clear
+          </button>
+        </div>
+
+        {loadedCard ? (
+          <div className="grid gap-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="rounded-md bg-zinc-950 px-2 py-1 text-xs font-medium text-white">
+                {loadedCard.format}
+              </span>
+              {loadedCard.name ? (
+                <span className="rounded-md border border-zinc-200 bg-white px-2 py-1 text-xs font-medium text-zinc-700">
+                  {loadedCard.name}
+                </span>
+              ) : null}
+              {loadedCard.tags.map((tag) => (
+                <span
+                  className="rounded-md border border-zinc-200 bg-zinc-50 px-2 py-1 text-xs font-medium text-zinc-600"
+                  key={tag}
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+
+            {loadedCard.warnings.length ? (
+              <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm leading-6 text-amber-900">
+                {loadedCard.warnings.join(" ")}
+              </div>
+            ) : null}
+
+            <div className="grid gap-3 lg:grid-cols-2">
+              <CharacterCardSection
+                items={[
+                  ["Name", loadedCard.name],
+                  ["Tags", loadedCard.tags.join(", ")],
+                  ["Creator notes", loadedCard.creatorNotes],
+                ]}
+                title="Identity + Metadata"
+              />
+              <CharacterCardSection
+                items={[
+                  ["Description", loadedCard.description],
+                  ["Personality", loadedCard.personality],
+                ]}
+                title="Character Definition"
+              />
+              <CharacterCardSection
+                items={[
+                  ["Scenario", loadedCard.scenario],
+                  ["First message", loadedCard.firstMessage],
+                  ["Alternate greetings", loadedCard.alternateGreetings.join("\n\n")],
+                ]}
+                title="Scenario + Openings"
+              />
+              <CharacterCardSection
+                items={[
+                  ["Example dialog", loadedCard.exampleDialog],
+                  ["System prompt", loadedCard.systemPrompt],
+                  ["Post-history instructions", loadedCard.postHistoryInstructions],
+                ]}
+                title="Prompting + Voice Samples"
+              />
+            </div>
+          </div>
+        ) : (
+          <div className="rounded-lg border border-dashed border-zinc-300 bg-white p-4 text-sm leading-6 text-zinc-600">
+            No card loaded yet. This will become the source snapshot for persona-fit decisions:
+            what the card already controls, what {"{{user}}"} should supply, and what the prompt pack
+            should avoid overwriting.
+          </div>
+        )}
+      </div>
+    </Panel>
+  );
+}
+
+function CharacterCardSection({
+  items,
+  title,
+}: {
+  items: [string, string | undefined][];
+  title: string;
+}) {
+  const visibleItems = items.filter(([, value]) => Boolean(value?.trim()));
+
+  return (
+    <article className="rounded-lg border border-zinc-200 bg-white p-4">
+      <h3 className="text-sm font-semibold text-zinc-950">{title}</h3>
+      {visibleItems.length ? (
+        <div className="mt-3 grid gap-3">
+          {visibleItems.map(([label, value]) => (
+            <div key={label}>
+              <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{label}</p>
+              <p className="mt-1 whitespace-pre-wrap text-sm leading-6 text-zinc-700">{value}</p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <p className="mt-3 text-sm leading-6 text-zinc-500">No imported fields in this section yet.</p>
+      )}
+    </article>
+  );
+}
+
+function UserPersonaBuilderPanel({
+  copied,
+  draft,
+  loadedCard,
+  onChange,
+  onCopy,
+  onGenerate,
+}: {
+  copied: boolean;
+  draft: UserPersonaDraft;
+  loadedCard: LoadedCharacterCard | null;
+  onChange: (field: keyof UserPersonaDraft, value: string) => void;
+  onCopy: () => void;
+  onGenerate: () => void;
+}) {
+  const personaPreview = formatUserPersonaDraft(draft);
+
+  return (
+    <Panel title="User Persona Builder" icon={UsersRound}>
+      <div className="grid gap-4">
+        <div className="rounded-md border border-zinc-200 bg-zinc-50 px-3 py-3 text-sm leading-6 text-zinc-600">
+          {loadedCard ? (
+            <>
+              Source card: <span className="font-semibold text-zinc-900">{loadedCard.name ?? "Unnamed card"}</span>.
+              Build what {"{{user}}"} brings to that established card without taking over {"{{char}}"}.
+            </>
+          ) : (
+            <>
+              Load a character card first for the strongest draft. You can still edit these fields
+              manually, but persona-fit works best when the card is the source.
+            </>
+          )}
+        </div>
+
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            className="flex h-10 items-center justify-center gap-2 rounded-md bg-zinc-950 px-3 text-sm font-medium text-white hover:bg-zinc-800"
+            onClick={onGenerate}
+            type="button"
+          >
+            <Sparkles className="size-4" aria-hidden="true" />
+            Generate From Card
+          </button>
+          <button
+            className="flex h-10 items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+            onClick={onCopy}
+            type="button"
+          >
+            {copied ? <Check className="size-4" aria-hidden="true" /> : <Copy className="size-4" aria-hidden="true" />}
+            {copied ? "Copied" : "Copy Persona"}
+          </button>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-2">
+          <ControlledField
+            label="Persona name"
+            onChange={(value) => onChange("displayName", value)}
+            placeholder="{{user}}"
+            value={draft.displayName}
+          />
+          <ControlledField
+            label="Role in story"
+            onChange={(value) => onChange("roleInStory", value)}
+            placeholder="Why this user player belongs in the card's premise"
+            value={draft.roleInStory}
+          />
+          <ControlledTextArea
+            label="Self-concept"
+            onChange={(value) => onChange("selfConcept", value)}
+            placeholder="What {{user}} believes about themself at the start"
+            value={draft.selfConcept}
+          />
+          <ControlledTextArea
+            label="Connection to {{char}}"
+            onChange={(value) => onChange("connectionToCharacter", value)}
+            placeholder="Why {{char}} and {{user}} are in each other's orbit"
+            value={draft.connectionToCharacter}
+          />
+          <ControlledTextArea
+            label="{{user}} knowledge"
+            onChange={(value) => onChange("whatUserKnows", value)}
+            placeholder="What {{user}} knows, suspects, or is hiding at the start"
+            value={draft.whatUserKnows}
+          />
+          <ControlledTextArea
+            label="Opening angle"
+            onChange={(value) => onChange("openingAngle", value)}
+            placeholder="How {{user}} can enter the opening with agency"
+            value={draft.openingAngle}
+          />
+          <ControlledTextArea
+            label="Persona boundaries"
+            onChange={(value) => onChange("boundaries", value)}
+            placeholder="What the AI must not write for {{user}}"
+            value={draft.boundaries}
+          />
+          <ControlledTextArea
+            label="Card-fit notes"
+            onChange={(value) => onChange("cardFitNotes", value)}
+            placeholder="What the loaded card already controls and what the persona should fit around"
+            value={draft.cardFitNotes}
+          />
+        </div>
+
+        <article className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
+          <div className="border-b border-zinc-200 bg-zinc-50 px-3 py-3">
+            <h3 className="text-sm font-semibold text-zinc-950">Persona Preview</h3>
+            <p className="mt-1 text-xs leading-5 text-zinc-500">
+              Paste-ready draft, still sessional until we add persistence.
+            </p>
+          </div>
+          <pre className="max-h-80 overflow-auto whitespace-pre-wrap bg-zinc-950 p-3 text-sm leading-6 text-zinc-100">
+            {personaPreview || "Generate or edit persona fields to build the preview."}
+          </pre>
+        </article>
+      </div>
+    </Panel>
+  );
+}
+
 function compactLines(lines: string[]) {
   return lines.filter((line) => line.trim().length > 0);
+}
+
+function formatUserPersonaDraft(draft: UserPersonaDraft) {
+  return compactLines([
+    `[${draft.displayName || "{{user}}"} Persona]`,
+    draft.roleInStory ? `Role: ${draft.roleInStory}` : "",
+    draft.selfConcept ? `Self-concept: ${draft.selfConcept}` : "",
+    draft.connectionToCharacter ? `Connection to {{char}}: ${draft.connectionToCharacter}` : "",
+    draft.whatUserKnows ? `Starting knowledge: ${draft.whatUserKnows}` : "",
+    draft.openingAngle ? `Opening angle: ${draft.openingAngle}` : "",
+    draft.boundaries ? `Boundaries:\n${draft.boundaries}` : "",
+    draft.cardFitNotes ? `Card-fit notes:\n${draft.cardFitNotes}` : "",
+  ]).join("\n\n");
+}
+
+function parseCharacterCard(source: string, sourceName?: string): LoadedCharacterCard {
+  const importedAt = new Date().toISOString();
+
+  try {
+    const parsed: unknown = JSON.parse(source);
+
+    if (!isRecord(parsed)) {
+      return {
+        alternateGreetings: [],
+        description: source,
+        format: "Plain text card notes",
+        importedAt,
+        rawText: source,
+        tags: [],
+        warnings: ["The card JSON did not contain an object, so it was loaded as raw notes."],
+      };
+    }
+
+    const cardData = isRecord(parsed.data) ? parsed.data : parsed;
+    const format = getCharacterCardFormat(parsed, sourceName);
+
+    return {
+      alternateGreetings: readStringArray(cardData, [
+        "alternate_greetings",
+        "alternateGreetings",
+        "alternate_messages",
+      ]),
+      creatorNotes: readString(cardData, [
+        "creator_notes",
+        "creatorNotes",
+        "creatorcomment",
+        "creator_comment",
+      ]),
+      description: readString(cardData, ["description", "char_description", "definition"]),
+      exampleDialog: readString(cardData, ["mes_example", "example_dialogue", "exampleDialog", "examples"]),
+      firstMessage: readString(cardData, ["first_mes", "first_message", "firstMessage", "greeting"]),
+      format,
+      importedAt,
+      name: readString(cardData, ["name", "char_name", "character_name"]),
+      personality: readString(cardData, ["personality", "personality_summary"]),
+      postHistoryInstructions: readString(cardData, [
+        "post_history_instructions",
+        "postHistoryInstructions",
+        "post_history",
+      ]),
+      rawText: source,
+      scenario: readString(cardData, ["scenario", "scenario_text"]),
+      systemPrompt: readString(cardData, ["system_prompt", "systemPrompt", "system"]),
+      tags: readStringArray(cardData, ["tags", "tagline", "categories"]),
+      warnings: [],
+    };
+  } catch {
+    return {
+      alternateGreetings: [],
+      description: source,
+      format: "Plain text card notes",
+      importedAt,
+      rawText: source,
+      tags: [],
+      warnings: ["This was not valid JSON, so it was loaded as plain card notes."],
+    };
+  }
+}
+
+async function extractCharacterCardSourceFromPng(file: File) {
+  const bytes = new Uint8Array(await file.arrayBuffer());
+
+  if (!isPng(bytes)) {
+    throw new Error("That file is not a valid PNG.");
+  }
+
+  const textChunks = await readPngTextChunks(bytes);
+  const preferredKeys = ["chara", "ccv3", "card", "character", "character_card", "json"];
+  const preferredChunks = [
+    ...textChunks.filter((chunk) => preferredKeys.includes(chunk.keyword.toLowerCase())),
+    ...textChunks.filter((chunk) => !preferredKeys.includes(chunk.keyword.toLowerCase())),
+  ];
+
+  for (const chunk of preferredChunks) {
+    const decoded = decodePossibleCharacterPayload(chunk.text);
+    if (decoded && looksLikeCharacterCardSource(decoded)) {
+      return decoded;
+    }
+  }
+
+  return null;
+}
+
+async function readPngTextChunks(bytes: Uint8Array) {
+  const chunks: { keyword: string; text: string }[] = [];
+  const decoder = new TextDecoder("latin1");
+  let offset = 8;
+
+  while (offset + 12 <= bytes.length) {
+    const length = readUint32(bytes, offset);
+    const type = decoder.decode(bytes.slice(offset + 4, offset + 8));
+    const dataStart = offset + 8;
+    const dataEnd = dataStart + length;
+
+    if (dataEnd > bytes.length) break;
+
+    const data = bytes.slice(dataStart, dataEnd);
+
+    if (type === "tEXt") {
+      const parsed = readPngTextChunk(data);
+      if (parsed) chunks.push(parsed);
+    }
+
+    if (type === "iTXt") {
+      const parsed = await readPngInternationalTextChunk(data);
+      if (parsed) chunks.push(parsed);
+    }
+
+    if (type === "zTXt") {
+      const parsed = await readPngCompressedTextChunk(data);
+      if (parsed) chunks.push(parsed);
+    }
+
+    offset = dataEnd + 4;
+    if (type === "IEND") break;
+  }
+
+  return chunks;
+}
+
+function readPngTextChunk(data: Uint8Array) {
+  const separator = data.indexOf(0);
+  if (separator === -1) return null;
+
+  const latin1Decoder = new TextDecoder("latin1");
+  const utf8Decoder = new TextDecoder();
+
+  return {
+    keyword: latin1Decoder.decode(data.slice(0, separator)),
+    text: utf8Decoder.decode(data.slice(separator + 1)),
+  };
+}
+
+async function readPngInternationalTextChunk(data: Uint8Array) {
+  const keywordEnd = data.indexOf(0);
+  if (keywordEnd === -1 || keywordEnd + 2 >= data.length) return null;
+
+  const latin1Decoder = new TextDecoder("latin1");
+  const utf8Decoder = new TextDecoder();
+  const keyword = latin1Decoder.decode(data.slice(0, keywordEnd));
+  const compressionFlag = data[keywordEnd + 1];
+  let cursor = keywordEnd + 3;
+
+  const languageEnd = data.indexOf(0, cursor);
+  if (languageEnd === -1) return null;
+  cursor = languageEnd + 1;
+
+  const translatedKeywordEnd = data.indexOf(0, cursor);
+  if (translatedKeywordEnd === -1) return null;
+  cursor = translatedKeywordEnd + 1;
+
+  const textBytes = data.slice(cursor);
+  const text =
+    compressionFlag === 1
+      ? await inflatePngText(textBytes)
+      : utf8Decoder.decode(textBytes);
+
+  return text ? { keyword, text } : null;
+}
+
+async function readPngCompressedTextChunk(data: Uint8Array) {
+  const separator = data.indexOf(0);
+  if (separator === -1 || separator + 2 >= data.length) return null;
+
+  const latin1Decoder = new TextDecoder("latin1");
+  const keyword = latin1Decoder.decode(data.slice(0, separator));
+  const text = await inflatePngText(data.slice(separator + 2));
+
+  return text ? { keyword, text } : null;
+}
+
+async function inflatePngText(data: Uint8Array) {
+  if (!("DecompressionStream" in globalThis)) return "";
+
+  try {
+    const buffer = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength) as ArrayBuffer;
+    const stream = new Blob([buffer]).stream().pipeThrough(new DecompressionStream("deflate"));
+    return new TextDecoder().decode(await new Response(stream).arrayBuffer());
+  } catch {
+    return "";
+  }
+}
+
+function decodePossibleCharacterPayload(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+
+  if (looksLikeCharacterCardSource(trimmed)) return trimmed;
+
+  try {
+    const binary = atob(trimmed);
+    const bytes = Uint8Array.from(binary, (character) => character.charCodeAt(0));
+    const decoded = new TextDecoder().decode(bytes);
+    return decoded.trim();
+  } catch {
+    return trimmed;
+  }
+}
+
+function looksLikeCharacterCardSource(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed.startsWith("{")) return false;
+
+  try {
+    const parsed: unknown = JSON.parse(trimmed);
+    if (!isRecord(parsed)) return false;
+    const data = isRecord(parsed.data) ? parsed.data : parsed;
+
+    return Boolean(
+      readString(data, ["name", "char_name", "character_name"]) ||
+        readString(data, ["description", "char_description", "definition"]) ||
+        readString(data, ["scenario", "scenario_text"]) ||
+        readString(parsed, ["spec"]),
+    );
+  } catch {
+    return false;
+  }
+}
+
+function isPng(bytes: Uint8Array) {
+  const signature = [137, 80, 78, 71, 13, 10, 26, 10];
+  return signature.every((byte, index) => bytes[index] === byte);
+}
+
+function readUint32(bytes: Uint8Array, offset: number) {
+  return (
+    bytes[offset] * 2 ** 24 +
+    bytes[offset + 1] * 2 ** 16 +
+    bytes[offset + 2] * 2 ** 8 +
+    bytes[offset + 3]
+  );
+}
+
+function getCharacterCardFormat(card: Record<string, unknown>, sourceName?: string) {
+  const spec = readString(card, ["spec"]);
+  const specVersion = readString(card, ["spec_version", "specVersion"]);
+  const sourceLabel = sourceName ? ` from ${sourceName}` : "";
+
+  if (spec || specVersion) {
+    return `${[spec, specVersion].filter(Boolean).join(" ")}${sourceLabel}`.trim();
+  }
+
+  if (isRecord(card.data)) {
+    return `Character card v2${sourceLabel}`;
+  }
+
+  return `Character card JSON${sourceLabel}`;
+}
+
+function readString(record: Record<string, unknown>, keys: string[]) {
+  for (const key of keys) {
+    const value = record[key];
+
+    if (typeof value === "string" && value.trim()) {
+      return value.trim();
+    }
+  }
+
+  return undefined;
+}
+
+function readStringArray(record: Record<string, unknown>, keys: string[]) {
+  for (const key of keys) {
+    const value = record[key];
+
+    if (Array.isArray(value)) {
+      return value
+        .filter((item): item is string => typeof item === "string" && item.trim().length > 0)
+        .map((item) => item.trim());
+    }
+
+    if (typeof value === "string" && value.trim()) {
+      return value
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+  }
+
+  return [];
+}
+
+function compactSentence(value: string | undefined, fallback: string) {
+  if (!value) return fallback;
+
+  const normalized = value.replace(/\s+/g, " ").trim();
+  return normalized.length > 220 ? `${normalized.slice(0, 217)}...` : normalized;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
 }
 
 function withTerminalPunctuation(text: string) {
@@ -2112,21 +2941,145 @@ function PromptModuleEditor({
   );
 }
 
-function PromptSlotCard({ onCopy, slot }: { onCopy: () => void; slot: PromptSlot }) {
+function JanitorExportPanel({
+  copiedSlotId,
+  isPending,
+  isPersisted,
+  latestPromptPack,
+  onCopySlot,
+  onGenerate,
+  onSave,
+  slots,
+}: {
+  copiedSlotId: string | null;
+  isPending: boolean;
+  isPersisted: boolean;
+  latestPromptPack?: GeneratedPromptPack;
+  onCopySlot: (slot: PromptSlot) => void;
+  onGenerate: () => void;
+  onSave: () => void;
+  slots: PromptSlot[];
+}) {
+  const status = latestPromptPack
+    ? getPromptPackStatus(latestPromptPack, isPersisted)
+    : {
+        helper: "Generate a pack to create JanitorAI-ready slots.",
+        label: "Not generated",
+        saved: false,
+      };
+  const isJanitorExport = latestPromptPack?.target_platform === "JanitorAI";
+  const totalCharacters = slots.reduce((total, slot) => total + slot.body.length, 0);
+  const totalWords = slots.reduce((total, slot) => total + countWords(slot.body), 0);
+
+  return (
+    <Panel title={isJanitorExport ? "JanitorAI Export" : "Export Preview"} icon={Download}>
+      <div className="grid gap-4">
+        <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                {isJanitorExport ? "Ready for JanitorAI" : "Latest generated pack"}
+              </p>
+              <h2 className="mt-1 text-base font-semibold text-zinc-950">
+                {latestPromptPack?.title ?? "No prompt pack yet"}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-zinc-600">
+                {latestPromptPack?.tailoring_goal ??
+                  "Generate from the active story memory, then copy each slot into the matching platform field."}
+              </p>
+            </div>
+            <StatusBadge helper={status.helper} saved={status.saved}>
+              {status.label}
+            </StatusBadge>
+          </div>
+
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            <ExportMetric label="Slots" value={slots.length || 0} />
+            <ExportMetric label="Words" value={totalWords} />
+            <ExportMetric label="Chars" value={totalCharacters} />
+          </div>
+
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <button
+              className="flex h-10 items-center justify-center gap-2 rounded-md bg-zinc-950 px-3 text-sm font-medium text-white hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={isPending}
+              onClick={onGenerate}
+              type="button"
+            >
+              <Sparkles className="size-4" aria-hidden="true" />
+              Generate
+            </button>
+            <button
+              className="flex h-10 items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={!latestPromptPack || latestPromptPack.persistence_state === "saved" || isPending}
+              onClick={onSave}
+              type="button"
+            >
+              <Save className="size-4" aria-hidden="true" />
+              Save
+            </button>
+          </div>
+        </div>
+
+        {latestPromptPack ? (
+          <div className="grid gap-3">
+            {slots.map((slot) => (
+              <PromptSlotCard
+                copied={copiedSlotId === slot.id}
+                key={slot.id}
+                onCopy={() => onCopySlot(slot)}
+                slot={slot}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-lg border border-dashed border-zinc-300 bg-white p-4 text-sm leading-6 text-zinc-600">
+            JanitorAI needs a Global Prompt for broad behavior and a Proxy Prompt for the active
+            session layer. Generate when the story memory state looks right.
+          </div>
+        )}
+      </div>
+    </Panel>
+  );
+}
+
+function ExportMetric({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="rounded-md border border-zinc-200 bg-white px-3 py-2">
+      <p className="text-xs font-medium text-zinc-500">{label}</p>
+      <p className="mt-1 text-sm font-semibold text-zinc-950">{value.toLocaleString()}</p>
+    </div>
+  );
+}
+
+function PromptSlotCard({
+  copied,
+  onCopy,
+  slot,
+}: {
+  copied: boolean;
+  onCopy: () => void;
+  slot: PromptSlot;
+}) {
+  const wordCount = countWords(slot.body);
+
   return (
     <article className="overflow-hidden rounded-lg border border-zinc-200 bg-white">
       <div className="flex items-start justify-between gap-3 border-b border-zinc-200 bg-zinc-50 px-3 py-3">
         <div>
           <h3 className="text-sm font-semibold text-zinc-950">{slot.label}</h3>
           <p className="mt-1 text-xs leading-5 text-zinc-500">{slot.helper}</p>
+          <p className="mt-1 text-xs leading-5 text-zinc-400">
+            {wordCount.toLocaleString()} words · {slot.body.length.toLocaleString()} characters
+          </p>
         </div>
         <button
           className="inline-flex h-8 shrink-0 items-center justify-center gap-1.5 rounded-md border border-zinc-300 bg-white px-2.5 text-xs font-medium text-zinc-800 hover:bg-zinc-100"
           onClick={onCopy}
           type="button"
         >
-          <Copy className="size-3.5" aria-hidden="true" />
-          Copy
+          {copied ? <Check className="size-3.5" aria-hidden="true" /> : <Copy className="size-3.5" aria-hidden="true" />}
+          {copied ? "Copied" : "Copy"}
         </button>
       </div>
       <pre className="max-h-64 overflow-auto whitespace-pre-wrap bg-zinc-950 p-3 text-sm leading-6 text-zinc-100">
@@ -2245,6 +3198,30 @@ function Field({
   );
 }
 
+function ControlledField({
+  label,
+  onChange,
+  placeholder,
+  value,
+}: {
+  label: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  value: string;
+}) {
+  return (
+    <label className="grid gap-1.5 text-sm">
+      <span className="font-medium text-zinc-700">{label}</span>
+      <input
+        className="h-10 rounded-md border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950"
+        onChange={(event) => onChange(event.target.value)}
+        placeholder={placeholder}
+        value={value}
+      />
+    </label>
+  );
+}
+
 function TextArea({
   label,
   name,
@@ -2264,6 +3241,30 @@ function TextArea({
         name={name}
         placeholder={placeholder}
         required={required}
+      />
+    </label>
+  );
+}
+
+function ControlledTextArea({
+  label,
+  onChange,
+  placeholder,
+  value,
+}: {
+  label: string;
+  onChange: (value: string) => void;
+  placeholder: string;
+  value: string;
+}) {
+  return (
+    <label className="grid gap-1.5 text-sm">
+      <span className="font-medium text-zinc-700">{label}</span>
+      <textarea
+        className="min-h-24 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm leading-6 outline-none focus:border-zinc-950"
+        onChange={(event) => onChange(event.target.value)}
+        placeholder={placeholder}
+        value={value}
       />
     </label>
   );
@@ -2321,17 +3322,50 @@ function MemoryColumn({ children, title }: { children: ReactNode; title: string 
   );
 }
 
-function StatusBadge({ saved }: { saved: boolean }) {
+function StatusBadge({
+  children,
+  helper,
+  saved,
+}: {
+  children?: ReactNode;
+  helper?: string;
+  saved: boolean;
+}) {
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium ${
+      className={`inline-flex max-w-44 items-center gap-1 rounded-md px-2 py-1 text-xs font-medium ${
         saved ? "bg-emerald-50 text-emerald-800" : "bg-amber-50 text-amber-800"
       }`}
+      title={helper}
     >
       {saved ? <Check className="size-3" aria-hidden="true" /> : null}
-      {saved ? "Saved" : "Session"}
+      <span className="truncate">{children ?? (saved ? "Saved" : "Session")}</span>
     </span>
   );
+}
+
+function getPromptPackStatus(pack: GeneratedPromptPack, isPersisted: boolean) {
+  if (pack.persistence_state !== "saved") {
+    return {
+      helper: "This generated pack will disappear when the session closes unless it is saved.",
+      label: "Session draft",
+      saved: false,
+    };
+  }
+
+  if (!isPersisted) {
+    return {
+      helper: "Saved inside this browser session only. Sign in for Supabase persistence.",
+      label: "Session saved",
+      saved: true,
+    };
+  }
+
+  return {
+    helper: "Saved to the Supabase workspace.",
+    label: "Workspace saved",
+    saved: true,
+  };
 }
 
 function characterOptions(characters: Character[]) {
@@ -2365,6 +3399,11 @@ function displayLabel(value: string) {
     .replaceAll("_", " ")
     .replaceAll("-", " ")
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function countWords(value: string) {
+  const words = value.trim().match(/\S+/g);
+  return words?.length ?? 0;
 }
 
 function slugify(value: string) {
