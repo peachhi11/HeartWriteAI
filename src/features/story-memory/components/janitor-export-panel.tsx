@@ -3,13 +3,7 @@ import { Check, Copy, Download, Save, Sparkles } from "lucide-react";
 
 import { SectionPanel } from "@/features/story-memory/components/section-panel";
 import type { GeneratedPromptPack } from "@/features/story-memory/types/story-memory";
-
-export type PromptSlot = {
-  body: string;
-  helper: string;
-  id: string;
-  label: string;
-};
+import type { PromptSlot } from "@/features/story-memory/utils/prompt-slot-builder";
 
 export function JanitorExportPanel({
   copiedSlotId,
