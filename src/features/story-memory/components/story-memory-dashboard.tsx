@@ -485,6 +485,8 @@ export function StoryMemoryDashboard({
   const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>(initialSelectedTagSlugs);
   const [activeCorePackId, setActiveCorePackId] = useState(corePromptPacks[0]?.id ?? "");
   const [activeWritingStylePresetId, setActiveWritingStylePresetId] = useState(writingStylePresets[0].id);
+  const [customStyleName, setCustomStyleName] = useState("");
+  const [customWritingStylePresets, setCustomWritingStylePresets] = useState<WritingStylePreset[]>([]);
   const [promptModuleDrafts, setPromptModuleDrafts] = useState<PromptModuleDrafts>({});
   const [promptModuleExpanded, setPromptModuleExpanded] = useState<PromptModuleExpanded>(
     defaultPromptModuleExpanded,
@@ -508,6 +510,10 @@ export function StoryMemoryDashboard({
   const latestPromptSlots = latestPromptPack ? getPromptPackSlots(latestPromptPack) : [];
   const activeCorePack = corePromptPacks.find((pack) => pack.id === activeCorePackId) ?? corePromptPacks[0];
   const activePlatformProfile = platformProfiles[platform] ?? platformProfiles.JanitorAI;
+  const availableWritingStylePresets = useMemo(
+    () => [...writingStylePresets, ...customWritingStylePresets],
+    [customWritingStylePresets],
+  );
   const selectedTagLabels = useMemo(
     () =>
       selectedTagSlugs
@@ -1072,7 +1078,9 @@ export function StoryMemoryDashboard({
   }
 
   function applyWritingStylePreset(presetId: string) {
-    const preset = writingStylePresets.find((candidate) => candidate.id === presetId) ?? writingStylePresets[0];
+    const preset =
+      availableWritingStylePresets.find((candidate) => candidate.id === presetId) ??
+      writingStylePresets[0];
 
     setActiveWritingStylePresetId(preset.id);
     setPromptModuleDrafts((current) => ({ ...current, ...preset.modules }));
@@ -1085,6 +1093,33 @@ export function StoryMemoryDashboard({
       styleToneSensory: false,
     }));
     setNotice(`Applied writing style: ${preset.label}.`);
+  }
+
+  function saveCustomWritingStylePreset() {
+    const trimmedName = customStyleName.trim();
+
+    if (!trimmedName) {
+      setNotice("Name the custom style first.");
+      return;
+    }
+
+    const preset: WritingStylePreset = {
+      description: "Saved for this session from the current writing-style modules.",
+      id: `custom-${slugify(trimmedName)}-${Date.now()}`,
+      label: trimmedName,
+      modules: {
+        styleDialogueVoice: promptModuleValues.styleDialogueVoice,
+        stylePerspectiveLens: promptModuleValues.stylePerspectiveLens,
+        styleRhythmDensity: promptModuleValues.styleRhythmDensity,
+        styleSubtextEmotion: promptModuleValues.styleSubtextEmotion,
+        styleToneSensory: promptModuleValues.styleToneSensory,
+      },
+    };
+
+    setCustomWritingStylePresets((current) => [...current, preset]);
+    setActiveWritingStylePresetId(preset.id);
+    setCustomStyleName("");
+    setNotice(`Saved custom style: ${preset.label}.`);
   }
 
   function setPromptModuleText(key: PromptModuleKey, value: string) {
@@ -1509,7 +1544,7 @@ export function StoryMemoryDashboard({
                                   onChange={(event) => setActiveWritingStylePresetId(event.target.value)}
                                   value={activeWritingStylePresetId}
                                 >
-                                  {writingStylePresets.map((preset) => (
+                                  {availableWritingStylePresets.map((preset) => (
                                     <option key={preset.id} value={preset.id}>
                                       {preset.label}
                                     </option>
@@ -1518,19 +1553,38 @@ export function StoryMemoryDashboard({
                               </label>
                               <p className="text-xs leading-5 text-zinc-500">
                                 {
-                                  writingStylePresets.find(
+                                  availableWritingStylePresets.find(
                                     (preset) => preset.id === activeWritingStylePresetId,
                                   )?.description
                                 }
                               </p>
-                              <button
-                                className="flex h-9 items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-xs font-medium text-zinc-800 hover:bg-zinc-100"
-                                onClick={() => applyWritingStylePreset(activeWritingStylePresetId)}
-                                type="button"
-                              >
-                                <Sparkles className="size-3.5" aria-hidden="true" />
-                                Apply Style
-                              </button>
+                              <div className="grid grid-cols-2 gap-2">
+                                <button
+                                  className="flex h-9 items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-xs font-medium text-zinc-800 hover:bg-zinc-100"
+                                  onClick={() => applyWritingStylePreset(activeWritingStylePresetId)}
+                                  type="button"
+                                >
+                                  <Sparkles className="size-3.5" aria-hidden="true" />
+                                  Apply Style
+                                </button>
+                                <button
+                                  className="flex h-9 items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-xs font-medium text-zinc-800 hover:bg-zinc-100"
+                                  onClick={saveCustomWritingStylePreset}
+                                  type="button"
+                                >
+                                  <Save className="size-3.5" aria-hidden="true" />
+                                  Save Custom
+                                </button>
+                              </div>
+                              <label className="grid gap-1.5 text-sm">
+                                <span className="font-medium text-zinc-700">Custom style name</span>
+                                <input
+                                  className="h-10 rounded-md border border-zinc-300 bg-white px-3 text-sm text-zinc-900 outline-none focus:border-zinc-950"
+                                  onChange={(event) => setCustomStyleName(event.target.value)}
+                                  placeholder="My smoky slow burn"
+                                  value={customStyleName}
+                                />
+                              </label>
                             </div>
                           ) : null}
                           {promptModuleOptions
@@ -2185,6 +2239,14 @@ function displayLabel(value: string) {
     .replaceAll("_", " ")
     .replaceAll("-", " ")
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
+}
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 function getAuthMessage(auth: StoryMemoryAuthState) {
