@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChangeEvent, FormEvent, MouseEvent, ReactNode } from "react";
-import { useMemo, useState, useTransition } from "react";
+import { Children, useMemo, useState, useTransition } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
   BookOpenText,
@@ -17,6 +17,7 @@ import {
   ShieldCheck,
   Sparkles,
   Tags,
+  Trash2,
   UsersRound,
 } from "lucide-react";
 
@@ -58,6 +59,7 @@ import type {
   SpiceVisibility,
   Story,
 } from "@/features/story-memory/types/story-memory";
+import type { UserPersonaGender } from "@/features/story-memory/types/user-persona";
 import { buildUserPersonaDraftFromCard } from "@/features/story-memory/utils/user-persona-draft";
 import {
   extractCharacterCardSourceFromPng,
@@ -536,6 +538,7 @@ export function StoryMemoryDashboard({
   const [characterCardInput, setCharacterCardInput] = useState("");
   const [loadedCharacterCard, setLoadedCharacterCard] = useState<LoadedCharacterCard | null>(null);
   const [userPersonaDraft, setUserPersonaDraft] = useState<UserPersonaDraft>(emptyUserPersonaDraft);
+  const [userPersonaGender, setUserPersonaGender] = useState<UserPersonaGender>("female");
   const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>(initialSelectedTagSlugs);
   const [activeCorePackId, setActiveCorePackId] = useState(corePromptPacks[0]?.id ?? "");
   const [activeWritingStylePresetId, setActiveWritingStylePresetId] = useState(writingStylePresets[0].id);
@@ -1134,6 +1137,269 @@ export function StoryMemoryDashboard({
     setNotice(`Added scene memory: ${title}${isPersisted ? " and saved it" : ""}.`);
   }
 
+  async function saveCharacterEntry(event: FormEvent<HTMLFormElement>, characterId: string) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const existing = characters.find((character) => character.id === characterId);
+    if (!existing) return;
+
+    const name = getFormValue(form, "name") || existing.name;
+    const role = getFormValue(form, "role");
+    const selfBelief = getFormValue(form, "selfBelief");
+    const privateTruth = getFormValue(form, "privateTruth");
+    const updated: Character = {
+      ...existing,
+      name,
+      role,
+      public_facts: role ? [`Known role: ${role}`] : [],
+      private_truths: privateTruth ? [privateTruth] : [],
+      self_beliefs: selfBelief ? [selfBelief] : [],
+      updated_at: new Date().toISOString(),
+    };
+
+    if (isPersisted && supabase && userId) {
+      const { data, error } = await supabase
+        .from("characters")
+        .update({
+          name: updated.name,
+          role: updated.role || null,
+          public_facts: updated.public_facts,
+          private_truths: updated.private_truths,
+          self_beliefs: updated.self_beliefs,
+          updated_at: updated.updated_at,
+        })
+        .eq("id", characterId)
+        .select()
+        .single();
+
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      setCharacters((current) => replaceById(current, characterId, mapCharacterRow(data)));
+    } else {
+      setCharacters((current) => replaceById(current, characterId, updated));
+    }
+
+    setNotice(`Updated participant: ${name}.`);
+  }
+
+  async function deleteCharacterEntry(characterId: string) {
+    const character = characters.find((candidate) => candidate.id === characterId);
+    if (!character || !window.confirm(`Delete participant "${character.name}"?`)) return;
+
+    if (isPersisted && supabase && userId) {
+      const { error } = await supabase.from("characters").delete().eq("id", characterId);
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+    }
+
+    setCharacters((current) => removeById(current, characterId));
+    setNotice(`Deleted participant: ${character.name}.`);
+  }
+
+  async function saveRelationshipEntry(event: FormEvent<HTMLFormElement>, relationshipId: string) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const existing = relationships.find((relationship) => relationship.id === relationshipId);
+    if (!existing) return;
+
+    const first = getFormValue(form, "participantA");
+    const second = getFormValue(form, "participantB");
+    const dynamic = getFormValue(form, "dynamic") || existing.dynamic_label;
+    const updated: RelationshipThread = {
+      ...existing,
+      participants: [first, second].filter(Boolean),
+      dynamic_label: dynamic,
+      current_state: getFormValue(form, "state"),
+      conflict_notes: getFormValue(form, "conflict"),
+      next_pressure_point: getFormValue(form, "nextPressure"),
+      updated_at: new Date().toISOString(),
+    };
+
+    if (isPersisted && supabase && userId) {
+      const { data, error } = await supabase
+        .from("relationship_threads")
+        .update({
+          participants: updated.participants,
+          dynamic_label: updated.dynamic_label,
+          current_state: updated.current_state || null,
+          conflict_notes: updated.conflict_notes || null,
+          next_pressure_point: updated.next_pressure_point || null,
+          updated_at: updated.updated_at,
+        })
+        .eq("id", relationshipId)
+        .select()
+        .single();
+
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      setRelationships((current) => replaceById(current, relationshipId, mapRelationshipThreadRow(data)));
+    } else {
+      setRelationships((current) => replaceById(current, relationshipId, updated));
+    }
+
+    setNotice(`Updated relationship: ${dynamic}.`);
+  }
+
+  async function deleteRelationshipEntry(relationshipId: string) {
+    const relationship = relationships.find((candidate) => candidate.id === relationshipId);
+    if (!relationship || !window.confirm(`Delete relationship "${relationship.dynamic_label}"?`)) return;
+
+    if (isPersisted && supabase && userId) {
+      const { error } = await supabase.from("relationship_threads").delete().eq("id", relationshipId);
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+    }
+
+    setRelationships((current) => removeById(current, relationshipId));
+    setNotice(`Deleted relationship: ${relationship.dynamic_label}.`);
+  }
+
+  async function saveSecretEntry(event: FormEvent<HTMLFormElement>, secretId: string) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const existing = secrets.find((secret) => secret.id === secretId);
+    if (!existing) return;
+
+    const title = getFormValue(form, "title") || "Untitled secret";
+    const updated: SecretOrReveal = {
+      ...existing,
+      title,
+      secret_text: getFormValue(form, "secretText") || existing.secret_text,
+      who_knows: compactIds([getFormValue(form, "whoKnows")]),
+      who_is_hiding_it: compactIds([getFormValue(form, "whoHides")]),
+      who_falsely_believes_they_are_safe: compactIds([getFormValue(form, "whoHides")]),
+      who_is_pretending_not_to_know: compactIds([getFormValue(form, "whoPretends")]),
+      current_pressure: getFormValue(form, "pressure") || "Dormant",
+      updated_at: new Date().toISOString(),
+    };
+
+    if (isPersisted && supabase && userId) {
+      const { data, error } = await supabase
+        .from("secrets")
+        .update({
+          title: updated.title ?? null,
+          secret_text: updated.secret_text,
+          who_knows: updated.who_knows,
+          who_is_hiding_it: updated.who_is_hiding_it,
+          who_falsely_believes_they_are_safe: updated.who_falsely_believes_they_are_safe,
+          who_is_pretending_not_to_know: updated.who_is_pretending_not_to_know,
+          current_pressure: updated.current_pressure ?? null,
+          updated_at: updated.updated_at,
+        })
+        .eq("id", secretId)
+        .select()
+        .single();
+
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      setSecrets((current) => replaceById(current, secretId, mapSecretRow(data)));
+    } else {
+      setSecrets((current) => replaceById(current, secretId, updated));
+    }
+
+    setNotice(`Updated secret: ${title}.`);
+  }
+
+  async function deleteSecretEntry(secretId: string) {
+    const secret = secrets.find((candidate) => candidate.id === secretId);
+    if (!secret || !window.confirm(`Delete secret "${secret.title ?? "Untitled secret"}"?`)) return;
+
+    if (isPersisted && supabase && userId) {
+      const { error } = await supabase.from("secrets").delete().eq("id", secretId);
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+    }
+
+    setSecrets((current) => removeById(current, secretId));
+    setNotice(`Deleted secret: ${secret.title ?? "Untitled secret"}.`);
+  }
+
+  async function saveSceneEntry(event: FormEvent<HTMLFormElement>, sceneId: string) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const existing = scenes.find((scene) => scene.id === sceneId);
+    if (!existing) return;
+
+    const title = getFormValue(form, "title") || "Untitled scene";
+    const updated: SceneMemory = {
+      ...existing,
+      title,
+      location: getFormValue(form, "location"),
+      scenario: getFormValue(form, "scenario"),
+      setting: getFormValue(form, "setting"),
+      continuity_mode: (getFormValue(form, "continuityMode") || "canon") as ContinuityMode,
+      chapter_label: getFormValue(form, "chapterLabel"),
+      narrative_arc: getFormValue(form, "narrativeArc"),
+      participants: compactIds([getFormValue(form, "participant")]),
+      summary: getFormValue(form, "summary") || existing.summary,
+      continuity_flags: compactIds([getFormValue(form, "continuityFlag")]),
+      updated_at: new Date().toISOString(),
+    };
+
+    if (isPersisted && supabase && userId) {
+      const { data, error } = await supabase
+        .from("scene_memories")
+        .update({
+          title: updated.title ?? null,
+          location: updated.location ?? null,
+          scenario: updated.scenario ?? null,
+          setting: updated.setting ?? null,
+          continuity_mode: updated.continuity_mode,
+          chapter_label: updated.chapter_label ?? null,
+          narrative_arc: updated.narrative_arc ?? null,
+          participants: updated.participants,
+          summary: updated.summary,
+          continuity_flags: updated.continuity_flags,
+          updated_at: updated.updated_at,
+        })
+        .eq("id", sceneId)
+        .select()
+        .single();
+
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      setScenes((current) => replaceById(current, sceneId, mapSceneMemoryRow(data)));
+    } else {
+      setScenes((current) => replaceById(current, sceneId, updated));
+    }
+
+    setNotice(`Updated scene: ${title}.`);
+  }
+
+  async function deleteSceneEntry(sceneId: string) {
+    const scene = scenes.find((candidate) => candidate.id === sceneId);
+    if (!scene || !window.confirm(`Delete scene "${scene.title ?? "Untitled scene"}"?`)) return;
+
+    if (isPersisted && supabase && userId) {
+      const { error } = await supabase.from("scene_memories").delete().eq("id", sceneId);
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+    }
+
+    setScenes((current) => removeById(current, sceneId));
+    setNotice(`Deleted scene: ${scene.title ?? "Untitled scene"}.`);
+  }
+
   async function loadCharacterCardFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -1193,7 +1459,7 @@ export function StoryMemoryDashboard({
       return;
     }
 
-    setUserPersonaDraft(buildUserPersonaDraftFromCard(loadedCharacterCard));
+    setUserPersonaDraft(buildUserPersonaDraftFromCard(loadedCharacterCard, userPersonaGender));
     setNotice(`Generated a user persona draft for ${loadedCharacterCard.name ?? "{{char}}"}.`);
   }
 
@@ -1597,6 +1863,8 @@ export function StoryMemoryDashboard({
                     void copyUserPersonaDraft();
                   }}
                   onGenerate={generateUserPersonaFromCard}
+                  onPersonaGenderChange={setUserPersonaGender}
+                  personaGender={userPersonaGender}
                 />
               ) : null}
 
@@ -1625,6 +1893,42 @@ export function StoryMemoryDashboard({
                     </Panel>
                   ) : null}
 
+                  {activeWorkspaceSection === "participants" ? (
+                    <Panel title="Participants" icon={UsersRound}>
+                      <EditableList emptyText="No participants yet.">
+                        {characters.map((character) => (
+                          <EditableItem
+                            key={character.id}
+                            title={character.name}
+                            onDelete={() => {
+                              void deleteCharacterEntry(character.id);
+                            }}
+                          >
+                            <form className="grid gap-3" onSubmit={(event) => void saveCharacterEntry(event, character.id)}>
+                              <div className="grid gap-3 sm:grid-cols-2">
+                                <Field defaultValue={character.name} label="Name" name="name" placeholder="Character name" required />
+                                <Field defaultValue={character.role ?? ""} label="Role" name="role" placeholder="AI-controlled character, user player, rival..." />
+                              </div>
+                              <Field
+                                defaultValue={character.self_beliefs[0] ?? ""}
+                                label="Self-belief"
+                                name="selfBelief"
+                                placeholder="What they believe about themselves"
+                              />
+                              <TextArea
+                                defaultValue={character.private_truths[0] ?? ""}
+                                label="Private truth"
+                                name="privateTruth"
+                                placeholder="Author-known truth, not automatically exported"
+                              />
+                              <SaveInlineButton label="Save participant" />
+                            </form>
+                          </EditableItem>
+                        ))}
+                      </EditableList>
+                    </Panel>
+                  ) : null}
+
                   {activeWorkspaceSection === "relationships" ? (
                     <Panel title="Add Relationship" icon={Layers3}>
                   <form className="grid gap-3" onSubmit={addRelationship}>
@@ -1638,6 +1942,44 @@ export function StoryMemoryDashboard({
                     <Field label="Next pressure point" name="nextPressure" placeholder="Force proximity, overheard secret..." />
                     <SubmitButton label="Add relationship" />
                   </form>
+                    </Panel>
+                  ) : null}
+
+                  {activeWorkspaceSection === "relationships" ? (
+                    <Panel title="Relationships" icon={Layers3}>
+                      <EditableList emptyText="No relationship threads yet.">
+                        {relationships.map((relationship) => (
+                          <EditableItem
+                            key={relationship.id}
+                            title={relationship.dynamic_label}
+                            onDelete={() => {
+                              void deleteRelationshipEntry(relationship.id);
+                            }}
+                          >
+                            <form className="grid gap-3" onSubmit={(event) => void saveRelationshipEntry(event, relationship.id)}>
+                              <div className="grid gap-3 sm:grid-cols-2">
+                                <SelectField
+                                  defaultValue={relationship.participants[0] ?? ""}
+                                  label="First participant"
+                                  name="participantA"
+                                  options={characterOptions(characters)}
+                                />
+                                <SelectField
+                                  defaultValue={relationship.participants[1] ?? ""}
+                                  label="Second participant"
+                                  name="participantB"
+                                  options={characterOptions(characters)}
+                                />
+                              </div>
+                              <Field defaultValue={relationship.dynamic_label} label="Dynamic" name="dynamic" placeholder="Situationship, FWB, enemies to lovers..." required />
+                              <TextArea defaultValue={relationship.current_state ?? ""} label="Current state" name="state" placeholder="What is true between them right now" />
+                              <TextArea defaultValue={relationship.conflict_notes ?? ""} label="Conflict" name="conflict" placeholder="What keeps them from being honest" />
+                              <Field defaultValue={relationship.next_pressure_point ?? ""} label="Next pressure point" name="nextPressure" placeholder="Force proximity, overheard secret..." />
+                              <SaveInlineButton label="Save relationship" />
+                            </form>
+                          </EditableItem>
+                        ))}
+                      </EditableList>
                     </Panel>
                   ) : null}
                 </section>
@@ -1658,6 +2000,34 @@ export function StoryMemoryDashboard({
                     <Field label="Pressure" name="pressure" placeholder="Dormant, rising, dangerous..." />
                     <SubmitButton label="Add secret" />
                   </form>
+                    </Panel>
+                  ) : null}
+
+                  {activeWorkspaceSection === "secrets" ? (
+                    <Panel title="Secrets" icon={KeyRound}>
+                      <EditableList emptyText="No secrets yet.">
+                        {secrets.map((secret) => (
+                          <EditableItem
+                            key={secret.id}
+                            title={secret.title ?? "Untitled secret"}
+                            onDelete={() => {
+                              void deleteSecretEntry(secret.id);
+                            }}
+                          >
+                            <form className="grid gap-3" onSubmit={(event) => void saveSecretEntry(event, secret.id)}>
+                              <Field defaultValue={secret.title ?? ""} label="Title" name="title" placeholder="The secret leverage" />
+                              <TextArea defaultValue={secret.secret_text} label="Secret" name="secretText" placeholder="Who believes what, who is wrong, who is pretending" required />
+                              <div className="grid gap-3 sm:grid-cols-3">
+                                <SelectField defaultValue={secret.who_knows[0] ?? ""} label="Knows" name="whoKnows" options={characterOptions(characters)} />
+                                <SelectField defaultValue={secret.who_is_hiding_it[0] ?? ""} label="Hiding it" name="whoHides" options={characterOptions(characters)} />
+                                <SelectField defaultValue={secret.who_is_pretending_not_to_know[0] ?? ""} label="Pretending" name="whoPretends" options={characterOptions(characters)} />
+                              </div>
+                              <Field defaultValue={secret.current_pressure ?? ""} label="Pressure" name="pressure" placeholder="Dormant, rising, dangerous..." />
+                              <SaveInlineButton label="Save secret" />
+                            </form>
+                          </EditableItem>
+                        ))}
+                      </EditableList>
                     </Panel>
                   ) : null}
 
@@ -1685,6 +2055,46 @@ export function StoryMemoryDashboard({
                     <Field label="Continuity flag" name="continuityFlag" placeholder="What must not be forgotten next time" />
                     <SubmitButton label="Add current scene" />
                   </form>
+                    </Panel>
+                  ) : null}
+
+                  {activeWorkspaceSection === "story" ? (
+                    <Panel title="Scenes" icon={BookOpenText}>
+                      <EditableList emptyText="No scenes yet.">
+                        {scenes.map((scene) => (
+                          <EditableItem
+                            key={scene.id}
+                            title={scene.title ?? "Untitled scene"}
+                            onDelete={() => {
+                              void deleteSceneEntry(scene.id);
+                            }}
+                          >
+                            <form className="grid gap-3" onSubmit={(event) => void saveSceneEntry(event, scene.id)}>
+                              <div className="grid gap-3 sm:grid-cols-2">
+                                <Field defaultValue={scene.title ?? ""} label="Title" name="title" placeholder="After the party" />
+                                <Field defaultValue={scene.location ?? ""} label="Location" name="location" placeholder="Kitchen doorway" />
+                              </div>
+                              <TextArea defaultValue={scene.scenario ?? ""} label="Scenario" name="scenario" placeholder="The setup or situation the characters are caught inside" />
+                              <Field defaultValue={scene.setting ?? ""} label="Setting" name="setting" placeholder="Location, world context, and situational frame" />
+                              <div className="grid gap-3 sm:grid-cols-3">
+                                <SelectField
+                                  defaultValue={scene.continuity_mode}
+                                  label="Continuity"
+                                  name="continuityMode"
+                                  optionLabels={continuityModeLabels}
+                                  options={continuityModeOptions}
+                                />
+                                <Field defaultValue={scene.chapter_label ?? ""} label="Chapter" name="chapterLabel" placeholder="Opening, chapter 3, alt opener..." />
+                                <Field defaultValue={scene.narrative_arc ?? ""} label="Arc" name="narrativeArc" placeholder="Mutual suspicion, forced proximity..." />
+                              </div>
+                              <SelectField defaultValue={scene.participants[0] ?? ""} label="Main participant" name="participant" options={characterOptions(characters)} />
+                              <TextArea defaultValue={scene.summary} label="Scene" name="summary" placeholder="What is happening right now" required />
+                              <Field defaultValue={scene.continuity_flags[0] ?? ""} label="Continuity flag" name="continuityFlag" placeholder="What must not be forgotten next time" />
+                              <SaveInlineButton label="Save scene" />
+                            </form>
+                          </EditableItem>
+                        ))}
+                      </EditableList>
                     </Panel>
                   ) : null}
                 </section>
@@ -2154,11 +2564,13 @@ function ControlSegment({
 }
 
 function Field({
+  defaultValue,
   label,
   name,
   placeholder,
   required,
 }: {
+  defaultValue?: string;
   label: string;
   name: string;
   placeholder: string;
@@ -2169,6 +2581,7 @@ function Field({
       <span className="font-medium text-zinc-700">{label}</span>
       <input
         className="h-10 rounded-md border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950"
+        defaultValue={defaultValue}
         name={name}
         placeholder={placeholder}
         required={required}
@@ -2178,11 +2591,13 @@ function Field({
 }
 
 function TextArea({
+  defaultValue,
   label,
   name,
   placeholder,
   required,
 }: {
+  defaultValue?: string;
   label: string;
   name: string;
   placeholder: string;
@@ -2193,6 +2608,7 @@ function TextArea({
       <span className="font-medium text-zinc-700">{label}</span>
       <textarea
         className="min-h-24 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm leading-6 outline-none focus:border-zinc-950"
+        defaultValue={defaultValue}
         name={name}
         placeholder={placeholder}
         required={required}
@@ -2202,11 +2618,13 @@ function TextArea({
 }
 
 function SelectField({
+  defaultValue,
   label,
   name,
   optionLabels,
   options,
 }: {
+  defaultValue?: string;
   label: string;
   name: string;
   optionLabels?: Partial<Record<string, string>>;
@@ -2217,6 +2635,7 @@ function SelectField({
       <span className="font-medium text-zinc-700">{label}</span>
       <select
         className="h-10 rounded-md border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950"
+        defaultValue={defaultValue}
         name={name}
       >
         {options.map((option) => (
@@ -2229,6 +2648,53 @@ function SelectField({
         ))}
       </select>
     </label>
+  );
+}
+
+function EditableList({ children, emptyText }: { children: ReactNode; emptyText: string }) {
+  return (
+    <div className="grid gap-3">
+      {Children.count(children) ? children : <p className="text-sm text-zinc-500">{emptyText}</p>}
+    </div>
+  );
+}
+
+function EditableItem({
+  children,
+  onDelete,
+  title,
+}: {
+  children: ReactNode;
+  onDelete: () => void;
+  title: string;
+}) {
+  return (
+    <article className="grid gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-3">
+      <div className="flex items-start justify-between gap-3">
+        <p className="text-sm font-semibold text-zinc-950">{title}</p>
+        <button
+          className="flex h-8 items-center gap-1.5 rounded-md border border-red-200 bg-white px-2 text-xs font-medium text-red-700 hover:bg-red-50"
+          onClick={onDelete}
+          type="button"
+        >
+          <Trash2 className="size-3.5" aria-hidden="true" />
+          Delete
+        </button>
+      </div>
+      {children}
+    </article>
+  );
+}
+
+function SaveInlineButton({ label }: { label: string }) {
+  return (
+    <button
+      className="flex h-9 items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 hover:bg-zinc-100"
+      type="submit"
+    >
+      <Save className="size-4" aria-hidden="true" />
+      {label}
+    </button>
   );
 }
 
@@ -2270,6 +2736,18 @@ function makeId(prefix: string) {
     return `${prefix}-${crypto.randomUUID()}`;
   }
   return `${prefix}-${Date.now()}`;
+}
+
+function replaceById<TItem extends { id: string }>(items: TItem[], id: string, replacement: TItem) {
+  return items.map((item) => (item.id === id ? replacement : item));
+}
+
+function removeById<TItem extends { id: string }>(items: TItem[], id: string) {
+  return items.filter((item) => item.id !== id);
+}
+
+function compactIds(values: string[]) {
+  return values.filter((value) => value.trim().length > 0);
 }
 
 function displayLabel(value: string) {

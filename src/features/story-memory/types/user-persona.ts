@@ -1,3 +1,5 @@
+export type UserPersonaGender = "female" | "male" | "neutral" | "infer";
+
 export type UserPersonaDraft = {
   boundaries: string;
   cardFitNotes: string;

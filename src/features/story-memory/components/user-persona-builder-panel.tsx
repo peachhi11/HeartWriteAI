@@ -1,7 +1,11 @@
 import { Check, Copy, Sparkles, UsersRound } from "lucide-react";
 
 import { SectionPanel } from "@/features/story-memory/components/section-panel";
-import { emptyUserPersonaDraft, type UserPersonaDraft } from "@/features/story-memory/types/user-persona";
+import {
+  emptyUserPersonaDraft,
+  type UserPersonaDraft,
+  type UserPersonaGender,
+} from "@/features/story-memory/types/user-persona";
 import type { LoadedCharacterCard } from "@/features/story-memory/utils/character-card-parser";
 
 export { emptyUserPersonaDraft };
@@ -27,6 +31,8 @@ export function UserPersonaBuilderPanel({
   onChange,
   onCopy,
   onGenerate,
+  onPersonaGenderChange,
+  personaGender,
 }: {
   copied: boolean;
   draft: UserPersonaDraft;
@@ -34,6 +40,8 @@ export function UserPersonaBuilderPanel({
   onChange: (field: keyof UserPersonaDraft, value: string) => void;
   onCopy: () => void;
   onGenerate: () => void;
+  onPersonaGenderChange: (value: UserPersonaGender) => void;
+  personaGender: UserPersonaGender;
 }) {
   const personaPreview = formatUserPersonaDraft(draft);
 
@@ -54,9 +62,20 @@ export function UserPersonaBuilderPanel({
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid gap-2 lg:grid-cols-[1fr_1fr_1fr]">
+          <ControlledSelect
+            label="Persona gender"
+            onChange={onPersonaGenderChange}
+            options={[
+              { label: "Female", value: "female" },
+              { label: "Male", value: "male" },
+              { label: "Neutral / Any", value: "neutral" },
+              { label: "Infer from card", value: "infer" },
+            ]}
+            value={personaGender}
+          />
           <button
-            className="flex h-10 items-center justify-center gap-2 rounded-md bg-zinc-950 px-3 text-sm font-medium text-white hover:bg-zinc-800"
+            className="flex h-10 self-end items-center justify-center gap-2 rounded-md bg-zinc-950 px-3 text-sm font-medium text-white hover:bg-zinc-800"
             onClick={onGenerate}
             type="button"
           >
@@ -64,7 +83,7 @@ export function UserPersonaBuilderPanel({
             Generate From Card
           </button>
           <button
-            className="flex h-10 items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+            className="flex h-10 self-end items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
             onClick={onCopy}
             type="button"
           >
@@ -137,6 +156,35 @@ export function UserPersonaBuilderPanel({
         </article>
       </div>
     </SectionPanel>
+  );
+}
+
+function ControlledSelect<TValue extends string>({
+  label,
+  onChange,
+  options,
+  value,
+}: {
+  label: string;
+  onChange: (value: TValue) => void;
+  options: { label: string; value: TValue }[];
+  value: TValue;
+}) {
+  return (
+    <label className="grid gap-1.5 text-sm">
+      <span className="font-medium text-zinc-700">{label}</span>
+      <select
+        className="h-10 rounded-md border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950"
+        onChange={(event) => onChange(event.target.value as TValue)}
+        value={value}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </label>
   );
 }
 

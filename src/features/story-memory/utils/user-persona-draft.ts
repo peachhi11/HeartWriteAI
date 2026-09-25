@@ -1,16 +1,19 @@
-import type { UserPersonaDraft } from "@/features/story-memory/types/user-persona";
+import type { UserPersonaDraft, UserPersonaGender } from "@/features/story-memory/types/user-persona";
 import { compactSentence, type LoadedCharacterCard } from "@/features/story-memory/utils/character-card-parser";
 
 type UserGenderFrame = {
-  adjective: "female" | "male" | "neutral";
+  adjective: Exclude<UserPersonaGender, "infer">;
   possessive: "her" | "his" | "their";
   pronoun: "she" | "he" | "they";
 };
 
-export function buildUserPersonaDraftFromCard(card: LoadedCharacterCard): UserPersonaDraft {
+export function buildUserPersonaDraftFromCard(
+  card: LoadedCharacterCard,
+  personaGender: UserPersonaGender = "female",
+): UserPersonaDraft {
   const characterName = card.name ?? "{{char}}";
   const sourceText = getCardSourceText(card);
-  const userFrame = inferUserGenderFrame(sourceText);
+  const userFrame = getUserGenderFrame(personaGender, sourceText);
   const personaFit = inferPersonaFit(sourceText, characterName, userFrame);
 
   return {
@@ -56,6 +59,14 @@ function getCardSourceText(card: LoadedCharacterCard) {
     .join("\n")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+function getUserGenderFrame(personaGender: UserPersonaGender, sourceText: string): UserGenderFrame {
+  if (personaGender === "female") return { adjective: "female", possessive: "her", pronoun: "she" };
+  if (personaGender === "male") return { adjective: "male", possessive: "his", pronoun: "he" };
+  if (personaGender === "neutral") return { adjective: "neutral", possessive: "their", pronoun: "they" };
+
+  return inferUserGenderFrame(sourceText);
 }
 
 function inferUserGenderFrame(sourceText: string): UserGenderFrame {
@@ -120,10 +131,10 @@ function inferPersonaFit(sourceText: string, characterName: string, userFrame: U
         `{{user}} sees ${reflexiveFor(userFrame)} as the person who knew ${characterName} before ${partnerName} had a claim on him.`,
         hasDormFamiliarity
           ? `{{user}} is used to being casual in his space: stealing comfort, taking up room, and acting like the mess does not scare ${objectFor(userFrame)} off.`
-          : `She is used to having a place in his life that other people struggle to name.`,
+          : `{{user}} is used to having a place in his life that other people struggle to name.`,
         hasBlurredPhysicalLine
-          ? `She may tell ${reflexiveFor(userFrame)} the physical line between them is casual, but the card pressure suggests that line has consequences now.`
-          : `She may tell ${reflexiveFor(userFrame)} the bond is simple, but the scene pressure asks whether that is still true.`,
+          ? `{{user}} may tell ${reflexiveFor(userFrame)} the physical line between them is casual, but the card pressure suggests that line has consequences now.`
+          : `{{user}} may tell ${reflexiveFor(userFrame)} the bond is simple, but the scene pressure asks whether that is still true.`,
       ].join(" "),
       whatUserKnows: [
         `{{user}} knows ${userFrame.possessive} own history with ${characterName}, that ${partnerName} is the current partner pressure, and that ${partnerName} wants distance between them.`,

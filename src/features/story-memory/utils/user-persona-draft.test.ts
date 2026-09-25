@@ -37,18 +37,39 @@ describe("buildUserPersonaDraftFromCard", () => {
     expect(combined).not.toContain("Did she just suck your fucking dick");
   });
 
-  it("falls back to a neutral persona frame when the card does not define {{user}} pronouns", () => {
+  it("uses the selected neutral persona frame even when the card does not define {{user}} pronouns", () => {
     const card = makeCard({
       firstMessage: "{{char}} waits at the edge of the station for {{user}} to arrive.",
       name: "Riven",
       scenario: "{{user}} is the only person who knows why Riven left the old crew.",
     });
 
-    const draft = buildUserPersonaDraftFromCard(card);
+    const draft = buildUserPersonaDraftFromCard(card, "neutral");
 
     expect(draft.roleInStory).toContain("Neutral user player");
     expect(draft.connectionToCharacter).toContain("the card's active scenario around Riven");
     expect(draft.whatUserKnows).toContain("their own history");
+  });
+
+  it("lets the selected persona gender override card-pronoun inference", () => {
+    const card = makeCard({
+      firstMessage: [
+        "{{char}} dragged {{user}} into his apartment before anyone could follow.",
+        "He told {{user}} that his brother would assume she was trouble if he saw them together.",
+      ].join("\n"),
+      name: "Dane",
+      scenario: "{{user}} is his best friend's sister and everyone thinks she should stay away from him.",
+    });
+
+    const maleDraft = buildUserPersonaDraftFromCard(card, "male");
+    const femaleDraft = buildUserPersonaDraftFromCard(card, "female");
+    const inferredDraft = buildUserPersonaDraftFromCard(card, "infer");
+
+    expect(maleDraft.roleInStory).toContain("Male");
+    expect(maleDraft.whatUserKnows).toContain("his own history");
+    expect(femaleDraft.roleInStory).toContain("Female");
+    expect(femaleDraft.whatUserKnows).toContain("her own history");
+    expect(inferredDraft.roleInStory).toContain("Female");
   });
 });
 
