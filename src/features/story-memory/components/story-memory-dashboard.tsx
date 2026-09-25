@@ -715,6 +715,27 @@ export function StoryMemoryDashboard({
     });
   }
 
+  function signInWithGoogle() {
+    if (!supabase) return;
+
+    setAuthNotice("Opening Google sign-in...");
+
+    startTransition(async () => {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (error) {
+        const message = getFriendlyAuthErrorMessage(error.message);
+        setAuthNotice(message);
+        setNotice(message);
+      }
+    });
+  }
+
   function signInWithPassword(email: string, password: string) {
     if (!supabase) return;
 
@@ -1459,6 +1480,21 @@ export function StoryMemoryDashboard({
                 </div>
               ) : (
                 <form className="mt-3 grid gap-2" onSubmit={handleAuthSubmit}>
+                  <button
+                    onClick={signInWithGoogle}
+                    className="h-9 rounded-md bg-white px-3 text-sm font-medium text-zinc-800 ring-1 ring-inset ring-zinc-300 hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={isPending || !supabase}
+                    type="button"
+                  >
+                    Continue with Google
+                  </button>
+                  <div className="flex items-center gap-2 py-1">
+                    <span className="h-px flex-1 bg-zinc-200" />
+                    <span className="text-[11px] font-medium uppercase tracking-wide text-zinc-400">
+                      or email
+                    </span>
+                    <span className="h-px flex-1 bg-zinc-200" />
+                  </div>
                   <input
                     aria-label="Email"
                     autoComplete="email"
