@@ -1,29 +1,11 @@
 import { Check, Copy, Sparkles, UsersRound } from "lucide-react";
 
 import { SectionPanel } from "@/features/story-memory/components/section-panel";
+import { emptyUserPersonaDraft, type UserPersonaDraft } from "@/features/story-memory/types/user-persona";
 import type { LoadedCharacterCard } from "@/features/story-memory/utils/character-card-parser";
 
-export type UserPersonaDraft = {
-  boundaries: string;
-  cardFitNotes: string;
-  connectionToCharacter: string;
-  displayName: string;
-  openingAngle: string;
-  roleInStory: string;
-  selfConcept: string;
-  whatUserKnows: string;
-};
-
-export const emptyUserPersonaDraft: UserPersonaDraft = {
-  boundaries: "",
-  cardFitNotes: "",
-  connectionToCharacter: "",
-  displayName: "{{user}}",
-  openingAngle: "",
-  roleInStory: "",
-  selfConcept: "",
-  whatUserKnows: "",
-};
+export { emptyUserPersonaDraft };
+export type { UserPersonaDraft };
 
 export function formatUserPersonaDraft(draft: UserPersonaDraft) {
   return compactLines([

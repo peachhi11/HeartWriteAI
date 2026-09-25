@@ -58,8 +58,8 @@ import type {
   SpiceVisibility,
   Story,
 } from "@/features/story-memory/types/story-memory";
+import { buildUserPersonaDraftFromCard } from "@/features/story-memory/utils/user-persona-draft";
 import {
-  compactSentence,
   extractCharacterCardSourceFromPng,
   type LoadedCharacterCard,
   parseCharacterCard,
@@ -1193,46 +1193,8 @@ export function StoryMemoryDashboard({
       return;
     }
 
-    const characterName = loadedCharacterCard.name ?? "{{char}}";
-    const scenarioSource =
-      loadedCharacterCard.scenario ??
-      loadedCharacterCard.firstMessage ??
-      loadedCharacterCard.description ??
-      "the card's established scenario";
-    const tagText = loadedCharacterCard.tags.length
-      ? `Relevant card tags: ${loadedCharacterCard.tags.join(", ")}.`
-      : "No card tags were imported.";
-
-    setUserPersonaDraft({
-      boundaries: [
-        "Do not write {{user}}'s thoughts, dialogue, consent, or choices.",
-        "{{user}} should reveal personal history through play, not through omniscient preload.",
-        `Keep ${characterName}'s established autonomy intact.`,
-      ].join("\n"),
-      cardFitNotes: [
-        `${characterName}'s card already controls: ${compactSentence(
-          loadedCharacterCard.description,
-          "character definition and behavior",
-        )}`,
-        loadedCharacterCard.personality
-          ? `Personality pressure to fit around: ${loadedCharacterCard.personality}`
-          : "",
-        tagText,
-      ]
-        .filter(Boolean)
-        .join("\n"),
-      connectionToCharacter: `{{user}} belongs in ${characterName}'s orbit because the card scenario gives them a reason to matter without making them automatically special: ${scenarioSource}`,
-      displayName: "{{user}}",
-      openingAngle: loadedCharacterCard.firstMessage
-        ? `Build {{user}} to answer this opener with agency: ${loadedCharacterCard.firstMessage}`
-        : `Build {{user}} to enter the scenario with a concrete want, a reason to stay, and a pressure point ${characterName} can notice.`,
-      roleInStory: `User player designed to fit ${characterName}'s established card, scenario, and prompt boundaries.`,
-      selfConcept:
-        "{{user}}'s persona should describe what they believe about themself on page one, not the author's full diagnosis of them.",
-      whatUserKnows:
-        "List only what {{user}} can honestly know at the start: their own history, what they have observed, what they suspect, and what they are hiding.",
-    });
-    setNotice(`Generated a user persona draft for ${characterName}.`);
+    setUserPersonaDraft(buildUserPersonaDraftFromCard(loadedCharacterCard));
+    setNotice(`Generated a user persona draft for ${loadedCharacterCard.name ?? "{{char}}"}.`);
   }
 
   async function copyUserPersonaDraft() {
