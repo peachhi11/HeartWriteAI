@@ -5,6 +5,10 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
+import {
+  getFriendlyAuthErrorMessage,
+  minimumWorkspacePasswordLength,
+} from "@/features/story-memory/auth/workspace-auth";
 import { createClient } from "@/lib/supabase/browser";
 
 export default function UpdatePasswordPage() {
@@ -23,8 +27,8 @@ export default function UpdatePasswordPage() {
       return;
     }
 
-    if (password.length < 8) {
-      setNotice("Use at least 8 characters.");
+    if (password.length < minimumWorkspacePasswordLength) {
+      setNotice(`Use at least ${minimumWorkspacePasswordLength} characters.`);
       return;
     }
 
@@ -38,7 +42,7 @@ export default function UpdatePasswordPage() {
       const { error } = await supabase.auth.updateUser({ password });
 
       if (error) {
-        setNotice(error.message);
+        setNotice(getFriendlyAuthErrorMessage(error.message));
         return;
       }
 

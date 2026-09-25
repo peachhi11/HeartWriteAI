@@ -20,6 +20,12 @@ import {
   UsersRound,
 } from "lucide-react";
 
+import {
+  getCreateAccountSuccessMessage,
+  getFriendlyAuthErrorMessage,
+  type AuthAction,
+  validateWorkspaceAuthInput,
+} from "@/features/story-memory/auth/workspace-auth";
 import { CharacterCardIntakePanel } from "@/features/story-memory/components/character-card-intake-panel";
 import { JanitorExportPanel } from "@/features/story-memory/components/janitor-export-panel";
 import { SectionPanel as Panel } from "@/features/story-memory/components/section-panel";
@@ -503,8 +509,6 @@ type StoryMemoryDashboardProps = {
   corePromptPacks: CorePromptPack[];
 };
 
-type AuthAction = "sign-in" | "create-account" | "magic-link" | "reset-password";
-
 export function StoryMemoryDashboard({
   auth,
   story,
@@ -637,9 +641,15 @@ export function StoryMemoryDashboard({
   function runAuthAction(form: HTMLFormElement, action: AuthAction) {
     const email = getFormValue(form, "email");
     const password = getFormValue(form, "password");
+    const validationMessage = validateWorkspaceAuthInput({ action, email, password });
 
-    if (!email || !supabase) {
-      setAuthNotice("Enter an email address first.");
+    if (validationMessage) {
+      setAuthNotice(validationMessage);
+      return;
+    }
+
+    if (!supabase) {
+      setAuthNotice("Saved workspace sign-in is not configured for this local session.");
       return;
     }
 
@@ -679,7 +689,9 @@ export function StoryMemoryDashboard({
         },
       });
 
-      const message = error ? error.message : "Magic link sent. Check your email.";
+      const message = error
+        ? getFriendlyAuthErrorMessage(error.message)
+        : "Magic link sent. Check your email.";
       setAuthNotice(message);
       setNotice(message);
     });
@@ -695,7 +707,9 @@ export function StoryMemoryDashboard({
         redirectTo: `${window.location.origin}/auth/callback?next=/auth/update-password`,
       });
 
-      const message = error ? error.message : "Password setup link sent. Check your email.";
+      const message = error
+        ? getFriendlyAuthErrorMessage(error.message)
+        : "Password setup link sent. Check your email.";
       setAuthNotice(message);
       setNotice(message);
     });
@@ -713,8 +727,9 @@ export function StoryMemoryDashboard({
       });
 
       if (error) {
-        setAuthNotice(error.message);
-        setNotice(error.message);
+        const message = getFriendlyAuthErrorMessage(error.message);
+        setAuthNotice(message);
+        setNotice(message);
         return;
       }
 
@@ -737,8 +752,9 @@ export function StoryMemoryDashboard({
       });
 
       if (error) {
-        setAuthNotice(error.message);
-        setNotice(error.message);
+        const message = getFriendlyAuthErrorMessage(error.message);
+        setAuthNotice(message);
+        setNotice(message);
         return;
       }
 
@@ -747,8 +763,12 @@ export function StoryMemoryDashboard({
         return;
       }
 
-      setAuthNotice("Account created. Check your email if Supabase asks you to confirm it.");
-      setNotice("Account created. Check your email if Supabase asks you to confirm it.");
+      const message = getCreateAccountSuccessMessage({
+        hasSession: Boolean(data.session),
+        identitiesCount: data.user?.identities?.length,
+      });
+      setAuthNotice(message);
+      setNotice(message);
     });
   }
 
