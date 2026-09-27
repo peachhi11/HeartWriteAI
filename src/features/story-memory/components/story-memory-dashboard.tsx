@@ -37,34 +37,45 @@ import {
   UserPersonaBuilderPanel,
 } from "@/features/story-memory/components/user-persona-builder-panel";
 import {
+  mapBookshelfRow,
   mapCharacterRow,
+  mapLibraryBookRow,
   mapRelationshipThreadRow,
   mapSavedPromptPackRow,
   mapSceneMemoryRow,
   mapSecretRow,
+  mapStoryBookBindingRow,
+  mapStoryBookRow,
 } from "@/features/story-memory/persistence/mappers";
 import { saveGeneratedPromptPack } from "@/features/story-memory/persistence/saved-prompt-packs";
 import type { StoryMemoryAuthState } from "@/features/story-memory/persistence/workspace";
 import type {
+  BookType,
+  Bookshelf,
   CategoryTag,
   Character,
   ContinuityMode,
   CorePromptPack,
   GeneratedPromptPack,
   HeatLevelLabel,
+  LibraryBook,
   PovMode,
   RelationshipThread,
   SceneMemory,
   SecretOrReveal,
   SpiceVisibility,
   Story,
+  StoryBook,
+  StoryBookBinding,
 } from "@/features/story-memory/types/story-memory";
 import type { UserPersonaGender } from "@/features/story-memory/types/user-persona";
 import { buildUserPersonaDraftFromCard } from "@/features/story-memory/utils/user-persona-draft";
 import {
+  buildCharacterBookPayload,
   extractCharacterCardSourceFromPng,
   type LoadedCharacterCard,
   parseCharacterCard,
+  readCharacterCardFromBookPayload,
 } from "@/features/story-memory/utils/character-card-parser";
 import {
   continuityModeLabels,
@@ -82,9 +93,11 @@ import {
   type PromptSlot,
 } from "@/features/story-memory/utils/prompt-slot-builder";
 import { createClient } from "@/lib/supabase/browser";
+import type { Json } from "@/lib/supabase/database.types";
 
 type WorkspaceSection =
   | "story"
+  | "library"
   | "character-card"
   | "user-persona"
   | "participants"
@@ -100,12 +113,13 @@ const navItems: {
 }[] = [
   { id: "story", label: "Story", icon: BookOpenText },
   { id: "character-card", label: "Character Card", icon: BookOpenText },
-  { id: "user-persona", label: "User Persona", icon: UsersRound },
   { id: "participants", label: "Participants", icon: UsersRound },
   { id: "relationships", label: "Relationships", icon: Layers3 },
   { id: "secrets", label: "Secrets", icon: LockKeyhole },
+  { id: "user-persona", label: "User Persona", icon: UsersRound },
   { id: "prompt-packs", label: "Prompt Packs", icon: MessageSquareText },
   { id: "exports", label: "Exports", icon: Download },
+  { id: "library", label: "Library", icon: Layers3 },
 ];
 
 const heatOptions: HeatLevelLabel[] = ["sweet", "sensual", "spicy", "explicit", "extreme"];
@@ -138,6 +152,7 @@ const defaultPromptModuleExpanded: PromptModuleExpanded = {
   relationshipPressure: false,
   scenarioSetup: true,
   settingFrame: false,
+  storybookOperationalMode: true,
   styleDialogueVoice: false,
   stylePerspectiveLens: true,
   styleRhythmDensity: false,
@@ -152,6 +167,13 @@ const promptModuleOptions: {
   label: string;
   slot: "Global" | "Proxy";
 }[] = [
+  {
+    group: "Story state",
+    helper: "Proxy context layer that translates the global prompt into the active scene.",
+    key: "storybookOperationalMode",
+    label: "StoryBook operational mode",
+    slot: "Proxy",
+  },
   {
     group: "Story state",
     helper: "Authorship and POV boundary text for the stable global prompt.",
@@ -281,6 +303,7 @@ const promptModuleSectionLabels: Record<PromptModuleKey, string> = {
   relationshipPressure: "Relationship pressure",
   scenarioSetup: "Scenario setup",
   settingFrame: "Setting frame",
+  storybookOperationalMode: "StoryBook operational mode",
   styleDialogueVoice: "Dialogue, voice, and interiority",
   stylePerspectiveLens: "POV, lens, and narrative distance",
   styleRhythmDensity: "Sentence rhythm and description density",
@@ -497,15 +520,38 @@ const groupLabels: Record<CategoryTag["group"], string> = {
   content_boundary: "Content boundary",
 };
 
+const bookTypeLabels: Record<BookType, string> = {
+  character_book: "Character Book",
+  memory_book: "Memory Book",
+  prompt_book: "Prompt Book",
+  scenario_book: "Scenario Book",
+  user_book: "User Book",
+  world_book: "World Book",
+};
+
+const requiredStoryBookTypes: BookType[] = [
+  "character_book",
+  "user_book",
+  "scenario_book",
+  "world_book",
+  "memory_book",
+  "prompt_book",
+];
+const bookTypeOptions = requiredStoryBookTypes;
+
 type StoryMemoryDashboardProps = {
   auth: StoryMemoryAuthState;
   story: Story;
+  initialBookshelves: Bookshelf[];
   initialCharacters: Character[];
+  initialLibraryBooks: LibraryBook[];
   initialScenes: SceneMemory[];
   initialRelationships: RelationshipThread[];
   initialSecrets: SecretOrReveal[];
   initialPromptPacks: GeneratedPromptPack[];
   initialSelectedTagSlugs: string[];
+  initialStoryBookBindings: StoryBookBinding[];
+  initialStoryBooks: StoryBook[];
   isPersisted: boolean;
   categoryTags: CategoryTag[];
   corePromptPacks: CorePromptPack[];
@@ -514,29 +560,44 @@ type StoryMemoryDashboardProps = {
 export function StoryMemoryDashboard({
   auth,
   story,
+  initialBookshelves,
   initialCharacters,
+  initialLibraryBooks,
   initialScenes,
   initialRelationships,
   initialSecrets,
   initialPromptPacks,
   initialSelectedTagSlugs,
+  initialStoryBookBindings,
+  initialStoryBooks,
   isPersisted,
   categoryTags,
   corePromptPacks,
 }: StoryMemoryDashboardProps) {
   const [isPending, startTransition] = useTransition();
+  const initialCharacterCard = getInitialLoadedCharacterCard({
+    initialLibraryBooks,
+    initialStoryBookBindings,
+    initialStoryBooks,
+  });
+  const [bookshelves, setBookshelves] = useState(initialBookshelves);
   const [characters, setCharacters] = useState(initialCharacters);
+  const [libraryBooks, setLibraryBooks] = useState(initialLibraryBooks);
   const [scenes, setScenes] = useState(initialScenes);
   const [relationships, setRelationships] = useState(initialRelationships);
   const [secrets, setSecrets] = useState(initialSecrets);
+  const [storyBookBindings, setStoryBookBindings] = useState(initialStoryBookBindings);
+  const [storyBooks, setStoryBooks] = useState(initialStoryBooks);
   const [promptPacks, setPromptPacks] = useState(initialPromptPacks);
   const [heatLevel, setHeatLevel] = useState<HeatLevelLabel>(story.heat_level ?? "spicy");
   const [spiceVisibility, setSpiceVisibility] = useState<SpiceVisibility>("censored");
   const [povMode, setPovMode] = useState<PovMode>(story.default_pov_mode ?? "narrator_pov");
   const [platform, setPlatform] = useState(story.export_targets?.[0] ?? "JanitorAI");
   const [activeWorkspaceSection, setActiveWorkspaceSection] = useState<WorkspaceSection>("story");
-  const [characterCardInput, setCharacterCardInput] = useState("");
-  const [loadedCharacterCard, setLoadedCharacterCard] = useState<LoadedCharacterCard | null>(null);
+  const [characterCardInput, setCharacterCardInput] = useState(initialCharacterCard?.rawText ?? "");
+  const [loadedCharacterCard, setLoadedCharacterCard] = useState<LoadedCharacterCard | null>(
+    initialCharacterCard,
+  );
   const [userPersonaDraft, setUserPersonaDraft] = useState<UserPersonaDraft>(emptyUserPersonaDraft);
   const [userPersonaGender, setUserPersonaGender] = useState<UserPersonaGender>("female");
   const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>(initialSelectedTagSlugs);
@@ -562,6 +623,25 @@ export function StoryMemoryDashboard({
   ]);
   const userId = auth.status === "signed_in" ? auth.userId : null;
 
+  const activeStoryBook = storyBooks[0];
+  const activeStoryBookBookIds = useMemo(
+    () =>
+      new Set(
+        storyBookBindings
+          .filter((binding) => binding.storybook_id === activeStoryBook?.id)
+          .sort((first, second) => first.sort_order - second.sort_order)
+          .map((binding) => binding.book_id),
+      ),
+    [activeStoryBook?.id, storyBookBindings],
+  );
+  const activeStoryBookBooks = useMemo(
+    () =>
+      libraryBooks
+        .filter((book) => activeStoryBookBookIds.has(book.id))
+        .sort((first, second) => first.sort_order - second.sort_order),
+    [activeStoryBookBookIds, libraryBooks],
+  );
+  const activeStoryBookTypes = new Set(activeStoryBookBooks.map((book) => book.book_type));
   const activeRelationship = relationships.at(-1);
   const activeSecret = secrets.at(-1);
   const activeScene = scenes.at(-1);
@@ -1459,7 +1539,15 @@ export function StoryMemoryDashboard({
       return;
     }
 
-    setUserPersonaDraft(buildUserPersonaDraftFromCard(loadedCharacterCard, userPersonaGender));
+    setUserPersonaDraft(
+      buildUserPersonaDraftFromCard(loadedCharacterCard, userPersonaGender, {
+        activeRelationship,
+        activeScene,
+        activeSecret,
+        characters,
+        selectedTagLabels,
+      }),
+    );
     setNotice(`Generated a user persona draft for ${loadedCharacterCard.name ?? "{{char}}"}.`);
   }
 
@@ -1486,6 +1574,65 @@ export function StoryMemoryDashboard({
     } catch {
       setNotice("Copy failed. Select the persona preview manually for now.");
     }
+  }
+
+  async function saveLoadedCardAsCharacterBook() {
+    if (!loadedCharacterCard) {
+      setNotice("Load a character card before saving a Character Book.");
+      return;
+    }
+
+    await saveActiveStoryBookSourceBook({
+      bookType: "character_book",
+      description: [
+        loadedCharacterCard.format,
+        loadedCharacterCard.tags.length ? `Tags: ${loadedCharacterCard.tags.join(", ")}` : "",
+        "Raw card snapshot plus parsed character fields.",
+      ]
+        .filter(Boolean)
+        .join(" · "),
+      payload: {
+        ...buildCharacterBookPayload(loadedCharacterCard),
+      },
+      sourceEntityId: loadedCharacterCard.name ?? undefined,
+      sourceEntityType: "loaded_character_card",
+      title: `${loadedCharacterCard.name ?? "{{char}}"} Character Book`,
+    });
+  }
+
+  async function saveUserPersonaDraftAsUserBook() {
+    const personaPreview = formatUserPersonaDraft(userPersonaDraft);
+
+    if (!personaPreview.trim()) {
+      setNotice("Generate or edit the user persona before saving a User Book.");
+      return;
+    }
+
+    await saveActiveStoryBookSourceBook({
+      bookType: "user_book",
+      description: [
+        "Lightweight {{user}} persona model for player-aware prompts and occasional impersonation.",
+        loadedCharacterCard?.name ? `Built around ${loadedCharacterCard.name}.` : "",
+      ]
+        .filter(Boolean)
+        .join(" "),
+      payload: {
+        draft: userPersonaDraft,
+        formattedPersona: personaPreview,
+        personaGender: userPersonaGender,
+        sourceStoryContext: {
+          activeRelationshipId: activeRelationship?.id ?? null,
+          activeSceneId: activeScene?.id ?? null,
+          activeSecretId: activeSecret?.id ?? null,
+          participantIds: characters.map((character) => character.id),
+          selectedTagLabels,
+        },
+        sourceCardName: loadedCharacterCard?.name ?? null,
+      },
+      sourceEntityId: userPersonaDraft.displayName || "{{user}}",
+      sourceEntityType: "user_persona_draft",
+      title: `${userPersonaDraft.displayName || "{{user}}"} User Book`,
+    });
   }
 
   function generatePromptPack() {
@@ -1645,6 +1792,526 @@ export function StoryMemoryDashboard({
       ),
     );
     setNotice(`Saved prompt pack: ${latestPromptPack.title}.`);
+  }
+
+  async function addBookshelf(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const title = getFormValue(form, "title");
+    const description = getFormValue(form, "description");
+
+    if (!title) return;
+
+    const now = new Date().toISOString();
+    const draft: Bookshelf = {
+      created_at: now,
+      description,
+      id: makeId("bookshelf"),
+      sort_order: bookshelves.length + 1,
+      title,
+      updated_at: now,
+    };
+
+    if (isPersisted && supabase && userId) {
+      const { data, error } = await supabase
+        .from("bookshelves")
+        .insert({
+          description: draft.description || null,
+          owner_id: userId,
+          sort_order: draft.sort_order,
+          title: draft.title,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      setBookshelves((current) => [...current, mapBookshelfRow(data)]);
+    } else {
+      setBookshelves((current) => [...current, draft]);
+    }
+
+    form.reset();
+    setNotice(`Added bookshelf: ${title}.`);
+  }
+
+  async function saveBookshelfEntry(event: FormEvent<HTMLFormElement>, bookshelfId: string) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const existing = bookshelves.find((bookshelf) => bookshelf.id === bookshelfId);
+    if (!existing) return;
+
+    const updated: Bookshelf = {
+      ...existing,
+      description: getFormValue(form, "description"),
+      title: getFormValue(form, "title") || existing.title,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (isPersisted && supabase && userId) {
+      const { data, error } = await supabase
+        .from("bookshelves")
+        .update({
+          description: updated.description || null,
+          title: updated.title,
+          updated_at: updated.updated_at,
+        })
+        .eq("id", bookshelfId)
+        .select()
+        .single();
+
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      setBookshelves((current) => replaceById(current, bookshelfId, mapBookshelfRow(data)));
+    } else {
+      setBookshelves((current) => replaceById(current, bookshelfId, updated));
+    }
+
+    setNotice(`Updated bookshelf: ${updated.title}.`);
+  }
+
+  async function deleteBookshelfEntry(bookshelfId: string) {
+    const bookshelf = bookshelves.find((candidate) => candidate.id === bookshelfId);
+    if (!bookshelf || !window.confirm(`Delete bookshelf "${bookshelf.title}"?`)) return;
+
+    const storyBookIds = new Set(
+      storyBooks.filter((storybook) => storybook.bookshelf_id === bookshelfId).map((storybook) => storybook.id),
+    );
+    const bookIds = new Set(
+      libraryBooks.filter((book) => book.bookshelf_id === bookshelfId).map((book) => book.id),
+    );
+
+    if (isPersisted && supabase && userId) {
+      const { error } = await supabase.from("bookshelves").delete().eq("id", bookshelfId);
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+    }
+
+    setBookshelves((current) => removeById(current, bookshelfId));
+    setStoryBooks((current) => current.filter((storybook) => storybook.bookshelf_id !== bookshelfId));
+    setLibraryBooks((current) => current.filter((book) => book.bookshelf_id !== bookshelfId));
+    setStoryBookBindings((current) =>
+      current.filter((binding) => !storyBookIds.has(binding.storybook_id) && !bookIds.has(binding.book_id)),
+    );
+    setNotice(`Deleted bookshelf: ${bookshelf.title}.`);
+  }
+
+  async function addStoryBook(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const bookshelfId = getFormValue(form, "bookshelfId") || bookshelves[0]?.id;
+    const title = getFormValue(form, "title");
+    const description = getFormValue(form, "description");
+
+    if (!bookshelfId || !title) return;
+
+    const now = new Date().toISOString();
+    const draft: StoryBook = {
+      active_story_id: story.id,
+      bookshelf_id: bookshelfId,
+      created_at: now,
+      description,
+      id: makeId("storybook"),
+      sort_order: storyBooks.length + 1,
+      status: "active",
+      title,
+      updated_at: now,
+    };
+
+    if (isPersisted && supabase && userId) {
+      const { data, error } = await supabase
+        .from("storybooks")
+        .insert({
+          active_story_id: story.id,
+          bookshelf_id: bookshelfId,
+          description: draft.description || null,
+          owner_id: userId,
+          sort_order: draft.sort_order,
+          status: draft.status,
+          title: draft.title,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      setStoryBooks((current) => [...current, mapStoryBookRow(data)]);
+    } else {
+      setStoryBooks((current) => [...current, draft]);
+    }
+
+    form.reset();
+    setNotice(`Added StoryBook: ${title}.`);
+  }
+
+  async function saveStoryBookEntry(event: FormEvent<HTMLFormElement>, storyBookId: string) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const existing = storyBooks.find((storybook) => storybook.id === storyBookId);
+    if (!existing) return;
+
+    const updated: StoryBook = {
+      ...existing,
+      bookshelf_id: getFormValue(form, "bookshelfId") || existing.bookshelf_id,
+      description: getFormValue(form, "description"),
+      title: getFormValue(form, "title") || existing.title,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (isPersisted && supabase && userId) {
+      const { data, error } = await supabase
+        .from("storybooks")
+        .update({
+          bookshelf_id: updated.bookshelf_id,
+          description: updated.description || null,
+          title: updated.title,
+          updated_at: updated.updated_at,
+        })
+        .eq("id", storyBookId)
+        .select()
+        .single();
+
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      setStoryBooks((current) => replaceById(current, storyBookId, mapStoryBookRow(data)));
+    } else {
+      setStoryBooks((current) => replaceById(current, storyBookId, updated));
+    }
+
+    setNotice(`Updated StoryBook: ${updated.title}.`);
+  }
+
+  async function deleteStoryBookEntry(storyBookId: string) {
+    const storybook = storyBooks.find((candidate) => candidate.id === storyBookId);
+    if (!storybook || !window.confirm(`Delete StoryBook "${storybook.title}"?`)) return;
+
+    if (isPersisted && supabase && userId) {
+      const { error } = await supabase.from("storybooks").delete().eq("id", storyBookId);
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+    }
+
+    setStoryBooks((current) => removeById(current, storyBookId));
+    setStoryBookBindings((current) => current.filter((binding) => binding.storybook_id !== storyBookId));
+    setNotice(`Deleted StoryBook: ${storybook.title}.`);
+  }
+
+  async function saveActiveStoryBookSourceBook({
+    bookType,
+    description,
+    payload,
+    sourceEntityId,
+    sourceEntityType,
+    title,
+  }: {
+    bookType: BookType;
+    description: string;
+    payload: Record<string, unknown>;
+    sourceEntityId?: string;
+    sourceEntityType: string;
+    title: string;
+  }) {
+    if (!activeStoryBook) {
+      setNotice("Create a StoryBook before saving a book into it.");
+      return;
+    }
+
+    const bookshelfId = activeStoryBook.bookshelf_id || bookshelves[0]?.id;
+    if (!bookshelfId) {
+      setNotice("Create a Bookshelf before saving a book.");
+      return;
+    }
+
+    const now = new Date().toISOString();
+    const jsonPayload = toJsonPayload(payload);
+    const existingBook = activeStoryBookBooks.find((book) => book.book_type === bookType);
+
+    if (existingBook) {
+      const updated: LibraryBook = {
+        ...existingBook,
+        bookshelf_id: bookshelfId,
+        description,
+        payload: jsonPayload,
+        source_entity_id: sourceEntityId,
+        source_entity_type: sourceEntityType,
+        title,
+        updated_at: now,
+      };
+
+      if (isPersisted && supabase && userId) {
+        const { data, error } = await supabase
+          .from("library_books")
+          .update({
+            bookshelf_id: updated.bookshelf_id,
+            description: updated.description || null,
+            payload: jsonPayload as Json,
+            source_entity_id: updated.source_entity_id ?? null,
+            source_entity_type: updated.source_entity_type ?? null,
+            title: updated.title,
+            updated_at: updated.updated_at,
+          })
+          .eq("id", existingBook.id)
+          .select()
+          .single();
+
+        if (error) {
+          setNotice(error.message);
+          return;
+        }
+
+        setLibraryBooks((current) => replaceById(current, existingBook.id, mapLibraryBookRow(data)));
+      } else {
+        setLibraryBooks((current) => replaceById(current, existingBook.id, updated));
+      }
+
+      setNotice(`Updated ${bookTypeLabels[bookType]}: ${title}.`);
+      return;
+    }
+
+    const draft: LibraryBook = {
+      book_type: bookType,
+      bookshelf_id: bookshelfId,
+      created_at: now,
+      description,
+      id: makeId("book"),
+      payload: jsonPayload,
+      sort_order: libraryBooks.length + 1,
+      source_entity_id: sourceEntityId,
+      source_entity_type: sourceEntityType,
+      title,
+      updated_at: now,
+    };
+
+    if (isPersisted && supabase && userId) {
+      const { data, error } = await supabase
+        .from("library_books")
+        .insert({
+          book_type: draft.book_type,
+          bookshelf_id: draft.bookshelf_id,
+          description: draft.description || null,
+          owner_id: userId,
+          payload: jsonPayload as Json,
+          sort_order: draft.sort_order,
+          source_entity_id: draft.source_entity_id ?? null,
+          source_entity_type: draft.source_entity_type ?? null,
+          title: draft.title,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      const mappedBook = mapLibraryBookRow(data);
+      setLibraryBooks((current) => [...current, mappedBook]);
+      await linkLibraryBookToStoryBook(mappedBook);
+    } else {
+      setLibraryBooks((current) => [...current, draft]);
+      await linkLibraryBookToStoryBook(draft);
+    }
+
+    setNotice(`Saved ${bookTypeLabels[bookType]}: ${title}.`);
+  }
+
+  async function addLibraryBook(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const bookshelfId = getFormValue(form, "bookshelfId") || bookshelves[0]?.id;
+    const bookType = (getFormValue(form, "bookType") || "memory_book") as BookType;
+    const title = getFormValue(form, "title");
+    const description = getFormValue(form, "description");
+
+    if (!bookshelfId || !title) return;
+
+    const now = new Date().toISOString();
+    const draft: LibraryBook = {
+      book_type: bookType,
+      bookshelf_id: bookshelfId,
+      created_at: now,
+      description,
+      id: makeId("book"),
+      payload: {},
+      sort_order: libraryBooks.length + 1,
+      title,
+      updated_at: now,
+    };
+
+    if (isPersisted && supabase && userId) {
+      const { data, error } = await supabase
+        .from("library_books")
+        .insert({
+          book_type: draft.book_type,
+          bookshelf_id: draft.bookshelf_id,
+          description: draft.description || null,
+          owner_id: userId,
+          payload: {},
+          sort_order: draft.sort_order,
+          source_entity_id: null,
+          source_entity_type: null,
+          title: draft.title,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      const mappedBook = mapLibraryBookRow(data);
+      setLibraryBooks((current) => [...current, mappedBook]);
+      await linkLibraryBookToStoryBook(mappedBook);
+    } else {
+      setLibraryBooks((current) => [...current, draft]);
+      void linkLibraryBookToStoryBook(draft);
+    }
+
+    form.reset();
+    setNotice(`Added ${bookTypeLabels[bookType]}: ${title}.`);
+  }
+
+  async function saveLibraryBookEntry(event: FormEvent<HTMLFormElement>, bookId: string) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const existing = libraryBooks.find((book) => book.id === bookId);
+    if (!existing) return;
+
+    const updated: LibraryBook = {
+      ...existing,
+      book_type: (getFormValue(form, "bookType") || existing.book_type) as BookType,
+      bookshelf_id: getFormValue(form, "bookshelfId") || existing.bookshelf_id,
+      description: getFormValue(form, "description"),
+      title: getFormValue(form, "title") || existing.title,
+      updated_at: new Date().toISOString(),
+    };
+
+    if (isPersisted && supabase && userId) {
+      const { data, error } = await supabase
+        .from("library_books")
+        .update({
+          book_type: updated.book_type,
+          bookshelf_id: updated.bookshelf_id,
+          description: updated.description || null,
+          title: updated.title,
+          updated_at: updated.updated_at,
+        })
+        .eq("id", bookId)
+        .select()
+        .single();
+
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      setLibraryBooks((current) => replaceById(current, bookId, mapLibraryBookRow(data)));
+    } else {
+      setLibraryBooks((current) => replaceById(current, bookId, updated));
+    }
+
+    setNotice(`Updated book: ${updated.title}.`);
+  }
+
+  async function deleteLibraryBookEntry(bookId: string) {
+    const book = libraryBooks.find((candidate) => candidate.id === bookId);
+    if (!book || !window.confirm(`Delete book "${book.title}"?`)) return;
+
+    if (isPersisted && supabase && userId) {
+      const { error } = await supabase.from("library_books").delete().eq("id", bookId);
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+    }
+
+    setLibraryBooks((current) => removeById(current, bookId));
+    setStoryBookBindings((current) => current.filter((binding) => binding.book_id !== bookId));
+    setNotice(`Deleted book: ${book.title}.`);
+  }
+
+  async function linkLibraryBookToStoryBook(book: LibraryBook) {
+    if (!activeStoryBook) {
+      setNotice("Create a StoryBook before linking books.");
+      return;
+    }
+
+    const existing = storyBookBindings.find(
+      (binding) => binding.storybook_id === activeStoryBook.id && binding.book_id === book.id,
+    );
+    if (existing) return;
+
+    const now = new Date().toISOString();
+    const draft: StoryBookBinding = {
+      book_id: book.id,
+      created_at: now,
+      id: makeId("binding"),
+      sort_order: storyBookBindings.length + 1,
+      storybook_id: activeStoryBook.id,
+      updated_at: now,
+    };
+
+    if (isPersisted && supabase && userId) {
+      const { data, error } = await supabase
+        .from("storybook_book_bindings")
+        .insert({
+          book_id: book.id,
+          owner_id: userId,
+          sort_order: draft.sort_order,
+          storybook_id: activeStoryBook.id,
+        })
+        .select()
+        .single();
+
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+
+      setStoryBookBindings((current) => [...current, mapStoryBookBindingRow(data)]);
+    } else {
+      setStoryBookBindings((current) => [...current, draft]);
+    }
+
+    setNotice(`Linked ${book.title} to ${activeStoryBook.title}.`);
+  }
+
+  async function unlinkLibraryBookFromStoryBook(bookId: string) {
+    if (!activeStoryBook) return;
+
+    const binding = storyBookBindings.find(
+      (candidate) => candidate.storybook_id === activeStoryBook.id && candidate.book_id === bookId,
+    );
+    const book = libraryBooks.find((candidate) => candidate.id === bookId);
+    if (!binding) return;
+
+    if (isPersisted && supabase && userId) {
+      const { error } = await supabase.from("storybook_book_bindings").delete().eq("id", binding.id);
+      if (error) {
+        setNotice(error.message);
+        return;
+      }
+    }
+
+    setStoryBookBindings((current) => removeById(current, binding.id));
+    setNotice(`Unlinked ${book?.title ?? "book"} from ${activeStoryBook.title}.`);
   }
 
   return (
@@ -1834,7 +2501,9 @@ export function StoryMemoryDashboard({
 
           <div
             className={`grid gap-5 px-5 py-5 xl:px-8 ${
-              activeWorkspaceSection === "prompt-packs" || activeWorkspaceSection === "exports"
+              activeWorkspaceSection === "prompt-packs" ||
+              activeWorkspaceSection === "exports" ||
+              activeWorkspaceSection === "library"
                 ? "xl:grid-cols-1"
                 : "xl:grid-cols-[minmax(0,1.25fr)_400px]"
             }`}
@@ -1850,6 +2519,9 @@ export function StoryMemoryDashboard({
                     void loadCharacterCardFile(event);
                   }}
                   onLoad={() => loadCharacterCard()}
+                  onSaveToCharacterBook={() => {
+                    void saveLoadedCardAsCharacterBook();
+                  }}
                 />
               ) : null}
 
@@ -1864,6 +2536,9 @@ export function StoryMemoryDashboard({
                   }}
                   onGenerate={generateUserPersonaFromCard}
                   onPersonaGenderChange={setUserPersonaGender}
+                  onSaveToUserBook={() => {
+                    void saveUserPersonaDraftAsUserBook();
+                  }}
                   personaGender={userPersonaGender}
                 />
               ) : null}
@@ -1876,6 +2551,270 @@ export function StoryMemoryDashboard({
                       <p className="mt-3 text-3xl font-semibold">{stat.value}</p>
                     </article>
                   ))}
+                </section>
+              ) : null}
+
+              {activeWorkspaceSection === "library" ? (
+                <section className="grid gap-5">
+                  <Panel title="Bookshelves" icon={BookOpenText}>
+                    <div className="grid gap-4">
+                      <form className="grid gap-3" onSubmit={addBookshelf}>
+                        <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+                          <Field label="Shelf name" name="title" placeholder="Active Romance Builds" required />
+                          <Field
+                            label="Description"
+                            name="description"
+                            placeholder="Working StoryBooks that should stay packaged together"
+                          />
+                        </div>
+                        <SubmitButton label="Add bookshelf" />
+                      </form>
+
+                      <EditableList emptyText="No bookshelves yet.">
+                        {bookshelves.map((bookshelf) => {
+                          const shelfStoryBooks = storyBooks.filter(
+                            (candidate) => candidate.bookshelf_id === bookshelf.id,
+                          );
+                          const shelfBooks = libraryBooks.filter(
+                            (book) => book.bookshelf_id === bookshelf.id,
+                          );
+
+                          return (
+                            <EditableItem
+                              key={bookshelf.id}
+                              onDelete={() => {
+                                void deleteBookshelfEntry(bookshelf.id);
+                              }}
+                              title={`${bookshelf.title} · ${shelfStoryBooks.length} StoryBooks · ${shelfBooks.length} Books`}
+                            >
+                              <form
+                                className="grid gap-3"
+                                onSubmit={(event) => void saveBookshelfEntry(event, bookshelf.id)}
+                              >
+                                <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+                                  <Field
+                                    defaultValue={bookshelf.title}
+                                    label="Shelf name"
+                                    name="title"
+                                    placeholder="Active Romance Builds"
+                                    required
+                                  />
+                                  <Field
+                                    defaultValue={bookshelf.description ?? ""}
+                                    label="Description"
+                                    name="description"
+                                    placeholder="Working StoryBooks that should stay packaged together"
+                                  />
+                                </div>
+                                <SaveInlineButton label="Save bookshelf" />
+                              </form>
+                            </EditableItem>
+                          );
+                        })}
+                      </EditableList>
+                    </div>
+                  </Panel>
+
+                  <Panel title="StoryBooks" icon={Layers3}>
+                    <div className="grid gap-4">
+                      <form className="grid gap-3" onSubmit={addStoryBook}>
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <SelectField
+                            label="Bookshelf"
+                            name="bookshelfId"
+                            options={bookshelfOptions(bookshelves)}
+                          />
+                          <Field label="StoryBook name" name="title" placeholder="{{char}} / {{user}} StoryBook" required />
+                        </div>
+                        <Field
+                          label="Description"
+                          name="description"
+                          placeholder="The character/user/scenario package for this storyline"
+                        />
+                        <SubmitButton label="Add StoryBook" />
+                      </form>
+
+                      <EditableList emptyText="No StoryBooks yet.">
+                        {storyBooks.map((storybook) => {
+                          const boundBooks = storyBookBindings.filter(
+                            (binding) => binding.storybook_id === storybook.id,
+                          );
+
+                          return (
+                            <EditableItem
+                              key={storybook.id}
+                              onDelete={() => {
+                                void deleteStoryBookEntry(storybook.id);
+                              }}
+                              title={`${storybook.title} · ${boundBooks.length} linked books`}
+                            >
+                              <form
+                                className="grid gap-3"
+                                onSubmit={(event) => void saveStoryBookEntry(event, storybook.id)}
+                              >
+                                <div className="grid gap-3 sm:grid-cols-2">
+                                  <SelectField
+                                    defaultValue={storybook.bookshelf_id}
+                                    label="Bookshelf"
+                                    name="bookshelfId"
+                                    options={bookshelfOptions(bookshelves)}
+                                  />
+                                  <Field
+                                    defaultValue={storybook.title}
+                                    label="StoryBook name"
+                                    name="title"
+                                    placeholder="{{char}} / {{user}} StoryBook"
+                                    required
+                                  />
+                                </div>
+                                <Field
+                                  defaultValue={storybook.description ?? ""}
+                                  label="Description"
+                                  name="description"
+                                  placeholder="The character/user/scenario package for this storyline"
+                                />
+                                <SaveInlineButton label="Save StoryBook" />
+                              </form>
+                            </EditableItem>
+                          );
+                        })}
+                      </EditableList>
+                    </div>
+                  </Panel>
+
+                  <Panel title="Book Library" icon={BookOpenText}>
+                    <div className="grid gap-4">
+                      <form className="grid gap-3" onSubmit={addLibraryBook}>
+                        <div className="grid gap-3 sm:grid-cols-3">
+                          <SelectField
+                            label="Bookshelf"
+                            name="bookshelfId"
+                            options={bookshelfOptions(bookshelves)}
+                          />
+                          <SelectField
+                            label="Book type"
+                            name="bookType"
+                            optionLabels={bookTypeLabels}
+                            options={bookTypeOptions}
+                          />
+                          <Field label="Book name" name="title" placeholder="Character Book" required />
+                        </div>
+                        <Field
+                          label="Description"
+                          name="description"
+                          placeholder="What this book stores for the StoryBook"
+                        />
+                        <SubmitButton label="Add book" />
+                      </form>
+
+                      <EditableList emptyText="No books yet.">
+                        {libraryBooks.map((book) => {
+                          const isLinked = Boolean(
+                            activeStoryBookBookIds.has(book.id) && activeStoryBook,
+                          );
+
+                          return (
+                            <EditableItem
+                              key={book.id}
+                              onDelete={() => {
+                                void deleteLibraryBookEntry(book.id);
+                              }}
+                              title={`${book.title} · ${bookTypeLabels[book.book_type]}`}
+                            >
+                              <form
+                                className="grid gap-3"
+                                onSubmit={(event) => void saveLibraryBookEntry(event, book.id)}
+                              >
+                                <div className="grid gap-3 sm:grid-cols-3">
+                                  <SelectField
+                                    defaultValue={book.bookshelf_id}
+                                    label="Bookshelf"
+                                    name="bookshelfId"
+                                    options={bookshelfOptions(bookshelves)}
+                                  />
+                                  <SelectField
+                                    defaultValue={book.book_type}
+                                    label="Book type"
+                                    name="bookType"
+                                    optionLabels={bookTypeLabels}
+                                    options={bookTypeOptions}
+                                  />
+                                  <Field
+                                    defaultValue={book.title}
+                                    label="Book name"
+                                    name="title"
+                                    placeholder="Character Book"
+                                    required
+                                  />
+                                </div>
+                                <Field
+                                  defaultValue={book.description ?? ""}
+                                  label="Description"
+                                  name="description"
+                                  placeholder="What this book stores for the StoryBook"
+                                />
+                                <div className="grid gap-2 sm:grid-cols-2">
+                                  <SaveInlineButton label="Save book" />
+                                  <button
+                                    className="flex h-9 items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-50"
+                                    disabled={!activeStoryBook}
+                                    onClick={() => {
+                                      if (isLinked) {
+                                        void unlinkLibraryBookFromStoryBook(book.id);
+                                      } else {
+                                        void linkLibraryBookToStoryBook(book);
+                                      }
+                                    }}
+                                    type="button"
+                                  >
+                                    {isLinked ? "Unlink from active StoryBook" : "Link to active StoryBook"}
+                                  </button>
+                                </div>
+                              </form>
+                            </EditableItem>
+                          );
+                        })}
+                      </EditableList>
+                    </div>
+                  </Panel>
+
+                  <Panel title="StoryBook Stack" icon={BookOpenText}>
+                    <div className="grid gap-4">
+                      <div>
+                        <p className="text-sm font-semibold text-zinc-950">
+                          {activeStoryBook?.title ?? "No StoryBook selected"}
+                        </p>
+                        <p className="mt-2 text-sm leading-6 text-zinc-600">
+                          Character Books, User Books, Scenario Books, World Books, Memory Books,
+                          and Prompt Books combine into one isolated story package.
+                        </p>
+                      </div>
+
+                      <div className="grid gap-3 md:grid-cols-2">
+                        {requiredStoryBookTypes.map((bookType) => {
+                          const book = activeStoryBookBooks.find(
+                            (candidate) => candidate.book_type === bookType,
+                          );
+
+                          return (
+                            <LibraryBookCard
+                              book={book}
+                              isPresent={activeStoryBookTypes.has(bookType)}
+                              key={bookType}
+                              label={bookTypeLabels[bookType]}
+                              onUnlink={
+                                book
+                                  ? () => {
+                                      void unlinkLibraryBookFromStoryBook(book.id);
+                                    }
+                                  : undefined
+                              }
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </Panel>
                 </section>
               ) : null}
 
@@ -2134,6 +3073,7 @@ export function StoryMemoryDashboard({
               ) : null}
 
               {activeWorkspaceSection === "story" ||
+              activeWorkspaceSection === "user-persona" ||
               activeWorkspaceSection === "participants" ||
               activeWorkspaceSection === "relationships" ||
               activeWorkspaceSection === "secrets" ? (
@@ -2490,6 +3430,52 @@ function PromptModuleEditor({
   );
 }
 
+function LibraryBookCard({
+  book,
+  isPresent,
+  label,
+  onUnlink,
+}: {
+  book?: LibraryBook;
+  isPresent: boolean;
+  label: string;
+  onUnlink?: () => void;
+}) {
+  return (
+    <article
+      className={`rounded-lg border p-4 ${
+        isPresent ? "border-zinc-200 bg-zinc-50" : "border-dashed border-zinc-300 bg-white"
+      }`}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-zinc-950">{book?.title ?? label}</p>
+          <p className="mt-1 text-xs font-medium uppercase tracking-wide text-zinc-500">{label}</p>
+        </div>
+        <span
+          className={`rounded px-2 py-1 text-xs font-medium ${
+            isPresent ? "bg-emerald-50 text-emerald-700" : "bg-zinc-100 text-zinc-500"
+          }`}
+        >
+          {isPresent ? "Linked" : "Empty"}
+        </span>
+      </div>
+      <p className="mt-3 text-sm leading-6 text-zinc-600">
+        {book?.description ?? "Ready for this StoryBook, but no saved book has been linked yet."}
+      </p>
+      {book && onUnlink ? (
+        <button
+          className="mt-3 h-8 rounded-md border border-zinc-300 bg-white px-2 text-xs font-medium text-zinc-700 hover:bg-zinc-100"
+          onClick={onUnlink}
+          type="button"
+        >
+          Unlink
+        </button>
+      ) : null}
+    </article>
+  );
+}
+
 function ControlSelect({
   icon: Icon,
   label,
@@ -2725,10 +3711,44 @@ function characterOptions(characters: Character[]) {
     : [{ label: "No participants yet", value: "" }];
 }
 
+function bookshelfOptions(bookshelves: Bookshelf[]) {
+  return bookshelves.length
+    ? bookshelves.map((bookshelf) => ({ label: bookshelf.title, value: bookshelf.id }))
+    : [{ label: "Create a bookshelf first", value: "" }];
+}
+
+function getInitialLoadedCharacterCard({
+  initialLibraryBooks,
+  initialStoryBookBindings,
+  initialStoryBooks,
+}: {
+  initialLibraryBooks: LibraryBook[];
+  initialStoryBookBindings: StoryBookBinding[];
+  initialStoryBooks: StoryBook[];
+}) {
+  const activeStoryBook = initialStoryBooks[0];
+  if (!activeStoryBook) return null;
+
+  const linkedBookIds = new Set(
+    initialStoryBookBindings
+      .filter((binding) => binding.storybook_id === activeStoryBook.id)
+      .map((binding) => binding.book_id),
+  );
+  const characterBook = initialLibraryBooks.find(
+    (book) => linkedBookIds.has(book.id) && book.book_type === "character_book",
+  );
+
+  return characterBook ? readCharacterCardFromBookPayload(characterBook.payload) : null;
+}
+
 function getFormValue(form: HTMLFormElement, name: string) {
   const field = form.elements.namedItem(name);
   if (!field || !("value" in field)) return "";
   return String(field.value).trim();
+}
+
+function toJsonPayload(payload: Record<string, unknown>) {
+  return JSON.parse(JSON.stringify(payload)) as Record<string, unknown>;
 }
 
 function makeId(prefix: string) {

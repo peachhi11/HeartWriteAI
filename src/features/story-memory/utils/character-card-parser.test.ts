@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  buildCharacterBookPayload,
   compactSentence,
   extractCharacterCardSourceFromPng,
   parseCharacterCard,
+  readCharacterCardFromBookPayload,
 } from "./character-card-parser";
 
 describe("parseCharacterCard", () => {
@@ -56,6 +58,63 @@ describe("parseCharacterCard", () => {
     );
 
     expect(card.tags).toEqual(["JanitorAI", "Friends to Lovers", "Slow Burn"]);
+  });
+
+  it("routes loaded card metadata into Character Book sections", () => {
+    const card = parseCharacterCard(
+      JSON.stringify({
+        data: {
+          alternate_greetings: ["Second opener"],
+          creator_notes: "Keep the jealousy subtext active.",
+          description: "A guarded musician with an ugly history.",
+          first_mes: "Do not touch the guitar case.",
+          mes_example: "{{char}}: You heard me.",
+          name: "Caleb Myers",
+          personality: "Protective, competitive, lonely.",
+          post_history_instructions: "Respect the established fallout.",
+          scenario: "{{char}} and {{user}} are forced to collaborate.",
+          system_prompt: "Keep role boundaries intact.",
+          tags: ["JanitorAI", "Enemies to Lovers"],
+        },
+      }),
+    );
+
+    const payload = buildCharacterBookPayload(card);
+
+    expect(payload.sourceMetadata).toMatchObject({
+      creatorNotes: "Keep the jealousy subtext active.",
+      format: "Character card v2",
+      name: "Caleb Myers",
+      tags: ["JanitorAI", "Enemies to Lovers"],
+    });
+    expect(payload.routedSections.characterIdentity).toMatchObject({
+      aliases: ["Caleb Myers", "{{char}}"],
+      name: "Caleb Myers",
+      tags: ["JanitorAI", "Enemies to Lovers"],
+    });
+    expect(payload.routedSections.backstory).toMatchObject({
+      cardDescription: "A guarded musician with an ugly history.",
+      creatorNotes: "Keep the jealousy subtext active.",
+    });
+    expect(payload.routedSections.relationships).toMatchObject({
+      firstMessage: "Do not touch the guitar case.",
+      scenario: "{{char}} and {{user}} are forced to collaborate.",
+    });
+    expect(payload.routedSections.cognition).toMatchObject({
+      postHistoryInstructions: "Respect the established fallout.",
+      systemPrompt: "Keep role boundaries intact.",
+    });
+    expect(payload.routedSections.speechProfile).toMatchObject({
+      exampleDialog: "{{char}}: You heard me.",
+      firstMessage: "Do not touch the guitar case.",
+    });
+  });
+
+  it("hydrates a loaded card from a saved Character Book payload", () => {
+    const card = parseCharacterCard(JSON.stringify({ name: "Hydrated Card" }));
+    const payload = buildCharacterBookPayload(card);
+
+    expect(readCharacterCardFromBookPayload(payload)?.name).toBe("Hydrated Card");
   });
 });
 

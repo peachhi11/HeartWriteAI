@@ -15,12 +15,22 @@ export function formatUserPersonaDraft(draft: UserPersonaDraft) {
   return compactLines([
     `[${draft.displayName || "{{user}}"} Persona]`,
     draft.roleInStory ? `Role: ${draft.roleInStory}` : "",
+    draft.tropeRelationshipWorldContext ? `Story fit:\n${draft.tropeRelationshipWorldContext}` : "",
+    draft.appearancePresentation ? `Appearance + presentation:\n${draft.appearancePresentation}` : "",
     draft.selfConcept ? `Self-concept: ${draft.selfConcept}` : "",
     draft.connectionToCharacter ? `Connection to {{char}}: ${draft.connectionToCharacter}` : "",
+    draft.relationalBackstory ? `Relational backstory + triggers:\n${draft.relationalBackstory}` : "",
+    draft.psychologyInternalConflict ? `Psychology + internal conflict:\n${draft.psychologyInternalConflict}` : "",
+    draft.romanticIntimateDynamics ? `Romantic + intimate dynamics:\n${draft.romanticIntimateDynamics}` : "",
+    draft.compatibilityArchitecture ? `Compatibility + friction:\n${draft.compatibilityArchitecture}` : "",
+    draft.interactionStyle ? `Interaction style:\n${draft.interactionStyle}` : "",
     draft.whatUserKnows ? `Starting knowledge: ${draft.whatUserKnows}` : "",
-    draft.openingAngle ? `Opening angle: ${draft.openingAngle}` : "",
-    draft.boundaries ? `Boundaries:\n${draft.boundaries}` : "",
-    draft.cardFitNotes ? `Card-fit notes:\n${draft.cardFitNotes}` : "",
+    draft.openingAngle ? `Opening position: ${draft.openingAngle}` : "",
+    draft.narrativeArc ? `Narrative + romantic arc:\n${draft.narrativeArc}` : "",
+    draft.sceneOpportunities ? `Scene hooks:\n${draft.sceneOpportunities}` : "",
+    draft.voiceDialogue ? `Voice, dialogue + emotional expression:\n${draft.voiceDialogue}` : "",
+    draft.boundaries ? `Agency + boundaries:\n${draft.boundaries}` : "",
+    draft.cardFitNotes ? `Source card notes:\n${draft.cardFitNotes}` : "",
   ]).join("\n\n");
 }
 
@@ -32,6 +42,7 @@ export function UserPersonaBuilderPanel({
   onCopy,
   onGenerate,
   onPersonaGenderChange,
+  onSaveToUserBook,
   personaGender,
 }: {
   copied: boolean;
@@ -41,6 +52,7 @@ export function UserPersonaBuilderPanel({
   onCopy: () => void;
   onGenerate: () => void;
   onPersonaGenderChange: (value: UserPersonaGender) => void;
+  onSaveToUserBook?: () => void;
   personaGender: UserPersonaGender;
 }) {
   const personaPreview = formatUserPersonaDraft(draft);
@@ -52,17 +64,18 @@ export function UserPersonaBuilderPanel({
           {loadedCard ? (
             <>
               Source card: <span className="font-semibold text-zinc-900">{loadedCard.name ?? "Unnamed card"}</span>.
-              Build what {"{{user}}"} brings to that established card without taking over {"{{char}}"}.
+              This profile defines what {"{{user}}"} brings to that established card without taking over {"{{char}}"}.
+              It works best after participants, relationships, and secrets are in place.
             </>
           ) : (
             <>
               Load a character card first for the strongest draft. You can still edit these fields
-              manually, but persona-fit works best when the card is the source.
+              manually, but persona-fit works best after the card, participants, relationships, and secrets exist.
             </>
           )}
         </div>
 
-        <div className="grid gap-2 lg:grid-cols-[1fr_1fr_1fr]">
+        <div className="grid gap-2 lg:grid-cols-[1fr_1fr_1fr_1fr]">
           <ControlledSelect
             label="Persona gender"
             onChange={onPersonaGenderChange}
@@ -82,6 +95,15 @@ export function UserPersonaBuilderPanel({
             <Sparkles className="size-4" aria-hidden="true" />
             Generate From Card
           </button>
+          {onSaveToUserBook ? (
+            <button
+              className="flex h-10 self-end items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+              onClick={onSaveToUserBook}
+              type="button"
+            >
+              Save as User Book
+            </button>
+          ) : null}
           <button
             className="flex h-10 self-end items-center justify-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
             onClick={onCopy}
@@ -106,6 +128,18 @@ export function UserPersonaBuilderPanel({
             value={draft.roleInStory}
           />
           <ControlledTextArea
+            label="Story fit"
+            onChange={(value) => onChange("tropeRelationshipWorldContext", value)}
+            placeholder="Trope alignment, relationship dynamic, world logic, and conflict driver"
+            value={draft.tropeRelationshipWorldContext}
+          />
+          <ControlledTextArea
+            label="Appearance + presentation"
+            onChange={(value) => onChange("appearancePresentation", value)}
+            placeholder="Physical presence, fashion, scent, mannerisms, and visible insecurities"
+            value={draft.appearancePresentation}
+          />
+          <ControlledTextArea
             label="Self-concept"
             onChange={(value) => onChange("selfConcept", value)}
             placeholder="What {{user}} believes about themself at the start"
@@ -118,27 +152,75 @@ export function UserPersonaBuilderPanel({
             value={draft.connectionToCharacter}
           />
           <ControlledTextArea
-            label="{{user}} knowledge"
+            label="Relational backstory + triggers"
+            onChange={(value) => onChange("relationalBackstory", value)}
+            placeholder="Family models, romantic history, wounds, secrets, and protective behaviors"
+            value={draft.relationalBackstory}
+          />
+          <ControlledTextArea
+            label="Psychology + internal conflict"
+            onChange={(value) => onChange("psychologyInternalConflict", value)}
+            placeholder="Temperament, core wound, coping, moral code, blind spots"
+            value={draft.psychologyInternalConflict}
+          />
+          <ControlledTextArea
+            label="Romantic + intimate dynamics"
+            onChange={(value) => onChange("romanticIntimateDynamics", value)}
+            placeholder="Attachment, love languages, attraction, jealousy, power dynamics"
+            value={draft.romanticIntimateDynamics}
+          />
+          <ControlledTextArea
+            label="Compatibility + friction"
+            onChange={(value) => onChange("compatibilityArchitecture", value)}
+            placeholder="Three sources of compatibility, three sources of conflict, and the emotional gap {{user}} fills"
+            value={draft.compatibilityArchitecture}
+          />
+          <ControlledTextArea
+            label="Interaction style"
+            onChange={(value) => onChange("interactionStyle", value)}
+            placeholder="Flirtation, communication, group vs one-on-one behavior, conflict approach"
+            value={draft.interactionStyle}
+          />
+          <ControlledTextArea
+            label="Starting knowledge"
             onChange={(value) => onChange("whatUserKnows", value)}
             placeholder="What {{user}} knows, suspects, or is hiding at the start"
             value={draft.whatUserKnows}
           />
           <ControlledTextArea
-            label="Opening angle"
+            label="Opening position"
             onChange={(value) => onChange("openingAngle", value)}
             placeholder="How {{user}} can enter the opening with agency"
             value={draft.openingAngle}
           />
           <ControlledTextArea
-            label="Persona boundaries"
+            label="Narrative + romantic arc"
+            onChange={(value) => onChange("narrativeArc", value)}
+            placeholder="Mismatch, tension, progression to trust, obstacles, payoff"
+            value={draft.narrativeArc}
+          />
+          <ControlledTextArea
+            label="Scene hooks"
+            onChange={(value) => onChange("sceneOpportunities", value)}
+            placeholder="Unique scenes and long-term RP hooks created by this pairing"
+            value={draft.sceneOpportunities}
+          />
+          <ControlledTextArea
+            label="Voice, dialogue + emotional expression"
+            onChange={(value) => onChange("voiceDialogue", value)}
+            placeholder="Tone, signature expressions, defensive lines, vulnerability, confession"
+            value={draft.voiceDialogue}
+          />
+          <ControlledTextArea
+            label="Agency + boundaries"
             onChange={(value) => onChange("boundaries", value)}
-            placeholder="What the AI must not write for {{user}}"
+            placeholder="Player agency, consent, knowledge, and authorship boundaries for {{user}}"
             value={draft.boundaries}
           />
           <ControlledTextArea
-            label="Card-fit notes"
+            label="Source card notes"
             onChange={(value) => onChange("cardFitNotes", value)}
-            placeholder="What the loaded card already controls and what the persona should fit around"
+            placeholder="What the loaded character card contributes to this persona"
             value={draft.cardFitNotes}
           />
         </div>
@@ -147,7 +229,7 @@ export function UserPersonaBuilderPanel({
           <div className="border-b border-zinc-200 bg-zinc-50 px-3 py-3">
             <h3 className="text-sm font-semibold text-zinc-950">Persona Preview</h3>
             <p className="mt-1 text-xs leading-5 text-zinc-500">
-              Paste-ready draft, still sessional until we add persistence.
+              Paste-ready draft. Save as a User Book to package it with the active StoryBook.
             </p>
           </div>
           <pre className="max-h-80 overflow-auto whitespace-pre-wrap bg-zinc-950 p-3 text-sm leading-6 text-zinc-100">

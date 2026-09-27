@@ -4,6 +4,7 @@ import type {
   Character,
   HeatLevelLabel,
   PovMode,
+  RelationshipThread,
   SceneMemory,
   SecretOrReveal,
   SpiceVisibility,
@@ -44,6 +45,45 @@ describe("getPromptModuleSuggestions", () => {
     });
 
     expect(suggestions.heatSpice).toBe(`Heat label: Explicit. ${expected}`);
+  });
+
+  it("creates the StoryBook operational mode framework", () => {
+    const suggestions = makeSuggestions({
+      activeRelationship: {
+        boundaries: [],
+        created_at: "2026-09-25T00:00:00.000Z",
+        dynamic_label: "Forbidden mutual longing",
+        id: "rel-1",
+        linked_secret_ids: [],
+        next_pressure_point: "A locked office leaves them too close to pretend.",
+        participants: ["char", "user"],
+        story_id: "story-1",
+        updated_at: "2026-09-25T00:00:00.000Z",
+      },
+      activeSecret: makeSecret({ title: "Hidden breakup ultimatum" }),
+      heatLevel: "explicit",
+      spiceVisibility: "uncensored",
+      story: makeStory({
+        content_boundaries: ["No non-consensual sexual content."],
+        genre: "Romance",
+        subgenre: "Erotic roleplay",
+      }),
+    });
+
+    expect(suggestions.storybookOperationalMode).toContain(
+      "[EROTIC ROMANTIC ROLEPLAY CONTEXT FRAMEWORK]",
+    );
+    expect(suggestions.storybookOperationalMode).toContain(
+      "- All sexual/romantic content involves consenting adults only.",
+    );
+    expect(suggestions.storybookOperationalMode).toContain(
+      "Do not narrate {{user}}'s thoughts, dialogue, hidden motives, consent, choices, arousal, orgasm, or body reactions.",
+    );
+    expect(suggestions.storybookOperationalMode).toContain(
+      "LATEST_USER_MOVE: {{latest_user_move}}",
+    );
+    expect(suggestions.storybookOperationalMode).toContain("Heat label: Explicit.");
+    expect(suggestions.storybookOperationalMode).toContain("Spice visibility: uncensored.");
   });
 
   it("uses roleplay scenario and setting terminology from the active scene", () => {
@@ -139,6 +179,7 @@ describe("getPromptModuleValues", () => {
 
 function makeSuggestions({
   activeScene,
+  activeRelationship,
   activeSecret,
   characters = [],
   heatLevel = "spicy",
@@ -148,6 +189,7 @@ function makeSuggestions({
   story = makeStory(),
 }: {
   activeScene?: SceneMemory;
+  activeRelationship?: RelationshipThread;
   activeSecret?: SecretOrReveal;
   characters?: Character[];
   heatLevel?: HeatLevelLabel;
@@ -157,6 +199,7 @@ function makeSuggestions({
   story?: Story;
 }): PromptModuleText {
   return getPromptModuleSuggestions({
+    activeRelationship,
     activeScene,
     activeSecret,
     characters,

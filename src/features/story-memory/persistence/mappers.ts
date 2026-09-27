@@ -1,14 +1,19 @@
 import type {
+  BookType,
+  Bookshelf,
   CategoryTag,
   Character,
   CorePromptPack,
   GeneratedPromptPack,
   HeatLevelLabel,
+  LibraryBook,
   PovMode,
   RelationshipThread,
   SceneMemory,
   SecretOrReveal,
   Story,
+  StoryBook,
+  StoryBookBinding,
   StoryStatus,
 } from "@/features/story-memory/types/story-memory";
 import type { Database } from "@/lib/supabase/database.types";
@@ -16,6 +21,10 @@ import type { Database } from "@/lib/supabase/database.types";
 type Tables = Database["public"]["Tables"];
 
 export type StoryRow = Tables["stories"]["Row"];
+export type BookshelfRow = Tables["bookshelves"]["Row"];
+export type StoryBookRow = Tables["storybooks"]["Row"];
+export type LibraryBookRow = Tables["library_books"]["Row"];
+export type StoryBookBindingRow = Tables["storybook_book_bindings"]["Row"];
 export type CharacterRow = Tables["characters"]["Row"];
 export type SceneMemoryRow = Tables["scene_memories"]["Row"];
 export type RelationshipThreadRow = Tables["relationship_threads"]["Row"];
@@ -38,6 +47,37 @@ export function mapStoryRow(row: StoryRow): Story {
     author_notes: row.author_notes ?? undefined,
     style_notes: row.style_notes ?? undefined,
   };
+}
+
+export function mapBookshelfRow(row: BookshelfRow): Bookshelf {
+  return {
+    ...row,
+    description: row.description ?? undefined,
+  };
+}
+
+export function mapStoryBookRow(row: StoryBookRow): StoryBook {
+  return {
+    ...row,
+    active_story_id: row.active_story_id ?? undefined,
+    description: row.description ?? undefined,
+    status: row.status as StoryStatus,
+  };
+}
+
+export function mapLibraryBookRow(row: LibraryBookRow): LibraryBook {
+  return {
+    ...row,
+    book_type: row.book_type as BookType,
+    description: row.description ?? undefined,
+    payload: typeof row.payload === "object" && row.payload !== null && !Array.isArray(row.payload) ? row.payload : {},
+    source_entity_id: row.source_entity_id ?? undefined,
+    source_entity_type: row.source_entity_type ?? undefined,
+  };
+}
+
+export function mapStoryBookBindingRow(row: StoryBookBindingRow): StoryBookBinding {
+  return row;
 }
 
 export function mapCharacterRow(row: CharacterRow): Character {

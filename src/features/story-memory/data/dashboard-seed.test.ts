@@ -3,7 +3,14 @@ import { resolve } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { corePromptPacks, groupedCategoryTags } from "./dashboard-seed";
+import {
+  corePromptPacks,
+  groupedCategoryTags,
+  sampleBookshelves,
+  sampleLibraryBooks,
+  sampleStoryBookBindings,
+  sampleStoryBooks,
+} from "./dashboard-seed";
 
 describe("story memory seed data", () => {
   it("loads the v1 grouped tag set without duplicate slugs", () => {
@@ -65,6 +72,47 @@ describe("story memory seed data", () => {
 
     for (const pack of corePromptPacks) {
       expect(seedSql).toContain(`'${pack.slug}'`);
+    }
+  });
+
+  it("seeds every required StoryBook library book type", () => {
+    expect(sampleLibraryBooks.map((book) => book.book_type)).toEqual([
+      "character_book",
+      "user_book",
+      "scenario_book",
+      "world_book",
+      "memory_book",
+      "prompt_book",
+    ]);
+  });
+
+  it("keeps seeded StoryBooks bound to real shelves and books", () => {
+    const bookshelfIds = new Set(sampleBookshelves.map((bookshelf) => bookshelf.id));
+    const storybookIds = new Set(sampleStoryBooks.map((storybook) => storybook.id));
+    const libraryBookIds = new Set(sampleLibraryBooks.map((book) => book.id));
+
+    expect(sampleStoryBooks.every((storybook) => bookshelfIds.has(storybook.bookshelf_id))).toBe(true);
+    expect(
+      sampleStoryBookBindings.every(
+        (binding) => storybookIds.has(binding.storybook_id) && libraryBookIds.has(binding.book_id),
+      ),
+    ).toBe(true);
+  });
+
+  it("keeps the Supabase core schema ready for StoryBook storage", () => {
+    const schemaSql = readFileSync(resolve(process.cwd(), "supabase/schemas/001_story_memory_core.sql"), "utf8");
+
+    for (const tableName of [
+      "bookshelves",
+      "storybooks",
+      "library_books",
+      "storybook_book_bindings",
+    ]) {
+      expect(schemaSql).toContain(`public.${tableName}`);
+    }
+
+    for (const bookType of sampleLibraryBooks.map((book) => book.book_type)) {
+      expect(schemaSql).toContain(`'${bookType}'`);
     }
   });
 });

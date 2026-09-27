@@ -14,6 +14,13 @@ export type RevealStatus =
   | "misunderstood";
 export type PromptPackPersistenceState = "session" | "saved";
 export type HeatLevelLabel = "sweet" | "sensual" | "spicy" | "explicit" | "extreme";
+export type BookType =
+  | "character_book"
+  | "user_book"
+  | "scenario_book"
+  | "world_book"
+  | "memory_book"
+  | "prompt_book";
 export type CategoryTagGroupName =
   | "trope"
   | "relationship_dynamic"
@@ -49,6 +56,38 @@ export interface Story extends TimestampedEntity {
   content_boundaries?: string[];
   style_notes?: string;
   export_targets?: string[];
+}
+
+export interface Bookshelf extends TimestampedEntity {
+  title: string;
+  description?: string;
+  sort_order: number;
+}
+
+export interface StoryBook extends TimestampedEntity {
+  bookshelf_id: EntityId;
+  title: string;
+  description?: string;
+  active_story_id?: EntityId;
+  status: StoryStatus;
+  sort_order: number;
+}
+
+export interface LibraryBook extends TimestampedEntity {
+  bookshelf_id: EntityId;
+  title: string;
+  book_type: BookType;
+  description?: string;
+  source_entity_id?: EntityId;
+  source_entity_type?: string;
+  payload: Record<string, unknown>;
+  sort_order: number;
+}
+
+export interface StoryBookBinding extends TimestampedEntity {
+  storybook_id: EntityId;
+  book_id: EntityId;
+  sort_order: number;
 }
 
 export interface Character extends TimestampedEntity {

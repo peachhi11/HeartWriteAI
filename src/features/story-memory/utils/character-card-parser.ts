@@ -16,6 +16,31 @@ export type LoadedCharacterCard = {
   warnings: string[];
 };
 
+export type CharacterBookPayload = {
+  parsedCard: LoadedCharacterCard;
+  rawText: string;
+  routedSections: {
+    backstory: Record<string, string | string[] | undefined>;
+    behavior: Record<string, string | string[] | undefined>;
+    characterIdentity: Record<string, string | string[] | undefined>;
+    cognition: Record<string, string | string[] | undefined>;
+    personality: Record<string, string | string[] | undefined>;
+    psychology: Record<string, string | string[] | undefined>;
+    relationships: Record<string, string | string[] | undefined>;
+    sexuality: Record<string, string | string[] | undefined>;
+    speechProfile: Record<string, string | string[] | undefined>;
+  };
+  source: "character-card-intake";
+  sourceMetadata: {
+    creatorNotes?: string;
+    format: string;
+    importedAt: string;
+    name?: string;
+    tags: string[];
+    warnings: string[];
+  };
+};
+
 export function parseCharacterCard(source: string, sourceName?: string): LoadedCharacterCard {
   const importedAt = new Date().toISOString();
 
@@ -78,6 +103,78 @@ export function parseCharacterCard(source: string, sourceName?: string): LoadedC
       warnings: ["This was not valid JSON, so it was loaded as plain card notes."],
     };
   }
+}
+
+export function buildCharacterBookPayload(card: LoadedCharacterCard): CharacterBookPayload {
+  return {
+    parsedCard: card,
+    rawText: card.rawText,
+    routedSections: compactRoutedSections({
+      backstory: {
+        cardDescription: card.description,
+        creatorNotes: card.creatorNotes,
+      },
+      behavior: {
+        firstMessage: card.firstMessage,
+        alternateGreetings: card.alternateGreetings,
+        postHistoryInstructions: card.postHistoryInstructions,
+        exampleDialog: card.exampleDialog,
+      },
+      characterIdentity: {
+        name: card.name,
+        aliases: card.name ? [card.name, "{{char}}"] : ["{{char}}"],
+        format: card.format,
+        tags: card.tags,
+      },
+      cognition: {
+        systemPrompt: card.systemPrompt,
+        postHistoryInstructions: card.postHistoryInstructions,
+      },
+      personality: {
+        personality: card.personality,
+        description: card.description,
+      },
+      psychology: {
+        personality: card.personality,
+        creatorNotes: card.creatorNotes,
+        scenarioPressure: card.scenario,
+      },
+      relationships: {
+        scenario: card.scenario,
+        firstMessage: card.firstMessage,
+        alternateGreetings: card.alternateGreetings,
+      },
+      sexuality: {
+        tags: card.tags,
+        cardDescription: card.description,
+      },
+      speechProfile: {
+        exampleDialog: card.exampleDialog,
+        firstMessage: card.firstMessage,
+        alternateGreetings: card.alternateGreetings,
+      },
+    }),
+    source: "character-card-intake",
+    sourceMetadata: {
+      creatorNotes: card.creatorNotes,
+      format: card.format,
+      importedAt: card.importedAt,
+      name: card.name,
+      tags: card.tags,
+      warnings: card.warnings,
+    },
+  };
+}
+
+export function readCharacterCardFromBookPayload(payload: Record<string, unknown>) {
+  const parsedCard = payload.parsedCard;
+
+  if (isLoadedCharacterCard(parsedCard)) {
+    return parsedCard;
+  }
+
+  const rawText = typeof payload.rawText === "string" ? payload.rawText : undefined;
+  return rawText ? parseCharacterCard(rawText) : null;
 }
 
 export async function extractCharacterCardSourceFromPng(file: File) {
@@ -294,6 +391,35 @@ function readStringArray(record: Record<string, unknown>, keys: string[]) {
   }
 
   return [];
+}
+
+function compactRoutedSections<TSectionMap extends Record<string, Record<string, string | string[] | undefined>>>(
+  sections: TSectionMap,
+) {
+  return Object.fromEntries(
+    Object.entries(sections).map(([sectionName, fields]) => [
+      sectionName,
+      Object.fromEntries(
+        Object.entries(fields).filter(([, value]) => {
+          if (Array.isArray(value)) return value.length > 0;
+          return typeof value === "string" ? value.trim().length > 0 : false;
+        }),
+      ),
+    ]),
+  ) as CharacterBookPayload["routedSections"];
+}
+
+function isLoadedCharacterCard(value: unknown): value is LoadedCharacterCard {
+  if (!isRecord(value)) return false;
+
+  return (
+    Array.isArray(value.alternateGreetings) &&
+    typeof value.format === "string" &&
+    typeof value.importedAt === "string" &&
+    typeof value.rawText === "string" &&
+    Array.isArray(value.tags) &&
+    Array.isArray(value.warnings)
+  );
 }
 
 function isPng(bytes: Uint8Array) {

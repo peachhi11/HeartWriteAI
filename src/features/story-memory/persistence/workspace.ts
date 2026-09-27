@@ -2,33 +2,54 @@ import {
   activeStory,
   corePromptPacks,
   groupedCategoryTags,
+  sampleBookshelves,
   sampleCharacters,
+  sampleLibraryBooks,
   samplePromptPacks,
   sampleRelationships,
   sampleScenes,
   sampleSecrets,
+  sampleStoryBookBindings,
+  sampleStoryBooks,
 } from "@/features/story-memory/data/dashboard-seed";
 import {
+  mapBookshelfRow,
   mapCategoryTagRow,
   mapCharacterRow,
   mapCorePromptPackRow,
+  mapLibraryBookRow,
   mapRelationshipThreadRow,
   mapSavedPromptPackRow,
   mapSceneMemoryRow,
   mapSecretRow,
+  mapStoryBookBindingRow,
+  mapStoryBookRow,
   mapStoryRow,
 } from "@/features/story-memory/persistence/mappers";
 import type {
+  Bookshelf,
   CategoryTag,
   Character,
   CorePromptPack,
   GeneratedPromptPack,
+  LibraryBook,
   RelationshipThread,
   SceneMemory,
   SecretOrReveal,
   Story,
+  StoryBook,
+  StoryBookBinding,
 } from "@/features/story-memory/types/story-memory";
 import { createClient } from "@/lib/supabase/server";
+
+type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
+type LibraryWorkspaceRows = {
+  bookshelves: Bookshelf[];
+  errorMessage?: string;
+  libraryBooks: LibraryBook[];
+  storyBookBindings: StoryBookBinding[];
+  storyBooks: StoryBook[];
+};
 
 export type StoryMemoryAuthState =
   | {
@@ -49,12 +70,16 @@ export type StoryMemoryWorkspace = {
   auth: StoryMemoryAuthState;
   categoryTags: CategoryTag[];
   corePromptPacks: CorePromptPack[];
+  initialBookshelves: Bookshelf[];
   initialCharacters: Character[];
+  initialLibraryBooks: LibraryBook[];
   initialPromptPacks: GeneratedPromptPack[];
   initialRelationships: RelationshipThread[];
   initialScenes: SceneMemory[];
   initialSecrets: SecretOrReveal[];
   initialSelectedTagSlugs: string[];
+  initialStoryBookBindings: StoryBookBinding[];
+  initialStoryBooks: StoryBook[];
   isPersisted: boolean;
   story: Story;
 };
@@ -166,6 +191,11 @@ export async function loadStoryMemoryWorkspace(): Promise<StoryMemoryWorkspace> 
 
   const categoryTags = tagsResult.data.map(mapCategoryTagRow);
   const selectedTagIds = new Set((tagSelectionsResult.data ?? []).map((selection) => selection.tag_id));
+  const libraryWorkspace = await loadOrCreateLibraryWorkspace(supabase, user.id, story);
+
+  if (libraryWorkspace.errorMessage) {
+    return createDemoWorkspace(libraryWorkspace.errorMessage);
+  }
 
   return {
     auth: {
@@ -175,7 +205,9 @@ export async function loadStoryMemoryWorkspace(): Promise<StoryMemoryWorkspace> 
     },
     categoryTags,
     corePromptPacks: corePacksResult.data.map(mapCorePromptPackRow),
+    initialBookshelves: libraryWorkspace.bookshelves,
     initialCharacters: (charactersResult.data ?? []).map(mapCharacterRow),
+    initialLibraryBooks: libraryWorkspace.libraryBooks,
     initialPromptPacks: (promptPacksResult.data ?? []).map(mapSavedPromptPackRow),
     initialRelationships: (relationshipsResult.data ?? []).map(mapRelationshipThreadRow),
     initialScenes: (scenesResult.data ?? []).map(mapSceneMemoryRow),
@@ -183,8 +215,145 @@ export async function loadStoryMemoryWorkspace(): Promise<StoryMemoryWorkspace> 
     initialSelectedTagSlugs: categoryTags
       .filter((tag) => selectedTagIds.has(tag.id))
       .map((tag) => tag.slug),
+    initialStoryBookBindings: libraryWorkspace.storyBookBindings,
+    initialStoryBooks: libraryWorkspace.storyBooks,
     isPersisted: true,
     story,
+  };
+}
+
+async function loadOrCreateLibraryWorkspace(
+  supabase: SupabaseServerClient,
+  userId: string,
+  story: Story,
+): Promise<LibraryWorkspaceRows> {
+  const loaded = await loadLibraryWorkspaceRows(supabase, userId);
+  if (loaded.errorMessage) return loaded;
+
+  if (
+    loaded.bookshelves.length ||
+    loaded.storyBooks.length ||
+    loaded.libraryBooks.length ||
+    loaded.storyBookBindings.length
+  ) {
+    return loaded;
+  }
+
+  const bookshelfResult = await supabase
+    .from("bookshelves")
+    .insert({
+      description: sampleBookshelves[0]?.description ?? null,
+      owner_id: userId,
+      sort_order: 1,
+      title: sampleBookshelves[0]?.title ?? "Active Romance Builds",
+    })
+    .select()
+    .single();
+
+  if (bookshelfResult.error) {
+    return emptyLibraryWorkspace(bookshelfResult.error.message);
+  }
+
+  const storyBookResult = await supabase
+    .from("storybooks")
+    .insert({
+      active_story_id: story.id,
+      bookshelf_id: bookshelfResult.data.id,
+      description: sampleStoryBooks[0]?.description ?? null,
+      owner_id: userId,
+      sort_order: 1,
+      status: "active",
+      title: sampleStoryBooks[0]?.title ?? `${story.title} StoryBook`,
+    })
+    .select()
+    .single();
+
+  if (storyBookResult.error) {
+    return emptyLibraryWorkspace(storyBookResult.error.message);
+  }
+
+  const libraryBooksResult = await supabase
+    .from("library_books")
+    .insert(
+      sampleLibraryBooks.map((book) => ({
+        bookshelf_id: bookshelfResult.data.id,
+        book_type: book.book_type,
+        description: book.description ?? null,
+        owner_id: userId,
+        payload: {},
+        sort_order: book.sort_order,
+        source_entity_id: null,
+        source_entity_type: book.source_entity_type ?? null,
+        title: book.title,
+      })),
+    )
+    .select();
+
+  if (libraryBooksResult.error) {
+    return emptyLibraryWorkspace(libraryBooksResult.error.message);
+  }
+
+  const bindingResult = await supabase
+    .from("storybook_book_bindings")
+    .insert(
+      (libraryBooksResult.data ?? []).map((book, index) => ({
+        book_id: book.id,
+        owner_id: userId,
+        sort_order: index + 1,
+        storybook_id: storyBookResult.data.id,
+      })),
+    )
+    .select();
+
+  if (bindingResult.error) {
+    return emptyLibraryWorkspace(bindingResult.error.message);
+  }
+
+  return {
+    bookshelves: [mapBookshelfRow(bookshelfResult.data)],
+    libraryBooks: (libraryBooksResult.data ?? []).map(mapLibraryBookRow),
+    storyBookBindings: (bindingResult.data ?? []).map(mapStoryBookBindingRow),
+    storyBooks: [mapStoryBookRow(storyBookResult.data)],
+  };
+}
+
+async function loadLibraryWorkspaceRows(
+  supabase: SupabaseServerClient,
+  userId: string,
+): Promise<LibraryWorkspaceRows> {
+  const [bookshelvesResult, storyBooksResult, libraryBooksResult, storyBookBindingsResult] =
+    await Promise.all([
+      supabase.from("bookshelves").select("*").eq("owner_id", userId).order("sort_order"),
+      supabase.from("storybooks").select("*").eq("owner_id", userId).order("sort_order"),
+      supabase.from("library_books").select("*").eq("owner_id", userId).order("sort_order"),
+      supabase.from("storybook_book_bindings").select("*").eq("owner_id", userId).order("sort_order"),
+    ]);
+
+  const error =
+    bookshelvesResult.error ??
+    storyBooksResult.error ??
+    libraryBooksResult.error ??
+    storyBookBindingsResult.error;
+
+  if (error) {
+    return emptyLibraryWorkspace(error.message);
+  }
+
+  return {
+    bookshelves: (bookshelvesResult.data ?? []).map(mapBookshelfRow),
+    libraryBooks: (libraryBooksResult.data ?? []).map(mapLibraryBookRow),
+    storyBookBindings: (storyBookBindingsResult.data ?? []).map(mapStoryBookBindingRow),
+    storyBooks: (storyBooksResult.data ?? []).map(mapStoryBookRow),
+  };
+}
+
+function emptyLibraryWorkspace(errorMessage?: string): LibraryWorkspaceRows {
+  return {
+    bookshelves: [],
+    errorMessage,
+    libraryBooks: [],
+    storyBookBindings: [],
+    storyBooks: [],
   };
 }
 
@@ -196,12 +365,16 @@ function createDemoWorkspace(message: string): StoryMemoryWorkspace {
     },
     categoryTags: groupedCategoryTags,
     corePromptPacks,
+    initialBookshelves: sampleBookshelves,
     initialCharacters: sampleCharacters,
+    initialLibraryBooks: sampleLibraryBooks,
     initialPromptPacks: samplePromptPacks,
     initialRelationships: sampleRelationships,
     initialScenes: sampleScenes,
     initialSecrets: sampleSecrets,
     initialSelectedTagSlugs: ["situationship"],
+    initialStoryBookBindings: sampleStoryBookBindings,
+    initialStoryBooks: sampleStoryBooks,
     isPersisted: false,
     story: activeStory,
   };

@@ -51,6 +51,30 @@ export type Database = {
         Update: Partial<CharacterMemoryInsert>;
         Relationships: [];
       };
+      bookshelves: {
+        Row: BookshelfRow;
+        Insert: BookshelfInsert;
+        Update: Partial<BookshelfInsert>;
+        Relationships: [];
+      };
+      storybooks: {
+        Row: StoryBookRow;
+        Insert: StoryBookInsert;
+        Update: Partial<StoryBookInsert>;
+        Relationships: [];
+      };
+      library_books: {
+        Row: LibraryBookRow;
+        Insert: LibraryBookInsert;
+        Update: Partial<LibraryBookInsert>;
+        Relationships: [];
+      };
+      storybook_book_bindings: {
+        Row: StoryBookBindingRow;
+        Insert: StoryBookBindingInsert;
+        Update: Partial<StoryBookBindingInsert>;
+        Relationships: [];
+      };
       scene_memories: {
         Row: SceneMemoryRow;
         Insert: SceneMemoryInsert;
@@ -111,13 +135,60 @@ export type Database = {
   };
 };
 
-type OwnedRow = {
+type OwnedTimestampedRow = {
   id: string;
   owner_id: string;
-  story_id: string;
   created_at: string;
   updated_at: string;
 };
+
+type OwnedRow = OwnedTimestampedRow & {
+  story_id: string;
+};
+
+type BookshelfRow = OwnedTimestampedRow & {
+  title: string;
+  description: string | null;
+  sort_order: number;
+};
+
+type BookshelfInsert = Omit<BookshelfRow, "id" | "created_at" | "updated_at"> &
+  Partial<Pick<BookshelfRow, "id" | "created_at" | "updated_at">>;
+
+type StoryBookRow = OwnedTimestampedRow & {
+  bookshelf_id: string;
+  title: string;
+  description: string | null;
+  active_story_id: string | null;
+  status: string;
+  sort_order: number;
+};
+
+type StoryBookInsert = Omit<StoryBookRow, "id" | "created_at" | "updated_at"> &
+  Partial<Pick<StoryBookRow, "id" | "created_at" | "updated_at">>;
+
+type LibraryBookRow = OwnedTimestampedRow & {
+  bookshelf_id: string;
+  title: string;
+  book_type: string;
+  description: string | null;
+  source_entity_id: string | null;
+  source_entity_type: string | null;
+  payload: Json;
+  sort_order: number;
+};
+
+type LibraryBookInsert = Omit<LibraryBookRow, "id" | "created_at" | "updated_at"> &
+  Partial<Pick<LibraryBookRow, "id" | "created_at" | "updated_at">>;
+
+type StoryBookBindingRow = OwnedTimestampedRow & {
+  storybook_id: string;
+  book_id: string;
+  sort_order: number;
+};
+
+type StoryBookBindingInsert = Omit<StoryBookBindingRow, "id" | "created_at" | "updated_at"> &
+  Partial<Pick<StoryBookBindingRow, "id" | "created_at" | "updated_at">>;
 
 type CharacterMemoryRow = OwnedRow & {
   name: string;

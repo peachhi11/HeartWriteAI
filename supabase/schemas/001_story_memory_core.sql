@@ -22,6 +22,64 @@ create table if not exists public.stories (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.bookshelves (
+  id text primary key default gen_random_uuid()::text,
+  owner_id uuid not null references auth.users(id) on delete cascade,
+  title text not null,
+  description text,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.storybooks (
+  id text primary key default gen_random_uuid()::text,
+  owner_id uuid not null references auth.users(id) on delete cascade,
+  bookshelf_id text not null references public.bookshelves(id) on delete cascade,
+  title text not null,
+  description text,
+  active_story_id text references public.stories(id) on delete set null,
+  status text not null default 'active'
+    check (status in ('active', 'paused', 'archived')),
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.library_books (
+  id text primary key default gen_random_uuid()::text,
+  owner_id uuid not null references auth.users(id) on delete cascade,
+  bookshelf_id text not null references public.bookshelves(id) on delete cascade,
+  title text not null,
+  book_type text not null
+    check (book_type in (
+      'character_book',
+      'user_book',
+      'scenario_book',
+      'world_book',
+      'memory_book',
+      'prompt_book'
+    )),
+  description text,
+  source_entity_id text,
+  source_entity_type text,
+  payload jsonb not null default '{}'::jsonb,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.storybook_book_bindings (
+  id text primary key default gen_random_uuid()::text,
+  owner_id uuid not null references auth.users(id) on delete cascade,
+  storybook_id text not null references public.storybooks(id) on delete cascade,
+  book_id text not null references public.library_books(id) on delete cascade,
+  sort_order integer not null default 0,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (storybook_id, book_id)
+);
+
 create table if not exists public.characters (
   id text primary key default gen_random_uuid()::text,
   owner_id uuid not null references auth.users(id) on delete cascade,
@@ -199,6 +257,18 @@ create table if not exists public.story_tag_selections (
 );
 
 create index if not exists stories_owner_id_idx on public.stories (owner_id);
+create index if not exists bookshelves_owner_id_idx on public.bookshelves (owner_id);
+create index if not exists storybooks_owner_id_idx on public.storybooks (owner_id);
+create index if not exists storybooks_bookshelf_id_idx on public.storybooks (bookshelf_id);
+create index if not exists storybooks_active_story_id_idx on public.storybooks (active_story_id);
+create index if not exists library_books_owner_id_idx on public.library_books (owner_id);
+create index if not exists library_books_bookshelf_id_idx on public.library_books (bookshelf_id);
+create index if not exists library_books_book_type_idx on public.library_books (book_type);
+create index if not exists storybook_book_bindings_owner_id_idx on public.storybook_book_bindings (owner_id);
+create index if not exists storybook_book_bindings_storybook_id_idx
+  on public.storybook_book_bindings (storybook_id);
+create index if not exists storybook_book_bindings_book_id_idx
+  on public.storybook_book_bindings (book_id);
 create index if not exists characters_owner_id_idx on public.characters (owner_id);
 create index if not exists characters_story_id_idx on public.characters (story_id);
 create index if not exists scene_memories_owner_id_idx on public.scene_memories (owner_id);
@@ -216,6 +286,10 @@ create index if not exists story_tag_selections_owner_id_idx on public.story_tag
 create index if not exists story_tag_selections_tag_id_idx on public.story_tag_selections (tag_id);
 
 alter table public.stories enable row level security;
+alter table public.bookshelves enable row level security;
+alter table public.storybooks enable row level security;
+alter table public.library_books enable row level security;
+alter table public.storybook_book_bindings enable row level security;
 alter table public.characters enable row level security;
 alter table public.scene_memories enable row level security;
 alter table public.relationship_threads enable row level security;
@@ -245,6 +319,30 @@ drop policy if exists "owners can delete stories" on public.stories;
 create policy "owners can delete stories" on public.stories
   for delete to authenticated
   using ((select auth.uid()) = owner_id);
+
+drop policy if exists "owners manage bookshelves" on public.bookshelves;
+create policy "owners manage bookshelves" on public.bookshelves
+  for all to authenticated
+  using ((select auth.uid()) = owner_id)
+  with check ((select auth.uid()) = owner_id);
+
+drop policy if exists "owners manage storybooks" on public.storybooks;
+create policy "owners manage storybooks" on public.storybooks
+  for all to authenticated
+  using ((select auth.uid()) = owner_id)
+  with check ((select auth.uid()) = owner_id);
+
+drop policy if exists "owners manage library books" on public.library_books;
+create policy "owners manage library books" on public.library_books
+  for all to authenticated
+  using ((select auth.uid()) = owner_id)
+  with check ((select auth.uid()) = owner_id);
+
+drop policy if exists "owners manage storybook book bindings" on public.storybook_book_bindings;
+create policy "owners manage storybook book bindings" on public.storybook_book_bindings
+  for all to authenticated
+  using ((select auth.uid()) = owner_id)
+  with check ((select auth.uid()) = owner_id);
 
 drop policy if exists "owners manage characters" on public.characters;
 create policy "owners manage characters" on public.characters
@@ -294,6 +392,10 @@ create policy "authenticated users can read core prompt packs" on public.core_pr
 
 grant usage on schema public to authenticated;
 grant select, insert, update, delete on public.stories to authenticated;
+grant select, insert, update, delete on public.bookshelves to authenticated;
+grant select, insert, update, delete on public.storybooks to authenticated;
+grant select, insert, update, delete on public.library_books to authenticated;
+grant select, insert, update, delete on public.storybook_book_bindings to authenticated;
 grant select, insert, update, delete on public.characters to authenticated;
 grant select, insert, update, delete on public.scene_memories to authenticated;
 grant select, insert, update, delete on public.relationship_threads to authenticated;

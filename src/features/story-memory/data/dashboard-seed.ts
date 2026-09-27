@@ -1,12 +1,16 @@
 import type {
+  Bookshelf,
   CategoryTag,
   Character,
   CorePromptPack,
   GeneratedPromptPack,
+  LibraryBook,
   RelationshipThread,
   SceneMemory,
   SecretOrReveal,
   Story,
+  StoryBook,
+  StoryBookBinding,
 } from "@/features/story-memory/types/story-memory";
 
 const now = "2026-09-22T00:00:00.000Z";
@@ -158,6 +162,96 @@ export const samplePromptPacks: GeneratedPromptPack[] = [
     updated_at: now,
   },
 ];
+
+export const sampleBookshelves: Bookshelf[] = [
+  {
+    id: "bookshelf-active-romance",
+    title: "Active Romance Builds",
+    description: "Working StoryBooks for character/user pairings that should stay packaged together.",
+    sort_order: 1,
+    created_at: now,
+    updated_at: now,
+  },
+];
+
+export const sampleStoryBooks: StoryBook[] = [
+  {
+    id: "storybook-demo",
+    bookshelf_id: "bookshelf-active-romance",
+    title: "{{char}} / {{user}} StoryBook",
+    description:
+      "A packaged story workspace assembled from the loaded character card, generated user persona, scenario state, world context, memory, and prompt stack.",
+    active_story_id: activeStory.id,
+    status: "active",
+    sort_order: 1,
+    created_at: now,
+    updated_at: now,
+  },
+];
+
+export const sampleLibraryBooks: LibraryBook[] = [
+  libraryBook({
+    id: "book-character-demo",
+    book_type: "character_book",
+    title: "Character Book",
+    description: "Loaded {{char}} card data and character-facing constraints.",
+    source_entity_id: "char",
+    source_entity_type: "character",
+    sort_order: 1,
+  }),
+  libraryBook({
+    id: "book-user-demo",
+    book_type: "user_book",
+    title: "User Book",
+    description: "Generated {{user}} persona drafts and player-facing identity notes.",
+    source_entity_id: "user",
+    source_entity_type: "character",
+    sort_order: 2,
+  }),
+  libraryBook({
+    id: "book-scenario-demo",
+    book_type: "scenario_book",
+    title: "Scenario Book",
+    description: "The setup, current scene, Alt branches, chapter labels, and narrative arcs.",
+    source_entity_id: "scene-1",
+    source_entity_type: "scene_memory",
+    sort_order: 3,
+  }),
+  libraryBook({
+    id: "book-world-demo",
+    book_type: "world_book",
+    title: "World Book",
+    description: "Setting, genre rules, world context, and reusable location logic.",
+    sort_order: 4,
+  }),
+  libraryBook({
+    id: "book-memory-demo",
+    book_type: "memory_book",
+    title: "Memory Book",
+    description: "Relationship threads, secrets, reveals, and continuity pressure.",
+    source_entity_id: "rel-1",
+    source_entity_type: "relationship_thread",
+    sort_order: 5,
+  }),
+  libraryBook({
+    id: "book-prompt-demo",
+    book_type: "prompt_book",
+    title: "Prompt Book",
+    description: "Generated prompt packs, writing-style modules, export settings, and platform targets.",
+    source_entity_id: "prompt-session-1",
+    source_entity_type: "generated_prompt_pack",
+    sort_order: 6,
+  }),
+];
+
+export const sampleStoryBookBindings: StoryBookBinding[] = sampleLibraryBooks.map((book, index) => ({
+  id: `binding-storybook-demo-${book.id}`,
+  storybook_id: "storybook-demo",
+  book_id: book.id,
+  sort_order: index + 1,
+  created_at: now,
+  updated_at: now,
+}));
 
 export const groupedCategoryTags: CategoryTag[] = [
   categoryTag("trope", "Brother's Best Friend", "brothers-best-friend"),
@@ -343,6 +437,20 @@ function corePromptPack(
   return {
     ...pack,
     default_platform_targets: ["JanitorAI", "SillyTavern", "MarinaraTavern"],
+    created_at: now,
+    updated_at: now,
+  };
+}
+
+function libraryBook(
+  book: Omit<LibraryBook, "bookshelf_id" | "created_at" | "payload" | "updated_at"> & {
+    payload?: Record<string, unknown>;
+  },
+): LibraryBook {
+  return {
+    ...book,
+    bookshelf_id: "bookshelf-active-romance",
+    payload: book.payload ?? {},
     created_at: now,
     updated_at: now,
   };

@@ -1,4 +1,5 @@
 import type { CorePromptPack } from "@/features/story-memory/types/story-memory";
+import { globalPromptStackV1 } from "@/features/story-memory/data/global-prompt-stack";
 
 export type PlatformProfile = {
   builderNote: string;
@@ -19,6 +20,7 @@ export type PromptModuleKey =
   | "relationshipPressure"
   | "scenarioSetup"
   | "settingFrame"
+  | "storybookOperationalMode"
   | "styleDialogueVoice"
   | "stylePerspectiveLens"
   | "styleRhythmDensity"
@@ -45,7 +47,10 @@ export function buildPlatformPromptSlots({
   platformProfile: PlatformProfile;
   promptModules: PromptModuleText;
 }): PromptSlot[] {
+  const corePromptPackSource = formatCorePromptPackSource(activeCorePack);
   const globalLines = compactLines([
+    globalPromptStackV1,
+    corePromptPackSource,
     promptModules.povGuardrails,
     promptModules.stylePerspectiveLens,
     promptModules.styleRhythmDensity,
@@ -56,6 +61,7 @@ export function buildPlatformPromptSlots({
     promptModules.activeTags,
   ]);
   const proxyLines = compactLines([
+    promptModules.storybookOperationalMode,
     promptModules.scenarioSetup,
     promptModules.settingFrame,
     promptModules.continuityBranch,
@@ -78,7 +84,10 @@ export function buildPlatformPromptSlots({
         body: [
           platformProfile.generatedFrame,
           "",
-          "[Core Prompt Source]",
+          "[Global Prompt Source]",
+          globalPromptStackV1,
+          "",
+          "[Selected Core Prompt Pack]",
           activeCorePack.base_prompt,
           "",
           "[Prompt Areas To Configure]",
@@ -102,9 +111,13 @@ export function buildPlatformPromptSlots({
           platformProfile.generatedFrame,
           "</agentic-stack-map>",
           "",
-          "<core-prompt-source>",
+          "<global-prompt-source>",
+          globalPromptStackV1,
+          "</global-prompt-source>",
+          "",
+          "<selected-core-prompt-pack>",
           activeCorePack.base_prompt,
-          "</core-prompt-source>",
+          "</selected-core-prompt-pack>",
           "",
           "<prompt-areas-to-configure>",
           platformProfile.promptAreas.map((area) => `- ${area}`).join("\n"),
@@ -123,7 +136,7 @@ export function buildPlatformPromptSlots({
       id: "janitorai-global-prompt",
       label: "Global Prompt",
       helper: "Paste into JanitorAI's global prompt slot.",
-      body: [activeCorePack.base_prompt, ...(globalLines.length ? ["", ...globalLines] : [])].join("\n"),
+      body: globalLines.join("\n\n"),
     },
     {
       id: "janitorai-proxy-prompt",
@@ -161,4 +174,8 @@ export function formatPromptSlots({
 
 function compactLines(lines: string[]) {
   return lines.filter((line) => line.trim().length > 0);
+}
+
+function formatCorePromptPackSource(activeCorePack: CorePromptPack) {
+  return [`[Selected Core Prompt Pack: ${activeCorePack.title}]`, activeCorePack.base_prompt].join("\n");
 }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { globalPromptStackV1 } from "@/features/story-memory/data/global-prompt-stack";
 import type { CorePromptPack } from "@/features/story-memory/types/story-memory";
 
 import {
@@ -42,6 +43,7 @@ describe("buildPlatformPromptSlots", () => {
         relationshipPressure: "Relationship pressure: mutual suspicion with no easy exit.",
         scenarioSetup: "Scenario: a public party left both of them with leverage.",
         settingFrame: "Setting: a private kitchen doorway after the party.",
+        storybookOperationalMode: "StoryBook operational mode.",
         stylePerspectiveLens: "Keep the prose in a close, limited lens.",
       },
     });
@@ -49,13 +51,21 @@ describe("buildPlatformPromptSlots", () => {
     const globalPrompt = slots[0].body;
     const proxyPrompt = slots[1].body;
 
+    expect(globalPrompt).toContain("# GLOBAL PROMPT STACK");
+    expect(globalPrompt).toContain("Do not write {{user}}'s dialogue");
+    expect(globalPrompt).toContain("## Additional Guideline Diagnostics");
+    expect(globalPrompt).toContain("Failure: writing that {{user}} blushes");
+    expect(globalPrompt).toContain("Success: erotic action is physically clear");
     expect(globalPrompt).toContain(corePack.base_prompt);
+    expect(globalPrompt).toContain("[Selected Core Prompt Pack: Changing Perspectives]");
     expect(globalPrompt).toContain("Heat label: Spicy.");
     expect(globalPrompt).toContain("censored language");
     expect(globalPrompt).toContain("close, limited lens");
+    expect(globalPrompt).not.toContain("StoryBook operational mode.");
     expect(globalPrompt).not.toContain("Current scene:");
     expect(globalPrompt).not.toContain("Scenario:");
 
+    expect(proxyPrompt).toContain("StoryBook operational mode.");
     expect(proxyPrompt).toContain("Scenario:");
     expect(proxyPrompt).toContain("Setting:");
     expect(proxyPrompt).toContain("Current scene:");
@@ -77,7 +87,13 @@ describe("buildPlatformPromptSlots", () => {
       },
     });
 
-    expect(slots[0].body).toBe(`${corePack.base_prompt}\n\nPOV guardrail.`);
+    expect(slots[0].body).toBe(
+      [
+        globalPromptStackV1,
+        `[Selected Core Prompt Pack: ${corePack.title}]\n${corePack.base_prompt}`,
+        "POV guardrail.",
+      ].join("\n\n"),
+    );
     expect(slots[1].body).toBe(
       [
         "Use this for the active session layer: scenario, setting, continuity branch, current relationship pressure, secrets, and current scene.",
@@ -124,7 +140,11 @@ describe("formatPromptSlots", () => {
         platformProfile.generatedFrame,
         "",
         "[Global Prompt]",
-        `${corePack.base_prompt}\n\nPOV guardrail.`,
+        [
+          globalPromptStackV1,
+          `[Selected Core Prompt Pack: ${corePack.title}]\n${corePack.base_prompt}`,
+          "POV guardrail.",
+        ].join("\n\n"),
         "",
         "[Proxy Prompt]",
         [
@@ -169,6 +189,7 @@ const emptyPromptModules: PromptModuleText = {
   relationshipPressure: "",
   scenarioSetup: "",
   settingFrame: "",
+  storybookOperationalMode: "",
   styleDialogueVoice: "",
   stylePerspectiveLens: "",
   styleRhythmDensity: "",
