@@ -2,16 +2,23 @@ import type {
   Character,
   ContinuityMode,
   HeatLevelLabel,
+  LibraryBook,
   PovMode,
   RelationshipThread,
   SceneMemory,
   SecretOrReveal,
   SpiceVisibility,
   Story,
+  StoryBook,
 } from "@/features/story-memory/types/story-memory";
 import type { PromptModuleText } from "@/features/story-memory/utils/prompt-slot-builder";
 
 export type PromptModuleDrafts = Partial<Record<keyof PromptModuleText, string>>;
+
+export type StoryBookPackageContext = {
+  books: LibraryBook[];
+  storybook?: StoryBook;
+};
 
 export const povLabels: Record<PovMode, string> = {
   char_pov: "{{char}} POV",
@@ -34,6 +41,7 @@ export function getPromptModuleSuggestions({
   selectedTagLabels,
   spiceVisibility,
   story,
+  storybookPackage,
 }: {
   activeRelationship?: RelationshipThread;
   activeScene?: SceneMemory;
@@ -44,6 +52,7 @@ export function getPromptModuleSuggestions({
   selectedTagLabels: string[];
   spiceVisibility: SpiceVisibility;
   story: Story;
+  storybookPackage?: StoryBookPackageContext;
 }): PromptModuleText {
   const spiceLine =
     spiceVisibility === "censored"
@@ -93,6 +102,7 @@ export function getPromptModuleSuggestions({
       heatLevel,
       spiceVisibility,
       story,
+      storybookPackage,
     }),
     styleDialogueVoice:
       "Dialogue should carry pressure, avoidance, desire, and character-specific voice. Use interiority sparingly and keep it tied to what the active POV can actually perceive or admit.",
@@ -138,6 +148,7 @@ function buildStoryBookOperationalMode({
   heatLevel,
   spiceVisibility,
   story,
+  storybookPackage,
 }: {
   activeRelationship?: RelationshipThread;
   activeScene?: SceneMemory;
@@ -145,9 +156,15 @@ function buildStoryBookOperationalMode({
   heatLevel: HeatLevelLabel;
   spiceVisibility: SpiceVisibility;
   story: Story;
+  storybookPackage?: StoryBookPackageContext;
 }) {
+  const packageLines = buildStoryBookPackageLines(storybookPackage);
+
   return [
     "[EROTIC ROMANTIC ROLEPLAY CONTEXT FRAMEWORK]",
+    "",
+    "0. StoryBook Package Source",
+    ...packageLines,
     "",
     "1. Stable Canon",
     "These facts remain true unless roleplay changes them on-page.",
@@ -215,6 +232,97 @@ function buildStoryBookOperationalMode({
     "",
     "LATEST_USER_MOVE: {{latest_user_move}}",
   ].join("\n");
+}
+
+function buildStoryBookPackageLines(storybookPackage?: StoryBookPackageContext) {
+  if (!storybookPackage?.books.length) {
+    return [
+      "- Prompt generation source: current unsaved story memory session.",
+      "- Saved StoryBook package: no linked Library Books are available yet.",
+    ];
+  }
+
+  const booksByType = new Map(storybookPackage.books.map((book) => [book.book_type, book]));
+  const userBook = booksByType.get("user_book");
+  const characterBook = booksByType.get("character_book");
+  const scenarioBook = booksByType.get("scenario_book");
+  const worldBook = booksByType.get("world_book");
+  const memoryBook = booksByType.get("memory_book");
+  const promptBook = booksByType.get("prompt_book");
+  const formattedPersona = readStringPayload(userBook?.payload, "formattedPersona");
+  const formattedScenarioBook = readStringPayload(scenarioBook?.payload, "formattedScenarioBook");
+  const formattedWorldBook = readStringPayload(worldBook?.payload, "formattedWorldBook");
+  const formattedMemoryBook = readStringPayload(memoryBook?.payload, "formattedMemoryBook");
+  const formattedPromptBook = readStringPayload(promptBook?.payload, "formattedPromptBook");
+  const userDraft = readRecordPayload(userBook?.payload, "draft");
+  const scenarioDraft = readRecordPayload(scenarioBook?.payload, "draft");
+  const worldDraft = readRecordPayload(worldBook?.payload, "draft");
+  const memoryDraft = readRecordPayload(memoryBook?.payload, "draft");
+  const promptDraft = readRecordPayload(promptBook?.payload, "draft");
+  const sourceStoryContext = readRecordPayload(userBook?.payload, "sourceStoryContext");
+
+  return compactLines([
+    `- Prompt generation source: active StoryBook package${
+      storybookPackage.storybook?.title ? ` "${storybookPackage.storybook.title}"` : ""
+    }.`,
+    `- Linked books: ${storybookPackage.books.map((book) => `${book.title} (${displayLabel(book.book_type)})`).join(", ")}.`,
+    characterBook ? `- Character Book source: ${bookSummary(characterBook)}.` : "- Character Book source: not linked.",
+    worldBook ? `- World Book source: ${bookSummary(worldBook)}.` : "- World Book source: active setting/world fields.",
+    formattedWorldBook ? `- Saved World Book:\n${formattedWorldBook}` : "",
+    worldDraft?.loreEntries ? `- Saved modular lore entries: ${String(worldDraft.loreEntries)}` : "",
+    worldDraft?.triggerPrecedence ? `- Saved world trigger precedence: ${String(worldDraft.triggerPrecedence)}` : "",
+    worldDraft?.crossReferences ? `- Saved world cross-references: ${String(worldDraft.crossReferences)}` : "",
+    worldDraft?.worldType ? `- Saved world type: ${String(worldDraft.worldType)}` : "",
+    worldDraft?.rules ? `- Saved world rules: ${String(worldDraft.rules)}` : "",
+    worldDraft?.locations ? `- Saved world locations: ${String(worldDraft.locations)}` : "",
+    userBook ? `- User Book source: ${bookSummary(userBook)}.` : "- User Book source: not linked.",
+    formattedPersona ? `- Saved User Book persona:\n${formattedPersona}` : "",
+    userDraft?.roleInStory ? `- Saved {{user}} role: ${String(userDraft.roleInStory)}` : "",
+    userDraft?.connectionToCharacter ? `- Saved {{user}} connection: ${String(userDraft.connectionToCharacter)}` : "",
+    userDraft?.whatUserKnows ? `- Saved {{user}} starting knowledge: ${String(userDraft.whatUserKnows)}` : "",
+    sourceStoryContext ? `- User Book source context: ${formatRecordSummary(sourceStoryContext)}.` : "",
+    scenarioBook ? `- Scenario Book source: ${bookSummary(scenarioBook)}.` : "- Scenario Book source: current scene memory.",
+    formattedScenarioBook ? `- Saved Scenario Book:\n${formattedScenarioBook}` : "",
+    scenarioDraft?.scenario ? `- Saved scenario: ${String(scenarioDraft.scenario)}` : "",
+    scenarioDraft?.currentScene ? `- Saved current scene: ${String(scenarioDraft.currentScene)}` : "",
+    scenarioDraft?.activePressure ? `- Saved scenario pressure: ${String(scenarioDraft.activePressure)}` : "",
+    scenarioDraft?.nextBeat ? `- Saved next playable beat: ${String(scenarioDraft.nextBeat)}` : "",
+    memoryBook ? `- Memory Book source: ${bookSummary(memoryBook)}.` : "- Memory Book source: active relationships and secrets.",
+    formattedMemoryBook ? `- Saved Memory Book:\n${formattedMemoryBook}` : "",
+    memoryDraft?.relationshipHistories ? `- Saved relationship histories: ${String(memoryDraft.relationshipHistories)}` : "",
+    memoryDraft?.secrets ? `- Saved memory secrets: ${String(memoryDraft.secrets)}` : "",
+    memoryDraft?.knowledgeBoundaries ? `- Saved knowledge boundaries: ${String(memoryDraft.knowledgeBoundaries)}` : "",
+    memoryDraft?.triggerRules ? `- Saved memory trigger rules: ${String(memoryDraft.triggerRules)}` : "",
+    promptBook ? `- Prompt Book source: ${bookSummary(promptBook)}.` : "- Prompt Book source: selected global prompt and generated modules.",
+    formattedPromptBook ? `- Saved Prompt Book:\n${formattedPromptBook}` : "",
+    promptDraft?.globalRules ? `- Saved global rules: ${String(promptDraft.globalRules)}` : "",
+    promptDraft?.proxyRules ? `- Saved proxy rules: ${String(promptDraft.proxyRules)}` : "",
+    promptDraft?.compilerInstructions ? `- Saved compiler instructions: ${String(promptDraft.compilerInstructions)}` : "",
+  ]);
+}
+
+function bookSummary(book: LibraryBook) {
+  return compactLines([book.title, book.description]).join(" - ") || book.title;
+}
+
+function readStringPayload(payload: Record<string, unknown> | undefined, key: string) {
+  const value = payload?.[key];
+  return typeof value === "string" && value.trim().length ? value : "";
+}
+
+function readRecordPayload(payload: Record<string, unknown> | undefined, key: string) {
+  const value = payload?.[key];
+  return value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : null;
+}
+
+function formatRecordSummary(record: Record<string, unknown>) {
+  return Object.entries(record)
+    .map(([key, value]) => {
+      if (Array.isArray(value)) return `${key}: ${value.join(", ") || "none"}`;
+      if (value === null || value === undefined || value === "") return `${key}: none`;
+      return `${key}: ${String(value)}`;
+    })
+    .join("; ");
 }
 
 function compactLines(lines: (string | undefined | null)[]) {

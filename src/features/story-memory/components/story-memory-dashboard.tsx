@@ -100,6 +100,10 @@ type WorkspaceSection =
   | "library"
   | "character-card"
   | "user-persona"
+  | "world-book"
+  | "scenario-book"
+  | "memory-book"
+  | "prompt-book"
   | "participants"
   | "relationships"
   | "secrets"
@@ -113,10 +117,14 @@ const navItems: {
 }[] = [
   { id: "story", label: "Story", icon: BookOpenText },
   { id: "character-card", label: "Character Card", icon: BookOpenText },
+  { id: "world-book", label: "World Book", icon: Layers3 },
   { id: "participants", label: "Participants", icon: UsersRound },
   { id: "relationships", label: "Relationships", icon: Layers3 },
   { id: "secrets", label: "Secrets", icon: LockKeyhole },
+  { id: "scenario-book", label: "Scenario Book", icon: BookOpenText },
+  { id: "memory-book", label: "Memory Book", icon: Brain },
   { id: "user-persona", label: "User Persona", icon: UsersRound },
+  { id: "prompt-book", label: "Prompt Book", icon: MessageSquareText },
   { id: "prompt-packs", label: "Prompt Packs", icon: MessageSquareText },
   { id: "exports", label: "Exports", icon: Download },
   { id: "library", label: "Library", icon: Layers3 },
@@ -127,6 +135,168 @@ const continuityModeOptions: ContinuityMode[] = ["canon", "alt"];
 const platformOptions = ["JanitorAI", "SillyTavern", "MarinaraTavern"];
 
 type PromptModuleExpanded = Record<PromptModuleKey, boolean>;
+type ScenarioBookDraft = {
+  title: string;
+  scenario: string;
+  currentScene: string;
+  setting: string;
+  participants: string;
+  povMode: string;
+  continuityMode: string;
+  chapterArc: string;
+  recentContext: string;
+  activePressure: string;
+  unresolvedHooks: string;
+  nextBeat: string;
+};
+type ScenarioBookDraftField = keyof ScenarioBookDraft;
+
+type WorldBookDraft = {
+  title: string;
+  worldType: string;
+  genreSubgenre: string;
+  tone: string;
+  loreEntries: string;
+  triggerPrecedence: string;
+  crossReferences: string;
+  rules: string;
+  locations: string;
+  factions: string;
+  items: string;
+  events: string;
+  socialStructure: string;
+  sensoryLogic: string;
+  contentBoundaries: string;
+  continuityNotes: string;
+};
+type WorldBookDraftField = keyof WorldBookDraft;
+
+type MemoryBookDraft = {
+  title: string;
+  relationshipHistories: string;
+  secrets: string;
+  knowledgeBoundaries: string;
+  episodicMemory: string;
+  revealedFacts: string;
+  suspicions: string;
+  falseBeliefs: string;
+  emotionalContinuity: string;
+  triggerRules: string;
+};
+type MemoryBookDraftField = keyof MemoryBookDraft;
+
+type PromptBookDraft = {
+  title: string;
+  globalRules: string;
+  proxyRules: string;
+  platformStack: string;
+  povAgencyRules: string;
+  heatSpiceRules: string;
+  styleModules: string;
+  compilerInstructions: string;
+  exportNotes: string;
+};
+type PromptBookDraftField = keyof PromptBookDraft;
+
+const emptyScenarioBookDraft: ScenarioBookDraft = {
+  title: "",
+  scenario: "",
+  currentScene: "",
+  setting: "",
+  participants: "",
+  povMode: "",
+  continuityMode: "",
+  chapterArc: "",
+  recentContext: "",
+  activePressure: "",
+  unresolvedHooks: "",
+  nextBeat: "",
+};
+
+const emptyWorldBookDraft: WorldBookDraft = {
+  title: "",
+  worldType: "",
+  genreSubgenre: "",
+  tone: "",
+  loreEntries: "",
+  triggerPrecedence: "",
+  crossReferences: "",
+  rules: "",
+  locations: "",
+  factions: "",
+  items: "",
+  events: "",
+  socialStructure: "",
+  sensoryLogic: "",
+  contentBoundaries: "",
+  continuityNotes: "",
+};
+
+const emptyMemoryBookDraft: MemoryBookDraft = {
+  title: "",
+  relationshipHistories: "",
+  secrets: "",
+  knowledgeBoundaries: "",
+  episodicMemory: "",
+  revealedFacts: "",
+  suspicions: "",
+  falseBeliefs: "",
+  emotionalContinuity: "",
+  triggerRules: "",
+};
+
+const emptyPromptBookDraft: PromptBookDraft = {
+  title: "",
+  globalRules: "",
+  proxyRules: "",
+  platformStack: "",
+  povAgencyRules: "",
+  heatSpiceRules: "",
+  styleModules: "",
+  compilerInstructions: "",
+  exportNotes: "",
+};
+
+const scenarioBookFields = [
+  { field: "title", label: "Scenario Book title", placeholder: "Kieran / {{user}} Active Scenario", compact: true },
+  { field: "scenario", label: "Scenario", placeholder: "The setup or situation the characters are caught inside." },
+  { field: "currentScene", label: "Current scene", placeholder: "What is happening right now." },
+  { field: "setting", label: "Setting", placeholder: "Location, world context, time, social environment." },
+  { field: "participants", label: "Participants", placeholder: "Who is present or directly involved." },
+  { field: "povMode", label: "POV mode", placeholder: "{{char}} POV, {{user}} POV, narrator/shared POV." },
+  { field: "continuityMode", label: "Continuity mode", placeholder: "Canon, alt, chapter, branch, season, arc." },
+  { field: "chapterArc", label: "Chapter / arc", placeholder: "Where this scene sits in the larger storyline." },
+  { field: "recentContext", label: "Recent context", placeholder: "Relevant recent facts for runtime memory." },
+  { field: "activePressure", label: "Active pressure", placeholder: "The romantic, social, sexual, or practical pressure currently increasing." },
+  { field: "unresolvedHooks", label: "Unresolved hooks", placeholder: "Loose threads the compiler should keep available." },
+  { field: "nextBeat", label: "Next playable beat", placeholder: "The next scene move suggested by current pressure." },
+] satisfies { compact?: boolean; field: ScenarioBookDraftField; label: string; placeholder: string }[];
+
+const memoryBookFields = [
+  { field: "title", label: "Memory Book title", placeholder: "Kieran / {{user}} Memory", compact: true },
+  { field: "relationshipHistories", label: "Relationship histories", placeholder: "How the relationship has changed, with key turning points." },
+  { field: "secrets", label: "Secrets", placeholder: "Who knows, who suspects, who hides it, who pretends not to know." },
+  { field: "knowledgeBoundaries", label: "Knowledge boundaries", placeholder: "Known facts, private truths, suspicions, rumors, misreads." },
+  { field: "episodicMemory", label: "Episodic memory", placeholder: "Scenes, events, aftermath, changed behavior, emotional residue." },
+  { field: "revealedFacts", label: "Revealed facts", placeholder: "Facts that entered play on-page." },
+  { field: "suspicions", label: "Suspicions", placeholder: "What characters suspect but cannot yet confirm." },
+  { field: "falseBeliefs", label: "False beliefs", placeholder: "What a character is wrong about and why it matters." },
+  { field: "emotionalContinuity", label: "Emotional continuity", placeholder: "What hurt, softened, escalated, or changed in the relationship." },
+  { field: "triggerRules", label: "Trigger rules", placeholder: "When memories should activate and what takes precedence." },
+] satisfies { compact?: boolean; field: MemoryBookDraftField; label: string; placeholder: string }[];
+
+const promptBookFields = [
+  { field: "title", label: "Prompt Book title", placeholder: "JanitorAI Prompt Book", compact: true },
+  { field: "globalRules", label: "Global rules", placeholder: "Stable writing law, POV boundaries, consent logic, style law." },
+  { field: "proxyRules", label: "Proxy rules", placeholder: "How to translate saved books into current scene behavior." },
+  { field: "platformStack", label: "Platform stack", placeholder: "JanitorAI, SillyTavern, Marinara stack slots and routing." },
+  { field: "povAgencyRules", label: "POV / agency rules", placeholder: "What can and cannot be narrated for {{user}}." },
+  { field: "heatSpiceRules", label: "Heat / spice rules", placeholder: "Heat label, censored/uncensored behavior, consent boundaries." },
+  { field: "styleModules", label: "Style modules", placeholder: "Writing style, voice, sensory logic, rhythm, tone." },
+  { field: "compilerInstructions", label: "Compiler instructions", placeholder: "How Character/User/World/Scenario/Memory Books route into final prompt." },
+  { field: "exportNotes", label: "Export notes", placeholder: "Platform-specific copy/export notes." },
+] satisfies { compact?: boolean; field: PromptBookDraftField; label: string; placeholder: string }[];
+
 type WritingStylePreset = {
   description: string;
   id: string;
@@ -531,10 +701,10 @@ const bookTypeLabels: Record<BookType, string> = {
 
 const requiredStoryBookTypes: BookType[] = [
   "character_book",
-  "user_book",
-  "scenario_book",
   "world_book",
+  "scenario_book",
   "memory_book",
+  "user_book",
   "prompt_book",
 ];
 const bookTypeOptions = requiredStoryBookTypes;
@@ -580,6 +750,26 @@ export function StoryMemoryDashboard({
     initialStoryBookBindings,
     initialStoryBooks,
   });
+  const initialScenarioBookDraft = getInitialScenarioBookDraft({
+    initialLibraryBooks,
+    initialStoryBookBindings,
+    initialStoryBooks,
+  });
+  const initialWorldBookDraft = getInitialWorldBookDraft({
+    initialLibraryBooks,
+    initialStoryBookBindings,
+    initialStoryBooks,
+  });
+  const initialMemoryBookDraft = getInitialMemoryBookDraft({
+    initialLibraryBooks,
+    initialStoryBookBindings,
+    initialStoryBooks,
+  });
+  const initialPromptBookDraft = getInitialPromptBookDraft({
+    initialLibraryBooks,
+    initialStoryBookBindings,
+    initialStoryBooks,
+  });
   const [bookshelves, setBookshelves] = useState(initialBookshelves);
   const [characters, setCharacters] = useState(initialCharacters);
   const [libraryBooks, setLibraryBooks] = useState(initialLibraryBooks);
@@ -600,6 +790,10 @@ export function StoryMemoryDashboard({
   );
   const [userPersonaDraft, setUserPersonaDraft] = useState<UserPersonaDraft>(emptyUserPersonaDraft);
   const [userPersonaGender, setUserPersonaGender] = useState<UserPersonaGender>("female");
+  const [scenarioBookDraft, setScenarioBookDraft] = useState<ScenarioBookDraft>(initialScenarioBookDraft);
+  const [worldBookDraft, setWorldBookDraft] = useState<WorldBookDraft>(initialWorldBookDraft);
+  const [memoryBookDraft, setMemoryBookDraft] = useState<MemoryBookDraft>(initialMemoryBookDraft);
+  const [promptBookDraft, setPromptBookDraft] = useState<PromptBookDraft>(initialPromptBookDraft);
   const [selectedTagSlugs, setSelectedTagSlugs] = useState<string[]>(initialSelectedTagSlugs);
   const [activeCorePackId, setActiveCorePackId] = useState(corePromptPacks[0]?.id ?? "");
   const [activeWritingStylePresetId, setActiveWritingStylePresetId] = useState(writingStylePresets[0].id);
@@ -672,11 +866,17 @@ export function StoryMemoryDashboard({
         selectedTagLabels,
         spiceVisibility,
         story,
+        storybookPackage: {
+          books: activeStoryBookBooks,
+          storybook: activeStoryBook,
+        },
       }),
     [
       activeRelationship,
       activeScene,
       activeSecret,
+      activeStoryBook,
+      activeStoryBookBooks,
       characters,
       heatLevel,
       povMode,
@@ -1151,7 +1351,7 @@ export function StoryMemoryDashboard({
     const chapterLabel = getFormValue(form, "chapterLabel");
     const narrativeArc = getFormValue(form, "narrativeArc");
     const summary = getFormValue(form, "summary");
-    const participant = getFormValue(form, "participant");
+    const participants = getSceneParticipantIds(form);
     const continuityFlag = getFormValue(form, "continuityFlag");
 
     if (!summary) return;
@@ -1169,7 +1369,7 @@ export function StoryMemoryDashboard({
       chapter_label: chapterLabel,
       narrative_arc: narrativeArc,
       pov_mode: povMode,
-      participants: participant ? [participant] : [],
+      participants,
       summary,
       key_actions: [],
       new_information: [],
@@ -1425,7 +1625,7 @@ export function StoryMemoryDashboard({
       continuity_mode: (getFormValue(form, "continuityMode") || "canon") as ContinuityMode,
       chapter_label: getFormValue(form, "chapterLabel"),
       narrative_arc: getFormValue(form, "narrativeArc"),
-      participants: compactIds([getFormValue(form, "participant")]),
+      participants: getSceneParticipantIds(form),
       summary: getFormValue(form, "summary") || existing.summary,
       continuity_flags: compactIds([getFormValue(form, "continuityFlag")]),
       updated_at: new Date().toISOString(),
@@ -1533,6 +1733,22 @@ export function StoryMemoryDashboard({
     setUserPersonaDraft((current) => ({ ...current, [field]: value }));
   }
 
+  function updateScenarioBookDraft(field: ScenarioBookDraftField, value: string) {
+    setScenarioBookDraft((current) => ({ ...current, [field]: value }));
+  }
+
+  function updateWorldBookDraft(field: WorldBookDraftField, value: string) {
+    setWorldBookDraft((current) => ({ ...current, [field]: value }));
+  }
+
+  function updateMemoryBookDraft(field: MemoryBookDraftField, value: string) {
+    setMemoryBookDraft((current) => ({ ...current, [field]: value }));
+  }
+
+  function updatePromptBookDraft(field: PromptBookDraftField, value: string) {
+    setPromptBookDraft((current) => ({ ...current, [field]: value }));
+  }
+
   function generateUserPersonaFromCard() {
     if (!loadedCharacterCard) {
       setNotice("Load a character card before generating a user persona draft.");
@@ -1541,11 +1757,13 @@ export function StoryMemoryDashboard({
 
     setUserPersonaDraft(
       buildUserPersonaDraftFromCard(loadedCharacterCard, userPersonaGender, {
+        activeCorePack,
         activeRelationship,
         activeScene,
         activeSecret,
         characters,
         selectedTagLabels,
+        selectedTagSlugs,
       }),
     );
     setNotice(`Generated a user persona draft for ${loadedCharacterCard.name ?? "{{char}}"}.`);
@@ -1635,6 +1853,189 @@ export function StoryMemoryDashboard({
     });
   }
 
+  function generateScenarioBookFromContext() {
+    setScenarioBookDraft(
+      buildScenarioBookDraftFromContext({
+        activeRelationship,
+        activeScene,
+        activeSecret,
+        characters,
+        loadedCharacterCard,
+        povMode,
+        story,
+      }),
+    );
+    setNotice("Generated a Scenario Book draft from the active scene and story context.");
+  }
+
+  async function saveScenarioBookDraftAsScenarioBook() {
+    const formattedScenarioBook = formatScenarioBookDraft(scenarioBookDraft);
+
+    if (!formattedScenarioBook.trim()) {
+      setNotice("Generate or edit the Scenario Book before saving.");
+      return;
+    }
+
+    await saveActiveStoryBookSourceBook({
+      bookType: "scenario_book",
+      description: [
+        scenarioBookDraft.scenario ? "Scenario setup and current scene context." : "Runtime scenario memory.",
+        scenarioBookDraft.chapterArc ? `Arc: ${scenarioBookDraft.chapterArc}.` : "",
+      ]
+        .filter(Boolean)
+        .join(" "),
+      payload: {
+        draft: scenarioBookDraft,
+        formattedScenarioBook,
+        sourceStoryContext: {
+          activeRelationshipId: activeRelationship?.id ?? null,
+          activeSceneId: activeScene?.id ?? null,
+          activeSecretId: activeSecret?.id ?? null,
+          sourceCardName: loadedCharacterCard?.name ?? null,
+        },
+      },
+      sourceEntityId: activeScene?.id ?? story.id,
+      sourceEntityType: "scenario_book_draft",
+      title: `${scenarioBookDraft.title || activeStoryBook?.title || "Story"} Scenario Book`,
+    });
+  }
+
+  function generateWorldBookFromContext() {
+    setWorldBookDraft(
+      buildWorldBookDraftFromContext({
+        activeCorePack,
+        activeRelationship,
+        activeScene,
+        activeSecret,
+        characterCard: loadedCharacterCard,
+        selectedTagLabels,
+        story,
+      }),
+    );
+    setNotice("Generated a World Book draft from the active card and story context.");
+  }
+
+  async function saveWorldBookDraftAsWorldBook() {
+    const formattedWorldBook = formatWorldBookDraft(worldBookDraft);
+
+    if (!formattedWorldBook.trim()) {
+      setNotice("Generate or edit the World Book before saving.");
+      return;
+    }
+
+    await saveActiveStoryBookSourceBook({
+      bookType: "world_book",
+      description: [
+        worldBookDraft.worldType ? `World type: ${worldBookDraft.worldType}.` : "Semantic world memory.",
+        worldBookDraft.genreSubgenre ? `Genre: ${worldBookDraft.genreSubgenre}.` : "",
+      ]
+        .filter(Boolean)
+        .join(" "),
+      payload: {
+        draft: worldBookDraft,
+        formattedWorldBook,
+        sourceStoryContext: {
+          activeRelationshipId: activeRelationship?.id ?? null,
+          activeSceneId: activeScene?.id ?? null,
+          activeSecretId: activeSecret?.id ?? null,
+          selectedTagLabels,
+          sourceCardName: loadedCharacterCard?.name ?? null,
+        },
+      },
+      sourceEntityId: worldBookDraft.title || activeStoryBook?.id || story.id,
+      sourceEntityType: "world_book_draft",
+      title: `${worldBookDraft.title || activeStoryBook?.title || "Story"} World Book`,
+    });
+  }
+
+  function generateMemoryBookFromContext() {
+    setMemoryBookDraft(
+      buildMemoryBookDraftFromContext({
+        activeRelationship,
+        activeScene,
+        activeSecret,
+        characters,
+        relationships,
+        scenes,
+        secrets,
+        story,
+      }),
+    );
+    setNotice("Generated a Memory Book draft from relationships, secrets, and scenes.");
+  }
+
+  async function saveMemoryBookDraftAsMemoryBook() {
+    const formattedMemoryBook = formatMemoryBookDraft(memoryBookDraft);
+
+    if (!formattedMemoryBook.trim()) {
+      setNotice("Generate or edit the Memory Book before saving.");
+      return;
+    }
+
+    await saveActiveStoryBookSourceBook({
+      bookType: "memory_book",
+      description: "Secrets, relationship history, knowledge boundaries, and episodic continuity.",
+      payload: {
+        draft: memoryBookDraft,
+        formattedMemoryBook,
+        sourceStoryContext: {
+          relationshipIds: relationships.map((relationship) => relationship.id),
+          sceneIds: scenes.map((scene) => scene.id),
+          secretIds: secrets.map((secret) => secret.id),
+        },
+      },
+      sourceEntityId: activeRelationship?.id ?? activeSecret?.id ?? story.id,
+      sourceEntityType: "memory_book_draft",
+      title: `${memoryBookDraft.title || activeStoryBook?.title || "Story"} Memory Book`,
+    });
+  }
+
+  function generatePromptBookFromContext() {
+    setPromptBookDraft(
+      buildPromptBookDraftFromContext({
+        activeCorePack,
+        heatLevel,
+        platform,
+        promptModuleValues,
+        spiceVisibility,
+        story,
+      }),
+    );
+    setNotice("Generated a Prompt Book draft from platform, POV, heat, and prompt module rules.");
+  }
+
+  async function savePromptBookDraftAsPromptBook() {
+    const formattedPromptBook = formatPromptBookDraft(promptBookDraft);
+
+    if (!formattedPromptBook.trim()) {
+      setNotice("Generate or edit the Prompt Book before saving.");
+      return;
+    }
+
+    await saveActiveStoryBookSourceBook({
+      bookType: "prompt_book",
+      description: [
+        "Procedural memory for prompt compilation.",
+        promptBookDraft.platformStack ? `Platform: ${platform}.` : "",
+      ]
+        .filter(Boolean)
+        .join(" "),
+      payload: {
+        draft: promptBookDraft,
+        formattedPromptBook,
+        sourceStoryContext: {
+          activeCorePackId: activeCorePack?.id ?? null,
+          heatLevel,
+          platform,
+          spiceVisibility,
+        },
+      },
+      sourceEntityId: activeCorePack?.id ?? story.id,
+      sourceEntityType: "prompt_book_draft",
+      title: `${promptBookDraft.title || activeStoryBook?.title || "Story"} Prompt Book`,
+    });
+  }
+
   function generatePromptPack() {
     if (!activeCorePack) return;
 
@@ -1654,7 +2055,9 @@ export function StoryMemoryDashboard({
         source_core_pack_id: activeCorePack.id,
         title: `${activeCorePack.title} for ${platform}`,
         target_platform: platform,
-        tailoring_goal: "Freshly generated from the active story memory session.",
+        tailoring_goal: activeStoryBook
+          ? `Freshly generated from the active StoryBook package: ${activeStoryBook.title}.`
+          : "Freshly generated from the active story memory session.",
         active_pov_mode: povMode,
         spice_visibility_snapshot: spiceVisibility,
         included_sections: getIncludedPromptSections(activePlatformProfile, promptModuleValues),
@@ -2543,6 +2946,68 @@ export function StoryMemoryDashboard({
                 />
               ) : null}
 
+              {activeWorkspaceSection === "world-book" ? (
+                <WorldBookBuilderPanel
+                  draft={worldBookDraft}
+                  onChange={(field, value) => updateWorldBookDraft(field as WorldBookDraftField, value)}
+                  onGenerate={generateWorldBookFromContext}
+                  onSave={() => {
+                    void saveWorldBookDraftAsWorldBook();
+                  }}
+                />
+              ) : null}
+
+              {activeWorkspaceSection === "scenario-book" ? (
+                <StructuredBookBuilderPanel
+                  description="Runtime context for the active setup, current scene, chapter or alt branch, active pressure, and next playable beat."
+                  draft={scenarioBookDraft}
+                  fields={scenarioBookFields}
+                  icon={BookOpenText}
+                  onChange={(field, value) => updateScenarioBookDraft(field as ScenarioBookDraftField, value)}
+                  onGenerate={generateScenarioBookFromContext}
+                  onSave={() => {
+                    void saveScenarioBookDraftAsScenarioBook();
+                  }}
+                  preview={formatScenarioBookDraft(scenarioBookDraft)}
+                  saveLabel="Save as Scenario Book"
+                  title="Scenario Book Builder"
+                />
+              ) : null}
+
+              {activeWorkspaceSection === "memory-book" ? (
+                <StructuredBookBuilderPanel
+                  description="Continuity memory for relationship history, secrets, knowledge boundaries, suspected facts, false beliefs, and episodic memory."
+                  draft={memoryBookDraft}
+                  fields={memoryBookFields}
+                  icon={Brain}
+                  onChange={(field, value) => updateMemoryBookDraft(field as MemoryBookDraftField, value)}
+                  onGenerate={generateMemoryBookFromContext}
+                  onSave={() => {
+                    void saveMemoryBookDraftAsMemoryBook();
+                  }}
+                  preview={formatMemoryBookDraft(memoryBookDraft)}
+                  saveLabel="Save as Memory Book"
+                  title="Memory Book Builder"
+                />
+              ) : null}
+
+              {activeWorkspaceSection === "prompt-book" ? (
+                <StructuredBookBuilderPanel
+                  description="Procedural memory for how the compiler should route StoryBook data into platform-aware prompt stacks."
+                  draft={promptBookDraft}
+                  fields={promptBookFields}
+                  icon={MessageSquareText}
+                  onChange={(field, value) => updatePromptBookDraft(field as PromptBookDraftField, value)}
+                  onGenerate={generatePromptBookFromContext}
+                  onSave={() => {
+                    void savePromptBookDraftAsPromptBook();
+                  }}
+                  preview={formatPromptBookDraft(promptBookDraft)}
+                  saveLabel="Save as Prompt Book"
+                  title="Prompt Book Builder"
+                />
+              ) : null}
+
               {activeWorkspaceSection === "story" ? (
                 <section className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-label="Story memory counts">
                   {stats.map((stat) => (
@@ -2824,7 +3289,7 @@ export function StoryMemoryDashboard({
                     <Panel title="Add Participant" icon={UsersRound}>
                   <form className="grid gap-3" onSubmit={addCharacter}>
                     <Field label="Name" name="name" placeholder="Character name" required />
-                    <Field label="Role" name="role" placeholder="AI-controlled character, user player, rival..." />
+                    <Field label="Role" name="role" placeholder="AI-controlled character, NPC, user player, rival..." />
                     <Field label="Self-belief" name="selfBelief" placeholder="What they believe about themselves" />
                     <TextArea label="Private truth" name="privateTruth" placeholder="Author-known truth, not automatically exported" />
                     <SubmitButton label="Add participant" />
@@ -2846,7 +3311,7 @@ export function StoryMemoryDashboard({
                             <form className="grid gap-3" onSubmit={(event) => void saveCharacterEntry(event, character.id)}>
                               <div className="grid gap-3 sm:grid-cols-2">
                                 <Field defaultValue={character.name} label="Name" name="name" placeholder="Character name" required />
-                                <Field defaultValue={character.role ?? ""} label="Role" name="role" placeholder="AI-controlled character, user player, rival..." />
+                                <Field defaultValue={character.role ?? ""} label="Role" name="role" placeholder="AI-controlled character, NPC, user player, rival..." />
                               </div>
                               <Field
                                 defaultValue={character.self_beliefs[0] ?? ""}
@@ -2989,7 +3454,12 @@ export function StoryMemoryDashboard({
                       <Field label="Chapter" name="chapterLabel" placeholder="Opening, chapter 3, alt opener..." />
                       <Field label="Arc" name="narrativeArc" placeholder="Mutual suspicion, forced proximity..." />
                     </div>
-                    <SelectField label="Main participant" name="participant" options={characterOptions(characters)} />
+                    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                      <SelectField label="Primary participant" name="participantPrimary" options={characterOptions(characters)} />
+                      <SelectField label="NPC / extra 1" name="participantExtraA" options={optionalCharacterOptions(characters)} />
+                      <SelectField label="NPC / extra 2" name="participantExtraB" options={optionalCharacterOptions(characters)} />
+                      <SelectField label="NPC / extra 3" name="participantExtraC" options={optionalCharacterOptions(characters)} />
+                    </div>
                     <TextArea label="Scene" name="summary" placeholder="What is happening right now" required />
                     <Field label="Continuity flag" name="continuityFlag" placeholder="What must not be forgotten next time" />
                     <SubmitButton label="Add current scene" />
@@ -3026,7 +3496,32 @@ export function StoryMemoryDashboard({
                                 <Field defaultValue={scene.chapter_label ?? ""} label="Chapter" name="chapterLabel" placeholder="Opening, chapter 3, alt opener..." />
                                 <Field defaultValue={scene.narrative_arc ?? ""} label="Arc" name="narrativeArc" placeholder="Mutual suspicion, forced proximity..." />
                               </div>
-                              <SelectField defaultValue={scene.participants[0] ?? ""} label="Main participant" name="participant" options={characterOptions(characters)} />
+                              <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                                <SelectField
+                                  defaultValue={scene.participants[0] ?? ""}
+                                  label="Primary participant"
+                                  name="participantPrimary"
+                                  options={characterOptions(characters)}
+                                />
+                                <SelectField
+                                  defaultValue={scene.participants[1] ?? ""}
+                                  label="NPC / extra 1"
+                                  name="participantExtraA"
+                                  options={optionalCharacterOptions(characters)}
+                                />
+                                <SelectField
+                                  defaultValue={scene.participants[2] ?? ""}
+                                  label="NPC / extra 2"
+                                  name="participantExtraB"
+                                  options={optionalCharacterOptions(characters)}
+                                />
+                                <SelectField
+                                  defaultValue={scene.participants[3] ?? ""}
+                                  label="NPC / extra 3"
+                                  name="participantExtraC"
+                                  options={optionalCharacterOptions(characters)}
+                                />
+                              </div>
                               <TextArea defaultValue={scene.summary} label="Scene" name="summary" placeholder="What is happening right now" required />
                               <Field defaultValue={scene.continuity_flags[0] ?? ""} label="Continuity flag" name="continuityFlag" placeholder="What must not be forgotten next time" />
                               <SaveInlineButton label="Save scene" />
@@ -3093,11 +3588,16 @@ export function StoryMemoryDashboard({
                     <p className="font-semibold text-zinc-950">{activeScene?.title ?? "No scene yet"}</p>
                     <p className="mt-2 leading-6">{activeScene?.summary ?? "Scene tracks what is happening right now in the active exchange."}</p>
                     {activeScene ? (
-                      <p className="mt-2 text-xs leading-5 text-zinc-500">
-                        {continuityModeLabels[activeScene.continuity_mode]}
-                        {activeScene.chapter_label ? ` · ${activeScene.chapter_label}` : ""}
-                        {activeScene.narrative_arc ? ` · ${activeScene.narrative_arc}` : ""}
-                      </p>
+                      <div className="mt-2 grid gap-1 text-xs leading-5 text-zinc-500">
+                        <p>
+                          {continuityModeLabels[activeScene.continuity_mode]}
+                          {activeScene.chapter_label ? ` · ${activeScene.chapter_label}` : ""}
+                          {activeScene.narrative_arc ? ` · ${activeScene.narrative_arc}` : ""}
+                        </p>
+                        {activeScene.participants.length ? (
+                          <p>Participants: {formatParticipantNames(activeScene.participants, characters)}</p>
+                        ) : null}
+                      </div>
                     ) : null}
                   </MemoryColumn>
                 </div>
@@ -3360,6 +3860,312 @@ function getSectionBody(text: string, startLabel: string, endLabel?: string) {
   const rawBody = text.slice(bodyStart, endIndex === -1 ? undefined : endIndex);
 
   return rawBody.trim();
+}
+
+function StructuredBookBuilderPanel({
+  description,
+  draft,
+  fields,
+  icon,
+  onChange,
+  onGenerate,
+  onSave,
+  preview,
+  saveLabel,
+  title,
+}: {
+  description: string;
+  draft: Record<string, string>;
+  fields: { compact?: boolean; field: string; label: string; placeholder: string }[];
+  icon: LucideIcon;
+  onChange: (field: string, value: string) => void;
+  onGenerate: () => void;
+  onSave: () => void;
+  preview: string;
+  saveLabel: string;
+  title: string;
+}) {
+  return (
+    <Panel title={title} icon={icon}>
+      <div className="grid gap-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="max-w-2xl text-sm leading-6 text-zinc-600">{description}</p>
+          <div className="flex gap-2">
+            <button
+              className="flex h-9 items-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 hover:bg-zinc-50"
+              onClick={onGenerate}
+              type="button"
+            >
+              <Sparkles className="size-4" aria-hidden="true" />
+              Generate
+            </button>
+            <button
+              className="flex h-9 items-center gap-2 rounded-md bg-zinc-950 px-3 text-sm font-medium text-white hover:bg-zinc-800"
+              onClick={onSave}
+              type="button"
+            >
+              <Save className="size-4" aria-hidden="true" />
+              {saveLabel}
+            </button>
+          </div>
+        </div>
+
+        <div className="grid gap-4 xl:grid-cols-2">
+          {fields.map((field) =>
+            field.compact ? (
+              <WorldBookInput
+                field={field.field}
+                key={field.field}
+                label={field.label}
+                onChange={onChange}
+                placeholder={field.placeholder}
+                value={draft[field.field] ?? ""}
+              />
+            ) : (
+              <WorldBookTextArea
+                field={field.field}
+                key={field.field}
+                label={field.label}
+                onChange={onChange}
+                placeholder={field.placeholder}
+                value={draft[field.field] ?? ""}
+              />
+            ),
+          )}
+        </div>
+
+        <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+          <p className="text-sm font-semibold text-zinc-950">Preview</p>
+          <pre className="mt-3 max-h-96 overflow-auto whitespace-pre-wrap rounded-md bg-white p-3 text-xs leading-5 text-zinc-700">
+            {preview || `[${title}]`}
+          </pre>
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
+function WorldBookBuilderPanel({
+  draft,
+  onChange,
+  onGenerate,
+  onSave,
+}: {
+  draft: WorldBookDraft;
+  onChange: (field: string, value: string) => void;
+  onGenerate: () => void;
+  onSave: () => void;
+}) {
+  const preview = formatWorldBookDraft(draft);
+
+  return (
+    <Panel title="World Book Builder" icon={Layers3}>
+      <div className="grid gap-5">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="max-w-2xl text-sm leading-6 text-zinc-600">
+            Build semantic memory for the StoryBook: world type, rules, locations, factions,
+            objects, events, and genre logic that should remain stable across scenes.
+          </p>
+          <div className="flex gap-2">
+            <button
+              className="flex h-9 items-center gap-2 rounded-md border border-zinc-300 bg-white px-3 text-sm font-medium text-zinc-800 hover:bg-zinc-50"
+              onClick={onGenerate}
+              type="button"
+            >
+              <Sparkles className="size-4" aria-hidden="true" />
+              Generate
+            </button>
+            <button
+              className="flex h-9 items-center gap-2 rounded-md bg-zinc-950 px-3 text-sm font-medium text-white hover:bg-zinc-800"
+              onClick={onSave}
+              type="button"
+            >
+              <Save className="size-4" aria-hidden="true" />
+              Save as World Book
+            </button>
+          </div>
+        </div>
+
+        <div className="grid gap-4 lg:grid-cols-2">
+          <WorldBookInput
+            field="title"
+            label="World Book title"
+            onChange={onChange}
+            placeholder="Kieran Omegaverse Household"
+            value={draft.title}
+          />
+          <WorldBookInput
+            field="worldType"
+            label="World type"
+            onChange={onChange}
+            placeholder="Omegaverse, contemporary university, supernatural court..."
+            value={draft.worldType}
+          />
+          <WorldBookInput
+            field="genreSubgenre"
+            label="Genre / subgenre"
+            onChange={onChange}
+            placeholder="Forbidden omegaverse romance, dark academia, mafia romance..."
+            value={draft.genreSubgenre}
+          />
+          <WorldBookInput
+            field="tone"
+            label="Tone"
+            onChange={onChange}
+            placeholder="Tense, intimate, domestic, taboo-aware, emotionally restrained..."
+            value={draft.tone}
+          />
+        </div>
+
+        <div className="grid gap-4 xl:grid-cols-2">
+          <WorldBookTextArea
+            field="loreEntries"
+            label="Modular lore entries"
+            onChange={onChange}
+            placeholder="Section/type, keys, content, metadata, and linked entities for each meaningful world entity."
+            value={draft.loreEntries}
+          />
+          <WorldBookTextArea
+            field="triggerPrecedence"
+            label="Trigger precedence"
+            onChange={onChange}
+            placeholder="Which entries win when multiple triggers activate; priority, frequency, cooldown, conditions."
+            value={draft.triggerPrecedence}
+          />
+          <WorldBookTextArea
+            field="crossReferences"
+            label="Cross-references"
+            onChange={onChange}
+            placeholder="How characters, locations, factions, items, events, emotional states, and triggers link."
+            value={draft.crossReferences}
+          />
+          <WorldBookTextArea
+            field="rules"
+            label="Rules"
+            onChange={onChange}
+            placeholder="Biology, magic, social laws, household rules, what can and cannot happen casually."
+            value={draft.rules}
+          />
+          <WorldBookTextArea
+            field="locations"
+            label="Locations"
+            onChange={onChange}
+            placeholder="Home, campus, bedrooms, kitchen, pack clinic, lecture hall, neutral ground."
+            value={draft.locations}
+          />
+          <WorldBookTextArea
+            field="factions"
+            label="Factions"
+            onChange={onChange}
+            placeholder="Family, university peers, pack structure, rivals, authority figures, friend groups."
+            value={draft.factions}
+          />
+          <WorldBookTextArea
+            field="items"
+            label="Items"
+            onChange={onChange}
+            placeholder="Suppressants, scent blockers, shared keys, class notes, keepsakes, phones."
+            value={draft.items}
+          />
+          <WorldBookTextArea
+            field="events"
+            label="Events"
+            onChange={onChange}
+            placeholder="Heat cycles, semester deadlines, family dinners, parties, exposure risks."
+            value={draft.events}
+          />
+          <WorldBookTextArea
+            field="socialStructure"
+            label="Social structure"
+            onChange={onChange}
+            placeholder="Status, family expectations, hierarchy, taboo pressure, reputation stakes."
+            value={draft.socialStructure}
+          />
+          <WorldBookTextArea
+            field="sensoryLogic"
+            label="Sensory logic"
+            onChange={onChange}
+            placeholder="Scent, proximity, privacy, weather, texture, sound bleed, biological tells."
+            value={draft.sensoryLogic}
+          />
+          <WorldBookTextArea
+            field="contentBoundaries"
+            label="Content boundaries"
+            onChange={onChange}
+            placeholder="Consenting adults only, no omniscient leakage, rules for taboo/social consequence."
+            value={draft.contentBoundaries}
+          />
+        </div>
+
+        <WorldBookTextArea
+          field="continuityNotes"
+          label="Continuity notes"
+          onChange={onChange}
+          placeholder="What must remain true unless changed on-page."
+          value={draft.continuityNotes}
+        />
+
+        <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+          <p className="text-sm font-semibold text-zinc-950">World Book Preview</p>
+          <pre className="mt-3 max-h-96 overflow-auto whitespace-pre-wrap rounded-md bg-white p-3 text-xs leading-5 text-zinc-700">
+            {preview || "[World Book]"}
+          </pre>
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
+function WorldBookInput({
+  field,
+  label,
+  onChange,
+  placeholder,
+  value,
+}: {
+  field: string;
+  label: string;
+  onChange: (field: string, value: string) => void;
+  placeholder: string;
+  value: string;
+}) {
+  return (
+    <label className="grid gap-1.5 text-sm">
+      <span className="font-medium text-zinc-700">{label}</span>
+      <input
+        className="h-10 rounded-md border border-zinc-300 bg-white px-3 text-sm outline-none focus:border-zinc-950"
+        onChange={(event) => onChange(field, event.target.value)}
+        placeholder={placeholder}
+        value={value}
+      />
+    </label>
+  );
+}
+
+function WorldBookTextArea({
+  field,
+  label,
+  onChange,
+  placeholder,
+  value,
+}: {
+  field: string;
+  label: string;
+  onChange: (field: string, value: string) => void;
+  placeholder: string;
+  value: string;
+}) {
+  return (
+    <label className="grid gap-1.5 text-sm">
+      <span className="font-medium text-zinc-700">{label}</span>
+      <textarea
+        className="min-h-28 rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm leading-6 outline-none focus:border-zinc-950"
+        onChange={(event) => onChange(field, event.target.value)}
+        placeholder={placeholder}
+        value={value}
+      />
+    </label>
+  );
 }
 
 function PromptModuleEditor({
@@ -3711,10 +4517,777 @@ function characterOptions(characters: Character[]) {
     : [{ label: "No participants yet", value: "" }];
 }
 
+function optionalCharacterOptions(characters: Character[]) {
+  return [{ label: "None", value: "" }, ...characterOptions(characters)];
+}
+
+function getSceneParticipantIds(form: HTMLFormElement) {
+  return uniqueText(
+    compactIds([
+      getFormValue(form, "participantPrimary"),
+      getFormValue(form, "participantExtraA"),
+      getFormValue(form, "participantExtraB"),
+      getFormValue(form, "participantExtraC"),
+    ]),
+  );
+}
+
 function bookshelfOptions(bookshelves: Bookshelf[]) {
   return bookshelves.length
     ? bookshelves.map((bookshelf) => ({ label: bookshelf.title, value: bookshelf.id }))
     : [{ label: "Create a bookshelf first", value: "" }];
+}
+
+function buildScenarioBookDraftFromContext({
+  activeRelationship,
+  activeScene,
+  activeSecret,
+  characters,
+  loadedCharacterCard,
+  povMode,
+  story,
+}: {
+  activeRelationship?: RelationshipThread;
+  activeScene?: SceneMemory;
+  activeSecret?: SecretOrReveal;
+  characters: Character[];
+  loadedCharacterCard: LoadedCharacterCard | null;
+  povMode: PovMode;
+  story: Story;
+}): ScenarioBookDraft {
+  const participantNames = formatParticipantNames(activeScene?.participants ?? [], characters);
+  const fallbackParticipantNames = uniqueText([
+    loadedCharacterCard?.name ?? "{{char}}",
+    "{{user}}",
+    ...characters.map((character) => character.name),
+  ]).join(", ");
+
+  return {
+    title: `${story.title} Scenario`,
+    scenario:
+      activeScene?.scenario ??
+      loadedCharacterCard?.scenario ??
+      story.description ??
+      "Define the setup or situation the characters are caught inside.",
+    currentScene:
+      activeScene?.summary ??
+      loadedCharacterCard?.firstMessage ??
+      "Use the latest scene state and latest user move as the current playable moment.",
+    setting: compactTextLines([
+      activeScene?.setting,
+      activeScene?.location ? `Location: ${activeScene.location}.` : "",
+      story.genre || story.subgenre ? `Genre frame: ${compactTextLines([story.genre, story.subgenre]).join(" / ")}.` : "",
+    ]).join("\n"),
+    participants: participantNames || fallbackParticipantNames,
+    povMode: povLabels[povMode] ?? displayLabel(povMode),
+    continuityMode: activeScene ? continuityModeLabels[activeScene.continuity_mode] : "Canon",
+    chapterArc: compactTextLines([activeScene?.chapter_label, activeScene?.narrative_arc]).join(" · "),
+    recentContext: compactTextLines([
+      ...(activeScene?.key_actions ?? []).map((action) => `- ${action}`),
+      ...(activeScene?.new_information ?? []).map((fact) => `- New information: ${fact}`),
+      activeScene?.relationship_shift ? `- Relationship shift: ${activeScene.relationship_shift}` : "",
+      activeScene?.emotional_shift ? `- Emotional shift: ${activeScene.emotional_shift}` : "",
+    ]).join("\n"),
+    activePressure: compactTextLines([
+      activeRelationship?.dynamic_label ? `Relationship: ${activeRelationship.dynamic_label}.` : "",
+      activeRelationship?.next_pressure_point ? `Next pressure: ${activeRelationship.next_pressure_point}` : "",
+      activeSecret?.current_pressure ? `Secret pressure: ${activeSecret.current_pressure}` : "",
+      activeSecret?.title ? `Active secret: ${activeSecret.title}` : "",
+    ]).join("\n"),
+    unresolvedHooks: compactTextLines(activeScene?.unresolved_hooks ?? []).map((hook) => `- ${hook}`).join("\n"),
+    nextBeat:
+      activeRelationship?.next_pressure_point ??
+      activeSecret?.current_pressure ??
+      activeScene?.unresolved_hooks?.[0] ??
+      "Continue from the latest user move without resetting the scene.",
+  };
+}
+
+function buildMemoryBookDraftFromContext({
+  activeRelationship,
+  activeScene,
+  activeSecret,
+  characters,
+  relationships,
+  scenes,
+  secrets,
+  story,
+}: {
+  activeRelationship?: RelationshipThread;
+  activeScene?: SceneMemory;
+  activeSecret?: SecretOrReveal;
+  characters: Character[];
+  relationships: RelationshipThread[];
+  scenes: SceneMemory[];
+  secrets: SecretOrReveal[];
+  story: Story;
+}): MemoryBookDraft {
+  const secretRows = secrets.map((secret) =>
+    compactTextLines([
+      `${secret.title || "Untitled secret"} (${displayLabel(secret.reveal_status)}): ${secret.secret_text}`,
+      `Known by: ${formatParticipantNames(secret.who_knows, characters) || "No one listed"}.`,
+      `Suspected by: ${formatParticipantNames(secret.who_suspects, characters) || "No one listed"}.`,
+      `Hidden by: ${formatParticipantNames(secret.who_is_hiding_it, characters) || "No one listed"}.`,
+      `Pretending not to know: ${formatParticipantNames(secret.who_is_pretending_not_to_know, characters) || "No one listed"}.`,
+      secret.current_pressure ? `Current pressure: ${secret.current_pressure}` : "",
+      secret.consequences_if_revealed ? `Consequences if revealed: ${secret.consequences_if_revealed}` : "",
+    ]).join("\n"),
+  );
+
+  return {
+    title: `${story.title} Memory`,
+    relationshipHistories:
+      relationships
+        .map((relationship) =>
+          compactTextLines([
+            `${relationship.dynamic_label}: ${formatParticipantNames(relationship.participants, characters) || "participants not listed"}`,
+            relationship.current_state ? `Current state: ${relationship.current_state}` : "",
+            relationship.last_major_change ? `Last major change: ${relationship.last_major_change}` : "",
+            relationship.attraction_notes ? `Attraction: ${relationship.attraction_notes}` : "",
+            relationship.conflict_notes ? `Conflict: ${relationship.conflict_notes}` : "",
+            relationship.unresolved_tension ? `Unresolved tension: ${relationship.unresolved_tension}` : "",
+            relationship.next_pressure_point ? `Next pressure: ${relationship.next_pressure_point}` : "",
+          ]).join("\n"),
+        )
+        .join("\n\n") ||
+      (activeRelationship ? `${activeRelationship.dynamic_label}: ${activeRelationship.current_state ?? "active relationship pressure."}` : ""),
+    secrets: secretRows.join("\n\n") || (activeSecret ? `${activeSecret.title}: ${activeSecret.secret_text}` : ""),
+    knowledgeBoundaries:
+      "No character may act on information they have not plausibly learned. Track known facts, suspicions, misread signals, private truths, rumors, unrevealed secrets, and emotional truths separately.",
+    episodicMemory:
+      scenes
+        .map((scene) =>
+          compactTextLines([
+            scene.chapter_label ? `${scene.chapter_label}: ${scene.summary}` : scene.summary,
+            scene.location ? `Location: ${scene.location}` : "",
+            scene.emotional_shift ? `Emotional shift: ${scene.emotional_shift}` : "",
+            scene.relationship_shift ? `Relationship shift: ${scene.relationship_shift}` : "",
+            scene.unresolved_hooks.length ? `Unresolved: ${scene.unresolved_hooks.join("; ")}` : "",
+          ]).join("\n"),
+        )
+        .join("\n\n") || activeScene?.summary || "",
+    revealedFacts: secrets
+      .filter((secret) => secret.reveal_status === "revealed" || secret.reveal_status === "partially_revealed")
+      .map((secret) => `${secret.title || "Secret"}: ${secret.secret_text}`)
+      .join("\n"),
+    suspicions: secrets
+      .filter((secret) => secret.who_suspects.length || secret.reveal_status === "suspected")
+      .map((secret) => `${secret.title || "Secret"} is suspected by ${formatParticipantNames(secret.who_suspects, characters) || "someone unspecified"}.`)
+      .join("\n"),
+    falseBeliefs: secrets
+      .filter((secret) => secret.who_is_wrong.length || secret.who_falsely_believes_they_are_safe.length)
+      .map((secret) =>
+        compactTextLines([
+          `${secret.title || "Secret"}:`,
+          secret.who_is_wrong.length ? `Wrong about it: ${formatParticipantNames(secret.who_is_wrong, characters)}.` : "",
+          secret.who_falsely_believes_they_are_safe.length
+            ? `Falsely believes they are safe: ${formatParticipantNames(secret.who_falsely_believes_they_are_safe, characters)}.`
+            : "",
+        ]).join(" "),
+      )
+      .join("\n"),
+    emotionalContinuity: compactTextLines([
+      activeRelationship?.attraction_notes ? `Attraction: ${activeRelationship.attraction_notes}` : "",
+      activeRelationship?.trust_notes ? `Trust: ${activeRelationship.trust_notes}` : "",
+      activeRelationship?.conflict_notes ? `Conflict: ${activeRelationship.conflict_notes}` : "",
+      activeScene?.emotional_shift ? `Current emotional shift: ${activeScene.emotional_shift}` : "",
+      activeScene?.intimacy_shift ? `Current intimacy shift: ${activeScene.intimacy_shift}` : "",
+    ]).join("\n"),
+    triggerRules: [
+      "Highest priority: current scene state, direct {{user}} action, active secrets, then relationship history.",
+      "Do not reveal hidden memory unless the active POV can know, infer, suspect, or misread it on-page.",
+      "Episodic memory should alter behavior, choices, hesitation, tone, and consequence rather than dumping exposition.",
+    ].join("\n"),
+  };
+}
+
+function buildPromptBookDraftFromContext({
+  activeCorePack,
+  heatLevel,
+  platform,
+  promptModuleValues,
+  spiceVisibility,
+  story,
+}: {
+  activeCorePack?: CorePromptPack;
+  heatLevel: HeatLevelLabel;
+  platform: string;
+  promptModuleValues: PromptModuleText;
+  spiceVisibility: SpiceVisibility;
+  story: Story;
+}): PromptBookDraft {
+  const platformProfile = platformProfiles[platform] ?? platformProfiles.JanitorAI;
+
+  return {
+    title: `${platform} Prompt Book`,
+    globalRules: compactTextLines([
+      activeCorePack?.base_prompt,
+      "Write collaborative narrative roleplay for {{char}}. Preserve {{user}} agency, bounded POV, consent logic, and continuity.",
+      "All sexual/romantic content involves consenting adults only.",
+      story.content_boundaries?.length ? `Content exclusions: ${story.content_boundaries.join("; ")}` : "",
+    ]).join("\n\n"),
+    proxyRules: promptModuleValues.storybookOperationalMode,
+    platformStack: [
+      `Target platform: ${platform}.`,
+      `Primary prompt areas: ${platformProfile.promptAreas.join(", ")}.`,
+      `Included compiler modules: ${getIncludedPromptSections(platformProfile, promptModuleValues).join(", ")}.`,
+      platformProfile.stackStatus ? `Stack status: ${platformProfile.stackStatus}.` : "",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+    povAgencyRules: promptModuleValues.povGuardrails,
+    heatSpiceRules: compactTextLines([
+      `Heat label: ${displayLabel(heatLevel)}.`,
+      `Spice visibility: ${displayLabel(spiceVisibility)}.`,
+      promptModuleValues.heatSpice,
+    ]).join("\n"),
+    styleModules: compactTextLines([
+      promptModuleValues.stylePerspectiveLens,
+      promptModuleValues.styleRhythmDensity,
+      promptModuleValues.styleToneSensory,
+      promptModuleValues.styleDialogueVoice,
+      promptModuleValues.styleSubtextEmotion,
+    ]).join("\n\n"),
+    compilerInstructions: [
+      "Compile in order: Prompt Book -> Character Book -> World Book -> User Book -> Scenario Book -> Memory Book -> Latest User Move.",
+      "World Book supplies semantic memory. Scenario Book supplies active runtime context. Memory Book supplies secrets, relationship history, episodic continuity, and knowledge boundaries.",
+      "Scenario and Memory may update current pressure, but they should not silently rewrite stable Character or World canon.",
+      "The final prompt must leave {{user}} room to act.",
+    ].join("\n"),
+    exportNotes:
+      "Generated prompt packs remain sessional until saved. Saved Library Books become the active StoryBook package source for later exports.",
+  };
+}
+
+function buildWorldBookDraftFromContext({
+  activeCorePack,
+  activeRelationship,
+  activeScene,
+  activeSecret,
+  characterCard,
+  selectedTagLabels,
+  story,
+}: {
+  activeCorePack?: CorePromptPack;
+  activeRelationship?: RelationshipThread;
+  activeScene?: SceneMemory;
+  activeSecret?: SecretOrReveal;
+  characterCard: LoadedCharacterCard | null;
+  selectedTagLabels: string[];
+  story: Story;
+}): WorldBookDraft {
+  const sourceText = [
+    characterCard?.tags.join(" "),
+    characterCard?.description,
+    characterCard?.personality,
+    characterCard?.scenario,
+    characterCard?.firstMessage,
+    characterCard?.creatorNotes,
+    activeScene?.setting,
+    activeScene?.location,
+    activeScene?.scenario,
+    story.description,
+    story.style_notes,
+    selectedTagLabels.join(" "),
+    activeCorePack?.title,
+    activeCorePack?.base_prompt,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  const characterName = characterCard?.name ?? "{{char}}";
+  const worldType = inferWorldType(sourceText);
+  const title = [characterName === "{{char}}" ? story.title : characterName, worldType].filter(Boolean).join(" · ");
+
+  return {
+    title: title || "Active Story World",
+    worldType,
+    genreSubgenre: inferGenreSubgenre(sourceText, selectedTagLabels),
+    tone: [
+      story.style_notes ?? "",
+      activeCorePack?.category ? `${activeCorePack.category} pressure` : "",
+      activeRelationship?.dynamic_label ? `${activeRelationship.dynamic_label} relationship pressure` : "",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+    loreEntries: buildWorldLoreEntries({ activeRelationship, activeScene, activeSecret, characterCard, sourceText }),
+    triggerPrecedence: buildWorldTriggerPrecedence(sourceText),
+    crossReferences: buildWorldCrossReferences({ activeRelationship, activeScene, activeSecret, characterCard, sourceText }),
+    rules: buildWorldRules(sourceText),
+    locations: buildWorldLocations({ activeScene, characterCard, sourceText }),
+    factions: buildWorldFactions(sourceText),
+    items: buildWorldItems(sourceText),
+    events: [
+      activeScene?.scenario ? `Scenario setup: ${activeScene.scenario}.` : "",
+      activeScene?.summary ? `Current scene pressure: ${activeScene.summary}.` : "",
+      activeRelationship?.next_pressure_point ? `Coming pressure: ${activeRelationship.next_pressure_point}.` : "",
+      activeSecret?.title ? `Secret pressure: ${activeSecret.title}.` : "",
+      inferWorldEvents(sourceText),
+    ]
+      .filter(Boolean)
+      .join("\n"),
+    socialStructure: buildSocialStructure(sourceText),
+    sensoryLogic: buildSensoryLogic(sourceText),
+    contentBoundaries: [
+      "All romantic or sexual content involves consenting adults only.",
+      "World rules create pressure and consequence; they do not override {{user}} agency, consent, or authored choices.",
+      /step[-\s]?sibling|sibling|age[-\s]?gap|forbidden/.test(sourceText)
+        ? "Forbidden or family-adjacent pressure must stay grounded in social consequence, secrecy, restraint, and adult consent."
+        : "",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+    continuityNotes: [
+      "World facts remain stable unless changed on-page.",
+      "Characters only know world facts they could plausibly know.",
+      "World events interrupt only when seeded, meaningful, or naturally timed.",
+      activeScene?.continuity_mode ? `Current continuity mode: ${activeScene.continuity_mode}.` : "",
+    ]
+      .filter(Boolean)
+      .join("\n"),
+  };
+}
+
+function buildWorldLoreEntries({
+  activeRelationship,
+  activeScene,
+  activeSecret,
+  characterCard,
+  sourceText,
+}: {
+  activeRelationship?: RelationshipThread;
+  activeScene?: SceneMemory;
+  activeSecret?: SecretOrReveal;
+  characterCard: LoadedCharacterCard | null;
+  sourceText: string;
+}) {
+  const characterName = characterCard?.name ?? "{{char}}";
+  const entries = [
+    characterCard
+      ? [
+          `Section/type: character`,
+          `Keys: ${uniqueText([characterName, "{{char}}", ...(characterCard.tags ?? [])]).join(", ")}`,
+          `Content: ${compactTextLines([characterCard.description, characterCard.personality]).join(" ") || "Primary character card source."}`,
+          "Metadata: priority high; activates when the character, relationship, or direct roleplay interaction is in focus.",
+          "Links: Character Book, User Book, Scenario Book, Memory Book.",
+        ].join("\n")
+      : "",
+    activeScene
+      ? [
+          "Section/type: scene",
+          `Keys: ${uniqueText([activeScene.title ?? "", activeScene.location ?? "", activeScene.setting ?? "", activeScene.chapter_label ?? ""]).join(", ")}`,
+          `Content: ${compactTextLines([activeScene.scenario, activeScene.summary]).join(" ")}`,
+          "Metadata: priority highest during active runtime; refreshes as Scenario Book changes.",
+          "Links: Scenario Book, Memory Book, latest user move.",
+        ].join("\n")
+      : "",
+    activeRelationship
+      ? [
+          "Section/type: relationship",
+          `Keys: ${uniqueText([activeRelationship.dynamic_label, activeRelationship.current_state ?? "", activeRelationship.unresolved_tension ?? ""]).join(", ")}`,
+          `Content: ${compactTextLines([
+            activeRelationship.current_state,
+            activeRelationship.attraction_notes,
+            activeRelationship.conflict_notes,
+            activeRelationship.next_pressure_point,
+          ]).join(" ")}`,
+          "Metadata: priority high; activates for intimacy, conflict, secrets, jealousy, boundaries, and emotional escalation.",
+          "Links: Character Book, User Book, Memory Book, Scenario Book.",
+        ].join("\n")
+      : "",
+    activeSecret
+      ? [
+          "Section/type: secret",
+          `Keys: ${uniqueText([activeSecret.title ?? "", activeSecret.reveal_status, activeSecret.truth_status ?? ""]).join(", ")}`,
+          `Content: ${compactTextLines([activeSecret.secret_text, activeSecret.current_pressure, activeSecret.consequences_if_revealed]).join(" ")}`,
+          "Metadata: priority high but gated by knowledge boundaries; do not leak to a POV that cannot know it.",
+          "Links: Memory Book, Relationship history, active scene pressure.",
+        ].join("\n")
+      : "",
+    /omegaverse|alpha|omega|heat|rut|pack/.test(sourceText)
+      ? [
+          "Section/type: world_rule",
+          "Keys: omegaverse, alpha, omega, heat, rut, scent, pack, suppressant",
+          "Content: Designation biology, scent, heat/rut timing, privacy, suppressants, and status norms shape social risk and physical proximity.",
+          "Metadata: priority medium-high; activates when biology, scent, status, or forced proximity matters.",
+          "Links: World rules, sensory logic, social structure, relationship pressure.",
+        ].join("\n")
+      : "",
+  ].filter(Boolean);
+
+  return entries.join("\n\n") || "Extract each meaningful character, place, faction, item, event, rule, document, or ability as a modular lore entry with keys, content, metadata, and links.";
+}
+
+function buildWorldTriggerPrecedence(sourceText: string) {
+  return [
+    "1. Active Scenario Book and Latest User Move override broad world entries for the current turn.",
+    "2. Character/User/Relationship entries override generic trope or world-type entries when behavior is character-specific.",
+    "3. Secret and Memory entries activate only when the active POV can know, suspect, misread, or plausibly be affected by them.",
+    "4. World rules activate when location, status, biology, faction, item, event, or social consequence is directly relevant.",
+    "5. Background lore stays quiet unless it changes choices, access, pressure, interruption, risk, or continuity.",
+    /omegaverse|alpha|omega|heat|rut|pack/.test(sourceText)
+      ? "Omegaverse biology and scent cues can outrank ordinary social reads, but they do not override {{user}} agency."
+      : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+function buildWorldCrossReferences({
+  activeRelationship,
+  activeScene,
+  activeSecret,
+  characterCard,
+  sourceText,
+}: {
+  activeRelationship?: RelationshipThread;
+  activeScene?: SceneMemory;
+  activeSecret?: SecretOrReveal;
+  characterCard: LoadedCharacterCard | null;
+  sourceText: string;
+}) {
+  return compactTextLines([
+    characterCard?.name ? `${characterCard.name} -> Character Book -> relationship dynamics -> active Scenario Book pressure.` : "",
+    activeRelationship?.dynamic_label
+      ? `${activeRelationship.dynamic_label} -> Memory Book relationship history -> Scenario Book next beat.`
+      : "",
+    activeSecret?.title ? `${activeSecret.title} -> Memory Book secret state -> knowledge boundaries -> reveal consequences.` : "",
+    activeScene?.location ? `${activeScene.location} -> World Book location -> active scene staging -> interruptions and privacy.` : "",
+    /college|university|campus/.test(sourceText)
+      ? "University/campus -> locations, schedules, peers, gossip, deadlines, and social exposure."
+      : "",
+    /omegaverse|alpha|omega|heat|rut|pack/.test(sourceText)
+      ? "Omegaverse designation -> scent logic, social hierarchy, biological events, boundary logic, and intimacy pressure."
+      : "",
+    /family|step[-\s]?sibling|sibling/.test(sourceText)
+      ? "Family/household role -> forbidden pressure, secrecy, domestic proximity, and public reputation."
+      : "",
+  ]).join("\n");
+}
+
+function inferWorldType(sourceText: string) {
+  if (/omegaverse|alpha|omega|beta|heat|rut|pack/.test(sourceText)) return "Omegaverse";
+  if (/vampire|werewolf|witch|fae|demon|angel|supernatural/.test(sourceText)) return "Supernatural";
+  if (/mafia|gang|cartel|underworld|crime/.test(sourceText)) return "Dark romance underworld";
+  if (/spaceship|android|alien|cyberpunk|sci[-\s]?fi|science fiction/.test(sourceText)) return "Science fiction";
+  if (/kingdom|duke|lord|lady|historical|regency|court/.test(sourceText)) return "Historical or courtly";
+  if (/celebrity|rock star|band|idol|actor|tour/.test(sourceText)) return "Celebrity / entertainment";
+  if (/college|university|campus|dorm|class|professor/.test(sourceText)) return "Contemporary university";
+  if (/office|company|boss|coworker|co-worker|workplace/.test(sourceText)) return "Workplace contemporary";
+  return "Contemporary reality";
+}
+
+function inferGenreSubgenre(sourceText: string, selectedTagLabels: string[]) {
+  const signals = [
+    /forbidden|step[-\s]?sibling|sibling|age[-\s]?gap/.test(sourceText) ? "forbidden attraction" : "",
+    /omegaverse|alpha|omega|heat|rut|pack/.test(sourceText) ? "omegaverse romance" : "",
+    /possessive|obsessive|morally grey|dark romance/.test(sourceText) ? "dark romance" : "",
+    /friends?\s*to\s*lovers|best friend|longtime/.test(sourceText) ? "friends-to-lovers" : "",
+    /enemies?\s*to\s*lovers|rival|competitive/.test(sourceText) ? "rivals-to-lovers" : "",
+    ...selectedTagLabels,
+  ].filter(Boolean);
+
+  return uniqueText(signals).join(", ") || "character-driven romantic roleplay";
+}
+
+function buildWorldRules(sourceText: string) {
+  const rules = [
+    /omegaverse|alpha|omega|heat|rut|pack/.test(sourceText)
+      ? "Omegaverse biology, scent, designation, heat/rut timing, suppressants, social expectation, and status language can affect behavior and scene pressure."
+      : "",
+    /step[-\s]?sibling|sibling|family/.test(sourceText)
+      ? "Family-adjacent labels create social risk, secrecy, household consequence, and public/private tension."
+      : "",
+    /age[-\s]?gap|older|younger/.test(sourceText)
+      ? "Age-gap or older-protector framing creates imbalance, restraint, and reputational risk without removing adult agency."
+      : "",
+    /college|university|campus|dorm|class/.test(sourceText)
+      ? "University life creates schedules, deadlines, campus peers, classes, parties, and obligations outside romance."
+      : "",
+    /living together|live together|same roof|shared house|shared home|roommates?/.test(sourceText)
+      ? "Shared living space makes privacy scarce and turns ordinary routines into continuity anchors."
+      : "",
+  ].filter(Boolean);
+
+  return rules.join("\n") || "World rules should shape behavior through consequence, access, social pressure, and plausible limits.";
+}
+
+function buildWorldLocations({
+  activeScene,
+  characterCard,
+  sourceText,
+}: {
+  activeScene?: SceneMemory;
+  characterCard: LoadedCharacterCard | null;
+  sourceText: string;
+}) {
+  const locations = [
+    activeScene?.setting ? `Current setting: ${activeScene.setting}.` : "",
+    activeScene?.location ? `Current location: ${activeScene.location}.` : "",
+    /living together|live together|same roof|shared house|shared home|roommates?/.test(sourceText)
+      ? "Shared home: bedroom doors, kitchen, hallway, bathroom, laundry, late-night common areas, and overheard private moments."
+      : "",
+    /college|university|campus|dorm|class/.test(sourceText)
+      ? "University: lecture halls, library, campus paths, dorms, parties, study spaces, and places where peers can observe tension."
+      : "",
+    characterCard?.scenario ? `Scenario location logic: ${characterCard.scenario}.` : "",
+  ].filter(Boolean);
+
+  return locations.join("\n") || "Define the recurring locations that can carry pressure, interruption, privacy, and routine.";
+}
+
+function buildWorldFactions(sourceText: string) {
+  const factions = [
+    /family|step[-\s]?sibling|sibling|brother|sister/.test(sourceText)
+      ? "Family/household: people with expectations, judgment, access to private routines, and power to create consequence."
+      : "",
+    /college|university|campus|class/.test(sourceText)
+      ? "University circle: classmates, friends, rivals, professors, roommates, and people who can witness or misread proximity."
+      : "",
+    /omegaverse|alpha|omega|pack/.test(sourceText)
+      ? "Omegaverse social groups: designation expectations, pack/family authority, medical support, gossip, and status pressure."
+      : "",
+  ].filter(Boolean);
+
+  return factions.join("\n") || "List recurring groups, institutions, rivals, families, or authority figures.";
+}
+
+function buildWorldItems(sourceText: string) {
+  const items = [
+    /omegaverse|alpha|omega|heat|rut/.test(sourceText)
+      ? "Omegaverse items: suppressants, scent blockers, heat supplies, spare clothes, bedding, medical records, and privacy tools."
+      : "",
+    /college|university|campus|class/.test(sourceText)
+      ? "University items: notebooks, laptops, class schedules, bags, textbooks, keys, phones, and assignment deadlines."
+      : "",
+    /living together|live together|same roof|shared/.test(sourceText)
+      ? "Household items: shared keys, laundry, mugs, towels, bedroom doors, spare blankets, and objects left in the wrong room."
+      : "",
+  ].filter(Boolean);
+
+  return items.join("\n") || "List objects that can become scene anchors, secrets, evidence, comfort items, or logistical pressure.";
+}
+
+function inferWorldEvents(sourceText: string) {
+  const events = [
+    /omegaverse|alpha|omega|heat|rut/.test(sourceText)
+      ? "Biological events: heat/rut risk, scent spikes, suppressant failure, medical appointments, and accidental scent exposure."
+      : "",
+    /college|university|campus|class/.test(sourceText)
+      ? "University events: deadlines, exams, parties, lectures, campus gossip, late study nights, and schedule conflicts."
+      : "",
+    /family|step[-\s]?sibling|sibling/.test(sourceText)
+      ? "Household/family events: dinners, family visits, overheard arguments, shared obligations, and moments where the family label matters."
+      : "",
+  ].filter(Boolean);
+
+  return events.join("\n");
+}
+
+function buildSocialStructure(sourceText: string) {
+  const structure = [
+    /omegaverse|alpha|omega|pack/.test(sourceText)
+      ? "Designation affects how people read power, vulnerability, scent, propriety, and acceptable closeness."
+      : "",
+    /step[-\s]?sibling|sibling|family/.test(sourceText)
+      ? "Family structure makes public perception matter; what looks domestic can become scandalous when desire enters it."
+      : "",
+    /college|university|campus/.test(sourceText)
+      ? "Campus life gives {{user}} an independent social world that can complicate secrecy and proximity."
+      : "",
+  ].filter(Boolean);
+
+  return structure.join("\n") || "Define status, reputation, hierarchy, family roles, legal/social rules, and who notices what.";
+}
+
+function buildSensoryLogic(sourceText: string) {
+  const sensory = [
+    /omegaverse|alpha|omega|scent/.test(sourceText)
+      ? "Scent is readable, intimate, and socially meaningful; changes in scent can betray stress, desire, fear, illness, or proximity."
+      : "",
+    /living together|live together|same roof|shared/.test(sourceText)
+      ? "Domestic sensory continuity matters: thin walls, familiar footsteps, detergent, shower steam, bedding, kitchen sounds, and late-night silence."
+      : "",
+    /college|university|campus/.test(sourceText)
+      ? "Campus sensory texture includes crowded halls, fluorescent classrooms, library quiet, party noise, weather between buildings, and shared transport."
+      : "",
+  ].filter(Boolean);
+
+  return sensory.join("\n") || "Define the sensory rules that make the world feel consistent: weather, sound, smell, privacy, touch, and recurring textures.";
+}
+
+function compactTextLines(lines: (string | undefined | null)[]) {
+  return lines.filter((line): line is string => Boolean(line?.trim()));
+}
+
+function formatParticipantNames(ids: string[], characters: Character[]) {
+  return ids
+    .map((id) => characters.find((character) => character.id === id)?.name ?? id)
+    .filter(Boolean)
+    .join(", ");
+}
+
+function formatWorldBookDraft(draft: WorldBookDraft) {
+  return formatStructuredBookDraft(draft.title || "World Book", [
+    ["World Type", draft.worldType],
+    ["Genre / Subgenre", draft.genreSubgenre],
+    ["Tone", draft.tone],
+    ["Modular Lore Entries", draft.loreEntries],
+    ["Trigger Precedence", draft.triggerPrecedence],
+    ["Cross-References", draft.crossReferences],
+    ["Rules", draft.rules],
+    ["Locations", draft.locations],
+    ["Factions", draft.factions],
+    ["Items", draft.items],
+    ["Events", draft.events],
+    ["Social Structure", draft.socialStructure],
+    ["Sensory Logic", draft.sensoryLogic],
+    ["Content Boundaries", draft.contentBoundaries],
+    ["Continuity Notes", draft.continuityNotes],
+  ]);
+}
+
+function formatScenarioBookDraft(draft: ScenarioBookDraft) {
+  return formatStructuredBookDraft(draft.title || "Scenario Book", [
+    ["Scenario", draft.scenario],
+    ["Current Scene", draft.currentScene],
+    ["Setting", draft.setting],
+    ["Participants", draft.participants],
+    ["POV Mode", draft.povMode],
+    ["Continuity Mode", draft.continuityMode],
+    ["Chapter / Arc", draft.chapterArc],
+    ["Recent Context", draft.recentContext],
+    ["Active Pressure", draft.activePressure],
+    ["Unresolved Hooks", draft.unresolvedHooks],
+    ["Next Playable Beat", draft.nextBeat],
+  ]);
+}
+
+function formatMemoryBookDraft(draft: MemoryBookDraft) {
+  return formatStructuredBookDraft(draft.title || "Memory Book", [
+    ["Relationship Histories", draft.relationshipHistories],
+    ["Secrets", draft.secrets],
+    ["Knowledge Boundaries", draft.knowledgeBoundaries],
+    ["Episodic Memory", draft.episodicMemory],
+    ["Revealed Facts", draft.revealedFacts],
+    ["Suspicions", draft.suspicions],
+    ["False Beliefs", draft.falseBeliefs],
+    ["Emotional Continuity", draft.emotionalContinuity],
+    ["Trigger Rules", draft.triggerRules],
+  ]);
+}
+
+function formatPromptBookDraft(draft: PromptBookDraft) {
+  return formatStructuredBookDraft(draft.title || "Prompt Book", [
+    ["Global Rules", draft.globalRules],
+    ["Proxy Rules", draft.proxyRules],
+    ["Platform Stack", draft.platformStack],
+    ["POV / Agency Rules", draft.povAgencyRules],
+    ["Heat / Spice Rules", draft.heatSpiceRules],
+    ["Style Modules", draft.styleModules],
+    ["Compiler Instructions", draft.compilerInstructions],
+    ["Export Notes", draft.exportNotes],
+  ]);
+}
+
+function formatStructuredBookDraft(title: string, sections: readonly (readonly [string, string])[]) {
+  const body = sections
+    .filter(([, value]) => value.trim().length > 0)
+    .map(([label, value]) => `## ${label}\n${value.trim()}`)
+    .join("\n\n");
+
+  return [`# ${title}`, body].filter(Boolean).join("\n\n").trim();
+}
+
+function readWorldBookDraftFromPayload(payload: Record<string, unknown>): WorldBookDraft {
+  const draft = payload.draft;
+  if (!draft || typeof draft !== "object") return emptyWorldBookDraft;
+  const record = draft as Partial<Record<WorldBookDraftField, unknown>>;
+
+  return {
+    title: readString(record.title),
+    worldType: readString(record.worldType),
+    genreSubgenre: readString(record.genreSubgenre),
+    tone: readString(record.tone),
+    loreEntries: readString(record.loreEntries),
+    triggerPrecedence: readString(record.triggerPrecedence),
+    crossReferences: readString(record.crossReferences),
+    rules: readString(record.rules),
+    locations: readString(record.locations),
+    factions: readString(record.factions),
+    items: readString(record.items),
+    events: readString(record.events),
+    socialStructure: readString(record.socialStructure),
+    sensoryLogic: readString(record.sensoryLogic),
+    contentBoundaries: readString(record.contentBoundaries),
+    continuityNotes: readString(record.continuityNotes),
+  };
+}
+
+function readScenarioBookDraftFromPayload(payload: Record<string, unknown>): ScenarioBookDraft {
+  const draft = payload.draft;
+  if (!draft || typeof draft !== "object") return emptyScenarioBookDraft;
+  const record = draft as Partial<Record<ScenarioBookDraftField, unknown>>;
+
+  return {
+    title: readString(record.title),
+    scenario: readString(record.scenario),
+    currentScene: readString(record.currentScene),
+    setting: readString(record.setting),
+    participants: readString(record.participants),
+    povMode: readString(record.povMode),
+    continuityMode: readString(record.continuityMode),
+    chapterArc: readString(record.chapterArc),
+    recentContext: readString(record.recentContext),
+    activePressure: readString(record.activePressure),
+    unresolvedHooks: readString(record.unresolvedHooks),
+    nextBeat: readString(record.nextBeat),
+  };
+}
+
+function readMemoryBookDraftFromPayload(payload: Record<string, unknown>): MemoryBookDraft {
+  const draft = payload.draft;
+  if (!draft || typeof draft !== "object") return emptyMemoryBookDraft;
+  const record = draft as Partial<Record<MemoryBookDraftField, unknown>>;
+
+  return {
+    title: readString(record.title),
+    relationshipHistories: readString(record.relationshipHistories),
+    secrets: readString(record.secrets),
+    knowledgeBoundaries: readString(record.knowledgeBoundaries),
+    episodicMemory: readString(record.episodicMemory),
+    revealedFacts: readString(record.revealedFacts),
+    suspicions: readString(record.suspicions),
+    falseBeliefs: readString(record.falseBeliefs),
+    emotionalContinuity: readString(record.emotionalContinuity),
+    triggerRules: readString(record.triggerRules),
+  };
+}
+
+function readPromptBookDraftFromPayload(payload: Record<string, unknown>): PromptBookDraft {
+  const draft = payload.draft;
+  if (!draft || typeof draft !== "object") return emptyPromptBookDraft;
+  const record = draft as Partial<Record<PromptBookDraftField, unknown>>;
+
+  return {
+    title: readString(record.title),
+    globalRules: readString(record.globalRules),
+    proxyRules: readString(record.proxyRules),
+    platformStack: readString(record.platformStack),
+    povAgencyRules: readString(record.povAgencyRules),
+    heatSpiceRules: readString(record.heatSpiceRules),
+    styleModules: readString(record.styleModules),
+    compilerInstructions: readString(record.compilerInstructions),
+    exportNotes: readString(record.exportNotes),
+  };
+}
+
+function readString(value: unknown) {
+  return typeof value === "string" ? value : "";
+}
+
+function uniqueText(items: string[]) {
+  return [...new Set(items.map((item) => item.trim()).filter(Boolean))];
 }
 
 function getInitialLoadedCharacterCard({
@@ -3739,6 +5312,105 @@ function getInitialLoadedCharacterCard({
   );
 
   return characterBook ? readCharacterCardFromBookPayload(characterBook.payload) : null;
+}
+
+function getInitialScenarioBookDraft({
+  initialLibraryBooks,
+  initialStoryBookBindings,
+  initialStoryBooks,
+}: {
+  initialLibraryBooks: LibraryBook[];
+  initialStoryBookBindings: StoryBookBinding[];
+  initialStoryBooks: StoryBook[];
+}) {
+  const scenarioBook = getInitialLibraryBookByType({
+    bookType: "scenario_book",
+    initialLibraryBooks,
+    initialStoryBookBindings,
+    initialStoryBooks,
+  });
+
+  return scenarioBook ? readScenarioBookDraftFromPayload(scenarioBook.payload) : emptyScenarioBookDraft;
+}
+
+function getInitialWorldBookDraft({
+  initialLibraryBooks,
+  initialStoryBookBindings,
+  initialStoryBooks,
+}: {
+  initialLibraryBooks: LibraryBook[];
+  initialStoryBookBindings: StoryBookBinding[];
+  initialStoryBooks: StoryBook[];
+}) {
+  const worldBook = getInitialLibraryBookByType({
+    bookType: "world_book",
+    initialLibraryBooks,
+    initialStoryBookBindings,
+    initialStoryBooks,
+  });
+
+  return worldBook ? readWorldBookDraftFromPayload(worldBook.payload) : emptyWorldBookDraft;
+}
+
+function getInitialMemoryBookDraft({
+  initialLibraryBooks,
+  initialStoryBookBindings,
+  initialStoryBooks,
+}: {
+  initialLibraryBooks: LibraryBook[];
+  initialStoryBookBindings: StoryBookBinding[];
+  initialStoryBooks: StoryBook[];
+}) {
+  const memoryBook = getInitialLibraryBookByType({
+    bookType: "memory_book",
+    initialLibraryBooks,
+    initialStoryBookBindings,
+    initialStoryBooks,
+  });
+
+  return memoryBook ? readMemoryBookDraftFromPayload(memoryBook.payload) : emptyMemoryBookDraft;
+}
+
+function getInitialPromptBookDraft({
+  initialLibraryBooks,
+  initialStoryBookBindings,
+  initialStoryBooks,
+}: {
+  initialLibraryBooks: LibraryBook[];
+  initialStoryBookBindings: StoryBookBinding[];
+  initialStoryBooks: StoryBook[];
+}) {
+  const promptBook = getInitialLibraryBookByType({
+    bookType: "prompt_book",
+    initialLibraryBooks,
+    initialStoryBookBindings,
+    initialStoryBooks,
+  });
+
+  return promptBook ? readPromptBookDraftFromPayload(promptBook.payload) : emptyPromptBookDraft;
+}
+
+function getInitialLibraryBookByType({
+  bookType,
+  initialLibraryBooks,
+  initialStoryBookBindings,
+  initialStoryBooks,
+}: {
+  bookType: BookType;
+  initialLibraryBooks: LibraryBook[];
+  initialStoryBookBindings: StoryBookBinding[];
+  initialStoryBooks: StoryBook[];
+}) {
+  const activeStoryBook = initialStoryBooks[0];
+  if (!activeStoryBook) return null;
+
+  const linkedBookIds = new Set(
+    initialStoryBookBindings
+      .filter((binding) => binding.storybook_id === activeStoryBook.id)
+      .map((binding) => binding.book_id),
+  );
+
+  return initialLibraryBooks.find((book) => linkedBookIds.has(book.id) && book.book_type === bookType) ?? null;
 }
 
 function getFormValue(form: HTMLFormElement, name: string) {

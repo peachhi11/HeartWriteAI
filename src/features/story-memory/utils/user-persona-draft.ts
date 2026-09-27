@@ -1,6 +1,7 @@
 import type { UserPersonaDraft, UserPersonaGender } from "@/features/story-memory/types/user-persona";
 import type {
   Character,
+  CorePromptPack,
   RelationshipThread,
   SceneMemory,
   SecretOrReveal,
@@ -22,12 +23,46 @@ type PersonaMatchContext = {
   worldContext: string;
 };
 
+type CardPersonaFacts = {
+  age?: string;
+  charBeliefFacts: string[];
+  hasAgeGap: boolean;
+  identityFacts: string[];
+  isLivingTogether: boolean;
+  isOmega: boolean;
+  isOmegaverse: boolean;
+  isStepSibling: boolean;
+  isUniversityStudent: boolean;
+  relationshipFacts: string[];
+  settingFacts: string[];
+  summaryFacts: string[];
+  worldFacts: string[];
+};
+
+type PersonaSeedProfile = {
+  appearance: string[];
+  backstory: string[];
+  compatibility: string[];
+  interaction: string[];
+  knowledge: string[];
+  opening: string[];
+  psychology: string[];
+  role: string[];
+  romance: string[];
+  scenes: string[];
+  selfConcept: string[];
+  sourceLabels: string[];
+  voice: string[];
+};
+
 export type UserPersonaGenerationContext = {
+  activeCorePack?: CorePromptPack;
   activeRelationship?: RelationshipThread;
   activeScene?: SceneMemory;
   activeSecret?: SecretOrReveal;
   characters?: Character[];
   selectedTagLabels?: string[];
+  selectedTagSlugs?: string[];
 };
 
 export const romanticRoleplayUserPersonaPrompt = `Romantic Roleplay User Persona Character Prompt (Matched for Character Card)
@@ -61,14 +96,18 @@ export function buildUserPersonaDraftFromCard(
   const userFrame = getUserGenderFrame(personaGender, sourceText);
   const matchContext = inferPersonaMatchContext(card, sourceText, characterName);
   const personaFit = inferPersonaFit(sourceText, characterName, userFrame, matchContext);
+  const seedProfile = buildPersonaSeedProfile(generationContext);
   const contextNotes = buildGenerationContextNotes(generationContext);
 
   return {
-    appearancePresentation: buildAppearancePresentation(characterName, userFrame, personaFit),
+    appearancePresentation: appendSeedLines(
+      buildAppearancePresentation(characterName, userFrame, personaFit),
+      seedProfile.appearance,
+    ),
     boundaries: [
-      "{{user}}'s thoughts, dialogue, consent, and choices remain player-controlled.",
+      "{{user}}'s thoughts, dialogue, consent, and choices remain controlled by the human user.",
       "The character card stays source context for {{char}} and the setup, not content to copy into {{user}}.",
-      "{{user}} has their own motives, history, boundaries, and secrets for the player to fill in or revise.",
+      "{{user}} has their own motives, history, boundaries, and secrets that can be filled in or revised.",
       "{{user}} reveals personal history through play, not through omniscient preload.",
       "{{user}} has independent goals, relationships, routines, responsibilities, and stakes that exist even when {{char}} is not present.",
       `${characterName}'s established autonomy stays intact.`,
@@ -85,27 +124,41 @@ export function buildUserPersonaDraftFromCard(
         : "",
       card.personality ? `Personality pressure to fit around: ${compactSentence(card.personality, "card personality")}` : "",
       card.tags.length ? `Relevant card tags: ${card.tags.join(", ")}.` : "No card tags were imported.",
+      personaFit.facts.summaryFacts.length ? `Card-derived persona facts: ${personaFit.facts.summaryFacts.join(", ")}.` : "",
+      seedProfile.sourceLabels.length ? `Persona source patterns: ${seedProfile.sourceLabels.join(", ")}.` : "",
       ...contextNotes,
       "{{user}} fills the missing emotional, thematic, moral, social, professional, ideological, or structural gap in the existing card dynamic.",
       "The persona keeps to what {{user}} can plausibly know, want, hide, or choose.",
     ]
       .filter(Boolean)
       .join("\n"),
-    compatibilityArchitecture: buildCompatibilityArchitecture(characterName, userFrame, personaFit),
-    connectionToCharacter: personaFit.connectionToCharacter,
+    compatibilityArchitecture: appendSeedLines(
+      buildCompatibilityArchitecture(characterName, userFrame, personaFit),
+      seedProfile.compatibility,
+    ),
+    connectionToCharacter: appendSeedLines(personaFit.connectionToCharacter, seedProfile.role),
     displayName: "{{user}}",
-    interactionStyle: buildInteractionStyle(characterName, userFrame, personaFit),
-    narrativeArc: buildNarrativeArc(characterName, userFrame, personaFit),
-    openingAngle: personaFit.openingAngle,
-    psychologyInternalConflict: buildPsychologyInternalConflict(characterName, userFrame, personaFit),
-    relationalBackstory: buildRelationalBackstory(characterName, userFrame, personaFit),
-    romanticIntimateDynamics: buildRomanticIntimateDynamics(characterName, userFrame, personaFit),
-    roleInStory: personaFit.roleInStory,
-    sceneOpportunities: buildSceneOpportunities(characterName, userFrame, personaFit),
-    selfConcept: personaFit.selfConcept,
-    tropeRelationshipWorldContext: buildTropeRelationshipWorldContext(characterName, matchContext),
-    voiceDialogue: buildVoiceDialogue(characterName, userFrame, personaFit),
-    whatUserKnows: personaFit.whatUserKnows,
+    interactionStyle: appendSeedLines(buildInteractionStyle(characterName, userFrame, personaFit), seedProfile.interaction),
+    narrativeArc: appendSeedLines(buildNarrativeArc(characterName, userFrame, personaFit), seedProfile.scenes),
+    openingAngle: appendSeedLines(personaFit.openingAngle, seedProfile.opening),
+    psychologyInternalConflict: appendSeedLines(
+      buildPsychologyInternalConflict(characterName, userFrame, personaFit),
+      seedProfile.psychology,
+    ),
+    relationalBackstory: appendSeedLines(
+      buildRelationalBackstory(characterName, userFrame, personaFit),
+      seedProfile.backstory,
+    ),
+    romanticIntimateDynamics: appendSeedLines(
+      buildRomanticIntimateDynamics(characterName, userFrame, personaFit),
+      seedProfile.romance,
+    ),
+    roleInStory: appendSeedLines(personaFit.roleInStory, seedProfile.role),
+    sceneOpportunities: appendSeedLines(buildSceneOpportunities(characterName, userFrame, personaFit), seedProfile.scenes),
+    selfConcept: prioritizeSeedLines(personaFit.selfConcept, seedProfile.selfConcept),
+    tropeRelationshipWorldContext: buildTropeRelationshipWorldContext(characterName, matchContext, personaFit.facts),
+    voiceDialogue: appendSeedLines(buildVoiceDialogue(characterName, userFrame, personaFit), seedProfile.voice),
+    whatUserKnows: appendSeedLines(personaFit.whatUserKnows, seedProfile.knowledge),
   };
 }
 
@@ -180,6 +233,232 @@ function getGenerationContextSourceText({
 
 function buildGenerationContextNotes(context: UserPersonaGenerationContext) {
   return getGenerationContextSourceText(context).map((line) => `Story setup context: ${line}`);
+}
+
+function buildPersonaSeedProfile({
+  activeCorePack,
+  selectedTagLabels = [],
+  selectedTagSlugs = [],
+}: UserPersonaGenerationContext): PersonaSeedProfile {
+  const seedText = [
+    activeCorePack?.title,
+    activeCorePack?.slug,
+    activeCorePack?.category,
+    activeCorePack?.description,
+    activeCorePack?.base_prompt,
+    ...(activeCorePack?.compatible_tag_slugs ?? []),
+    ...selectedTagLabels,
+    ...selectedTagSlugs,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  const profile = emptyPersonaSeedProfile();
+
+  if (hasSeed(seedText, ["enemies", "rival", "competitive"])) {
+    addSeed(profile, "Rival/competitive", {
+      compatibility: [
+        "Core friction: {{user}} is not agreeable by default; respect grows through competence, clean losses, tactical honesty, and the moment rivalry costs more than it protects.",
+      ],
+      interaction: [
+        "Interaction pattern: {{user}} challenges weak logic, notices tells, and treats banter as a duel where attraction leaks through precision rather than softness.",
+      ],
+      opening: [
+        "{{user}} enters with a concrete win condition, a professional or social stake, and a reason not to give {{char}} the satisfaction of seeing vulnerability first.",
+      ],
+      psychology: [
+        "Pride under pressure: {{user}} would rather look difficult than look needy, and vulnerability feels like giving the rival leverage.",
+      ],
+      role: ["Romantic rival/counterforce whose competence makes {{char}} react, adapt, and choose differently."],
+      scenes: [
+        "Scene pressure: a public competence test where {{user}} beats or saves {{char}}, changing the power balance without requiring a confession.",
+      ],
+      selfConcept: [
+        "{{user}} believes composure is armor and that being underestimated is useful until the rivalry starts touching something personal.",
+      ],
+      voice: [
+        'Voice pattern: clipped challenge, dry praise, and surgical honesty; e.g. "If you want me to fold, try earning it first."',
+      ],
+    });
+  }
+
+  if (hasSeed(seedText, ["friends-to-lovers", "friend", "best friend", "longtime"])) {
+    addSeed(profile, "Friends-to-lovers", {
+      backstory: [
+        "{{user}} carries ordinary intimacy with {{char}}: old jokes, casual access, witnessed bad habits, and memories that make denial harder.",
+      ],
+      compatibility: [
+        "Compatibility pattern: the romance grows from being known too well, not from mystery; conflict comes from risking the friendship's safe shape.",
+      ],
+      knowledge: [
+        "{{user}} knows small, unglamorous facts about {{char}} that outsiders miss, but not {{char}}'s private motives unless they have appeared on-page.",
+      ],
+      scenes: [
+        "Scene pressure: a familiar domestic or routine moment turns charged because both know exactly how normal it used to feel.",
+      ],
+      selfConcept: [
+        "{{user}} sees the bond as something earned over time, which makes wanting more feel like both a temptation and a possible betrayal.",
+      ],
+    });
+  }
+
+  if (hasSeed(seedText, ["situationship", "fwb", "friends with benefits", "one-night", "undefined"])) {
+    addSeed(profile, "Messy relationship/FWB", {
+      compatibility: [
+        "Messy dynamic: {{user}} can tolerate ambiguity in public while privately tracking every inconsistency, claim, touch, and avoidance.",
+      ],
+      interaction: [
+        "Messy-relationship pattern: {{user}} uses plausible deniability, teasing, and selective withdrawal when the arrangement starts asking for emotional truth.",
+      ],
+      psychology: [
+        "Core wound: {{user}} fears becoming convenient, not chosen; the sharper behavior often protects against feeling disposable.",
+      ],
+      romance: [
+        "Intimacy pattern: physical closeness carries history, unfinished meaning, and aftermath; sex or flirtation increases the question instead of settling it.",
+      ],
+      scenes: [
+        "Scene pressure: an almost-casual touch, hookup reference, or morning-after logistics beat forces both characters to define what they keep avoiding.",
+      ],
+    });
+  }
+
+  if (hasSeed(seedText, ["possessive", "obsessive", "dark romance", "morally grey"])) {
+    addSeed(profile, "Dark romance/possessive", {
+      compatibility: [
+        "Dark-romance pattern: {{user}} is drawn to intensity but tests whether protection is care, control, possession, or fear wearing a romantic mask.",
+      ],
+      interaction: [
+        "Possessive-dynamic pattern: {{user}} notices ownership language and answers it with boundaries, provocation, or conditional permission instead of automatic submission.",
+      ],
+      psychology: [
+        "Boundary trait: {{user}} values autonomy enough that being wanted only matters when it does not erase their agency.",
+      ],
+      romance: [
+        "Intimacy pattern: desire is charged by risk, protectiveness, jealousy, and restraint; the key question is what {{char}} can want without taking.",
+      ],
+    });
+  }
+
+  if (hasSeed(seedText, ["dominant", "submissive", "switch", "bdsm", "praise", "degradation", "ddlg", "daddy"])) {
+    addSeed(profile, "BDSM/power dynamic", {
+      compatibility: [
+        "Power-dynamic pattern: compatibility depends on trust, negotiated control, correction, reward, refusal, and aftermath, not a fixed generic script.",
+      ],
+      interaction: [
+        "Power-exchange interaction: {{user}} reads tone, permission, pressure, and restraint; control becomes meaningful only when both characters have something to risk.",
+      ],
+      romance: [
+        "Intimacy pattern: {{user}} may enjoy power exchange, praise, teasing, correction, or surrender when the scene earns it, while consent and {{user}} agency remain explicit boundaries.",
+      ],
+      voice: [
+        'Voice pattern: desire names the power move clearly; e.g. "Ask like you mean it, or stop pretending you are in control."',
+      ],
+    });
+  }
+
+  if (hasSeed(seedText, ["forbidden", "secret relationship", "sibling", "step", "age gap", "brother", "sister"])) {
+    addSeed(profile, "Forbidden attraction", {
+      backstory: [
+        "Forbidden-attraction pressure: {{user}} understands the social map around the desire: who would be hurt, who would judge, and what must stay hidden.",
+      ],
+      compatibility: [
+        "Forbidden compatibility: the romance becomes believable through restraint, cost, secrecy, and choices that prove the attraction is more than access.",
+      ],
+      knowledge: [
+        "{{user}} knows the visible social risk and any public rule around the connection, but private guilt, longing, or justification still has to emerge in play.",
+      ],
+      scenes: [
+        "Scene pressure: a public almost-slip or private near-confession makes the cost of being seen more dangerous than the desire itself.",
+      ],
+    });
+  }
+
+  if (hasSeed(seedText, ["fake dating", "marriage of convenience", "betrothal", "arranged"])) {
+    addSeed(profile, "Arrangement/fake dating", {
+      backstory: [
+        "Arrangement pressure: {{user}} enters with terms, obligations, reputation stakes, or survival needs that make the performance useful before it becomes intimate.",
+      ],
+      compatibility: [
+        "Arrangement compatibility: conflict lives in the gap between what is performed publicly, negotiated privately, and accidentally becomes real.",
+      ],
+      interaction: [
+        "{{user}} tracks contracts, favors, public optics, and private tells; affection becomes suspicious because it was not part of the agreement.",
+      ],
+      scenes: [
+        "Scene pressure: a public performance beat feels too convincing, leaving {{user}} to decide whether to call it strategy or admit it changed something.",
+      ],
+    });
+  }
+
+  if (hasSeed(seedText, ["vampire", "werewolf", "omegaverse", "alpha", "omega", "supernatural", "sci-fi"])) {
+    addSeed(profile, "Supernatural/world rules", {
+      appearance: [
+        "World-specific presentation: {{user}} has visible adaptations to the setting: practical clothing, status markers, protective habits, or sensory tells that belong to the world.",
+      ],
+      compatibility: [
+        "World-rule compatibility: attraction is shaped by biology, status, danger, law, species rules, technology, or social structure instead of floating as generic chemistry.",
+      ],
+      knowledge: [
+        "{{user}} knows the public rules of the world and how those rules affect their body, safety, status, or access to {{char}}.",
+      ],
+      scenes: [
+        "Scene pressure: a world rule interrupts desire at the worst possible time, forcing a choice between instinct, law, secrecy, and care.",
+      ],
+    });
+  }
+
+  if (hasSeed(seedText, ["grumpy", "sunshine", "opposites", "hurt comfort", "class disparity"])) {
+    addSeed(profile, "Dynamic contrast", {
+      compatibility: [
+        "Dynamic contrast: {{user}} meets {{char}} through a meaningful difference in temperament, resources, social ease, class position, or coping style.",
+      ],
+      psychology: [
+        "Contrast trait: {{user}}'s strength is not simple cheer or softness; it is the specific coping strategy that challenges {{char}}'s worldview.",
+      ],
+      scenes: [
+        "Scene pressure: care arrives in the wrong emotional language first, forcing both characters to learn how the other recognizes comfort.",
+      ],
+    });
+  }
+
+  return profile;
+}
+
+function emptyPersonaSeedProfile(): PersonaSeedProfile {
+  return {
+    appearance: [],
+    backstory: [],
+    compatibility: [],
+    interaction: [],
+    knowledge: [],
+    opening: [],
+    psychology: [],
+    role: [],
+    romance: [],
+    scenes: [],
+    selfConcept: [],
+    sourceLabels: [],
+    voice: [],
+  };
+}
+
+function hasSeed(seedText: string, needles: string[]) {
+  return needles.some((needle) => seedText.includes(needle));
+}
+
+function addSeed(profile: PersonaSeedProfile, sourceLabel: string, seed: Partial<Omit<PersonaSeedProfile, "sourceLabels">>) {
+  for (const [key, value] of Object.entries(seed) as [keyof Omit<PersonaSeedProfile, "sourceLabels">, string[]][]) {
+    profile[key].push(...value);
+  }
+  profile.sourceLabels.push(sourceLabel);
+}
+
+function appendSeedLines(base: string, seedLines: string[]) {
+  return [base, ...unique(seedLines)].filter(Boolean).join("\n");
+}
+
+function prioritizeSeedLines(base: string, seedLines: string[]) {
+  return [...unique(seedLines), base].filter(Boolean).join("\n");
 }
 
 function formatNames(ids: string[], characters: Character[] = []) {
@@ -302,6 +581,7 @@ function inferPersonaFit(
   matchContext: PersonaMatchContext,
 ) {
   const lower = sourceText.toLowerCase();
+  const facts = extractCardPersonaFacts(sourceText, characterName, userFrame);
   const partnerName = inferPartnerPressureName(sourceText);
   const hasLongHistory = /\b(before|way before|known him|known her|known them|grew up|childhood|longtime|long-time)\b/.test(
     lower,
@@ -324,15 +604,16 @@ function inferPersonaFit(
           ? `{{user}} is familiar enough with his space to treat the dorm, bed, hoodies, and mess like shared territory, which makes the scene feel lived-in instead of newly introduced.`
           : `Their history feels lived-in, casual, and hard for ${characterName} to neatly explain away.`,
         hasBlurredPhysicalLine
-          ? `Their boundary is already blurred by a private hookup or near-hookup, with the meaning left open for the player.`
-          : "Their boundary can be emotionally charged without deciding the player's exact desire up front.",
+          ? "Their boundary is already blurred by a private hookup or near-hookup, and neither of them can treat the meaning as harmless anymore."
+          : "Their boundary is emotionally charged without pretending {{user}}'s exact desire is already settled.",
         `${partnerName} sees {{user}} as the line ${characterName} keeps crossing, so {{user}}'s presence creates immediate consequence rather than automatic specialness.`,
       ].join(" "),
+      facts,
       fitCues: joinNaturalList(fitCueItems),
       matchContext,
       openingAngle: [
         `{{user}} is still in the room after ${partnerName}'s ultimatum lands and ${characterName} pulls back or changes posture around ${objectFor(userFrame)}.`,
-        `The player can decide whether ${userFrame.pronoun} plays it cool, calls out the hypocrisy, protects ${reflexiveFor(userFrame)}, needles him, or admits the friendship has stopped being clean.`,
+        `${toTitleCase(userFrame.pronoun)} is caught between playing it cool, calling out the hypocrisy, protecting ${reflexiveFor(userFrame)}, needling him, and admitting the friendship has stopped being clean.`,
       ].join(" "),
       roleInStory: `${toTitleCase(userFrame.adjective)} long-time friend and unresolved temptation in ${characterName}'s current relationship conflict, built as a distinct {{user}} persona rather than a rewrite of ${characterName}.`,
       selfConcept: [
@@ -359,7 +640,7 @@ function inferPersonaFit(
     };
   }
 
-  return inferGeneralPersonaFit(sourceText, characterName, userFrame, fitCueItems, matchContext);
+  return inferGeneralPersonaFit(sourceText, characterName, userFrame, fitCueItems, matchContext, facts);
 }
 
 function inferGeneralPersonaFit(
@@ -368,6 +649,7 @@ function inferGeneralPersonaFit(
   userFrame: UserGenderFrame,
   fitCueItems: string[],
   matchContext: PersonaMatchContext,
+  facts: CardPersonaFacts,
 ) {
   const lower = sourceText.toLowerCase();
   const details: string[] = [];
@@ -377,7 +659,7 @@ function inferGeneralPersonaFit(
   }
 
   if (/\b(fwb|friends with benefits|hooked up|hooking up|bathroom|suck|slept with|fucking|kissed)\b/.test(lower)) {
-    details.push("a blurred private boundary the player can define");
+    details.push("a blurred private boundary with unresolved meaning");
   }
 
   if (/\b(girlfriend|boyfriend|partner|pick|stop seeing|jealous)\b/.test(lower)) {
@@ -393,14 +675,179 @@ function inferGeneralPersonaFit(
   }
 
   return {
-    connectionToCharacter: `{{user}} connects to ${characterName} through ${joinNaturalList(details)}. The dynamic plays as ${matchContext.tropeAlignment} inside ${matchContext.worldContext}. ${toTitleCase(userFrame.possessive)} reason to stay, leave, confront, or hide something is specific enough for play while still leaving the player's choices open.`,
+    connectionToCharacter: [
+      `{{user}} connects to ${characterName} through ${joinNaturalList(details)}.`,
+      `The dynamic plays as ${matchContext.tropeAlignment} inside ${matchContext.worldContext}.`,
+      facts.relationshipFacts.length ? facts.relationshipFacts.join(" ") : "",
+      `${toTitleCase(userFrame.possessive)} reason to stay close is concrete enough to create pressure without pre-writing the outcome.`,
+    ]
+      .filter(Boolean)
+      .join(" "),
+    facts,
     fitCues: joinNaturalList(fitCueItems),
     matchContext,
-    openingAngle: `{{user}}'s opening position is an immediate response to ${inferOpeningPressure(sourceText, characterName)}. The player has room to choose whether ${userFrame.pronoun} deflects, confronts, flirts, withdraws, or sets a boundary.`,
-    roleInStory: `${toTitleCase(userFrame.adjective)} user player built as a distinct persona for ${characterName}'s established card, not a rewrite of ${characterName}.`,
-    selfConcept: `{{user}} sees ${reflexiveFor(userFrame)} as ${possessiveArticle(userFrame)} own person in ${characterName}'s life: someone with a private want, a defensible reason to stay close, and at least one line ${userFrame.pronoun} tells ${reflexiveFor(userFrame)} not to cross.`,
-    whatUserKnows: `{{user}} knows ${userFrame.possessive} own history with ${characterName}, what ${userFrame.pronoun} has directly witnessed, and what has been said in front of ${objectFor(userFrame)}. {{user}} may suspect more, but does not automatically know ${characterName}'s internal narration or another character's private thoughts.`,
+    openingAngle: [
+      `{{user}}'s opening position is an immediate response to ${inferOpeningPressure(sourceText, characterName)}.`,
+      formatConcreteOpeningPressure(facts, userFrame, characterName),
+    ]
+      .filter(Boolean)
+      .join(" "),
+    roleInStory: facts.summaryFacts.length
+      ? `{{user}} is the ${joinNaturalList(facts.summaryFacts)} whose presence makes ${characterName}'s established card pressure playable.`
+      : `${toTitleCase(userFrame.adjective)} {{user}} persona built as a distinct romantic counterpart for ${characterName}'s established card, not a rewrite of ${characterName}.`,
+    selfConcept: buildConcreteSelfConcept(facts, userFrame, matchContext),
+    whatUserKnows: [
+      `{{user}} knows ${userFrame.possessive} own history with ${characterName}, what ${userFrame.pronoun} has directly witnessed, and what has been said in front of ${objectFor(userFrame)}.`,
+      facts.identityFacts.join(" "),
+      facts.relationshipFacts.join(" "),
+      facts.worldFacts.join(" "),
+      facts.charBeliefFacts.join(" "),
+      `{{user}} may suspect more, but does not automatically know ${characterName}'s internal narration or another character's private thoughts.`,
+    ]
+      .filter(Boolean)
+      .join(" "),
   };
+}
+
+function buildConcreteSelfConcept(
+  facts: CardPersonaFacts,
+  userFrame: UserGenderFrame,
+  matchContext: PersonaMatchContext,
+) {
+  if (facts.summaryFacts.length) {
+    return [
+      `{{user}} understands ${reflexiveFor(userFrame)} as ${joinNaturalList(facts.summaryFacts)}.`,
+      facts.isOmega ? "Being omega affects how {{user}} manages attention, scent, safety, bodily autonomy, and social assumptions." : "",
+      facts.isUniversityStudent
+        ? "University gives {{user}} an independent identity: studies, campus routines, ambitions, peers, and a future that is not owned by the household."
+        : "",
+      facts.isStepSibling
+        ? "The step-sibling bond makes closeness socially dangerous because family language and forbidden attraction keep crossing wires."
+        : "",
+      facts.isLivingTogether
+        ? "Living together makes distance difficult; {{user}} has to share ordinary space with the person who is becoming emotionally difficult to categorize."
+        : "",
+      facts.charBeliefFacts.length
+        ? `The private self-concept is complicated by ${facts.charBeliefFacts.join(" ")}`
+        : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
+  }
+
+  return `{{user}} understands ${reflexiveFor(userFrame)} through the active pressure of ${matchContext.tropeAlignment}: private want, hidden refusal, the cost of staying close, and the boundary being tempted or redrawn on-page.`;
+}
+
+function extractCardPersonaFacts(
+  sourceText: string,
+  characterName: string,
+  userFrame: UserGenderFrame,
+): CardPersonaFacts {
+  const lower = sourceText.toLowerCase();
+  const age = extractUserAge(sourceText);
+  const isStepSibling = /\bstep[-\s]?(sibling|brother|sister)s?\b|\bstep\s*siblings?\b/.test(lower);
+  const isOmega = /\bomega\b/.test(lower);
+  const isOmegaverse = /\b(omegaverse|alpha|omega|beta|heat|rut|pack)\b/.test(lower);
+  const isLivingTogether = /\b(living together|live together|lives together|same house|same home|same roof|under one roof|under the same roof|shared house|shared home|moved in|moves in|roommates?)\b/.test(
+    lower,
+  );
+  const isUniversityStudent = /\b(university|college|campus|student|lecture|classmate|dorm)\b/.test(lower);
+  const hasAgeGap = /\b(age[-\s]?gap|older|younger|protective older brother|older brother figure)\b/.test(lower);
+  const hasIndifferentRead = /\b(indifferent|doesn'?t care|does not care|apathetic|unaffected)\b/.test(lower);
+  const hasProtectiveOlderBrotherRead = /\b(protective older brother|older brother figure|brother figure)\b/.test(lower);
+  const ageLabel = age ? `${age}-year-old` : userFrame.ageLabel;
+  const identityFacts = [
+    age ? `{{user}} is ${age} years old.` : "",
+    isOmega ? `{{user}} is an omega, so body, status, scent, heat logic, and social expectation can matter in the omegaverse.` : "",
+    isUniversityStudent ? `{{user}} is a university student with classes, campus routines, peers, deadlines, and a life outside the house.` : "",
+  ].filter(Boolean);
+  const relationshipFacts = [
+    isStepSibling
+      ? `{{user}} is ${characterName}'s step-sibling, making the attraction forbidden through family proximity, household history, and social consequence.`
+      : "",
+    isLivingTogether
+      ? `{{user}} and ${characterName} live together or share a home, so privacy, accidental proximity, routines, overheard moments, and domestic boundaries are active pressure.`
+      : "",
+    hasAgeGap
+      ? `An age-gap or older-protector dynamic shapes the imbalance: ${characterName} can be read as older, protective, or brother-like without making {{user}} passive.`
+      : "",
+  ].filter(Boolean);
+  const worldFacts = [
+    isOmegaverse
+      ? "The world is omegaverse, so rank, scent, instinct, biology, household rules, and social stigma can shape attraction and conflict."
+      : "",
+  ].filter(Boolean);
+  const settingFacts = [
+    isUniversityStudent ? "University life gives {{user}} independent obligations, friends, schedule pressure, and reasons to leave the domestic bubble." : "",
+    isLivingTogether ? "Living together turns ordinary spaces into scene anchors: kitchen, hallway, bedroom door, laundry, late-night noise, and shared routines." : "",
+  ].filter(Boolean);
+  const charBeliefFacts = [
+    hasIndifferentRead
+      ? `${characterName} believes {{user}} reads him as indifferent, detached, or emotionally unavailable, which gives him something to misread and overcorrect.`
+      : "",
+    hasProtectiveOlderBrotherRead
+      ? `${characterName} believes {{user}} may see him as a protective older-brother figure, making desire feel harder to name and easier to disguise as care.`
+      : "",
+  ].filter(Boolean);
+  const summaryFacts = [
+    age ? `${ageLabel} ${userFrame.genderLabel}` : "",
+    isOmega ? "omega" : "",
+    isUniversityStudent ? "university student" : "",
+    isStepSibling ? "step-sibling" : "",
+    isLivingTogether ? `living with ${characterName}` : "",
+    isOmegaverse ? "omegaverse" : "",
+    hasAgeGap ? "age-gap/older-protector pressure" : "",
+    hasIndifferentRead ? `${characterName} thinks {{user}} sees him as indifferent` : "",
+    hasProtectiveOlderBrotherRead ? `${characterName} thinks {{user}} sees him as protective/brother-like` : "",
+  ].filter(Boolean);
+
+  return {
+    age,
+    charBeliefFacts,
+    hasAgeGap,
+    identityFacts,
+    isLivingTogether,
+    isOmega,
+    isOmegaverse,
+    isStepSibling,
+    isUniversityStudent,
+    relationshipFacts,
+    settingFacts,
+    summaryFacts,
+    worldFacts,
+  };
+}
+
+function extractUserAge(sourceText: string) {
+  const patterns = [
+    /\{\{user\}\}[^.!?]{0,80}\b(?:is|age|aged|around)?\s*(1[89]|[2-3]\d)\b/i,
+    /\b(?:she|her|woman|girl|omega)\b[^.!?]{0,80}\b(?:is|age|aged|around)?\s*(1[89]|[2-3]\d)\b/i,
+    /\b(1[89]|[2-3]\d)[-\s]*(?:year[-\s]?old|yo)\b[^.!?]{0,80}\b(?:\{\{user\}\}|she|her|woman|girl|omega)\b/i,
+    /\b(?:\{\{user\}\}|she|her|woman|girl|omega)\b[^.!?]{0,80}\b(1[89]|[2-3]\d)[-\s]*(?:year[-\s]?old|yo)\b/i,
+  ];
+
+  for (const pattern of patterns) {
+    const match = sourceText.match(pattern);
+    if (match?.[1]) return match[1];
+  }
+
+  return undefined;
+}
+
+function formatConcreteOpeningPressure(facts: CardPersonaFacts, userFrame: UserGenderFrame, characterName: string) {
+  if (facts.summaryFacts.length) {
+    return `At the start of play, {{user}} is positioned as ${joinNaturalList(facts.summaryFacts)}. ${formatCharBeliefSentence(
+      facts,
+      characterName,
+    )}`.trim();
+  }
+
+  return `${toTitleCase(userFrame.pronoun)} begins with a concrete stake, a private reason to stay close, and a boundary already under pressure.`;
+}
+
+function formatCharBeliefSentence(facts: CardPersonaFacts, characterName: string) {
+  if (!facts.charBeliefFacts.length) return "";
+  return `${characterName}'s read of {{user}} matters: ${facts.charBeliefFacts.join(" ")}`;
 }
 
 function inferOpeningPressure(sourceText: string, characterName: string) {
@@ -467,22 +914,39 @@ function buildAppearancePresentation(
   userFrame: UserGenderFrame,
   personaFit: ReturnType<typeof inferPersonaFit>,
 ) {
+  const identityLine = personaFit.facts.identityFacts.length
+    ? personaFit.facts.identityFacts.join(" ")
+    : `{{user}} is an ${userFrame.ageLabel} ${userFrame.genderLabel} whose presentation contrasts with ${characterName} without feeling engineered for him.`;
+
   return [
-    `{{user}} is an ${userFrame.ageLabel} ${userFrame.genderLabel} whose presentation contrasts with ${characterName} without feeling engineered for him.`,
+    identityLine,
+    personaFit.facts.worldFacts.join(" "),
     `Memorable but editable physical anchors include expressive eyes, a style that signals independence, one distinguishing feature, and a scent or mannerism that can become scene memory.`,
-    `The appearance supports ${personaFit.fitCues}: confident enough to create friction, human enough to carry insecurity, and specific enough for romantic roleplay without deciding how attractive {{user}} feels to the player.`,
+    `The appearance supports ${personaFit.fitCues}: confident enough to create friction, human enough to carry insecurity, and specific enough for romantic roleplay while leaving exact beauty details editable.`,
     `Private vulnerability can sit in small tells: fussing with sleeves, going still when noticed, laughing too sharply, or dressing like ${userFrame.pronoun} is less affected than ${userFrame.pronoun} is.`,
-  ].join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 }
 
-function buildTropeRelationshipWorldContext(characterName: string, matchContext: PersonaMatchContext) {
+function buildTropeRelationshipWorldContext(
+  characterName: string,
+  matchContext: PersonaMatchContext,
+  facts: CardPersonaFacts,
+) {
   return [
     `Trope alignment: ${matchContext.tropeAlignment}.`,
     `Relationship dynamic: ${matchContext.relationshipDynamic}.`,
     `World/setting logic: ${matchContext.worldContext}.`,
+    facts.summaryFacts.length ? `Card-derived user facts: ${facts.summaryFacts.join(", ")}.` : "",
+    facts.relationshipFacts.join(" "),
+    facts.settingFacts.join(" "),
+    facts.charBeliefFacts.join(" "),
     `Primary conflict driver: ${matchContext.conflictDriver}.`,
     `{{user}} is a romantic counterweight to ${characterName}: not automatically perfect for him, but shaped so the active trope, relationship pressure, and world rules generate friction, choice, consequence, and eventual earned compatibility.`,
-  ].join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 }
 
 function buildRelationalBackstory(
@@ -493,11 +957,16 @@ function buildRelationalBackstory(
   return [
     `{{user}}'s backstory gives ${objectFor(userFrame)} a reason to recognize both the best and worst parts of ${characterName}.`,
     `The backstory belongs inside the world container: ${personaFit.matchContext.worldContext}.`,
+    personaFit.facts.identityFacts.join(" "),
+    personaFit.facts.relationshipFacts.join(" "),
+    personaFit.facts.settingFacts.join(" "),
     `${toTitleCase(userFrame.pronoun)} learned early that closeness can become leverage, so ${userFrame.pronoun} tends to watch for changes in tone, loyalty, and who gets chosen in public.`,
     `A past romantic disappointment left ${objectFor(userFrame)} wary of being someone's convenient almost, secret, fallback, or emotional shelter.`,
-    `The useful secret is not a solved tragedy; it is pressure the player can reveal later: why ${userFrame.pronoun} stayed close, what ${userFrame.pronoun} pretended did not hurt, and what line ${userFrame.pronoun} swore ${userFrame.pronoun} would not cross again.`,
+    `The useful secret pressure is personal and playable: why ${userFrame.pronoun} stayed close, what ${userFrame.pronoun} pretended did not hurt, and what line ${userFrame.pronoun} swore ${userFrame.pronoun} would not cross again.`,
     personaFit.connectionToCharacter,
-  ].join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 }
 
 function buildPsychologyInternalConflict(
@@ -507,12 +976,17 @@ function buildPsychologyInternalConflict(
 ) {
   return [
     `Temperament: observant, guardedly affectionate, stubborn under pressure, and quicker to joke or challenge than admit need.`,
+    personaFit.facts.charBeliefFacts.length
+      ? `Pressure from ${characterName}'s misread: ${personaFit.facts.charBeliefFacts.join(" ")}`
+      : "",
     `Core wound: {{user}} fears becoming emotionally optional to ${characterName}, even when ${userFrame.pronoun} acts like ${userFrame.pronoun} can take or leave the situation.`,
     `Coping pattern: ${userFrame.pronoun} hides vulnerability behind competence, banter, controlled distance, or a dare for ${characterName} to be honest first.`,
     `Moral code: {{user}} can want the messy thing without wanting to be cruel; ${userFrame.pronoun} will not knowingly erase ${userFrame.possessive} own dignity just to be chosen.`,
     `Blind spot: ${userFrame.pronoun} may mistake emotional self-protection for clarity, or treat jealousy as proof ${userFrame.pronoun} still has leverage.`,
     `Matched conflict: ${personaFit.fitCues} and ${personaFit.matchContext.conflictDriver} pressure both characters toward honesty without making love feel automatic.`,
-  ].join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 }
 
 function buildRomanticIntimateDynamics(
@@ -521,13 +995,21 @@ function buildRomanticIntimateDynamics(
   personaFit: ReturnType<typeof inferPersonaFit>,
 ) {
   return [
-    `Romantic orientation and relationship style are player-editable; the generated default frames {{user}} as open to adult romantic and sexual tension with ${characterName} when the story earns it.`,
+    `Romantic orientation and relationship style remain editable; the default frame makes {{user}} open to adult romantic and sexual tension with ${characterName} when the story earns it.`,
+    personaFit.facts.isOmegaverse
+      ? "Omegaverse intimacy carries biological, social, and scent/status pressure; desire is shaped by world rules rather than generic chemistry."
+      : "",
+    personaFit.facts.hasAgeGap
+      ? "The age-gap or older-protector layer makes attraction feel charged by care, restraint, imbalance, and the risk of being mistaken for dependence."
+      : "",
     `Attachment style: wary but intensely loyal once trust is proven; ${userFrame.pronoun} wants consistency, not performance.`,
     `Love languages: acts of practical loyalty, sharp private attention, remembered details, and physical closeness that feels chosen rather than claimed by default.`,
     `Power dynamic: responsive and self-possessed. {{user}} can be assertive, teasing, nurturing, guarded, or selectively submissive depending on the scene, but never becomes passive furniture for ${characterName}'s arc.`,
     `Attraction triggers: competence under stress, honesty that costs something, protectiveness without ownership, and ${characterName} noticing what ${userFrame.pronoun} tries to hide.`,
     `Jealousy and growth triggers come from ${personaFit.matchContext.relationshipDynamic}, not generic possessiveness.`,
-  ].join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 }
 
 function buildCompatibilityArchitecture(
@@ -537,13 +1019,17 @@ function buildCompatibilityArchitecture(
 ) {
   return [
     `Compatibility summary: {{user}} is useful for ${characterName}'s story because ${userFrame.pronoun} fills the missing dynamic space around ${personaFit.matchContext.conflictDriver}.`,
+    personaFit.facts.relationshipFacts.join(" "),
+    personaFit.facts.charBeliefFacts.join(" "),
     `Enduring compatibility: shared history or pressure that keeps them in orbit; mutual recognition under stress; chemistry that sharpens through banter, competence, and privately noticed tenderness.`,
     `Enduring conflict: different coping styles, public versus private loyalty, and the cost of admitting the relationship matters inside ${personaFit.matchContext.worldContext}.`,
     `Emotional complementarity: if ${characterName} controls, deflects, or withholds, {{user}} does not simply soothe him; ${userFrame.pronoun} pressures him toward choice while protecting ${userFrame.possessive} own dignity.`,
     `What {{user}} thinks ${userFrame.pronoun} wants: clarity, leverage, and not being made foolish.`,
     `What {{user}} actually needs: proof that being wanted does not require shrinking, waiting silently, or becoming a secret convenience.`,
     `The dynamic creates scenes through values, wounds, responsibilities, communication styles, and life circumstances, not avoidable misunderstandings alone.`,
-  ].join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 }
 
 function buildInteractionStyle(
@@ -553,11 +1039,19 @@ function buildInteractionStyle(
 ) {
   return [
     `Flirtation style: controlled, observant, and a little dangerous when cornered; {{user}} tests whether ${characterName} will tell the truth or take the easy exit.`,
+    personaFit.facts.isUniversityStudent
+      ? "{{user}}'s day-to-day interaction is shaped by university obligations: classes, study stress, campus friends, deadlines, and the need for a life beyond the house."
+      : "",
+    personaFit.facts.isLivingTogether
+      ? "Living together makes interaction domestic and unavoidable: breakfast tension, hallway near-misses, overheard calls, shared chores, and silence through thin walls."
+      : "",
     `Communication style: banter first, sincerity when pushed, silence when hurt, and precise questions when ${userFrame.pronoun} wants to make ${characterName} choose his words carefully.`,
     `In groups, {{user}} can look composed and socially capable; one-on-one, the history has more room to show through small provocations, withheld softness, and unfinished sentences.`,
     `Conflict approach: ${userFrame.pronoun} may confront if the hypocrisy is obvious, withdraw if dignity feels threatened, or turn playful when direct vulnerability feels too costly.`,
-    `The interaction keeps ${personaFit.matchContext.tropeAlignment} and ${personaFit.matchContext.relationshipDynamic} active while leaving the player room to decide each move.`,
-  ].join(" ");
+    `The interaction keeps ${personaFit.matchContext.tropeAlignment} and ${personaFit.matchContext.relationshipDynamic} active through observable behavior, not prewritten choices.`,
+  ]
+    .filter(Boolean)
+    .join(" ");
 }
 
 function buildSceneOpportunities(
@@ -609,7 +1103,7 @@ function buildVoiceDialogue(
     `Jealousy line: "I'm not jealous. I just hate watching you lie badly."`,
     `Vulnerability line: "I know exactly where I stand. That's the problem."`,
     `Confession line: "I didn't mean to become the person I looked for in every room. I just did."`,
-    `These lines are player-facing examples to adapt; they do not force {{user}}'s exact dialogue in play. The match target is ${characterName}, and the active pressure is ${personaFit.fitCues}.`,
+    `Dialogue style stays adaptable; these examples show voice, pressure, and emotional angle without forcing {{user}}'s exact lines in play. The match target is ${characterName}, and the active pressure is ${personaFit.fitCues}.`,
   ].join("\n");
 }
 
@@ -633,9 +1127,4 @@ function objectFor(frame: UserGenderFrame) {
   if (frame.pronoun === "she") return "her";
   if (frame.pronoun === "he") return "him";
   return "them";
-}
-
-function possessiveArticle(frame: UserGenderFrame) {
-  if (frame.pronoun === "they") return "their";
-  return `${frame.possessive}`;
 }

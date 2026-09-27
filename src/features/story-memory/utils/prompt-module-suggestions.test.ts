@@ -3,12 +3,14 @@ import { describe, expect, it } from "vitest";
 import type {
   Character,
   HeatLevelLabel,
+  LibraryBook,
   PovMode,
   RelationshipThread,
   SceneMemory,
   SecretOrReveal,
   SpiceVisibility,
   Story,
+  StoryBook,
 } from "@/features/story-memory/types/story-memory";
 import type { PromptModuleText } from "@/features/story-memory/utils/prompt-slot-builder";
 
@@ -84,6 +86,157 @@ describe("getPromptModuleSuggestions", () => {
     );
     expect(suggestions.storybookOperationalMode).toContain("Heat label: Explicit.");
     expect(suggestions.storybookOperationalMode).toContain("Spice visibility: uncensored.");
+  });
+
+  it("pulls saved User Book and linked StoryBook package details into the operational mode", () => {
+    const suggestions = makeSuggestions({
+      storybookPackage: {
+        books: [
+          makeLibraryBook({
+            book_type: "character_book",
+            description: "Saved Rowan character card.",
+            title: "Rowan Character Book",
+          }),
+          makeLibraryBook({
+            book_type: "world_book",
+            description: "Saved theatre world.",
+            payload: {
+              draft: {
+                crossReferences: "Main stage -> public exposure -> career pressure.",
+                loreEntries:
+                  "Section/type: location\nKeys: main stage, green room\nContent: Public reputation and private rehearsal spaces.",
+                locations: "Main stage, green room, rehearsal hall.",
+                rules: "Reputation and casting politics shape access.",
+                triggerPrecedence: "Active scene beats outrank general theatre lore.",
+                worldType: "Contemporary theatre",
+              },
+              formattedWorldBook:
+                "# Rowan Theatre World\n\n## Rules\nReputation and casting politics shape access.\n\n## Locations\nMain stage, green room, rehearsal hall.",
+            },
+            title: "Theatre World Book",
+          }),
+          makeLibraryBook({
+            book_type: "scenario_book",
+            description: "Saved active theatre scenario.",
+            payload: {
+              draft: {
+                activePressure: "Opening night forces Rowan and {{user}} into the same locked dressing room.",
+                currentScene: "Rowan finds {{user}} holding the missing contract.",
+                nextBeat: "{{user}} has to decide whether to confront him or hide the page.",
+                scenario: "Rival performers are trapped inside the same production scandal.",
+              },
+              formattedScenarioBook:
+                "# Rowan Scenario\n\n## Scenario\nRival performers are trapped inside the same production scandal.\n\n## Active Pressure\nOpening night forces Rowan and {{user}} into the same locked dressing room.",
+            },
+            title: "Opening Night Scenario Book",
+          }),
+          makeLibraryBook({
+            book_type: "memory_book",
+            description: "Saved theatre memory.",
+            payload: {
+              draft: {
+                knowledgeBoundaries: "Rowan does not know {{user}} copied the contract yet.",
+                relationshipHistories: "Rivalry became reluctant trust after the casting leak.",
+                secrets: "The contract is hidden in {{user}}'s bag; Rowan suspects another actor.",
+                triggerRules: "Secrets activate only when a character can plausibly know or suspect them.",
+              },
+              formattedMemoryBook:
+                "# Rowan Memory\n\n## Secrets\nThe contract is hidden in {{user}}'s bag; Rowan suspects another actor.",
+            },
+            title: "Theatre Memory Book",
+          }),
+          makeLibraryBook({
+            book_type: "user_book",
+            description: "Saved {{user}} persona.",
+            payload: {
+              draft: {
+                connectionToCharacter: "{{user}} knows why Rowan stayed.",
+                roleInStory: "Rival performer with private leverage.",
+                whatUserKnows: "{{user}} knows Rowan rejected another role.",
+              },
+              formattedPersona: "[{{user}} Persona]\nRole: Rival performer with private leverage.",
+              sourceStoryContext: {
+                activeRelationshipId: "rel-1",
+                activeSecretId: "secret-1",
+                selectedTagLabels: ["Enemies to Lovers", "Competitive"],
+              },
+            },
+            title: "{{user}} User Book",
+          }),
+          makeLibraryBook({
+            book_type: "prompt_book",
+            description: "Saved Janitor prompt routing.",
+            payload: {
+              draft: {
+                compilerInstructions:
+                  "Compile Prompt Book, Character Book, World Book, User Book, Scenario Book, Memory Book, then Latest User Move.",
+                globalRules: "Preserve {{user}} agency and theatre rivalry pressure.",
+                proxyRules: "Current scene pressure translates saved books into live behavior.",
+              },
+              formattedPromptBook:
+                "# Rowan Prompt Book\n\n## Compiler Instructions\nCompile Prompt Book, Character Book, World Book, User Book, Scenario Book, Memory Book, then Latest User Move.",
+            },
+            title: "Janitor Prompt Book",
+          }),
+        ],
+        storybook: makeStoryBook({ title: "Rowan / {{user}} StoryBook" }),
+      },
+    });
+
+    expect(suggestions.storybookOperationalMode).toContain(
+      'Prompt generation source: active StoryBook package "Rowan / {{user}} StoryBook".',
+    );
+    expect(suggestions.storybookOperationalMode).toContain("Character Book source: Rowan Character Book");
+    expect(suggestions.storybookOperationalMode).toContain("User Book source: {{user}} User Book");
+    expect(suggestions.storybookOperationalMode).toContain("[{{user}} Persona]");
+    expect(suggestions.storybookOperationalMode).toContain("Saved {{user}} role: Rival performer with private leverage.");
+    expect(suggestions.storybookOperationalMode).toContain("Saved {{user}} connection: {{user}} knows why Rowan stayed.");
+    expect(suggestions.storybookOperationalMode).toContain(
+      "Saved {{user}} starting knowledge: {{user}} knows Rowan rejected another role.",
+    );
+    expect(suggestions.storybookOperationalMode).toContain(
+      "selectedTagLabels: Enemies to Lovers, Competitive",
+    );
+    expect(suggestions.storybookOperationalMode).toContain("Scenario Book source: Opening Night Scenario Book");
+    expect(suggestions.storybookOperationalMode).toContain("Saved Scenario Book:");
+    expect(suggestions.storybookOperationalMode).toContain(
+      "Saved scenario: Rival performers are trapped inside the same production scandal.",
+    );
+    expect(suggestions.storybookOperationalMode).toContain(
+      "Saved scenario pressure: Opening night forces Rowan and {{user}} into the same locked dressing room.",
+    );
+    expect(suggestions.storybookOperationalMode).toContain(
+      "Saved next playable beat: {{user}} has to decide whether to confront him or hide the page.",
+    );
+    expect(suggestions.storybookOperationalMode).toContain("World Book source: Theatre World Book");
+    expect(suggestions.storybookOperationalMode).toContain("Saved World Book:");
+    expect(suggestions.storybookOperationalMode).toContain("Saved modular lore entries:");
+    expect(suggestions.storybookOperationalMode).toContain(
+      "Saved world trigger precedence: Active scene beats outrank general theatre lore.",
+    );
+    expect(suggestions.storybookOperationalMode).toContain(
+      "Saved world cross-references: Main stage -> public exposure -> career pressure.",
+    );
+    expect(suggestions.storybookOperationalMode).toContain("Saved world type: Contemporary theatre");
+    expect(suggestions.storybookOperationalMode).toContain(
+      "Saved world rules: Reputation and casting politics shape access.",
+    );
+    expect(suggestions.storybookOperationalMode).toContain(
+      "Saved world locations: Main stage, green room, rehearsal hall.",
+    );
+    expect(suggestions.storybookOperationalMode).toContain("Memory Book source: Theatre Memory Book");
+    expect(suggestions.storybookOperationalMode).toContain("Saved Memory Book:");
+    expect(suggestions.storybookOperationalMode).toContain(
+      "Saved memory secrets: The contract is hidden in {{user}}'s bag; Rowan suspects another actor.",
+    );
+    expect(suggestions.storybookOperationalMode).toContain(
+      "Saved knowledge boundaries: Rowan does not know {{user}} copied the contract yet.",
+    );
+    expect(suggestions.storybookOperationalMode).toContain("Prompt Book source: Janitor Prompt Book");
+    expect(suggestions.storybookOperationalMode).toContain("Saved Prompt Book:");
+    expect(suggestions.storybookOperationalMode).toContain(
+      "Saved compiler instructions: Compile Prompt Book, Character Book, World Book, User Book, Scenario Book, Memory Book, then Latest User Move.",
+    );
   });
 
   it("uses roleplay scenario and setting terminology from the active scene", () => {
@@ -187,6 +340,7 @@ function makeSuggestions({
   selectedTagLabels = [],
   spiceVisibility = "censored",
   story = makeStory(),
+  storybookPackage,
 }: {
   activeScene?: SceneMemory;
   activeRelationship?: RelationshipThread;
@@ -197,6 +351,10 @@ function makeSuggestions({
   selectedTagLabels?: string[];
   spiceVisibility?: SpiceVisibility;
   story?: Story;
+  storybookPackage?: {
+    books: LibraryBook[];
+    storybook?: StoryBook;
+  };
 }): PromptModuleText {
   return getPromptModuleSuggestions({
     activeRelationship,
@@ -208,6 +366,7 @@ function makeSuggestions({
     selectedTagLabels,
     spiceVisibility,
     story,
+    storybookPackage,
   });
 }
 
@@ -280,6 +439,34 @@ function makeSecret(overrides: Partial<SecretOrReveal> = {}): SecretOrReveal {
     who_knows: [],
     who_knows_that_someone_knows: [],
     who_suspects: [],
+    ...overrides,
+  };
+}
+
+function makeStoryBook(overrides: Partial<StoryBook> = {}): StoryBook {
+  return {
+    active_story_id: "story-1",
+    bookshelf_id: "shelf-1",
+    created_at: "2026-09-25T00:00:00.000Z",
+    id: "storybook-1",
+    sort_order: 1,
+    status: "active",
+    title: "Test StoryBook",
+    updated_at: "2026-09-25T00:00:00.000Z",
+    ...overrides,
+  };
+}
+
+function makeLibraryBook(overrides: Partial<LibraryBook> = {}): LibraryBook {
+  return {
+    book_type: "user_book",
+    bookshelf_id: "shelf-1",
+    created_at: "2026-09-25T00:00:00.000Z",
+    id: "book-1",
+    payload: {},
+    sort_order: 1,
+    title: "Test Book",
+    updated_at: "2026-09-25T00:00:00.000Z",
     ...overrides,
   };
 }

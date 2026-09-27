@@ -35,6 +35,7 @@ describe("buildUserPersonaDraftFromCard", () => {
     expect(draft.connectionToCharacter).toContain("line Zeke keeps crossing");
     expect(draft.openingAngle).toContain("Vanessa's ultimatum");
     expect(draft.selfConcept).toContain("before Vanessa had a claim on him");
+    expect(combined).not.toContain("own person in");
     expect(draft.appearancePresentation).toContain("Memorable but editable physical anchors");
     expect(draft.relationalBackstory).toContain("A past romantic disappointment");
     expect(draft.psychologyInternalConflict).toContain("Core wound");
@@ -73,6 +74,46 @@ describe("buildUserPersonaDraftFromCard", () => {
     expect(draft.narrativeArc).toContain("supernatural-romance pressure");
   });
 
+  it("turns concrete card facts into user persona fields instead of prompt instructions", () => {
+    const card = makeCard({
+      description: [
+        "Kieran is {{user}}'s stepbrother in an omegaverse household.",
+        "{{user}} is a 21-year-old omega university student.",
+        "They live together under the same roof.",
+        "Kieran believes {{user}} sees him as indifferent to her and only as a protective older brother figure.",
+      ].join(" "),
+      name: "Kieran",
+      scenario:
+        "{{user}} and Kieran are step-siblings living together while university, heat cycles, and family boundaries keep forcing them into close proximity.",
+      tags: ["Step Siblings", "Age Gap", "Omegaverse", "University"],
+    });
+
+    const draft = buildUserPersonaDraftFromCard(card, "female");
+    const combined = Object.values(draft).join("\n");
+
+    expect(draft.cardFitNotes).toContain("Card-derived persona facts:");
+    expect(draft.appearancePresentation).toContain("{{user}} is 21 years old.");
+    expect(draft.appearancePresentation).toContain("{{user}} is an omega");
+    expect(draft.appearancePresentation).toContain("{{user}} is a university student");
+    expect(draft.roleInStory).toContain("21-year-old woman");
+    expect(draft.roleInStory).toContain("omega");
+    expect(draft.roleInStory).toContain("university student");
+    expect(draft.roleInStory).toContain("step-sibling");
+    expect(draft.roleInStory).toContain("living with Kieran");
+    expect(draft.tropeRelationshipWorldContext).toContain("Kieran's step-sibling");
+    expect(draft.tropeRelationshipWorldContext).toContain("share a home");
+    expect(draft.tropeRelationshipWorldContext).toContain("omegaverse");
+    expect(draft.selfConcept).toContain("Being omega affects how {{user}} manages attention");
+    expect(draft.selfConcept).toContain("University gives {{user}} an independent identity");
+    expect(draft.selfConcept).toContain("The step-sibling bond makes closeness socially dangerous");
+    expect(draft.openingAngle).toContain("At the start of play, {{user}} is positioned as");
+    expect(draft.whatUserKnows).toContain("Kieran believes {{user}} reads him as indifferent");
+    expect(draft.whatUserKnows).toContain("protective older-brother figure");
+    expect(combined).not.toContain("The player has room");
+    expect(combined).not.toContain("Seeded");
+    expect(combined).not.toContain("seed:");
+  });
+
   it("draws in participants, relationship, secrets, scene, and selected tags when generating late in the flow", () => {
     const card = makeCard({
       description: "A closed-off rival keeps {{user}} at arm's length during rehearsals.",
@@ -81,6 +122,19 @@ describe("buildUserPersonaDraftFromCard", () => {
     });
 
     const draft = buildUserPersonaDraftFromCard(card, "female", {
+      activeCorePack: {
+        base_prompt:
+          "Track changed behavior through rivalry, withheld respect, and visible proof before anyone explains the emotional shift.",
+        category: "Trope core",
+        compatible_tag_slugs: ["enemies-to-lovers"],
+        created_at: "2026-09-25T00:00:00.000Z",
+        default_platform_targets: ["JanitorAI", "SillyTavern", "MarinaraTavern"],
+        description: "For enemies-to-lovers and competitive romantic pressure.",
+        id: "core-changing-perspectives",
+        slug: "changing-perspectives",
+        title: "Changing Perspectives",
+        updated_at: "2026-09-25T00:00:00.000Z",
+      },
       activeRelationship: {
         attraction_notes: "Mutual fixation under pressure.",
         boundaries: [],
@@ -136,9 +190,11 @@ describe("buildUserPersonaDraftFromCard", () => {
       },
       characters: [makeCharacter("char-rowan", "Rowan"), makeCharacter("user-player", "{{user}}")],
       selectedTagLabels: ["Enemies to Lovers", "Competitive", "Theatre"],
+      selectedTagSlugs: ["enemies-to-lovers", "competitive"],
     });
 
     expect(draft.tropeRelationshipWorldContext).toContain("enemies-to-lovers pressure");
+    expect(draft.cardFitNotes).toContain("Persona source patterns: Rival/competitive.");
     expect(draft.cardFitNotes).toContain("Selected story tags: Enemies to Lovers, Competitive, Theatre.");
     expect(draft.cardFitNotes).toContain("Active relationship: Rivals to lovers.");
     expect(draft.cardFitNotes).toContain("Relationship participants: Rowan, {{user}}.");
@@ -148,6 +204,13 @@ describe("buildUserPersonaDraftFromCard", () => {
     expect(draft.cardFitNotes).toContain(
       "Current scene: The duet choreography keeps putting Rowan's hands at {{user}}'s waist.",
     );
+    expect(draft.selfConcept).toContain("{{user}} believes composure is armor");
+    expect(draft.selfConcept.startsWith("{{user}} believes composure is armor")).toBe(true);
+    expect(draft.psychologyInternalConflict).toContain("Pride under pressure");
+    expect(draft.interactionStyle).toContain("Interaction pattern");
+    expect(draft.sceneOpportunities).toContain("Scene pressure: a public competence test");
+    expect(draft.voiceDialogue).toContain("If you want me to fold");
+    expect(draft.connectionToCharacter).toContain("Romantic rival/counterforce");
   });
 
   it("uses the selected neutral persona frame even when the card does not define {{user}} pronouns", () => {
@@ -159,8 +222,10 @@ describe("buildUserPersonaDraftFromCard", () => {
 
     const draft = buildUserPersonaDraftFromCard(card, "neutral");
 
-    expect(draft.roleInStory).toContain("Neutral user player");
+    expect(draft.roleInStory).toContain("Neutral {{user}} persona");
     expect(draft.connectionToCharacter).toContain("the card's active scenario around Riven");
+    expect(draft.selfConcept).not.toContain("own person in");
+    expect(draft.selfConcept).toContain("hidden refusal");
     expect(draft.whatUserKnows).toContain("their own history");
   });
 

@@ -78,10 +78,10 @@ describe("story memory seed data", () => {
   it("seeds every required StoryBook library book type", () => {
     expect(sampleLibraryBooks.map((book) => book.book_type)).toEqual([
       "character_book",
-      "user_book",
-      "scenario_book",
       "world_book",
+      "scenario_book",
       "memory_book",
+      "user_book",
       "prompt_book",
     ]);
   });

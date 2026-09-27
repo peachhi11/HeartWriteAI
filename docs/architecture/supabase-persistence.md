@@ -31,6 +31,11 @@ Schema files live in:
 
 - `supabase/schemas/001_story_memory_core.sql`
 - `supabase/schemas/002_seed_core_prompt_packs.sql`
+- `supabase/schemas/003_seed_character_persona_psychology.sql`
+- `supabase/schemas/004_seed_dark_relationship_psychology.sql`
+- `supabase/schemas/005_seed_attraction_seduction_psychology.sql`
+- `supabase/schemas/006_seed_relationship_communication_psychology.sql`
+- `supabase/schemas/007_seed_trope_creative_psychology.sql`
 
 These files are source SQL, not yet applied migrations.
 

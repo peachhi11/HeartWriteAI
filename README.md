@@ -41,6 +41,11 @@ Schema source lives in:
 
 - [001_story_memory_core.sql](/Users/meganmckinnon/Downloads/Archive/heartwriteai-app/supabase/schemas/001_story_memory_core.sql)
 - [002_seed_core_prompt_packs.sql](/Users/meganmckinnon/Downloads/Archive/heartwriteai-app/supabase/schemas/002_seed_core_prompt_packs.sql)
+- [003_seed_character_persona_psychology.sql](/Users/meganmckinnon/Downloads/Archive/heartwriteai-app/supabase/schemas/003_seed_character_persona_psychology.sql)
+- [004_seed_dark_relationship_psychology.sql](/Users/meganmckinnon/Downloads/Archive/heartwriteai-app/supabase/schemas/004_seed_dark_relationship_psychology.sql)
+- [005_seed_attraction_seduction_psychology.sql](/Users/meganmckinnon/Downloads/Archive/heartwriteai-app/supabase/schemas/005_seed_attraction_seduction_psychology.sql)
+- [006_seed_relationship_communication_psychology.sql](/Users/meganmckinnon/Downloads/Archive/heartwriteai-app/supabase/schemas/006_seed_relationship_communication_psychology.sql)
+- [007_seed_trope_creative_psychology.sql](/Users/meganmckinnon/Downloads/Archive/heartwriteai-app/supabase/schemas/007_seed_trope_creative_psychology.sql)
 
 ## Design Boundaries
 
