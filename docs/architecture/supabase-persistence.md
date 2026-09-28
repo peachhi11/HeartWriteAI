@@ -36,6 +36,7 @@ Schema files live in:
 - `supabase/schemas/005_seed_attraction_seduction_psychology.sql`
 - `supabase/schemas/006_seed_relationship_communication_psychology.sql`
 - `supabase/schemas/007_seed_trope_creative_psychology.sql`
+- `supabase/schemas/008_seed_research_taxonomy.sql`
 
 These files are source SQL, not yet applied migrations.
 

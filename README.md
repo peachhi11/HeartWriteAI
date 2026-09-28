@@ -46,6 +46,7 @@ Schema source lives in:
 - [005_seed_attraction_seduction_psychology.sql](/Users/meganmckinnon/Downloads/Archive/heartwriteai-app/supabase/schemas/005_seed_attraction_seduction_psychology.sql)
 - [006_seed_relationship_communication_psychology.sql](/Users/meganmckinnon/Downloads/Archive/heartwriteai-app/supabase/schemas/006_seed_relationship_communication_psychology.sql)
 - [007_seed_trope_creative_psychology.sql](/Users/meganmckinnon/Downloads/Archive/heartwriteai-app/supabase/schemas/007_seed_trope_creative_psychology.sql)
+- [008_seed_research_taxonomy.sql](/Users/meganmckinnon/Downloads/Archive/heartwriteai-app/supabase/schemas/008_seed_research_taxonomy.sql)
 
 ## Design Boundaries
 
