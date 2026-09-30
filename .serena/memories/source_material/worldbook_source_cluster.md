@@ -1,0 +1,10 @@
+# World Book Source Cluster
+
+- Source note: `docs/source-material/worldbook-source-cluster.md`.
+- Source files mined from the organized Archive inbox: `149747572-World-Building.docx`, `305773768-7-Deadly-Sins-of-Worldbuilding.pdf`, `409836508-The-Ultimate-Guide-To-WorldBuilding-How-To-Write-Fantasy-SciFi-And-RealLife-Worlds.pdf`, `441900715-Worldbuilding-Theory.pdf`, `600861970-ultimate-worldbuilding-template-reedsy24.pdf`, `684055159-Worldbuilding-Planner-Printable.pdf`, `853996476-World-Building.pdf`, plus kept duplicate-cleanup file `/Users/meganmckinnon/Downloads/Archive/00_Source_Reference_Library/source-documents/751784566-world-building-handout-FINAL.pdf`.
+- Product decision captured: World Book sits below Character Card / Character Book in builder order, because the character card determines the extraction lens; in prompt compilation, Prompt Book -> Character Book -> World Book -> User Book -> Scenario Book -> Memory Book -> Latest User Move.
+- Core split: World Book stores stable semantic world memory; Scenario Book stores current active scene/context memory. Do not put every recent scene beat in World Book.
+- Proposed World Book sections: world type, geography/locations, rules/physics, government/law/power, society/class/culture, economy/infrastructure, history/lore/events, religion/belief/myth, magic/technology/tools, species/biology, factions/groups, items/documents/artifacts.
+- Proposed entry shape includes type, name, summary, content, keys, secondary keys, related entries, source evidence, priority, trigger mode, and visibility.
+- Trigger guidance: proper nouns, place names, faction names, titles, species names, named events, objects, and rituals are good keys; generic terms should use secondary keys or stay manual.
+- Still needed: world presets for HeartWrite tags such as omegaverse/vampire/werewolf/mafia/university/celebrity/workplace/royal/superhero/sci-fi; platform exports; tests for card-to-world extraction; UI copy that does not feel like homework.

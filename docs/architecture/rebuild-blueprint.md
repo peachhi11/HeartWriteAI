@@ -4,7 +4,7 @@ This app is the clean rebuild of HeartWriteAI.
 
 The canonical planning package currently lives outside the app at:
 
-`/Users/meganmckinnon/Downloads/Archive/heartwriteai-blueprint`
+`/Users/meganmckinnon/Downloads/Archive/00_Source_Reference_Library/heartwrite-planning/heartwriteai-blueprint`
 
 ## Build Principles
 

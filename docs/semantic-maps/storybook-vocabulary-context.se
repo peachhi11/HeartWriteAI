@@ -1,0 +1,136 @@
+se 1
+
+# HeartWriteAI StoryBook vocabulary context map.
+# Design artifact only. Inspired by Semantic Programming Language notation.
+# This should help future Serena/JetBrains-assisted work reason about vocabulary
+# seeds as semantic nodes instead of loose phrase lists.
+
+program HeartWriteStoryBookVocabularyContext
+object StoryBook
+
+scope books {
+    node character_book
+    node user_book
+    node world_book
+    node scenario_book
+    node memory_book
+    node prompt_book
+    node storybook_proxy_context
+
+    relations
+    storybook_proxy_context -> character_book
+    storybook_proxy_context -> user_book
+    storybook_proxy_context -> world_book
+    storybook_proxy_context -> scenario_book
+    storybook_proxy_context -> memory_book
+    storybook_proxy_context -> prompt_book
+}
+
+scope vocabulary_seed_kinds {
+    node trope_tag
+    node relationship_dynamic
+    node heat_language
+    node body_language
+    node user_move_trigger
+    node dirty_talk_register
+    node world_lore_key
+    node persona_trait
+    node prompt_module
+
+    relations
+    trope_tag -> relationship_dynamic
+    relationship_dynamic -> scenario_book
+    body_language -> user_move_trigger
+    dirty_talk_register -> prompt_book
+    world_lore_key -> world_book
+    persona_trait -> user_book
+    prompt_module -> storybook_proxy_context
+}
+
+scope context_routes {
+    node affirming
+    node welcomed
+    node playful
+    node dark_romance_pressure
+    node conflicted
+    node hesitant
+    node wounding
+    node repair_needed
+    node boundary
+    node blocked
+
+    relations
+    affirming -> welcomed
+    playful -> welcomed
+    dark_romance_pressure -> conflicted
+    conflicted -> hesitant
+    wounding -> repair_needed
+    boundary -> blocked
+}
+
+scope example_possessive_seed {
+    node possessive
+    node protective_touch
+    node claimed_as_chosen
+    node jealousy_pressure
+    node control_risk
+    node boundary_repair
+
+    relations
+    possessive -> relationship_dynamic
+    possessive -> dark_romance_pressure
+    possessive -> protective_touch
+    possessive -> jealousy_pressure
+    protective_touch -> affirming
+    claimed_as_chosen -> welcomed
+    jealousy_pressure -> playful
+    jealousy_pressure -> conflicted
+    control_risk -> boundary
+    boundary_repair -> repair_needed
+}
+
+scope user_move_triggers {
+    node approach
+    node verbal_invitation
+    node physical_touch
+    node tease
+    node verbal_challenge
+    node submission_cue
+    node hesitation
+    node withdrawal
+    node boundary_signal
+    node scene_redirect
+    node aftercare_cue
+
+    relations
+    approach -> welcomed
+    verbal_invitation -> welcomed
+    physical_touch -> welcomed
+    tease -> playful
+    verbal_challenge -> playful
+    submission_cue -> welcomed
+    hesitation -> hesitant
+    withdrawal -> conflicted
+    boundary_signal -> blocked
+    scene_redirect -> repair_needed
+    aftercare_cue -> repair_needed
+}
+
+scope prompt_targets {
+    node style
+    node pov
+    node knowledge_boundary
+    node relationship_pressure
+    node physical_scene_continuity
+    node heat_language_target
+    node write_for_me_assist
+    node platform_export
+
+    relations
+    relationship_dynamic -> relationship_pressure
+    user_move_trigger -> relationship_pressure
+    body_language -> physical_scene_continuity
+    dirty_talk_register -> heat_language_target
+    persona_trait -> write_for_me_assist
+    prompt_module -> platform_export
+}
