@@ -8,6 +8,10 @@ Use it when HeartWrite needs adult-fiction vocabulary, power-dynamic routing, di
 
 Plain-English rule: do not turn this into a canned phrase list. Mine the pattern, the tone, and the scene function, then let the StoryBook generate fresh language that actually fits the character.
 
+Related note:
+
+- `lived-bdsm-positive-dark-routing.md` adds first-person/lived-experience evidence for positive-framed dark dynamics, especially the difference between consensual objectification/degradation/CNC fantasy and harm framing.
+
 ## Source Facts
 
 - Source size checked: 43,303 lines.
@@ -18,6 +22,26 @@ Plain-English rule: do not turn this into a canned phrase list. Mine the pattern
   - `How to Ask for an Open Relationship: Scripts, Prep, and What to Expect`
 
 The title undersells it. The file is really a bundle of speech registers, D/s roles, kink and fetish taxonomy, aftercare/drop material, poly/open relationship structure, swinging/hotwife/cuckold dynamics, threesomes, agreement logic, and negotiation frameworks.
+
+## Positive-Dark Routing Addendum
+
+The lived-experience source bundle adds an important correction: dark BDSM language should not be flattened into danger, harm, or negative framing by default. It can also be affirming, regulating, intimate, funny, devotional, or romantic when it is held inside trust, attunement, chosen surrender, and credible aftercare.
+
+Compiler route:
+
+- `affirming_dark`
+- `contained_objectification`
+- `trusted_use`
+- `control_as_containment`
+- `safe_surrender`
+- `reassurance_after_degradation`
+
+Key distinction:
+
+- Positive route: dark intensity exists inside a known care container.
+- Negative route: dark intensity ignores context, boundary, recovery, personhood, or aftermath.
+
+This is especially important for degradation, objectification, free-use, CNC fantasy, possessive language, jealousy, service, group play, and heavy power exchange.
 
 ## Corpus Map
 
