@@ -4,6 +4,10 @@ This folder stores recovered or external writing-system artifacts that inform He
 
 These files are reference material, not runtime instructions. Inspect them as source artifacts before adapting anything into app data, prompt seeds, tests, or UI copy.
 
+## Mined Registries
+
+- `lib/character-card/contemporaryWorldSeeds.ts` - curated vocabulary, trigger, routing, and compiler-hint seeds mined from `contemporary-world-systems-source-cluster.md`.
+
 ## Files
 
 - `contemporary-world-systems-source-cluster.md` - source-mining note for contemporary World Book defaults, including everyday technology, digital visibility, modern relationship systems, legal/economic pressure, location pressure, resources, time texture, and world-intrusion cadence.
