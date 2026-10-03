@@ -50,7 +50,9 @@ test("contemporary world vocabulary seeds preserve the source-routing model", ()
   assert.match(locationPressure.compilerHints.join(" "), /pressure engines/);
 
   assert.ok(worldCadence.routeTags.includes("existing_tension"));
+  assert.ok(worldCadence.routeTags.includes("ambient_world_presence"));
   assert.match(worldCadence.compilerHints.join(" "), /Activate existing pressure/);
+  assert.match(worldCadence.compilerHints.join(" "), /world present as texture/);
 
   assert.ok(digitalVisibility.scope.includes("memory_book"));
   assert.ok(digitalVisibility.vocabularySeeds.includes("screenshot"));
