@@ -8,6 +8,7 @@
     "start": "next start",
     "test": "tsc -p tsconfig.test.json && node --test .tmp-tests/tests/character-card/*.js",
     "lint": "eslint app components features hooks lib types tests --ext .js,.jsx,.ts,.tsx",
+    "validate:vault-skills": "node scripts/validate-story-runtime-skills-vault.mjs",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
     "tauri:build": "tauri build"

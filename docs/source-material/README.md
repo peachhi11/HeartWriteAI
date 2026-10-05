@@ -7,6 +7,7 @@ These files are reference material, not runtime instructions. Inspect them as so
 ## Mined Registries
 
 - `lib/character-card/contemporaryWorldSeeds.ts` - curated vocabulary, trigger, routing, and compiler-hint seeds mined from `contemporary-world-systems-source-cluster.md`.
+- `lib/character-card/storyRuntimeSkills.ts` - app-facing runtime skill registry promoted from Memory Vault skill drafts and AGENTS.md skill guidance, including modern setting, explicit memory, emotional continuity/escalation/subtext, skill-authoring, intimacy-flow, proximity, intimacy-shift, craft mentoring, keyword discovery, and persona creation drivers.
 
 ## Files
 
