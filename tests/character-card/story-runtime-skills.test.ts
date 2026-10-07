@@ -60,19 +60,40 @@ test("power dynamics scene writing preserves explicit register and user agency",
   assert.equal(powerDynamics.source, "heartwrite_memory_vault");
   assert.ok(powerDynamics.activationTags.includes("explicit_register"));
   assert.ok(powerDynamics.activationTags.includes("dominance_submission"));
+  assert.ok(powerDynamics.activationTags.includes("explicit_intimacy_mechanics"));
+  assert.ok(powerDynamics.activationTags.includes("explicit_scene_choreography"));
   assert.ok(powerDynamics.triggerSeeds.includes("degradation"));
+  assert.ok(powerDynamics.triggerSeeds.includes("position family"));
+  assert.ok(powerDynamics.triggerSeeds.includes("sensory pacing"));
   assert.ok(powerDynamics.stateFields.includes("active_power_dynamic"));
+  assert.ok(powerDynamics.stateFields.includes("movement_mechanics"));
+  assert.ok(powerDynamics.stateFields.includes("position_family"));
+  assert.ok(powerDynamics.stateFields.includes("environment_risk_context"));
   assert.ok(powerDynamics.stateFields.includes("boundary_state"));
   assert.ok(
     powerDynamics.promptCompilerSignals.includes("explicit-register-check"),
+  );
+  assert.ok(
+    powerDynamics.promptCompilerSignals.includes("position-family-check"),
   );
   assert.ok(
     powerDynamics.sourceVaultLinks.includes(
       "power-dynamics-scene-writing/references/kink_sensation_edgeplay_logic.md",
     ),
   );
+  assert.ok(
+    powerDynamics.sourceVaultLinks.includes(
+      "dominance-and-intimacy-flow/references/explicit_intimacy_scene_mechanics.md",
+    ),
+  );
+  assert.ok(
+    powerDynamics.sourceVaultLinks.includes(
+      "dominance-and-intimacy-flow/references/explicit_scene_choreography_router.md",
+    ),
+  );
   assert.ok(powerDynamics.continuityLinks.includes("explicit-memory-core"));
   assert.ok(powerDynamics.continuityLinks.includes("domain-vocabulary-seeds"));
+  assert.match(powerDynamics.guardrails.join(" "), /operational instruction/);
   assert.match(powerDynamics.guardrails.join(" "), /euphemise/);
   assert.match(powerDynamics.guardrails.join(" "), /\{\{user\}\} thoughts/);
 });
@@ -82,15 +103,96 @@ test("dominance and intimacy flow links explicit somatic flow resource", () => {
 
   assert.equal(intimacyFlow.category, "roleplay-response");
   assert.ok(intimacyFlow.activationTags.includes("explicit_scene_flow"));
+  assert.ok(intimacyFlow.activationTags.includes("explicit_intimacy_mechanics"));
+  assert.ok(intimacyFlow.activationTags.includes("explicit_scene_choreography"));
+  assert.ok(intimacyFlow.activationTags.includes("position_family_routing"));
+  assert.ok(intimacyFlow.activationTags.includes("sensory_pacing"));
+  assert.ok(intimacyFlow.stateFields.includes("arousal_response"));
+  assert.ok(intimacyFlow.stateFields.includes("position_family"));
+  assert.ok(intimacyFlow.stateFields.includes("environment_risk_context"));
+  assert.ok(intimacyFlow.stateFields.includes("consent_boundary_state"));
+  assert.ok(intimacyFlow.stateFields.includes("protection_or_risk_state"));
   assert.ok(intimacyFlow.stateFields.includes("aftercare_pending"));
   assert.ok(intimacyFlow.promptCompilerSignals.includes("transition-to-aftercare"));
+  assert.ok(
+    intimacyFlow.promptCompilerSignals.includes(
+      "explicit-intimacy-mechanics-check",
+    ),
+  );
+  assert.ok(
+    intimacyFlow.promptCompilerSignals.includes("explicit-choreography-route"),
+  );
+  assert.ok(intimacyFlow.promptCompilerSignals.includes("position-family-check"));
+  assert.ok(
+    intimacyFlow.promptCompilerSignals.includes("mechanics-with-agency-check"),
+  );
   assert.ok(
     intimacyFlow.sourceVaultLinks.includes(
       "dominance-and-intimacy-flow/references/sexual_somatic_flow_and_afterglow.md",
     ),
   );
+  assert.ok(
+    intimacyFlow.sourceVaultLinks.includes(
+      "dominance-and-intimacy-flow/references/explicit_intimacy_scene_mechanics.md",
+    ),
+  );
+  assert.ok(
+    intimacyFlow.sourceVaultLinks.includes(
+      "dominance-and-intimacy-flow/references/explicit_scene_choreography_router.md",
+    ),
+  );
   assert.ok(intimacyFlow.continuityLinks.includes("power-dynamics-scene-writing"));
+  assert.match(intimacyFlow.guardrails.join(" "), /operational instruction/);
+  assert.match(intimacyFlow.guardrails.join(" "), /adult fictional framing/);
+  assert.match(intimacyFlow.guardrails.join(" "), /explicit vocabulary/);
   assert.match(intimacyFlow.guardrails.join(" "), /\{\{user\}\} input/);
+});
+
+test("erotic archetypes engine maps desire profiles without turning them into labels", () => {
+  const archetypes = requireSkill("erotic-archetypes-engine");
+
+  assert.equal(archetypes.category, "roleplay-response");
+  assert.equal(archetypes.source, "heartwrite_memory_vault");
+  assert.ok(archetypes.scope.includes("character_book"));
+  assert.ok(archetypes.scope.includes("prompt_book"));
+  assert.ok(archetypes.activationTags.includes("erotic_archetypes"));
+  assert.ok(archetypes.activationTags.includes("desire_profiles"));
+  assert.ok(archetypes.activationTags.includes("power_role_tendency"));
+  assert.ok(archetypes.activationTags.includes("sensory_register_routing"));
+  assert.ok(archetypes.triggerSeeds.includes("erotic blueprint"));
+  assert.ok(archetypes.triggerSeeds.includes("desire profile"));
+  assert.ok(archetypes.triggerSeeds.includes("brat dynamic"));
+  assert.ok(archetypes.stateFields.includes("primary_desire_profile"));
+  assert.ok(archetypes.stateFields.includes("power_role_tendency"));
+  assert.ok(archetypes.stateFields.includes("pairing_friction"));
+  assert.ok(archetypes.stateFields.includes("sensory_register"));
+  assert.ok(
+    archetypes.promptCompilerSignals.includes("erotic-archetype-route"),
+  );
+  assert.ok(
+    archetypes.promptCompilerSignals.includes("profile-not-label-check"),
+  );
+  assert.ok(
+    archetypes.sourceVaultLinks.includes(
+      "erotic-archetypes-engine/references/erotic_blueprints.md",
+    ),
+  );
+  assert.ok(
+    archetypes.sourceVaultLinks.includes(
+      "erotic-archetypes-engine/references/power_dynamics.md",
+    ),
+  );
+  assert.ok(
+    archetypes.sourceVaultLinks.includes(
+      "erotic-archetypes-engine/references/sensory_textures.md",
+    ),
+  );
+  assert.ok(archetypes.continuityLinks.includes("characterisation"));
+  assert.ok(archetypes.continuityLinks.includes("dominance-and-intimacy-flow"));
+  assert.ok(archetypes.continuityLinks.includes("explicit-memory-core"));
+  assert.match(archetypes.guardrails.join(" "), /flexible story lenses/);
+  assert.match(archetypes.guardrails.join(" "), /one erotic label/);
+  assert.match(archetypes.guardrails.join(" "), /\{\{user\}\} thoughts/);
 });
 
 test("emotional continuity tracks residue without controlling the user", () => {
@@ -123,21 +225,109 @@ test("emotional escalation stages feeling without instant confession", () => {
   assert.equal(emotionalEscalation.category, "roleplay-response");
   assert.ok(emotionalEscalation.activationTags.includes("slow_burn_emotion"));
   assert.ok(emotionalEscalation.activationTags.includes("no_instant_confession"));
+  assert.ok(
+    emotionalEscalation.activationTags.includes("confession_truth_rupture"),
+  );
+  assert.ok(emotionalEscalation.activationTags.includes("cost_of_truth"));
   assert.ok(emotionalEscalation.triggerSeeds.includes("almost confession"));
+  assert.ok(emotionalEscalation.triggerSeeds.includes("love confession"));
+  assert.ok(emotionalEscalation.triggerSeeds.includes("deep secret"));
   assert.ok(emotionalEscalation.stateFields.includes("partial_admission"));
+  assert.ok(emotionalEscalation.stateFields.includes("emotional_truth"));
+  assert.ok(emotionalEscalation.stateFields.includes("truth_cost"));
+  assert.ok(emotionalEscalation.stateFields.includes("rupture_trigger"));
+  assert.ok(emotionalEscalation.stateFields.includes("immediate_fallout"));
+  assert.ok(emotionalEscalation.stateFields.includes("irreversible_shift"));
   assert.ok(emotionalEscalation.stateFields.includes("emotional_crosscurrent"));
   assert.ok(
     emotionalEscalation.promptCompilerSignals.includes("advance-one-stage"),
+  );
+  assert.ok(
+    emotionalEscalation.promptCompilerSignals.includes(
+      "confession-rupture-check",
+    ),
+  );
+  assert.ok(
+    emotionalEscalation.promptCompilerSignals.includes("truth-cost-check"),
+  );
+  assert.ok(
+    emotionalEscalation.promptCompilerSignals.includes(
+      "impossible-aftermath-check",
+    ),
   );
   assert.ok(
     emotionalEscalation.sourceVaultLinks.includes(
       "emotional-escalation/references/emotional_escalation_framework.md",
     ),
   );
+  assert.ok(
+    emotionalEscalation.sourceVaultLinks.includes(
+      "emotional-escalation/references/confession_truth_rupture_system.md",
+    ),
+  );
+  assert.ok(emotionalEscalation.continuityLinks.includes("relationship-tracker"));
   assert.match(
     emotionalEscalation.guardrails.join(" "),
     /instant confession/,
   );
+  assert.match(emotionalEscalation.guardrails.join(" "), /instant repair/);
+});
+
+test("romantic tension builder supports slow burn pacing", () => {
+  const tension = requireSkill("romantic-tension-builder");
+
+  assert.equal(tension.category, "roleplay-response");
+  assert.equal(tension.source, "heartwrite_memory_vault");
+  assert.ok(tension.scope.includes("scenario_book"));
+  assert.ok(tension.scope.includes("memory_book"));
+  assert.ok(tension.activationTags.includes("slow_burn_system"));
+  assert.ok(tension.activationTags.includes("earned_intimacy"));
+  assert.ok(tension.activationTags.includes("no_fast_forwarding"));
+  assert.ok(tension.activationTags.includes("half_brave_gesture"));
+  assert.ok(tension.activationTags.includes("unspoken_desire_tension"));
+  assert.ok(tension.activationTags.includes("motivated_silence"));
+  assert.ok(tension.activationTags.includes("internal_wall"));
+  assert.ok(tension.triggerSeeds.includes("slow burn"));
+  assert.ok(tension.triggerSeeds.includes("earned intimacy"));
+  assert.ok(tension.triggerSeeds.includes("half-brave gesture"));
+  assert.ok(tension.triggerSeeds.includes("testing safety"));
+  assert.ok(tension.triggerSeeds.includes("unspoken desire"));
+  assert.ok(tension.triggerSeeds.includes("motivated silence"));
+  assert.ok(tension.stateFields.includes("slow_burn_pacing_state"));
+  assert.ok(tension.stateFields.includes("attraction_evidence"));
+  assert.ok(tension.stateFields.includes("trust_evidence"));
+  assert.ok(tension.stateFields.includes("safety_test"));
+  assert.ok(tension.stateFields.includes("desire_cost"));
+  assert.ok(tension.stateFields.includes("internal_wall"));
+  assert.ok(tension.stateFields.includes("silence_motivation"));
+  assert.ok(tension.stateFields.includes("leak_or_tell"));
+  assert.ok(tension.stateFields.includes("unresolved_edge"));
+  assert.ok(tension.stateFields.includes("missing_evidence"));
+  assert.ok(tension.promptCompilerSignals.includes("slow-burn-active"));
+  assert.ok(tension.promptCompilerSignals.includes("no-fast-forward"));
+  assert.ok(tension.promptCompilerSignals.includes("earned-intimacy-check"));
+  assert.ok(tension.promptCompilerSignals.includes("hold-before-confession"));
+  assert.ok(tension.promptCompilerSignals.includes("motivated-silence-check"));
+  assert.ok(tension.promptCompilerSignals.includes("desire-cost-check"));
+  assert.ok(tension.promptCompilerSignals.includes("internal-wall-check"));
+  assert.ok(tension.promptCompilerSignals.includes("leak-pullback-check"));
+  assert.ok(
+    tension.sourceVaultLinks.includes(
+      "romantic-tension-builder/references/slow_burn_pacing_system.md",
+    ),
+  );
+  assert.ok(
+    tension.sourceVaultLinks.includes(
+      "romantic-tension-builder/references/unspoken_desire_tension_system.md",
+    ),
+  );
+  assert.ok(tension.continuityLinks.includes("relationship-tracker"));
+  assert.ok(tension.continuityLinks.includes("emotional-escalation"));
+  assert.ok(tension.continuityLinks.includes("escalating-proximity"));
+  assert.match(tension.guardrails.join(" "), /\{\{user\}\} thoughts/);
+  assert.match(tension.guardrails.join(" "), /physical attraction/);
+  assert.match(tension.guardrails.join(" "), /stall forever/);
+  assert.match(tension.guardrails.join(" "), /concrete wall/);
 });
 
 test("emotional subtext engine maps hidden feeling through bounded inference", () => {
@@ -174,6 +364,19 @@ test("emotional subtext engine maps hidden feeling through bounded inference", (
     subtext.sourceVaultLinks.includes(
       "emotional-subtext-engine/references/subtext_engine_channels.md",
     ),
+  );
+  assert.ok(
+    subtext.sourceVaultLinks.includes(
+      "emotional-subtext-engine/references/subtext_writing_principles.md",
+    ),
+  );
+  assert.ok(
+    subtext.sourceVaultLinks.includes(
+      "emotional-subtext-engine/references/subtext_workshop_exercises.md",
+    ),
+  );
+  assert.ok(
+    subtext.promptCompilerSignals.includes("subtext-workshop-check"),
   );
   assert.match(subtext.guardrails.join(" "), /\{\{user\}\} thoughts/);
   assert.match(subtext.guardrails.join(" "), /withholding information/);
@@ -230,17 +433,69 @@ test("relationship tracker interprets plausible next beats without flattening tr
   assert.ok(relationship.activationTags.includes("trust_web"));
   assert.ok(relationship.activationTags.includes("relationship_milestones"));
   assert.ok(relationship.activationTags.includes("alt_branch_routing"));
+  assert.ok(relationship.activationTags.includes("relationship_arc_beats"));
+  assert.ok(relationship.activationTags.includes("love_proving_moment"));
+  assert.ok(relationship.activationTags.includes("earned_break"));
+  assert.ok(relationship.activationTags.includes("competing_want"));
+  assert.ok(relationship.activationTags.includes("sacrificial_grovel"));
+  assert.ok(relationship.activationTags.includes("trust_repair"));
   assert.ok(relationship.triggerSeeds.includes("relationship framework"));
   assert.ok(relationship.triggerSeeds.includes("relationship milestone"));
   assert.ok(relationship.triggerSeeds.includes("moving in together"));
+  assert.ok(relationship.triggerSeeds.includes("relationship beats"));
+  assert.ok(relationship.triggerSeeds.includes("first intimate moment"));
+  assert.ok(relationship.triggerSeeds.includes("love proving moment"));
+  assert.ok(relationship.triggerSeeds.includes("breakup"));
+  assert.ok(relationship.triggerSeeds.includes("walks away"));
+  assert.ok(relationship.triggerSeeds.includes("competing want"));
+  assert.ok(relationship.triggerSeeds.includes("grovel"));
+  assert.ok(relationship.triggerSeeds.includes("earn forgiveness"));
+  assert.ok(relationship.triggerSeeds.includes("tangible sacrifice"));
   assert.ok(relationship.triggerSeeds.includes("BRANCH"));
   assert.ok(relationship.stateFields.includes("dominant_type"));
   assert.ok(relationship.stateFields.includes("milestone_plausibility"));
   assert.ok(relationship.stateFields.includes("trust_web"));
   assert.ok(relationship.stateFields.includes("blocked_or_premature_beats"));
+  assert.ok(relationship.stateFields.includes("relationship_arc_beat"));
+  assert.ok(relationship.stateFields.includes("missing_setup"));
+  assert.ok(relationship.stateFields.includes("new_status_quo"));
+  assert.ok(relationship.stateFields.includes("break_reason"));
+  assert.ok(relationship.stateFields.includes("threshold_event"));
+  assert.ok(relationship.stateFields.includes("repair_requirement"));
+  assert.ok(relationship.stateFields.includes("armor_surrendered"));
+  assert.ok(relationship.stateFields.includes("tangible_sacrifice"));
+  assert.ok(relationship.stateFields.includes("future_evidence_required"));
   assert.ok(relationship.promptCompilerSignals.includes("milestone-assessment"));
   assert.ok(relationship.promptCompilerSignals.includes("plausibility-check"));
   assert.ok(relationship.promptCompilerSignals.includes("canon-fit"));
+  assert.ok(
+    relationship.promptCompilerSignals.includes(
+      "relationship-arc-beats-check",
+    ),
+  );
+  assert.ok(
+    relationship.promptCompilerSignals.includes(
+      "love-proving-moment-check",
+    ),
+  );
+  assert.ok(
+    relationship.promptCompilerSignals.includes("earned-break-check"),
+  );
+  assert.ok(
+    relationship.promptCompilerSignals.includes(
+      "separation-aftermath-check",
+    ),
+  );
+  assert.ok(
+    relationship.promptCompilerSignals.includes(
+      "sacrificial-grovel-check",
+    ),
+  );
+  assert.ok(
+    relationship.promptCompilerSignals.includes(
+      "forgiveness-not-forced-check",
+    ),
+  );
   assert.ok(
     relationship.sourceVaultLinks.includes(
       "relationship-tracker/references/relationship_framework_plausibility_layer.md",
@@ -251,10 +506,28 @@ test("relationship tracker interprets plausible next beats without flattening tr
       "relationship-tracker/references/relationship_milestone_assessment.md",
     ),
   );
+  assert.ok(
+    relationship.sourceVaultLinks.includes(
+      "relationship-tracker/references/relationship_arc_scene_beats.md",
+    ),
+  );
+  assert.ok(
+    relationship.sourceVaultLinks.includes(
+      "relationship-tracker/references/earned_break_separation_system.md",
+    ),
+  );
+  assert.ok(
+    relationship.sourceVaultLinks.includes(
+      "relationship-tracker/references/sacrificial_grovel_repair_system.md",
+    ),
+  );
   assert.ok(relationship.continuityLinks.includes("intimacy-shift"));
   assert.ok(relationship.continuityLinks.includes("knowledge-boundary-response"));
   assert.match(relationship.guardrails.join(" "), /numeric matrix/);
   assert.match(relationship.guardrails.join(" "), /mandatory staircase/);
+  assert.match(relationship.guardrails.join(" "), /required sequence/);
+  assert.match(relationship.guardrails.join(" "), /force a breakup/);
+  assert.match(relationship.guardrails.join(" "), /apology words/);
   assert.match(relationship.guardrails.join(" "), /\{\{user\}\} feelings/);
 });
 
@@ -302,22 +575,59 @@ test("story idea generator includes character engine concept support", () => {
   assert.equal(storyIdea.category, "story-development");
   assert.equal(storyIdea.source, "heartwrite_memory_vault");
   assert.ok(storyIdea.activationTags.includes("character_engine"));
+  assert.ok(storyIdea.activationTags.includes("opening_hook"));
+  assert.ok(storyIdea.activationTags.includes("inciting_incident"));
+  assert.ok(storyIdea.activationTags.includes("meet_cute_system"));
+  assert.ok(storyIdea.activationTags.includes("spark_obstacle"));
   assert.ok(storyIdea.activationTags.includes("trope_world"));
   assert.ok(storyIdea.activationTags.includes("three_act_emotional_arc"));
   assert.ok(storyIdea.triggerSeeds.includes("trope world"));
+  assert.ok(storyIdea.triggerSeeds.includes("opening hook"));
+  assert.ok(storyIdea.triggerSeeds.includes("inciting incident"));
+  assert.ok(storyIdea.triggerSeeds.includes("first chapter"));
+  assert.ok(storyIdea.triggerSeeds.includes("meet cute"));
+  assert.ok(storyIdea.triggerSeeds.includes("first encounter"));
+  assert.ok(storyIdea.triggerSeeds.includes("spark plus obstacle"));
   assert.ok(storyIdea.triggerSeeds.includes("character need"));
   assert.ok(storyIdea.triggerSeeds.includes("psychological flaw"));
   assert.ok(storyIdea.stateFields.includes("reader_promise"));
+  assert.ok(storyIdea.stateFields.includes("status_quo"));
+  assert.ok(storyIdea.stateFields.includes("interruption"));
+  assert.ok(storyIdea.stateFields.includes("first_action"));
+  assert.ok(storyIdea.stateFields.includes("spark"));
+  assert.ok(storyIdea.stateFields.includes("obstacle"));
+  assert.ok(storyIdea.stateFields.includes("same_glance_evidence"));
+  assert.ok(storyIdea.stateFields.includes("desire_before_safety"));
+  assert.ok(storyIdea.stateFields.includes("next_scene_pressure"));
   assert.ok(storyIdea.stateFields.includes("character_desire"));
   assert.ok(storyIdea.stateFields.includes("character_need"));
   assert.ok(storyIdea.stateFields.includes("character_lie"));
   assert.ok(storyIdea.stateFields.includes("care_goal"));
   assert.ok(storyIdea.promptCompilerSignals.includes("character-engine-check"));
   assert.ok(storyIdea.promptCompilerSignals.includes("story-concept-generation"));
+  assert.ok(storyIdea.promptCompilerSignals.includes("opening-hook-route"));
+  assert.ok(storyIdea.promptCompilerSignals.includes("inciting-incident-check"));
+  assert.ok(storyIdea.promptCompilerSignals.includes("status-quo-interruption-action"));
+  assert.ok(storyIdea.promptCompilerSignals.includes("meet-cute-check"));
+  assert.ok(storyIdea.promptCompilerSignals.includes("spark-obstacle-pairing"));
+  assert.ok(storyIdea.promptCompilerSignals.includes("same-glance-check"));
+  assert.ok(storyIdea.promptCompilerSignals.includes("desire-before-safety-check"));
+  assert.ok(storyIdea.promptCompilerSignals.includes("gmcs-voice-route"));
+  assert.ok(storyIdea.promptCompilerSignals.includes("fresh-romance-strategy-check"));
   assert.ok(storyIdea.promptCompilerSignals.includes("trope-world-check"));
   assert.ok(
     storyIdea.sourceVaultLinks.includes(
       "story-idea-generator/references/character_arc_need_desire_engine.md",
+    ),
+  );
+  assert.ok(
+    storyIdea.sourceVaultLinks.includes(
+      "story-idea-generator/references/story_crafting_engine_router.md",
+    ),
+  );
+  assert.ok(
+    storyIdea.sourceVaultLinks.includes(
+      "story-idea-generator/references/meet_cute_first_contact_system.md",
     ),
   );
   assert.ok(storyIdea.sourceVaultLinks.includes("character-arc-structure/SKILL.md"));
@@ -331,6 +641,67 @@ test("story idea generator includes character engine concept support", () => {
   assert.ok(storyIdea.continuityLinks.includes("relationship-tracker"));
   assert.match(storyIdea.guardrails.join(" "), /adult and fiction-framed/);
   assert.match(storyIdea.guardrails.join(" "), /generic trope paste/);
+});
+
+test("narrative complications engine routes subplots secrets and macguffins", () => {
+  const complications = requireSkill("narrative-complications-engine");
+
+  assert.equal(complications.category, "story-development");
+  assert.equal(complications.source, "heartwrite_memory_vault");
+  assert.ok(complications.scope.includes("prompt_book"));
+  assert.ok(complications.scope.includes("scenario_book"));
+  assert.ok(complications.scope.includes("world_book"));
+  assert.ok(complications.activationTags.includes("subplot_engine"));
+  assert.ok(complications.activationTags.includes("secrets_revelations"));
+  assert.ok(complications.activationTags.includes("macguffin_engine"));
+  assert.ok(complications.activationTags.includes("reveal_aftermath"));
+  assert.ok(complications.triggerSeeds.includes("relationship subplot"));
+  assert.ok(complications.triggerSeeds.includes("secret reveal"));
+  assert.ok(complications.triggerSeeds.includes("MacGuffin"));
+  assert.ok(complications.triggerSeeds.includes("living MacGuffin"));
+  assert.ok(complications.stateFields.includes("mode"));
+  assert.ok(complications.stateFields.includes("secret_holder"));
+  assert.ok(complications.stateFields.includes("secret_seeker"));
+  assert.ok(complications.stateFields.includes("macguffin_status"));
+  assert.ok(complications.stateFields.includes("legitimate_claimants"));
+  assert.ok(
+    complications.promptCompilerSignals.includes(
+      "narrative-complication-route",
+    ),
+  );
+  assert.ok(complications.promptCompilerSignals.includes("subplot-build-check"));
+  assert.ok(
+    complications.promptCompilerSignals.includes("secret-revelation-check"),
+  );
+  assert.ok(
+    complications.promptCompilerSignals.includes("macguffin-pressure-check"),
+  );
+  assert.ok(complications.promptCompilerSignals.includes("failure-mode-check"));
+  assert.ok(
+    complications.sourceVaultLinks.includes(
+      "narrative-complications-engine/references/subplots_engine.md",
+    ),
+  );
+  assert.ok(
+    complications.sourceVaultLinks.includes(
+      "narrative-complications-engine/references/secrets_revelations_engine.md",
+    ),
+  );
+  assert.ok(
+    complications.sourceVaultLinks.includes(
+      "narrative-complications-engine/references/macguffin_quest_object_engine.md",
+    ),
+  );
+  assert.ok(complications.continuityLinks.includes("story-idea-generator"));
+  assert.ok(complications.continuityLinks.includes("relationship-tracker"));
+  assert.ok(
+    complications.continuityLinks.includes("knowledge-boundary-response"),
+  );
+  assert.ok(complications.continuityLinks.includes("motive-tracker"));
+  assert.match(complications.guardrails.join(" "), /\{\{user\}\} agency/);
+  assert.match(complications.guardrails.join(" "), /force romance/);
+  assert.match(complications.guardrails.join(" "), /secrets leak/);
+  assert.match(complications.guardrails.join(" "), /living MacGuffins/);
 });
 
 test("weather natural phenomena maps climate natural law and scene hazards", () => {
@@ -381,6 +752,8 @@ test("character gmcs maps personal goals motives conflicts and stakes", () => {
   assert.ok(gmcs.scope.includes("scenario_book"));
   assert.ok(gmcs.activationTags.includes("story_gmcs_alignment"));
   assert.ok(gmcs.activationTags.includes("personal_stakes"));
+  assert.ok(gmcs.activationTags.includes("character_agency_check"));
+  assert.ok(gmcs.activationTags.includes("action_reaction_loop"));
   assert.ok(gmcs.triggerSeeds.includes("character GMCS"));
   assert.ok(gmcs.triggerSeeds.includes("why does this character care"));
   assert.ok(gmcs.stateFields.includes("story_goal"));
@@ -389,19 +762,85 @@ test("character gmcs maps personal goals motives conflicts and stakes", () => {
   assert.ok(gmcs.stateFields.includes("character_conflict"));
   assert.ok(gmcs.stateFields.includes("character_stakes"));
   assert.ok(gmcs.stateFields.includes("scene_application"));
+  assert.ok(gmcs.stateFields.includes("external_pressure"));
+  assert.ok(gmcs.stateFields.includes("plot_reaction"));
   assert.ok(gmcs.promptCompilerSignals.includes("character-gmcs-map"));
   assert.ok(gmcs.promptCompilerSignals.includes("story-gmcs-alignment"));
   assert.ok(gmcs.promptCompilerSignals.includes("scene-action-alignment"));
+  assert.ok(gmcs.promptCompilerSignals.includes("character-agency-check"));
+  assert.ok(gmcs.promptCompilerSignals.includes("action-reaction-loop"));
+  assert.ok(
+    gmcs.promptCompilerSignals.includes("passive-character-diagnostic"),
+  );
+  assert.ok(
+    gmcs.promptCompilerSignals.includes("overpowered-character-diagnostic"),
+  );
   assert.ok(
     gmcs.sourceVaultLinks.includes(
       "character-gmcs/references/character_gmcs_alignment_worksheet.md",
+    ),
+  );
+  assert.ok(
+    gmcs.sourceVaultLinks.includes(
+      "character-gmcs/references/gmcs_agency_plot_integration.md",
     ),
   );
   assert.ok(gmcs.continuityLinks.includes("character-arc-structure"));
   assert.ok(gmcs.continuityLinks.includes("romance-conflict-outliner"));
   assert.ok(gmcs.continuityLinks.includes("scene-sequel-structure"));
   assert.match(gmcs.guardrails.join(" "), /protagonist's exact goal/);
+  assert.match(gmcs.guardrails.join(" "), /passive/);
+  assert.match(gmcs.guardrails.join(" "), /competence/);
   assert.match(gmcs.guardrails.join(" "), /\{\{user\}\} goals/);
+});
+
+test("motive tracker maps motive states and intent reframing", () => {
+  const motive = requireSkill("motive-tracker");
+
+  assert.equal(motive.category, "roleplay-response");
+  assert.equal(motive.source, "heartwrite_memory_vault");
+  assert.ok(motive.scope.includes("character_book"));
+  assert.ok(motive.scope.includes("scenario_book"));
+  assert.ok(motive.scope.includes("memory_book"));
+  assert.ok(motive.activationTags.includes("active_motive"));
+  assert.ok(motive.activationTags.includes("blocked_motive"));
+  assert.ok(motive.activationTags.includes("conflicted_motive"));
+  assert.ok(motive.activationTags.includes("motive_interpretation"));
+  assert.ok(motive.activationTags.includes("intent_reframe"));
+  assert.ok(motive.activationTags.includes("moral_weight"));
+  assert.ok(motive.triggerSeeds.includes("why did they do that"));
+  assert.ok(motive.triggerSeeds.includes("what was their intention"));
+  assert.ok(motive.triggerSeeds.includes("hidden motive"));
+  assert.ok(motive.stateFields.includes("motive_state"));
+  assert.ok(motive.stateFields.includes("blockers"));
+  assert.ok(motive.stateFields.includes("competing_motives"));
+  assert.ok(motive.stateFields.includes("observed_action"));
+  assert.ok(motive.stateFields.includes("motive_hypotheses"));
+  assert.ok(motive.stateFields.includes("moral_weight"));
+  assert.ok(motive.stateFields.includes("identity_reframe"));
+  assert.ok(motive.stateFields.includes("confidence"));
+  assert.ok(motive.promptCompilerSignals.includes("motive-state-update"));
+  assert.ok(motive.promptCompilerSignals.includes("active-motive-check"));
+  assert.ok(motive.promptCompilerSignals.includes("blocked-motive-check"));
+  assert.ok(motive.promptCompilerSignals.includes("conflicted-motive-check"));
+  assert.ok(motive.promptCompilerSignals.includes("motive-interpretation-check"));
+  assert.ok(motive.promptCompilerSignals.includes("intent-reframe-check"));
+  assert.ok(motive.promptCompilerSignals.includes("moral-weight-check"));
+  assert.ok(motive.promptCompilerSignals.includes("motive-confidence-check"));
+  assert.ok(motive.sourceVaultLinks.includes("motive-tracker/SKILL.md"));
+  assert.ok(
+    motive.sourceVaultLinks.includes(
+      "motive-tracker/references/motive_interpretation_and_moral_weight.md",
+    ),
+  );
+  assert.ok(motive.sourceVaultLinks.includes("personality-values-and-morals/SKILL.md"));
+  assert.ok(motive.continuityLinks.includes("character-gmcs"));
+  assert.ok(motive.continuityLinks.includes("personality-values-and-morals"));
+  assert.ok(motive.continuityLinks.includes("flaw-preservation"));
+  assert.ok(motive.continuityLinks.includes("knowledge-boundary-response"));
+  assert.match(motive.guardrails.join(" "), /\{\{user\}\} agency/);
+  assert.match(motive.guardrails.join(" "), /moralize through the narrator/);
+  assert.match(motive.guardrails.join(" "), /motive confidence/);
 });
 
 test("character arc structure maps lie truth want need and plot-point evidence", () => {
@@ -411,25 +850,34 @@ test("character arc structure maps lie truth want need and plot-point evidence",
   assert.equal(arc.source, "heartwrite_memory_vault");
   assert.ok(arc.scope.includes("character_book"));
   assert.ok(arc.scope.includes("scenario_book"));
+  assert.ok(arc.activationTags.includes("positive_change_arc"));
   assert.ok(arc.activationTags.includes("lie_truth_arc"));
   assert.ok(arc.activationTags.includes("want_need_split"));
+  assert.ok(arc.activationTags.includes("reactive_to_active_shift"));
   assert.ok(arc.activationTags.includes("transformation_evidence"));
   assert.ok(arc.triggerSeeds.includes("character arc"));
+  assert.ok(arc.triggerSeeds.includes("Inciting Event"));
   assert.ok(arc.triggerSeeds.includes("Third Plot Point"));
   assert.ok(arc.triggerSeeds.includes("Resolution baseline"));
   assert.ok(arc.stateFields.includes("character_lie"));
   assert.ok(arc.stateFields.includes("counter_truth"));
   assert.ok(arc.stateFields.includes("ghost_wound"));
+  assert.ok(arc.stateFields.includes("lie_based_tactics"));
+  assert.ok(arc.stateFields.includes("reactive_to_active_shift"));
+  assert.ok(arc.stateFields.includes("truth_choice"));
   assert.ok(arc.stateFields.includes("midpoint_revelation"));
   assert.ok(arc.stateFields.includes("climax_proof"));
+  assert.ok(arc.promptCompilerSignals.includes("internal-elements-check"));
+  assert.ok(arc.promptCompilerSignals.includes("act-one-setup-check"));
+  assert.ok(arc.promptCompilerSignals.includes("act-two-struggle-check"));
+  assert.ok(arc.promptCompilerSignals.includes("act-three-climax-check"));
   assert.ok(arc.promptCompilerSignals.includes("lie-truth-check"));
   assert.ok(arc.promptCompilerSignals.includes("third-plot-point-sacrifice"));
   assert.ok(arc.promptCompilerSignals.includes("resolution-baseline"));
-  assert.ok(
-    arc.sourceVaultLinks.includes(
-      "character-arc-structure/references/character_arc_beat_structure_guide.md",
-    ),
-  );
+  assert.ok(arc.sourceVaultLinks.includes("character-arc-structure/references/internal_elements.md"));
+  assert.ok(arc.sourceVaultLinks.includes("character-arc-structure/references/act_one_setup.md"));
+  assert.ok(arc.sourceVaultLinks.includes("character-arc-structure/references/act_two_struggle.md"));
+  assert.ok(arc.sourceVaultLinks.includes("character-arc-structure/references/act_three_climax.md"));
   assert.ok(arc.sourceVaultLinks.includes("character-gmcs/SKILL.md"));
   assert.ok(arc.continuityLinks.includes("character-gmcs"));
   assert.ok(arc.continuityLinks.includes("story-idea-generator"));
@@ -437,7 +885,162 @@ test("character arc structure maps lie truth want need and plot-point evidence",
   assert.ok(arc.continuityLinks.includes("romance-conflict-outliner"));
   assert.ok(arc.continuityLinks.includes("crafting-satisfying-ending"));
   assert.match(arc.guardrails.join(" "), /moral correction/);
+  assert.match(arc.guardrails.join(" "), /revelation as full transformation/);
   assert.match(arc.guardrails.join(" "), /\{\{user\}\}'s arc/);
+});
+
+test("archetypal character arcs map life-cycle shadows and impact roles", () => {
+  const archetype = requireSkill("archetypal-character-arcs");
+
+  assert.equal(archetype.category, "story-development");
+  assert.equal(archetype.source, "heartwrite_memory_vault");
+  assert.ok(archetype.scope.includes("character_book"));
+  assert.ok(archetype.scope.includes("prompt_book"));
+  assert.ok(archetype.activationTags.includes("life_cycle_arcs"));
+  assert.ok(archetype.activationTags.includes("positive_change_archetypes"));
+  assert.ok(archetype.activationTags.includes("shadow_archetypes"));
+  assert.ok(archetype.activationTags.includes("flat_impact_archetypes"));
+  assert.ok(archetype.activationTags.includes("death_rebirth_beat"));
+  assert.ok(archetype.triggerSeeds.includes("archetypal arc"));
+  assert.ok(archetype.triggerSeeds.includes("Maiden Arc"));
+  assert.ok(archetype.triggerSeeds.includes("Mage Arc"));
+  assert.ok(archetype.triggerSeeds.includes("shadow archetype"));
+  assert.ok(archetype.triggerSeeds.includes("impact character"));
+  assert.ok(archetype.stateFields.includes("archetypal_lie"));
+  assert.ok(archetype.stateFields.includes("archetypal_truth"));
+  assert.ok(archetype.stateFields.includes("shadow_polarity"));
+  assert.ok(archetype.stateFields.includes("flat_impact_role"));
+  assert.ok(archetype.stateFields.includes("death_rebirth_beat"));
+  assert.ok(archetype.promptCompilerSignals.includes("archetypal-arc-route"));
+  assert.ok(archetype.promptCompilerSignals.includes("positive-change-archetype-check"));
+  assert.ok(archetype.promptCompilerSignals.includes("shadow-polarity-check"));
+  assert.ok(archetype.promptCompilerSignals.includes("flat-impact-role-check"));
+  assert.ok(archetype.promptCompilerSignals.includes("archetype-not-label-check"));
+  assert.ok(archetype.sourceVaultLinks.includes("archetypal-character-arcs/SKILL.md"));
+  assert.ok(
+    archetype.sourceVaultLinks.includes(
+      "archetypal-character-arcs/references/positive_change_arcs.md",
+    ),
+  );
+  assert.ok(
+    archetype.sourceVaultLinks.includes(
+      "archetypal-character-arcs/references/shadow_archetypes.md",
+    ),
+  );
+  assert.ok(
+    archetype.sourceVaultLinks.includes(
+      "archetypal-character-arcs/references/flat_archetypes.md",
+    ),
+  );
+  assert.ok(
+    archetype.sourceVaultLinks.includes(
+      "archetypal-character-arcs/references/structural_beats.md",
+    ),
+  );
+  assert.ok(archetype.continuityLinks.includes("character-arc-structure"));
+  assert.ok(archetype.continuityLinks.includes("character-gmcs"));
+  assert.ok(archetype.continuityLinks.includes("flaw-preservation"));
+  assert.ok(archetype.continuityLinks.includes("personality-gradual-development"));
+  assert.match(archetype.guardrails.join(" "), /age, gender/);
+  assert.match(archetype.guardrails.join(" "), /single label/);
+  assert.match(archetype.guardrails.join(" "), /shadow archetypes as automatic villainy/);
+  assert.match(archetype.guardrails.join(" "), /\{\{user\}\}'s inner life/);
+});
+
+test("flaw preservation routes character-flaw-system without duplicating the skill", () => {
+  const flaw = requireSkill("flaw-preservation");
+
+  assert.equal(flaw.category, "roleplay-response");
+  assert.equal(flaw.source, "heartwrite_memory_vault");
+  assert.ok(flaw.scope.includes("character_book"));
+  assert.ok(flaw.scope.includes("scenario_book"));
+  assert.ok(flaw.scope.includes("memory_book"));
+  assert.ok(flaw.scope.includes("prompt_book"));
+  assert.ok(flaw.activationTags.includes("flaw_preservation"));
+  assert.ok(flaw.activationTags.includes("character_flaw_system"));
+  assert.ok(flaw.activationTags.includes("flaw_consequence"));
+  assert.ok(flaw.activationTags.includes("earned_change"));
+  assert.ok(flaw.activationTags.includes("resist_correction"));
+  assert.ok(flaw.triggerSeeds.includes("character-flaw-system"));
+  assert.ok(flaw.triggerSeeds.includes("messy characterization"));
+  assert.ok(flaw.triggerSeeds.includes("resist correction"));
+  assert.ok(flaw.stateFields.includes("recognition_level"));
+  assert.ok(flaw.stateFields.includes("earned_change_evidence"));
+  assert.ok(flaw.promptCompilerSignals.includes("character-flaw-system-route"));
+  assert.ok(flaw.promptCompilerSignals.includes("resist-correction-check"));
+  assert.ok(flaw.sourceVaultLinks.includes("flaw-preservation/SKILL.md"));
+  assert.ok(
+    flaw.sourceVaultLinks.includes(
+      "flaw-preservation/references/character_flaw_system_source_fold_in.md",
+    ),
+  );
+  assert.ok(flaw.continuityLinks.includes("personality-behavioral-contradiction"));
+  assert.ok(flaw.continuityLinks.includes("personality-gradual-development"));
+  assert.ok(flaw.continuityLinks.includes("stress-response"));
+  assert.match(flaw.guardrails.join(" "), /\{\{user\}\} agency/);
+  assert.match(flaw.guardrails.join(" "), /correct flaws before story events earn/);
+});
+
+test("story grid engine maps core promise antagonist pressure and love mechanics", () => {
+  const storyGrid = requireSkill("story-grid-engine");
+
+  assert.equal(storyGrid.category, "story-development");
+  assert.equal(storyGrid.source, "heartwrite_memory_vault");
+  assert.ok(storyGrid.scope.includes("prompt_book"));
+  assert.ok(storyGrid.scope.includes("world_book"));
+  assert.ok(storyGrid.activationTags.includes("four_core_framework"));
+  assert.ok(storyGrid.activationTags.includes("core_need"));
+  assert.ok(storyGrid.activationTags.includes("core_event"));
+  assert.ok(storyGrid.activationTags.includes("antagonist_pressure"));
+  assert.ok(storyGrid.activationTags.includes("love_story_conventions"));
+  assert.ok(storyGrid.activationTags.includes("love_triangle_dynamics"));
+  assert.ok(storyGrid.triggerSeeds.includes("story grid"));
+  assert.ok(storyGrid.triggerSeeds.includes("core need"));
+  assert.ok(storyGrid.triggerSeeds.includes("antagonist design"));
+  assert.ok(storyGrid.triggerSeeds.includes("proof of love"));
+  assert.ok(storyGrid.triggerSeeds.includes("love triangle"));
+  assert.ok(storyGrid.stateFields.includes("core_need"));
+  assert.ok(storyGrid.stateFields.includes("core_value_spectrum"));
+  assert.ok(storyGrid.stateFields.includes("core_emotion"));
+  assert.ok(storyGrid.stateFields.includes("core_event"));
+  assert.ok(storyGrid.stateFields.includes("antagonist_function"));
+  assert.ok(storyGrid.stateFields.includes("love_story_conventions"));
+  assert.ok(storyGrid.stateFields.includes("proof_of_love_cost"));
+  assert.ok(storyGrid.stateFields.includes("triangle_active_choice"));
+  assert.ok(storyGrid.promptCompilerSignals.includes("four-core-check"));
+  assert.ok(storyGrid.promptCompilerSignals.includes("antagonist-pressure-check"));
+  assert.ok(storyGrid.promptCompilerSignals.includes("love-genre-convention-check"));
+  assert.ok(storyGrid.promptCompilerSignals.includes("proof-of-love-check"));
+  assert.ok(storyGrid.promptCompilerSignals.includes("love-triangle-viability-check"));
+  assert.ok(storyGrid.sourceVaultLinks.includes("story-grid-engine/SKILL.md"));
+  assert.ok(
+    storyGrid.sourceVaultLinks.includes(
+      "story-grid-engine/references/four_core_framework.md",
+    ),
+  );
+  assert.ok(
+    storyGrid.sourceVaultLinks.includes(
+      "story-grid-engine/references/antagonist_design.md",
+    ),
+  );
+  assert.ok(
+    storyGrid.sourceVaultLinks.includes(
+      "story-grid-engine/references/love_genre_mechanics.md",
+    ),
+  );
+  assert.ok(
+    storyGrid.sourceVaultLinks.includes(
+      "story-grid-engine/references/love_triangle_dynamics.md",
+    ),
+  );
+  assert.ok(storyGrid.continuityLinks.includes("story-idea-generator"));
+  assert.ok(storyGrid.continuityLinks.includes("relationship-tracker"));
+  assert.ok(storyGrid.continuityLinks.includes("romance-conflict-outliner"));
+  assert.ok(storyGrid.continuityLinks.includes("trope-world-builder"));
+  assert.match(storyGrid.guardrails.join(" "), /mandatory formula/);
+  assert.match(storyGrid.guardrails.join(" "), /proof-of-love beats/);
+  assert.match(storyGrid.guardrails.join(" "), /\{\{user\}\} feelings/);
+  assert.match(storyGrid.guardrails.join(" "), /moralize through the narrator/);
 });
 
 test("scene sequel structure maps goal conflict disaster and aftermath handoff", () => {
