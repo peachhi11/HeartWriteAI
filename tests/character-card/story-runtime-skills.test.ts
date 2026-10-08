@@ -98,6 +98,60 @@ test("power dynamics scene writing preserves explicit register and user agency",
   assert.match(powerDynamics.guardrails.join(" "), /\{\{user\}\} thoughts/);
 });
 
+test("erotic dynamics prose calibrates heat as camera distance and character voice", () => {
+  const prose = requireSkill("erotic-dynamics-prose");
+
+  assert.equal(prose.category, "roleplay-response");
+  assert.equal(prose.source, "heartwrite_memory_vault");
+  assert.ok(prose.scope.includes("prompt_book"));
+  assert.ok(prose.scope.includes("character_book"));
+  assert.ok(prose.scope.includes("scenario_book"));
+  assert.ok(prose.scope.includes("memory_book"));
+  assert.ok(prose.activationTags.includes("heat_register_calibration"));
+  assert.ok(prose.activationTags.includes("camera_dial_not_plot_dial"));
+  assert.ok(prose.activationTags.includes("voice_card"));
+  assert.ok(prose.activationTags.includes("attention_consequence_heat"));
+  assert.ok(prose.activationTags.includes("authority_signature_variety"));
+  assert.ok(prose.triggerSeeds.includes("camera dial"));
+  assert.ok(prose.triggerSeeds.includes("voice card"));
+  assert.ok(prose.triggerSeeds.includes("flat and floaty"));
+  assert.ok(prose.triggerSeeds.includes("hot but empty"));
+  assert.ok(prose.stateFields.includes("requested_heat_register"));
+  assert.ok(prose.stateFields.includes("camera_distance"));
+  assert.ok(prose.stateFields.includes("voice_card_status"));
+  assert.ok(prose.stateFields.includes("authority_signature"));
+  assert.ok(prose.stateFields.includes("attention_read"));
+  assert.ok(prose.stateFields.includes("landing_required"));
+  assert.ok(prose.promptCompilerSignals.includes("heat-register-check"));
+  assert.ok(prose.promptCompilerSignals.includes("camera-distance-check"));
+  assert.ok(prose.promptCompilerSignals.includes("voice-card-required"));
+  assert.ok(prose.promptCompilerSignals.includes("authority-variety-check"));
+  assert.ok(prose.promptCompilerSignals.includes("landing-required-check"));
+  assert.ok(prose.sourceVaultLinks.includes("erotic-dynamics-prose/SKILL.md"));
+  assert.ok(
+    prose.sourceVaultLinks.includes(
+      "erotic-dynamics-prose/references/dynamics-deep.md",
+    ),
+  );
+  assert.ok(
+    prose.sourceVaultLinks.includes(
+      "erotic-dynamics-prose/references/heat-levels.md",
+    ),
+  );
+  assert.ok(
+    prose.sourceVaultLinks.includes(
+      "erotic-dynamics-prose/references/voice-card.md",
+    ),
+  );
+  assert.ok(prose.continuityLinks.includes("power-dynamics-scene-writing"));
+  assert.ok(prose.continuityLinks.includes("erotic-archetypes-engine"));
+  assert.ok(prose.continuityLinks.includes("romantic-speech-pattern"));
+  assert.match(prose.guardrails.join(" "), /camera distance/);
+  assert.match(prose.guardrails.join(" "), /stillness or low speech/);
+  assert.match(prose.guardrails.join(" "), /claim the person/);
+  assert.match(prose.guardrails.join(" "), /\{\{user\}\} thoughts/);
+});
+
 test("dominance and intimacy flow links explicit somatic flow resource", () => {
   const intimacyFlow = requireSkill("dominance-and-intimacy-flow");
 
