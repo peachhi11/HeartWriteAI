@@ -355,6 +355,76 @@ export const EvaluationWindowGuardrailTraceSchema = z
     }
   });
 
+export const StoryEvalRunResultSchema = z
+  .object({
+    metadata: z
+      .object({
+        run_id: nonEmptyStringSchema,
+        created_at: z.string().datetime(),
+        storybook_id: nonEmptyStringSchema.optional(),
+        privacy_mode: z
+          .enum(["aggregate_only", "explicitly_saved_source"])
+          .default("aggregate_only"),
+      })
+      .strict(),
+    suites: z
+      .object({
+        evaluation_window_guardrail_traces: z
+          .array(EvaluationWindowGuardrailTraceSchema)
+          .default([]),
+        reasoning_integrity_suites: z
+          .array(ReasoningIntegritySuiteSchema)
+          .default([]),
+      })
+      .strict(),
+    summary: z
+      .object({
+        suite_count: z.number().int().min(1),
+        sample_count: z.number().int().min(1),
+        fallback_required: z.boolean(),
+        review_label: EvaluationTraceReviewLabelSchema,
+        mitigation_proposals: z.array(nonEmptyStringSchema).default([]),
+        blocked_routes: z.number().int().min(0),
+        sandbox_routes: z.number().int().min(0),
+        failed_reasoning_checks: z
+          .array(ReasoningIntegrityCheckKeySchema)
+          .default([]),
+        warning_reasoning_checks: z
+          .array(ReasoningIntegrityCheckKeySchema)
+          .default([]),
+        context_pruning_recommended: z.boolean(),
+        collapse_warning: z.boolean(),
+        trace_visibility: traceVisibilitySchema.default("hidden"),
+      })
+      .strict(),
+  })
+  .strict()
+  .superRefine((runResult, context) => {
+    const suiteCount =
+      runResult.suites.evaluation_window_guardrail_traces.length +
+      runResult.suites.reasoning_integrity_suites.length;
+
+    if (suiteCount === 0) {
+      context.addIssue({
+        code: "custom",
+        message: "story eval run results must include at least one suite",
+        path: ["suites"],
+      });
+    }
+
+    if (
+      runResult.metadata.privacy_mode === "aggregate_only" &&
+      runResult.summary.trace_visibility === "debug_local_only"
+    ) {
+      context.addIssue({
+        code: "custom",
+        message:
+          "debug trace visibility requires explicitly_saved_source privacy mode",
+        path: ["summary", "trace_visibility"],
+      });
+    }
+  });
+
 export type EvaluationWindowGuardrailTrace = z.infer<
   typeof EvaluationWindowGuardrailTraceSchema
 >;
@@ -387,6 +457,7 @@ export type ReasoningIntegrityCheckInput = z.input<
 export type ReasoningIntegritySuite = z.infer<
   typeof ReasoningIntegritySuiteSchema
 >;
+export type StoryEvalRunResult = z.infer<typeof StoryEvalRunResultSchema>;
 
 export function parseEvaluationWindowGuardrailTrace(input: unknown) {
   return EvaluationWindowGuardrailTraceSchema.parse(input);
@@ -836,6 +907,92 @@ export function createReasoningIntegritySuite(input: {
   });
 }
 
+export function createStoryEvalRunResult(input: {
+  run_id: string;
+  created_at: string;
+  storybook_id?: string;
+  privacy_mode?: "aggregate_only" | "explicitly_saved_source";
+  evaluation_window_guardrail_traces?: readonly EvaluationWindowGuardrailTrace[];
+  reasoning_integrity_suites?: readonly ReasoningIntegritySuite[];
+}): StoryEvalRunResult {
+  const evaluationWindowGuardrailTraces = (
+    input.evaluation_window_guardrail_traces ?? []
+  ).map((trace) => EvaluationWindowGuardrailTraceSchema.parse(trace));
+  const reasoningIntegritySuites = (
+    input.reasoning_integrity_suites ?? []
+  ).map((suite) => ReasoningIntegritySuiteSchema.parse(suite));
+  const blockedRoutes = evaluationWindowGuardrailTraces.filter(
+    (trace) => trace.guardrail_trace.toxicity_routing.target_route === "blocked",
+  ).length;
+  const sandboxRoutes = evaluationWindowGuardrailTraces.filter(
+    (trace) => trace.guardrail_trace.toxicity_routing.target_route === "sandbox",
+  ).length;
+  const failedReasoningChecks = uniqueValues(
+    reasoningIntegritySuites.flatMap((suite) => suite.summary.failed_checks),
+  );
+  const warningReasoningChecks = uniqueValues(
+    reasoningIntegritySuites.flatMap((suite) => suite.summary.warning_checks),
+  );
+  const contextPruningRecommended = evaluationWindowGuardrailTraces.some(
+    (trace) =>
+      trace.evaluation_window.narrative_metrics.context_pruning_recommended,
+  );
+  const collapseWarning = evaluationWindowGuardrailTraces.some(
+    (trace) =>
+      trace.evaluation_window.behavioral_metrics.message_length
+        .collapse_warning,
+  );
+  const fallbackRequired = evaluationWindowGuardrailTraces.some(
+    (trace) => trace.guardrail_trace.fallback_required,
+  );
+  const reviewLabel =
+    blockedRoutes > 0 || failedReasoningChecks.length > 0
+      ? "Review Before Export"
+      : sandboxRoutes > 0 ||
+          warningReasoningChecks.length > 0 ||
+          contextPruningRecommended ||
+          collapseWarning
+        ? "Needs Your Eye"
+        : "Ready to Play";
+  const mitigationProposals = uniqueValues(
+    evaluationWindowGuardrailTraces.flatMap((trace) =>
+      trace.review?.mitigation_proposal
+        ? [trace.review.mitigation_proposal]
+        : [],
+    ),
+  );
+  const suiteCount =
+    evaluationWindowGuardrailTraces.length + reasoningIntegritySuites.length;
+
+  return StoryEvalRunResultSchema.parse({
+    metadata: {
+      run_id: input.run_id,
+      created_at: input.created_at,
+      storybook_id: input.storybook_id,
+      privacy_mode: input.privacy_mode ?? "aggregate_only",
+    },
+    suites: {
+      evaluation_window_guardrail_traces: evaluationWindowGuardrailTraces,
+      reasoning_integrity_suites: reasoningIntegritySuites,
+    },
+    summary: {
+      suite_count: suiteCount,
+      sample_count: suiteCount,
+      fallback_required: fallbackRequired,
+      review_label: reviewLabel,
+      mitigation_proposals: mitigationProposals,
+      blocked_routes: blockedRoutes,
+      sandbox_routes: sandboxRoutes,
+      failed_reasoning_checks: failedReasoningChecks,
+      warning_reasoning_checks: warningReasoningChecks,
+      context_pruning_recommended: contextPruningRecommended,
+      collapse_warning: collapseWarning,
+      trace_visibility:
+        reviewLabel === "Ready to Play" ? "hidden" : "author_summary",
+    },
+  });
+}
+
 function roundToTwoDecimals(value: number): number {
   return Math.round(value * 100) / 100;
 }
@@ -874,4 +1031,8 @@ function assertNonNegativeIntegerTokenCount(value: number, label: string): void 
   if (!Number.isInteger(value) || value < 0) {
     throw new Error(`${label} must be a non-negative integer`);
   }
+}
+
+function uniqueValues<T>(values: readonly T[]): T[] {
+  return Array.from(new Set(values));
 }

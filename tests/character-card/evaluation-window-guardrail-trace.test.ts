@@ -8,6 +8,7 @@ import {
   createResponseLatencyProfile,
   createResponseSpeedDiagnostic,
   createReasoningIntegritySuite,
+  createStoryEvalRunResult,
   detectFormattingArchetype,
   EvaluationWindowGuardrailTraceSchema,
   estimateMessageTokenCount,
@@ -16,6 +17,7 @@ import {
   ReasoningIntegrityCheckSchema,
   ReasoningIntegritySuiteSchema,
   resolveGuardrailRoute,
+  StoryEvalRunResultSchema,
 } from "../../lib/character-card/evaluationWindowGuardrailTrace";
 
 const baseTrace = {
@@ -865,4 +867,149 @@ test("keeps raw private text out of reasoning integrity suites", () => {
   });
 
   assert.equal(result.success, false);
+});
+
+test("creates a story eval run result from trace and reasoning suites", () => {
+  const route = resolveGuardrailRoute({
+    consentBoundaryProximity: 0.62,
+    toxicityScore: 0.61,
+    userAgencyViolationDetected: false,
+    platformRouteGuardrailVerified: true,
+    savedPreferenceIntegrityVerified: true,
+  });
+  const trace = EvaluationWindowGuardrailTraceSchema.parse({
+    ...baseTrace,
+    evaluation_window: {
+      ...baseTrace.evaluation_window,
+      behavioral_metrics: {
+        ...baseTrace.evaluation_window.behavioral_metrics,
+        message_length: {
+          rolling_average_tokens: 120,
+          delta_percentage: 80,
+          collapse_warning: true,
+        },
+      },
+      narrative_metrics: {
+        ...baseTrace.evaluation_window.narrative_metrics,
+        context_pruning_recommended: true,
+      },
+    },
+    guardrail_trace: {
+      ...baseTrace.guardrail_trace,
+      consent_boundary_proximity: 0.62,
+      toxicity_routing: {
+        score: 0.61,
+        target_route: route.target_route,
+      },
+      fallback_required: route.fallback_required,
+    },
+    review: {
+      review_label: route.review_label,
+      mitigation_proposal: route.mitigation_proposal,
+      trace_visibility: "author_summary",
+    },
+  });
+  const reasoningSuite = createReasoningIntegritySuite({
+    suite_id: "storybook-run-reasoning",
+    run_id: "run-rose-house",
+    created_at: "2026-10-09T04:10:00.000Z",
+    checks: [
+      {
+        key: "continuity_reasoning",
+        score: 0.95,
+        status: "pass",
+      },
+      {
+        key: "agency_reasoning",
+        score: 0.72,
+        status: "warning",
+        violations: [
+          {
+            code: "user_agency_assignment",
+            message: "Opening risked assigning a player reaction.",
+            affected_books: ["scenario_book", "prompt_book"],
+          },
+        ],
+      },
+    ],
+  });
+  const result = createStoryEvalRunResult({
+    run_id: "run-rose-house",
+    created_at: "2026-10-09T04:15:00.000Z",
+    storybook_id: "storybook-rose-house",
+    evaluation_window_guardrail_traces: [trace],
+    reasoning_integrity_suites: [reasoningSuite],
+  });
+
+  assert.equal(result.metadata.privacy_mode, "aggregate_only");
+  assert.equal(result.summary.suite_count, 2);
+  assert.equal(result.summary.sample_count, 2);
+  assert.equal(result.summary.review_label, "Needs Your Eye");
+  assert.equal(result.summary.fallback_required, true);
+  assert.equal(result.summary.sandbox_routes, 1);
+  assert.equal(result.summary.blocked_routes, 0);
+  assert.equal(result.summary.context_pruning_recommended, true);
+  assert.equal(result.summary.collapse_warning, true);
+  assert.deepEqual(result.summary.warning_reasoning_checks, [
+    "agency_reasoning",
+  ]);
+  assert.deepEqual(result.summary.mitigation_proposals, [
+    "Route this turn through sandbox review before generation.",
+  ]);
+  assert.equal(result.summary.trace_visibility, "author_summary");
+});
+
+test("rejects empty story eval run results and aggregate debug visibility", () => {
+  const emptyResult = StoryEvalRunResultSchema.safeParse({
+    metadata: {
+      run_id: "empty-run",
+      created_at: "2026-10-09T04:15:00.000Z",
+    },
+    suites: {
+      evaluation_window_guardrail_traces: [],
+      reasoning_integrity_suites: [],
+    },
+    summary: {
+      suite_count: 1,
+      sample_count: 1,
+      fallback_required: false,
+      review_label: "Ready to Play",
+      mitigation_proposals: [],
+      blocked_routes: 0,
+      sandbox_routes: 0,
+      failed_reasoning_checks: [],
+      warning_reasoning_checks: [],
+      context_pruning_recommended: false,
+      collapse_warning: false,
+      trace_visibility: "hidden",
+    },
+  });
+  const aggregateDebugResult = StoryEvalRunResultSchema.safeParse({
+    metadata: {
+      run_id: "debug-run",
+      created_at: "2026-10-09T04:15:00.000Z",
+      privacy_mode: "aggregate_only",
+    },
+    suites: {
+      evaluation_window_guardrail_traces: [baseTrace],
+      reasoning_integrity_suites: [],
+    },
+    summary: {
+      suite_count: 1,
+      sample_count: 1,
+      fallback_required: false,
+      review_label: "Ready to Play",
+      mitigation_proposals: [],
+      blocked_routes: 0,
+      sandbox_routes: 0,
+      failed_reasoning_checks: [],
+      warning_reasoning_checks: [],
+      context_pruning_recommended: false,
+      collapse_warning: false,
+      trace_visibility: "debug_local_only",
+    },
+  });
+
+  assert.equal(emptyResult.success, false);
+  assert.equal(aggregateDebugResult.success, false);
 });
