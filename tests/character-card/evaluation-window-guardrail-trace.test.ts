@@ -15,6 +15,7 @@ import {
   parseEvaluationWindowGuardrailTrace,
   ReasoningIntegrityCheckSchema,
   ReasoningIntegritySuiteSchema,
+  resolveGuardrailRoute,
 } from "../../lib/character-card/evaluationWindowGuardrailTrace";
 
 const baseTrace = {
@@ -226,6 +227,160 @@ test("allows debug visibility only when the source was explicitly saved", () => 
   });
 
   assert.equal(result.success, true);
+});
+
+test("resolves standard guardrail route when scores and integrity checks are clean", () => {
+  const route = resolveGuardrailRoute({
+    consentBoundaryProximity: 0.12,
+    toxicityScore: 0.08,
+    userAgencyViolationDetected: false,
+    platformRouteGuardrailVerified: true,
+    savedPreferenceIntegrityVerified: true,
+  });
+
+  assert.equal(route.target_route, "standard");
+  assert.equal(route.fallback_required, false);
+  assert.equal(route.review_label, "Set in Ink");
+  assert.deepEqual(route.reason_codes, []);
+  assert.equal(route.mitigation_proposal, undefined);
+});
+
+test("resolves sandbox route for elevated but non-blocking guardrail scores", () => {
+  const route = resolveGuardrailRoute({
+    consentBoundaryProximity: 0.58,
+    toxicityScore: 0.2,
+    userAgencyViolationDetected: false,
+    platformRouteGuardrailVerified: true,
+    savedPreferenceIntegrityVerified: true,
+  });
+
+  assert.equal(route.target_route, "sandbox");
+  assert.equal(route.fallback_required, true);
+  assert.equal(route.review_label, "Needs Your Eye");
+  assert.deepEqual(route.reason_codes, ["consent_boundary_sandbox_threshold"]);
+  assert.equal(
+    route.mitigation_proposal,
+    "Route this turn through sandbox review before generation.",
+  );
+});
+
+test("resolves blocked route for hard guardrail failures", () => {
+  const route = resolveGuardrailRoute({
+    consentBoundaryProximity: 0.2,
+    toxicityScore: 0.91,
+    userAgencyViolationDetected: true,
+    platformRouteGuardrailVerified: true,
+    savedPreferenceIntegrityVerified: true,
+  });
+
+  assert.equal(route.target_route, "blocked");
+  assert.equal(route.fallback_required, true);
+  assert.equal(route.review_label, "Review Before Export");
+  assert.deepEqual(route.reason_codes, [
+    "user_agency_violation",
+    "toxicity_block_threshold",
+  ]);
+  assert.equal(
+    route.mitigation_proposal,
+    "Stop generation and use a plain-language fallback.",
+  );
+});
+
+test("blocks guardrail routing when platform or saved preferences are unverified", () => {
+  const route = resolveGuardrailRoute({
+    consentBoundaryProximity: 0,
+    toxicityScore: 0,
+    userAgencyViolationDetected: false,
+    platformRouteGuardrailVerified: false,
+    savedPreferenceIntegrityVerified: false,
+  });
+
+  assert.equal(route.target_route, "blocked");
+  assert.deepEqual(route.reason_codes, [
+    "platform_route_unverified",
+    "saved_preference_integrity_failed",
+  ]);
+});
+
+test("supports custom guardrail route thresholds", () => {
+  const route = resolveGuardrailRoute({
+    consentBoundaryProximity: 0.4,
+    toxicityScore: 0.3,
+    userAgencyViolationDetected: false,
+    platformRouteGuardrailVerified: true,
+    savedPreferenceIntegrityVerified: true,
+    sandboxThreshold: 0.3,
+    blockThreshold: 0.6,
+  });
+
+  assert.equal(route.target_route, "sandbox");
+  assert.deepEqual(route.reason_codes, [
+    "toxicity_sandbox_threshold",
+    "consent_boundary_sandbox_threshold",
+  ]);
+});
+
+test("rejects invalid guardrail route inputs", () => {
+  assert.throws(() =>
+    resolveGuardrailRoute({
+      consentBoundaryProximity: -0.1,
+      toxicityScore: 0,
+      userAgencyViolationDetected: false,
+      platformRouteGuardrailVerified: true,
+      savedPreferenceIntegrityVerified: true,
+    }),
+  );
+  assert.throws(() =>
+    resolveGuardrailRoute({
+      consentBoundaryProximity: 0,
+      toxicityScore: 1.1,
+      userAgencyViolationDetected: false,
+      platformRouteGuardrailVerified: true,
+      savedPreferenceIntegrityVerified: true,
+    }),
+  );
+  assert.throws(() =>
+    resolveGuardrailRoute({
+      consentBoundaryProximity: 0,
+      toxicityScore: 0,
+      userAgencyViolationDetected: false,
+      platformRouteGuardrailVerified: true,
+      savedPreferenceIntegrityVerified: true,
+      sandboxThreshold: 0.8,
+      blockThreshold: 0.8,
+    }),
+  );
+});
+
+test("uses resolved guardrail routing inside evaluation traces", () => {
+  const route = resolveGuardrailRoute({
+    consentBoundaryProximity: 0.62,
+    toxicityScore: 0.61,
+    userAgencyViolationDetected: false,
+    platformRouteGuardrailVerified: true,
+    savedPreferenceIntegrityVerified: true,
+  });
+  const trace = EvaluationWindowGuardrailTraceSchema.parse({
+    ...baseTrace,
+    guardrail_trace: {
+      ...baseTrace.guardrail_trace,
+      consent_boundary_proximity: 0.62,
+      toxicity_routing: {
+        score: 0.61,
+        target_route: route.target_route,
+      },
+      fallback_required: route.fallback_required,
+    },
+    review: {
+      review_label: route.review_label,
+      mitigation_proposal: route.mitigation_proposal,
+      trace_visibility: "author_summary",
+    },
+  });
+
+  assert.equal(trace.guardrail_trace.toxicity_routing.target_route, "sandbox");
+  assert.equal(trace.guardrail_trace.fallback_required, true);
+  assert.equal(trace.review?.review_label, "Needs Your Eye");
 });
 
 test("creates a raw response speed diagnostic without normalized scoring", () => {

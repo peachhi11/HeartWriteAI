@@ -10,6 +10,8 @@ const defaultLatencyTargetMedianSeconds = 2.5;
 const defaultLatencyMaxAcceptableSeconds = 12;
 const defaultMaxContextTokens = 8192;
 const defaultPruningThresholdPercentage = 80;
+const defaultSandboxThreshold = 0.55;
+const defaultBlockThreshold = 0.9;
 const asteriskFormattingPattern = /\*+([^*]+)\*+/g;
 const quoteFormattingPattern =
   /["\u201c\u201d\u2018\u2019][^"\u201c\u201d\u2018\u2019]+["\u201c\u201d\u2018\u2019]/g;
@@ -43,6 +45,26 @@ export const EvaluationTraceReviewLabelSchema = z.enum([
 ]);
 
 export const ToxicityRouteSchema = z.enum(["standard", "sandbox", "blocked"]);
+
+export const GuardrailRouteReasonCodeSchema = z.enum([
+  "platform_route_unverified",
+  "saved_preference_integrity_failed",
+  "user_agency_violation",
+  "toxicity_block_threshold",
+  "consent_boundary_block_threshold",
+  "toxicity_sandbox_threshold",
+  "consent_boundary_sandbox_threshold",
+]);
+
+export const GuardrailRouteResolutionSchema = z
+  .object({
+    target_route: ToxicityRouteSchema,
+    fallback_required: z.boolean(),
+    review_label: EvaluationTraceReviewLabelSchema,
+    reason_codes: z.array(GuardrailRouteReasonCodeSchema),
+    mitigation_proposal: nonEmptyStringSchema.optional(),
+  })
+  .strict();
 
 export const ReasoningIntegrityCheckKeySchema = z.enum([
   "continuity_reasoning",
@@ -336,6 +358,12 @@ export const EvaluationWindowGuardrailTraceSchema = z
 export type EvaluationWindowGuardrailTrace = z.infer<
   typeof EvaluationWindowGuardrailTraceSchema
 >;
+export type GuardrailRouteReasonCode = z.infer<
+  typeof GuardrailRouteReasonCodeSchema
+>;
+export type GuardrailRouteResolution = z.infer<
+  typeof GuardrailRouteResolutionSchema
+>;
 export type ResponseSpeedDiagnostic = z.infer<
   typeof ResponseSpeedDiagnosticSchema
 >;
@@ -362,6 +390,93 @@ export type ReasoningIntegritySuite = z.infer<
 
 export function parseEvaluationWindowGuardrailTrace(input: unknown) {
   return EvaluationWindowGuardrailTraceSchema.parse(input);
+}
+
+export function resolveGuardrailRoute(input: {
+  consentBoundaryProximity: number;
+  toxicityScore: number;
+  userAgencyViolationDetected: boolean;
+  platformRouteGuardrailVerified: boolean;
+  savedPreferenceIntegrityVerified: boolean;
+  sandboxThreshold?: number;
+  blockThreshold?: number;
+}): GuardrailRouteResolution {
+  const sandboxThreshold = input.sandboxThreshold ?? defaultSandboxThreshold;
+  const blockThreshold = input.blockThreshold ?? defaultBlockThreshold;
+
+  if (
+    !Number.isFinite(sandboxThreshold) ||
+    !Number.isFinite(blockThreshold) ||
+    sandboxThreshold < 0 ||
+    sandboxThreshold > 1 ||
+    blockThreshold < 0 ||
+    blockThreshold > 1 ||
+    sandboxThreshold >= blockThreshold
+  ) {
+    throw new Error("guardrail route thresholds must be ordered 0..1 scores");
+  }
+
+  const consentBoundaryProximity = normalizedScoreSchema.parse(
+    input.consentBoundaryProximity,
+  );
+  const toxicityScore = normalizedScoreSchema.parse(input.toxicityScore);
+  const reasonCodes: GuardrailRouteReasonCode[] = [];
+
+  if (!input.platformRouteGuardrailVerified) {
+    reasonCodes.push("platform_route_unverified");
+  }
+
+  if (!input.savedPreferenceIntegrityVerified) {
+    reasonCodes.push("saved_preference_integrity_failed");
+  }
+
+  if (input.userAgencyViolationDetected) {
+    reasonCodes.push("user_agency_violation");
+  }
+
+  if (toxicityScore >= blockThreshold) {
+    reasonCodes.push("toxicity_block_threshold");
+  }
+
+  if (consentBoundaryProximity >= blockThreshold) {
+    reasonCodes.push("consent_boundary_block_threshold");
+  }
+
+  const hasBlockReason = reasonCodes.length > 0;
+
+  if (!hasBlockReason && toxicityScore >= sandboxThreshold) {
+    reasonCodes.push("toxicity_sandbox_threshold");
+  }
+
+  if (!hasBlockReason && consentBoundaryProximity >= sandboxThreshold) {
+    reasonCodes.push("consent_boundary_sandbox_threshold");
+  }
+
+  const hasSandboxReason = reasonCodes.length > 0;
+  const targetRoute = hasBlockReason
+    ? "blocked"
+    : hasSandboxReason
+      ? "sandbox"
+      : "standard";
+  const mitigationProposal =
+    targetRoute === "blocked"
+      ? "Stop generation and use a plain-language fallback."
+      : targetRoute === "sandbox"
+        ? "Route this turn through sandbox review before generation."
+        : undefined;
+
+  return GuardrailRouteResolutionSchema.parse({
+    target_route: targetRoute,
+    fallback_required: targetRoute !== "standard",
+    review_label:
+      targetRoute === "blocked"
+        ? "Review Before Export"
+        : targetRoute === "sandbox"
+          ? "Needs Your Eye"
+          : "Set in Ink",
+    reason_codes: reasonCodes,
+    mitigation_proposal: mitigationProposal,
+  });
 }
 
 export function createResponseSpeedDiagnostic(
