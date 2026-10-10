@@ -150,6 +150,82 @@ export const ReasoningIntegritySuiteSchema = z
     }
   });
 
+export const StoryEvalSuiteKindSchema = z.enum([
+  "streaming_response_reconstruction",
+  "source_intake_safety",
+  "export_serialization_integrity",
+  "lorebook_activation_integrity",
+  "boundary_alignment",
+  "drift_evaluation",
+]);
+
+export const StoryEvalCaseStatusSchema = z.enum(["pass", "warning", "fail"]);
+
+export const StoryEvalCaseSchema = z
+  .object({
+    case_id: nonEmptyStringSchema,
+    status: StoryEvalCaseStatusSchema,
+    review_label: EvaluationTraceReviewLabelSchema.default("Set in Ink"),
+    evidence_refs: z.array(nonEmptyStringSchema).default([]),
+    mitigation_proposal: nonEmptyStringSchema.optional(),
+  })
+  .strict()
+  .superRefine((testCase, context) => {
+    if (testCase.status !== "pass" && testCase.evidence_refs.length === 0) {
+      context.addIssue({
+        code: "custom",
+        message: "warning and fail story eval cases must include evidence refs",
+        path: ["evidence_refs"],
+      });
+    }
+  });
+
+export const StoryEvalSuiteSchema = z
+  .object({
+    category: z.literal("deterministic_story_eval"),
+    kind: StoryEvalSuiteKindSchema,
+    metadata: z
+      .object({
+        suite_id: nonEmptyStringSchema,
+        run_id: nonEmptyStringSchema.optional(),
+        created_at: z.string().datetime(),
+        source_note: nonEmptyStringSchema.optional(),
+      })
+      .strict(),
+    cases: z.array(StoryEvalCaseSchema).min(1),
+    summary: z
+      .object({
+        case_count: z.number().int().min(1),
+        failed_cases: z.array(nonEmptyStringSchema).default([]),
+        warning_cases: z.array(nonEmptyStringSchema).default([]),
+        review_label: EvaluationTraceReviewLabelSchema,
+      })
+      .strict(),
+  })
+  .strict()
+  .superRefine((suite, context) => {
+    const seen = new Set<string>();
+
+    for (const [index, testCase] of suite.cases.entries()) {
+      if (seen.has(testCase.case_id)) {
+        context.addIssue({
+          code: "custom",
+          message: "story eval cases must be unique by case_id",
+          path: ["cases", index, "case_id"],
+        });
+      }
+      seen.add(testCase.case_id);
+    }
+
+    if (suite.summary.case_count !== suite.cases.length) {
+      context.addIssue({
+        code: "custom",
+        message: "story eval suite summary case_count must match cases length",
+        path: ["summary", "case_count"],
+      });
+    }
+  });
+
 export const ResponseSpeedDiagnosticSchema = z
   .object({
     name: z.literal("response_speed"),
@@ -375,6 +451,7 @@ export const StoryEvalRunResultSchema = z
         reasoning_integrity_suites: z
           .array(ReasoningIntegritySuiteSchema)
           .default([]),
+        story_eval_suites: z.array(StoryEvalSuiteSchema).default([]),
       })
       .strict(),
     summary: z
@@ -392,6 +469,8 @@ export const StoryEvalRunResultSchema = z
         warning_reasoning_checks: z
           .array(ReasoningIntegrityCheckKeySchema)
           .default([]),
+        failed_story_eval_cases: z.array(nonEmptyStringSchema).default([]),
+        warning_story_eval_cases: z.array(nonEmptyStringSchema).default([]),
         context_pruning_recommended: z.boolean(),
         collapse_warning: z.boolean(),
         trace_visibility: traceVisibilitySchema.default("hidden"),
@@ -402,7 +481,8 @@ export const StoryEvalRunResultSchema = z
   .superRefine((runResult, context) => {
     const suiteCount =
       runResult.suites.evaluation_window_guardrail_traces.length +
-      runResult.suites.reasoning_integrity_suites.length;
+      runResult.suites.reasoning_integrity_suites.length +
+      runResult.suites.story_eval_suites.length;
 
     if (suiteCount === 0) {
       context.addIssue({
@@ -457,7 +537,57 @@ export type ReasoningIntegrityCheckInput = z.input<
 export type ReasoningIntegritySuite = z.infer<
   typeof ReasoningIntegritySuiteSchema
 >;
+export type StoryEvalSuiteKind = z.infer<typeof StoryEvalSuiteKindSchema>;
+export type StoryEvalCase = z.infer<typeof StoryEvalCaseSchema>;
+export type StoryEvalCaseInput = z.input<typeof StoryEvalCaseSchema>;
+export type StoryEvalSuite = z.infer<typeof StoryEvalSuiteSchema>;
 export type StoryEvalRunResult = z.infer<typeof StoryEvalRunResultSchema>;
+
+export type StreamingReconstructionFixture = {
+  case_id: string;
+  evidence_ref: string;
+  expected_text: string;
+  reconstructed_text: string;
+  final_buffer_flushed?: boolean;
+  partial_state_committed?: boolean;
+  ui_remained_unlocked?: boolean;
+  user_facing_fallback?: boolean;
+  leaked_metadata_keys?: readonly string[];
+};
+
+export type SourceIntakeSafetyFixture = {
+  suite_id: string;
+  evidence_ref: string;
+  malformed_schema_rejected: boolean;
+  structural_controls_stripped: boolean;
+  display_text_escaped: boolean;
+  model_prompt_preserved_plain_text: boolean;
+  raw_source_preserved_separately: boolean;
+  rendered_fields_reviewed: boolean;
+};
+
+export type ExportSerializationFixture = {
+  suite_id: string;
+  evidence_ref: string;
+  json_roundtrip_valid: boolean;
+  fixed_clock_used: boolean;
+  roleplay_syntax_preserved: boolean;
+  unsupported_internal_fields_warned: boolean;
+  target_schema_valid: boolean;
+  binary_metadata_clean?: boolean;
+};
+
+export type LorebookActivationFixture = {
+  suite_id: string;
+  evidence_ref: string;
+  cold_open_core_lore_loaded: boolean;
+  pronoun_drift_resolved: boolean;
+  key_variants_triggered: boolean;
+  broad_key_false_positive_blocked: boolean;
+  budget_eviction_preserved_priority: boolean;
+  snippets_remained_whole: boolean;
+  spoiler_lock_suppressed: boolean;
+};
 
 export function parseEvaluationWindowGuardrailTrace(input: unknown) {
   return EvaluationWindowGuardrailTraceSchema.parse(input);
@@ -907,6 +1037,307 @@ export function createReasoningIntegritySuite(input: {
   });
 }
 
+export function createStoryEvalSuite(input: {
+  suite_id: string;
+  run_id?: string;
+  created_at: string;
+  kind: StoryEvalSuiteKind;
+  source_note?: string;
+  cases: readonly StoryEvalCaseInput[];
+}): StoryEvalSuite {
+  const cases = input.cases.map((testCase) =>
+    StoryEvalCaseSchema.parse(testCase),
+  );
+  const failedCases = cases
+    .filter((testCase) => testCase.status === "fail")
+    .map((testCase) => testCase.case_id);
+  const warningCases = cases
+    .filter((testCase) => testCase.status === "warning")
+    .map((testCase) => testCase.case_id);
+  const reviewLabel =
+    failedCases.length > 0
+      ? "Review Before Export"
+      : warningCases.length > 0
+        ? "Needs Your Eye"
+        : "Ready to Play";
+
+  return StoryEvalSuiteSchema.parse({
+    category: "deterministic_story_eval",
+    kind: input.kind,
+    metadata: {
+      suite_id: input.suite_id,
+      run_id: input.run_id,
+      created_at: input.created_at,
+      source_note: input.source_note,
+    },
+    cases,
+    summary: {
+      case_count: cases.length,
+      failed_cases: failedCases,
+      warning_cases: warningCases,
+      review_label: reviewLabel,
+    },
+  });
+}
+
+export function createStreamingResponseReconstructionSuite(input: {
+  suite_id: string;
+  run_id?: string;
+  created_at: string;
+  source_note?: string;
+  fixtures: readonly StreamingReconstructionFixture[];
+}): StoryEvalSuite {
+  const cases = input.fixtures.map((fixture) => {
+    const leakedMetadataKeys = fixture.leaked_metadata_keys ?? [];
+    const failedChecks: string[] = [];
+    const warningChecks: string[] = [];
+
+    if (fixture.reconstructed_text !== fixture.expected_text) {
+      failedChecks.push("exact token reconstruction failed");
+    }
+
+    if (leakedMetadataKeys.length > 0) {
+      failedChecks.push("provider metadata leaked into visible text");
+    }
+
+    if (fixture.user_facing_fallback === false) {
+      failedChecks.push("failure fallback was not user-facing");
+    }
+
+    if (fixture.final_buffer_flushed === false) {
+      warningChecks.push("final buffer did not flush immediately");
+    }
+
+    if (fixture.partial_state_committed === false) {
+      warningChecks.push("partial state was not committed on interruption");
+    }
+
+    if (fixture.ui_remained_unlocked === false) {
+      warningChecks.push("UI did not remain ready for retry");
+    }
+
+    return createStoryEvalCaseFromFindings({
+      caseId: fixture.case_id,
+      evidenceRef: fixture.evidence_ref,
+      failedChecks,
+      warningChecks,
+      failedMitigation:
+        "Keep raw stream assembly exact, strip provider metadata, and route upstream failures to plain-language fallbacks.",
+      warningMitigation:
+        "Persist partial stream state and keep retry controls responsive during interrupted responses.",
+    });
+  });
+
+  return createStoryEvalSuite({
+    suite_id: input.suite_id,
+    run_id: input.run_id,
+    created_at: input.created_at,
+    kind: "streaming_response_reconstruction",
+    source_note:
+      input.source_note ?? "Streaming Response Reconstruction Validation - 2026-10-09",
+    cases,
+  });
+}
+
+export function createSourceIntakeSafetySuite(input: {
+  run_id?: string;
+  created_at: string;
+  source_note?: string;
+  fixture: SourceIntakeSafetyFixture;
+}): StoryEvalSuite {
+  const fixture = input.fixture;
+  const cases: StoryEvalCaseInput[] = [
+    createBooleanStoryEvalCase({
+      caseId: "malformed_schema_rejected",
+      evidenceRef: fixture.evidence_ref,
+      passed: fixture.malformed_schema_rejected,
+      failMitigation: "Reject malformed cards before source mining begins.",
+    }),
+    createBooleanStoryEvalCase({
+      caseId: "structural_controls_stripped",
+      evidenceRef: fixture.evidence_ref,
+      passed: fixture.structural_controls_stripped,
+      failMitigation:
+        "Strip or escape structural control tags before prompt compilation.",
+    }),
+    createBooleanStoryEvalCase({
+      caseId: "display_text_escaped",
+      evidenceRef: fixture.evidence_ref,
+      passed: fixture.display_text_escaped,
+      failMitigation:
+        "Render imported source through display-safe escaping before showing it.",
+    }),
+    createBooleanStoryEvalCase({
+      caseId: "model_prompt_preserved_plain_text",
+      evidenceRef: fixture.evidence_ref,
+      passed: fixture.model_prompt_preserved_plain_text,
+      failMitigation:
+        "Keep HTML entities out of model-facing prompts and exports.",
+    }),
+    createBooleanStoryEvalCase({
+      caseId: "raw_source_preserved_separately",
+      evidenceRef: fixture.evidence_ref,
+      passed: fixture.raw_source_preserved_separately,
+      failMitigation:
+        "Store raw imported material separately from compiled StoryBook fields.",
+    }),
+    createBooleanStoryEvalCase({
+      caseId: "rendered_fields_reviewed",
+      evidenceRef: fixture.evidence_ref,
+      passed: fixture.rendered_fields_reviewed,
+      warningOnly: true,
+      warningMitigation:
+        "Require review state for every rendered card field before export.",
+    }),
+  ];
+
+  return createStoryEvalSuite({
+    suite_id: fixture.suite_id,
+    run_id: input.run_id,
+    created_at: input.created_at,
+    kind: "source_intake_safety",
+    source_note:
+      input.source_note ?? "Lorebook Source Intake Export Eval Suites - 2026-10-10",
+    cases,
+  });
+}
+
+export function createExportSerializationIntegritySuite(input: {
+  run_id?: string;
+  created_at: string;
+  source_note?: string;
+  fixture: ExportSerializationFixture;
+}): StoryEvalSuite {
+  const fixture = input.fixture;
+  const cases: StoryEvalCaseInput[] = [
+    createBooleanStoryEvalCase({
+      caseId: "json_roundtrip_valid",
+      evidenceRef: fixture.evidence_ref,
+      passed: fixture.json_roundtrip_valid,
+      failMitigation:
+        "Exported JSON must parse and round-trip before it can be shared.",
+    }),
+    createBooleanStoryEvalCase({
+      caseId: "fixed_clock_used",
+      evidenceRef: fixture.evidence_ref,
+      passed: fixture.fixed_clock_used,
+      warningOnly: true,
+      warningMitigation:
+        "Use a fixed test clock so export snapshots are deterministic.",
+    }),
+    createBooleanStoryEvalCase({
+      caseId: "roleplay_syntax_preserved",
+      evidenceRef: fixture.evidence_ref,
+      passed: fixture.roleplay_syntax_preserved,
+      failMitigation:
+        "Preserve quotes, asterisks, braces, and newlines during serialization.",
+    }),
+    createBooleanStoryEvalCase({
+      caseId: "unsupported_internal_fields_warned",
+      evidenceRef: fixture.evidence_ref,
+      passed: fixture.unsupported_internal_fields_warned,
+      warningOnly: true,
+      warningMitigation:
+        "Warn before dropping internal fields that target platforms cannot run.",
+    }),
+    createBooleanStoryEvalCase({
+      caseId: "target_schema_valid",
+      evidenceRef: fixture.evidence_ref,
+      passed: fixture.target_schema_valid,
+      failMitigation:
+        "Validate exported payloads against the selected platform schema.",
+    }),
+    createBooleanStoryEvalCase({
+      caseId: "binary_metadata_clean",
+      evidenceRef: fixture.evidence_ref,
+      passed: fixture.binary_metadata_clean ?? true,
+      failMitigation:
+        "Regenerate image-embedded metadata when PNG/card bytes fail validation.",
+    }),
+  ];
+
+  return createStoryEvalSuite({
+    suite_id: fixture.suite_id,
+    run_id: input.run_id,
+    created_at: input.created_at,
+    kind: "export_serialization_integrity",
+    source_note: input.source_note ?? "Export Slot Format Validation - 2026-10-09",
+    cases,
+  });
+}
+
+export function createLorebookActivationIntegritySuite(input: {
+  run_id?: string;
+  created_at: string;
+  source_note?: string;
+  fixture: LorebookActivationFixture;
+}): StoryEvalSuite {
+  const fixture = input.fixture;
+  const cases: StoryEvalCaseInput[] = [
+    createBooleanStoryEvalCase({
+      caseId: "cold_open_core_lore_loaded",
+      evidenceRef: fixture.evidence_ref,
+      passed: fixture.cold_open_core_lore_loaded,
+      warningOnly: true,
+      warningMitigation:
+        "Inject only the core primer on cold open without flooding the prompt.",
+    }),
+    createBooleanStoryEvalCase({
+      caseId: "pronoun_drift_resolved",
+      evidenceRef: fixture.evidence_ref,
+      passed: fixture.pronoun_drift_resolved,
+      warningOnly: true,
+      warningMitigation:
+        "Bind pronouns to the intended entity before adding lore entries.",
+    }),
+    createBooleanStoryEvalCase({
+      caseId: "key_variants_triggered",
+      evidenceRef: fixture.evidence_ref,
+      passed: fixture.key_variants_triggered,
+      warningOnly: true,
+      warningMitigation:
+        "Normalize case, possessives, plurals, and approved fuzzy key variants.",
+    }),
+    createBooleanStoryEvalCase({
+      caseId: "broad_key_false_positive_blocked",
+      evidenceRef: fixture.evidence_ref,
+      passed: fixture.broad_key_false_positive_blocked,
+      failMitigation:
+        "Require proximity or secondary keys before broad lore triggers fire.",
+    }),
+    createBooleanStoryEvalCase({
+      caseId: "budget_eviction_preserved_priority",
+      evidenceRef: fixture.evidence_ref,
+      passed: fixture.budget_eviction_preserved_priority,
+      failMitigation:
+        "Evict lowest-priority inactive lore before current high-priority context.",
+    }),
+    createBooleanStoryEvalCase({
+      caseId: "snippets_remained_whole",
+      evidenceRef: fixture.evidence_ref,
+      passed: fixture.snippets_remained_whole,
+      failMitigation:
+        "Insert lore as whole snippets and avoid sentence-level truncation.",
+    }),
+    createBooleanStoryEvalCase({
+      caseId: "spoiler_lock_suppressed",
+      evidenceRef: fixture.evidence_ref,
+      passed: fixture.spoiler_lock_suppressed,
+      failMitigation:
+        "Block spoiler-locked entries even when direct keywords match.",
+    }),
+  ];
+
+  return createStoryEvalSuite({
+    suite_id: fixture.suite_id,
+    run_id: input.run_id,
+    created_at: input.created_at,
+    kind: "lorebook_activation_integrity",
+    source_note: input.source_note ?? "Lorebook Optimization Testing - 2026-10-09",
+    cases,
+  });
+}
+
 export function createStoryEvalRunResult(input: {
   run_id: string;
   created_at: string;
@@ -914,6 +1345,7 @@ export function createStoryEvalRunResult(input: {
   privacy_mode?: "aggregate_only" | "explicitly_saved_source";
   evaluation_window_guardrail_traces?: readonly EvaluationWindowGuardrailTrace[];
   reasoning_integrity_suites?: readonly ReasoningIntegritySuite[];
+  story_eval_suites?: readonly StoryEvalSuite[];
 }): StoryEvalRunResult {
   const evaluationWindowGuardrailTraces = (
     input.evaluation_window_guardrail_traces ?? []
@@ -921,6 +1353,9 @@ export function createStoryEvalRunResult(input: {
   const reasoningIntegritySuites = (
     input.reasoning_integrity_suites ?? []
   ).map((suite) => ReasoningIntegritySuiteSchema.parse(suite));
+  const storyEvalSuites = (input.story_eval_suites ?? []).map((suite) =>
+    StoryEvalSuiteSchema.parse(suite),
+  );
   const blockedRoutes = evaluationWindowGuardrailTraces.filter(
     (trace) => trace.guardrail_trace.toxicity_routing.target_route === "blocked",
   ).length;
@@ -932,6 +1367,12 @@ export function createStoryEvalRunResult(input: {
   );
   const warningReasoningChecks = uniqueValues(
     reasoningIntegritySuites.flatMap((suite) => suite.summary.warning_checks),
+  );
+  const failedStoryEvalCases = uniqueValues(
+    storyEvalSuites.flatMap((suite) => suite.summary.failed_cases),
+  );
+  const warningStoryEvalCases = uniqueValues(
+    storyEvalSuites.flatMap((suite) => suite.summary.warning_cases),
   );
   const contextPruningRecommended = evaluationWindowGuardrailTraces.some(
     (trace) =>
@@ -946,23 +1387,37 @@ export function createStoryEvalRunResult(input: {
     (trace) => trace.guardrail_trace.fallback_required,
   );
   const reviewLabel =
-    blockedRoutes > 0 || failedReasoningChecks.length > 0
+    blockedRoutes > 0 ||
+    failedReasoningChecks.length > 0 ||
+    failedStoryEvalCases.length > 0
       ? "Review Before Export"
       : sandboxRoutes > 0 ||
           warningReasoningChecks.length > 0 ||
+          warningStoryEvalCases.length > 0 ||
           contextPruningRecommended ||
           collapseWarning
         ? "Needs Your Eye"
         : "Ready to Play";
-  const mitigationProposals = uniqueValues(
-    evaluationWindowGuardrailTraces.flatMap((trace) =>
+  const mitigationProposals = uniqueValues([
+    ...evaluationWindowGuardrailTraces.flatMap((trace) =>
       trace.review?.mitigation_proposal
         ? [trace.review.mitigation_proposal]
         : [],
     ),
-  );
+    ...storyEvalSuites.flatMap((suite) =>
+      suite.cases.flatMap((testCase) =>
+        testCase.mitigation_proposal ? [testCase.mitigation_proposal] : [],
+      ),
+    ),
+  ]);
   const suiteCount =
-    evaluationWindowGuardrailTraces.length + reasoningIntegritySuites.length;
+    evaluationWindowGuardrailTraces.length +
+    reasoningIntegritySuites.length +
+    storyEvalSuites.length;
+  const sampleCount =
+    evaluationWindowGuardrailTraces.length +
+    reasoningIntegritySuites.length +
+    storyEvalSuites.reduce((total, suite) => total + suite.cases.length, 0);
 
   return StoryEvalRunResultSchema.parse({
     metadata: {
@@ -974,10 +1429,11 @@ export function createStoryEvalRunResult(input: {
     suites: {
       evaluation_window_guardrail_traces: evaluationWindowGuardrailTraces,
       reasoning_integrity_suites: reasoningIntegritySuites,
+      story_eval_suites: storyEvalSuites,
     },
     summary: {
       suite_count: suiteCount,
-      sample_count: suiteCount,
+      sample_count: sampleCount,
       fallback_required: fallbackRequired,
       review_label: reviewLabel,
       mitigation_proposals: mitigationProposals,
@@ -985,12 +1441,26 @@ export function createStoryEvalRunResult(input: {
       sandbox_routes: sandboxRoutes,
       failed_reasoning_checks: failedReasoningChecks,
       warning_reasoning_checks: warningReasoningChecks,
+      failed_story_eval_cases: failedStoryEvalCases,
+      warning_story_eval_cases: warningStoryEvalCases,
       context_pruning_recommended: contextPruningRecommended,
       collapse_warning: collapseWarning,
       trace_visibility:
         reviewLabel === "Ready to Play" ? "hidden" : "author_summary",
     },
   });
+}
+
+export function createStoryEvalRun(input: {
+  run_id: string;
+  created_at: string;
+  storybook_id?: string;
+  privacy_mode?: "aggregate_only" | "explicitly_saved_source";
+  evaluation_window_guardrail_traces?: readonly EvaluationWindowGuardrailTrace[];
+  reasoning_integrity_suites?: readonly ReasoningIntegritySuite[];
+  story_eval_suites?: readonly StoryEvalSuite[];
+}): StoryEvalRunResult {
+  return createStoryEvalRunResult(input);
 }
 
 function roundToTwoDecimals(value: number): number {
@@ -1031,6 +1501,68 @@ function assertNonNegativeIntegerTokenCount(value: number, label: string): void 
   if (!Number.isInteger(value) || value < 0) {
     throw new Error(`${label} must be a non-negative integer`);
   }
+}
+
+function createBooleanStoryEvalCase(input: {
+  caseId: string;
+  evidenceRef: string;
+  passed: boolean;
+  warningOnly?: boolean;
+  failMitigation?: string;
+  warningMitigation?: string;
+}): StoryEvalCaseInput {
+  if (input.passed) {
+    return {
+      case_id: input.caseId,
+      status: "pass",
+      evidence_refs: [input.evidenceRef],
+    };
+  }
+
+  return {
+    case_id: input.caseId,
+    status: input.warningOnly ? "warning" : "fail",
+    review_label: input.warningOnly ? "Needs Your Eye" : "Review Before Export",
+    evidence_refs: [input.evidenceRef],
+    mitigation_proposal: input.warningOnly
+      ? input.warningMitigation
+      : input.failMitigation,
+  };
+}
+
+function createStoryEvalCaseFromFindings(input: {
+  caseId: string;
+  evidenceRef: string;
+  failedChecks: readonly string[];
+  warningChecks: readonly string[];
+  failedMitigation: string;
+  warningMitigation: string;
+}): StoryEvalCaseInput {
+  if (input.failedChecks.length > 0) {
+    return {
+      case_id: input.caseId,
+      status: "fail",
+      review_label: "Review Before Export",
+      evidence_refs: [input.evidenceRef],
+      mitigation_proposal: input.failedMitigation,
+    };
+  }
+
+  if (input.warningChecks.length > 0) {
+    return {
+      case_id: input.caseId,
+      status: "warning",
+      review_label: "Needs Your Eye",
+      evidence_refs: [input.evidenceRef],
+      mitigation_proposal: input.warningMitigation,
+    };
+  }
+
+  return {
+    case_id: input.caseId,
+    status: "pass",
+    evidence_refs: [input.evidenceRef],
+  };
 }
 
 function uniqueValues<T>(values: readonly T[]): T[] {

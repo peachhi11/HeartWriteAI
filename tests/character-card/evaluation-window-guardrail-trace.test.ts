@@ -7,8 +7,14 @@ import {
   createFormattingArchetypeDiagnostic,
   createResponseLatencyProfile,
   createResponseSpeedDiagnostic,
+  createExportSerializationIntegritySuite,
+  createLorebookActivationIntegritySuite,
   createReasoningIntegritySuite,
+  createSourceIntakeSafetySuite,
+  createStoryEvalRun,
   createStoryEvalRunResult,
+  createStoryEvalSuite,
+  createStreamingResponseReconstructionSuite,
   detectFormattingArchetype,
   EvaluationWindowGuardrailTraceSchema,
   estimateMessageTokenCount,
@@ -17,7 +23,9 @@ import {
   ReasoningIntegrityCheckSchema,
   ReasoningIntegritySuiteSchema,
   resolveGuardrailRoute,
+  StoryEvalCaseSchema,
   StoryEvalRunResultSchema,
+  StoryEvalSuiteSchema,
 } from "../../lib/character-card/evaluationWindowGuardrailTrace";
 
 const baseTrace = {
@@ -869,6 +877,255 @@ test("keeps raw private text out of reasoning integrity suites", () => {
   assert.equal(result.success, false);
 });
 
+test("creates deterministic story eval suites for streaming, source intake, and export", () => {
+  const streamingSuite = createStoryEvalSuite({
+    suite_id: "streaming-response-reconstruction",
+    run_id: "run-storyeval-spine",
+    created_at: "2026-10-10T05:00:00.000Z",
+    kind: "streaming_response_reconstruction",
+    source_note: "Streaming Response Reconstruction Validation - 2026-10-09",
+    cases: [
+      {
+        case_id: "token_stitching",
+        status: "pass",
+        evidence_refs: ["fixture:streaming/token-stitching"],
+      },
+      {
+        case_id: "raw_preserved_display_repaired",
+        status: "warning",
+        review_label: "Needs Your Eye",
+        evidence_refs: ["fixture:streaming/raw-display-separation"],
+        mitigation_proposal:
+          "Keep raw stream buffers separate from display-repaired text.",
+      },
+    ],
+  });
+  const sourceIntakeSuite = createStoryEvalSuite({
+    suite_id: "source-intake-safety",
+    run_id: "run-storyeval-spine",
+    created_at: "2026-10-10T05:00:00.000Z",
+    kind: "source_intake_safety",
+    source_note: "Lorebook Source Intake Export Eval Suites - 2026-10-10",
+    cases: [
+      {
+        case_id: "malformed_card_rejected",
+        status: "pass",
+        evidence_refs: ["fixture:source-intake/malformed-card"],
+      },
+      {
+        case_id: "model_prompt_not_entity_encoded",
+        status: "fail",
+        review_label: "Review Before Export",
+        evidence_refs: ["fixture:source-intake/entity-encoding"],
+        mitigation_proposal:
+          "Separate display-safe text from compiled model prompt text.",
+      },
+    ],
+  });
+  const exportSuite = createStoryEvalSuite({
+    suite_id: "export-serialization-integrity",
+    run_id: "run-storyeval-spine",
+    created_at: "2026-10-10T05:00:00.000Z",
+    kind: "export_serialization_integrity",
+    source_note: "Export Slot Format Validation - 2026-10-09",
+    cases: [
+      {
+        case_id: "fixed_clock_export_date",
+        status: "pass",
+        evidence_refs: ["fixture:export/fixed-clock"],
+      },
+      {
+        case_id: "json_roundtrip_preserves_roleplay_syntax",
+        status: "pass",
+        evidence_refs: ["fixture:export/roleplay-syntax"],
+      },
+    ],
+  });
+
+  assert.equal(streamingSuite.category, "deterministic_story_eval");
+  assert.equal(streamingSuite.summary.case_count, 2);
+  assert.deepEqual(streamingSuite.summary.warning_cases, [
+    "raw_preserved_display_repaired",
+  ]);
+  assert.equal(sourceIntakeSuite.summary.review_label, "Review Before Export");
+  assert.deepEqual(sourceIntakeSuite.summary.failed_cases, [
+    "model_prompt_not_entity_encoded",
+  ]);
+  assert.equal(exportSuite.summary.review_label, "Ready to Play");
+});
+
+test("rejects story eval warning or fail cases without evidence", () => {
+  const warningWithoutEvidence = StoryEvalCaseSchema.safeParse({
+    case_id: "raw_preserved_display_repaired",
+    status: "warning",
+  });
+  const failedWithEvidence = StoryEvalCaseSchema.safeParse({
+    case_id: "model_prompt_not_entity_encoded",
+    status: "fail",
+    evidence_refs: ["fixture:source-intake/entity-encoding"],
+  });
+
+  assert.equal(warningWithoutEvidence.success, false);
+  assert.equal(failedWithEvidence.success, true);
+});
+
+test("rejects duplicate story eval cases and raw fixture text fields", () => {
+  const duplicateCases = StoryEvalSuiteSchema.safeParse({
+    category: "deterministic_story_eval",
+    kind: "source_intake_safety",
+    metadata: {
+      suite_id: "duplicate-source-intake-cases",
+      created_at: "2026-10-10T05:00:00.000Z",
+    },
+    cases: [
+      {
+        case_id: "malformed_card_rejected",
+        status: "pass",
+      },
+      {
+        case_id: "malformed_card_rejected",
+        status: "pass",
+      },
+    ],
+    summary: {
+      case_count: 2,
+      failed_cases: [],
+      warning_cases: [],
+      review_label: "Ready to Play",
+    },
+  });
+  const rawFixtureText = StoryEvalCaseSchema.safeParse({
+    case_id: "raw_source_preserved_separately",
+    status: "pass",
+    evidence_refs: ["fixture:source-intake/raw-preservation"],
+    raw_fixture_text: "Full imported character card text should live elsewhere.",
+  });
+
+  assert.equal(duplicateCases.success, false);
+  assert.equal(rawFixtureText.success, false);
+});
+
+test("scores streaming reconstruction fixtures without exposing raw text", () => {
+  const suite = createStreamingResponseReconstructionSuite({
+    suite_id: "streaming-response-reconstruction",
+    run_id: "run-streaming-fixtures",
+    created_at: "2026-10-10T05:20:00.000Z",
+    fixtures: [
+      {
+        case_id: "token_stitching",
+        evidence_ref: "fixture:streaming/token-stitching",
+        expected_text: "Evaluating softly.\n",
+        reconstructed_text: "Evaluating softly.\n",
+        final_buffer_flushed: true,
+        partial_state_committed: true,
+        ui_remained_unlocked: true,
+        leaked_metadata_keys: [],
+      },
+      {
+        case_id: "metadata_stripped",
+        evidence_ref: "fixture:streaming/provider-metadata",
+        expected_text: "She stays at the threshold.",
+        reconstructed_text: "She stays at the threshold.",
+        leaked_metadata_keys: ["x-provider-latency"],
+      },
+      {
+        case_id: "partial_state_committed",
+        evidence_ref: "fixture:streaming/disconnect-recovery",
+        expected_text: "The sentence stops midstream",
+        reconstructed_text: "The sentence stops midstream",
+        partial_state_committed: false,
+        ui_remained_unlocked: true,
+      },
+    ],
+  });
+
+  assert.equal(suite.kind, "streaming_response_reconstruction");
+  assert.deepEqual(suite.summary.failed_cases, ["metadata_stripped"]);
+  assert.deepEqual(suite.summary.warning_cases, ["partial_state_committed"]);
+  assert.equal(suite.summary.review_label, "Review Before Export");
+  assert.equal(
+    "expected_text" in suite.cases[0],
+    false,
+  );
+});
+
+test("scores source intake safety fixtures with display and prompt separation", () => {
+  const suite = createSourceIntakeSafetySuite({
+    run_id: "run-source-intake-fixtures",
+    created_at: "2026-10-10T05:22:00.000Z",
+    fixture: {
+      suite_id: "source-intake-safety",
+      evidence_ref: "fixture:source-intake/imported-card",
+      malformed_schema_rejected: true,
+      structural_controls_stripped: true,
+      display_text_escaped: true,
+      model_prompt_preserved_plain_text: false,
+      raw_source_preserved_separately: true,
+      rendered_fields_reviewed: false,
+    },
+  });
+
+  assert.equal(suite.kind, "source_intake_safety");
+  assert.deepEqual(suite.summary.failed_cases, [
+    "model_prompt_preserved_plain_text",
+  ]);
+  assert.deepEqual(suite.summary.warning_cases, ["rendered_fields_reviewed"]);
+  assert.equal(
+    suite.cases.find((testCase) => testCase.case_id === "display_text_escaped")
+      ?.status,
+    "pass",
+  );
+});
+
+test("scores export serialization fixtures for platform readiness", () => {
+  const suite = createExportSerializationIntegritySuite({
+    run_id: "run-export-fixtures",
+    created_at: "2026-10-10T05:24:00.000Z",
+    fixture: {
+      suite_id: "export-serialization-integrity",
+      evidence_ref: "fixture:export/character-card-v2",
+      json_roundtrip_valid: true,
+      fixed_clock_used: true,
+      roleplay_syntax_preserved: true,
+      unsupported_internal_fields_warned: false,
+      target_schema_valid: true,
+      binary_metadata_clean: true,
+    },
+  });
+
+  assert.equal(suite.kind, "export_serialization_integrity");
+  assert.deepEqual(suite.summary.failed_cases, []);
+  assert.deepEqual(suite.summary.warning_cases, [
+    "unsupported_internal_fields_warned",
+  ]);
+  assert.equal(suite.summary.review_label, "Needs Your Eye");
+});
+
+test("scores lorebook activation fixtures for trigger and spoiler safety", () => {
+  const suite = createLorebookActivationIntegritySuite({
+    run_id: "run-lorebook-fixtures",
+    created_at: "2026-10-10T05:26:00.000Z",
+    fixture: {
+      suite_id: "lorebook-activation-integrity",
+      evidence_ref: "fixture:lorebook/activation-matrix",
+      cold_open_core_lore_loaded: true,
+      pronoun_drift_resolved: true,
+      key_variants_triggered: true,
+      broad_key_false_positive_blocked: true,
+      budget_eviction_preserved_priority: false,
+      snippets_remained_whole: true,
+      spoiler_lock_suppressed: false,
+    },
+  });
+
+  assert.equal(suite.kind, "lorebook_activation_integrity");
+  assert.deepEqual(suite.summary.failed_cases, [
+    "budget_eviction_preserved_priority",
+    "spoiler_lock_suppressed",
+  ]);
+  assert.equal(suite.summary.review_label, "Review Before Export");
+});
+
 test("creates a story eval run result from trace and reasoning suites", () => {
   const route = resolveGuardrailRoute({
     consentBoundaryProximity: 0.62,
@@ -957,6 +1214,75 @@ test("creates a story eval run result from trace and reasoning suites", () => {
     "Route this turn through sandbox review before generation.",
   ]);
   assert.equal(result.summary.trace_visibility, "author_summary");
+});
+
+test("creates a story eval run from deterministic suites while keeping evidence scoped", () => {
+  const streamingSuite = createStoryEvalSuite({
+    suite_id: "streaming-response-reconstruction",
+    run_id: "run-deterministic-suite-spine",
+    created_at: "2026-10-10T05:10:00.000Z",
+    kind: "streaming_response_reconstruction",
+    cases: [
+      {
+        case_id: "token_stitching",
+        status: "pass",
+        evidence_refs: ["fixture:streaming/token-stitching"],
+      },
+      {
+        case_id: "bottom_lock_when_previously_pinned",
+        status: "warning",
+        review_label: "Needs Your Eye",
+        evidence_refs: ["fixture:streaming/bottom-lock"],
+        mitigation_proposal:
+          "Track whether the user was pinned before the stream chunk rendered.",
+      },
+    ],
+  });
+  const sourceIntakeSuite = createStoryEvalSuite({
+    suite_id: "source-intake-safety",
+    run_id: "run-deterministic-suite-spine",
+    created_at: "2026-10-10T05:10:00.000Z",
+    kind: "source_intake_safety",
+    cases: [
+      {
+        case_id: "model_prompt_not_entity_encoded",
+        status: "fail",
+        review_label: "Review Before Export",
+        evidence_refs: ["fixture:source-intake/entity-encoding"],
+        mitigation_proposal:
+          "Keep display-safe HTML entities out of compiled prompts.",
+      },
+    ],
+  });
+  const result = createStoryEvalRun({
+    run_id: "run-deterministic-suite-spine",
+    created_at: "2026-10-10T05:15:00.000Z",
+    storybook_id: "storybook-rose-house",
+    story_eval_suites: [streamingSuite, sourceIntakeSuite],
+  });
+
+  assert.equal(result.summary.suite_count, 2);
+  assert.equal(result.summary.sample_count, 3);
+  assert.equal(result.summary.review_label, "Review Before Export");
+  assert.deepEqual(result.summary.failed_story_eval_cases, [
+    "model_prompt_not_entity_encoded",
+  ]);
+  assert.deepEqual(result.summary.warning_story_eval_cases, [
+    "bottom_lock_when_previously_pinned",
+  ]);
+  assert.deepEqual(result.summary.mitigation_proposals, [
+    "Track whether the user was pinned before the stream chunk rendered.",
+    "Keep display-safe HTML entities out of compiled prompts.",
+  ]);
+  assert.equal(result.summary.trace_visibility, "author_summary");
+  assert.equal(
+    result.suites.story_eval_suites[0]?.cases[1]?.evidence_refs[0],
+    "fixture:streaming/bottom-lock",
+  );
+  assert.equal(
+    "evidence_refs" in result.summary,
+    false,
+  );
 });
 
 test("rejects empty story eval run results and aggregate debug visibility", () => {
