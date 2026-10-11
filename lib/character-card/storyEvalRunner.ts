@@ -1,6 +1,3 @@
-import { mkdir, readFile, writeFile } from "node:fs/promises";
-import { dirname } from "node:path";
-
 import {
   EvaluationWindowGuardrailTraceSchema,
   ReasoningIntegritySuiteSchema,
@@ -245,6 +242,8 @@ export function appendStoryEvalRunHistory(input: {
 export async function readStoryEvalRunHistoryFile(
   historyFilePath: string,
 ): Promise<StoryEvalRunHistoryFile> {
+  const { readFile } = await import("node:fs/promises");
+
   try {
     return parseStoryEvalRunHistoryFile(
       JSON.parse(await readFile(historyFilePath, "utf8")) as unknown,
@@ -266,6 +265,8 @@ export async function writeStoryEvalRunHistoryFile(
   historyFilePath: string,
   historyFile: StoryEvalRunHistoryFile,
 ): Promise<StoryEvalRunHistoryFile> {
+  const { mkdir, writeFile } = await import("node:fs/promises");
+  const { dirname } = await import("node:path");
   const parsed = parseStoryEvalRunHistoryFile(historyFile);
 
   await mkdir(dirname(historyFilePath), { recursive: true });
@@ -907,7 +908,9 @@ function isStoryEvalRunResult(
   return "metadata" in input && "summary" in input;
 }
 
-function parseStoryEvalRunHistoryFile(input: unknown): StoryEvalRunHistoryFile {
+export function parseStoryEvalRunHistoryFile(
+  input: unknown,
+): StoryEvalRunHistoryFile {
   const value = readRecord(input, "StoryEval run history file");
 
   if (value.version !== 1) {
@@ -925,7 +928,7 @@ function parseStoryEvalRunHistoryFile(input: unknown): StoryEvalRunHistoryFile {
   };
 }
 
-function parseStoryEvalRunHistoryEntry(
+export function parseStoryEvalRunHistoryEntry(
   input: unknown,
 ): StoryEvalRunHistoryEntry {
   const value = readRecord(input, "StoryEval run history entry");
