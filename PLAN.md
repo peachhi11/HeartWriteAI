@@ -2,6 +2,20 @@
 
 HeartWriteAI is the Next.js + Tailwind + shadcn + Tauri rebuild of CharacterGen. The app should become a local-first studio for CCV3 character cards, editable personas, lorebooks, scenario arcs, and eventually chat runtime compilation.
 
+## Private-First Direction
+
+HeartWriteAI should be built first as a private desktop/local app. The active implementation path should not depend on Supabase, hosted auth, hosted storage, cloud sync, or public marketplace infrastructure, even though an existing Supabase project already contains a cloud StoryBook prototype schema.
+
+The first durable storage layer should be:
+
+- local project files and portable exports
+- CHARX masters for full-fidelity cards
+- Tauri app data for private library state
+- SQLite/rusqlite for cache, search indexes, session history, StoryEval run history, and later chat memory tables
+- repository/storage interfaces that can gain cloud adapters later
+
+Supabase can be reconsidered later as an optional expansion layer for accounts, multi-device sync, collaboration, hosted backups, public libraries, marketplace/community features, or shared projects. The existing Supabase schema should inform future adapter mapping, but it should not shape the Phase 1 app model before the local contracts are stable.
+
 ## Scope Reset
 
 CharacterGen is now treated as a concept and reference archive, not as code to move wholesale.
@@ -52,8 +66,8 @@ Goal: make HeartWriteAI capable of reading and writing character-card metadata a
 - Support CHARX import/export as the preferred full-fidelity desktop save format.
 - Import CHARX through a safe archive pipeline: reject encrypted zips, reject path traversal, require root `card.json`, cap file count and decompressed size, allowlist asset MIME types, and preserve the original package as a backup/export artifact.
 - Store accepted desktop CHARX imports under Tauri app data as `characters/{character_id}/card.json`, `original.charx`, copied `assets/`, and local `meta.json`.
-- Use Rust/Tauri commands for local CHARX reads, zip validation, asset copying, SQLite writes, and searchable-field indexing; keep the Next.js side focused on preview, confirmation, library browsing, and publish/sync actions.
-- Treat local CHARX validation as sufficient for private desktop library use, but require repeated server-side validation before any publish/sync/public listing path.
+- Use Rust/Tauri commands for local CHARX reads, zip validation, asset copying, SQLite writes, and searchable-field indexing; keep the Next.js side focused on preview, confirmation, library browsing, and explicit local export actions.
+- Treat local CHARX validation as sufficient for private desktop library use. If publish, sync, or public listing paths are added later, they must repeat validation server-side and enter through explicit opt-in cloud adapters.
 - Keep JSON visible as export/debug infrastructure, not the main editing UI.
 - Add focused tests for:
   - PNG with `ccv3`

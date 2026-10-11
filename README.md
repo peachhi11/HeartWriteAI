@@ -2,6 +2,8 @@
 
 HeartWriteAI is a local-first romance roleplay creation suite. It is designed to generate and edit character cards, craft standalone or matched user personas, convert V1/V2 cards to Character Card V3, build lorebooks, generate images, and support character chat and group chat workflows.
 
+The current product direction is private-first. The app should run usefully without Supabase, hosted auth, hosted storage, cloud sync, or marketplace infrastructure. An existing Supabase project already holds a cloud StoryBook prototype schema; treat it as a future adapter target and reference model, not as a Phase 1 runtime dependency. Cloud services can be added later behind explicit opt-in repository/storage adapters once the local StoryBook, Memory Book, Prompt Book, and StoryEval contracts are stable.
+
 The app is being built CCV3-first. New cards should be authored as Character Card V3, while V1/V2 support exists for import, conversion, and sanity checks rather than as the main creation format.
 
 ## What HeartWriteAI Is For
