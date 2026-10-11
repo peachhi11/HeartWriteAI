@@ -66,6 +66,12 @@ YOUR_API_CHAT_ENDPOINT=...
 YOUR_API_CHAT_MODEL=...
 ```
 
+Private power-user tools are allowed in the local desktop app but should stay
+out of public app surfaces. StoryEval run-history controls are shown in the
+desktop shell by default, can be enabled in browser builds with
+`NEXT_PUBLIC_HEARTWRITE_PRIVATE_TOOLS=1`, and can be hidden everywhere with
+`NEXT_PUBLIC_HEARTWRITE_PUBLIC_APP=1`.
+
 ## Current Status
 
 Implemented in the current scaffold:
