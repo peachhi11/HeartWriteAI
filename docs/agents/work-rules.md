@@ -31,8 +31,24 @@ Use one primary skill per phase:
 | Review                   | `code-review`                                        |
 | Process drift            | `retro`                                              |
 | Schema or interface seam | `api-and-interface-design` / `zod-schema-validation` |
+| Autonomous run contract  | `goal`                                               |
 
 Do not stack broad skills for one small change. Chain skills only across real lifecycle gates.
+
+## Autonomous Goals
+
+Use `goal` only when converting larger, unattended work into a `/goal` contract. Do not use it for ordinary single-turn implementation.
+
+A valid `/goal` contract must:
+
+- define an observable done condition;
+- grant decision authority for non-critical ambiguity;
+- name only verified paths, tools, or resources;
+- require at least three medium-matched verification passes;
+- specify the delivery destination;
+- end with the terminal autonomy line and nothing after it.
+
+Specify destination and quality bar, not a brittle step-by-step script.
 
 ## Slice Control
 

@@ -49,6 +49,16 @@ const contentChecks = [
     includes: "Push only when explicitly asked.",
     message: "docs/agents/work-rules.md must preserve explicit push authority.",
   },
+  {
+    file: "docs/agents/work-rules.md",
+    includes: "A valid `/goal` contract must:",
+    message: "docs/agents/work-rules.md must preserve autonomous goal-contract rules.",
+  },
+  {
+    file: "docs/agents/work-rules.md",
+    includes: "Specify destination and quality bar, not a brittle step-by-step script.",
+    message: "docs/agents/work-rules.md must preserve the goal-contract anti-micromanagement rule.",
+  },
 ];
 
 const failures = [];
