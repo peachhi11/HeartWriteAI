@@ -11,6 +11,10 @@ Before substantive HeartWriteAI work, read the Memory Vault startup notes:
 
 When work changes repo state, project decisions, mappings, validations, or next steps, update the vault before final response.
 
+## Work rules
+
+Follow `docs/agents/work-rules.md` for evidence labels, skill routing, slice control, QC, commits, and vault updates.
+
 ## Agent skills
 
 ### Issue tracker

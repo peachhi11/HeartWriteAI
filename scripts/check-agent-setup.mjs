@@ -10,6 +10,7 @@ const requiredFiles = [
   "docs/agents/issue-tracker.md",
   "docs/agents/triage-labels.md",
   "docs/agents/domain.md",
+  "docs/agents/work-rules.md",
 ];
 
 const contentChecks = [
@@ -32,6 +33,21 @@ const contentChecks = [
     file: "docs/agents/triage-labels.md",
     includes: "ready-for-agent",
     message: "docs/agents/triage-labels.md must preserve the default triage label map.",
+  },
+  {
+    file: "AGENTS.md",
+    includes: "docs/agents/work-rules.md",
+    message: "AGENTS.md must point agents to the repo work rules.",
+  },
+  {
+    file: "docs/agents/work-rules.md",
+    includes: "No completion claim without naming the evidence behind it.",
+    message: "docs/agents/work-rules.md must preserve the evidence-label contract.",
+  },
+  {
+    file: "docs/agents/work-rules.md",
+    includes: "Push only when explicitly asked.",
+    message: "docs/agents/work-rules.md must preserve explicit push authority.",
   },
 ];
 
