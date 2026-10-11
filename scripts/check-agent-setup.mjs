@@ -59,6 +59,17 @@ const contentChecks = [
     includes: "Specify destination and quality bar, not a brittle step-by-step script.",
     message: "docs/agents/work-rules.md must preserve the goal-contract anti-micromanagement rule.",
   },
+  {
+    file: "docs/agents/work-rules.md",
+    includes:
+      "After every commit, and again after every push, name the next step or the next three best options in ranked order",
+    message: "docs/agents/work-rules.md must preserve commit/push next-step handoff rules.",
+  },
+  {
+    file: "docs/agents/work-rules.md",
+    includes: 'Do not leave the user with only "done" when the work creates a natural next choice.',
+    message: "docs/agents/work-rules.md must preserve the post-completion next-choice rule.",
+  },
 ];
 
 const failures = [];

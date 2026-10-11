@@ -87,6 +87,20 @@ For targeted work, run focused tests first, then broader checks when the touched
 - Commit messages must describe the actual bundled change.
 - Never rewrite history, hard reset, force push, or delete branches without explicit user approval.
 
+## Next-Step Handoff
+
+After every commit, and again after every push, name the next step or the next three best options in ranked order when the current area is complete.
+
+Each option should include:
+
+- rank and short title;
+- why it comes next;
+- expected scope or files;
+- suggested verification;
+- any known risk, blocker, or decision needed.
+
+Do not leave the user with only "done" when the work creates a natural next choice.
+
 ## Vault Closeout
 
 Before final response, update the HeartWriteAI Memory Vault when work changes repo state, decisions, mappings, validations, or next steps:
