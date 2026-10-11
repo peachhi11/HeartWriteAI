@@ -1,7 +1,4 @@
 import {
-  appendStoryEvalRunHistory,
-  compareStoryEvalRunHistoryEntries,
-  createStoryEvalCiReport,
   parseStoryEvalRunHistoryFile,
   serializeStoryEvalCiReport,
   type StoryEvalCiReport,
@@ -17,6 +14,11 @@ import {
   type StoryEvalFixtureTextCommandResult,
   type StoryEvalLocalHistoryRepository,
 } from "./storyEvalLocalHistory";
+import {
+  createMemoryStoryEvalHistoryStorage,
+  createStoryEvalHistoryRepository,
+  type StoryEvalHistoryStorageAdapter,
+} from "./storyEvalHistoryRepository";
 
 const STORY_EVAL_STORE_FILE = "storyeval-run-history.json";
 const STORY_EVAL_STORE_KEY = "history";
@@ -31,10 +33,7 @@ interface BrowserLikeGlobal {
   window?: unknown;
 }
 
-export interface StoryEvalStoredHistoryStorageAdapter {
-  load(): Promise<unknown | null>;
-  save(history: StoryEvalRunHistoryFile): Promise<void>;
-}
+export type StoryEvalStoredHistoryStorageAdapter = StoryEvalHistoryStorageAdapter;
 
 export function createStoryEvalStoredHistoryRepository(input?: {
   maxEntries?: number;
@@ -42,55 +41,10 @@ export function createStoryEvalStoredHistoryRepository(input?: {
 }): StoryEvalLocalHistoryRepository {
   const storage = input?.storage ?? createStoryEvalBrowserHistoryStorage();
 
-  return {
-    async compareRuns(baselineRunId, candidateRunId) {
-      return compareStoryEvalRunHistoryEntries(
-        await this.findRun(baselineRunId),
-        await this.findRun(candidateRunId),
-      );
-    },
-    async createCiReport(input) {
-      const run = await this.findRun(input.runId);
-      const baseline = input.baselineRunId
-        ? await this.findRun(input.baselineRunId)
-        : undefined;
-
-      return createStoryEvalCiReport({
-        run,
-        baseline,
-        generatedAt: input.generatedAt,
-      });
-    },
-    async findRun(runId) {
-      const history = await this.listRuns();
-      const run = history.runs.find((entry) => entry.run_id === runId);
-
-      if (!run) {
-        throw new Error(`StoryEval run not found: ${runId}`);
-      }
-
-      return run;
-    },
-    async listRuns() {
-      return readStoredStoryEvalHistory(storage);
-    },
-    async saveRun(run, options) {
-      const existing = await readStoredStoryEvalHistory(storage);
-      const nextHistory = parseStoryEvalRunHistoryFile({
-        version: 1,
-        updated_at: options?.updatedAt ?? run.metadata.created_at,
-        runs: appendStoryEvalRunHistory({
-          history: existing.runs,
-          run,
-          maxEntries: options?.maxEntries ?? input?.maxEntries,
-        }),
-      });
-
-      await storage.save(nextHistory);
-
-      return nextHistory;
-    },
-  };
+  return createStoryEvalHistoryRepository({
+    maxEntries: input?.maxEntries,
+    storage,
+  });
 }
 
 export function createMemoryStoryEvalStoredHistoryStorage(
@@ -98,19 +52,7 @@ export function createMemoryStoryEvalStoredHistoryStorage(
 ): StoryEvalStoredHistoryStorageAdapter & {
   readRawStoredValue(): unknown | null;
 } {
-  let value: unknown | null = seed ?? null;
-
-  return {
-    async load() {
-      return value;
-    },
-    readRawStoredValue() {
-      return value;
-    },
-    async save(history) {
-      value = parseStoryEvalRunHistoryFile(history);
-    },
-  };
+  return createMemoryStoryEvalHistoryStorage(seed);
 }
 
 export function createStoryEvalBrowserHistoryStorage(): StoryEvalStoredHistoryStorageAdapter {
@@ -144,10 +86,7 @@ export function createStoryEvalBrowserHistoryStorage(): StoryEvalStoredHistorySt
         return;
       }
 
-      getLocalStorage()?.setItem(
-        STORY_EVAL_LOCAL_STORAGE_KEY,
-        JSON.stringify(parsed),
-      );
+      getLocalStorage()?.setItem(STORY_EVAL_LOCAL_STORAGE_KEY, JSON.stringify(parsed));
     },
   };
 }
@@ -180,8 +119,7 @@ export async function listStoryEvalStoredHistoryCommand(input?: {
 }): Promise<StoryEvalRunHistoryFile> {
   return listStoryEvalRunHistoryCommand({
     repository:
-      input?.repository ??
-      createStoryEvalStoredHistoryRepository({ storage: input?.storage }),
+      input?.repository ?? createStoryEvalStoredHistoryRepository({ storage: input?.storage }),
   });
 }
 
@@ -195,8 +133,7 @@ export async function compareStoryEvalStoredHistoryCommand(input: {
     baselineRunId: input.baselineRunId,
     candidateRunId: input.candidateRunId,
     repository:
-      input.repository ??
-      createStoryEvalStoredHistoryRepository({ storage: input.storage }),
+      input.repository ?? createStoryEvalStoredHistoryRepository({ storage: input.storage }),
   });
 }
 
@@ -211,30 +148,13 @@ export async function exportStoryEvalStoredCiReportCommand(input: {
     baselineRunId: input.baselineRunId,
     generatedAt: input.generatedAt,
     repository:
-      input.repository ??
-      createStoryEvalStoredHistoryRepository({ storage: input.storage }),
+      input.repository ?? createStoryEvalStoredHistoryRepository({ storage: input.storage }),
     runId: input.runId,
   });
 }
 
 export function serializeStoryEvalStoredCiReport(report: StoryEvalCiReport) {
   return serializeStoryEvalCiReport(report);
-}
-
-async function readStoredStoryEvalHistory(
-  storage: StoryEvalStoredHistoryStorageAdapter,
-): Promise<StoryEvalRunHistoryFile> {
-  const stored = await storage.load();
-
-  if (!stored) {
-    return {
-      version: 1,
-      updated_at: "",
-      runs: [],
-    };
-  }
-
-  return parseStoryEvalRunHistoryFile(stored);
 }
 
 async function loadStoryEvalHistoryStore() {
@@ -271,10 +191,7 @@ function isStoryEvalBrowserRuntime() {
 function isStoryEvalTauriRuntime() {
   const browserGlobal = getBrowserGlobal();
 
-  return (
-    isStoryEvalBrowserRuntime() &&
-    typeof browserGlobal.__TAURI_INTERNALS__ !== "undefined"
-  );
+  return isStoryEvalBrowserRuntime() && typeof browserGlobal.__TAURI_INTERNALS__ !== "undefined";
 }
 
 function getBrowserGlobal() {
