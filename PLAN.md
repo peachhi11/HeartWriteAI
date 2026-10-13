@@ -38,16 +38,20 @@ Goal: establish a clean, reproducible base before porting major CharacterGen beh
 - Keep README focused on setup, current status, and next milestone.
 - Keep this plan as the roadmap for implementation order and handoff.
 - Keep updater work parked in [`docs/auto-update-security.md`](docs/auto-update-security.md) until real signing and release infrastructure exists.
-- Before committing this checkpoint, verify:
+- Current baseline status: the scaffold, agent rules, local StoryEval history seams, and private-tool gating are already implemented enough for normal repo work. Keep this checkpoint current rather than treating Phase 1 as an untouched future milestone.
+- Before committing broad repo/process checkpoints, verify:
+  - `npm run check:agent-setup`
   - `npm run lint`
+  - `npm test`
   - `npm run build`
-  - `npm run tauri:build`
+- Run `npm run tauri:build` when the slice touches Tauri shell config, Rust commands, capabilities, bundled assets, or desktop-only behavior.
 
 Exit criteria:
 
 - README and PLAN are current.
 - The app builds as a static frontend for Tauri.
-- The desktop shell can be bundled locally.
+- Agent setup checks, lint, tests, and production build pass.
+- The desktop shell can be bundled locally when Tauri-facing files change.
 
 ## Phase 2: CCV3 PNG/JSON Import/Export Codec
 

@@ -51,12 +51,16 @@ npm run tauri:dev
 Build and verify:
 
 ```bash
+npm run check:agent-setup
 npm run lint
+npm test
 npm run build
 npm run tauri:build
 ```
 
-The Tauri commands require Rust/Cargo.
+The Tauri commands require Rust/Cargo. For web-only or docs/process slices, the
+current default health gate is `npm run check:agent-setup`, `npm run lint`,
+`npm test`, and `npm run build`.
 
 Optional AI-assisted generation and chat are provider-generic until a runtime endpoint is supplied. Use `YOUR_API_*` environment values when wiring a provider:
 
@@ -101,7 +105,11 @@ Implemented in the current scaffold:
 
 Immediate next milestone:
 
-- Stabilize the desktop folder-intake and CHARX master workflow around real imported card folders, then move the same normalized card model into lorebook/persona/chat runtime work.
+- Keep the private/local StoryEval and agent-workflow baseline stable while the
+  next product slice is chosen. The app currently has a green health gate for
+  `check:agent-setup`, lint, tests, and build; folder-intake, CHARX masters,
+  lorebook/persona editors, and chat runtime remain product roadmap work rather
+  than the only immediate milestone.
 
 ## Project Shape
 
@@ -124,13 +132,14 @@ The old CharacterGen project is now treated as a reference archive. The active p
 
 The current priority order is:
 
-1. Stabilize the scaffold and documentation checkpoint.
-2. Complete CCV3 PNG/JSON/CHARX import and export, with CHARX as the native master.
-3. Maintain the CharacterGen reference port map.
-4. Turn the character page into the editable intake hub.
-5. Add editable lorebook/persona/scenario asset editors and attachments.
-6. Expand Tauri local file/library management.
-7. Build the production chat runtime around the context compiler.
+1. Keep the private-first/local-first baseline green and documented.
+2. Expand StoryEval private run-history review into a useful power-user surface.
+3. Continue CCV3 PNG/JSON/CHARX import and export hardening, with CHARX as the native master.
+4. Maintain the CharacterGen reference port map.
+5. Turn the character page into the editable intake hub.
+6. Add editable lorebook/persona/scenario asset editors and attachments.
+7. Expand Tauri local file/library management.
+8. Build the production chat runtime around the context compiler.
 
 ## Auto-Update Safety
 
