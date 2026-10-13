@@ -12,10 +12,14 @@ Inbox files are not canonical until reviewed. Check this folder periodically dur
 
 ## Mined Registries
 
+These pointers are a wayfinding aid, not an exhaustive inventory. Verify the
+current app-facing registry in `lib/character-card/storyRuntimeSkills.ts` and
+`tests/character-card/story-runtime-skills.test.ts` before claiming a source
+cluster is wired into runtime behavior.
+
 - `lib/character-card/contemporaryWorldSeeds.ts` - curated vocabulary, trigger, routing, and compiler-hint seeds mined from `contemporary-world-systems-source-cluster.md`.
-- `lib/character-card/storyRuntimeSkills.ts` - app-facing runtime skill registry promoted from Memory Vault skill drafts and AGENTS.md skill guidance, including modern setting, weather/natural-phenomena world logic, trope-world building, explicit memory, relationship milestone plausibility, story concept generation, character-level GMCS, character-arc structure, scene/sequel structure, romance conflict outlining, chapter-cut evaluation, ending/payoff pacing, emotional continuity/escalation, surface/subterranean subtext routing, skill-authoring, intimacy-flow, proximity, space/distance blocking, scene-coherence playfield routing, multi-character/world narration, intimacy-shift, craft mentoring, keyword discovery, and persona creation drivers.
-- `lib/character-card/storyRuntimeSkills.ts` now links the first explicit-intimacy Memory Vault resources mined from `The Living Sexual World by @lilyvalley.md`, especially `dominance-and-intimacy-flow/references/sexual_somatic_flow_and_afterglow.md` and `power-dynamics-scene-writing/references/kink_sensation_edgeplay_logic.md`.
-- `lib/character-card/storyRuntimeSkills.ts` now links the latest inbox mining resources for reveal gating and worldbuilding question routing: `knowledge-boundary-response/references/structured_knowledge_tree_epistemic_pacing.md` and `world-bible-builder/references/worldbuilding_prompt_taxonomy.md`.
+- `lib/character-card/storyRuntimeSkills.ts` - app-facing runtime skill registry promoted from Memory Vault skill drafts and AGENTS.md skill guidance. It includes broad routing for setting, weather/natural phenomena, trope worlds, explicit memory, relationship plausibility, story generation, scene structure, subtext, intimacy-flow, proximity/blocking, multi-character/world narration, craft mentoring, keyword discovery, and persona creation.
+- Recent explicit-intimacy, reveal-gating, and worldbuilding-question resources are linked through the same registry when promoted. Treat this README as a locator and confirm exact current links in code/tests.
 
 ## Files
 

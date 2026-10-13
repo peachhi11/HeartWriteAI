@@ -83,7 +83,9 @@ The app must preserve user data across update failures. Before enabling auto-upd
 Before turning updater on:
 
 ```bash
+npm run check:agent-setup
 npm run lint
+npm test
 npm run build
 npm run tauri:build
 ```
