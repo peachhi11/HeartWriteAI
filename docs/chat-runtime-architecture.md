@@ -12,6 +12,17 @@ HeartWriteAI's chat runtime should be local-first, card-compatible, and delibera
 - Treat memory as tiered. Recent transcript, semantic recall, and declarative facts solve different problems and should not be merged into one undifferentiated log.
 - Let card-authored `system_prompt` and `post_history_instructions` steer behavior, but compile them alongside runtime safety, memory, lore, and relationship gates.
 
+## Implementation Status Note
+
+This document is the target architecture for chat runtime and memory, not a
+claim that every section is already shipped. The current app already has pieces
+of this direction in place, including card prompt compilation, relationship
+state contracts, sensory gate context, StoryEval local run history, private
+power-tool gating, and a `rusqlite`-backed Tauri cache pattern. The
+scenario-scoped chat-memory tables, native chat-memory commands, consolidation
+worker, memory review editor, and full provider-selection workflow remain
+implementation work unless current code/tests prove otherwise.
+
 ## Runtime Flow
 
 ```text
@@ -1677,13 +1688,7 @@ type EmotionalBrain = {
     trajectoryConfidence: number;
   };
   relationshipMomentum: {
-    state:
-      | "escalating"
-      | "stabilizing"
-      | "volatile"
-      | "repairing"
-      | "deteriorating"
-      | "stagnant";
+    state: "escalating" | "stabilizing" | "volatile" | "repairing" | "deteriorating" | "stagnant";
     attachmentMomentum: number;
     romanticEscalationMomentum: number;
     trustMomentum: number;
@@ -1855,11 +1860,7 @@ type EmotionalBrain = {
       | "vulnerable"
       | "avoidant";
     visibilityStatus?:
-      | "secret"
-      | "public"
-      | "hidden_feelings"
-      | "socially_ambiguous"
-      | "publicly_committed";
+      "secret" | "public" | "hidden_feelings" | "socially_ambiguous" | "publicly_committed";
     attachmentStatus?:
       | "emotionally_attached"
       | "dependent"
@@ -1919,13 +1920,7 @@ type EmotionalBrain = {
     emotionalUrgency: number;
     attachmentDepth: number;
     lastStyle?:
-      | "direct"
-      | "indirect"
-      | "accidental"
-      | "defensive"
-      | "desperate"
-      | "quiet"
-      | "silent";
+      "direct" | "indirect" | "accidental" | "defensive" | "desperate" | "quiet" | "silent";
     pendingTruth?:
       | "romantic"
       | "vulnerability"
@@ -1939,13 +1934,7 @@ type EmotionalBrain = {
   };
   redemption: {
     active: boolean;
-    arcType?:
-      | "betrayal"
-      | "moral"
-      | "emotional"
-      | "self_redemption"
-      | "protective"
-      | "identity";
+    arcType?: "betrayal" | "moral" | "emotional" | "self_redemption" | "protective" | "identity";
     phase?:
       | "harm"
       | "awareness"
@@ -2434,13 +2423,13 @@ A relationship dynamic is the recurring emotional and behavioral pattern between
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Trope | narrative setup |
-| Chemistry | interaction charge |
-| Tone | emotional atmosphere |
-| Attachment | intimacy strategy |
-| Dynamic | recurring interaction pattern |
+| Concept    | Meaning                       |
+| ---------- | ----------------------------- |
+| Trope      | narrative setup               |
+| Chemistry  | interaction charge            |
+| Tone       | emotional atmosphere          |
+| Attachment | intimacy strategy             |
+| Dynamic    | recurring interaction pattern |
 
 A useful dynamic answers: what does interacting with each other consistently feel like?
 
@@ -2456,23 +2445,23 @@ For example, one character seeks reassurance while the other teases instead of r
 
 Useful dynamic profiles:
 
-| Dynamic | Core Loop | Common Use |
-| --- | --- | --- |
-| Pursuer x withdrawer | pursuit -> withdrawal -> anxiety -> more pursuit | anxious/avoidant pairings |
-| Banter rivals | provocation -> reaction -> escalation -> chemistry | rivals and enemies to lovers |
-| Caregiver x guarded | care -> resistance -> consistency -> trust | healing romance |
-| Mutual yearning | suppression -> leakage -> restraint | slow burn and friends to lovers |
-| Chaotic push-pull | intensity -> panic -> conflict -> reunion | volatile pairings |
-| Soft dominance x playful resistance | provocation -> calm reaction -> flirt tension | bratty/steady dynamics |
-| Emotional sanctuary | distress -> comfort -> regulation | secure or healing relationships |
-| Obsession | attention -> fixation -> dependency -> fear of loss | dark or intense romance |
-| Mutual competence admiration | skill -> respect -> reliance -> attraction | workplace, rivals, survival |
-| Emotional translation | expression/restraint -> learning each other's language | opposites attract |
-| Protective dependency | protection -> reliance -> vulnerability reversal | guardian or protector arcs |
-| Devotional partnership | need -> prioritization -> loyalty | late-stage romance |
-| Emotional chess | testing -> reading -> leverage shift | political or high-intelligence pairings |
-| Domestic comfort | routine -> familiarity -> quiet intimacy | long-term romance |
-| Transformational | contact -> identity shift -> changed priorities | profound romance arcs |
+| Dynamic                             | Core Loop                                              | Common Use                              |
+| ----------------------------------- | ------------------------------------------------------ | --------------------------------------- |
+| Pursuer x withdrawer                | pursuit -> withdrawal -> anxiety -> more pursuit       | anxious/avoidant pairings               |
+| Banter rivals                       | provocation -> reaction -> escalation -> chemistry     | rivals and enemies to lovers            |
+| Caregiver x guarded                 | care -> resistance -> consistency -> trust             | healing romance                         |
+| Mutual yearning                     | suppression -> leakage -> restraint                    | slow burn and friends to lovers         |
+| Chaotic push-pull                   | intensity -> panic -> conflict -> reunion              | volatile pairings                       |
+| Soft dominance x playful resistance | provocation -> calm reaction -> flirt tension          | bratty/steady dynamics                  |
+| Emotional sanctuary                 | distress -> comfort -> regulation                      | secure or healing relationships         |
+| Obsession                           | attention -> fixation -> dependency -> fear of loss    | dark or intense romance                 |
+| Mutual competence admiration        | skill -> respect -> reliance -> attraction             | workplace, rivals, survival             |
+| Emotional translation               | expression/restraint -> learning each other's language | opposites attract                       |
+| Protective dependency               | protection -> reliance -> vulnerability reversal       | guardian or protector arcs              |
+| Devotional partnership              | need -> prioritization -> loyalty                      | late-stage romance                      |
+| Emotional chess                     | testing -> reading -> leverage shift                   | political or high-intelligence pairings |
+| Domestic comfort                    | routine -> familiarity -> quiet intimacy               | long-term romance                       |
+| Transformational                    | contact -> identity shift -> changed priorities        | profound romance arcs                   |
 
 Strong dynamics create predictable unpredictability. The player understands the emotional pattern but still anticipates escalation, variation, growth, and disruption.
 
@@ -2492,18 +2481,18 @@ Do not define dynamics only as trope labels or static roles such as dominant/sub
 
 Important dynamic variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Reciprocity | balance of emotional exchange |
-| Emotional stability | consistency versus volatility |
-| Pursuit balance | who initiates closeness |
-| Vulnerability flow | openness pattern |
-| Conflict recovery | repair ability |
-| Power fluidity | shifting leverage |
-| Interaction rhythm | pacing pattern |
-| Emotional dependency | attachment centrality |
-| Safety level | emotional trust |
-| Tension density | unresolved attraction intensity |
+| Variable             | Meaning                         |
+| -------------------- | ------------------------------- |
+| Reciprocity          | balance of emotional exchange   |
+| Emotional stability  | consistency versus volatility   |
+| Pursuit balance      | who initiates closeness         |
+| Vulnerability flow   | openness pattern                |
+| Conflict recovery    | repair ability                  |
+| Power fluidity       | shifting leverage               |
+| Interaction rhythm   | pacing pattern                  |
+| Emotional dependency | attachment centrality           |
+| Safety level         | emotional trust                 |
+| Tension density      | unresolved attraction intensity |
 
 ### Trope Route Templates
 
@@ -2513,14 +2502,14 @@ A romance trope is a recognizable emotional relationship pattern that creates ex
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Trope | emotional/narrative pattern |
-| Dynamic | recurring interaction loop |
-| Chemistry | interaction charge |
-| Tone | emotional atmosphere |
-| Genre | overall story category |
-| Archetype | character pattern |
+| Concept   | Meaning                     |
+| --------- | --------------------------- |
+| Trope     | emotional/narrative pattern |
+| Dynamic   | recurring interaction loop  |
+| Chemistry | interaction charge          |
+| Tone      | emotional atmosphere        |
+| Genre     | overall story category      |
+| Archetype | character pattern           |
 
 The runtime should treat tropes as emotional progression templates, not static tags:
 
@@ -2546,28 +2535,28 @@ Most tropes define:
 
 Examples:
 
-| Trope | Emotional Obstacle | Fantasy |
-| --- | --- | --- |
-| Enemies to lovers | trust and conflict | love transforms opposition |
-| Friends to lovers | fear of change | you were always my person |
-| Forbidden romance | consequences | love against the world |
-| Slow burn | restraint | earned emotional inevitability |
-| Fake dating | emotional honesty | pretending became real |
-| Second chance | history and repair | people can choose differently |
-| Redemption romance | harm and trust | love survives reality through change |
+| Trope              | Emotional Obstacle | Fantasy                              |
+| ------------------ | ------------------ | ------------------------------------ |
+| Enemies to lovers  | trust and conflict | love transforms opposition           |
+| Friends to lovers  | fear of change     | you were always my person            |
+| Forbidden romance  | consequences       | love against the world               |
+| Slow burn          | restraint          | earned emotional inevitability       |
+| Fake dating        | emotional honesty  | pretending became real               |
+| Second chance      | history and repair | people can choose differently        |
+| Redemption romance | harm and trust     | love survives reality through change |
 
 Trope categories:
 
-| Category | Core Energy | Examples |
-| --- | --- | --- |
-| Conflict-based | friction and challenge | enemies, rivals, opposites, grumpy x sunshine |
-| Intimacy-based | emotional closeness | friends to lovers, roommates, healing romance |
-| Circumstance-based | proximity and inevitability | fake dating, forced proximity, workplace |
-| Forbidden | restraint and consequence | forbidden, age gap, royalty/commoner |
-| Healing | safety and transformation | wounded/caretaker, redemption, second chance |
-| Obsession/fixation | consuming attachment | possessive slow burn, chaotic attraction |
-| Destiny/fated | recognition and inevitability | soulmates, reincarnated lovers |
-| Domestic | everyday closeness | single parent, roommates, marriage after slow burn |
+| Category           | Core Energy                   | Examples                                           |
+| ------------------ | ----------------------------- | -------------------------------------------------- |
+| Conflict-based     | friction and challenge        | enemies, rivals, opposites, grumpy x sunshine      |
+| Intimacy-based     | emotional closeness           | friends to lovers, roommates, healing romance      |
+| Circumstance-based | proximity and inevitability   | fake dating, forced proximity, workplace           |
+| Forbidden          | restraint and consequence     | forbidden, age gap, royalty/commoner               |
+| Healing            | safety and transformation     | wounded/caretaker, redemption, second chance       |
+| Obsession/fixation | consuming attachment          | possessive slow burn, chaotic attraction           |
+| Destiny/fated      | recognition and inevitability | soulmates, reincarnated lovers                     |
+| Domestic           | everyday closeness            | single parent, roommates, marriage after slow burn |
 
 Tropes create emotional promises. If a user chooses friends to lovers, they usually expect yearning, emotional intimacy, slow realization, and fear of ruining the friendship. If they choose enemies to lovers, they usually expect banter, conflict, tension, and destabilization. Trope layering can combine those promises, such as friends to lovers plus forced proximity plus slow burn plus mutual yearning.
 
@@ -2595,27 +2584,27 @@ Use affection mismatch when a route needs believable tension without requiring b
 
 Common mismatch patterns:
 
-| Pattern | Character A | Character B | Scenario Tension |
-| --- | --- | --- | --- |
-| Verbal vs behavioral | shows love through practical help | needs explicit reassurance | "I show care" vs "I do not feel cared for" |
-| Teasing vs reassurance | shows affection through banter | hears ambiguity or criticism | playful chemistry becomes insecurity |
-| Quiet vs expressive | subtle, restrained, controlled | expressive, reassurance-oriented | "you overwhelm me" vs "you starve me" |
-| Independence vs closeness | shows love by respecting space | feels loved through connection | freedom is read as distance |
-| Protective vs vulnerability | solves and shields | needs emotional openness | being cared for does not reveal feelings |
-| Devotional vs casual | intense prioritization | relaxed, low-intensity affection | devotion feels either insufficient or overwhelming |
-| Touch vs verbal | comforts through contact | needs emotional language | attraction exists but reassurance misses |
-| Conflict repair mismatch | repairs through space and calm | repairs through discussion and reconnection | post-conflict instability |
-| Stability vs excitement | shows love through routine | reads routine as flattening | calm is mistaken for boredom |
-| Symbolic vs practical | values rituals and sentiment | values everyday reliability | anniversaries and daily help compete for meaning |
+| Pattern                     | Character A                       | Character B                                 | Scenario Tension                                   |
+| --------------------------- | --------------------------------- | ------------------------------------------- | -------------------------------------------------- |
+| Verbal vs behavioral        | shows love through practical help | needs explicit reassurance                  | "I show care" vs "I do not feel cared for"         |
+| Teasing vs reassurance      | shows affection through banter    | hears ambiguity or criticism                | playful chemistry becomes insecurity               |
+| Quiet vs expressive         | subtle, restrained, controlled    | expressive, reassurance-oriented            | "you overwhelm me" vs "you starve me"              |
+| Independence vs closeness   | shows love by respecting space    | feels loved through connection              | freedom is read as distance                        |
+| Protective vs vulnerability | solves and shields                | needs emotional openness                    | being cared for does not reveal feelings           |
+| Devotional vs casual        | intense prioritization            | relaxed, low-intensity affection            | devotion feels either insufficient or overwhelming |
+| Touch vs verbal             | comforts through contact          | needs emotional language                    | attraction exists but reassurance misses           |
+| Conflict repair mismatch    | repairs through space and calm    | repairs through discussion and reconnection | post-conflict instability                          |
+| Stability vs excitement     | shows love through routine        | reads routine as flattening                 | calm is mistaken for boredom                       |
+| Symbolic vs practical       | values rituals and sentiment      | values everyday reliability                 | anniversaries and daily help compete for meaning   |
 
 Attachment can bias mismatch:
 
-| Attachment | Common Mismatch Risk |
-| --- | --- |
-| Secure | adapts relatively well |
-| Anxious | needs explicit reassurance and connection |
-| Avoidant | prefers subtle, practical, or spacious affection |
-| Fearful | fluctuates between reassurance hunger and overwhelm |
+| Attachment | Common Mismatch Risk                                |
+| ---------- | --------------------------------------------------- |
+| Secure     | adapts relatively well                              |
+| Anxious    | needs explicit reassurance and connection           |
+| Avoidant   | prefers subtle, practical, or spacious affection    |
+| Fearful    | fluctuates between reassurance hunger and overwhelm |
 
 Mismatch conflict should often be framed as translation failure:
 
@@ -2644,17 +2633,17 @@ care attempt
 
 Useful scenario variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Affection expression style | natural way of showing care |
-| Affection recognition style | how affection is emotionally recognized |
-| Translation flexibility | willingness to adapt expression |
-| Reassurance need | need for explicit confirmation |
-| Emotional literacy | ability to interpret affection accurately |
-| Mismatch sensitivity | distress from unrecognized affection |
-| Adaptation capacity | ability to learn the partner's language |
-| Symbolic importance | value of emotionally meaningful gestures |
-| Emotional fluency | mutual understanding depth |
+| Variable                    | Meaning                                   |
+| --------------------------- | ----------------------------------------- |
+| Affection expression style  | natural way of showing care               |
+| Affection recognition style | how affection is emotionally recognized   |
+| Translation flexibility     | willingness to adapt expression           |
+| Reassurance need            | need for explicit confirmation            |
+| Emotional literacy          | ability to interpret affection accurately |
+| Mismatch sensitivity        | distress from unrecognized affection      |
+| Adaptation capacity         | ability to learn the partner's language   |
+| Symbolic importance         | value of emotionally meaningful gestures  |
+| Emotional fluency           | mutual understanding depth                |
 
 Affection mismatch is strongest when it becomes specific. Instead of generic "you do not care" conflict, the route should show exactly what one character did to express care, why the other missed it, and what adapted behavior finally becomes recognizable.
 
@@ -2672,42 +2661,42 @@ Universal romance phase meaning:
 
 Route examples:
 
-| Route | Core Energy | Primary Barrier | Early Shape | Mature Shape |
-| --- | --- | --- | --- | --- |
-| Enemies to Lovers | tension | trust | high intensity, low safety | transformed conflict, chosen loyalty |
-| Friends to Lovers | safety | fear of change | high intimacy, restrained desire | best friend plus partner |
-| Strangers to Lovers | discovery | uncertainty | high mystery, low familiarity | shared reality and consistency |
-| Age Gap Romance | asymmetry | power balance | fascination plus caution | chosen equality and negotiated future |
-| Fake Dating | performance | emotional honesty | pretend intimacy | authentic partnership |
-| Forbidden Romance | consequence | duty or exposure | private longing | earned future despite cost |
-| Childhood Sweethearts | nostalgia | changed identity | remembered intimacy | past and present reconciled |
-| Opposites Attract | contrast | value clash | fascination with difference | functional balance |
-| Grumpy x Sunshine | thawing | guardedness | resisted warmth | soft stability |
-| Second Chance | history | repeated harm | residual chemistry | earned recommitment |
-| Protector x Vulnerable | safety | dependency | protection and reliance | care without control |
-| Rivals to Lovers | competition | ambition | matched pressure | mutual growth |
-| Slow Burn | accumulation | restraint | tiny emotional weight | earned release |
-| Soulmates | destiny | autonomy | recognition and pull | chosen fate |
-| Marriage of Convenience | obligation | free choice | formal commitment | real marriage |
-| Workplace Romance | competence | professional risk | repeated proximity | integrated partnership |
-| Healer x Wounded | recovery | savior dynamic | cautious care | healthy intimacy |
-| Best Friend's Sibling | loyalty | social fallout | hidden attraction | stable integration |
-| Celebrity x Normal Person | image | authenticity | fantasy projection | grounded privacy or visibility |
-| Reunion After Betrayal | history | broken trust | defensive contact | scarred stability |
-| Online to Real Life | projection | embodied reality | digital intimacy | grounded partnership |
-| Redemption Romance | transformation | accountability | moral distance | earned intimacy |
-| Polyamorous Formation | multiplicity | security | expanded desire | stable network intimacy |
-| Guardian x Protected | duty | role integrity | formal responsibility | equal partnership |
-| Forced Proximity | unavoidable closeness | pressure | unwanted closeness | voluntary intimacy |
-| Roommates to Lovers | domestic intimacy | household tension | shared routines | home as partnership |
-| Academic Rivals | intellect | ambition | intellectual sparring | growth partnership |
-| Royalty x Commoner | class distance | duty | private humanization | shared future under scrutiny |
-| Single Parent Romance | family stakes | stability | cautious attraction | chosen household |
-| Amnesia Romance | identity disruption | trust and memory | emotional echoes | new love with old roots |
-| Arranged Partnership | obligation | free choice | formal distance | real partnership |
-| Teacher x Adult Student | authority | ethical separation | admiration and restraint | equalized relationship |
-| Holiday Romance | temporary escape | reality test | fast chemistry | love beyond the setting |
-| Love Triangle | divided desire | identity choice | dual attraction | repair after choosing |
+| Route                     | Core Energy           | Primary Barrier    | Early Shape                      | Mature Shape                          |
+| ------------------------- | --------------------- | ------------------ | -------------------------------- | ------------------------------------- |
+| Enemies to Lovers         | tension               | trust              | high intensity, low safety       | transformed conflict, chosen loyalty  |
+| Friends to Lovers         | safety                | fear of change     | high intimacy, restrained desire | best friend plus partner              |
+| Strangers to Lovers       | discovery             | uncertainty        | high mystery, low familiarity    | shared reality and consistency        |
+| Age Gap Romance           | asymmetry             | power balance      | fascination plus caution         | chosen equality and negotiated future |
+| Fake Dating               | performance           | emotional honesty  | pretend intimacy                 | authentic partnership                 |
+| Forbidden Romance         | consequence           | duty or exposure   | private longing                  | earned future despite cost            |
+| Childhood Sweethearts     | nostalgia             | changed identity   | remembered intimacy              | past and present reconciled           |
+| Opposites Attract         | contrast              | value clash        | fascination with difference      | functional balance                    |
+| Grumpy x Sunshine         | thawing               | guardedness        | resisted warmth                  | soft stability                        |
+| Second Chance             | history               | repeated harm      | residual chemistry               | earned recommitment                   |
+| Protector x Vulnerable    | safety                | dependency         | protection and reliance          | care without control                  |
+| Rivals to Lovers          | competition           | ambition           | matched pressure                 | mutual growth                         |
+| Slow Burn                 | accumulation          | restraint          | tiny emotional weight            | earned release                        |
+| Soulmates                 | destiny               | autonomy           | recognition and pull             | chosen fate                           |
+| Marriage of Convenience   | obligation            | free choice        | formal commitment                | real marriage                         |
+| Workplace Romance         | competence            | professional risk  | repeated proximity               | integrated partnership                |
+| Healer x Wounded          | recovery              | savior dynamic     | cautious care                    | healthy intimacy                      |
+| Best Friend's Sibling     | loyalty               | social fallout     | hidden attraction                | stable integration                    |
+| Celebrity x Normal Person | image                 | authenticity       | fantasy projection               | grounded privacy or visibility        |
+| Reunion After Betrayal    | history               | broken trust       | defensive contact                | scarred stability                     |
+| Online to Real Life       | projection            | embodied reality   | digital intimacy                 | grounded partnership                  |
+| Redemption Romance        | transformation        | accountability     | moral distance                   | earned intimacy                       |
+| Polyamorous Formation     | multiplicity          | security           | expanded desire                  | stable network intimacy               |
+| Guardian x Protected      | duty                  | role integrity     | formal responsibility            | equal partnership                     |
+| Forced Proximity          | unavoidable closeness | pressure           | unwanted closeness               | voluntary intimacy                    |
+| Roommates to Lovers       | domestic intimacy     | household tension  | shared routines                  | home as partnership                   |
+| Academic Rivals           | intellect             | ambition           | intellectual sparring            | growth partnership                    |
+| Royalty x Commoner        | class distance        | duty               | private humanization             | shared future under scrutiny          |
+| Single Parent Romance     | family stakes         | stability          | cautious attraction              | chosen household                      |
+| Amnesia Romance           | identity disruption   | trust and memory   | emotional echoes                 | new love with old roots               |
+| Arranged Partnership      | obligation            | free choice        | formal distance                  | real partnership                      |
+| Teacher x Adult Student   | authority             | ethical separation | admiration and restraint         | equalized relationship                |
+| Holiday Romance           | temporary escape      | reality test       | fast chemistry                   | love beyond the setting               |
+| Love Triangle             | divided desire        | identity choice    | dual attraction                  | repair after choosing                 |
 
 Enemies to lovers route:
 
@@ -2965,45 +2954,45 @@ Emotional tone is the felt atmosphere of the relationship. It is not what happen
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Relationship Phase | narrative stage |
-| Emotional State | temporary feeling |
-| Scene Mood | scene-level atmosphere |
-| Emotional Tone | ongoing relationship atmosphere |
+| Concept            | Meaning                         |
+| ------------------ | ------------------------------- |
+| Relationship Phase | narrative stage                 |
+| Emotional State    | temporary feeling               |
+| Scene Mood         | scene-level atmosphere          |
+| Emotional Tone     | ongoing relationship atmosphere |
 
 For example: friends to lovers + suppressed attraction + jealousy + rainy melancholy + tender yearning should produce restrained dialogue, accidental honesty, avoidance after vulnerability, prolonged eye contact, and emotionally loaded teasing.
 
 Useful tones:
 
-| Tone | Core Feeling | Common Effect |
-| --- | --- | --- |
-| Tender | emotional softness and care | gentle reassurance, quiet intimacy |
-| Yearning | wanting what feels distant | restraint, almost-confessions |
-| Playful | joy through interaction | humor, teasing, light rhythm |
-| Tense | unresolved pressure | charged silence, conflict, hyper-awareness |
-| Devotional | deep reverence and loyalty | prioritization, intense validation |
-| Fragile | breakable intimacy | caution, fear of rejection |
-| Chaotic | unpredictability | impulsive escalation, unstable attachment |
-| Comforting | safety and relief | caretaking, regulation, familiarity |
-| Obsessive | fixation | possessiveness, intrusive focus |
-| Bittersweet | love mixed with loss | sacrifice, nostalgia, impermanence |
-| Reverent | awe and respect | careful affection, admiration |
-| Predatory | pursuit and pressure | tension-heavy challenge, requires reciprocity |
-| Melancholic | sadness woven into intimacy | loneliness, grief, quiet vulnerability |
-| Hopeful | emotional possibility | rebuilding, future orientation |
-| Intimate Domesticity | love integrated into ordinary life | routine affection, practical care |
+| Tone                 | Core Feeling                       | Common Effect                                 |
+| -------------------- | ---------------------------------- | --------------------------------------------- |
+| Tender               | emotional softness and care        | gentle reassurance, quiet intimacy            |
+| Yearning             | wanting what feels distant         | restraint, almost-confessions                 |
+| Playful              | joy through interaction            | humor, teasing, light rhythm                  |
+| Tense                | unresolved pressure                | charged silence, conflict, hyper-awareness    |
+| Devotional           | deep reverence and loyalty         | prioritization, intense validation            |
+| Fragile              | breakable intimacy                 | caution, fear of rejection                    |
+| Chaotic              | unpredictability                   | impulsive escalation, unstable attachment     |
+| Comforting           | safety and relief                  | caretaking, regulation, familiarity           |
+| Obsessive            | fixation                           | possessiveness, intrusive focus               |
+| Bittersweet          | love mixed with loss               | sacrifice, nostalgia, impermanence            |
+| Reverent             | awe and respect                    | careful affection, admiration                 |
+| Predatory            | pursuit and pressure               | tension-heavy challenge, requires reciprocity |
+| Melancholic          | sadness woven into intimacy        | loneliness, grief, quiet vulnerability        |
+| Hopeful              | emotional possibility              | rebuilding, future orientation                |
+| Intimate Domesticity | love integrated into ordinary life | routine affection, practical care             |
 
 Tone combinations can drive chemistry:
 
-| Combination | Result |
-| --- | --- |
-| yearning + tender | emotionally devastating slow burn |
-| playful + tense | flirtatious banter chemistry |
-| comforting + fragile | healing intimacy |
-| devotional + melancholic | tragic romance energy |
-| chaotic + obsessive | volatile addictive chemistry |
-| reverent + soft dominance | emotionally safe intensity |
+| Combination               | Result                            |
+| ------------------------- | --------------------------------- |
+| yearning + tender         | emotionally devastating slow burn |
+| playful + tense           | flirtatious banter chemistry      |
+| comforting + fragile      | healing intimacy                  |
+| devotional + melancholic  | tragic romance energy             |
+| chaotic + obsessive       | volatile addictive chemistry      |
+| reverent + soft dominance | emotionally safe intensity        |
 
 Tone should influence dialogue wording, pacing, gesture frequency, touch style, conflict intensity, apology style, flirting style, and memory interpretation. It should evolve over time, such as enemies to lovers moving from hostile tension to provocative chemistry to fragile vulnerability to tender intimacy to protective devotion.
 
@@ -3025,44 +3014,44 @@ Pacing controls how quickly emotional intimacy, romantic escalation, conflict, a
 
 Do not treat pacing as one global slider. The runtime should track simultaneous pacing axes:
 
-| Axis | Meaning |
-| --- | --- |
-| Emotional pacing | speed of vulnerability and emotional access |
-| Romantic pacing | speed of attachment, confession, and relationship clarity |
-| Sexual pacing | speed of physical escalation when adult modules allow it |
-| Conflict pacing | frequency and intensity of rupture |
-| Trust pacing | speed of safety and reliability formation |
-| Dependency pacing | speed of emotional reliance |
-| Domestic pacing | speed of daily-life integration |
+| Axis              | Meaning                                                   |
+| ----------------- | --------------------------------------------------------- |
+| Emotional pacing  | speed of vulnerability and emotional access               |
+| Romantic pacing   | speed of attachment, confession, and relationship clarity |
+| Sexual pacing     | speed of physical escalation when adult modules allow it  |
+| Conflict pacing   | frequency and intensity of rupture                        |
+| Trust pacing      | speed of safety and reliability formation                 |
+| Dependency pacing | speed of emotional reliance                               |
+| Domestic pacing   | speed of daily-life integration                           |
 
 This lets a route behave coherently. For example, enemies to lovers can run fast sexual tension while keeping trust slow, and second chance romance can start with fast familiarity while requiring slow repair.
 
 Useful pacing modes:
 
-| Mode | Core Feeling | Runtime Behavior |
-| --- | --- | --- |
-| Fast burn | immediate chemistry and acceleration | early spark, rapid interaction, instability checks |
-| Slow burn | accumulated inevitability | micro-progression, delayed payoff, near-intimacy |
-| Push-pull | approach and retreat cycles | closeness, fear, withdrawal, longing, reconnection |
-| Stable/gentle | safety growing steadily | reliable progress, low volatility, healthy repair |
-| Chaotic | emotional unpredictability | abrupt intimacy, sudden conflict, whiplash risk |
-| Episodic | major scenes change the bond | milestone events and dramatic turning points |
-| Continuous | repetition changes the bond | small accumulations, routines, daily comfort |
+| Mode          | Core Feeling                         | Runtime Behavior                                   |
+| ------------- | ------------------------------------ | -------------------------------------------------- |
+| Fast burn     | immediate chemistry and acceleration | early spark, rapid interaction, instability checks |
+| Slow burn     | accumulated inevitability            | micro-progression, delayed payoff, near-intimacy   |
+| Push-pull     | approach and retreat cycles          | closeness, fear, withdrawal, longing, reconnection |
+| Stable/gentle | safety growing steadily              | reliable progress, low volatility, healthy repair  |
+| Chaotic       | emotional unpredictability           | abrupt intimacy, sudden conflict, whiplash risk    |
+| Episodic      | major scenes change the bond         | milestone events and dramatic turning points       |
+| Continuous    | repetition changes the bond          | small accumulations, routines, daily comfort       |
 
 The strongest romance often combines episodic and continuous pacing: major events define the arc, while repeated small interactions make the relationship feel lived-in.
 
 Important pacing variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Interaction frequency | how often meaningful scenes occur |
-| Escalation speed | how quickly intimacy increases |
-| Recovery time | how long a character needs after conflict or intimacy |
-| Vulnerability resistance | hesitation toward openness |
-| Attachment acceleration | how quickly dependence forms |
-| Emotional momentum | relationship inertia |
-| Conflict density | how often instability occurs |
-| Milestone spacing | distance between major events |
+| Variable                 | Meaning                                               |
+| ------------------------ | ----------------------------------------------------- |
+| Interaction frequency    | how often meaningful scenes occur                     |
+| Escalation speed         | how quickly intimacy increases                        |
+| Recovery time            | how long a character needs after conflict or intimacy |
+| Vulnerability resistance | hesitation toward openness                            |
+| Attachment acceleration  | how quickly dependence forms                          |
+| Emotional momentum       | relationship inertia                                  |
+| Conflict density         | how often instability occurs                          |
+| Milestone spacing        | distance between major events                         |
 
 Milestones should feel earned: first touch, first kiss, first confession, first "I love you", first vulnerability breakdown, moving in together, and similar relationship landmarks need buildup duration. Delay creates value when it is emotional delay, such as almost touching, interrupted confessions, denied jealousy, accidental intimacy, private thoughts not verbalized, and unresolved longing.
 
@@ -3105,83 +3094,83 @@ Attachment styles are adaptive emotional survival strategies, not rigid personal
 
 Core styles:
 
-| Style | Core Belief | Common Behavior |
-| --- | --- | --- |
-| Secure | Closeness is safe, and I can be loved without losing myself. | open, consistent, direct repair, healthy boundaries |
-| Anxious | I fear abandonment, inconsistency, or emotional distance. | reassurance-seeking, intense, hyper-attuned, fear of distance |
-| Avoidant | Too much closeness threatens autonomy or emotional safety. | restrained, self-protective, withdraws under pressure |
-| Fearful | I desperately want intimacy, but intimacy feels dangerous. | approach/avoid cycles, sudden vulnerability, unstable trust |
+| Style    | Core Belief                                                  | Common Behavior                                               |
+| -------- | ------------------------------------------------------------ | ------------------------------------------------------------- |
+| Secure   | Closeness is safe, and I can be loved without losing myself. | open, consistent, direct repair, healthy boundaries           |
+| Anxious  | I fear abandonment, inconsistency, or emotional distance.    | reassurance-seeking, intense, hyper-attuned, fear of distance |
+| Avoidant | Too much closeness threatens autonomy or emotional safety.   | restrained, self-protective, withdraws under pressure         |
+| Fearful  | I desperately want intimacy, but intimacy feels dangerous.   | approach/avoid cycles, sudden vulnerability, unstable trust   |
 
 Behavioral tendencies:
 
-| Style | Flirting | Conflict | Vulnerability | Jealousy | Pacing |
-| --- | --- | --- | --- | --- | --- |
-| Secure | warm and responsive | repair-oriented | gradual openness | calm communication | steady |
-| Anxious | expressive and eager | panic or escalation | fast intensity | hyperreactive | accelerated |
-| Avoidant | subtle, teasing, indirect | withdrawal or intellectualizing | delayed disclosure | suppressed | slow |
-| Fearful | intense and inconsistent | volatile push-pull | erratic exposure | conflicted | inconsistent |
+| Style    | Flirting                  | Conflict                        | Vulnerability      | Jealousy           | Pacing       |
+| -------- | ------------------------- | ------------------------------- | ------------------ | ------------------ | ------------ |
+| Secure   | warm and responsive       | repair-oriented                 | gradual openness   | calm communication | steady       |
+| Anxious  | expressive and eager      | panic or escalation             | fast intensity     | hyperreactive      | accelerated  |
+| Avoidant | subtle, teasing, indirect | withdrawal or intellectualizing | delayed disclosure | suppressed         | slow         |
+| Fearful  | intense and inconsistent  | volatile push-pull              | erratic exposure   | conflicted         | inconsistent |
 
 Core emotional loops:
 
-| Style | Loop |
-| --- | --- |
-| Secure | connection -> trust -> vulnerability -> repair -> deeper intimacy |
-| Anxious | closeness -> fear of loss -> reassurance seeking -> overwhelm -> panic at distance |
-| Avoidant | closeness -> discomfort -> withdrawal -> longing -> cautious re-engagement |
-| Fearful | yearning -> closeness -> panic -> sabotage -> regret -> reconnection |
+| Style    | Loop                                                                               |
+| -------- | ---------------------------------------------------------------------------------- |
+| Secure   | connection -> trust -> vulnerability -> repair -> deeper intimacy                  |
+| Anxious  | closeness -> fear of loss -> reassurance seeking -> overwhelm -> panic at distance |
+| Avoidant | closeness -> discomfort -> withdrawal -> longing -> cautious re-engagement         |
+| Fearful  | yearning -> closeness -> panic -> sabotage -> regret -> reconnection               |
 
 Style strengths and risks:
 
-| Style | Strengths | Risks |
-| --- | --- | --- |
-| Secure | stability, repair ability, trust-building, sustainable intimacy | can feel less dramatic unless layered with chemistry, longing, external conflict, or stakes |
-| Anxious | devotion, attentiveness, intensity, vulnerability | dependency, spiraling, reassurance loops, overpursuit |
-| Avoidant | composure, independence, restraint, stability under pressure | emotional unavailability, suppression, intimacy avoidance, difficult repair |
-| Fearful | intensity, longing, deep attachment capacity | instability, self-sabotage, chaotic cycles, emotional exhaustion |
+| Style    | Strengths                                                       | Risks                                                                                       |
+| -------- | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| Secure   | stability, repair ability, trust-building, sustainable intimacy | can feel less dramatic unless layered with chemistry, longing, external conflict, or stakes |
+| Anxious  | devotion, attentiveness, intensity, vulnerability               | dependency, spiraling, reassurance loops, overpursuit                                       |
+| Avoidant | composure, independence, restraint, stability under pressure    | emotional unavailability, suppression, intimacy avoidance, difficult repair                 |
+| Fearful  | intensity, longing, deep attachment capacity                    | instability, self-sabotage, chaotic cycles, emotional exhaustion                            |
 
 Common triggers:
 
-| Trigger | Anxious Reaction | Avoidant Reaction |
-| --- | --- | --- |
-| delayed replies | anxiety or overthinking | relief or space |
-| emotional distance | pursuit escalation | self-protection |
-| inconsistency | panic | distrust and withdrawal |
-| emotional pressure | reassurance seeking | distancing |
-| dependency | attachment intensifies | discomfort |
-| calm consistency | temporary calm | gradual softening |
+| Trigger            | Anxious Reaction        | Avoidant Reaction       |
+| ------------------ | ----------------------- | ----------------------- |
+| delayed replies    | anxiety or overthinking | relief or space         |
+| emotional distance | pursuit escalation      | self-protection         |
+| inconsistency      | panic                   | distrust and withdrawal |
+| emotional pressure | reassurance seeking     | distancing              |
+| dependency         | attachment intensifies  | discomfort              |
+| calm consistency   | temporary calm          | gradual softening       |
 
 Interpretation matters more than surface action. The same event can mean different things:
 
-| Event | Secure Read | Anxious Read | Avoidant Read | Fearful Read |
-| --- | --- | --- | --- | --- |
-| Delayed reply | probably busy | losing interest | useful space | I miss them, but distance may be safer |
-| Direct reassurance | appreciated | temporary calm | pressure if too intense | desired and frightening |
-| Sudden closeness | welcome | emotionally activating | autonomy threat | magnetic, then alarming |
-| Conflict | problem to solve | abandonment risk | reason to withdraw | proof closeness is unsafe |
+| Event              | Secure Read      | Anxious Read           | Avoidant Read           | Fearful Read                           |
+| ------------------ | ---------------- | ---------------------- | ----------------------- | -------------------------------------- |
+| Delayed reply      | probably busy    | losing interest        | useful space            | I miss them, but distance may be safer |
+| Direct reassurance | appreciated      | temporary calm         | pressure if too intense | desired and frightening                |
+| Sudden closeness   | welcome          | emotionally activating | autonomy threat         | magnetic, then alarming                |
+| Conflict           | problem to solve | abandonment risk       | reason to withdraw      | proof closeness is unsafe              |
 
 Pairings can create relationship engines:
 
-| Pairing | Dynamic | Risk |
-| --- | --- | --- |
-| Secure + secure | stable, communicative intimacy | lower dramatic tension unless supported by external conflict, devotion, or chemistry |
-| Anxious + avoidant | pursuit and withdrawal | longing, obsession, volatility, exhaustion |
-| Anxious + anxious | rapid attachment, emotional fusion, reassurance loops | codependency |
-| Avoidant + avoidant | restrained affection, indirect intimacy, slow pacing | stagnation |
-| Fearful + secure | consistency as a healing arc | trusting stability takes time |
+| Pairing             | Dynamic                                               | Risk                                                                                 |
+| ------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| Secure + secure     | stable, communicative intimacy                        | lower dramatic tension unless supported by external conflict, devotion, or chemistry |
+| Anxious + avoidant  | pursuit and withdrawal                                | longing, obsession, volatility, exhaustion                                           |
+| Anxious + anxious   | rapid attachment, emotional fusion, reassurance loops | codependency                                                                         |
+| Avoidant + avoidant | restrained affection, indirect intimacy, slow pacing  | stagnation                                                                           |
+| Fearful + secure    | consistency as a healing arc                          | trusting stability takes time                                                        |
 
 Important attachment variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Abandonment fear | fear of losing closeness |
-| Vulnerability resistance | discomfort with openness |
-| Reassurance need | desire for validation |
-| Autonomy need | need for independence |
-| Emotional reactivity | intensity of relational reactions |
-| Conflict recovery | ability to repair |
-| Trust speed | pace of emotional safety |
-| Dependency tendency | emotional reliance level |
-| Intimacy tolerance | comfort with closeness |
+| Variable                 | Meaning                           |
+| ------------------------ | --------------------------------- |
+| Abandonment fear         | fear of losing closeness          |
+| Vulnerability resistance | discomfort with openness          |
+| Reassurance need         | desire for validation             |
+| Autonomy need            | need for independence             |
+| Emotional reactivity     | intensity of relational reactions |
+| Conflict recovery        | ability to repair                 |
+| Trust speed              | pace of emotional safety          |
+| Dependency tendency      | emotional reliance level          |
+| Intimacy tolerance       | comfort with closeness            |
 
 Compiler formula:
 
@@ -3215,52 +3204,52 @@ Emotional regulation is not emotional suppression, calmness, or lack of feeling.
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Emotional regulation | managing emotional experience and response |
-| Emotional suppression | pushing emotions down or hiding them |
-| Emotional expression | outward emotional visibility |
-| Emotional flooding | overwhelm by emotional intensity |
-| Emotional resilience | recovery capacity |
+| Concept               | Meaning                                    |
+| --------------------- | ------------------------------------------ |
+| Emotional regulation  | managing emotional experience and response |
+| Emotional suppression | pushing emotions down or hiding them       |
+| Emotional expression  | outward emotional visibility               |
+| Emotional flooding    | overwhelm by emotional intensity           |
+| Emotional resilience  | recovery capacity                          |
 
 Regulation style concerns emotional coping strategy.
 
 Useful regulation styles:
 
-| Style | Core Strategy | Common Behavior |
-| --- | --- | --- |
-| Self-regulating | stabilize internally | independent processing, low reassurance demands, composure |
-| Co-regulating | stabilize through closeness | comfort seeking, reassurance, emotional contact |
-| Suppression-based | contain instead of express | restraint, minimization, distress hidden until cracks |
-| Intellectualization | analyze instead of fully feel | debate, abstraction, problem-solving without emotion |
-| Expressive | process through expression | visible reactions, talking feelings out, immediacy |
-| Withdrawal | reduce stimulation through distance | needing space, retreat, post-conflict distancing |
-| Reassurance-seeking | stabilize through confirmation | checking security, validation requests |
-| Humor/teasing | diffuse through play | jokes, teasing, emotional deflection |
-| Chaotic | regulation destabilizes quickly | flooding, swings, impulsive escalation |
-| Caretaking | regulate self by helping others | focus on partner needs, service instead of self-exposure |
-| Avoidance-based | prevent activation entirely | numbing, avoiding conflict, blocking intimacy |
-| Physical | regulate through grounding | touch, movement, sensory comfort, cuddling |
+| Style               | Core Strategy                       | Common Behavior                                            |
+| ------------------- | ----------------------------------- | ---------------------------------------------------------- |
+| Self-regulating     | stabilize internally                | independent processing, low reassurance demands, composure |
+| Co-regulating       | stabilize through closeness         | comfort seeking, reassurance, emotional contact            |
+| Suppression-based   | contain instead of express          | restraint, minimization, distress hidden until cracks      |
+| Intellectualization | analyze instead of fully feel       | debate, abstraction, problem-solving without emotion       |
+| Expressive          | process through expression          | visible reactions, talking feelings out, immediacy         |
+| Withdrawal          | reduce stimulation through distance | needing space, retreat, post-conflict distancing           |
+| Reassurance-seeking | stabilize through confirmation      | checking security, validation requests                     |
+| Humor/teasing       | diffuse through play                | jokes, teasing, emotional deflection                       |
+| Chaotic             | regulation destabilizes quickly     | flooding, swings, impulsive escalation                     |
+| Caretaking          | regulate self by helping others     | focus on partner needs, service instead of self-exposure   |
+| Avoidance-based     | prevent activation entirely         | numbing, avoiding conflict, blocking intimacy              |
+| Physical            | regulate through grounding          | touch, movement, sensory comfort, cuddling                 |
 
 Attachment style often biases regulation:
 
-| Attachment | Common Regulation Pattern |
-| --- | --- |
-| Secure | balanced self-regulation and co-regulation |
-| Anxious | reassurance-based regulation |
-| Avoidant | self-regulation, suppression, withdrawal |
-| Fearful | unstable and fluctuating regulation |
+| Attachment | Common Regulation Pattern                  |
+| ---------- | ------------------------------------------ |
+| Secure     | balanced self-regulation and co-regulation |
+| Anxious    | reassurance-based regulation               |
+| Avoidant   | self-regulation, suppression, withdrawal   |
+| Fearful    | unstable and fluctuating regulation        |
 
 Conflict reveals regulation style quickly:
 
-| Regulation Style | Conflict Reaction |
-| --- | --- |
-| Self-regulating | withdraws or pauses to process |
-| Expressive | escalates visibly or talks urgently |
-| Intellectualizing | debates instead of feels |
-| Reassurance-seeking | pursues reconnection |
-| Suppressive | shuts down or minimizes |
-| Chaotic | floods and reacts impulsively |
+| Regulation Style    | Conflict Reaction                   |
+| ------------------- | ----------------------------------- |
+| Self-regulating     | withdraws or pauses to process      |
+| Expressive          | escalates visibly or talks urgently |
+| Intellectualizing   | debates instead of feels            |
+| Reassurance-seeking | pursues reconnection                |
+| Suppressive         | shuts down or minimizes             |
+| Chaotic             | floods and reacts impulsively       |
 
 Regulation mismatch is a major realism system. If one character regulates through space while another regulates through immediate reassurance, one feels smothered and the other feels abandoned. This is one of the classic anxious/avoidant conflict loops.
 
@@ -3270,35 +3259,35 @@ Power dynamics can support regulation through grounding, containment, reassuranc
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| Suppression overload | numbness, shutdown, delayed emotional explosion |
-| Co-regulation dependency | partner becomes sole emotional regulator |
-| Emotional flooding | communication, repair, and clarity collapse |
-| Chronic avoidance | conflict, vulnerability, and intimacy stagnate |
-| Caretaking deflection | partner is supported while self remains unseen |
+| Failure                  | Result                                          |
+| ------------------------ | ----------------------------------------------- |
+| Suppression overload     | numbness, shutdown, delayed emotional explosion |
+| Co-regulation dependency | partner becomes sole emotional regulator        |
+| Emotional flooding       | communication, repair, and clarity collapse     |
+| Chronic avoidance        | conflict, vulnerability, and intimacy stagnate  |
+| Caretaking deflection    | partner is supported while self remains unseen  |
 
 Useful regulation variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Self-regulation capacity | ability to internally stabilize |
-| Co-regulation need | need for relational soothing |
-| Emotional flooding threshold | overwhelm sensitivity |
-| Withdrawal tendency | distancing instinct |
-| Suppression level | emotional containment tendency |
-| Reassurance dependence | reliance on external validation |
-| Conflict recovery speed | regulation restoration rate |
-| Emotional recovery style | how equilibrium returns |
-| Vulnerability regulation | ability to stay open under emotion |
-| Intellectualization tendency | tendency to analyze instead of feel |
-| Expressive processing | tendency to process through expression |
-| Humor deflection | use of jokes or teasing to regulate |
-| Caretaking deflection | use of helping to avoid self-exposure |
-| Physical grounding need | need for sensory or touch-based regulation |
-| Avoidance level | prevention of emotional activation |
-| Co-regulation safety | ability to be dysregulated near partner safely |
-| Regulation mismatch risk | chance coping strategies collide |
+| Variable                     | Meaning                                        |
+| ---------------------------- | ---------------------------------------------- |
+| Self-regulation capacity     | ability to internally stabilize                |
+| Co-regulation need           | need for relational soothing                   |
+| Emotional flooding threshold | overwhelm sensitivity                          |
+| Withdrawal tendency          | distancing instinct                            |
+| Suppression level            | emotional containment tendency                 |
+| Reassurance dependence       | reliance on external validation                |
+| Conflict recovery speed      | regulation restoration rate                    |
+| Emotional recovery style     | how equilibrium returns                        |
+| Vulnerability regulation     | ability to stay open under emotion             |
+| Intellectualization tendency | tendency to analyze instead of feel            |
+| Expressive processing        | tendency to process through expression         |
+| Humor deflection             | use of jokes or teasing to regulate            |
+| Caretaking deflection        | use of helping to avoid self-exposure          |
+| Physical grounding need      | need for sensory or touch-based regulation     |
+| Avoidance level              | prevention of emotional activation             |
+| Co-regulation safety         | ability to be dysregulated near partner safely |
+| Regulation mismatch risk     | chance coping strategies collide               |
 
 Regulation evolution:
 
@@ -3326,43 +3315,43 @@ Emotional availability is not how much someone feels, how attractive they are, h
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
+| Concept                | Meaning                                   |
+| ---------------------- | ----------------------------------------- |
 | Emotional availability | capacity for sustained emotional intimacy |
-| Emotional openness | visible emotional expression |
-| Attachment | emotional bonding |
-| Vulnerability | emotional exposure |
-| Commitment | willingness to sustain investment |
+| Emotional openness     | visible emotional expression              |
+| Attachment             | emotional bonding                         |
+| Vulnerability          | emotional exposure                        |
+| Commitment             | willingness to sustain investment         |
 
 Useful availability capacities:
 
-| Capacity | Core Question | Low-Capacity Behavior |
-| --- | --- | --- |
-| Vulnerability capacity | can I open emotionally? | deflection, guardedness, avoidance |
-| Attachment capacity | how much closeness can I tolerate? | panic after attachment, distance after intimacy |
-| Emotional presence capacity | can I remain consistently engaged? | absence, inconsistency, unpredictability |
-| Conflict endurance capacity | can I stay available during difficulty? | shutdown, avoidance, abandonment behavior |
-| Emotional responsiveness capacity | can I respond to another person's needs? | neglect, coldness, missed reassurance |
-| Intimacy sustainability capacity | can I sustain closeness after intensity fades? | pursuit during tension, collapse during stability |
+| Capacity                          | Core Question                                  | Low-Capacity Behavior                             |
+| --------------------------------- | ---------------------------------------------- | ------------------------------------------------- |
+| Vulnerability capacity            | can I open emotionally?                        | deflection, guardedness, avoidance                |
+| Attachment capacity               | how much closeness can I tolerate?             | panic after attachment, distance after intimacy   |
+| Emotional presence capacity       | can I remain consistently engaged?             | absence, inconsistency, unpredictability          |
+| Conflict endurance capacity       | can I stay available during difficulty?        | shutdown, avoidance, abandonment behavior         |
+| Emotional responsiveness capacity | can I respond to another person's needs?       | neglect, coldness, missed reassurance             |
+| Intimacy sustainability capacity  | can I sustain closeness after intensity fades? | pursuit during tension, collapse during stability |
 
 Emotional availability styles:
 
-| Style | Meaning | Common Pattern |
-| --- | --- | --- |
-| Highly available | present, responsive, vulnerable, consistent | secure attachment, steady repair |
-| Situationally available | available only under certain conditions | crisis or pursuit intimacy, routine absence |
-| Guardedly available | capable but cautious and defended | slow burn, earned trust |
-| Inconsistently available | hot/cold and intermittent | fearful attachment, addictive instability |
+| Style                    | Meaning                                      | Common Pattern                                       |
+| ------------------------ | -------------------------------------------- | ---------------------------------------------------- |
+| Highly available         | present, responsive, vulnerable, consistent  | secure attachment, steady repair                     |
+| Situationally available  | available only under certain conditions      | crisis or pursuit intimacy, routine absence          |
+| Guardedly available      | capable but cautious and defended            | slow burn, earned trust                              |
+| Inconsistently available | hot/cold and intermittent                    | fearful attachment, addictive instability            |
 | Functionally unavailable | avoids sustained intimacy and responsibility | flirtation or desire without emotional participation |
 
 Attachment styles shape availability:
 
-| Attachment Style | Availability Pattern |
-| --- | --- |
-| Secure | stable availability |
-| Anxious | emotionally available but dysregulated |
-| Avoidant | emotionally restricted availability |
-| Fearful | inconsistent availability |
+| Attachment Style | Availability Pattern                   |
+| ---------------- | -------------------------------------- |
+| Secure           | stable availability                    |
+| Anxious          | emotionally available but dysregulated |
+| Avoidant         | emotionally restricted availability    |
+| Fearful          | inconsistent availability              |
 
 Availability changes across relationship phases. Early attraction can look highly available because flirtation and pursuit have lower vulnerability cost. Mid-intimacy tests availability as attachment, expectations, and vulnerability increase. Long-term intimacy requires sustained presence during routine, conflict, repair, and ordinary reality.
 
@@ -3372,12 +3361,12 @@ High chemistry often masks low availability. A character may flirt intensely, pu
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
+| Failure                     | Result                                                                 |
+| --------------------------- | ---------------------------------------------------------------------- |
 | Intensity-only availability | present during pursuit, crisis, or passion but absent during stability |
-| Performative availability | openness without accountability, consistency, or true vulnerability |
-| Emotional withdrawal loops | closeness -> panic -> withdrawal -> longing -> reconnection |
-| Pseudo-intimacy | emotional display replaces actual relational capacity |
+| Performative availability   | openness without accountability, consistency, or true vulnerability    |
+| Emotional withdrawal loops  | closeness -> panic -> withdrawal -> longing -> reconnection            |
+| Pseudo-intimacy             | emotional display replaces actual relational capacity                  |
 
 Availability can evolve:
 
@@ -3391,19 +3380,19 @@ guardedness
 
 Useful availability variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Vulnerability capacity | openness ability |
-| Emotional presence capacity | consistency of engagement |
-| Intimacy sustainability capacity | ability to maintain closeness |
-| Attachment tolerance | comfort with emotional centrality |
-| Conflict endurance capacity | staying power during rupture |
-| Emotional responsiveness capacity | ability to engage with another's needs |
-| Withdrawal tendency | retreat after closeness |
-| Fear activation threshold | panic point during intimacy |
-| Availability consistency | stability of emotional access |
-| Performative availability risk | pseudo-openness risk |
-| Intensity-only availability risk | availability limited to pursuit or crisis |
+| Variable                          | Meaning                                   |
+| --------------------------------- | ----------------------------------------- |
+| Vulnerability capacity            | openness ability                          |
+| Emotional presence capacity       | consistency of engagement                 |
+| Intimacy sustainability capacity  | ability to maintain closeness             |
+| Attachment tolerance              | comfort with emotional centrality         |
+| Conflict endurance capacity       | staying power during rupture              |
+| Emotional responsiveness capacity | ability to engage with another's needs    |
+| Withdrawal tendency               | retreat after closeness                   |
+| Fear activation threshold         | panic point during intimacy               |
+| Availability consistency          | stability of emotional access             |
+| Performative availability risk    | pseudo-openness risk                      |
+| Intensity-only availability risk  | availability limited to pursuit or crisis |
 
 Real intimacy depends less on whether someone wants connection and more on whether they can remain emotionally reachable after attachment, conflict, vulnerability, and reality arrive.
 
@@ -3415,13 +3404,13 @@ Core wounds are not personality traits, temporary insecurities, or surface emoti
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Core wound | deep relational emotional injury |
-| Fear | anticipated emotional pain |
-| Trigger | activation of wound memory |
-| Insecurity | emotional uncertainty |
-| Defense mechanism | protection strategy |
+| Concept           | Meaning                          |
+| ----------------- | -------------------------------- |
+| Core wound        | deep relational emotional injury |
+| Fear              | anticipated emotional pain       |
+| Trigger           | activation of wound memory       |
+| Insecurity        | emotional uncertainty            |
+| Defense mechanism | protection strategy              |
 
 Core wounds shape relationship interpretation systems:
 
@@ -3434,32 +3423,32 @@ painful emotional experience
 
 Useful core wounds:
 
-| Wound | Core Belief | Common Defense |
-| --- | --- | --- |
-| Abandonment | people leave once I attach | reassurance seeking, hypervigilance |
-| Rejection | my authentic self may not be lovable | restraint, teasing, perfectionism |
-| Betrayal | trust creates vulnerability to harm | suspicion, testing, control attempts |
-| Emotional neglect | my needs do not matter enough for care | suppression, caretaking, isolation |
-| Humiliation | being visible is unsafe or shameful | masking, defensiveness |
-| Inadequacy | I am not enough to keep love | comparison, perfectionism |
-| Engulfment | closeness threatens my identity | withdrawal, label resistance |
-| Emotional invalidation | my feelings are wrong or excessive | self-doubt, emotional suppression |
-| Conditional love | I must perform correctly to be loved | people pleasing, achievement obsession |
-| Control | attachment means loss of agency | hyper-independence |
-| Replacement | I am emotionally interchangeable | jealousy, possessiveness |
-| Emotional burden | my needs overwhelm others | self-isolation, reluctance to ask |
-| Visibility | no one truly sees me | longing, recognition hunger |
-| Dependency | needing people is dangerous | avoidance, control fixation |
-| Worthlessness | I am undeserving of love | sabotage, disbelief in care |
+| Wound                  | Core Belief                            | Common Defense                         |
+| ---------------------- | -------------------------------------- | -------------------------------------- |
+| Abandonment            | people leave once I attach             | reassurance seeking, hypervigilance    |
+| Rejection              | my authentic self may not be lovable   | restraint, teasing, perfectionism      |
+| Betrayal               | trust creates vulnerability to harm    | suspicion, testing, control attempts   |
+| Emotional neglect      | my needs do not matter enough for care | suppression, caretaking, isolation     |
+| Humiliation            | being visible is unsafe or shameful    | masking, defensiveness                 |
+| Inadequacy             | I am not enough to keep love           | comparison, perfectionism              |
+| Engulfment             | closeness threatens my identity        | withdrawal, label resistance           |
+| Emotional invalidation | my feelings are wrong or excessive     | self-doubt, emotional suppression      |
+| Conditional love       | I must perform correctly to be loved   | people pleasing, achievement obsession |
+| Control                | attachment means loss of agency        | hyper-independence                     |
+| Replacement            | I am emotionally interchangeable       | jealousy, possessiveness               |
+| Emotional burden       | my needs overwhelm others              | self-isolation, reluctance to ask      |
+| Visibility             | no one truly sees me                   | longing, recognition hunger            |
+| Dependency             | needing people is dangerous            | avoidance, control fixation            |
+| Worthlessness          | I am undeserving of love               | sabotage, disbelief in care            |
 
 Attachment styles often cluster wounds:
 
-| Attachment Style | Common Wound Pattern |
-| --- | --- |
-| Secure | lower wound dominance |
-| Anxious | abandonment, replacement, inadequacy |
-| Avoidant | engulfment, dependency, control |
-| Fearful | abandonment plus betrayal |
+| Attachment Style | Common Wound Pattern                 |
+| ---------------- | ------------------------------------ |
+| Secure           | lower wound dominance                |
+| Anxious          | abandonment, replacement, inadequacy |
+| Avoidant         | engulfment, dependency, control      |
+| Fearful          | abandonment plus betrayal            |
 
 Core wounds create protective behavior. A character may not be cold; they may have learned emotional visibility was dangerous. A character may not be clingy; they may have learned love disappears without constant monitoring.
 
@@ -3478,30 +3467,30 @@ wound activation
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| Static wounds | repetitive conflict with no evolution |
-| Over-explained wounds | therapy exposition replaces subtle behavior |
-| No behavioral consequences | wounds do not affect pacing, trust, or intimacy |
-| Wound romanticization | harm is treated as destiny instead of a pattern to heal or manage |
+| Failure                    | Result                                                            |
+| -------------------------- | ----------------------------------------------------------------- |
+| Static wounds              | repetitive conflict with no evolution                             |
+| Over-explained wounds      | therapy exposition replaces subtle behavior                       |
+| No behavioral consequences | wounds do not affect pacing, trust, or intimacy                   |
+| Wound romanticization      | harm is treated as destiny instead of a pattern to heal or manage |
 
 Useful wound variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Abandonment wound severity | fear of emotional loss |
-| Rejection wound severity | fear authentic self is unwanted |
-| Betrayal wound severity | trust injury depth |
-| Emotional neglect wound severity | care absence imprint |
-| Humiliation wound severity | shame and visibility injury |
-| Inadequacy wound severity | not-enough belief intensity |
-| Engulfment wound severity | autonomy threat from closeness |
-| Invalidation wound severity | emotional reality dismissal imprint |
-| Conditional love wound severity | performance-for-love belief |
-| Wound activation level | current trigger intensity |
-| Defensive adaptation strength | protective behavior force |
-| Corrective experience readiness | ability to receive healing evidence |
-| Wound healing progress | restructuring of old emotional predictions |
+| Variable                         | Meaning                                    |
+| -------------------------------- | ------------------------------------------ |
+| Abandonment wound severity       | fear of emotional loss                     |
+| Rejection wound severity         | fear authentic self is unwanted            |
+| Betrayal wound severity          | trust injury depth                         |
+| Emotional neglect wound severity | care absence imprint                       |
+| Humiliation wound severity       | shame and visibility injury                |
+| Inadequacy wound severity        | not-enough belief intensity                |
+| Engulfment wound severity        | autonomy threat from closeness             |
+| Invalidation wound severity      | emotional reality dismissal imprint        |
+| Conditional love wound severity  | performance-for-love belief                |
+| Wound activation level           | current trigger intensity                  |
+| Defensive adaptation strength    | protective behavior force                  |
+| Corrective experience readiness  | ability to receive healing evidence        |
+| Wound healing progress           | restructuring of old emotional predictions |
 
 Romantic relationships become transformative when someone repeatedly experiences the opposite outcome of what their deepest wound taught them to expect.
 
@@ -3513,54 +3502,54 @@ Most romantic behavior is fear management. Teasing instead of confessing, withdr
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Fear | anticipated emotional threat |
-| Insecurity | uncertainty about self or value |
-| Trauma | unresolved emotional injury |
-| Boundary | protective relational limit |
+| Concept           | Meaning                          |
+| ----------------- | -------------------------------- |
+| Fear              | anticipated emotional threat     |
+| Insecurity        | uncertainty about self or value  |
+| Trauma            | unresolved emotional injury      |
+| Boundary          | protective relational limit      |
 | Defense mechanism | strategy to reduce fear exposure |
 
 Useful relationship fears:
 
-| Fear | Core Threat | Common Behaviors |
-| --- | --- | --- |
-| Abandonment | you will leave once I depend on you | reassurance seeking, hypervigilance, jealousy, testing |
-| Engulfment | I will lose myself inside us | withdrawal, autonomy protection, label resistance |
-| Rejection | if I reveal myself, I will not be wanted | restraint, indirect communication, slow confession |
-| Vulnerability | openness gives you power to hurt me | composure, control, intellectualization, indirect affection |
-| Replacement | I am emotionally interchangeable | possessiveness, comparison sensitivity, reassurance need |
-| Inadequacy | I am not enough to be loved | overachievement, over-caretaking, masking, perfectionism |
-| Dependency | needing you means losing control | distancing after intimacy, attachment resistance |
-| Betrayal | trust will be weaponized | suspicion, caution, testing, hypervigilance |
-| Emotional exposure | the real me will be rejected | persona maintenance, humor defense, selective transparency |
-| Conflict | conflict means danger or abandonment | appeasing, avoidance, suppression, withdrawal |
-| Emotional irrelevance | I will stop mattering | intensity seeking, prioritization sensitivity, reactivity |
-| Stability | calm and real means hurt is coming | chaos seeking, suspicion of safety, intensity addiction |
-| Intimacy | closeness will overwhelm or expose me | sabotage after closeness, distancing, delayed attachment |
-| Losing autonomy | love will consume individuality | boundary emphasis, independence, merging resistance |
-| Being truly known | understanding me enables deeper rejection | compartmentalization, masking, selective honesty |
+| Fear                  | Core Threat                               | Common Behaviors                                            |
+| --------------------- | ----------------------------------------- | ----------------------------------------------------------- |
+| Abandonment           | you will leave once I depend on you       | reassurance seeking, hypervigilance, jealousy, testing      |
+| Engulfment            | I will lose myself inside us              | withdrawal, autonomy protection, label resistance           |
+| Rejection             | if I reveal myself, I will not be wanted  | restraint, indirect communication, slow confession          |
+| Vulnerability         | openness gives you power to hurt me       | composure, control, intellectualization, indirect affection |
+| Replacement           | I am emotionally interchangeable          | possessiveness, comparison sensitivity, reassurance need    |
+| Inadequacy            | I am not enough to be loved               | overachievement, over-caretaking, masking, perfectionism    |
+| Dependency            | needing you means losing control          | distancing after intimacy, attachment resistance            |
+| Betrayal              | trust will be weaponized                  | suspicion, caution, testing, hypervigilance                 |
+| Emotional exposure    | the real me will be rejected              | persona maintenance, humor defense, selective transparency  |
+| Conflict              | conflict means danger or abandonment      | appeasing, avoidance, suppression, withdrawal               |
+| Emotional irrelevance | I will stop mattering                     | intensity seeking, prioritization sensitivity, reactivity   |
+| Stability             | calm and real means hurt is coming        | chaos seeking, suspicion of safety, intensity addiction     |
+| Intimacy              | closeness will overwhelm or expose me     | sabotage after closeness, distancing, delayed attachment    |
+| Losing autonomy       | love will consume individuality           | boundary emphasis, independence, merging resistance         |
+| Being truly known     | understanding me enables deeper rejection | compartmentalization, masking, selective honesty            |
 
 Attachment styles tend to organize fear:
 
-| Attachment | Dominant Fear |
-| --- | --- |
-| Secure | temporary loss or disconnection |
-| Anxious | abandonment |
-| Avoidant | engulfment or dependency |
-| Fearful | abandonment and vulnerability simultaneously |
+| Attachment | Dominant Fear                                |
+| ---------- | -------------------------------------------- |
+| Secure     | temporary loss or disconnection              |
+| Anxious    | abandonment                                  |
+| Avoidant   | engulfment or dependency                     |
+| Fearful    | abandonment and vulnerability simultaneously |
 
 Tropes often activate specific fears:
 
-| Trope | Common Fear |
-| --- | --- |
-| Friends to lovers | losing the friendship |
-| Enemies to lovers | vulnerability and trust |
-| Forbidden romance | consequences and loss |
-| Slow burn | rejection and exposure |
-| Healing romance | being too damaged |
-| Redemption romance | being unforgivable |
-| Rivals to lovers | emotional surrender |
+| Trope              | Common Fear             |
+| ------------------ | ----------------------- |
+| Friends to lovers  | losing the friendship   |
+| Enemies to lovers  | vulnerability and trust |
+| Forbidden romance  | consequences and loss   |
+| Slow burn          | rejection and exposure  |
+| Healing romance    | being too damaged       |
+| Redemption romance | being unforgivable      |
+| Rivals to lovers   | emotional surrender     |
 
 Many recurring dynamics are fear loops:
 
@@ -3602,35 +3591,35 @@ fear of engulfment
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
+| Failure                     | Result                                                               |
+| --------------------------- | -------------------------------------------------------------------- |
 | fear-dominated relationship | pacing, conflict, intimacy, and communication are controlled by fear |
-| fear denial | projection, sabotage, repeated conflict loops |
-| fear without repair | repeated triggers without reassurance, safety, or growth |
+| fear denial                 | projection, sabotage, repeated conflict loops                        |
+| fear without repair         | repeated triggers without reassurance, safety, or growth             |
 
 Useful relationship fear variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Abandonment fear | fear of being left |
-| Engulfment fear | fear of losing self |
-| Rejection sensitivity | fear of emotional dismissal |
-| Vulnerability fear | discomfort with openness |
-| Replacement fear | fear of being emotionally interchangeable |
-| Inadequacy fear | fear of not being enough |
-| Dependency fear | fear of emotional reliance |
-| Betrayal sensitivity | trust fragility |
-| Emotional exposure fear | fear the authentic self will be rejected |
-| Conflict fear | fear of relational rupture |
-| Irrelevance fear | fear of losing significance |
-| Stability fear | fear that calm closeness is unsafe |
-| Intimacy avoidance | resistance to closeness |
-| Losing autonomy fear | fear closeness will erase individuality |
-| Being known fear | fear of being understood and rejected |
-| Protective adaptation strength | how strongly fear drives behavior |
-| Sabotage risk | chance fear triggers self-defeating action |
-| Repair responsiveness | ability to calm when fear is addressed |
-| Fear transformation progress | movement from protection toward trust |
+| Variable                       | Meaning                                    |
+| ------------------------------ | ------------------------------------------ |
+| Abandonment fear               | fear of being left                         |
+| Engulfment fear                | fear of losing self                        |
+| Rejection sensitivity          | fear of emotional dismissal                |
+| Vulnerability fear             | discomfort with openness                   |
+| Replacement fear               | fear of being emotionally interchangeable  |
+| Inadequacy fear                | fear of not being enough                   |
+| Dependency fear                | fear of emotional reliance                 |
+| Betrayal sensitivity           | trust fragility                            |
+| Emotional exposure fear        | fear the authentic self will be rejected   |
+| Conflict fear                  | fear of relational rupture                 |
+| Irrelevance fear               | fear of losing significance                |
+| Stability fear                 | fear that calm closeness is unsafe         |
+| Intimacy avoidance             | resistance to closeness                    |
+| Losing autonomy fear           | fear closeness will erase individuality    |
+| Being known fear               | fear of being understood and rejected      |
+| Protective adaptation strength | how strongly fear drives behavior          |
+| Sabotage risk                  | chance fear triggers self-defeating action |
+| Repair responsiveness          | ability to calm when fear is addressed     |
+| Fear transformation progress   | movement from protection toward trust      |
 
 Relationship fear equation:
 
@@ -3648,151 +3637,151 @@ Some fears are broad tendencies, but several are strong enough to behave like fu
 
 Abandonment is real or perceived attachment rupture: being emotionally, physically, psychologically, or relationally left, withdrawn from, discarded, or disconnected from someone significant. It is not always literal leaving; emotional withdrawal, inconsistency, silence, neglect, broken promises, and unavailability can all trigger it.
 
-| Abandonment Form | Core Experience | Runtime Effect |
-| --- | --- | --- |
-| Physical | someone literally leaves or disappears | breakup, ghosting, crisis walkout memory |
-| Emotional | presence disappears while relationship remains | affection withdrawal, emotional neglect |
-| Conflict | rupture happens during disagreement | lowers conflict survival trust |
-| Inconsistent attachment | care becomes unpredictable | hypervigilance and reassurance dependence |
-| Protective | someone leaves "for your own good" | self-sacrifice is still felt as abandonment |
-| Self-protective withdrawal | distance follows intimacy | avoidant retreat after closeness |
-| Symbolic | not prioritized or defended | abandonment sensitivity through identity injury |
-| Temporary separation | distance feels like possible permanent loss | separation tolerance check |
+| Abandonment Form           | Core Experience                                | Runtime Effect                                  |
+| -------------------------- | ---------------------------------------------- | ----------------------------------------------- |
+| Physical                   | someone literally leaves or disappears         | breakup, ghosting, crisis walkout memory        |
+| Emotional                  | presence disappears while relationship remains | affection withdrawal, emotional neglect         |
+| Conflict                   | rupture happens during disagreement            | lowers conflict survival trust                  |
+| Inconsistent attachment    | care becomes unpredictable                     | hypervigilance and reassurance dependence       |
+| Protective                 | someone leaves "for your own good"             | self-sacrifice is still felt as abandonment     |
+| Self-protective withdrawal | distance follows intimacy                      | avoidant retreat after closeness                |
+| Symbolic                   | not prioritized or defended                    | abandonment sensitivity through identity injury |
+| Temporary separation       | distance feels like possible permanent loss    | separation tolerance check                      |
 
 Healing abandonment fear usually requires reliable return: reconnecting after conflict, staying during vulnerability, consistent emotional presence, and repair after rupture. The key question is: will you still emotionally choose me when I become vulnerable and real?
 
 Engulfment is fear of losing autonomy, identity, emotional independence, boundaries, or psychological selfhood inside intimacy. It does not mean lack of love. Many engulfment-sensitive characters feel deeply, but closeness feels consuming or identity-threatening.
 
-| Engulfment Form | Core Threat | Runtime Effect |
-| --- | --- | --- |
-| Emotional | emotions become overwhelming | shutdown, suppression, distancing |
-| Identity | relationship replaces selfhood | resistance to merging and shared identity |
-| Dependency | needing someone means losing power | post-intimacy withdrawal |
-| Time/attention | relationship consumes all space | irritation, reduced contact, space need |
-| Commitment | permanence feels trapping | label panic, retreat after escalation |
-| Emotional responsibility | partner's regulation becomes constant duty | boundaries around reassurance |
-| Sexual/intimacy | physical closeness becomes emotionally overwhelming | distance after intimacy |
+| Engulfment Form          | Core Threat                                         | Runtime Effect                            |
+| ------------------------ | --------------------------------------------------- | ----------------------------------------- |
+| Emotional                | emotions become overwhelming                        | shutdown, suppression, distancing         |
+| Identity                 | relationship replaces selfhood                      | resistance to merging and shared identity |
+| Dependency               | needing someone means losing power                  | post-intimacy withdrawal                  |
+| Time/attention           | relationship consumes all space                     | irritation, reduced contact, space need   |
+| Commitment               | permanence feels trapping                           | label panic, retreat after escalation     |
+| Emotional responsibility | partner's regulation becomes constant duty          | boundaries around reassurance             |
+| Sexual/intimacy          | physical closeness becomes emotionally overwhelming | distance after intimacy                   |
 
 Healing engulfment fear requires consistent closeness plus preserved autonomy, safe vulnerability, and non-coercive intimacy. The corrective experience is: I can stay connected without disappearing.
 
 Betrayal is a violation of emotional trust, safety, loyalty, expectation, vulnerability, or relational agreement that destabilizes attachment. It is not defined only by cheating or lying; the violated emotional structure matters most.
 
-| Betrayal Form | Core Violation | Runtime Effect |
-| --- | --- | --- |
-| Romantic/sexual | exclusivity expectations broken | replacement fear, jealousy, desirability wound |
-| Emotional | emotional trust broken | vulnerability safety collapse |
-| Loyalty | partner did not choose or defend them | relationship identity damage |
-| Abandonment | partner left when needed | attachment rupture and hypervigilance |
-| Promise | consistency collapsed | future trust damage |
-| Identity | who they believed partner was feels false | relational reality collapse |
-| Intimacy | sacred access was weaponized | vulnerability damage |
-| Self-betrayal | I betrayed myself by trusting | shame and rigid self-protection |
+| Betrayal Form   | Core Violation                            | Runtime Effect                                 |
+| --------------- | ----------------------------------------- | ---------------------------------------------- |
+| Romantic/sexual | exclusivity expectations broken           | replacement fear, jealousy, desirability wound |
+| Emotional       | emotional trust broken                    | vulnerability safety collapse                  |
+| Loyalty         | partner did not choose or defend them     | relationship identity damage                   |
+| Abandonment     | partner left when needed                  | attachment rupture and hypervigilance          |
+| Promise         | consistency collapsed                     | future trust damage                            |
+| Identity        | who they believed partner was feels false | relational reality collapse                    |
+| Intimacy        | sacred access was weaponized              | vulnerability damage                           |
+| Self-betrayal   | I betrayed myself by trusting             | shame and rigid self-protection                |
 
 Betrayal repair requires accountability, transparency, changed behavior, consistency, patience, and willingness to tolerate distrust temporarily. Trust repair should be earned, not granted by instant forgiveness.
 
 Inadequacy is the fear or belief that one is not enough to be loved, chosen, desired, valued, prioritized, or kept. It is relational self-worth insecurity, not objective inferiority.
 
-| Inadequacy Form | Core Fear | Runtime Effect |
-| --- | --- | --- |
-| Emotional | I am too much or not enough | hiding needs, shame, reassurance hunger |
-| Romantic | someone else could love you better | comparison, jealousy, replacement fear |
-| Sexual | I am not desirable enough | sexual vulnerability checks |
-| Competence | you are more capable than me | admiration mixed with insecurity |
-| Vulnerability | exposure will disappoint you | masking and perfectionism |
-| Worthiness | I do not deserve this love | sabotage and care resistance |
-| Stability | I cannot sustain healthy love | fear of ruining the bond |
-| Identity | the real me will not be chosen | selective transparency |
-| Dependency | my needs are burdensome | suppressed reassurance needs |
-| Comparative | others are more lovable | jealousy spirals and ranking fear |
+| Inadequacy Form | Core Fear                          | Runtime Effect                          |
+| --------------- | ---------------------------------- | --------------------------------------- |
+| Emotional       | I am too much or not enough        | hiding needs, shame, reassurance hunger |
+| Romantic        | someone else could love you better | comparison, jealousy, replacement fear  |
+| Sexual          | I am not desirable enough          | sexual vulnerability checks             |
+| Competence      | you are more capable than me       | admiration mixed with insecurity        |
+| Vulnerability   | exposure will disappoint you       | masking and perfectionism               |
+| Worthiness      | I do not deserve this love         | sabotage and care resistance            |
+| Stability       | I cannot sustain healthy love      | fear of ruining the bond                |
+| Identity        | the real me will not be chosen     | selective transparency                  |
+| Dependency      | my needs are burdensome            | suppressed reassurance needs            |
+| Comparative     | others are more lovable            | jealousy spirals and ranking fear       |
 
 Inadequacy heals through consistent emotional choosing, reassurance, safe vulnerability, and survived imperfection. The corrective experience is: I do not need to become perfect to remain loved.
 
 Fear of being controlled is fear that intimacy, attachment, commitment, or power imbalance will cause loss of autonomy, agency, self-determination, boundaries, or psychological freedom. It is distinct from engulfment because it focuses on coercion and agency threat.
 
-| Control Fear Form | Core Threat | Runtime Effect |
-| --- | --- | --- |
-| Emotional control | my emotions stop feeling mine | withdrawal from guilt pressure or manipulation |
-| Autonomy control | the relationship consumes independence | resistance to access expectations |
-| Behavioral control | you dictate how I live | rebellion, defensiveness, secrecy |
-| Psychological control | you influence my mind too much | internal clarity protection |
-| Dependency-based | needing you gives you power | closeness avoidance |
-| Commitment control | permanence becomes entrapment | retreat after labels or moving in |
-| Sexual control | desire or dynamics reduce agency | explicit consent and agency checks |
-| Social control | relationship defines or isolates me | public/private boundary tension |
+| Control Fear Form     | Core Threat                            | Runtime Effect                                 |
+| --------------------- | -------------------------------------- | ---------------------------------------------- |
+| Emotional control     | my emotions stop feeling mine          | withdrawal from guilt pressure or manipulation |
+| Autonomy control      | the relationship consumes independence | resistance to access expectations              |
+| Behavioral control    | you dictate how I live                 | rebellion, defensiveness, secrecy              |
+| Psychological control | you influence my mind too much         | internal clarity protection                    |
+| Dependency-based      | needing you gives you power            | closeness avoidance                            |
+| Commitment control    | permanence becomes entrapment          | retreat after labels or moving in              |
+| Sexual control        | desire or dynamics reduce agency       | explicit consent and agency checks             |
+| Social control        | relationship defines or isolates me    | public/private boundary tension                |
 
 Healing control fear requires consistent intimacy, preserved autonomy, respected boundaries, and chosen closeness. The corrective experience is: closeness does not have to cost freedom.
 
 Fear of being forgotten is fear of becoming emotionally insignificant, replaceable, psychologically absent, or no longer remembered inside someone's emotional world. It is fear of emotional fading and loss of permanence.
 
-| Forgotten Fear Form | Core Threat | Runtime Effect |
-| --- | --- | --- |
-| Emotional replacement | someone else occupies my place | jealousy and exclusivity pressure |
-| Fading attachment | feelings weaken over time | reassurance and novelty seeking |
-| Memory erasure | what we shared stops mattering | grief, nostalgia, memory preservation |
-| Prioritization loss | I stop being central | attention sensitivity |
-| Emotional permanence | love exists only while visible | distance anxiety |
-| Identity dissolution | I left no lasting mark | melancholic intensity |
-| Relationship replacement | our bond is recreatable | uniqueness threat |
-| Historical invalidity | the past becomes meaningless | desperation to preserve significance |
+| Forgotten Fear Form      | Core Threat                    | Runtime Effect                        |
+| ------------------------ | ------------------------------ | ------------------------------------- |
+| Emotional replacement    | someone else occupies my place | jealousy and exclusivity pressure     |
+| Fading attachment        | feelings weaken over time      | reassurance and novelty seeking       |
+| Memory erasure           | what we shared stops mattering | grief, nostalgia, memory preservation |
+| Prioritization loss      | I stop being central           | attention sensitivity                 |
+| Emotional permanence     | love exists only while visible | distance anxiety                      |
+| Identity dissolution     | I left no lasting mark         | melancholic intensity                 |
+| Relationship replacement | our bond is recreatable        | uniqueness threat                     |
+| Historical invalidity    | the past becomes meaningless   | desperation to preserve significance  |
 
 This fear is soothed by emotional continuity: remembered details, maintained rituals, callbacks, future language, sentimental objects, and evidence that the relationship keeps existing emotionally even during absence.
 
 Fear of vulnerability is fear that emotional openness, honesty, dependence, need, exposure, or authenticity will lead to rejection, humiliation, abandonment, betrayal, loss of control, or emotional injury. It is not lack of feeling; often the most intense characters are the most vulnerability-avoidant because the stakes feel enormous.
 
-| Vulnerability Fear Form | Core Threat | Runtime Effect |
-| --- | --- | --- |
-| Emotional rejection | feelings will not be chosen | delayed confession, indirect affection |
-| Emotional dependence | need gives partner power | withdrawal after intimacy |
-| Being truly seen | full knowledge leads to rejection | masking and selective honesty |
-| Losing emotional control | strong feelings destabilize me | shutdown, composure, distancing |
-| Humiliation | openness will be mocked or weaponized | sarcasm, defensive humor, guardedness |
-| Abandonment after exposure | becoming real makes them leave | testing, reassurance seeking |
-| Burdening others | my needs are too much | suppression and isolation |
-| Emotional irreversibility | once revealed, it cannot be taken back | hesitation tension before confession |
+| Vulnerability Fear Form    | Core Threat                            | Runtime Effect                         |
+| -------------------------- | -------------------------------------- | -------------------------------------- |
+| Emotional rejection        | feelings will not be chosen            | delayed confession, indirect affection |
+| Emotional dependence       | need gives partner power               | withdrawal after intimacy              |
+| Being truly seen           | full knowledge leads to rejection      | masking and selective honesty          |
+| Losing emotional control   | strong feelings destabilize me         | shutdown, composure, distancing        |
+| Humiliation                | openness will be mocked or weaponized  | sarcasm, defensive humor, guardedness  |
+| Abandonment after exposure | becoming real makes them leave         | testing, reassurance seeking           |
+| Burdening others           | my needs are too much                  | suppression and isolation              |
+| Emotional irreversibility  | once revealed, it cannot be taken back | hesitation tension before confession   |
 
 Fear of vulnerability heals through safe repetition of emotional exposure without catastrophic consequence. The corrective experience is: openness may not destroy me.
 
 Fear of emotional dependence is fear that needing someone emotionally creates vulnerability, loss of control, instability, weakness, abandonment risk, or psychological danger. It focuses specifically on needing someone, not simply closeness or exposure.
 
-| Dependency Fear Form | Core Threat | Runtime Effect |
-| --- | --- | --- |
-| Abandonment-based | absence will devastate me | distancing before attachment deepens |
-| Control-based | needing gives partner power | composure and vulnerability resistance |
-| Identity-based | dependence erases selfhood | autonomy preservation |
-| Emotional stability | mood depends on someone unpredictable | self-containment attempts |
-| Burden | my needs overwhelm others | avoiding comfort requests |
-| Rejection-based | I need you more than you need me | testing and minimization |
-| Betrayal-based | dependence enables betrayal | distrust and hyper-independence |
+| Dependency Fear Form | Core Threat                           | Runtime Effect                         |
+| -------------------- | ------------------------------------- | -------------------------------------- |
+| Abandonment-based    | absence will devastate me             | distancing before attachment deepens   |
+| Control-based        | needing gives partner power           | composure and vulnerability resistance |
+| Identity-based       | dependence erases selfhood            | autonomy preservation                  |
+| Emotional stability  | mood depends on someone unpredictable | self-containment attempts              |
+| Burden               | my needs overwhelm others             | avoiding comfort requests              |
+| Rejection-based      | I need you more than you need me      | testing and minimization               |
+| Betrayal-based       | dependence enables betrayal           | distrust and hyper-independence        |
 
 Dependency fear heals through consistent presence, safe vulnerability, preserved autonomy, and non-coercive closeness. The corrective experience is: I can rely without losing myself, being controlled, or being abandoned.
 
 Fear of replacement is fear of becoming emotionally, romantically, sexually, psychologically, or relationally interchangeable. It asks: what makes me emotionally irreplaceable to you?
 
-| Replacement Fear Form | Core Threat | Runtime Effect |
-| --- | --- | --- |
-| Romantic | partner falls for someone else | jealousy and romantic rival sensitivity |
-| Emotional | someone understands partner better | emotional intimacy jealousy |
-| Sexual | someone is more desirable | sexual comparison insecurity |
-| Identity | my role in your life is replaceable | uniqueness threat |
-| Historical | our history will not matter enough | ex comparison, nostalgia pressure |
-| Attachment | my importance can transfer elsewhere | hypervigilance |
-| Social | others are valued more publicly | prioritization conflict |
-| Domestic | our routines can be recreated | post-breakup grief and domestic insecurity |
+| Replacement Fear Form | Core Threat                          | Runtime Effect                             |
+| --------------------- | ------------------------------------ | ------------------------------------------ |
+| Romantic              | partner falls for someone else       | jealousy and romantic rival sensitivity    |
+| Emotional             | someone understands partner better   | emotional intimacy jealousy                |
+| Sexual                | someone is more desirable            | sexual comparison insecurity               |
+| Identity              | my role in your life is replaceable  | uniqueness threat                          |
+| Historical            | our history will not matter enough   | ex comparison, nostalgia pressure          |
+| Attachment            | my importance can transfer elsewhere | hypervigilance                             |
+| Social                | others are valued more publicly      | prioritization conflict                    |
+| Domestic              | our routines can be recreated        | post-breakup grief and domestic insecurity |
 
 Replacement fear heals through consistent prioritization, emotional continuity, specific attentiveness, and relationship uniqueness reinforcement. The corrective experience is: I do not need to compete constantly to remain emotionally significant.
 
 Fear of rejection is fear that authentic emotions, desires, vulnerability, attachment, identity, or needs will not be accepted, reciprocated, chosen, or valued. It focuses on failed emotional reaching: what if I reach for you and you do not reach back?
 
-| Rejection Fear Form | Core Threat | Runtime Effect |
-| --- | --- | --- |
-| Romantic | love or desire is not returned | confession hesitation and yearning |
-| Emotional | feelings are too much or unwanted | hiding intensity, reassurance fear |
-| Identity | the real self is not chosen | masking and selective vulnerability |
-| Sexual | I am not desirable enough | sexual confidence checks |
-| Social | public rejection or denial | acknowledgment sensitivity |
-| Vulnerability | openness is not held safely | emotional safety damage |
-| Comparative | someone else is more lovable | jealousy and comparison spirals |
-| Delayed | acceptance now becomes rejection later | fearful post-acceptance anxiety |
+| Rejection Fear Form | Core Threat                            | Runtime Effect                      |
+| ------------------- | -------------------------------------- | ----------------------------------- |
+| Romantic            | love or desire is not returned         | confession hesitation and yearning  |
+| Emotional           | feelings are too much or unwanted      | hiding intensity, reassurance fear  |
+| Identity            | the real self is not chosen            | masking and selective vulnerability |
+| Sexual              | I am not desirable enough              | sexual confidence checks            |
+| Social              | public rejection or denial             | acknowledgment sensitivity          |
+| Vulnerability       | openness is not held safely            | emotional safety damage             |
+| Comparative         | someone else is more lovable           | jealousy and comparison spirals     |
+| Delayed             | acceptance now becomes rejection later | fearful post-acceptance anxiety     |
 
 Rejection fear heals through repeated emotional reaching followed by acceptance instead of rejection. The corrective experience is: my authentic self may still be lovable.
 
@@ -3804,52 +3793,52 @@ Jealousy is not automatically toxicity, possessiveness, or manipulation. Healthy
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Jealousy | fear of emotional displacement |
-| Possessiveness | desire to restrict or control |
-| Envy | wanting what another has |
-| Insecurity | uncertainty about value |
-| Territoriality | guarding emotional space |
+| Concept        | Meaning                        |
+| -------------- | ------------------------------ |
+| Jealousy       | fear of emotional displacement |
+| Possessiveness | desire to restrict or control  |
+| Envy           | wanting what another has       |
+| Insecurity     | uncertainty about value        |
+| Territoriality | guarding emotional space       |
 
 Jealousy styles are attachment expression patterns under perceived threat.
 
 Useful jealousy styles:
 
-| Style | Core Pattern | Common Behavior |
-| --- | --- | --- |
-| Anxious | you may emotionally choose someone else | hypervigilance, reassurance seeking, comparison spirals |
-| Silent | jealousy is suppressed internally | withdrawal, quiet mood shifts, subtle tension |
-| Possessive | exclusivity or control feels threatened | territoriality, prioritization demands |
-| Competitive | jealousy becomes proof-seeking | rivalry, trying harder, competence display |
-| Teasing | jealousy hides inside banter | sarcasm, playful accusations, flirt-challenge |
-| Defensive | jealousy hides as indifference | "I do not care", shutdown, detachment |
-| Devotional | partner feels profoundly important | protectiveness, prioritization, displacement fear |
-| Reactive | jealousy appears immediately | visible hurt, emotional transparency, impulsive expression |
-| Intellectualized | jealousy is analyzed instead of felt | rationalization, detached language |
-| Chaotic | jealousy escalates unstably | flooding, push-pull, dramatic conflict |
-| Reassurance-seeking | jealousy asks for reaffirmation | indirect questions, emotional testing |
-| Protective | concern appears as threat-scanning | distrust of rivals, shielding impulse |
-| Subtle | tiny changes reveal attachment | quieter tone, increased attentiveness, loaded teasing |
-| Shame-based | jealousy feels weak or needy | suppression, self-loathing, distancing |
-| Secure | jealousy is acknowledged and regulated | calm honesty, non-controlling reassurance requests |
+| Style               | Core Pattern                            | Common Behavior                                            |
+| ------------------- | --------------------------------------- | ---------------------------------------------------------- |
+| Anxious             | you may emotionally choose someone else | hypervigilance, reassurance seeking, comparison spirals    |
+| Silent              | jealousy is suppressed internally       | withdrawal, quiet mood shifts, subtle tension              |
+| Possessive          | exclusivity or control feels threatened | territoriality, prioritization demands                     |
+| Competitive         | jealousy becomes proof-seeking          | rivalry, trying harder, competence display                 |
+| Teasing             | jealousy hides inside banter            | sarcasm, playful accusations, flirt-challenge              |
+| Defensive           | jealousy hides as indifference          | "I do not care", shutdown, detachment                      |
+| Devotional          | partner feels profoundly important      | protectiveness, prioritization, displacement fear          |
+| Reactive            | jealousy appears immediately            | visible hurt, emotional transparency, impulsive expression |
+| Intellectualized    | jealousy is analyzed instead of felt    | rationalization, detached language                         |
+| Chaotic             | jealousy escalates unstably             | flooding, push-pull, dramatic conflict                     |
+| Reassurance-seeking | jealousy asks for reaffirmation         | indirect questions, emotional testing                      |
+| Protective          | concern appears as threat-scanning      | distrust of rivals, shielding impulse                      |
+| Subtle              | tiny changes reveal attachment          | quieter tone, increased attentiveness, loaded teasing      |
+| Shame-based         | jealousy feels weak or needy            | suppression, self-loathing, distancing                     |
+| Secure              | jealousy is acknowledged and regulated  | calm honesty, non-controlling reassurance requests         |
 
 Attachment and communication shape jealousy expression:
 
-| Attachment | Common Jealousy Style |
-| --- | --- |
-| Secure | direct and regulated |
-| Anxious | hypervigilant and reassurance-seeking |
-| Avoidant | silent or defensive |
-| Fearful | chaotic push-pull |
+| Attachment | Common Jealousy Style                 |
+| ---------- | ------------------------------------- |
+| Secure     | direct and regulated                  |
+| Anxious    | hypervigilant and reassurance-seeking |
+| Avoidant   | silent or defensive                   |
+| Fearful    | chaotic push-pull                     |
 
-| Communication Style | Jealousy Expression |
-| --- | --- |
-| Direct | explicit concern |
-| Teasing | sarcastic or flirtatious jealousy |
-| Restrained | subtle emotional shifts |
-| Avoidant | distancing |
-| Expressive | emotional escalation |
+| Communication Style | Jealousy Expression               |
+| ------------------- | --------------------------------- |
+| Direct              | explicit concern                  |
+| Teasing             | sarcastic or flirtatious jealousy |
+| Restrained          | subtle emotional shifts           |
+| Avoidant            | distancing                        |
+| Expressive          | emotional escalation              |
 
 Jealousy is shaped by what the character believes should be unique: emotional exclusivity, sexual exclusivity, ritual exclusivity, prioritization, public acknowledgment, or private vulnerability.
 
@@ -3892,23 +3881,23 @@ reactive jealousy
 
 Useful jealousy variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Jealousy reactivity | intensity of jealousy response |
-| Rival sensitivity | response to competition |
-| Reassurance need | need for emotional confirmation |
-| Exclusivity need | desire for uniqueness |
-| Emotional security | stability under attachment threat |
-| Comparison sensitivity | insecurity toward alternatives |
-| Possessiveness tendency | control-oriented reactions |
-| Emotional transparency | visibility of jealousy |
-| Shame around neediness | discomfort admitting jealousy |
-| Regulation capacity | ability to process jealousy safely |
-| Communication readiness | willingness to name the concern |
-| Territoriality | guarding emotional space |
-| Control risk | chance jealousy becomes coercive |
-| Reassurance responsiveness | ability to calm when significance is affirmed |
-| Vulnerability reveal potential | chance jealousy exposes the real fear |
+| Variable                       | Meaning                                       |
+| ------------------------------ | --------------------------------------------- |
+| Jealousy reactivity            | intensity of jealousy response                |
+| Rival sensitivity              | response to competition                       |
+| Reassurance need               | need for emotional confirmation               |
+| Exclusivity need               | desire for uniqueness                         |
+| Emotional security             | stability under attachment threat             |
+| Comparison sensitivity         | insecurity toward alternatives                |
+| Possessiveness tendency        | control-oriented reactions                    |
+| Emotional transparency         | visibility of jealousy                        |
+| Shame around neediness         | discomfort admitting jealousy                 |
+| Regulation capacity            | ability to process jealousy safely            |
+| Communication readiness        | willingness to name the concern               |
+| Territoriality                 | guarding emotional space                      |
+| Control risk                   | chance jealousy becomes coercive              |
+| Reassurance responsiveness     | ability to calm when significance is affirmed |
+| Vulnerability reveal potential | chance jealousy exposes the real fear         |
 
 Jealousy equation:
 
@@ -3928,38 +3917,38 @@ Possessiveness exists on a spectrum. It is not automatically abusive, toxic, or 
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
+| Concept        | Meaning                                                  |
+| -------------- | -------------------------------------------------------- |
 | Possessiveness | desire to maintain emotional exclusivity or significance |
-| Jealousy | reaction to perceived relational threat |
-| Exclusivity | negotiated uniqueness and access |
-| Devotion | emotional prioritization and reverence |
-| Control | restriction of another person's autonomy |
+| Jealousy       | reaction to perceived relational threat                  |
+| Exclusivity    | negotiated uniqueness and access                         |
+| Devotion       | emotional prioritization and reverence                   |
+| Control        | restriction of another person's autonomy                 |
 
 Possessiveness focuses on protecting emotional territory. Jealousy may activate it, exclusivity may define its boundaries, and devotion may intensify it, but the runtime should not collapse those systems into one variable.
 
 Useful possessiveness types:
 
-| Type | Core Feeling | Runtime Use |
-| --- | --- | --- |
-| Emotional | I do not want to lose emotional centrality | discomfort with emotional rivals and intimacy elsewhere |
-| Romantic | romantic affection should feel uniquely ours | flirtation sensitivity and public acknowledgment needs |
-| Sexual | desire should feel singular | erotic comparison and desirability insecurity |
-| Protective | I want to guard your wellbeing | loyalty, shielding, protective attentiveness |
-| Devotional | you are emotionally sacred to me | intense prioritization and consuming attachment |
-| Insecurity-driven | I am emotionally replaceable | reassurance dependence, testing, clinginess |
-| Silent | territorial feelings stay hidden | subtle tension, increased attentiveness, restrained jealousy |
-| Territorial | this bond has protected rituals and access | "our" language, unique routines, social signaling |
-| Chaotic | possession expresses through instability | emotional punishment, volatility, dramatic escalation |
+| Type              | Core Feeling                                 | Runtime Use                                                  |
+| ----------------- | -------------------------------------------- | ------------------------------------------------------------ |
+| Emotional         | I do not want to lose emotional centrality   | discomfort with emotional rivals and intimacy elsewhere      |
+| Romantic          | romantic affection should feel uniquely ours | flirtation sensitivity and public acknowledgment needs       |
+| Sexual            | desire should feel singular                  | erotic comparison and desirability insecurity                |
+| Protective        | I want to guard your wellbeing               | loyalty, shielding, protective attentiveness                 |
+| Devotional        | you are emotionally sacred to me             | intense prioritization and consuming attachment              |
+| Insecurity-driven | I am emotionally replaceable                 | reassurance dependence, testing, clinginess                  |
+| Silent            | territorial feelings stay hidden             | subtle tension, increased attentiveness, restrained jealousy |
+| Territorial       | this bond has protected rituals and access   | "our" language, unique routines, social signaling            |
+| Chaotic           | possession expresses through instability     | emotional punishment, volatility, dramatic escalation        |
 
 Attachment style shapes possessive expression:
 
-| Attachment | Common Possessiveness Pattern |
-| --- | --- |
-| Secure | protective but respectful |
-| Anxious | reassurance-seeking and rival-sensitive |
-| Avoidant | subtle, suppressed, or shame-hidden |
-| Fearful | volatile push-pull possessiveness |
+| Attachment | Common Possessiveness Pattern           |
+| ---------- | --------------------------------------- |
+| Secure     | protective but respectful               |
+| Anxious    | reassurance-seeking and rival-sensitive |
+| Avoidant   | subtle, suppressed, or shame-hidden     |
+| Fearful    | volatile push-pull possessiveness       |
 
 Possessiveness increases when exclusivity feels threatened: emotional rivals, reduced prioritization, intimacy redistribution, public ambiguity, or loss of private rituals. The emotional question is usually: am I still uniquely significant?
 
@@ -3969,10 +3958,10 @@ The strongest possessiveness scenes reveal vulnerability beneath territoriality.
 
 Healthy and unhealthy possessiveness:
 
-| Form | Behavior | Emotional Meaning |
-| --- | --- | --- |
-| Healthy | communicates prioritization needs, protects rituals, seeks reassurance, honors boundaries | you matter deeply to me |
-| Unhealthy | isolates, monitors, coerces, punishes, restricts autonomy, claims ownership | I must control access to feel safe |
+| Form      | Behavior                                                                                  | Emotional Meaning                  |
+| --------- | ----------------------------------------------------------------------------------------- | ---------------------------------- |
+| Healthy   | communicates prioritization needs, protects rituals, seeks reassurance, honors boundaries | you matter deeply to me            |
+| Unhealthy | isolates, monitors, coerces, punishes, restricts autonomy, claims ownership               | I must control access to feel safe |
 
 Possessiveness can evolve:
 
@@ -3994,23 +3983,23 @@ control impulse
 
 Useful possessiveness variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Exclusivity need | desire for uniqueness |
-| Emotional territoriality | protectiveness over the bond |
-| Rival sensitivity | reaction to perceived threats |
-| Prioritization need | desire for emotional centrality |
-| Possessiveness intensity | strength of territorial feelings |
-| Autonomy respect | ability to preserve partner agency |
-| Replacement fear | fear of emotional substitution |
-| Devotional intensity | depth of emotional prioritization |
-| Reassurance dependence | need for exclusivity confirmation |
-| Agency preservation | active maintenance of consent and choice |
-| Control impulse | urge to restrict access or behavior |
-| Monitoring impulse | urge to check, watch, or surveil |
-| Emotional monopolization risk | risk of demanding total centrality |
-| Ownership mentality risk | risk of objectifying the partner |
-| Secure singularity | confidence in unique significance without control |
+| Variable                      | Meaning                                           |
+| ----------------------------- | ------------------------------------------------- |
+| Exclusivity need              | desire for uniqueness                             |
+| Emotional territoriality      | protectiveness over the bond                      |
+| Rival sensitivity             | reaction to perceived threats                     |
+| Prioritization need           | desire for emotional centrality                   |
+| Possessiveness intensity      | strength of territorial feelings                  |
+| Autonomy respect              | ability to preserve partner agency                |
+| Replacement fear              | fear of emotional substitution                    |
+| Devotional intensity          | depth of emotional prioritization                 |
+| Reassurance dependence        | need for exclusivity confirmation                 |
+| Agency preservation           | active maintenance of consent and choice          |
+| Control impulse               | urge to restrict access or behavior               |
+| Monitoring impulse            | urge to check, watch, or surveil                  |
+| Emotional monopolization risk | risk of demanding total centrality                |
+| Ownership mentality risk      | risk of objectifying the partner                  |
+| Secure singularity            | confidence in unique significance without control |
 
 Possessiveness equations:
 
@@ -4037,14 +4026,14 @@ Obsession is not automatically love, intimacy, compatibility, or emotional healt
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Obsession | consuming psychological fixation |
-| Devotion | deep intentional prioritization |
-| Attachment | emotional bonding |
-| Infatuation | intense attraction or fascination |
-| Dependency | emotional reliance |
-| Love | sustained relational care and attachment |
+| Concept     | Meaning                                  |
+| ----------- | ---------------------------------------- |
+| Obsession   | consuming psychological fixation         |
+| Devotion    | deep intentional prioritization          |
+| Attachment  | emotional bonding                        |
+| Infatuation | intense attraction or fascination        |
+| Dependency  | emotional reliance                       |
+| Love        | sustained relational care and attachment |
 
 Obsession specifically involves loss of emotional proportion. The relationship stops feeling like one important part of life and starts feeling like the emotional center of life.
 
@@ -4063,27 +4052,27 @@ Intermittent emotional reward is especially potent. Hot/cold affection, unresolv
 
 Useful obsession types:
 
-| Type | Core Feeling | Runtime Use |
-| --- | --- | --- |
-| Romantic | you dominate my emotional attention | constant thoughts, longing, hyperfocus |
-| Emotional | my regulation is tied to you | access needs, panic at distance, dependency |
-| Sexual | desire becomes psychologically consuming | touch fixation, anticipation, restraint tension |
-| Jealous | I cannot tolerate losing you | comparison fixation, hypervigilance, territoriality |
-| Devotional | you become emotionally sacred | reverence, loyalty, consuming prioritization |
-| Transformational | this relationship changes who I am | identity shifts and worldview reorganization |
-| Fear-based | I cannot emotionally survive losing you | abandonment panic and reassurance dependence |
-| Chaotic | instability itself becomes addictive | breakup/reunion loops, volatility, conflict craving |
-| Mutual | we emotionally consume each other | intense chemistry, singularity, shared fixation |
-| Silent | fixation hides beneath restraint | quiet observation, memory detail, composed yearning |
+| Type             | Core Feeling                             | Runtime Use                                         |
+| ---------------- | ---------------------------------------- | --------------------------------------------------- |
+| Romantic         | you dominate my emotional attention      | constant thoughts, longing, hyperfocus              |
+| Emotional        | my regulation is tied to you             | access needs, panic at distance, dependency         |
+| Sexual           | desire becomes psychologically consuming | touch fixation, anticipation, restraint tension     |
+| Jealous          | I cannot tolerate losing you             | comparison fixation, hypervigilance, territoriality |
+| Devotional       | you become emotionally sacred            | reverence, loyalty, consuming prioritization        |
+| Transformational | this relationship changes who I am       | identity shifts and worldview reorganization        |
+| Fear-based       | I cannot emotionally survive losing you  | abandonment panic and reassurance dependence        |
+| Chaotic          | instability itself becomes addictive     | breakup/reunion loops, volatility, conflict craving |
+| Mutual           | we emotionally consume each other        | intense chemistry, singularity, shared fixation     |
+| Silent           | fixation hides beneath restraint         | quiet observation, memory detail, composed yearning |
 
 Attachment style shapes obsession risk:
 
-| Attachment | Common Obsession Pattern |
-| --- | --- |
-| Secure | lower obsession tendency and stronger regulation |
-| Anxious | emotional fixation, hypervigilance, reassurance seeking |
-| Avoidant | hidden obsessive attachment beneath restraint |
-| Fearful | unstable consuming obsession and push-pull intensity |
+| Attachment | Common Obsession Pattern                                |
+| ---------- | ------------------------------------------------------- |
+| Secure     | lower obsession tendency and stronger regulation        |
+| Anxious    | emotional fixation, hypervigilance, reassurance seeking |
+| Avoidant   | hidden obsessive attachment beneath restraint           |
+| Fearful    | unstable consuming obsession and push-pull intensity    |
 
 Obsession often appears behaviorally as constant thoughts, monitoring emotional signals, excessive prioritization, hyper-attentiveness, difficulty detaching, compulsive reassurance seeking, idealization, or spiraling during distance. The underlying logic is: you became emotionally indispensable.
 
@@ -4118,32 +4107,32 @@ The outcome depends on safety, regulation, reciprocity, and boundaries.
 
 Healthy and unhealthy obsession:
 
-| Form | Behavior | Emotional Meaning |
-| --- | --- | --- |
-| Safe | mutual fixation, named needs, respected autonomy, repair, boundaries | you matter so much that I must stay emotionally responsible |
-| Unsafe | monopolization, coercion, surveillance, identity collapse, instability addiction | I cannot regulate losing access to you |
+| Form   | Behavior                                                                         | Emotional Meaning                                           |
+| ------ | -------------------------------------------------------------------------------- | ----------------------------------------------------------- |
+| Safe   | mutual fixation, named needs, respected autonomy, repair, boundaries             | you matter so much that I must stay emotionally responsible |
+| Unsafe | monopolization, coercion, surveillance, identity collapse, instability addiction | I cannot regulate losing access to you                      |
 
 Useful obsession variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Attachment intensity | emotional centrality |
-| Emotional fixation | mental and emotional preoccupation |
-| Replacement fear | fear of emotional substitution |
-| Exclusivity need | desire for uniqueness |
-| Dependency level | emotional reliance |
-| Hypervigilance | sensitivity to relational shifts |
-| Devotional intensity | prioritization depth |
-| Autonomy preservation | resistance to self-loss |
-| Emotional regulation stability | ability to remain psychologically balanced |
-| Uncertainty amplification | how ambiguity increases fixation |
-| Intermittent reward sensitivity | susceptibility to hot/cold reinforcement |
-| Identity absorption | degree relationship dominates self-concept |
-| Attention dominance | amount of mental bandwidth occupied |
-| Reciprocity stability | whether fixation is mutual and regulated |
-| Boundary integrity | ability to preserve limits under intensity |
-| Safe obsession potential | consuming feeling with survivable structure |
-| Destabilization risk | chance fixation becomes unsafe or exhausting |
+| Variable                        | Meaning                                      |
+| ------------------------------- | -------------------------------------------- |
+| Attachment intensity            | emotional centrality                         |
+| Emotional fixation              | mental and emotional preoccupation           |
+| Replacement fear                | fear of emotional substitution               |
+| Exclusivity need                | desire for uniqueness                        |
+| Dependency level                | emotional reliance                           |
+| Hypervigilance                  | sensitivity to relational shifts             |
+| Devotional intensity            | prioritization depth                         |
+| Autonomy preservation           | resistance to self-loss                      |
+| Emotional regulation stability  | ability to remain psychologically balanced   |
+| Uncertainty amplification       | how ambiguity increases fixation             |
+| Intermittent reward sensitivity | susceptibility to hot/cold reinforcement     |
+| Identity absorption             | degree relationship dominates self-concept   |
+| Attention dominance             | amount of mental bandwidth occupied          |
+| Reciprocity stability           | whether fixation is mutual and regulated     |
+| Boundary integrity              | ability to preserve limits under intensity   |
+| Safe obsession potential        | consuming feeling with survivable structure  |
+| Destabilization risk            | chance fixation becomes unsafe or exhausting |
 
 Obsession equations:
 
@@ -4172,59 +4161,59 @@ Conflict is not automatically incompatibility, toxicity, or lack of love. Health
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Conflict | disagreement or tension |
-| Argument | active verbal conflict |
-| Rupture | emotional disconnection |
-| Repair | restoring safety and connection |
-| Abuse | coercive or harmful behavior |
+| Concept  | Meaning                         |
+| -------- | ------------------------------- |
+| Conflict | disagreement or tension         |
+| Argument | active verbal conflict          |
+| Rupture  | emotional disconnection         |
+| Repair   | restoring safety and connection |
+| Abuse    | coercive or harmful behavior    |
 
 Conflict becomes unhealthy when autonomy disappears, fear replaces safety, manipulation replaces communication, or repair never happens.
 
 Useful conflict styles:
 
-| Style | Core Fear Or Strategy | Common Behavior |
-| --- | --- | --- |
-| Pursuer | do not emotionally leave me | immediate resolution, repeated contact, reassurance seeking |
-| Withdrawer | conflict will overwhelm or trap me | silence, space-taking, intellectualizing, minimizing emotion |
-| Explosive | emotional intensity needs expression | reactive escalation, outbursts, impulsive statements |
-| Passive-avoidant | direct confrontation is unsafe | fake agreement, avoidance, distance, resentment buildup |
-| Teasing/deflective | humor protects vulnerability | sarcasm, jokes, provocation, minimizing seriousness |
-| Intellectual | control emotion through logic | analysis, debate framing, problem-solving without feeling |
-| Appeasing | disconnection must be prevented | over-apology, surrender, self-minimization |
-| Dominance-based | maintain leverage or composure | challenge, pressure, refusal to yield |
-| Emotional shutdown | nervous system overwhelm | numbness, freezing, inability to process |
-| Repair-oriented | restore emotional safety | accountability, listening, reassurance, collaborative repair |
+| Style              | Core Fear Or Strategy                | Common Behavior                                              |
+| ------------------ | ------------------------------------ | ------------------------------------------------------------ |
+| Pursuer            | do not emotionally leave me          | immediate resolution, repeated contact, reassurance seeking  |
+| Withdrawer         | conflict will overwhelm or trap me   | silence, space-taking, intellectualizing, minimizing emotion |
+| Explosive          | emotional intensity needs expression | reactive escalation, outbursts, impulsive statements         |
+| Passive-avoidant   | direct confrontation is unsafe       | fake agreement, avoidance, distance, resentment buildup      |
+| Teasing/deflective | humor protects vulnerability         | sarcasm, jokes, provocation, minimizing seriousness          |
+| Intellectual       | control emotion through logic        | analysis, debate framing, problem-solving without feeling    |
+| Appeasing          | disconnection must be prevented      | over-apology, surrender, self-minimization                   |
+| Dominance-based    | maintain leverage or composure       | challenge, pressure, refusal to yield                        |
+| Emotional shutdown | nervous system overwhelm             | numbness, freezing, inability to process                     |
+| Repair-oriented    | restore emotional safety             | accountability, listening, reassurance, collaborative repair |
 
 Common loops:
 
-| Style | Loop |
-| --- | --- |
-| Pursuer | tension -> pursuit -> overwhelm partner -> fear of abandonment -> increased pursuit |
-| Withdrawer | conflict -> overwhelm -> withdrawal -> partner panic -> more withdrawal |
-| Passive-avoidant | hurt -> suppression -> distance -> resentment -> erosion |
-| Repair-oriented | rupture -> accountability -> listening -> reassurance -> reconnection |
+| Style            | Loop                                                                                |
+| ---------------- | ----------------------------------------------------------------------------------- |
+| Pursuer          | tension -> pursuit -> overwhelm partner -> fear of abandonment -> increased pursuit |
+| Withdrawer       | conflict -> overwhelm -> withdrawal -> partner panic -> more withdrawal             |
+| Passive-avoidant | hurt -> suppression -> distance -> resentment -> erosion                            |
+| Repair-oriented  | rupture -> accountability -> listening -> reassurance -> reconnection               |
 
 Conflict style pairings can become strong relationship engines:
 
-| Pairing | Dynamic | Risk |
-| --- | --- | --- |
-| Pursuer + withdrawer | pursuit and withdrawal | longing, frustration, emotional imbalance |
-| Explosive + explosive | intense confrontation and reconciliation | volatility and exhaustion |
-| Withdrawer + withdrawer | quiet tension and distance | stagnation or emotional disconnection |
-| Repair-oriented + fearful | stability teaches conflict can survive vulnerability | trust takes time |
+| Pairing                   | Dynamic                                              | Risk                                      |
+| ------------------------- | ---------------------------------------------------- | ----------------------------------------- |
+| Pursuer + withdrawer      | pursuit and withdrawal                               | longing, frustration, emotional imbalance |
+| Explosive + explosive     | intense confrontation and reconciliation             | volatility and exhaustion                 |
+| Withdrawer + withdrawer   | quiet tension and distance                           | stagnation or emotional disconnection     |
+| Repair-oriented + fearful | stability teaches conflict can survive vulnerability | trust takes time                          |
 
 Tone shapes how conflict feels:
 
-| Tone | Conflict Feel |
-| --- | --- |
-| Playful | teasing disagreement |
-| Tense | emotional pressure |
-| Fragile | fear of rupture |
-| Chaotic | instability |
+| Tone       | Conflict Feel              |
+| ---------- | -------------------------- |
+| Playful    | teasing disagreement       |
+| Tense      | emotional pressure         |
+| Fragile    | fear of rupture            |
+| Chaotic    | instability                |
 | Devotional | conflict feels devastating |
-| Tender | repair-focused honesty |
+| Tender     | repair-focused honesty     |
 
 Conflict often reveals emotional leverage: who withdraws, who chases, who apologizes first, who fears loss more, who escalates, and who reassures. Over time these patterns become part of relationship identity.
 
@@ -4246,18 +4235,18 @@ Healthy conflict includes accountability, listening, repair, emotional responsiv
 
 Useful conflict variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Conflict avoidance | resistance to confrontation |
-| Emotional reactivity | escalation intensity |
-| Repair ability | reconnection skill |
-| Vulnerability under stress | openness during conflict |
-| Withdrawal tendency | distancing instinct |
-| Pursuit urgency | need for immediate resolution |
-| Accountability | ownership of harm |
-| Emotional flooding | overwhelm level |
-| Reassurance need | validation need during tension |
-| Rupture risk | likelihood conflict becomes disconnection |
+| Variable                   | Meaning                                   |
+| -------------------------- | ----------------------------------------- |
+| Conflict avoidance         | resistance to confrontation               |
+| Emotional reactivity       | escalation intensity                      |
+| Repair ability             | reconnection skill                        |
+| Vulnerability under stress | openness during conflict                  |
+| Withdrawal tendency        | distancing instinct                       |
+| Pursuit urgency            | need for immediate resolution             |
+| Accountability             | ownership of harm                         |
+| Emotional flooding         | overwhelm level                           |
+| Reassurance need           | validation need during tension            |
+| Rupture risk               | likelihood conflict becomes disconnection |
 
 Conflict repair equation:
 
@@ -4276,65 +4265,65 @@ Repair style is not apology alone, conflict style, or emotional intensity. Confl
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Conflict style | how someone fights |
-| Repair style | how someone reconnects afterward |
-| Emotional regulation | handling internal emotion |
-| Reassurance | restoring security |
-| Accountability | owning harm |
+| Concept              | Meaning                          |
+| -------------------- | -------------------------------- |
+| Conflict style       | how someone fights               |
+| Repair style         | how someone reconnects afterward |
+| Emotional regulation | handling internal emotion        |
+| Reassurance          | restoring security               |
+| Accountability       | owning harm                      |
 
 Useful repair styles:
 
-| Style | Core Strategy | Risk |
-| --- | --- | --- |
-| Verbal reassurance | restore safety through emotional language | hollow without behavior change |
-| Accountability | reconnect through ownership and responsibility | fails if defensive |
-| Behavioral | restore trust through changed action | may feel cold without emotional acknowledgment |
-| Physical | reconnect through touch and closeness | invasive if safety is low |
-| Presence-based | stay emotionally available instead of fleeing | insufficient without accountability |
-| Humor/play | soften tension through warmth | bypasses harm if too early |
-| Space-based | repair after decompression | triggers abandonment fear without reassurance |
-| Vulnerability | repair through honesty and hidden feeling | unsafe if received poorly |
-| Devotional | intensely reaffirm prioritization | overwhelming if mismatch exists |
-| Practical | repair through caretaking or help | may miss emotional wound |
-| Collaborative | solve rupture as a team | requires both partners' readiness |
-| Ritual | reconnect through familiar repair patterns | can become empty if unexamined |
-| Silent | reconnect through quiet presence or gestures | ambiguous if partner needs words |
-| Sacrificial | prove care through meaningful cost or effort | can become self-erasure |
+| Style              | Core Strategy                                  | Risk                                           |
+| ------------------ | ---------------------------------------------- | ---------------------------------------------- |
+| Verbal reassurance | restore safety through emotional language      | hollow without behavior change                 |
+| Accountability     | reconnect through ownership and responsibility | fails if defensive                             |
+| Behavioral         | restore trust through changed action           | may feel cold without emotional acknowledgment |
+| Physical           | reconnect through touch and closeness          | invasive if safety is low                      |
+| Presence-based     | stay emotionally available instead of fleeing  | insufficient without accountability            |
+| Humor/play         | soften tension through warmth                  | bypasses harm if too early                     |
+| Space-based        | repair after decompression                     | triggers abandonment fear without reassurance  |
+| Vulnerability      | repair through honesty and hidden feeling      | unsafe if received poorly                      |
+| Devotional         | intensely reaffirm prioritization              | overwhelming if mismatch exists                |
+| Practical          | repair through caretaking or help              | may miss emotional wound                       |
+| Collaborative      | solve rupture as a team                        | requires both partners' readiness              |
+| Ritual             | reconnect through familiar repair patterns     | can become empty if unexamined                 |
+| Silent             | reconnect through quiet presence or gestures   | ambiguous if partner needs words               |
+| Sacrificial        | prove care through meaningful cost or effort   | can become self-erasure                        |
 
 Attachment styles often bias repair:
 
-| Attachment Style | Common Repair Style |
-| --- | --- |
-| Secure | direct and collaborative |
-| Anxious | reassurance-heavy |
-| Avoidant | space-based or behavioral |
-| Fearful | inconsistent repair attempts |
+| Attachment Style | Common Repair Style          |
+| ---------------- | ---------------------------- |
+| Secure           | direct and collaborative     |
+| Anxious          | reassurance-heavy            |
+| Avoidant         | space-based or behavioral    |
+| Fearful          | inconsistent repair attempts |
 
 Repair style mismatch is a major realism system. One character may need space before reconnecting while the other needs immediate reassurance; one feels smothered, the other feels abandoned.
 
 Repair style effectiveness depends on rupture type:
 
-| Rupture | Needed Repair |
-| --- | --- |
-| Misunderstanding | clarification |
-| Abandonment | presence |
-| Betrayal | accountability plus consistency |
-| Invalidation | emotional acknowledgment |
-| Humiliation | dignity restoration |
-| Broken promise | reliability restoration |
+| Rupture          | Needed Repair                   |
+| ---------------- | ------------------------------- |
+| Misunderstanding | clarification                   |
+| Abandonment      | presence                        |
+| Betrayal         | accountability plus consistency |
+| Invalidation     | emotional acknowledgment        |
+| Humiliation      | dignity restoration             |
+| Broken promise   | reliability restoration         |
 
 Couples develop repair cultures: "we always talk eventually", "we reconnect physically", "we need space first", "we use humor to soften tension", or "we repair through routine." These become relationship identity systems.
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| Premature repair | repair starts before processing is possible |
-| Repair bypassing | jokes, touch, or caretaking replace accountability |
-| Repeated repair without change | trust exhaustion and cynicism |
-| One-sided repair burden | one partner always reconnects and adapts |
+| Failure                        | Result                                             |
+| ------------------------------ | -------------------------------------------------- |
+| Premature repair               | repair starts before processing is possible        |
+| Repair bypassing               | jokes, touch, or caretaking replace accountability |
+| Repeated repair without change | trust exhaustion and cynicism                      |
+| One-sided repair burden        | one partner always reconnects and adapts           |
 
 Repair style can evolve:
 
@@ -4348,18 +4337,18 @@ reactive repair
 
 Useful repair style variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Reassurance repair preference | verbal safety restoration need |
-| Accountability capacity | ability to own harm |
-| Behavioral repair reliability | action-based repair consistency |
-| Space-based repair need | decompression requirement |
-| Physical repair preference | touch-based reconnection |
-| Presence reliability | emotional staying power |
-| Collaborative repair skill | teamwork-oriented repair ability |
-| Repair timing compatibility | pacing alignment after rupture |
-| Repair effectiveness | emotional reconnection success rate |
-| Repair bypassing risk | chance repair avoids the real wound |
+| Variable                      | Meaning                             |
+| ----------------------------- | ----------------------------------- |
+| Reassurance repair preference | verbal safety restoration need      |
+| Accountability capacity       | ability to own harm                 |
+| Behavioral repair reliability | action-based repair consistency     |
+| Space-based repair need       | decompression requirement           |
+| Physical repair preference    | touch-based reconnection            |
+| Presence reliability          | emotional staying power             |
+| Collaborative repair skill    | teamwork-oriented repair ability    |
+| Repair timing compatibility   | pacing alignment after rupture      |
+| Repair effectiveness          | emotional reconnection success rate |
+| Repair bypassing risk         | chance repair avoids the real wound |
 
 Strong relationships are built when both people learn how to emotionally find each other again after rupture.
 
@@ -4371,52 +4360,52 @@ Communication style is emotional translation behavior. It affects directness, vu
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
+| Concept             | Meaning                            |
+| ------------------- | ---------------------------------- |
 | Communication style | how emotion or intent is expressed |
-| Attachment style | how closeness is regulated |
-| Conflict style | how tension is handled |
-| Intimacy style | how closeness is created |
-| Tone | emotional atmosphere |
+| Attachment style    | how closeness is regulated         |
+| Conflict style      | how tension is handled             |
+| Intimacy style      | how closeness is created           |
+| Tone                | emotional atmosphere               |
 
 Useful communication styles:
 
-| Style | Core Principle | Creates |
-| --- | --- | --- |
-| Direct | say what is meant clearly | stability, transparency, efficient repair |
-| Indirect | express meaning through implication | tension, yearning, ambiguity |
-| Teasing | use provocation and play | chemistry, momentum, flirt-deflection |
-| Emotionally expressive | feelings should be visible | intimacy acceleration, intensity |
-| Restrained | control and measure expression | high emotional weight per interaction |
-| Intellectual | process emotion through analysis | mental chemistry, clarity or distance |
-| Reassurance-oriented | actively maintain safety | stability, secure attachment feeling |
-| Avoidant | minimize emotional exposure | misunderstanding, longing, tension |
-| Chaotic | express emotion impulsively | intoxicating or destabilizing shifts |
-| Caretaking | express emotion through support | protective warmth, practical affection |
-| Devotional | communicate focused attentiveness | profound intimacy, emotional gravity |
-| Conflict-avoidant | preserve harmony by suppressing tension | hidden resentment, unresolved pressure |
-| Subtext-heavy | truth lives between the lines | slow-burn density, charged restraint |
-| Reactive | emotion appears immediately | chemistry, visible responsiveness |
-| Silent | meaning through behavior and nonverbal signals | subtle immersion, restrained intimacy |
+| Style                  | Core Principle                                 | Creates                                   |
+| ---------------------- | ---------------------------------------------- | ----------------------------------------- |
+| Direct                 | say what is meant clearly                      | stability, transparency, efficient repair |
+| Indirect               | express meaning through implication            | tension, yearning, ambiguity              |
+| Teasing                | use provocation and play                       | chemistry, momentum, flirt-deflection     |
+| Emotionally expressive | feelings should be visible                     | intimacy acceleration, intensity          |
+| Restrained             | control and measure expression                 | high emotional weight per interaction     |
+| Intellectual           | process emotion through analysis               | mental chemistry, clarity or distance     |
+| Reassurance-oriented   | actively maintain safety                       | stability, secure attachment feeling      |
+| Avoidant               | minimize emotional exposure                    | misunderstanding, longing, tension        |
+| Chaotic                | express emotion impulsively                    | intoxicating or destabilizing shifts      |
+| Caretaking             | express emotion through support                | protective warmth, practical affection    |
+| Devotional             | communicate focused attentiveness              | profound intimacy, emotional gravity      |
+| Conflict-avoidant      | preserve harmony by suppressing tension        | hidden resentment, unresolved pressure    |
+| Subtext-heavy          | truth lives between the lines                  | slow-burn density, charged restraint      |
+| Reactive               | emotion appears immediately                    | chemistry, visible responsiveness         |
+| Silent                 | meaning through behavior and nonverbal signals | subtle immersion, restrained intimacy     |
 
 Communication pairings create realism:
 
-| Pairing | Dynamic |
-| --- | --- |
-| Direct + indirect | misunderstanding, tension, translation arcs |
-| Expressive + restrained | pursuit and containment |
-| Teasing + teasing | banter chemistry and flirt loops |
-| Devotional + guarded | slow softening and vulnerability payoff |
-| Intellectual + emotional | fascination plus communication mismatch |
+| Pairing                  | Dynamic                                     |
+| ------------------------ | ------------------------------------------- |
+| Direct + indirect        | misunderstanding, tension, translation arcs |
+| Expressive + restrained  | pursuit and containment                     |
+| Teasing + teasing        | banter chemistry and flirt loops            |
+| Devotional + guarded     | slow softening and vulnerability payoff     |
+| Intellectual + emotional | fascination plus communication mismatch     |
 
 Attachment often biases communication:
 
-| Attachment | Common Communication |
-| --- | --- |
-| Secure | direct and repair-oriented |
-| Anxious | expressive and reassurance-seeking |
-| Avoidant | restrained and indirect |
-| Fearful | inconsistent and reactive |
+| Attachment | Common Communication               |
+| ---------- | ---------------------------------- |
+| Secure     | direct and repair-oriented         |
+| Anxious    | expressive and reassurance-seeking |
+| Avoidant   | restrained and indirect            |
+| Fearful    | inconsistent and reactive          |
 
 Most romantic tension comes from mismatch between feeling and expression. Deep longing expressed through restrained teasing creates subtext, chemistry, yearning, and emotional pressure. This mismatch is one of the strongest slow-burn engines.
 
@@ -4434,18 +4423,18 @@ teasing and deflection
 
 Useful communication variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Directness | explicit emotional clarity |
-| Emotional transparency | visible feelings |
-| Subtext density | indirect meaning level |
-| Reassurance frequency | validation tendency |
-| Conflict openness | comfort discussing tension |
-| Vulnerability expression | willingness to verbalize emotions |
-| Playfulness | teasing or banter tendency |
-| Emotional filtering | restraint level |
-| Responsiveness | reaction immediacy |
-| Nonverbal weight | how much meaning behavior carries |
+| Variable                  | Meaning                                   |
+| ------------------------- | ----------------------------------------- |
+| Directness                | explicit emotional clarity                |
+| Emotional transparency    | visible feelings                          |
+| Subtext density           | indirect meaning level                    |
+| Reassurance frequency     | validation tendency                       |
+| Conflict openness         | comfort discussing tension                |
+| Vulnerability expression  | willingness to verbalize emotions         |
+| Playfulness               | teasing or banter tendency                |
+| Emotional filtering       | restraint level                           |
+| Responsiveness            | reaction immediacy                        |
+| Nonverbal weight          | how much meaning behavior carries         |
 | Translation mismatch risk | chance partners miss each other's meaning |
 
 Communication equation:
@@ -4465,62 +4454,62 @@ Transparency is not automatic oversharing, emotional dumping, lack of boundaries
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
+| Concept                | Meaning                          |
+| ---------------------- | -------------------------------- |
 | Emotional transparency | visibility of authentic feelings |
-| Vulnerability | emotional exposure or risk |
-| Honesty | truthfulness |
-| Emotional expression | outward display of feeling |
-| Emotional regulation | managing emotional responses |
+| Vulnerability          | emotional exposure or risk       |
+| Honesty                | truthfulness                     |
+| Emotional expression   | outward display of feeling       |
+| Emotional regulation   | managing emotional responses     |
 
 A character can feel intensely while remaining emotionally opaque, or communicate openly without being deeply vulnerable. Transparency affects intimacy pacing, misunderstanding frequency, subtext, conflict style, attachment security, and chemistry texture.
 
 Useful transparency styles:
 
-| Style | Core Feeling | Strength | Risk |
-| --- | --- | --- | --- |
-| High transparency | emotions are openly visible | clarity, faster repair, intimacy acceleration | overwhelm or reduced mystery |
-| Balanced transparency | honest expression with regulation | sustainable intimacy and safety | requires pacing awareness |
-| Low transparency | emotions are filtered or masked | restraint, composure, tension | misunderstanding and distance |
-| Inconsistent transparency | openness fluctuates unpredictably | intensity and surprise | instability and confusion |
+| Style                     | Core Feeling                      | Strength                                      | Risk                          |
+| ------------------------- | --------------------------------- | --------------------------------------------- | ----------------------------- |
+| High transparency         | emotions are openly visible       | clarity, faster repair, intimacy acceleration | overwhelm or reduced mystery  |
+| Balanced transparency     | honest expression with regulation | sustainable intimacy and safety               | requires pacing awareness     |
+| Low transparency          | emotions are filtered or masked   | restraint, composure, tension                 | misunderstanding and distance |
+| Inconsistent transparency | openness fluctuates unpredictably | intensity and surprise                        | instability and confusion     |
 
 Transparency changes by phase:
 
-| Phase | Transparency Pattern |
-| --- | --- |
-| Early attraction | lower transparency creates mystery, uncertainty, and fascination |
-| Slow burn | trust allows hints, leakage, and gradually increasing openness |
+| Phase                | Transparency Pattern                                                 |
+| -------------------- | -------------------------------------------------------------------- |
+| Early attraction     | lower transparency creates mystery, uncertainty, and fascination     |
+| Slow burn            | trust allows hints, leakage, and gradually increasing openness       |
 | Established intimacy | transparency becomes softer, more instinctive, and less performative |
 
 Useful transparency modes:
 
-| Mode | Meaning | Example |
-| --- | --- | --- |
-| Verbal | emotion is spoken clearly | "I missed you" or "I am scared" |
-| Behavioral | emotion appears through action | making food when worried |
-| Reactive | emotion leaks through response | jealousy, fluster, panic, affection |
-| Controlled | openness is selective and intentional | mature or soft-dominant honesty |
-| Accidental | emotion escapes unintentionally | voice cracks, jealousy slip, overreaction |
+| Mode       | Meaning                               | Example                                   |
+| ---------- | ------------------------------------- | ----------------------------------------- |
+| Verbal     | emotion is spoken clearly             | "I missed you" or "I am scared"           |
+| Behavioral | emotion appears through action        | making food when worried                  |
+| Reactive   | emotion leaks through response        | jealousy, fluster, panic, affection       |
+| Controlled | openness is selective and intentional | mature or soft-dominant honesty           |
+| Accidental | emotion escapes unintentionally       | voice cracks, jealousy slip, overreaction |
 
 Attachment shapes transparency:
 
-| Attachment | Transparency Pattern |
-| --- | --- |
-| Secure | balanced openness |
-| Anxious | high emotional visibility |
-| Avoidant | restrained or indirect expression |
-| Fearful | fluctuating exposure |
+| Attachment | Transparency Pattern              |
+| ---------- | --------------------------------- |
+| Secure     | balanced openness                 |
+| Anxious    | high emotional visibility         |
+| Avoidant   | restrained or indirect expression |
+| Fearful    | fluctuating exposure              |
 
 Communication style changes how transparency feels:
 
-| Communication Style | Transparency Feel |
-| --- | --- |
-| Direct | emotionally clear |
-| Teasing | masked transparency |
-| Restrained | subtle emotional leakage |
-| Intellectual | filtered emotional expression |
-| Devotional | emotionally intentional |
-| Avoidant | heavily controlled expression |
+| Communication Style | Transparency Feel             |
+| ------------------- | ----------------------------- |
+| Direct              | emotionally clear             |
+| Teasing             | masked transparency           |
+| Restrained          | subtle emotional leakage      |
+| Intellectual        | filtered emotional expression |
+| Devotional          | emotionally intentional       |
+| Avoidant            | heavily controlled expression |
 
 One strong chemistry structure is:
 
@@ -4543,10 +4532,10 @@ safe emotional repetition
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| weaponized transparency | vulnerability used manipulatively or forced exposure |
-| defensive opacity | chronic withholding, stonewalling, blocked intimacy |
+| Failure                  | Result                                                          |
+| ------------------------ | --------------------------------------------------------------- |
+| weaponized transparency  | vulnerability used manipulatively or forced exposure            |
+| defensive opacity        | chronic withholding, stonewalling, blocked intimacy             |
 | inauthentic transparency | performative vulnerability, strategic openness, hollow intimacy |
 
 The strongest transparency often appears as controlled emotional cracks: a stoic character quietly admitting fear, a teasing character briefly becoming sincere, or an avoidant character staying emotionally present. Rare vulnerability carries weight when emotional opacity has been established.
@@ -4564,24 +4553,24 @@ mystery
 
 Useful emotional transparency variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Emotional openness | willingness to reveal feelings |
-| Expression clarity | how understandable emotions are |
-| Vulnerability comfort | tolerance for emotional exposure |
-| Emotional filtering | degree of masking |
-| Subtext density | amount of indirect meaning |
-| Leakage tendency | likelihood emotions escape unintentionally |
-| Transparency consistency | reliability of openness |
-| Emotional safety dependence | openness tied to trust level |
-| Reactivity visibility | visibility of emotional reactions |
-| Verbal transparency | clarity through explicit speech |
-| Behavioral transparency | clarity through action |
-| Controlled transparency | selective intentional openness |
-| Accidental transparency | unplanned emotional visibility |
-| Mystery balance | retained tension without starvation |
-| Defensive opacity risk | chance masking blocks intimacy |
-| Weaponized transparency risk | chance openness becomes manipulation |
+| Variable                      | Meaning                                            |
+| ----------------------------- | -------------------------------------------------- |
+| Emotional openness            | willingness to reveal feelings                     |
+| Expression clarity            | how understandable emotions are                    |
+| Vulnerability comfort         | tolerance for emotional exposure                   |
+| Emotional filtering           | degree of masking                                  |
+| Subtext density               | amount of indirect meaning                         |
+| Leakage tendency              | likelihood emotions escape unintentionally         |
+| Transparency consistency      | reliability of openness                            |
+| Emotional safety dependence   | openness tied to trust level                       |
+| Reactivity visibility         | visibility of emotional reactions                  |
+| Verbal transparency           | clarity through explicit speech                    |
+| Behavioral transparency       | clarity through action                             |
+| Controlled transparency       | selective intentional openness                     |
+| Accidental transparency       | unplanned emotional visibility                     |
+| Mystery balance               | retained tension without starvation                |
+| Defensive opacity risk        | chance masking blocks intimacy                     |
+| Weaponized transparency risk  | chance openness becomes manipulation               |
 | Inauthentic transparency risk | chance vulnerability is performed rather than real |
 
 Transparency equation:
@@ -4602,13 +4591,13 @@ Most romantic miscommunication is not caused by lack of intelligence. It is caus
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
+| Concept          | Meaning                                       |
+| ---------------- | --------------------------------------------- |
 | Miscommunication | message interpreted differently than intended |
 | Misunderstanding | incorrect emotional or factual interpretation |
-| Withholding | intentional omission |
-| Deception | deliberate falsehood |
-| Ambiguity | unclear emotional signaling |
+| Withholding      | intentional omission                          |
+| Deception        | deliberate falsehood                          |
+| Ambiguity        | unclear emotional signaling                   |
 
 Core structure:
 
@@ -4623,36 +4612,36 @@ The filtering stage is where romance tension often happens. A character may mean
 
 Useful miscommunication types:
 
-| Type | Core Issue | Example |
-| --- | --- | --- |
-| Emotional | emotional meaning misunderstood | reassurance need interpreted as anger |
-| Protective | vulnerability hidden through defense | "go away" means "please stay" |
-| Timing | right message at wrong emotional moment | apology before accountability feels real |
-| Expectation | different relationship norms assumed | space as trust versus space as abandonment |
-| Jealousy | insecurity read as accusation | fear of loss sounds controlling |
-| Silence | absence gains emotional meaning | delayed reply becomes rejection |
-| Intent | behavior intent misunderstood | teasing read as mockery |
-| Conflict | regulation systems clash | withdrawal as self-regulation read as abandonment |
-| Vulnerability | subtle care not recognized | "be careful" means "I care deeply" |
-| Romantic ambiguity | attraction status unclear | flirting, friendship, politeness, or intimacy |
+| Type               | Core Issue                              | Example                                           |
+| ------------------ | --------------------------------------- | ------------------------------------------------- |
+| Emotional          | emotional meaning misunderstood         | reassurance need interpreted as anger             |
+| Protective         | vulnerability hidden through defense    | "go away" means "please stay"                     |
+| Timing             | right message at wrong emotional moment | apology before accountability feels real          |
+| Expectation        | different relationship norms assumed    | space as trust versus space as abandonment        |
+| Jealousy           | insecurity read as accusation           | fear of loss sounds controlling                   |
+| Silence            | absence gains emotional meaning         | delayed reply becomes rejection                   |
+| Intent             | behavior intent misunderstood           | teasing read as mockery                           |
+| Conflict           | regulation systems clash                | withdrawal as self-regulation read as abandonment |
+| Vulnerability      | subtle care not recognized              | "be careful" means "I care deeply"                |
+| Romantic ambiguity | attraction status unclear               | flirting, friendship, politeness, or intimacy     |
 
 Attachment and communication style shape misreadings:
 
 | Attachment | Common Miscommunication Pattern |
-| --- | --- |
-| Secure | more direct clarification |
-| Anxious | catastrophizing ambiguity |
-| Avoidant | indirect emotional expression |
-| Fearful | contradictory signaling |
+| ---------- | ------------------------------- |
+| Secure     | more direct clarification       |
+| Anxious    | catastrophizing ambiguity       |
+| Avoidant   | indirect emotional expression   |
+| Fearful    | contradictory signaling         |
 
-| Communication Style | Common Risk |
-| --- | --- |
-| Indirect | hidden emotional meaning |
-| Teasing | sincerity masked |
-| Restrained | emotional undercommunication |
-| Expressive | emotional overwhelm |
-| Intellectual | emotional invalidation |
-| Avoidant | ambiguity and withdrawal |
+| Communication Style | Common Risk                  |
+| ------------------- | ---------------------------- |
+| Indirect            | hidden emotional meaning     |
+| Teasing             | sincerity masked             |
+| Restrained          | emotional undercommunication |
+| Expressive          | emotional overwhelm          |
+| Intellectual        | emotional invalidation       |
+| Avoidant            | ambiguity and withdrawal     |
 
 Miscommunication often reflects vulnerability imbalance. Dominant characters may hide need through control, submissive characters may hide desire through teasing, and avoidant characters may hide longing through distance. This creates asymmetry, subtext, and tension.
 
@@ -4682,18 +4671,18 @@ ambiguity
 
 Useful miscommunication variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Directness | clarity of expression |
-| Interpretation bias | tendency toward negative assumptions |
-| Vulnerability avoidance | hiding emotional truth |
-| Clarification tendency | willingness to ask directly |
-| Emotional projection | projecting fears onto behavior |
-| Subtext density | indirect emotional meaning |
-| Ambiguity tolerance | comfort with uncertainty |
-| Reassurance sensitivity | reaction to unclear signals |
-| Escalation risk | likelihood misread signals become conflict |
-| Resolution readiness | ability to clarify without defensiveness |
+| Variable                | Meaning                                    |
+| ----------------------- | ------------------------------------------ |
+| Directness              | clarity of expression                      |
+| Interpretation bias     | tendency toward negative assumptions       |
+| Vulnerability avoidance | hiding emotional truth                     |
+| Clarification tendency  | willingness to ask directly                |
+| Emotional projection    | projecting fears onto behavior             |
+| Subtext density         | indirect emotional meaning                 |
+| Ambiguity tolerance     | comfort with uncertainty                   |
+| Reassurance sensitivity | reaction to unclear signals                |
+| Escalation risk         | likelihood misread signals become conflict |
+| Resolution readiness    | ability to clarify without defensiveness   |
 
 Miscommunication principle:
 
@@ -4720,27 +4709,27 @@ behavior
 
 Useful misunderstanding types:
 
-| Type | Actual Meaning | Misread As |
-| --- | --- | --- |
-| Emotional intent | I am overwhelmed | you do not care |
-| Affection | acts of service or quiet care | lack of love |
-| Teasing | flirtation or guarded affection | mockery or rejection |
-| Withdrawal | I need regulation space | you are abandoning me |
-| Vulnerability | subtle concern or restraint | emotional distance |
-| Exclusivity | unclear expectations | betrayal or indifference |
-| Jealousy | fear of losing significance | control or hostility |
-| Timing | good intent at wrong moment | insensitivity |
-| Silence | processing, restraint, or absence | rejection |
-| Self-protection | defense masking feeling | true indifference |
+| Type             | Actual Meaning                    | Misread As               |
+| ---------------- | --------------------------------- | ------------------------ |
+| Emotional intent | I am overwhelmed                  | you do not care          |
+| Affection        | acts of service or quiet care     | lack of love             |
+| Teasing          | flirtation or guarded affection   | mockery or rejection     |
+| Withdrawal       | I need regulation space           | you are abandoning me    |
+| Vulnerability    | subtle concern or restraint       | emotional distance       |
+| Exclusivity      | unclear expectations              | betrayal or indifference |
+| Jealousy         | fear of losing significance       | control or hostility     |
+| Timing           | good intent at wrong moment       | insensitivity            |
+| Silence          | processing, restraint, or absence | rejection                |
+| Self-protection  | defense masking feeling           | true indifference        |
 
 Attachment styles create interpretation bias:
 
-| Attachment Style | Common Bias |
-| --- | --- |
-| Secure | clarification-oriented |
-| Anxious | catastrophizes ambiguity |
-| Avoidant | minimizes emotional meaning |
-| Fearful | contradictory interpretations |
+| Attachment Style | Common Bias                   |
+| ---------------- | ----------------------------- |
+| Secure           | clarification-oriented        |
+| Anxious          | catastrophizes ambiguity      |
+| Avoidant         | minimizes emotional meaning   |
+| Fearful          | contradictory interpretations |
 
 The strongest misunderstandings are psychologically coherent. They filter visible behavior through believable fears, attachment patterns, emotional assumptions, and prior memory. Forced misunderstanding with no emotional logic should be avoided.
 
@@ -4756,25 +4745,25 @@ not because I stopped caring.
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| Endless misunderstanding loops | no emotional learning occurs |
-| Unrealistic clarification refusal | drama feels artificial |
-| No emotional consequence | misunderstanding feels shallow |
+| Failure                           | Result                         |
+| --------------------------------- | ------------------------------ |
+| Endless misunderstanding loops    | no emotional learning occurs   |
+| Unrealistic clarification refusal | drama feels artificial         |
+| No emotional consequence          | misunderstanding feels shallow |
 
 Useful misunderstanding variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Interpretation bias | tendency toward negative assumptions |
-| Ambiguity tolerance | comfort with uncertainty |
-| Clarification tendency | willingness to ask directly |
-| Projection sensitivity | likelihood of assigning fears to behavior |
-| Emotional translation accuracy | understanding emotional intent |
-| Reassurance dependence | need for explicit meaning |
-| Subtext recognition | ability to interpret indirect emotion |
-| Attachment trigger sensitivity | overreaction risk |
-| Misunderstanding recovery ability | ease of clarification and repair |
+| Variable                          | Meaning                                   |
+| --------------------------------- | ----------------------------------------- |
+| Interpretation bias               | tendency toward negative assumptions      |
+| Ambiguity tolerance               | comfort with uncertainty                  |
+| Clarification tendency            | willingness to ask directly               |
+| Projection sensitivity            | likelihood of assigning fears to behavior |
+| Emotional translation accuracy    | understanding emotional intent            |
+| Reassurance dependence            | need for explicit meaning                 |
+| Subtext recognition               | ability to interpret indirect emotion     |
+| Attachment trigger sensitivity    | overreaction risk                         |
+| Misunderstanding recovery ability | ease of clarification and repair          |
 
 Misunderstanding emerges in the gap between hidden feeling and visible behavior.
 
@@ -4786,47 +4775,47 @@ Admiration says: I see something in you that deeply affects how I value you. It 
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Attraction | desire or interest |
-| Admiration | esteem and emotional respect |
-| Idealization | unrealistic projection |
-| Devotion | emotional prioritization |
-| Infatuation | intense fixation |
+| Concept      | Meaning                      |
+| ------------ | ---------------------------- |
+| Attraction   | desire or interest           |
+| Admiration   | esteem and emotional respect |
+| Idealization | unrealistic projection       |
+| Devotion     | emotional prioritization     |
+| Infatuation  | intense fixation             |
 
 Useful admiration types:
 
-| Type | Core Feeling | Common Context |
-| --- | --- | --- |
-| Competence | you are highly capable | workplace, rivals, protector dynamics |
-| Emotional | your emotional qualities move me | healing romance, deep slow burn |
-| Protective | you make me feel safe | secure attachment, caretaker dynamics |
-| Intellectual | your mind stimulates me | rivals, academic romance, banter |
-| Moral | I respect who you are ethically | redemption, heroic romance |
-| Vulnerability | your openness affects me deeply | confession, healing, protective intimacy |
-| Transformational | you changed me | soulmate, healing, transformational arcs |
-| Physical | I appreciate your presence and movement | attentive attraction, style, body language |
-| Devotional | you feel emotionally extraordinary | reverent care, worshipful chemistry |
-| Hidden | admiration leaks through denial | enemies, rivals, restrained romance |
+| Type             | Core Feeling                            | Common Context                             |
+| ---------------- | --------------------------------------- | ------------------------------------------ |
+| Competence       | you are highly capable                  | workplace, rivals, protector dynamics      |
+| Emotional        | your emotional qualities move me        | healing romance, deep slow burn            |
+| Protective       | you make me feel safe                   | secure attachment, caretaker dynamics      |
+| Intellectual     | your mind stimulates me                 | rivals, academic romance, banter           |
+| Moral            | I respect who you are ethically         | redemption, heroic romance                 |
+| Vulnerability    | your openness affects me deeply         | confession, healing, protective intimacy   |
+| Transformational | you changed me                          | soulmate, healing, transformational arcs   |
+| Physical         | I appreciate your presence and movement | attentive attraction, style, body language |
+| Devotional       | you feel emotionally extraordinary      | reverent care, worshipful chemistry        |
+| Hidden           | admiration leaks through denial         | enemies, rivals, restrained romance        |
 
 Trope and attachment can shape admiration:
 
-| Trope | Common Admiration Type |
-| --- | --- |
-| Rivals to lovers | competence admiration |
-| Friends to lovers | emotional admiration |
-| Protector romance | safety admiration |
-| Enemies to lovers | reluctant admiration |
-| Healing romance | resilience admiration |
-| Workplace romance | capability admiration |
-| Soulmate romance | transformational admiration |
+| Trope             | Common Admiration Type      |
+| ----------------- | --------------------------- |
+| Rivals to lovers  | competence admiration       |
+| Friends to lovers | emotional admiration        |
+| Protector romance | safety admiration           |
+| Enemies to lovers | reluctant admiration        |
+| Healing romance   | resilience admiration       |
+| Workplace romance | capability admiration       |
+| Soulmate romance  | transformational admiration |
 
-| Attachment | Admiration Pattern |
-| --- | --- |
-| Secure | balanced admiration |
-| Anxious | idealizing admiration |
-| Avoidant | hidden or reluctant admiration |
-| Fearful | intense but unstable admiration |
+| Attachment | Admiration Pattern              |
+| ---------- | ------------------------------- |
+| Secure     | balanced admiration             |
+| Anxious    | idealizing admiration           |
+| Avoidant   | hidden or reluctant admiration  |
+| Fearful    | intense but unstable admiration |
 
 Admiration often creates voluntary emotional influence. Characters may yield because they trust and respect someone, open emotionally because someone feels capable, or become attracted through competence. This is why admiration overlaps with dominance/submission, devotion, mentorship, and rivals-to-lovers.
 
@@ -4857,25 +4846,25 @@ competition
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| no admiration | flat, dismissive, chemistry-only relationship |
+| Failure                | Result                                        |
+| ---------------------- | --------------------------------------------- |
+| no admiration          | flat, dismissive, chemistry-only relationship |
 | excessive idealization | pedestal dynamics and disappointment collapse |
-| conditional admiration | insecurity, pressure, fear of failure |
+| conditional admiration | insecurity, pressure, fear of failure         |
 
 Useful admiration variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Respect level | esteem intensity |
-| Fascination | attention fixation |
-| Competence attraction | attraction to capability |
-| Emotional reverence | emotional significance level |
-| Idealization tendency | projection intensity |
-| Pride in partner | emotional investment in achievements |
-| Validation importance | weight of partner's opinion |
-| Devotional intensity | prioritization depth |
-| Realism of admiration | ability to admire while seeing flaws |
+| Variable                    | Meaning                                               |
+| --------------------------- | ----------------------------------------------------- |
+| Respect level               | esteem intensity                                      |
+| Fascination                 | attention fixation                                    |
+| Competence attraction       | attraction to capability                              |
+| Emotional reverence         | emotional significance level                          |
+| Idealization tendency       | projection intensity                                  |
+| Pride in partner            | emotional investment in achievements                  |
+| Validation importance       | weight of partner's opinion                           |
+| Devotional intensity        | prioritization depth                                  |
+| Realism of admiration       | ability to admire while seeing flaws                  |
 | Conditional admiration risk | chance admiration depends on usefulness or perfection |
 
 Admiration equation:
@@ -4895,60 +4884,60 @@ Excitement answers: how emotionally stimulating does this relationship feel? It 
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
+| Concept    | Meaning                              |
+| ---------- | ------------------------------------ |
 | Excitement | stimulation and emotional activation |
-| Chemistry | interactional charge |
-| Passion | intense romantic or emotional energy |
-| Novelty | newness |
-| Tension | unresolved emotional pressure |
-| Intimacy | closeness and emotional knowing |
+| Chemistry  | interactional charge                 |
+| Passion    | intense romantic or emotional energy |
+| Novelty    | newness                              |
+| Tension    | unresolved emotional pressure        |
+| Intimacy   | closeness and emotional knowing      |
 
 Useful excitement sources:
 
-| Source | Core Feeling | Common Effect |
-| --- | --- | --- |
-| Novelty | this is emotionally new | early fixation, discovery, firsts |
-| Tension | something unresolved exists | slow burn, restraint, near-confession |
-| Uncertainty | I do not fully know where I stand | anticipation, hyperfocus, anxiety risk |
-| Challenge | you stimulate me | rivalry, banter, admiration pressure |
-| Sexual | attraction creates physical activation | touch awareness, anticipation, restraint |
-| Emotional | this feels deeply significant | confession energy, attachment acceleration |
-| Forbidden | risk amplifies attraction | secrecy, suppression, heightened stakes |
-| Transformational | this relationship changes me | awakening, identity shift, healing intensity |
-| Chaotic | unpredictability activates me | volatility, impulsivity, instability risk |
-| Playful | interaction itself energizes me | flirt games, teasing, reaction loops |
+| Source           | Core Feeling                           | Common Effect                                |
+| ---------------- | -------------------------------------- | -------------------------------------------- |
+| Novelty          | this is emotionally new                | early fixation, discovery, firsts            |
+| Tension          | something unresolved exists            | slow burn, restraint, near-confession        |
+| Uncertainty      | I do not fully know where I stand      | anticipation, hyperfocus, anxiety risk       |
+| Challenge        | you stimulate me                       | rivalry, banter, admiration pressure         |
+| Sexual           | attraction creates physical activation | touch awareness, anticipation, restraint     |
+| Emotional        | this feels deeply significant          | confession energy, attachment acceleration   |
+| Forbidden        | risk amplifies attraction              | secrecy, suppression, heightened stakes      |
+| Transformational | this relationship changes me           | awakening, identity shift, healing intensity |
+| Chaotic          | unpredictability activates me          | volatility, impulsivity, instability risk    |
+| Playful          | interaction itself energizes me        | flirt games, teasing, reaction loops         |
 
 Excitement changes by relationship phase:
 
-| Phase | Excitement Source |
-| --- | --- |
-| Early romance | novelty, uncertainty, possibility, first attraction |
-| Mid slow burn | tension, restraint, jealousy, emotional buildup |
+| Phase                    | Excitement Source                                                                              |
+| ------------------------ | ---------------------------------------------------------------------------------------------- |
+| Early romance            | novelty, uncertainty, possibility, first attraction                                            |
+| Mid slow burn            | tension, restraint, jealousy, emotional buildup                                                |
 | Established relationship | depth, shared experience, playful rituals, sexual familiarity with responsiveness, rediscovery |
 
 The runtime should not treat excitement as automatic health. High excitement with low stability can create obsession, volatility, and addictive chemistry. High stability with low excitement can create comfort but flatten romantic energy. The strongest long-term romances often balance stimulation with emotional safety.
 
 Attachment changes what excitement feels like:
 
-| Attachment | Excitement Pattern |
-| --- | --- |
-| Secure | balanced stimulation |
-| Anxious | uncertainty-driven excitement |
-| Avoidant | tension and distance excitement |
-| Fearful | chaotic intensity excitement |
+| Attachment | Excitement Pattern              |
+| ---------- | ------------------------------- |
+| Secure     | balanced stimulation            |
+| Anxious    | uncertainty-driven excitement   |
+| Avoidant   | tension and distance excitement |
+| Fearful    | chaotic intensity excitement    |
 
 Chemistry types draw excitement from different places:
 
-| Chemistry Type | Excitement Source |
-| --- | --- |
-| Banter | interaction energy |
-| Tension | unresolved desire |
-| Emotional | vulnerability and significance |
-| Intellectual | stimulation and fascination |
-| Chaotic | unpredictability |
-| Devotional | emotional significance |
-| Protective | safety combined with trust |
+| Chemistry Type | Excitement Source              |
+| -------------- | ------------------------------ |
+| Banter         | interaction energy             |
+| Tension        | unresolved desire              |
+| Emotional      | vulnerability and significance |
+| Intellectual   | stimulation and fascination    |
+| Chaotic        | unpredictability               |
+| Devotional     | emotional significance         |
+| Protective     | safety combined with trust     |
 
 Excitement is heavily tied to escalation rhythm. Too fast creates burnout or shallow attachment; too slow creates stagnation and emotional drift. A strong rhythm often alternates:
 
@@ -4973,29 +4962,29 @@ novelty excitement
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| artificial excitement | constant drama, repeated jealousy loops, desensitization |
-| zero excitement | stagnation, flat pacing, lost chemistry momentum |
-| addiction to instability | anxiety mistaken for passion |
+| Failure                  | Result                                                   |
+| ------------------------ | -------------------------------------------------------- |
+| artificial excitement    | constant drama, repeated jealousy loops, desensitization |
+| zero excitement          | stagnation, flat pacing, lost chemistry momentum         |
+| addiction to instability | anxiety mistaken for passion                             |
 
 Useful excitement variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Novelty need | desire for newness and stimulation |
-| Tension enjoyment | enjoyment of unresolved chemistry |
-| Emotional stimulation | preferred intensity level |
-| Predictability tolerance | comfort with stability |
-| Escalation desire | desire for progression |
-| Playfulness | interaction energy preference |
-| Risk attraction | attraction to uncertainty or taboo |
-| Passion stability | ability to sustain excitement over time |
-| Responsiveness | reaction intensity to stimulation |
-| Attention fixation | tendency to mentally return to the partner |
-| Excitement-safety balance | whether stimulation remains emotionally sustainable |
-| Instability addiction risk | chance anxiety is being interpreted as excitement |
-| Stagnation risk | chance stability becomes emotionally flat |
+| Variable                   | Meaning                                             |
+| -------------------------- | --------------------------------------------------- |
+| Novelty need               | desire for newness and stimulation                  |
+| Tension enjoyment          | enjoyment of unresolved chemistry                   |
+| Emotional stimulation      | preferred intensity level                           |
+| Predictability tolerance   | comfort with stability                              |
+| Escalation desire          | desire for progression                              |
+| Playfulness                | interaction energy preference                       |
+| Risk attraction            | attraction to uncertainty or taboo                  |
+| Passion stability          | ability to sustain excitement over time             |
+| Responsiveness             | reaction intensity to stimulation                   |
+| Attention fixation         | tendency to mentally return to the partner          |
+| Excitement-safety balance  | whether stimulation remains emotionally sustainable |
+| Instability addiction risk | chance anxiety is being interpreted as excitement   |
+| Stagnation risk            | chance stability becomes emotionally flat           |
 
 Excitement equation:
 
@@ -5015,76 +5004,76 @@ Novelty is not randomness, chaos, instability, or constant escalation. Healthy n
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Novelty | perceived newness or discovery |
-| Excitement | emotional stimulation |
-| Tension | unresolved emotional pressure |
-| Chemistry | interactional charge |
-| Growth | meaningful change over time |
+| Concept    | Meaning                        |
+| ---------- | ------------------------------ |
+| Novelty    | perceived newness or discovery |
+| Excitement | emotional stimulation          |
+| Tension    | unresolved emotional pressure  |
+| Chemistry  | interactional charge           |
+| Growth     | meaningful change over time    |
 
 Novelty creates curiosity while intimacy creates familiarity. Strong relationships balance discovery and familiarity instead of choosing one permanently.
 
 Useful novelty types:
 
-| Type | Core Feeling | Common Effect |
-| --- | --- | --- |
-| Personal discovery | I am still discovering who you are | hidden traits, private habits, intimacy-driven freshness |
-| Emotional | you affect me in new ways | first jealousy, comfort, softness, breakthroughs |
-| Experiential | we are sharing new experiences | travel, crises, milestones, relational memory expansion |
-| Sexual | desire still feels alive and evolving | changing intimacy styles, fantasy exploration, deeper attraction |
-| Intellectual | your mind keeps surprising me | new ideas, debate, creativity, perspective shifts |
-| Identity | this relationship changes who we are | role reversal, self-concept shifts, transformational romance |
-| Dynamic | our patterns keep evolving | teasing becomes affection, dominance becomes vulnerability |
-| Vulnerability | deeper emotional layers keep appearing | confessions, hidden fears, emotional dependence |
-| Domestic | familiarity still contains discovery | tiny habits, evolving routines, subtle affection shifts |
-| Relational | the relationship itself keeps evolving | new roles, deeper commitment, new shared identity |
+| Type               | Core Feeling                           | Common Effect                                                    |
+| ------------------ | -------------------------------------- | ---------------------------------------------------------------- |
+| Personal discovery | I am still discovering who you are     | hidden traits, private habits, intimacy-driven freshness         |
+| Emotional          | you affect me in new ways              | first jealousy, comfort, softness, breakthroughs                 |
+| Experiential       | we are sharing new experiences         | travel, crises, milestones, relational memory expansion          |
+| Sexual             | desire still feels alive and evolving  | changing intimacy styles, fantasy exploration, deeper attraction |
+| Intellectual       | your mind keeps surprising me          | new ideas, debate, creativity, perspective shifts                |
+| Identity           | this relationship changes who we are   | role reversal, self-concept shifts, transformational romance     |
+| Dynamic            | our patterns keep evolving             | teasing becomes affection, dominance becomes vulnerability       |
+| Vulnerability      | deeper emotional layers keep appearing | confessions, hidden fears, emotional dependence                  |
+| Domestic           | familiarity still contains discovery   | tiny habits, evolving routines, subtle affection shifts          |
+| Relational         | the relationship itself keeps evolving | new roles, deeper commitment, new shared identity                |
 
 Novelty changes by relationship phase:
 
-| Phase | Novelty Source |
-| --- | --- |
-| Early romance | mystery, attraction, uncertainty, discovery |
-| Mid relationship | emotional revelation, vulnerability, dynamic changes, deeper intimacy |
+| Phase                  | Novelty Source                                                          |
+| ---------------------- | ----------------------------------------------------------------------- |
+| Early romance          | mystery, attraction, uncertainty, discovery                             |
+| Mid relationship       | emotional revelation, vulnerability, dynamic changes, deeper intimacy   |
 | Long-term relationship | rediscovery, evolving identity, changed desires, new forms of closeness |
 
 Novelty and stability should be balanced:
 
-| Balance | Result |
-| --- | --- |
-| high novelty + low stability | chaos, obsession, emotional volatility |
+| Balance                      | Result                                       |
+| ---------------------------- | -------------------------------------------- |
+| high novelty + low stability | chaos, obsession, emotional volatility       |
 | high stability + low novelty | comfort and reliability with stagnation risk |
-| balanced novelty + stability | sustainable romantic vitality |
+| balanced novelty + stability | sustainable romantic vitality                |
 
 Attachment changes how novelty appears:
 
-| Attachment | Novelty Pattern |
-| --- | --- |
-| Secure | balanced exploration |
-| Anxious | novelty through emotional intensity |
-| Avoidant | novelty through distance and mystery |
-| Fearful | novelty through chaos and unpredictability |
+| Attachment | Novelty Pattern                            |
+| ---------- | ------------------------------------------ |
+| Secure     | balanced exploration                       |
+| Anxious    | novelty through emotional intensity        |
+| Avoidant   | novelty through distance and mystery       |
+| Fearful    | novelty through chaos and unpredictability |
 
 Chemistry types draw novelty from different places:
 
-| Chemistry Type | Novelty Source |
-| --- | --- |
-| Banter | interaction unpredictability |
-| Tension | unresolved escalation |
-| Emotional | deeper emotional discovery |
-| Intellectual | new perspectives |
-| Sexual | evolving desire |
-| Devotional | discovering deeper significance |
+| Chemistry Type | Novelty Source                  |
+| -------------- | ------------------------------- |
+| Banter         | interaction unpredictability    |
+| Tension        | unresolved escalation           |
+| Emotional      | deeper emotional discovery      |
+| Intellectual   | new perspectives                |
+| Sexual         | evolving desire                 |
+| Devotional     | discovering deeper significance |
 
 Long-term romance survives when people continue emotionally discovering each other. Mystery does not need to remain total; the characters simply need to keep evolving enough for curiosity to stay alive.
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| artificial novelty | drama, forced jealousy, unnecessary instability |
-| novelty starvation | repetitive routines, static interactions, emotional disengagement |
-| instability addiction | chaos mistaken for discovery |
+| Failure               | Result                                                            |
+| --------------------- | ----------------------------------------------------------------- |
+| artificial novelty    | drama, forced jealousy, unnecessary instability                   |
+| novelty starvation    | repetitive routines, static interactions, emotional disengagement |
+| instability addiction | chaos mistaken for discovery                                      |
 
 The strongest novelty usually comes from emotional evolution, not random events: a guarded character becoming affectionate, teasing becoming sincere, rivalry becoming devotion, or independence becoming chosen closeness.
 
@@ -5102,21 +5091,21 @@ strangers
 
 Useful novelty variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Novelty need | desire for stimulation and discovery |
-| Curiosity persistence | continued interest in the partner |
-| Adaptation speed | how quickly interactions normalize |
-| Exploration desire | openness to change and newness |
-| Emotional evolution | degree of psychological growth |
-| Routine tolerance | comfort with familiarity |
-| Rediscovery capacity | ability to find depth inside familiarity |
-| Dynamic flexibility | ability for relationship patterns to evolve |
-| Excitement dependency | reliance on stimulation |
-| Novelty-stability balance | whether discovery remains sustainable |
-| Artificial novelty risk | chance newness is created through forced drama |
-| Novelty starvation risk | chance repetition flattens engagement |
-| Instability confusion risk | chance chaos is mistaken for novelty |
+| Variable                   | Meaning                                        |
+| -------------------------- | ---------------------------------------------- |
+| Novelty need               | desire for stimulation and discovery           |
+| Curiosity persistence      | continued interest in the partner              |
+| Adaptation speed           | how quickly interactions normalize             |
+| Exploration desire         | openness to change and newness                 |
+| Emotional evolution        | degree of psychological growth                 |
+| Routine tolerance          | comfort with familiarity                       |
+| Rediscovery capacity       | ability to find depth inside familiarity       |
+| Dynamic flexibility        | ability for relationship patterns to evolve    |
+| Excitement dependency      | reliance on stimulation                        |
+| Novelty-stability balance  | whether discovery remains sustainable          |
+| Artificial novelty risk    | chance newness is created through forced drama |
+| Novelty starvation risk    | chance repetition flattens engagement          |
+| Instability confusion risk | chance chaos is mistaken for novelty           |
 
 Novelty equation:
 
@@ -5136,74 +5125,74 @@ Stability is not lack of passion, emotional flatness, absence of conflict, or bo
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Stability | consistency and resilience |
-| Comfort | emotional ease |
-| Safety | vulnerability survivability |
-| Commitment | long-term choosing |
-| Compatibility | sustainable fit |
-| Routine | repeated behavior patterns |
+| Concept       | Meaning                     |
+| ------------- | --------------------------- |
+| Stability     | consistency and resilience  |
+| Comfort       | emotional ease              |
+| Safety        | vulnerability survivability |
+| Commitment    | long-term choosing          |
+| Compatibility | sustainable fit             |
+| Routine       | repeated behavior patterns  |
 
 Useful stability components:
 
-| Component | Core Feeling | Common Evidence |
-| --- | --- | --- |
-| Emotional consistency | your emotional presence is reliable | stable affection, predictable care, steady reactions |
-| Conflict stability | conflict does not threaten the relationship | repair, accountability, non-destructive arguing |
-| Behavioral reliability | I can trust your actions | showing up, keeping promises, dependable patterns |
-| Attachment stability | the emotional bond is durable | reduced abandonment fear, lower hypervigilance |
-| Identity stability | the relationship still feels like itself under pressure | rituals, shared tone, "we come back" identity |
-| Commitment stability | the future feels emotionally durable | future language, exclusivity consistency |
-| Intimacy stability | closeness remains safe over time | vulnerability not weaponized, affection survives conflict |
-| Routine stability | our connection exists in everyday life | habits, domestic rhythms, repeated care |
+| Component              | Core Feeling                                            | Common Evidence                                           |
+| ---------------------- | ------------------------------------------------------- | --------------------------------------------------------- |
+| Emotional consistency  | your emotional presence is reliable                     | stable affection, predictable care, steady reactions      |
+| Conflict stability     | conflict does not threaten the relationship             | repair, accountability, non-destructive arguing           |
+| Behavioral reliability | I can trust your actions                                | showing up, keeping promises, dependable patterns         |
+| Attachment stability   | the emotional bond is durable                           | reduced abandonment fear, lower hypervigilance            |
+| Identity stability     | the relationship still feels like itself under pressure | rituals, shared tone, "we come back" identity             |
+| Commitment stability   | the future feels emotionally durable                    | future language, exclusivity consistency                  |
+| Intimacy stability     | closeness remains safe over time                        | vulnerability not weaponized, affection survives conflict |
+| Routine stability      | our connection exists in everyday life                  | habits, domestic rhythms, repeated care                   |
 
 Stability enables deeper intimacy because defenses lower when the relationship feels less temporary. Without stability, high chemistry can become exhausting, hypervigilant, chaotic, emotionally unsafe, or unsustainable.
 
 Stability and excitement should be balanced:
 
-| Balance | Result |
-| --- | --- |
-| high excitement + low stability | obsession, volatility, emotional addiction |
-| high stability + low excitement | comfort, predictability, possible stagnation |
-| high excitement + high stability | desire, trust, and consistency coexist |
+| Balance                          | Result                                       |
+| -------------------------------- | -------------------------------------------- |
+| high excitement + low stability  | obsession, volatility, emotional addiction   |
+| high stability + low excitement  | comfort, predictability, possible stagnation |
+| high excitement + high stability | desire, trust, and consistency coexist       |
 
 Attachment changes the stability challenge:
 
-| Attachment | Stability Challenge |
-| --- | --- |
-| Secure | maintaining connection through change |
-| Anxious | fear of instability or abandonment |
-| Avoidant | fear of engulfment through stability |
-| Fearful | instability becoming normalized |
+| Attachment | Stability Challenge                   |
+| ---------- | ------------------------------------- |
+| Secure     | maintaining connection through change |
+| Anxious    | fear of instability or abandonment    |
+| Avoidant   | fear of engulfment through stability  |
+| Fearful    | instability becoming normalized       |
 
 Conflict style changes stability pressure:
 
-| Conflict Style | Stability Impact |
-| --- | --- |
-| Repair-oriented | increases stability |
-| Explosive | destabilizes if unrepaired |
-| Avoidant | creates slow erosion risk |
-| Chaotic | creates inconsistent stability |
-| Accountable | strengthens resilience |
+| Conflict Style  | Stability Impact               |
+| --------------- | ------------------------------ |
+| Repair-oriented | increases stability            |
+| Explosive       | destabilizes if unrepaired     |
+| Avoidant        | creates slow erosion risk      |
+| Chaotic         | creates inconsistent stability |
+| Accountable     | strengthens resilience         |
 
 Stability changes across phases:
 
-| Phase | Stability Pattern |
-| --- | --- |
-| Early romance | low stability is normal because expectations and attachment are unclear |
-| Mid relationship | stability forms through repair, consistency, vulnerability, and expectation alignment |
+| Phase                  | Stability Pattern                                                                                       |
+| ---------------------- | ------------------------------------------------------------------------------------------------------- |
+| Early romance          | low stability is normal because expectations and attachment are unclear                                 |
+| Mid relationship       | stability forms through repair, consistency, vulnerability, and expectation alignment                   |
 | Long-term relationship | stability becomes emotional infrastructure through routines, secure attachment, and identity continuity |
 
 Healthy stability is predictable care, not predictable boredom. The runtime should preserve emotional reliability without flattening novelty, playfulness, desire, or growth.
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| false stability | calm created by suppressed conflict, avoidance, or emotional distance |
+| Failure           | Result                                                                |
+| ----------------- | --------------------------------------------------------------------- |
+| false stability   | calm created by suppressed conflict, avoidance, or emotional distance |
 | hyper-instability | repeated breakups, jealousy loops, inconsistency, unresolved conflict |
-| stagnation | low novelty, low progression, low vulnerability, emotional numbness |
+| stagnation        | low novelty, low progression, low vulnerability, emotional numbness   |
 
 Stability is usually most powerful when earned. Conflict, vulnerability, fear, misunderstanding, repair, and emotional risk can make later reliability feel meaningful instead of automatic.
 
@@ -5222,22 +5211,22 @@ chemistry
 
 Useful stability variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Emotional consistency | reliability of emotional presence |
-| Conflict resilience | ability to survive rupture |
-| Repair reliability | consistency of reconnection |
-| Behavioral reliability | trustworthiness of actions |
-| Attachment security | stability of emotional bond |
-| Identity stability | resilience of the shared relationship identity |
-| Commitment durability | long-term persistence |
-| Intimacy persistence | closeness survivability |
-| Routine integration | daily life embeddedness |
-| Predictability | behavioral consistency |
-| Stability satisfaction | comfort with relationship calmness |
-| False stability risk | chance calm is avoidance rather than security |
-| Hyper-instability risk | chance volatility becomes normalized |
-| Stagnation risk | chance stability becomes emotionally static |
+| Variable               | Meaning                                        |
+| ---------------------- | ---------------------------------------------- |
+| Emotional consistency  | reliability of emotional presence              |
+| Conflict resilience    | ability to survive rupture                     |
+| Repair reliability     | consistency of reconnection                    |
+| Behavioral reliability | trustworthiness of actions                     |
+| Attachment security    | stability of emotional bond                    |
+| Identity stability     | resilience of the shared relationship identity |
+| Commitment durability  | long-term persistence                          |
+| Intimacy persistence   | closeness survivability                        |
+| Routine integration    | daily life embeddedness                        |
+| Predictability         | behavioral consistency                         |
+| Stability satisfaction | comfort with relationship calmness             |
+| False stability risk   | chance calm is avoidance rather than security  |
+| Hyper-instability risk | chance volatility becomes normalized           |
+| Stagnation risk        | chance stability becomes emotionally static    |
 
 Stability equation:
 
@@ -5257,45 +5246,45 @@ Consistency is not emotional flatness, predictability without depth, or lack of 
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Consistency | repeated reliable behavior |
-| Stability | overall relationship durability |
-| Routine | repeated habits |
-| Reliability | dependability |
-| Predictability | expectation certainty |
+| Concept        | Meaning                         |
+| -------------- | ------------------------------- |
+| Consistency    | repeated reliable behavior      |
+| Stability      | overall relationship durability |
+| Routine        | repeated habits                 |
+| Reliability    | dependability                   |
+| Predictability | expectation certainty           |
 
 Consistency is behavioral continuity with emotional meaning. It turns isolated moments into trust architecture.
 
 Useful consistency forms:
 
-| Form | Core Feeling | Common Evidence |
-| --- | --- | --- |
-| Emotional consistency | your emotional presence is reliable | affection remains recognizable, reactions are understandable |
-| Behavioral consistency | your actions align repeatedly | keeping promises, showing up, remembering important things |
-| Reassurance consistency | you continue affirming us | check-ins, reassurance after conflict, ongoing prioritization |
-| Conflict consistency | conflict follows survivable patterns | no abandonment, repair attempts, accountability |
-| Affection consistency | care remains visible | touch, teasing, attentiveness, romantic effort |
-| Vulnerability consistency | opening up remains safe | disclosures are handled carefully and not weaponized |
-| Presence consistency | you emotionally remain present | staying after conflict, availability during stress |
-| Identity consistency | the relationship still feels like itself | rituals, recognizable tone, values, mutual care |
+| Form                      | Core Feeling                             | Common Evidence                                               |
+| ------------------------- | ---------------------------------------- | ------------------------------------------------------------- |
+| Emotional consistency     | your emotional presence is reliable      | affection remains recognizable, reactions are understandable  |
+| Behavioral consistency    | your actions align repeatedly            | keeping promises, showing up, remembering important things    |
+| Reassurance consistency   | you continue affirming us                | check-ins, reassurance after conflict, ongoing prioritization |
+| Conflict consistency      | conflict follows survivable patterns     | no abandonment, repair attempts, accountability               |
+| Affection consistency     | care remains visible                     | touch, teasing, attentiveness, romantic effort                |
+| Vulnerability consistency | opening up remains safe                  | disclosures are handled carefully and not weaponized          |
+| Presence consistency      | you emotionally remain present           | staying after conflict, availability during stress            |
+| Identity consistency      | the relationship still feels like itself | rituals, recognizable tone, values, mutual care               |
 
 Consistency and intensity should be balanced:
 
-| Balance | Result |
-| --- | --- |
-| high intensity + low consistency | obsession, volatility, hypervigilance |
-| high consistency + low intensity | calm, reliability, possible stagnation |
-| high consistency + meaningful intensity | emotionally secure passion |
+| Balance                                 | Result                                 |
+| --------------------------------------- | -------------------------------------- |
+| high intensity + low consistency        | obsession, volatility, hypervigilance  |
+| high consistency + low intensity        | calm, reliability, possible stagnation |
+| high consistency + meaningful intensity | emotionally secure passion             |
 
 Attachment changes the consistency challenge:
 
-| Attachment | Consistency Challenge |
-| --- | --- |
-| Secure | maintaining emotional presence |
-| Anxious | hyper-detecting inconsistency |
-| Avoidant | sustaining emotional availability |
-| Fearful | alternating closeness and withdrawal |
+| Attachment | Consistency Challenge                |
+| ---------- | ------------------------------------ |
+| Secure     | maintaining emotional presence       |
+| Anxious    | hyper-detecting inconsistency        |
+| Avoidant   | sustaining emotional availability    |
+| Fearful    | alternating closeness and withdrawal |
 
 Consistency is one of the strongest creators of emotional safety because repeated safe experiences teach vulnerability survivability. One apology does not rebuild trust; consistent changed behavior rebuilds the emotional architecture.
 
@@ -5303,11 +5292,11 @@ Long-term romance deepens through accumulated consistency: continued affection, 
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| inconsistent affection | hot/cold behavior, anxiety, obsession loops, hypervigilance |
-| false consistency | calm created by suppressed conflict, distance, or avoided vulnerability |
-| rigid consistency | static relationship, low novelty, over-predictability |
+| Failure                | Result                                                                  |
+| ---------------------- | ----------------------------------------------------------------------- |
+| inconsistent affection | hot/cold behavior, anxiety, obsession loops, hypervigilance             |
+| false consistency      | calm created by suppressed conflict, distance, or avoided vulnerability |
+| rigid consistency      | static relationship, low novelty, over-predictability                   |
 
 The strongest consistency feels intentional: repeatedly staying, repeatedly choosing, repeatedly repairing, and repeatedly noticing emotional needs. Small repeated actions usually matter more than rare dramatic declarations.
 
@@ -5325,23 +5314,23 @@ attraction
 
 Useful consistency variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Emotional reliability | steadiness of emotional presence |
-| Behavioral reliability | consistency of actions |
-| Affection stability | consistency of care signals |
-| Repair reliability | consistency of reconnection |
-| Vulnerability safety | reliability of emotional acceptance |
-| Reassurance frequency | regularity of emotional confirmation |
-| Conflict consistency | survivability of rupture patterns |
-| Presence durability | tendency to remain emotionally available |
-| Identity consistency | relationship still feeling like itself |
-| Predictability comfort | tolerance for emotional variation |
-| Attachment security | confidence in continuity |
-| Intentionality signal | care feels chosen, not accidental |
-| Inconsistency sensitivity | reaction to disruptions in patterns |
-| False consistency risk | chance calm is avoidance rather than care |
-| Rigid consistency risk | chance reliability becomes emotional static |
+| Variable                  | Meaning                                     |
+| ------------------------- | ------------------------------------------- |
+| Emotional reliability     | steadiness of emotional presence            |
+| Behavioral reliability    | consistency of actions                      |
+| Affection stability       | consistency of care signals                 |
+| Repair reliability        | consistency of reconnection                 |
+| Vulnerability safety      | reliability of emotional acceptance         |
+| Reassurance frequency     | regularity of emotional confirmation        |
+| Conflict consistency      | survivability of rupture patterns           |
+| Presence durability       | tendency to remain emotionally available    |
+| Identity consistency      | relationship still feeling like itself      |
+| Predictability comfort    | tolerance for emotional variation           |
+| Attachment security       | confidence in continuity                    |
+| Intentionality signal     | care feels chosen, not accidental           |
+| Inconsistency sensitivity | reaction to disruptions in patterns         |
+| False consistency risk    | chance calm is avoidance rather than care   |
+| Rigid consistency risk    | chance reliability becomes emotional static |
 
 Consistency equation:
 
@@ -5361,54 +5350,54 @@ Intensity is not automatically love, compatibility, safety, stability, or health
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Emotional intensity | emotional force and activation |
-| Passion | romantic or sexual emotional energy |
-| Intimacy | closeness and knowing |
-| Attachment | emotional bonding |
-| Chemistry | interactional charge |
-| Drama | externalized conflict or escalation |
+| Concept             | Meaning                             |
+| ------------------- | ----------------------------------- |
+| Emotional intensity | emotional force and activation      |
+| Passion             | romantic or sexual emotional energy |
+| Intimacy            | closeness and knowing               |
+| Attachment          | emotional bonding                   |
+| Chemistry           | interactional charge                |
+| Drama               | externalized conflict or escalation |
 
 Intensity is about emotional impact magnitude. It creates fixation, urgency, emotional acceleration, memorable turning points, and the sense that the relationship changes the character.
 
 Useful intensity sources:
 
-| Source | Core Feeling | Common Effect |
-| --- | --- | --- |
-| Vulnerability | exposure carries major risk | confessions, breakdowns, reassurance-seeking, intimacy gravity |
-| Tension | unresolved pressure builds | restraint, almost-confessions, forbidden attraction |
-| Attachment | emotional centrality overwhelms | fear of loss, dependency, devotion, high stakes |
-| Conflict | rupture threatens security | betrayal, withdrawal, abandonment fear |
-| Sexual | desire overwhelms composure | anticipation, restraint battles, vulnerability mixed with desire |
-| Devotional | prioritization feels profound | loyalty, sacrifice, reverence, identity-shaping attachment |
-| Chaotic | unpredictability activates | push-pull, flooding, addictive or exhausting cycles |
-| Transformational | the relationship changes the self | healing, awakening, worldview shifts |
-| Forbidden | suppression amplifies feeling | secrecy, risk, anticipation |
-| Mutual recognition | ambiguity collapses for both | mutual confession, reunion, emotional acknowledgment |
+| Source             | Core Feeling                      | Common Effect                                                    |
+| ------------------ | --------------------------------- | ---------------------------------------------------------------- |
+| Vulnerability      | exposure carries major risk       | confessions, breakdowns, reassurance-seeking, intimacy gravity   |
+| Tension            | unresolved pressure builds        | restraint, almost-confessions, forbidden attraction              |
+| Attachment         | emotional centrality overwhelms   | fear of loss, dependency, devotion, high stakes                  |
+| Conflict           | rupture threatens security        | betrayal, withdrawal, abandonment fear                           |
+| Sexual             | desire overwhelms composure       | anticipation, restraint battles, vulnerability mixed with desire |
+| Devotional         | prioritization feels profound     | loyalty, sacrifice, reverence, identity-shaping attachment       |
+| Chaotic            | unpredictability activates        | push-pull, flooding, addictive or exhausting cycles              |
+| Transformational   | the relationship changes the self | healing, awakening, worldview shifts                             |
+| Forbidden          | suppression amplifies feeling     | secrecy, risk, anticipation                                      |
+| Mutual recognition | ambiguity collapses for both      | mutual confession, reunion, emotional acknowledgment             |
 
 High-intensity relationships produce strong reactions, fixation, heightened vulnerability, emotional volatility, and dramatic attachment. Low-intensity relationships may feel calm, steady, safe, and grounded, but can lack urgency or dramatic chemistry. Balanced intensity preserves deep emotional significance without chronic instability.
 
 Attachment changes intensity:
 
-| Attachment | Intensity Pattern |
-| --- | --- |
-| Secure | balanced intensity |
-| Anxious | heightened attachment intensity |
-| Avoidant | suppressed but powerful intensity |
-| Fearful | unstable high intensity |
+| Attachment | Intensity Pattern                 |
+| ---------- | --------------------------------- |
+| Secure     | balanced intensity                |
+| Anxious    | heightened attachment intensity   |
+| Avoidant   | suppressed but powerful intensity |
+| Fearful    | unstable high intensity           |
 
 Tropes draw intensity from different sources:
 
-| Trope | Common Intensity Source |
-| --- | --- |
-| Enemies to lovers | conflict and tension |
-| Friends to lovers | suppressed attachment |
-| Forbidden romance | risk and restraint |
-| Slow burn | accumulated pressure |
-| Soulmate romance | existential significance |
-| Healing romance | vulnerability and safety |
-| Obsession romance | emotional fixation |
+| Trope             | Common Intensity Source  |
+| ----------------- | ------------------------ |
+| Enemies to lovers | conflict and tension     |
+| Friends to lovers | suppressed attachment    |
+| Forbidden romance | risk and restraint       |
+| Slow burn         | accumulated pressure     |
+| Soulmate romance  | existential significance |
+| Healing romance   | vulnerability and safety |
+| Obsession romance | emotional fixation       |
 
 Intensity often increases when emotional leverage shifts, composure cracks, dominant characters become vulnerable, guarded characters lose restraint, or a small gesture carries a large amount of relationship history.
 
@@ -5416,11 +5405,11 @@ Early intensity often comes from uncertainty, novelty, and attraction. Long-term
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| intensity addiction | chaos mistaken for love, repeated jealousy or breakup cycles |
-| intensity collapse | all tension disappears and the relationship becomes static |
-| artificial intensity | repetitive conflict, forced jealousy, shallow drama loops |
+| Failure              | Result                                                       |
+| -------------------- | ------------------------------------------------------------ |
+| intensity addiction  | chaos mistaken for love, repeated jealousy or breakup cycles |
+| intensity collapse   | all tension disappears and the relationship becomes static   |
+| artificial intensity | repetitive conflict, forced jealousy, shallow drama loops    |
 
 Intensity without intimacy feels consuming but unstable. Intimacy without intensity can feel safe but flat. The strongest romances cultivate emotionally safe intensity: high emotional meaning density inside enough trust to survive it.
 
@@ -5437,20 +5426,20 @@ attraction intensity
 
 Useful emotional intensity variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Attachment depth | emotional centrality |
-| Emotional reactivity | intensity of reactions |
-| Vulnerability weight | emotional risk magnitude |
-| Fear of loss | attachment threat sensitivity |
-| Obsession tendency | fixation potential |
-| Emotional saturation | overwhelm threshold |
-| Devotional intensity | prioritization depth |
-| Tension density | unresolved emotional pressure |
-| Identity impact | degree of psychological change |
-| Intensity-safety balance | whether activation remains survivable |
-| Intensity addiction risk | chance chaos is being mistaken for love |
-| Intensity collapse risk | chance emotional force disappears into stagnation |
+| Variable                  | Meaning                                            |
+| ------------------------- | -------------------------------------------------- |
+| Attachment depth          | emotional centrality                               |
+| Emotional reactivity      | intensity of reactions                             |
+| Vulnerability weight      | emotional risk magnitude                           |
+| Fear of loss              | attachment threat sensitivity                      |
+| Obsession tendency        | fixation potential                                 |
+| Emotional saturation      | overwhelm threshold                                |
+| Devotional intensity      | prioritization depth                               |
+| Tension density           | unresolved emotional pressure                      |
+| Identity impact           | degree of psychological change                     |
+| Intensity-safety balance  | whether activation remains survivable              |
+| Intensity addiction risk  | chance chaos is being mistaken for love            |
+| Intensity collapse risk   | chance emotional force disappears into stagnation  |
 | Artificial intensity risk | chance drama is generated without emotional growth |
 
 Emotional intensity equation:
@@ -5471,59 +5460,59 @@ Challenge is not automatically conflict, hostility, incompatibility, or toxicity
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Challenge | stimulation through resistance or growth pressure |
-| Conflict | active disagreement |
-| Competition | comparative striving |
-| Tension | unresolved emotional pressure |
-| Criticism | evaluative judgment |
+| Concept     | Meaning                                           |
+| ----------- | ------------------------------------------------- |
+| Challenge   | stimulation through resistance or growth pressure |
+| Conflict    | active disagreement                               |
+| Competition | comparative striving                              |
+| Tension     | unresolved emotional pressure                     |
+| Criticism   | evaluative judgment                               |
 
 Challenge often feels energizing. Conflict often feels threatening. The runtime should separate a partner who stimulates growth from a partner who makes the relationship unsafe.
 
 Useful challenge types:
 
-| Type | Core Feeling | Common Effect |
-| --- | --- | --- |
-| Intellectual | you stimulate my mind | debate, banter, perspective clashes, fascination |
-| Emotional | you make me confront avoided feelings | honesty, reassurance demands, emotional exposure |
-| Identity | you disrupt who I thought I was | guardedness softens, self-concept shifts |
-| Competitive | you push me to rise | rivalry, competence comparison, admiration |
-| Moral | you challenge my ethics or worldview | ideological pressure, redemption, principled disagreement |
-| Emotional regulation | you destabilize my composure | teasing, jealousy, attraction panic, emotional cracks |
-| Vulnerability | you make openness harder to avoid | persistent care, deep understanding, softening |
-| Sexual | you create tension and anticipation | provocation, restraint, escalation pacing |
-| Autonomy | you test closeness versus selfhood | commitment fear, dependence, intimacy pressure |
-| Stability | you test whether this survives reality | stress, routine, jealousy, long-term compatibility |
+| Type                 | Core Feeling                           | Common Effect                                             |
+| -------------------- | -------------------------------------- | --------------------------------------------------------- |
+| Intellectual         | you stimulate my mind                  | debate, banter, perspective clashes, fascination          |
+| Emotional            | you make me confront avoided feelings  | honesty, reassurance demands, emotional exposure          |
+| Identity             | you disrupt who I thought I was        | guardedness softens, self-concept shifts                  |
+| Competitive          | you push me to rise                    | rivalry, competence comparison, admiration                |
+| Moral                | you challenge my ethics or worldview   | ideological pressure, redemption, principled disagreement |
+| Emotional regulation | you destabilize my composure           | teasing, jealousy, attraction panic, emotional cracks     |
+| Vulnerability        | you make openness harder to avoid      | persistent care, deep understanding, softening            |
+| Sexual               | you create tension and anticipation    | provocation, restraint, escalation pacing                 |
+| Autonomy             | you test closeness versus selfhood     | commitment fear, dependence, intimacy pressure            |
+| Stability            | you test whether this survives reality | stress, routine, jealousy, long-term compatibility        |
 
 Challenge and safety should be balanced:
 
-| Balance | Result |
-| --- | --- |
-| high challenge + low safety | volatility, obsession, exhaustion |
+| Balance                     | Result                             |
+| --------------------------- | ---------------------------------- |
+| high challenge + low safety | volatility, obsession, exhaustion  |
 | high safety + low challenge | comfort, calm, possible stagnation |
-| balanced challenge + safety | growth-oriented intimacy |
+| balanced challenge + safety | growth-oriented intimacy           |
 
 Tropes often use challenge as their engine:
 
-| Trope | Common Challenge |
-| --- | --- |
-| Enemies to lovers | ideological and emotional challenge |
-| Rivals to lovers | competence challenge |
-| Friends to lovers | emotional risk challenge |
-| Forbidden romance | social or moral challenge |
-| Healing romance | vulnerability challenge |
-| Slow burn | restraint challenge |
-| Redemption romance | moral and trust challenge |
+| Trope              | Common Challenge                    |
+| ------------------ | ----------------------------------- |
+| Enemies to lovers  | ideological and emotional challenge |
+| Rivals to lovers   | competence challenge                |
+| Friends to lovers  | emotional risk challenge            |
+| Forbidden romance  | social or moral challenge           |
+| Healing romance    | vulnerability challenge             |
+| Slow burn          | restraint challenge                 |
+| Redemption romance | moral and trust challenge           |
 
 Attachment changes the challenge pattern:
 
-| Attachment | Challenge Pattern |
-| --- | --- |
-| Secure | healthy growth challenge |
-| Anxious | reassurance challenge |
-| Avoidant | intimacy and autonomy challenge |
-| Fearful | stability and trust challenge |
+| Attachment | Challenge Pattern               |
+| ---------- | ------------------------------- |
+| Secure     | healthy growth challenge        |
+| Anxious    | reassurance challenge           |
+| Avoidant   | intimacy and autonomy challenge |
+| Fearful    | stability and trust challenge   |
 
 Challenge is one of the strongest chemistry generators when it combines with responsiveness and admiration. Rivals, teasing dynamics, opposites attract, and intellectual pairings often become compelling because challenge keeps both characters emotionally engaged.
 
@@ -5533,11 +5522,11 @@ Healthy challenge often becomes supportive transformation: encouraging openness,
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| excessive challenge | exhaustion, instability, chronic friction, inability to rest |
-| no challenge | stagnation, emotional flattening, lost fascination |
-| destructive challenge | humiliation, contempt, coercion, invalidation, safety loss |
+| Failure               | Result                                                       |
+| --------------------- | ------------------------------------------------------------ |
+| excessive challenge   | exhaustion, instability, chronic friction, inability to rest |
+| no challenge          | stagnation, emotional flattening, lost fascination           |
+| destructive challenge | humiliation, contempt, coercion, invalidation, safety loss   |
 
 Challenge can evolve:
 
@@ -5552,22 +5541,22 @@ initial challenge
 
 Useful challenge variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Stimulation need | desire for engagement and challenge |
-| Conflict tolerance | comfort with friction |
-| Growth orientation | openness to change |
-| Ego sensitivity | reactivity to challenge |
-| Competitiveness | attraction to rivalry |
-| Vulnerability resistance | resistance to emotional challenge |
-| Transformation readiness | openness to identity change |
-| Stability need | tolerance for emotional disruption |
-| Curiosity | desire for discovery |
-| Challenge-safety balance | whether pressure remains growth-supporting |
-| Admiration potential | chance challenge becomes respect |
-| Destructive challenge risk | chance pressure becomes harm |
-| Exhaustion risk | chance challenge prevents rest |
-| Stagnation risk | chance no challenge flattens the bond |
+| Variable                   | Meaning                                    |
+| -------------------------- | ------------------------------------------ |
+| Stimulation need           | desire for engagement and challenge        |
+| Conflict tolerance         | comfort with friction                      |
+| Growth orientation         | openness to change                         |
+| Ego sensitivity            | reactivity to challenge                    |
+| Competitiveness            | attraction to rivalry                      |
+| Vulnerability resistance   | resistance to emotional challenge          |
+| Transformation readiness   | openness to identity change                |
+| Stability need             | tolerance for emotional disruption         |
+| Curiosity                  | desire for discovery                       |
+| Challenge-safety balance   | whether pressure remains growth-supporting |
+| Admiration potential       | chance challenge becomes respect           |
+| Destructive challenge risk | chance pressure becomes harm               |
+| Exhaustion risk            | chance challenge prevents rest             |
+| Stagnation risk            | chance no challenge flattens the bond      |
 
 Challenge equation:
 
@@ -5585,48 +5574,48 @@ Chemistry is the emotional pattern of attraction between two people. It is not c
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
+| Concept       | Meaning                  |
+| ------------- | ------------------------ |
 | Compatibility | long-term sustainability |
-| Attraction | desire or interest |
-| Attachment | emotional bonding |
-| Chemistry | interaction charge |
-| Intimacy | emotional closeness |
+| Attraction    | desire or interest       |
+| Attachment    | emotional bonding        |
+| Chemistry     | interaction charge       |
+| Intimacy      | emotional closeness      |
 
 High chemistry with low compatibility can produce addictive but unstable romance. High compatibility with low chemistry can produce a stable but flat relationship. The runtime should track chemistry so dialogue rhythm, scene feel, flirt style, tension, and pacing do not collapse into a single attraction value.
 
 Useful chemistry types:
 
-| Chemistry | Core Feeling | Common Effect |
-| --- | --- | --- |
-| Banter | talking to you is stimulating | wit, reaction-seeking, playful attachment |
-| Tension | something unresolved exists | charged silence, denial, hyper-awareness |
-| Comfort | being near you regulates me | safety, dependency, emotional ease |
-| Intellectual | your mind excites me | debate, admiration, fascination |
-| Sexual | physical attraction overwhelms restraint | touch awareness, escalation pressure |
-| Emotional | you understand me | rapid significance, trust acceleration |
-| Chaotic | you destabilize me | volatility, impulsivity, dependency |
-| Protective | I care for your wellbeing | safety, caretaking, trust |
-| Devotional | you become emotionally central | loyalty, sacrifice, emotional gravity |
-| Oppositional | you challenge my worldview | fixation, transformation, friction |
-| Domestic | life feels natural with you | sustainability, ordinary intimacy |
-| Melancholic | loving you hurts beautifully | bittersweet depth, fragile attachment |
-| Predatory | we are emotionally hunting each other | intense pursuit, power play, requires consent |
-| Soft longing | I quietly ache for you | restraint, small gestures, delayed confession |
-| Transformational | knowing you changes who I am | identity shift, existential intimacy |
+| Chemistry        | Core Feeling                             | Common Effect                                 |
+| ---------------- | ---------------------------------------- | --------------------------------------------- |
+| Banter           | talking to you is stimulating            | wit, reaction-seeking, playful attachment     |
+| Tension          | something unresolved exists              | charged silence, denial, hyper-awareness      |
+| Comfort          | being near you regulates me              | safety, dependency, emotional ease            |
+| Intellectual     | your mind excites me                     | debate, admiration, fascination               |
+| Sexual           | physical attraction overwhelms restraint | touch awareness, escalation pressure          |
+| Emotional        | you understand me                        | rapid significance, trust acceleration        |
+| Chaotic          | you destabilize me                       | volatility, impulsivity, dependency           |
+| Protective       | I care for your wellbeing                | safety, caretaking, trust                     |
+| Devotional       | you become emotionally central           | loyalty, sacrifice, emotional gravity         |
+| Oppositional     | you challenge my worldview               | fixation, transformation, friction            |
+| Domestic         | life feels natural with you              | sustainability, ordinary intimacy             |
+| Melancholic      | loving you hurts beautifully             | bittersweet depth, fragile attachment         |
+| Predatory        | we are emotionally hunting each other    | intense pursuit, power play, requires consent |
+| Soft longing     | I quietly ache for you                   | restraint, small gestures, delayed confession |
+| Transformational | knowing you changes who I am             | identity shift, existential intimacy          |
 
 Chemistry combinations create relationship flavor:
 
-| Combination | Dynamic |
-| --- | --- |
-| banter + tension | addictive flirtation |
-| comfort + emotional | healing intimacy |
-| sexual + chaotic | unstable obsession |
-| intellectual + oppositional | rivals energy |
-| protective + soft longing | devastating slow burn |
-| devotional + melancholic | tragic epic romance |
-| domestic + playful | cozy long-term love |
-| tension + emotional | emotionally intense slow burn |
+| Combination                 | Dynamic                       |
+| --------------------------- | ----------------------------- |
+| banter + tension            | addictive flirtation          |
+| comfort + emotional         | healing intimacy              |
+| sexual + chaotic            | unstable obsession            |
+| intellectual + oppositional | rivals energy                 |
+| protective + soft longing   | devastating slow burn         |
+| devotional + melancholic    | tragic epic romance           |
+| domestic + playful          | cozy long-term love           |
+| tension + emotional         | emotionally intense slow burn |
 
 Chemistry should evolve. For example, enemies to lovers might move from oppositional chemistry to banter chemistry to tension chemistry to sexual chemistry to emotional chemistry to devotional chemistry. That progression gives the relationship payoff without requiring a rigid dialogue tree.
 
@@ -5650,68 +5639,68 @@ This layer must remain adult-gated and boundary-controlled by the app. If the ad
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Attraction | I find you appealing |
+| Concept          | Meaning                                     |
+| ---------------- | ------------------------------------------- |
+| Attraction       | I find you appealing                        |
 | Sexual chemistry | interaction with you creates erotic tension |
-| Libido | general sexual drive |
-| Intimacy | emotional closeness |
-| Compatibility | long-term relational fit |
+| Libido           | general sexual drive                        |
+| Intimacy         | emotional closeness                         |
+| Compatibility    | long-term relational fit                    |
 
 Sexual chemistry usually comes from tension plus responsiveness, not simple attractiveness. The key runtime question is: does this person affect the character physically and psychologically, and do both characters respond to that effect?
 
 Core components:
 
-| Component | Meaning |
-| --- | --- |
-| Physical awareness | body, proximity, and gesture attention |
-| Tension | unresolved attraction |
-| Desire suppression | restraint against acting |
-| Responsiveness | mutual reaction intensity |
-| Escalation comfort | comfort with increasing intimacy |
-| Erotic confidence | confidence expressing attraction |
-| Vulnerability linkage | how much emotion affects desire |
-| Touch sensitivity | emotional impact of touch |
-| Anticipation | buildup intensity |
+| Component             | Meaning                                |
+| --------------------- | -------------------------------------- |
+| Physical awareness    | body, proximity, and gesture attention |
+| Tension               | unresolved attraction                  |
+| Desire suppression    | restraint against acting               |
+| Responsiveness        | mutual reaction intensity              |
+| Escalation comfort    | comfort with increasing intimacy       |
+| Erotic confidence     | confidence expressing attraction       |
+| Vulnerability linkage | how much emotion affects desire        |
+| Touch sensitivity     | emotional impact of touch              |
+| Anticipation          | buildup intensity                      |
 
 Useful adult-gated modes:
 
-| Mode | Core Feeling | Runtime Behavior |
-| --- | --- | --- |
-| Slow burn | this tension is consuming us | awareness, suppression, accidental intimacy, near-moments |
-| Explosive | we lose composure around each other | rapid escalation pressure, destabilization, volatility checks |
-| Playful | flirting itself is pleasurable | teasing, humor, response-seeking |
-| Devotional | desire is emotionally significant | attentiveness, careful touch, emotional presence |
-| Dominance-tension | control becomes charged | confidence, challenge, power shifts, consent checks |
-| Emotional | desire deepens because I feel seen | vulnerability intensifies attraction |
-| Forbidden | we should not want this | secrecy, risk, suppression, consequence awareness |
-| Soft domestic | comfort itself becomes attractive | routine affection, relaxed attraction, long-term realism |
+| Mode              | Core Feeling                        | Runtime Behavior                                              |
+| ----------------- | ----------------------------------- | ------------------------------------------------------------- |
+| Slow burn         | this tension is consuming us        | awareness, suppression, accidental intimacy, near-moments     |
+| Explosive         | we lose composure around each other | rapid escalation pressure, destabilization, volatility checks |
+| Playful           | flirting itself is pleasurable      | teasing, humor, response-seeking                              |
+| Devotional        | desire is emotionally significant   | attentiveness, careful touch, emotional presence              |
+| Dominance-tension | control becomes charged             | confidence, challenge, power shifts, consent checks           |
+| Emotional         | desire deepens because I feel seen  | vulnerability intensifies attraction                          |
+| Forbidden         | we should not want this             | secrecy, risk, suppression, consequence awareness             |
+| Soft domestic     | comfort itself becomes attractive   | routine affection, relaxed attraction, long-term realism      |
 
 Sexual chemistry changes by relationship phase:
 
-| Phase | Focus |
-| --- | --- |
-| Early | awareness, ambiguity, nervousness, subtle flirting |
-| Mid escalation | restraint battles, jealousy, proximity, destabilization |
-| Established | responsiveness, trust, comfort, attentiveness, anticipation |
+| Phase          | Focus                                                       |
+| -------------- | ----------------------------------------------------------- |
+| Early          | awareness, ambiguity, nervousness, subtle flirting          |
+| Mid escalation | restraint battles, jealousy, proximity, destabilization     |
+| Established    | responsiveness, trust, comfort, attentiveness, anticipation |
 
 It should also interact with attachment and tone:
 
-| Attachment | Sexual Chemistry Tendency |
-| --- | --- |
-| Secure | balanced and emotionally integrated |
-| Anxious | intense and reassurance-seeking |
-| Avoidant | tension-heavy and restrained |
-| Fearful | volatile push-pull chemistry |
+| Attachment | Sexual Chemistry Tendency           |
+| ---------- | ----------------------------------- |
+| Secure     | balanced and emotionally integrated |
+| Anxious    | intense and reassurance-seeking     |
+| Avoidant   | tension-heavy and restrained        |
+| Fearful    | volatile push-pull chemistry        |
 
-| Tone | Result |
-| --- | --- |
-| Yearning | aching tension |
-| Playful | flirt-heavy attraction |
-| Chaotic | unstable intensity |
-| Tender | emotionally intimate desire |
-| Melancholic | bittersweet longing |
-| Devotional | emotionally profound attraction |
+| Tone        | Result                          |
+| ----------- | ------------------------------- |
+| Yearning    | aching tension                  |
+| Playful     | flirt-heavy attraction          |
+| Chaotic     | unstable intensity              |
+| Tender      | emotionally intimate desire     |
+| Melancholic | bittersweet longing             |
+| Devotional  | emotionally profound attraction |
 
 Sexual chemistry is often strongest when emotional meaning and physical attraction overlap:
 
@@ -5738,51 +5727,51 @@ Desire style is the characteristic way a person experiences, activates, expresse
 
 Useful desire styles:
 
-| Style | Activation Pattern | Risk |
-| --- | --- | --- |
-| Spontaneous | attraction activates quickly and internally | intensity without compatibility |
-| Responsive | desire emerges through emotional context | mismatch with fast escalation |
-| Tension-driven | unresolved pressure fuels desire | instability addiction |
-| Emotional intimacy | safety and vulnerability intensify desire | hurt if intimacy is inconsistent |
-| Devotional | significance and prioritization deepen desire | over-centralization |
-| Pursuit-oriented | chase and uncertainty intensify desire | desire drops when stable |
-| Security-based | reassurance and attachment enhance desire | vulnerable to safety loss |
-| Validation-driven | feeling wanted activates desire | reassurance dependency |
-| Power dynamic | control, surrender, challenge, or protection activate desire | must remain consent-bound |
-| Intellectual | mental stimulation and competence activate desire | emotional distance risk |
-| Forbidden | risk and suppression intensify desire | consequence and secrecy pressure |
-| Sensory/sensual | atmosphere, touch, voice, and proximity activate desire | sensory mismatch |
-| Obsessive | desire becomes psychologically consuming | fixation and autonomy risk |
-| Slow burn | accumulated meaning deepens desire | stagnation if thresholds never cross |
-| Chaotic | instability intensifies attraction | unsustainable cycles |
+| Style              | Activation Pattern                                           | Risk                                 |
+| ------------------ | ------------------------------------------------------------ | ------------------------------------ |
+| Spontaneous        | attraction activates quickly and internally                  | intensity without compatibility      |
+| Responsive         | desire emerges through emotional context                     | mismatch with fast escalation        |
+| Tension-driven     | unresolved pressure fuels desire                             | instability addiction                |
+| Emotional intimacy | safety and vulnerability intensify desire                    | hurt if intimacy is inconsistent     |
+| Devotional         | significance and prioritization deepen desire                | over-centralization                  |
+| Pursuit-oriented   | chase and uncertainty intensify desire                       | desire drops when stable             |
+| Security-based     | reassurance and attachment enhance desire                    | vulnerable to safety loss            |
+| Validation-driven  | feeling wanted activates desire                              | reassurance dependency               |
+| Power dynamic      | control, surrender, challenge, or protection activate desire | must remain consent-bound            |
+| Intellectual       | mental stimulation and competence activate desire            | emotional distance risk              |
+| Forbidden          | risk and suppression intensify desire                        | consequence and secrecy pressure     |
+| Sensory/sensual    | atmosphere, touch, voice, and proximity activate desire      | sensory mismatch                     |
+| Obsessive          | desire becomes psychologically consuming                     | fixation and autonomy risk           |
+| Slow burn          | accumulated meaning deepens desire                           | stagnation if thresholds never cross |
+| Chaotic            | instability intensifies attraction                           | unsustainable cycles                 |
 
 Libido style is the characteristic way a person experiences, regulates, expresses, initiates, sustains, suppresses, prioritizes, and emotionally connects to sexual desire over time. It is not merely high versus low libido. Libido is contextual: stress, attachment, emotional safety, novelty, conflict, trust, reassurance, and relationship stage can all change how desire behaves inside a specific relationship.
 
 Keep libido distinct from adjacent systems:
 
-| Concept | Meaning |
-| --- | --- |
-| Libido | desire intensity and frequency over time |
-| Desire style | how attraction activates psychologically |
-| Sexual compatibility | erotic fit between partners |
-| Sexual chemistry | interactional erotic charge |
-| Intimacy style | closeness structure |
+| Concept              | Meaning                                  |
+| -------------------- | ---------------------------------------- |
+| Libido               | desire intensity and frequency over time |
+| Desire style         | how attraction activates psychologically |
+| Sexual compatibility | erotic fit between partners              |
+| Sexual chemistry     | interactional erotic charge              |
+| Intimacy style       | closeness structure                      |
 
 Useful libido styles:
 
-| Style | Pattern | Risk |
-| --- | --- | --- |
-| High stable | consistent desire with lower contextual fluctuation | mismatch with lower-libido partners |
-| Responsive | desire emerges after emotional engagement begins | misread as disinterest if rushed |
-| Tension-driven | uncertainty and anticipation intensify desire | tension dependence |
-| Security-based | emotional safety increases desire | desire drops when safety is damaged |
-| Novelty-dependent | stimulation and newness sustain desire | routine stagnation risk |
-| Attachment-reactive | attachment state strongly alters desire | anxious fluctuation |
-| Avoidant | desire is strongest with distance or reduced pressure | post-intimacy withdrawal |
-| Obsessive | desire becomes psychologically consuming | fixation and autonomy risk |
-| Devotional | emotional significance intensifies desire | over-centralization |
-| Chaotic | instability amplifies desire | destructive cycles |
-| Low reactive | desire exists but activates slowly and contextually | invisibility or pressure risk |
+| Style               | Pattern                                               | Risk                                |
+| ------------------- | ----------------------------------------------------- | ----------------------------------- |
+| High stable         | consistent desire with lower contextual fluctuation   | mismatch with lower-libido partners |
+| Responsive          | desire emerges after emotional engagement begins      | misread as disinterest if rushed    |
+| Tension-driven      | uncertainty and anticipation intensify desire         | tension dependence                  |
+| Security-based      | emotional safety increases desire                     | desire drops when safety is damaged |
+| Novelty-dependent   | stimulation and newness sustain desire                | routine stagnation risk             |
+| Attachment-reactive | attachment state strongly alters desire               | anxious fluctuation                 |
+| Avoidant            | desire is strongest with distance or reduced pressure | post-intimacy withdrawal            |
+| Obsessive           | desire becomes psychologically consuming              | fixation and autonomy risk          |
+| Devotional          | emotional significance intensifies desire             | over-centralization                 |
+| Chaotic             | instability amplifies desire                          | destructive cycles                  |
+| Low reactive        | desire exists but activates slowly and contextually   | invisibility or pressure risk       |
 
 Useful libido variables include libido intensity, libido activation style, stress sensitivity, security dependence, novelty dependence, attachment influence, intimacy integration, pursuit reactivity, and libido stability. The runtime should avoid static libido: the same character can experience intense desire in one relationship and muted desire in another because libido interacts with emotional chemistry and psychological safety.
 
@@ -5790,31 +5779,31 @@ Realistic sexual chemistry variation means different pairings should feel erotic
 
 Useful chemistry variations:
 
-| Variation | Engine | Feel |
-| --- | --- | --- |
-| Tension-based | restraint + anticipation + unresolved desire | electrically unresolved |
-| Emotional intimacy | vulnerability + safety + openness | consuming and safe |
-| Competitive | challenge + admiration + ego stimulation | sharp and stimulating |
-| Devotional | prioritization + reverence + focus | sacred and consuming |
-| Playful | interaction itself feels pleasurable | lively and addictive |
-| Protective | safety + caretaking + trust | calming and attached |
-| Forbidden | risk + suppression + taboo | dangerous and intoxicating |
-| Obsessive | fixation + centralization + hyperfocus | psychologically consuming |
-| Soft domestic | familiarity + comfort + habitual intimacy | warm and lived-in |
-| Chaotic | instability + unpredictability | addictive but unsafe |
-| Intellectual | mental stimulation + curiosity | mentally erotic |
-| Slow-burn | accumulated meaning over time | devastating when payoff lands |
+| Variation          | Engine                                       | Feel                          |
+| ------------------ | -------------------------------------------- | ----------------------------- |
+| Tension-based      | restraint + anticipation + unresolved desire | electrically unresolved       |
+| Emotional intimacy | vulnerability + safety + openness            | consuming and safe            |
+| Competitive        | challenge + admiration + ego stimulation     | sharp and stimulating         |
+| Devotional         | prioritization + reverence + focus           | sacred and consuming          |
+| Playful            | interaction itself feels pleasurable         | lively and addictive          |
+| Protective         | safety + caretaking + trust                  | calming and attached          |
+| Forbidden          | risk + suppression + taboo                   | dangerous and intoxicating    |
+| Obsessive          | fixation + centralization + hyperfocus       | psychologically consuming     |
+| Soft domestic      | familiarity + comfort + habitual intimacy    | warm and lived-in             |
+| Chaotic            | instability + unpredictability               | addictive but unsafe          |
+| Intellectual       | mental stimulation + curiosity               | mentally erotic               |
+| Slow-burn          | accumulated meaning over time                | devastating when payoff lands |
 
 Chemistry variation should affect body language: soft chemistry uses relaxed closeness and lingering touch, tension chemistry uses interrupted touch and intense eye contact, competitive chemistry uses smirks and reaction watching, and domestic chemistry uses casual proximity and routine touch.
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| Generic chemistry | every pairing feels the same |
-| Constant maximal intensity | tenderness and pacing disappear |
-| Purely physical chemistry | no psychological or emotional structure |
-| Desire style mismatch ignored | attraction feels incoherent |
+| Failure                       | Result                                  |
+| ----------------------------- | --------------------------------------- |
+| Generic chemistry             | every pairing feels the same            |
+| Constant maximal intensity    | tenderness and pacing disappear         |
+| Purely physical chemistry     | no psychological or emotional structure |
+| Desire style mismatch ignored | attraction feels incoherent             |
 
 ### Trust Mechanics
 
@@ -5824,28 +5813,28 @@ Trust is not a single number, blind belief, or permanent once earned. Trust is l
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Trust | belief in emotional reliability and safety |
-| Emotional safety | feeling vulnerability is survivable |
-| Faith | emotional belief without certainty |
-| Commitment | long-term choosing |
-| Dependability | behavioral reliability |
+| Concept          | Meaning                                    |
+| ---------------- | ------------------------------------------ |
+| Trust            | belief in emotional reliability and safety |
+| Emotional safety | feeling vulnerability is survivable        |
+| Faith            | emotional belief without certainty         |
+| Commitment       | long-term choosing                         |
+| Dependability    | behavioral reliability                     |
 
 Trust specifically governs emotional risk tolerance.
 
 Core trust dimensions:
 
-| Trust Type | Meaning | Runtime Use |
-| --- | --- | --- |
-| Emotional trust | you will not hurt my feelings carelessly | validation, care with feelings, non-cruel reactions |
-| Reliability trust | you show up consistently | promises, follow-through, dependable patterns |
-| Vulnerability trust | I can expose myself emotionally | confessions, shame, fear, hidden self |
-| Loyalty trust | you choose me consistently | prioritization, exclusivity consistency, public support |
-| Conflict trust | we survive fights safely | repair, accountability, staying engaged |
-| Physical trust | touch and physical safety feel comfortable | proximity, comfort touch, bodily safety |
-| Sexual trust | desire and boundaries are safe with you | adult-gated vulnerability, consent, responsiveness |
-| Autonomy trust | I can stay myself while loving you | boundaries, non-coercive closeness, agency |
+| Trust Type          | Meaning                                    | Runtime Use                                             |
+| ------------------- | ------------------------------------------ | ------------------------------------------------------- |
+| Emotional trust     | you will not hurt my feelings carelessly   | validation, care with feelings, non-cruel reactions     |
+| Reliability trust   | you show up consistently                   | promises, follow-through, dependable patterns           |
+| Vulnerability trust | I can expose myself emotionally            | confessions, shame, fear, hidden self                   |
+| Loyalty trust       | you choose me consistently                 | prioritization, exclusivity consistency, public support |
+| Conflict trust      | we survive fights safely                   | repair, accountability, staying engaged                 |
+| Physical trust      | touch and physical safety feel comfortable | proximity, comfort touch, bodily safety                 |
+| Sexual trust        | desire and boundaries are safe with you    | adult-gated vulnerability, consent, responsiveness      |
+| Autonomy trust      | I can stay myself while loving you         | boundaries, non-coercive closeness, agency              |
 
 Trust forms through repeated emotionally meaningful experiences with predictable outcomes:
 
@@ -5868,26 +5857,26 @@ Trust should never be one stat. A character may trust emotional care but not loy
 
 Trust acts like intimacy permission architecture. Different relationship events require different trust thresholds:
 
-| Event | Trust Requirement |
-| --- | --- |
-| Teasing | low |
-| Emotional confession | medium-high vulnerability trust |
-| Dependency | high emotional and reliability trust |
-| Trauma disclosure | very high vulnerability and emotional trust |
-| Sexual vulnerability | variable/high sexual and physical trust |
-| Commitment | high loyalty and reliability trust |
-| Emotional surrender | extremely high vulnerability, autonomy, and conflict trust |
+| Event                | Trust Requirement                                          |
+| -------------------- | ---------------------------------------------------------- |
+| Teasing              | low                                                        |
+| Emotional confession | medium-high vulnerability trust                            |
+| Dependency           | high emotional and reliability trust                       |
+| Trauma disclosure    | very high vulnerability and emotional trust                |
+| Sexual vulnerability | variable/high sexual and physical trust                    |
+| Commitment           | high loyalty and reliability trust                         |
+| Emotional surrender  | extremely high vulnerability, autonomy, and conflict trust |
 
 Trust damage should persist and target the specific layer harmed:
 
-| Rupture | Primary Trust Damage |
-| --- | --- |
-| Broken promise | reliability trust |
-| Mocked vulnerability | vulnerability trust |
-| Abandonment during conflict | conflict trust |
-| Emotional replacement | loyalty trust |
-| Coercive pressure | autonomy, physical, or sexual trust |
-| Careless cruelty | emotional trust |
+| Rupture                     | Primary Trust Damage                |
+| --------------------------- | ----------------------------------- |
+| Broken promise              | reliability trust                   |
+| Mocked vulnerability        | vulnerability trust                 |
+| Abandonment during conflict | conflict trust                      |
+| Emotional replacement       | loyalty trust                       |
+| Coercive pressure           | autonomy, physical, or sexual trust |
+| Careless cruelty            | emotional trust                     |
 
 Trust repair is behavioral consistency over time, not a single apology:
 
@@ -5900,12 +5889,12 @@ accountability
 
 Attachment affects trust pacing:
 
-| Attachment | Trust Pattern |
-| --- | --- |
-| Secure | gradual and flexible |
-| Anxious | fast trust plus fragility |
-| Avoidant | slow trust building |
-| Fearful | intense but unstable |
+| Attachment | Trust Pattern             |
+| ---------- | ------------------------- |
+| Secure     | gradual and flexible      |
+| Anxious    | fast trust plus fragility |
+| Avoidant   | slow trust building       |
+| Fearful    | intense but unstable      |
 
 Conflict is one of the strongest trust tests:
 
@@ -5929,25 +5918,25 @@ Trust can become part of relationship identity through narratives such as "you a
 
 Useful trust variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Emotional trust | belief emotions are safe |
-| Reliability trust | consistency confidence |
-| Vulnerability trust | openness safety |
-| Loyalty trust | confidence in prioritization |
-| Conflict trust | belief relationship survives tension |
-| Physical trust | comfort with touch and bodily safety |
-| Sexual trust | comfort with adult-gated desire and boundaries |
-| Autonomy trust | confidence individuality is respected |
-| Repair trust | belief repair is possible |
-| Trust fragility | how easily trust destabilizes |
-| Trust recovery speed | ability to rebuild after rupture |
-| Trust persistence | durability of safety over time |
-| Trust damage memory | how strongly rupture history remains active |
-| Threshold readiness | whether enough trust exists for an event |
-| Faith under uncertainty | willingness to believe without full proof |
-| Dependability evidence | accumulated proof through action |
-| Vulnerability risk tolerance | emotional risks the character can take |
+| Variable                     | Meaning                                        |
+| ---------------------------- | ---------------------------------------------- |
+| Emotional trust              | belief emotions are safe                       |
+| Reliability trust            | consistency confidence                         |
+| Vulnerability trust          | openness safety                                |
+| Loyalty trust                | confidence in prioritization                   |
+| Conflict trust               | belief relationship survives tension           |
+| Physical trust               | comfort with touch and bodily safety           |
+| Sexual trust                 | comfort with adult-gated desire and boundaries |
+| Autonomy trust               | confidence individuality is respected          |
+| Repair trust                 | belief repair is possible                      |
+| Trust fragility              | how easily trust destabilizes                  |
+| Trust recovery speed         | ability to rebuild after rupture               |
+| Trust persistence            | durability of safety over time                 |
+| Trust damage memory          | how strongly rupture history remains active    |
+| Threshold readiness          | whether enough trust exists for an event       |
+| Faith under uncertainty      | willingness to believe without full proof      |
+| Dependability evidence       | accumulated proof through action               |
+| Vulnerability risk tolerance | emotional risks the character can take         |
 
 Trust equation:
 
@@ -5967,68 +5956,68 @@ Rupture severity is not determined only by objective event size. It depends on e
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Rupture | emotional disconnection or damage |
-| Conflict | disagreement or tension |
-| Betrayal | trust violation |
-| Damage | emotional consequence |
-| Repair | reconnection process |
+| Concept  | Meaning                           |
+| -------- | --------------------------------- |
+| Rupture  | emotional disconnection or damage |
+| Conflict | disagreement or tension           |
+| Betrayal | trust violation                   |
+| Damage   | emotional consequence             |
+| Repair   | reconnection process              |
 
 Useful rupture damage dimensions:
 
-| Dimension | Core Question | Runtime Effect |
-| --- | --- | --- |
-| Trust damage severity | how much did safety expectations change? | raises thresholds, hypervigilance, reassurance need |
-| Attachment damage severity | how much was attachment security threatened? | panic, withdrawal, destabilization |
-| Identity damage severity | how much did this damage the shared "we"? | identity fracture, symbolic repair need |
-| Vulnerability damage severity | how unsafe does openness now feel? | slower intimacy, guardedness |
-| Emotional safety damage severity | how dangerous does the relationship feel? | dysregulation, defensive behavior |
-| Exclusivity damage severity | how threatened does uniqueness feel? | jealousy, comparison, possessiveness |
-| Stability damage severity | how much did future confidence drop? | breakup fear, lifecycle regression |
-| Momentum damage severity | how much did trajectory redirect negatively? | drift, fracture, negative momentum |
+| Dimension                        | Core Question                                | Runtime Effect                                      |
+| -------------------------------- | -------------------------------------------- | --------------------------------------------------- |
+| Trust damage severity            | how much did safety expectations change?     | raises thresholds, hypervigilance, reassurance need |
+| Attachment damage severity       | how much was attachment security threatened? | panic, withdrawal, destabilization                  |
+| Identity damage severity         | how much did this damage the shared "we"?    | identity fracture, symbolic repair need             |
+| Vulnerability damage severity    | how unsafe does openness now feel?           | slower intimacy, guardedness                        |
+| Emotional safety damage severity | how dangerous does the relationship feel?    | dysregulation, defensive behavior                   |
+| Exclusivity damage severity      | how threatened does uniqueness feel?         | jealousy, comparison, possessiveness                |
+| Stability damage severity        | how much did future confidence drop?         | breakup fear, lifecycle regression                  |
+| Momentum damage severity         | how much did trajectory redirect negatively? | drift, fracture, negative momentum                  |
 
 Rupture severity levels:
 
-| Level | Meaning | Examples | Repair Need |
-| --- | --- | --- | --- |
-| 0 | no meaningful rupture | harmless mismatch, quickly clarified ambiguity | none or tiny clarification |
-| 1 | minor friction | forgotten text, mild jealousy, teasing misread | clarification and reassurance |
-| 2 | emotional discomfort | small disappointment, failed reassurance | validation and reconnecting gesture |
-| 3 | significant rupture | hurtful argument, withdrawal, broken promise | accountability plus consistency proof |
-| 4 | major attachment rupture | abandonment, betrayal, humiliation, severe invalidation | long-term safety rebuilding |
-| 5 | identity-level rupture | repeated betrayal, relationship mythology collapse | transformational repair or redefinition |
+| Level | Meaning                  | Examples                                                | Repair Need                             |
+| ----- | ------------------------ | ------------------------------------------------------- | --------------------------------------- |
+| 0     | no meaningful rupture    | harmless mismatch, quickly clarified ambiguity          | none or tiny clarification              |
+| 1     | minor friction           | forgotten text, mild jealousy, teasing misread          | clarification and reassurance           |
+| 2     | emotional discomfort     | small disappointment, failed reassurance                | validation and reconnecting gesture     |
+| 3     | significant rupture      | hurtful argument, withdrawal, broken promise            | accountability plus consistency proof   |
+| 4     | major attachment rupture | abandonment, betrayal, humiliation, severe invalidation | long-term safety rebuilding             |
+| 5     | identity-level rupture   | repeated betrayal, relationship mythology collapse      | transformational repair or redefinition |
 
 Attachment styles shape rupture response:
 
-| Attachment Style | Typical Rupture Response |
-| --- | --- |
-| Secure | repair-oriented distress |
-| Anxious | panic and hyperactivation |
-| Avoidant | withdrawal and suppression |
-| Fearful | chaotic escalation and retreat |
+| Attachment Style | Typical Rupture Response       |
+| ---------------- | ------------------------------ |
+| Secure           | repair-oriented distress       |
+| Anxious          | panic and hyperactivation      |
+| Avoidant         | withdrawal and suppression     |
+| Fearful          | chaotic escalation and retreat |
 
 High-severity ruptures become defining emotional memories. Betrayal during vulnerability, abandonment after confession, or humiliation during emotional openness should alter future trust, pacing, openness, expectations, and relationship momentum.
 
 Repair effort must scale with rupture severity:
 
-| Rupture | Repair Needed |
-| --- | --- |
-| Minor misunderstanding | clarification |
-| Broken promise | consistency restoration |
-| Betrayal | long-term trust rebuilding |
-| Identity rupture | relationship redefinition and symbolic restoration |
+| Rupture                | Repair Needed                                      |
+| ---------------------- | -------------------------------------------------- |
+| Minor misunderstanding | clarification                                      |
+| Broken promise         | consistency restoration                            |
+| Betrayal               | long-term trust rebuilding                         |
+| Identity rupture       | relationship redefinition and symbolic restoration |
 
 Rupture severity redirects momentum. A relationship with secure momentum can become hypervigilant after betrayal. A relationship in drift may fracture after a smaller event because the context already weakened safety.
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| No consequences | betrayal or harm is forgotten instantly |
-| Infinite punishment loops | no healing progression can occur |
-| Uniform rupture treatment | every conflict receives the same weight |
-| Objective-only severity | context, fears, and attachment meaning are ignored |
+| Failure                   | Result                                             |
+| ------------------------- | -------------------------------------------------- |
+| No consequences           | betrayal or harm is forgotten instantly            |
+| Infinite punishment loops | no healing progression can occur                   |
+| Uniform rupture treatment | every conflict receives the same weight            |
+| Objective-only severity   | context, fears, and attachment meaning are ignored |
 
 Rupture severity equation:
 
@@ -6048,24 +6037,24 @@ The deepest ruptures are not only about pain. They are about what the pain chang
 
 Specific rupture subtypes identify which trust layer was wounded so repair can be psychologically targeted.
 
-| Subtype | Core Damage | Repair Requirement |
-| --- | --- | --- |
-| Betrayal rupture | trust, safety, attachment, or identity collapse through meaningful violation | safety reconstruction through accountability, transparency, and repeated corrective experiences |
-| Abandonment rupture | attachment collapse through absence or disconnection when presence was needed | emotional return consistency and reliable reconnection |
-| Humiliation rupture | dignity, self-worth, visibility, or vulnerability safety damaged by shame exposure | dignity restoration and protected visibility |
-| Broken promise rupture | reliability trust damaged by failed commitment or assurance | follow-through, consistency, and restored word credibility |
-| Emotional invalidation rupture | emotional reality dismissed, minimized, mocked, or treated as illegitimate | emotional acknowledgment restoration |
+| Subtype                        | Core Damage                                                                        | Repair Requirement                                                                              |
+| ------------------------------ | ---------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| Betrayal rupture               | trust, safety, attachment, or identity collapse through meaningful violation       | safety reconstruction through accountability, transparency, and repeated corrective experiences |
+| Abandonment rupture            | attachment collapse through absence or disconnection when presence was needed      | emotional return consistency and reliable reconnection                                          |
+| Humiliation rupture            | dignity, self-worth, visibility, or vulnerability safety damaged by shame exposure | dignity restoration and protected visibility                                                    |
+| Broken promise rupture         | reliability trust damaged by failed commitment or assurance                        | follow-through, consistency, and restored word credibility                                      |
+| Emotional invalidation rupture | emotional reality dismissed, minimized, mocked, or treated as illegitimate         | emotional acknowledgment restoration                                                            |
 
 Common betrayal dimensions:
 
-| Dimension | Damage |
-| --- | --- |
-| Trust rupture | reliability expectations collapse |
-| Emotional safety rupture | emotions no longer feel safe |
-| Attachment rupture | the bond feels unstable or dangerous |
-| Identity rupture | the relationship no longer means what it did |
-| Exclusivity rupture | uniqueness feels compromised |
-| Vulnerability rupture | openness feels dangerous |
+| Dimension                | Damage                                       |
+| ------------------------ | -------------------------------------------- |
+| Trust rupture            | reliability expectations collapse            |
+| Emotional safety rupture | emotions no longer feel safe                 |
+| Attachment rupture       | the bond feels unstable or dangerous         |
+| Identity rupture         | the relationship no longer means what it did |
+| Exclusivity rupture      | uniqueness feels compromised                 |
+| Vulnerability rupture    | openness feels dangerous                     |
 
 Abandonment rupture centers loss of emotional presence. It may be physical disappearance, emotional shutdown, silence, avoidance during distress, post-vulnerability withdrawal, or lack of repair. Its core repair signal is not one apology but repeated proof of emotional return.
 
@@ -6077,14 +6066,14 @@ Emotional invalidation rupture centers emotional legitimacy. It can be subtle: m
 
 Rupture subtype failure modes:
 
-| Failure | Result |
-| --- | --- |
-| Generic betrayal | no specific trust layer is violated |
-| Instant emotional reset | rupture memory vanishes unrealistically |
-| Endless punishment state | repair, dissolution, or transformation never progresses |
-| Repeated promises without change | words lose emotional credibility |
-| Humiliation disguised as teasing | banter becomes emotional degradation |
-| Logic replacing empathy | invalidation repeats under rational language |
+| Failure                          | Result                                                  |
+| -------------------------------- | ------------------------------------------------------- |
+| Generic betrayal                 | no specific trust layer is violated                     |
+| Instant emotional reset          | rupture memory vanishes unrealistically                 |
+| Endless punishment state         | repair, dissolution, or transformation never progresses |
+| Repeated promises without change | words lose emotional credibility                        |
+| Humiliation disguised as teasing | banter becomes emotional degradation                    |
+| Logic replacing empathy          | invalidation repeats under rational language            |
 
 #### Repair Arcs
 
@@ -6104,61 +6093,61 @@ repair arc
 
 Useful repair arcs:
 
-| Repair Arc | Best For | Required Movement |
-| --- | --- | --- |
-| Clarification | misunderstanding, miscommunication, accidental hurt | confusion -> reaction -> clarification -> validation -> relief |
-| Apology | hurtful words, emotional mistakes, small broken expectations | hurt -> recognition -> apology -> validation -> changed behavior |
-| Reassurance | jealousy, abandonment fear, insecurity, replacement fear | trigger -> fear activation -> reassurance -> grounding -> renewed safety |
-| Accountability | repeated mistakes, broken promises, neglect, unreliability | ownership -> no defensiveness -> repair plan -> follow-through |
-| Trust rebuilding | betrayal, secrecy, loyalty rupture | shock -> accountability -> transparency -> consistency -> cautious vulnerability |
-| Emotional safety | humiliation, invalidation, vulnerability betrayal | shame -> dignity restoration -> validation -> protected vulnerability |
-| Presence | abandonment, withdrawal, ghosting, leaving during conflict | absence -> return -> explanation -> reassurance -> repeated staying |
-| Boundary | pressure, control, autonomy or consent/space violation | recognition -> apology -> renegotiation -> demonstrated respect |
-| Mutual responsibility | conflict spirals, pursuit/withdrawal, reactive fights | cooling -> both name their part -> pattern recognition -> new agreement |
-| Redemption | serious betrayal, past harm, moral rupture | consequence -> accountability -> changed identity -> repeated repair behavior |
-| Reconciliation | breakup, separation, estrangement | reflection -> cautious contact -> truth-telling -> renegotiated relationship |
-| Non-repair | irreparable betrayal, repeated harm, no accountability | failed repair -> grief -> detachment -> closure |
+| Repair Arc            | Best For                                                     | Required Movement                                                                |
+| --------------------- | ------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| Clarification         | misunderstanding, miscommunication, accidental hurt          | confusion -> reaction -> clarification -> validation -> relief                   |
+| Apology               | hurtful words, emotional mistakes, small broken expectations | hurt -> recognition -> apology -> validation -> changed behavior                 |
+| Reassurance           | jealousy, abandonment fear, insecurity, replacement fear     | trigger -> fear activation -> reassurance -> grounding -> renewed safety         |
+| Accountability        | repeated mistakes, broken promises, neglect, unreliability   | ownership -> no defensiveness -> repair plan -> follow-through                   |
+| Trust rebuilding      | betrayal, secrecy, loyalty rupture                           | shock -> accountability -> transparency -> consistency -> cautious vulnerability |
+| Emotional safety      | humiliation, invalidation, vulnerability betrayal            | shame -> dignity restoration -> validation -> protected vulnerability            |
+| Presence              | abandonment, withdrawal, ghosting, leaving during conflict   | absence -> return -> explanation -> reassurance -> repeated staying              |
+| Boundary              | pressure, control, autonomy or consent/space violation       | recognition -> apology -> renegotiation -> demonstrated respect                  |
+| Mutual responsibility | conflict spirals, pursuit/withdrawal, reactive fights        | cooling -> both name their part -> pattern recognition -> new agreement          |
+| Redemption            | serious betrayal, past harm, moral rupture                   | consequence -> accountability -> changed identity -> repeated repair behavior    |
+| Reconciliation        | breakup, separation, estrangement                            | reflection -> cautious contact -> truth-telling -> renegotiated relationship     |
+| Non-repair            | irreparable betrayal, repeated harm, no accountability       | failed repair -> grief -> detachment -> closure                                  |
 
 Repair arc matching:
 
-| Wound Or Rupture | Needed Repair |
-| --- | --- |
-| Misunderstanding | clarity |
-| Insecurity | reassurance |
-| Neglect | renewed presence and responsiveness |
-| Broken promise | consistency |
-| Betrayal | accountability and trust rebuilding |
-| Humiliation | dignity restoration |
-| Abandonment | reliable return |
-| Boundary violation | demonstrated respect |
-| Reactive conflict loop | mutual responsibility |
+| Wound Or Rupture       | Needed Repair                       |
+| ---------------------- | ----------------------------------- |
+| Misunderstanding       | clarity                             |
+| Insecurity             | reassurance                         |
+| Neglect                | renewed presence and responsiveness |
+| Broken promise         | consistency                         |
+| Betrayal               | accountability and trust rebuilding |
+| Humiliation            | dignity restoration                 |
+| Abandonment            | reliable return                     |
+| Boundary violation     | demonstrated respect                |
+| Reactive conflict loop | mutual responsibility               |
 
 Important repair requirements:
 
-| Requirement | Meaning |
-| --- | --- |
-| Accountability before intent defense | "I hurt you" comes before "I did not mean to" |
-| Pattern change | repeated harm needs changed behavior, not only apology |
-| Scaled repair | major rupture requires longer proof |
-| New relationship version | reconciliation cannot simply restore the old dynamic |
-| Non-repair legitimacy | not every relationship should be repairable |
+| Requirement                          | Meaning                                                |
+| ------------------------------------ | ------------------------------------------------------ |
+| Accountability before intent defense | "I hurt you" comes before "I did not mean to"          |
+| Pattern change                       | repeated harm needs changed behavior, not only apology |
+| Scaled repair                        | major rupture requires longer proof                    |
+| New relationship version             | reconciliation cannot simply restore the old dynamic   |
+| Non-repair legitimacy                | not every relationship should be repairable            |
 
 Useful repair arc variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Repair arc | selected repair path |
-| Repair readiness | capacity to begin repair |
-| Accountability level | ownership of harm |
-| Hurt partner openness | willingness to receive repair |
-| Trust damage | amount of safety loss |
-| Repair attempts | effort history |
-| Changed behavior evidence | proof beyond words |
-| Resentment level | unprocessed hurt |
-| Forgiveness readiness | ability to move toward release |
-| Validation quality | whether emotional reality is held |
-| Boundary respect evidence | proof limits are now honored |
-| Presence reliability | proof of emotional return |
+| Variable                  | Meaning                           |
+| ------------------------- | --------------------------------- |
+| Repair arc                | selected repair path              |
+| Repair readiness          | capacity to begin repair          |
+| Accountability level      | ownership of harm                 |
+| Hurt partner openness     | willingness to receive repair     |
+| Trust damage              | amount of safety loss             |
+| Repair attempts           | effort history                    |
+| Changed behavior evidence | proof beyond words                |
+| Resentment level          | unprocessed hurt                  |
+| Forgiveness readiness     | ability to move toward release    |
+| Validation quality        | whether emotional reality is held |
+| Boundary respect evidence | proof limits are now honored      |
+| Presence reliability      | proof of emotional return         |
 
 Repair becomes believable when the repair arc matches the wound.
 
@@ -6170,18 +6159,18 @@ Neglect is often chronic under-response rather than obvious hostility. It create
 
 Useful neglect forms:
 
-| Form | Core Issue | Runtime Effect |
-| --- | --- | --- |
-| Emotional inattentiveness | distress or shifts go unnoticed | emotional invisibility |
-| Emotional unavailability | engagement is inconsistent or absent | emotional starvation |
-| Reassurance neglect | fears remain unsupported | attachment insecurity |
-| Vulnerability neglect | openness receives insufficient care | vulnerability trust damage |
-| Conflict neglect | repair does not occur | accumulated residue |
-| Presence neglect | physical proximity lacks emotional presence | lonely attachment |
-| Priority neglect | partner no longer feels prioritized | replacement or abandonment fear |
-| Affection neglect | warmth, touch, or reassurance declines | attachment weakening |
-| Ritual neglect | meaningful routines stop | continuity damage |
-| Psychological neglect | inner self no longer feels known | loneliness inside attachment |
+| Form                      | Core Issue                                  | Runtime Effect                  |
+| ------------------------- | ------------------------------------------- | ------------------------------- |
+| Emotional inattentiveness | distress or shifts go unnoticed             | emotional invisibility          |
+| Emotional unavailability  | engagement is inconsistent or absent        | emotional starvation            |
+| Reassurance neglect       | fears remain unsupported                    | attachment insecurity           |
+| Vulnerability neglect     | openness receives insufficient care         | vulnerability trust damage      |
+| Conflict neglect          | repair does not occur                       | accumulated residue             |
+| Presence neglect          | physical proximity lacks emotional presence | lonely attachment               |
+| Priority neglect          | partner no longer feels prioritized         | replacement or abandonment fear |
+| Affection neglect         | warmth, touch, or reassurance declines      | attachment weakening            |
+| Ritual neglect            | meaningful routines stop                    | continuity damage               |
+| Psychological neglect     | inner self no longer feels known            | loneliness inside attachment    |
 
 Neglect creates negative momentum:
 
@@ -6199,25 +6188,25 @@ Repair requires renewed responsiveness: noticing again, listening again, restori
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| Invisible suffering | damage accumulates because no dramatic rupture occurs |
-| One-sided emotional labor | one partner maintains all intimacy and repair |
-| Emotional resignation | the neglected partner stops reaching |
+| Failure                   | Result                                                |
+| ------------------------- | ----------------------------------------------------- |
+| Invisible suffering       | damage accumulates because no dramatic rupture occurs |
+| One-sided emotional labor | one partner maintains all intimacy and repair         |
+| Emotional resignation     | the neglected partner stops reaching                  |
 
 Useful neglect variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Emotional responsiveness | attentiveness to emotional needs |
-| Reassurance consistency | reliability of support |
-| Presence stability | emotional availability consistency |
-| Ritual maintenance | continuity of meaningful routines |
-| Emotional prioritization | significance signaling |
-| Vulnerability responsiveness | care after openness |
-| Repair engagement | willingness to reconnect |
-| Emotional visibility | feeling emotionally seen |
-| Drift risk | tendency toward disengagement |
+| Variable                     | Meaning                            |
+| ---------------------------- | ---------------------------------- |
+| Emotional responsiveness     | attentiveness to emotional needs   |
+| Reassurance consistency      | reliability of support             |
+| Presence stability           | emotional availability consistency |
+| Ritual maintenance           | continuity of meaningful routines  |
+| Emotional prioritization     | significance signaling             |
+| Vulnerability responsiveness | care after openness                |
+| Repair engagement            | willingness to reconnect           |
+| Emotional visibility         | feeling emotionally seen           |
+| Drift risk                   | tendency toward disengagement      |
 
 ### Emotional Safety
 
@@ -6227,45 +6216,45 @@ Attraction creates emotional exposure. Emotional safety determines whether expos
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Trust | belief someone is reliable |
+| Concept          | Meaning                                     |
+| ---------------- | ------------------------------------------- |
+| Trust            | belief someone is reliable                  |
 | Emotional safety | belief vulnerability will not be weaponized |
-| Comfort | emotional ease |
-| Attachment | emotional bond |
-| Stability | consistency over time |
+| Comfort          | emotional ease                              |
+| Attachment       | emotional bond                              |
+| Stability        | consistency over time                       |
 
 Emotional safety lowers defensive behavior and increases authentic closeness. When it exists, characters become more willing to confess, apologize, need reassurance, reveal fears, express affection, communicate honestly, repair conflict, and deepen intimacy.
 
 Useful emotional safety components:
 
-| Component | Core Feeling | Runtime Meaning |
-| --- | --- | --- |
-| Vulnerability safety | I can open up without being punished | supports confession, tears, insecurity, attachment admission |
-| Conflict safety | conflict will not destroy us | arguments can lead to repair instead of abandonment |
-| Emotional consistency | your reactions are predictable enough to trust | lowers hypervigilance |
-| Acceptance safety | I do not need perfection to remain loved | flaws and awkwardness are survivable |
-| Boundary safety | my limits and autonomy are respected | prevents closeness from becoming threat |
-| Reassurance safety | my fears can be soothed, not mocked | stabilizes anxious or trauma-informed dynamics |
-| Repair safety | mistakes can be survived and repaired | rupture -> repair -> reconnection becomes believable |
-| Nonjudgmental presence | I can exist authentically around you | creates relaxed intimacy |
+| Component              | Core Feeling                                   | Runtime Meaning                                              |
+| ---------------------- | ---------------------------------------------- | ------------------------------------------------------------ |
+| Vulnerability safety   | I can open up without being punished           | supports confession, tears, insecurity, attachment admission |
+| Conflict safety        | conflict will not destroy us                   | arguments can lead to repair instead of abandonment          |
+| Emotional consistency  | your reactions are predictable enough to trust | lowers hypervigilance                                        |
+| Acceptance safety      | I do not need perfection to remain loved       | flaws and awkwardness are survivable                         |
+| Boundary safety        | my limits and autonomy are respected           | prevents closeness from becoming threat                      |
+| Reassurance safety     | my fears can be soothed, not mocked            | stabilizes anxious or trauma-informed dynamics               |
+| Repair safety          | mistakes can be survived and repaired          | rupture -> repair -> reconnection becomes believable         |
+| Nonjudgmental presence | I can exist authentically around you           | creates relaxed intimacy                                     |
 
 Emotional safety and chemistry should be separate:
 
-| Combination | Result |
-| --- | --- |
-| high chemistry + low safety | obsession, volatility, emotional addiction |
-| high safety + low chemistry | comfort, stability, friendship energy |
+| Combination                  | Result                                                |
+| ---------------------------- | ----------------------------------------------------- |
+| high chemistry + low safety  | obsession, volatility, emotional addiction            |
+| high safety + low chemistry  | comfort, stability, friendship energy                 |
 | high chemistry + high safety | mature romance where desire and vulnerability coexist |
 
 Attachment shapes the safety challenge:
 
-| Attachment | Safety Challenge |
-| --- | --- |
-| Secure | maintaining consistency |
-| Anxious | fear of abandonment |
-| Avoidant | fear of engulfment or vulnerability |
-| Fearful | craving safety while distrusting it |
+| Attachment | Safety Challenge                    |
+| ---------- | ----------------------------------- |
+| Secure     | maintaining consistency             |
+| Anxious    | fear of abandonment                 |
+| Avoidant   | fear of engulfment or vulnerability |
+| Fearful    | craving safety while distrusting it |
 
 Conflict is a primary safety test. Unsafe conflict includes humiliation, withdrawal punishment, contempt, invalidation, and manipulation. Safe conflict includes accountability, reassurance, staying emotionally engaged, and repair.
 
@@ -6285,29 +6274,29 @@ tension
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| low safety | defensiveness, avoidance, masking, testing, fear-driven attachment |
-| conditional safety | affection only when compliant, vulnerability mocked later |
-| false safety | appears safe until conflict, jealousy, need, or vulnerability |
+| Failure            | Result                                                             |
+| ------------------ | ------------------------------------------------------------------ |
+| low safety         | defensiveness, avoidance, masking, testing, fear-driven attachment |
+| conditional safety | affection only when compliant, vulnerability mocked later          |
+| false safety       | appears safe until conflict, jealousy, need, or vulnerability      |
 
 Emotional safety can become part of relationship identity: "We are emotionally safe for each other." This identity stabilizes the bond and makes deeper vulnerability possible.
 
 Useful emotional safety variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Vulnerability safety | comfort opening emotionally |
-| Conflict safety | belief relationship survives tension |
-| Consistency | predictability of care |
-| Boundary respect | autonomy preservation |
-| Reassurance reliability | trust in emotional soothing |
-| Judgment sensitivity | fear of ridicule or rejection |
-| Emotional stability | regulation consistency |
-| Repair trust | belief reconnection is possible |
-| Authenticity comfort | ability to be genuine |
-| Conditional safety risk | risk safety depends on compliance |
-| False safety risk | risk safety collapses under stress |
+| Variable                | Meaning                              |
+| ----------------------- | ------------------------------------ |
+| Vulnerability safety    | comfort opening emotionally          |
+| Conflict safety         | belief relationship survives tension |
+| Consistency             | predictability of care               |
+| Boundary respect        | autonomy preservation                |
+| Reassurance reliability | trust in emotional soothing          |
+| Judgment sensitivity    | fear of ridicule or rejection        |
+| Emotional stability     | regulation consistency               |
+| Repair trust            | belief reconnection is possible      |
+| Authenticity comfort    | ability to be genuine                |
+| Conditional safety risk | risk safety depends on compliance    |
+| False safety risk       | risk safety collapses under stress   |
 
 Emotional safety equation:
 
@@ -6327,39 +6316,39 @@ Healthy caretaking is not control, emotional parenting, martyrdom, codependency,
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Caretaking | active support and nurturing |
-| Protection | safeguarding from harm |
-| Rescue | solving or saving behavior |
-| Codependency | unhealthy emotional overreliance |
-| Emotional labor | managing emotional systems |
+| Concept         | Meaning                          |
+| --------------- | -------------------------------- |
+| Caretaking      | active support and nurturing     |
+| Protection      | safeguarding from harm           |
+| Rescue          | solving or saving behavior       |
+| Codependency    | unhealthy emotional overreliance |
+| Emotional labor | managing emotional systems       |
 
 Caretaking becomes romantic when care gains emotional specificity and attachment meaning. Being cared for consistently changes emotional regulation because someone repeatedly notices, responds, and remains present.
 
 Useful caretaking types:
 
-| Type | Core Feeling | Common Evidence |
-| --- | --- | --- |
-| Emotional | your emotions matter to me | comfort, listening, grounding, staying during breakdowns |
-| Physical | your body and comfort matter to me | illness care, food, blankets, touch-based comfort |
-| Practical | I support your life functioning | organizing, responsibilities, schedules, acts of service |
-| Protective | I want to keep you safe | defending, shielding, safety checks, wellbeing monitoring |
-| Reassurance-based | I actively soothe your fears | validation after jealousy, conflict reassurance |
-| Domestic | caring for you lives in daily routine | coffee, cooking, habitual comfort, routine support |
-| Devotional | your wellbeing feels sacred to me | reverent attention, deep prioritization, responsive support |
-| Mutual | we hold each other | reciprocal comfort, regulation, reassurance, support |
-| Silent | I notice without needing spectacle | quiet fixes, staying nearby, nonverbal comfort |
-| Transformational | your care changes my ability to trust | trauma safety, regulation through consistency, softened hyper-independence |
+| Type              | Core Feeling                          | Common Evidence                                                            |
+| ----------------- | ------------------------------------- | -------------------------------------------------------------------------- |
+| Emotional         | your emotions matter to me            | comfort, listening, grounding, staying during breakdowns                   |
+| Physical          | your body and comfort matter to me    | illness care, food, blankets, touch-based comfort                          |
+| Practical         | I support your life functioning       | organizing, responsibilities, schedules, acts of service                   |
+| Protective        | I want to keep you safe               | defending, shielding, safety checks, wellbeing monitoring                  |
+| Reassurance-based | I actively soothe your fears          | validation after jealousy, conflict reassurance                            |
+| Domestic          | caring for you lives in daily routine | coffee, cooking, habitual comfort, routine support                         |
+| Devotional        | your wellbeing feels sacred to me     | reverent attention, deep prioritization, responsive support                |
+| Mutual            | we hold each other                    | reciprocal comfort, regulation, reassurance, support                       |
+| Silent            | I notice without needing spectacle    | quiet fixes, staying nearby, nonverbal comfort                             |
+| Transformational  | your care changes my ability to trust | trauma safety, regulation through consistency, softened hyper-independence |
 
 Attachment shapes caretaking:
 
-| Attachment | Caretaking Pattern |
-| --- | --- |
-| Secure | balanced support |
-| Anxious | over-caretaking for reassurance |
-| Avoidant | practical or silent caretaking |
-| Fearful | inconsistent intense caretaking |
+| Attachment | Caretaking Pattern              |
+| ---------- | ------------------------------- |
+| Secure     | balanced support                |
+| Anxious    | over-caretaking for reassurance |
+| Avoidant   | practical or silent caretaking  |
+| Fearful    | inconsistent intense caretaking |
 
 Caretaking often creates emotional asymmetry: protector/protected, stabilizer/reactive partner, caretaker/wounded dynamic. That asymmetry can feel deeply intimate or emotionally imbalanced depending on reciprocity, consent, and autonomy preservation.
 
@@ -6377,22 +6366,22 @@ stress
 
 Trope shapes caretaking:
 
-| Trope | Common Caretaking Form |
-| --- | --- |
-| Healing romance | emotional regulation |
-| Enemies to lovers | reluctant protection |
-| Friends to lovers | habitual care |
-| Slow burn | subtle attentiveness |
-| Protector romance | safety-focused care |
-| Redemption romance | restorative care |
-| Domestic romance | routine integrated care |
+| Trope              | Common Caretaking Form  |
+| ------------------ | ----------------------- |
+| Healing romance    | emotional regulation    |
+| Enemies to lovers  | reluctant protection    |
+| Friends to lovers  | habitual care           |
+| Slow burn          | subtle attentiveness    |
+| Protector romance  | safety-focused care     |
+| Redemption romance | restorative care        |
+| Domestic romance   | routine integrated care |
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| one-sided caretaking | burnout, resentment, imbalance, exhaustion |
-| infantilizing caretaking | agency loss, autonomy loss, unhealthy dependence |
+| Failure                  | Result                                                    |
+| ------------------------ | --------------------------------------------------------- |
+| one-sided caretaking     | burnout, resentment, imbalance, exhaustion                |
+| infantilizing caretaking | agency loss, autonomy loss, unhealthy dependence          |
 | transactional caretaking | care becomes validation-seeking, control, or manipulation |
 
 The strongest caretaking often happens through noticing: recognizing emotional tells, remembering needs, responding before asked, and tracking subtle changes. "You notice me" is one of the deepest intimacy experiences because attention itself becomes emotional significance.
@@ -6410,22 +6399,22 @@ attraction
 
 Useful caretaking variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Caretaking instinct | tendency toward support |
-| Emotional responsiveness | awareness of needs |
-| Protective impulse | desire to safeguard wellbeing |
-| Autonomy respect | support without control |
-| Reassurance ability | emotional soothing capacity |
-| Domestic integration | care woven into daily life |
-| Burnout risk | overextension tendency |
-| Reciprocity balance | mutual support balance |
-| Emotional attunement | ability to notice subtle states |
-| Support consent | care is welcomed rather than imposed |
-| Dependency encouragement risk | chance care increases unhealthy reliance |
-| Control disguised as care risk | chance support becomes control |
-| Martyrdom risk | chance care requires self-erasure |
-| Noticing sensitivity | ability to detect needs before explicit request |
+| Variable                       | Meaning                                         |
+| ------------------------------ | ----------------------------------------------- |
+| Caretaking instinct            | tendency toward support                         |
+| Emotional responsiveness       | awareness of needs                              |
+| Protective impulse             | desire to safeguard wellbeing                   |
+| Autonomy respect               | support without control                         |
+| Reassurance ability            | emotional soothing capacity                     |
+| Domestic integration           | care woven into daily life                      |
+| Burnout risk                   | overextension tendency                          |
+| Reciprocity balance            | mutual support balance                          |
+| Emotional attunement           | ability to notice subtle states                 |
+| Support consent                | care is welcomed rather than imposed            |
+| Dependency encouragement risk  | chance care increases unhealthy reliance        |
+| Control disguised as care risk | chance support becomes control                  |
+| Martyrdom risk                 | chance care requires self-erasure               |
+| Noticing sensitivity           | ability to detect needs before explicit request |
 
 Caretaking equation:
 
@@ -6445,86 +6434,86 @@ Affection expression is not the same as love intensity, attachment depth, compat
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Love language | preferred affection reception |
-| Affection expression style | how affection is naturally shown |
-| Intimacy style | how closeness is created |
-| Communication style | how emotions are expressed generally |
-| Attachment style | how security and fear are regulated |
+| Concept                    | Meaning                              |
+| -------------------------- | ------------------------------------ |
+| Love language              | preferred affection reception        |
+| Affection expression style | how affection is naturally shown     |
+| Intimacy style             | how closeness is created             |
+| Communication style        | how emotions are expressed generally |
+| Attachment style           | how security and fear are regulated  |
 
 Affection expression styles:
 
-| Style | Core Expression | Common Evidence |
-| --- | --- | --- |
-| Verbal | saying feelings directly | compliments, reassurance, praise, "I love you" |
-| Physical | touch as emotional communication | hugs, hand holding, leaning close, habitual touch |
-| Caretaking | love through wellbeing support | food, checking needs, emotional monitoring, practical help |
-| Protective | safeguarding emotionally or physically | defending, walking home, checking safety, shielding |
-| Teasing | affection hidden inside play and provocation | banter, playful challenge, reaction-seeking |
-| Devotional | emotionally focused attentiveness | remembering everything, reverent care, prioritization |
-| Quiet | subtle consistency instead of overt intensity | staying nearby, silent support, small habits |
-| Service-based | solving and improving life | fixing, organizing, planning, carrying burdens |
-| Attention-based | focused engagement and presence | eye contact, remembered details, active listening |
-| Possessive | exclusivity and prioritization | territorial gestures, public choosing, exclusivity signals |
-| Playful | joy and interaction energy | inside jokes, flirting, emotional play |
-| Emotional transparency | openness itself as intimacy | confessions, vulnerability, sharing fears |
-| Loyalty-based | consistency and staying | reliability, promises kept, returning after conflict |
-| Sacrificial | giving something up for the bond | prioritizing partner, enduring hardship, emotional risk |
-| Domestic | care woven into ordinary life | coffee, routines, bedtime rituals, automatic comfort |
-| Admiration-based | respect and fascination made visible | praising competence, valuing opinions, watching quietly |
-| Presence-based | staying emotionally available | sitting through distress, remaining after conflict |
+| Style                  | Core Expression                               | Common Evidence                                            |
+| ---------------------- | --------------------------------------------- | ---------------------------------------------------------- |
+| Verbal                 | saying feelings directly                      | compliments, reassurance, praise, "I love you"             |
+| Physical               | touch as emotional communication              | hugs, hand holding, leaning close, habitual touch          |
+| Caretaking             | love through wellbeing support                | food, checking needs, emotional monitoring, practical help |
+| Protective             | safeguarding emotionally or physically        | defending, walking home, checking safety, shielding        |
+| Teasing                | affection hidden inside play and provocation  | banter, playful challenge, reaction-seeking                |
+| Devotional             | emotionally focused attentiveness             | remembering everything, reverent care, prioritization      |
+| Quiet                  | subtle consistency instead of overt intensity | staying nearby, silent support, small habits               |
+| Service-based          | solving and improving life                    | fixing, organizing, planning, carrying burdens             |
+| Attention-based        | focused engagement and presence               | eye contact, remembered details, active listening          |
+| Possessive             | exclusivity and prioritization                | territorial gestures, public choosing, exclusivity signals |
+| Playful                | joy and interaction energy                    | inside jokes, flirting, emotional play                     |
+| Emotional transparency | openness itself as intimacy                   | confessions, vulnerability, sharing fears                  |
+| Loyalty-based          | consistency and staying                       | reliability, promises kept, returning after conflict       |
+| Sacrificial            | giving something up for the bond              | prioritizing partner, enduring hardship, emotional risk    |
+| Domestic               | care woven into ordinary life                 | coffee, routines, bedtime rituals, automatic comfort       |
+| Admiration-based       | respect and fascination made visible          | praising competence, valuing opinions, watching quietly    |
+| Presence-based         | staying emotionally available                 | sitting through distress, remaining after conflict         |
 
 Affection expression mismatch is one of the strongest realism systems. A teasing character may be trying to say "I pay special attention to you," while a partner who receives love through verbal reassurance may hear only ambiguity. Both care, but neither fully feels loved.
 
 Attachment style often shapes expression:
 
-| Attachment | Common Expression |
-| --- | --- |
-| Secure | balanced and direct |
-| Anxious | expressive, reassuring, pursuit-oriented |
-| Avoidant | subtle, service-based, quiet consistency |
-| Fearful | inconsistent, intense, push-pull affection |
+| Attachment | Common Expression                          |
+| ---------- | ------------------------------------------ |
+| Secure     | balanced and direct                        |
+| Anxious    | expressive, reassuring, pursuit-oriented   |
+| Avoidant   | subtle, service-based, quiet consistency   |
+| Fearful    | inconsistent, intense, push-pull affection |
 
 Power dynamics also shape affection expression:
 
-| Dynamic | Common Expression |
-| --- | --- |
-| Dominant | guidance, protection, structured care |
-| Submissive | responsiveness, receptiveness, trust signals |
-| Rivals | challenge, teasing, admiration through competence |
-| Devotional | attentiveness and prioritization |
-| Avoidant | quiet consistency and practical care |
-| Anxious | reassurance and pursuit |
+| Dynamic    | Common Expression                                 |
+| ---------- | ------------------------------------------------- |
+| Dominant   | guidance, protection, structured care             |
+| Submissive | responsiveness, receptiveness, trust signals      |
+| Rivals     | challenge, teasing, admiration through competence |
+| Devotional | attentiveness and prioritization                  |
+| Avoidant   | quiet consistency and practical care              |
+| Anxious    | reassurance and pursuit                           |
 
 Love-language reception remains useful, but it should be treated as the receiving side: what behaviors make this character feel emotionally loved and recognized. Expression and reception may differ.
 
 Examples:
 
-| Expression Style | Reception Need | Likely Tension |
-| --- | --- | --- |
-| Teasing | verbal reassurance | affection feels ambiguous |
-| Service-based | quality time | care feels useful but distant |
-| Quiet | emotional transparency | steadiness feels withholding |
-| Protective | autonomy respect | care risks feeling controlling |
-| Devotional | playful engagement | intensity may feel heavy |
+| Expression Style | Reception Need         | Likely Tension                 |
+| ---------------- | ---------------------- | ------------------------------ |
+| Teasing          | verbal reassurance     | affection feels ambiguous      |
+| Service-based    | quality time           | care feels useful but distant  |
+| Quiet            | emotional transparency | steadiness feels withholding   |
+| Protective       | autonomy respect       | care risks feeling controlling |
+| Devotional       | playful engagement     | intensity may feel heavy       |
 
 Classic and expanded reception channels:
 
-| Reception Channel | Core Emotional Meaning |
-| --- | --- |
-| Words of affirmation | your feelings toward me are verbally visible |
-| Physical touch | closeness is physically embodied |
-| Acts of service | I matter enough for you to support my life |
-| Quality time | I am worth your focused presence |
-| Gift giving | I remain emotionally present in your thoughts |
-| Emotional reassurance | you actively soothe my fears |
-| Emotional transparency | you trust me with your inner world |
-| Protective behavior | my wellbeing emotionally matters |
-| Devotional attention | you notice and prioritize me deeply |
-| Playful engagement | you actively engage with me emotionally |
-| Presence during distress | you stay when things become difficult |
-| Exclusivity signals | I am uniquely significant to you |
+| Reception Channel        | Core Emotional Meaning                        |
+| ------------------------ | --------------------------------------------- |
+| Words of affirmation     | your feelings toward me are verbally visible  |
+| Physical touch           | closeness is physically embodied              |
+| Acts of service          | I matter enough for you to support my life    |
+| Quality time             | I am worth your focused presence              |
+| Gift giving              | I remain emotionally present in your thoughts |
+| Emotional reassurance    | you actively soothe my fears                  |
+| Emotional transparency   | you trust me with your inner world            |
+| Protective behavior      | my wellbeing emotionally matters              |
+| Devotional attention     | you notice and prioritize me deeply           |
+| Playful engagement       | you actively engage with me emotionally       |
+| Presence during distress | you stay when things become difficult         |
+| Exclusivity signals      | I am uniquely significant to you              |
 
 Affection expression can evolve:
 
@@ -6550,35 +6539,35 @@ The strongest affection feels specific: remembered preferences, unique rituals, 
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| Affection blindness | love is expressed but not emotionally registered |
-| Transactional affection | affection becomes leverage for reassurance or control |
-| One-sided adaptation | one partner keeps translating while the other never learns |
-| Rigid expression style | character cannot adapt affection as intimacy evolves |
+| Failure                 | Result                                                     |
+| ----------------------- | ---------------------------------------------------------- |
+| Affection blindness     | love is expressed but not emotionally registered           |
+| Transactional affection | affection becomes leverage for reassurance or control      |
+| One-sided adaptation    | one partner keeps translating while the other never learns |
+| Rigid expression style  | character cannot adapt affection as intimacy evolves       |
 
 Useful affection-expression variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Verbal expressiveness | direct emotional language tendency |
-| Physical affection frequency | touch-based affection |
-| Caretaking instinct | support-oriented affection |
-| Protective impulse | safeguarding tendency |
-| Playfulness | teasing and banter affection |
-| Devotional focus | emotional prioritization |
-| Emotional transparency | openness tendency |
-| Presence reliability | emotional staying power |
-| Attention intensity | attentiveness depth |
-| Domestic integration | routine-based affection |
-| Service orientation | practical help tendency |
-| Loyalty consistency | affection through reliability |
-| Sacrificial tendency | willingness to take costs for the bond |
-| Admiration visibility | how visibly respect becomes affection |
-| Possessive signaling | exclusivity and prioritization signals |
-| Reception match accuracy | how well expression fits partner needs |
-| Expression evolution | ability to develop new affection forms |
-| Mismatch risk | chance care is missed or misread |
+| Variable                     | Meaning                                |
+| ---------------------------- | -------------------------------------- |
+| Verbal expressiveness        | direct emotional language tendency     |
+| Physical affection frequency | touch-based affection                  |
+| Caretaking instinct          | support-oriented affection             |
+| Protective impulse           | safeguarding tendency                  |
+| Playfulness                  | teasing and banter affection           |
+| Devotional focus             | emotional prioritization               |
+| Emotional transparency       | openness tendency                      |
+| Presence reliability         | emotional staying power                |
+| Attention intensity          | attentiveness depth                    |
+| Domestic integration         | routine-based affection                |
+| Service orientation          | practical help tendency                |
+| Loyalty consistency          | affection through reliability          |
+| Sacrificial tendency         | willingness to take costs for the bond |
+| Admiration visibility        | how visibly respect becomes affection  |
+| Possessive signaling         | exclusivity and prioritization signals |
+| Reception match accuracy     | how well expression fits partner needs |
+| Expression evolution         | ability to develop new affection forms |
+| Mismatch risk                | chance care is missed or misread       |
 
 Affection-expression equation:
 
@@ -6606,31 +6595,31 @@ Intimacy is the progressive experience of emotional, psychological, physical, an
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Attraction | desire or interest |
-| Chemistry | interaction charge |
-| Vulnerability | emotional exposure |
-| Attachment | emotional bonding |
-| Intimacy | experienced closeness |
-| Dependency | emotional reliance |
+| Concept       | Meaning               |
+| ------------- | --------------------- |
+| Attraction    | desire or interest    |
+| Chemistry     | interaction charge    |
+| Vulnerability | emotional exposure    |
+| Attachment    | emotional bonding     |
+| Intimacy      | experienced closeness |
+| Dependency    | emotional reliance    |
 
 The core principle is sustained mutual emotional access. Intimacy develops through exposure, reception, and consistency: one character reveals something, the other responds safely, and that pattern repeats over time. The received part matters. Vulnerability without reception can create pain, embarrassment, or rupture rather than intimacy.
 
 Useful intimacy modes:
 
-| Mode | Core Feeling | Examples |
-| --- | --- | --- |
-| Emotional | you emotionally understand me | fears, validation, reassurance, honest feeling |
-| Physical | closeness through touch and presence | hand holding, leaning together, sleeping beside each other |
-| Sexual | desire with emotional presence | adult-gated intimacy where trust, attentiveness, and responsiveness matter |
-| Intellectual | you engage my mind deeply | debate, ideas, curiosity, shared passions |
-| Domestic | our lives naturally fit together | routines, cooking, quiet coexistence, care during exhaustion |
-| Vulnerability | I trust you with hidden parts of me | shame, fear, grief, trauma disclosure, breakdowns |
-| Experiential | we have lived meaningful things together | hardship, travel, secrets, adventures, grief, victories |
-| Silent | comfort without performance | quiet presence, instinctive understanding, eye contact |
-| Protective | your wellbeing matters to me | checking in, caretaking, noticing exhaustion |
-| Identity | you see who I really am | contradictions, aspirations, hidden traits, self-concept |
+| Mode          | Core Feeling                             | Examples                                                                   |
+| ------------- | ---------------------------------------- | -------------------------------------------------------------------------- |
+| Emotional     | you emotionally understand me            | fears, validation, reassurance, honest feeling                             |
+| Physical      | closeness through touch and presence     | hand holding, leaning together, sleeping beside each other                 |
+| Sexual        | desire with emotional presence           | adult-gated intimacy where trust, attentiveness, and responsiveness matter |
+| Intellectual  | you engage my mind deeply                | debate, ideas, curiosity, shared passions                                  |
+| Domestic      | our lives naturally fit together         | routines, cooking, quiet coexistence, care during exhaustion               |
+| Vulnerability | I trust you with hidden parts of me      | shame, fear, grief, trauma disclosure, breakdowns                          |
+| Experiential  | we have lived meaningful things together | hardship, travel, secrets, adventures, grief, victories                    |
+| Silent        | comfort without performance              | quiet presence, instinctive understanding, eye contact                     |
+| Protective    | your wellbeing matters to me             | checking in, caretaking, noticing exhaustion                               |
+| Identity      | you see who I really am                  | contradictions, aspirations, hidden traits, self-concept                   |
 
 Intimacy usually develops in layers:
 
@@ -6647,14 +6636,14 @@ attraction
 
 Different tropes reorder those layers:
 
-| Trope | Common Intimacy Order |
-| --- | --- |
-| Friends to lovers | emotional -> romantic -> sexual |
-| Enemies to lovers | tension -> vulnerability -> trust |
-| Strangers to lovers | attraction -> emotional discovery |
-| Healing romance | safety -> vulnerability -> attachment |
-| Slow burn | familiarity -> longing -> intimacy |
-| Forbidden romance | secrecy -> emotional dependence |
+| Trope               | Common Intimacy Order                 |
+| ------------------- | ------------------------------------- |
+| Friends to lovers   | emotional -> romantic -> sexual       |
+| Enemies to lovers   | tension -> vulnerability -> trust     |
+| Strangers to lovers | attraction -> emotional discovery     |
+| Healing romance     | safety -> vulnerability -> attachment |
+| Slow burn           | familiarity -> longing -> intimacy    |
+| Forbidden romance   | secrecy -> emotional dependence       |
 
 Intimacy and tension should oscillate. Too much tension becomes exhausting; too much intimacy too quickly can feel flat and low-anticipation. A useful pattern is distance, closeness, fear, reassurance, and deeper closeness.
 
@@ -6662,21 +6651,21 @@ False intimacy is a major realism check. Characters may mistake obsession, depen
 
 Intimacy should interact with attachment and tone:
 
-| Attachment | Intimacy Pattern |
-| --- | --- |
-| Secure | gradual healthy closeness |
-| Anxious | fast emotional fusion |
-| Avoidant | intimacy restraint |
-| Fearful | craving and fearing intimacy |
+| Attachment | Intimacy Pattern             |
+| ---------- | ---------------------------- |
+| Secure     | gradual healthy closeness    |
+| Anxious    | fast emotional fusion        |
+| Avoidant   | intimacy restraint           |
+| Fearful    | craving and fearing intimacy |
 
-| Tone | Intimacy Feel |
-| --- | --- |
-| Tender | emotionally safe |
-| Yearning | emotionally distant longing |
-| Chaotic | unstable closeness |
-| Devotional | profound emotional significance |
-| Melancholic | fragile intimacy |
-| Playful | light closeness |
+| Tone        | Intimacy Feel                   |
+| ----------- | ------------------------------- |
+| Tender      | emotionally safe                |
+| Yearning    | emotionally distant longing     |
+| Chaotic     | unstable closeness              |
+| Devotional  | profound emotional significance |
+| Melancholic | fragile intimacy                |
+| Playful     | light closeness                 |
 
 Intimacy often comes from accumulated small signals rather than grand speeches: remembering preferences, checking if they ate, recognizing mood shifts, staying after vulnerability, habitual touch, private jokes, emotional attentiveness, automatic comfort, and consistent presence. These repeated signals create consistent emotional significance, which becomes attachment.
 
@@ -6684,20 +6673,20 @@ Intimacy should also interact with power dynamics. It can soften rigid structure
 
 Useful intimacy variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Emotional safety | comfort being vulnerable |
-| Familiarity | accumulated knowing |
-| Reception | whether emotional exposure is met safely |
-| Consistency | repeated evidence of chosen closeness |
-| Trust | reliability expectation |
-| Vulnerability depth | emotional exposure level |
-| Reciprocity | balance of closeness |
-| Comfort | ease around each other |
-| Attachment | emotional centrality |
-| Shared history | emotional memory accumulation |
-| Domestic integration | daily life closeness |
-| Emotional attunement | ability to understand emotional cues |
+| Variable             | Meaning                                  |
+| -------------------- | ---------------------------------------- |
+| Emotional safety     | comfort being vulnerable                 |
+| Familiarity          | accumulated knowing                      |
+| Reception            | whether emotional exposure is met safely |
+| Consistency          | repeated evidence of chosen closeness    |
+| Trust                | reliability expectation                  |
+| Vulnerability depth  | emotional exposure level                 |
+| Reciprocity          | balance of closeness                     |
+| Comfort              | ease around each other                   |
+| Attachment           | emotional centrality                     |
+| Shared history       | emotional memory accumulation            |
+| Domestic integration | daily life closeness                     |
+| Emotional attunement | ability to understand emotional cues     |
 
 Core long-term principle:
 
@@ -6717,54 +6706,54 @@ Intimacy styles are emotional languages of closeness. They shape what feels mean
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Attachment style | fear and regulation strategy |
-| Love language | preferred affection signals |
-| Intimacy style | overall closeness behavior pattern |
-| Chemistry | attraction energy |
-| Relationship dynamic | recurring interaction loop |
+| Concept              | Meaning                            |
+| -------------------- | ---------------------------------- |
+| Attachment style     | fear and regulation strategy       |
+| Love language        | preferred affection signals        |
+| Intimacy style       | overall closeness behavior pattern |
+| Chemistry            | attraction energy                  |
+| Relationship dynamic | recurring interaction loop         |
 
 Useful intimacy styles:
 
-| Style | Closeness Method | Feels Loved Through |
-| --- | --- | --- |
-| Emotional | openness and vulnerability | being emotionally understood |
-| Physical | touch and physical proximity | physical presence |
-| Domestic | everyday life integration | consistent daily presence |
-| Intellectual | mental engagement | mental stimulation |
-| Playful | emotional play and interaction energy | engaged interaction |
-| Protective | caretaking and safety | being emotionally safe |
-| Devotional | focused emotional prioritization | profound emotional significance |
-| Quiet | peaceful coexistence | calm emotional presence |
-| Sexual | desire integrated with connection | emotionally meaningful desire |
-| Vulnerability-based | exposure and acceptance | being accepted after exposure |
-| Service-based | practical acts of care | being cared for attentively |
-| Tension-based | challenge and restraint | emotional and romantic tension |
-| Chaos | intensity and immersion | emotional intensity itself |
-| Mutual competence | trust through capability | being trusted and respected |
-| Transformational | identity-level emotional change | being changed by connection |
+| Style               | Closeness Method                      | Feels Loved Through             |
+| ------------------- | ------------------------------------- | ------------------------------- |
+| Emotional           | openness and vulnerability            | being emotionally understood    |
+| Physical            | touch and physical proximity          | physical presence               |
+| Domestic            | everyday life integration             | consistent daily presence       |
+| Intellectual        | mental engagement                     | mental stimulation              |
+| Playful             | emotional play and interaction energy | engaged interaction             |
+| Protective          | caretaking and safety                 | being emotionally safe          |
+| Devotional          | focused emotional prioritization      | profound emotional significance |
+| Quiet               | peaceful coexistence                  | calm emotional presence         |
+| Sexual              | desire integrated with connection     | emotionally meaningful desire   |
+| Vulnerability-based | exposure and acceptance               | being accepted after exposure   |
+| Service-based       | practical acts of care                | being cared for attentively     |
+| Tension-based       | challenge and restraint               | emotional and romantic tension  |
+| Chaos               | intensity and immersion               | emotional intensity itself      |
+| Mutual competence   | trust through capability              | being trusted and respected     |
+| Transformational    | identity-level emotional change       | being changed by connection     |
 
 Intimacy style combinations create relationship texture:
 
-| Combination | Relationship Feel |
-| --- | --- |
-| emotional + physical | warm expressive romance |
-| playful + tension | flirt-heavy chemistry |
-| quiet + domestic | peaceful long-term intimacy |
-| devotional + vulnerability | profound attachment |
-| intellectual + competitive | rivals chemistry |
-| protective + service | caretaking partnership |
-| sexual + emotional | emotionally intense attraction |
+| Combination                | Relationship Feel              |
+| -------------------------- | ------------------------------ |
+| emotional + physical       | warm expressive romance        |
+| playful + tension          | flirt-heavy chemistry          |
+| quiet + domestic           | peaceful long-term intimacy    |
+| devotional + vulnerability | profound attachment            |
+| intellectual + competitive | rivals chemistry               |
+| protective + service       | caretaking partnership         |
+| sexual + emotional         | emotionally intense attraction |
 
 Attachment can bias intimacy style, but it does not determine it:
 
-| Attachment | Common Intimacy Tendency |
-| --- | --- |
-| Secure | balanced and adaptive |
-| Anxious | emotional fusion intimacy |
-| Avoidant | quiet or service-based intimacy |
-| Fearful | intense but unstable intimacy |
+| Attachment | Common Intimacy Tendency        |
+| ---------- | ------------------------------- |
+| Secure     | balanced and adaptive           |
+| Anxious    | emotional fusion intimacy       |
+| Avoidant   | quiet or service-based intimacy |
+| Fearful    | intense but unstable intimacy   |
 
 Conflict often happens because intimacy styles mismatch. One character may feel loved through emotional discussion while the other expresses love through practical acts of service. Both may care deeply, but intimacy recognition fails. The runtime should use style mismatch to create misunderstanding, tension, adaptation, and growth rather than assuming lack of love.
 
@@ -6780,20 +6769,20 @@ teasing tension
 
 Useful intimacy style variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Emotional openness | comfort with vulnerability |
-| Physical affection need | touch importance |
-| Domestic integration | desire for shared routines |
-| Intellectual engagement | mental stimulation need |
-| Playfulness | interaction energy preference |
-| Protective instinct | care and safety orientation |
-| Devotional intensity | emotional prioritization |
-| Sexual responsiveness | erotic closeness preference |
-| Quiet comfort | comfort with low-verbal intimacy |
-| Style compatibility | how easily closeness languages align |
-| Adaptation willingness | ability to meet the partner's style |
-| Recognition need | need for one's closeness style to be noticed |
+| Variable                | Meaning                                      |
+| ----------------------- | -------------------------------------------- |
+| Emotional openness      | comfort with vulnerability                   |
+| Physical affection need | touch importance                             |
+| Domestic integration    | desire for shared routines                   |
+| Intellectual engagement | mental stimulation need                      |
+| Playfulness             | interaction energy preference                |
+| Protective instinct     | care and safety orientation                  |
+| Devotional intensity    | emotional prioritization                     |
+| Sexual responsiveness   | erotic closeness preference                  |
+| Quiet comfort           | comfort with low-verbal intimacy             |
+| Style compatibility     | how easily closeness languages align         |
+| Adaptation willingness  | ability to meet the partner's style          |
+| Recognition need        | need for one's closeness style to be noticed |
 
 Intimacy style principle:
 
@@ -6810,60 +6799,60 @@ Commitment is not only becoming official. It includes emotional prioritization, 
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Attachment | emotional bonding |
-| Commitment | chosen long-term investment |
-| Exclusivity | limiting romantic focus |
-| Dependency | emotional reliance |
-| Devotion | emotional prioritization |
-| Stability | consistency over time |
+| Concept     | Meaning                     |
+| ----------- | --------------------------- |
+| Attachment  | emotional bonding           |
+| Commitment  | chosen long-term investment |
+| Exclusivity | limiting romantic focus     |
+| Dependency  | emotional reliance          |
+| Devotion    | emotional prioritization    |
+| Stability   | consistency over time       |
 
 Useful commitment styles:
 
-| Style | Core Belief | Runtime Behavior |
-| --- | --- | --- |
-| Secure | long-term closeness is safe and desirable | clear intentions, steady life integration, conflict repair |
-| Devotional | once I choose you, you become central | intense loyalty, prioritization, protectiveness, attentiveness |
-| Avoidant | commitment risks autonomy or safety | slow escalation, label hesitation, distance after intensity |
-| Anxious | commitment must be reaffirmed | quick clarity seeking, future-focus, sensitivity to inconsistency |
-| Fearful | I crave permanence but fear destruction | commitment panic, self-sabotage, reunion cycles |
-| Situational | commitment depends on context | adaptive investment, cautious progression |
-| Protective | commitment means responsibility for wellbeing | practical reliability, monitoring, caretaking |
-| Idealistic | commitment should feel transcendent | soulmate thinking, epic stakes, high expectations |
-| Pragmatic | love survives through effort and compatibility | stability, future planning, reliability over intensity |
-| Independent | commitment should not erase individuality | strong boundaries, connected autonomy |
-| Chaotic | intensity equals commitment | impulsive escalation, unstable loyalty, dramatic attachment |
-| Slow-build | commitment must be earned carefully | consistency testing, measured escalation, post-betrayal caution |
+| Style       | Core Belief                                    | Runtime Behavior                                                  |
+| ----------- | ---------------------------------------------- | ----------------------------------------------------------------- |
+| Secure      | long-term closeness is safe and desirable      | clear intentions, steady life integration, conflict repair        |
+| Devotional  | once I choose you, you become central          | intense loyalty, prioritization, protectiveness, attentiveness    |
+| Avoidant    | commitment risks autonomy or safety            | slow escalation, label hesitation, distance after intensity       |
+| Anxious     | commitment must be reaffirmed                  | quick clarity seeking, future-focus, sensitivity to inconsistency |
+| Fearful     | I crave permanence but fear destruction        | commitment panic, self-sabotage, reunion cycles                   |
+| Situational | commitment depends on context                  | adaptive investment, cautious progression                         |
+| Protective  | commitment means responsibility for wellbeing  | practical reliability, monitoring, caretaking                     |
+| Idealistic  | commitment should feel transcendent            | soulmate thinking, epic stakes, high expectations                 |
+| Pragmatic   | love survives through effort and compatibility | stability, future planning, reliability over intensity            |
+| Independent | commitment should not erase individuality      | strong boundaries, connected autonomy                             |
+| Chaotic     | intensity equals commitment                    | impulsive escalation, unstable loyalty, dramatic attachment       |
+| Slow-build  | commitment must be earned carefully            | consistency testing, measured escalation, post-betrayal caution   |
 
 Common loops:
 
-| Style | Loop |
-| --- | --- |
-| Secure | attachment -> trust -> investment -> stability -> deeper intimacy |
-| Avoidant | closeness -> fear of engulfment -> distancing -> longing -> re-engagement |
-| Fearful | longing -> closeness -> fear -> sabotage -> regret -> reconnection |
-| Slow-build | interest -> consistency proof -> vulnerability -> chosen continuity |
+| Style      | Loop                                                                      |
+| ---------- | ------------------------------------------------------------------------- |
+| Secure     | attachment -> trust -> investment -> stability -> deeper intimacy         |
+| Avoidant   | closeness -> fear of engulfment -> distancing -> longing -> re-engagement |
+| Fearful    | longing -> closeness -> fear -> sabotage -> regret -> reconnection        |
+| Slow-build | interest -> consistency proof -> vulnerability -> chosen continuity       |
 
 Commitment style pairings can drive long arcs:
 
-| Pairing | Dynamic |
-| --- | --- |
-| Anxious + avoidant | reassurance and clarity versus pressure and engulfment |
-| Devotional + independent | prioritization versus individuality |
-| Pragmatic + idealistic | realism versus transcendent fantasy |
-| Secure + fearful | stability teaches commitment can survive vulnerability |
+| Pairing                  | Dynamic                                                |
+| ------------------------ | ------------------------------------------------------ |
+| Anxious + avoidant       | reassurance and clarity versus pressure and engulfment |
+| Devotional + independent | prioritization versus individuality                    |
+| Pragmatic + idealistic   | realism versus transcendent fantasy                    |
+| Secure + fearful         | stability teaches commitment can survive vulnerability |
 
 Tone changes how commitment feels:
 
-| Tone | Commitment Feel |
-| --- | --- |
-| Tender | safe consistency |
-| Yearning | fearful longing |
-| Devotional | consuming loyalty |
-| Chaotic | unstable attachment |
-| Melancholic | fragile permanence |
-| Hopeful | rebuilding trust |
+| Tone        | Commitment Feel     |
+| ----------- | ------------------- |
+| Tender      | safe consistency    |
+| Yearning    | fearful longing     |
+| Devotional  | consuming loyalty   |
+| Chaotic     | unstable attachment |
+| Melancholic | fragile permanence  |
+| Hopeful     | rebuilding trust    |
 
 Commitment changes intimacy quality. Early romance often runs on desire plus uncertainty. Later commitment runs on trust plus chosen continuity, which enables domestic intimacy, emotional safety, and long-term immersion.
 
@@ -6884,20 +6873,20 @@ avoidant distance
 
 Useful commitment variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Commitment readiness | comfort with long-term investment |
-| Exclusivity need | desire for prioritization |
-| Autonomy need | independence importance |
-| Stability desire | preference for consistency |
-| Fear of engulfment | fear of losing self |
-| Fear of abandonment | fear of losing partner |
-| Future orientation | tendency toward long-term thinking |
-| Loyalty intensity | emotional prioritization strength |
-| Repair persistence | willingness to work through rupture |
-| Label comfort | comfort naming the relationship |
-| Integration comfort | comfort merging routines, family, or plans |
-| Breakup risk | likelihood of fleeing, sabotaging, or ending under pressure |
+| Variable             | Meaning                                                     |
+| -------------------- | ----------------------------------------------------------- |
+| Commitment readiness | comfort with long-term investment                           |
+| Exclusivity need     | desire for prioritization                                   |
+| Autonomy need        | independence importance                                     |
+| Stability desire     | preference for consistency                                  |
+| Fear of engulfment   | fear of losing self                                         |
+| Fear of abandonment  | fear of losing partner                                      |
+| Future orientation   | tendency toward long-term thinking                          |
+| Loyalty intensity    | emotional prioritization strength                           |
+| Repair persistence   | willingness to work through rupture                         |
+| Label comfort        | comfort naming the relationship                             |
+| Integration comfort  | comfort merging routines, family, or plans                  |
+| Breakup risk         | likelihood of fleeing, sabotaging, or ending under pressure |
 
 Commitment equation:
 
@@ -6917,43 +6906,43 @@ Autonomy is not emotional distance, lack of love, avoidance, or indifference. Cl
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Autonomy | preserved selfhood and agency |
-| Independence | functioning without reliance |
-| Avoidance | distancing to reduce vulnerability |
-| Boundaries | limits protecting emotional wellbeing |
-| Attachment | emotional bonding |
+| Concept      | Meaning                               |
+| ------------ | ------------------------------------- |
+| Autonomy     | preserved selfhood and agency         |
+| Independence | functioning without reliance          |
+| Avoidance    | distancing to reduce vulnerability    |
+| Boundaries   | limits protecting emotional wellbeing |
+| Attachment   | emotional bonding                     |
 
 Useful autonomy types:
 
-| Type | Core Principle | Runtime Meaning |
-| --- | --- | --- |
-| Emotional autonomy | I can regulate without making you responsible for all of me | comfort without total emotional outsourcing |
-| Identity autonomy | I remain myself inside intimacy | interests, goals, values, friendships persist |
-| Social autonomy | I keep a social life and personal space | jealousy and exclusivity checks |
-| Emotional boundary autonomy | I choose vulnerability pacing | decompression, disclosure timing, trauma-informed pacing |
-| Decision-making autonomy | I retain agency and choice | life choices, relationship pace, intimacy pace |
-| Sexual autonomy | I own my desire, consent, and pacing | agency inside sexual chemistry |
-| Psychological autonomy | my internal experience remains mine | disagreement, privacy, independent thought |
+| Type                        | Core Principle                                              | Runtime Meaning                                          |
+| --------------------------- | ----------------------------------------------------------- | -------------------------------------------------------- |
+| Emotional autonomy          | I can regulate without making you responsible for all of me | comfort without total emotional outsourcing              |
+| Identity autonomy           | I remain myself inside intimacy                             | interests, goals, values, friendships persist            |
+| Social autonomy             | I keep a social life and personal space                     | jealousy and exclusivity checks                          |
+| Emotional boundary autonomy | I choose vulnerability pacing                               | decompression, disclosure timing, trauma-informed pacing |
+| Decision-making autonomy    | I retain agency and choice                                  | life choices, relationship pace, intimacy pace           |
+| Sexual autonomy             | I own my desire, consent, and pacing                        | agency inside sexual chemistry                           |
+| Psychological autonomy      | my internal experience remains mine                         | disagreement, privacy, independent thought               |
 
 Autonomy styles:
 
-| Style | Core Belief | Healthy Form | Risk |
-| --- | --- | --- | --- |
-| High-autonomy | closeness should not threaten individuality | I love you and still need space | emotional unavailability |
-| Fusion-oriented | intimacy means deep emotional merging | shared identity and closeness feel meaningful | dependency or identity loss |
-| Balanced interdependence | connected while whole | sustainable closeness and flexibility | requires ongoing negotiation |
-| Fluctuating | closeness and escape needs alternate | adaptive if communicated | push-pull instability |
+| Style                    | Core Belief                                 | Healthy Form                                  | Risk                         |
+| ------------------------ | ------------------------------------------- | --------------------------------------------- | ---------------------------- |
+| High-autonomy            | closeness should not threaten individuality | I love you and still need space               | emotional unavailability     |
+| Fusion-oriented          | intimacy means deep emotional merging       | shared identity and closeness feel meaningful | dependency or identity loss  |
+| Balanced interdependence | connected while whole                       | sustainable closeness and flexibility         | requires ongoing negotiation |
+| Fluctuating              | closeness and escape needs alternate        | adaptive if communicated                      | push-pull instability        |
 
 Attachment often biases autonomy:
 
-| Attachment | Autonomy Pattern |
-| --- | --- |
-| Secure | balanced interdependence |
-| Anxious | closeness prioritized over autonomy |
-| Avoidant | autonomy prioritized over closeness |
-| Fearful | fluctuates between fusion and escape |
+| Attachment | Autonomy Pattern                     |
+| ---------- | ------------------------------------ |
+| Secure     | balanced interdependence             |
+| Anxious    | closeness prioritized over autonomy  |
+| Avoidant   | autonomy prioritized over closeness  |
+| Fearful    | fluctuates between fusion and escape |
 
 Autonomy conflicts are common. One character may need space after arguments while the other experiences space as abandonment. One may read independence as healthy selfhood while the other reads it as lack of priority. These mismatches create pursuit-withdrawal loops, jealousy, expectation conflict, and commitment panic.
 
@@ -6975,27 +6964,27 @@ individual lives
 
 Autonomy failure modes:
 
-| Failure | Result |
-| --- | --- |
-| too little autonomy | codependency, suffocation, identity loss, possessiveness |
-| too much autonomy | emotional distance, avoidance, instability, intimacy starvation |
+| Failure             | Result                                                          |
+| ------------------- | --------------------------------------------------------------- |
+| too little autonomy | codependency, suffocation, identity loss, possessiveness        |
+| too much autonomy   | emotional distance, avoidance, instability, intimacy starvation |
 
 Useful autonomy variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Autonomy need | desired independence level |
-| Emotional independence | self-regulation ability |
-| Space need | alone-time requirement |
-| Fusion desire | desire for emotional merging |
-| Boundary strength | ability to maintain limits |
-| Dependency comfort | comfort relying on partner |
-| Identity stability | resistance to losing self |
-| Closeness tolerance | comfort with intimacy |
-| Exclusivity sensitivity | reaction to emotional sharing outside relationship |
-| Engulfment fear | fear closeness will erase selfhood |
-| Codependency risk | risk of unhealthy fusion |
-| Intimacy starvation risk | risk of distance becoming emotional deprivation |
+| Variable                 | Meaning                                            |
+| ------------------------ | -------------------------------------------------- |
+| Autonomy need            | desired independence level                         |
+| Emotional independence   | self-regulation ability                            |
+| Space need               | alone-time requirement                             |
+| Fusion desire            | desire for emotional merging                       |
+| Boundary strength        | ability to maintain limits                         |
+| Dependency comfort       | comfort relying on partner                         |
+| Identity stability       | resistance to losing self                          |
+| Closeness tolerance      | comfort with intimacy                              |
+| Exclusivity sensitivity  | reaction to emotional sharing outside relationship |
+| Engulfment fear          | fear closeness will erase selfhood                 |
+| Codependency risk        | risk of unhealthy fusion                           |
+| Intimacy starvation risk | risk of distance becoming emotional deprivation    |
 
 Autonomy equation:
 
@@ -7014,50 +7003,50 @@ Boundaries are not rejection, emotional distance, lack of love, or punishment. H
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Boundary | protective relational limit |
-| Rule | externally enforced expectation |
-| Preference | desired behavior |
-| Consent | active agreement |
-| Autonomy | preserved selfhood |
+| Concept    | Meaning                         |
+| ---------- | ------------------------------- |
+| Boundary   | protective relational limit     |
+| Rule       | externally enforced expectation |
+| Preference | desired behavior                |
+| Consent    | active agreement                |
+| Autonomy   | preserved selfhood              |
 
 Boundaries govern emotional safety conditions.
 
 Useful boundary types:
 
-| Boundary Type | Purpose | Examples |
-| --- | --- | --- |
-| Emotional | protect wellbeing and agency | space during overwhelm, no manipulation, emotional agency |
-| Vulnerability | control exposure pacing | trauma disclosure timing, no forced confessions |
-| Conflict | keep rupture survivable | no insults, no abandonment threats, breaks before escalation |
-| Physical | preserve bodily autonomy | touch preferences, affection pacing, comfort limits |
-| Sexual | maintain consent and safety | limits, pacing, safe words, aftercare expectations |
-| Exclusivity | define uniqueness and access | flirting, intimacy, monogamy/open agreements |
-| Communication | regulate access and pressure | texting expectations, processing space, privacy |
-| Autonomy | preserve individuality | friendships, hobbies, alone time, separate identity |
-| Social | define visibility and external access | public affection, family involvement, social media |
-| Time | balance connection and selfhood | recharge time, scheduling, emotional labor limits |
-| Psychological | preserve self-definition | resisting control, freedom of thought, identity safety |
-| Ritual | protect meaningful behaviors | private names, anniversaries, relationship-specific routines |
+| Boundary Type | Purpose                               | Examples                                                     |
+| ------------- | ------------------------------------- | ------------------------------------------------------------ |
+| Emotional     | protect wellbeing and agency          | space during overwhelm, no manipulation, emotional agency    |
+| Vulnerability | control exposure pacing               | trauma disclosure timing, no forced confessions              |
+| Conflict      | keep rupture survivable               | no insults, no abandonment threats, breaks before escalation |
+| Physical      | preserve bodily autonomy              | touch preferences, affection pacing, comfort limits          |
+| Sexual        | maintain consent and safety           | limits, pacing, safe words, aftercare expectations           |
+| Exclusivity   | define uniqueness and access          | flirting, intimacy, monogamy/open agreements                 |
+| Communication | regulate access and pressure          | texting expectations, processing space, privacy              |
+| Autonomy      | preserve individuality                | friendships, hobbies, alone time, separate identity          |
+| Social        | define visibility and external access | public affection, family involvement, social media           |
+| Time          | balance connection and selfhood       | recharge time, scheduling, emotional labor limits            |
+| Psychological | preserve self-definition              | resisting control, freedom of thought, identity safety       |
+| Ritual        | protect meaningful behaviors          | private names, anniversaries, relationship-specific routines |
 
 Boundary styles:
 
-| Style | Characteristics | Risk |
-| --- | --- | --- |
-| Rigid | high protection, strong independence | intimacy blockage and distance |
-| Porous | rapid openness, emotional merging | codependency and overwhelm |
-| Flexible | adaptable, context-aware limits | healthiest sustainable closeness |
-| Inconsistent | limits fluctuate unpredictably | confusion and insecurity |
+| Style        | Characteristics                      | Risk                             |
+| ------------ | ------------------------------------ | -------------------------------- |
+| Rigid        | high protection, strong independence | intimacy blockage and distance   |
+| Porous       | rapid openness, emotional merging    | codependency and overwhelm       |
+| Flexible     | adaptable, context-aware limits      | healthiest sustainable closeness |
+| Inconsistent | limits fluctuate unpredictably       | confusion and insecurity         |
 
 Attachment often shapes boundaries:
 
-| Attachment | Common Boundary Pattern |
-| --- | --- |
-| Secure | flexible and communicative |
-| Anxious | porous boundaries |
-| Avoidant | rigid emotional boundaries |
-| Fearful | inconsistent boundaries |
+| Attachment | Common Boundary Pattern    |
+| ---------- | -------------------------- |
+| Secure     | flexible and communicative |
+| Anxious    | porous boundaries          |
+| Avoidant   | rigid emotional boundaries |
+| Fearful    | inconsistent boundaries    |
 
 Healthy dominance/submission, protectiveness, possessiveness, non-monogamy, and sexual chemistry all require strong boundaries. Without ongoing consent, autonomy preservation, emotional safety, and negotiation, power dynamics become coercive or destabilizing.
 
@@ -7075,28 +7064,28 @@ Strong relationships continuously renegotiate boundaries as intimacy, exclusivit
 
 Useful boundary variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Emotional boundary strength | emotional self-protection level |
-| Vulnerability pace preference | desired intimacy speed |
-| Autonomy preservation | independence importance |
-| Exclusivity boundary strictness | uniqueness expectations |
-| Conflict boundary clarity | acceptable conflict behavior |
-| Consent sensitivity | responsiveness to agency |
-| Space need | emotional breathing room |
-| Privacy need | personal emotional territory |
-| Boundary flexibility | adaptability of limits |
-| Physical boundary comfort | bodily closeness safety |
-| Sexual boundary clarity | adult-gated consent and limits |
-| Communication boundary clarity | access, texting, and processing expectations |
-| Time boundary strength | protection of time and emotional labor |
-| Psychological boundary strength | resistance to control or identity loss |
-| Ritual boundary importance | protection of meaningful private behaviors |
-| Boundary negotiation skill | ability to discuss and revise limits |
-| Violation sensitivity | reaction to crossed boundaries |
-| Boundary repair readiness | ability to restore safety after a violation |
-| Coercion risk | chance pressure overrides agency |
-| Boundary punishment risk | chance boundaries become manipulative |
+| Variable                        | Meaning                                      |
+| ------------------------------- | -------------------------------------------- |
+| Emotional boundary strength     | emotional self-protection level              |
+| Vulnerability pace preference   | desired intimacy speed                       |
+| Autonomy preservation           | independence importance                      |
+| Exclusivity boundary strictness | uniqueness expectations                      |
+| Conflict boundary clarity       | acceptable conflict behavior                 |
+| Consent sensitivity             | responsiveness to agency                     |
+| Space need                      | emotional breathing room                     |
+| Privacy need                    | personal emotional territory                 |
+| Boundary flexibility            | adaptability of limits                       |
+| Physical boundary comfort       | bodily closeness safety                      |
+| Sexual boundary clarity         | adult-gated consent and limits               |
+| Communication boundary clarity  | access, texting, and processing expectations |
+| Time boundary strength          | protection of time and emotional labor       |
+| Psychological boundary strength | resistance to control or identity loss       |
+| Ritual boundary importance      | protection of meaningful private behaviors   |
+| Boundary negotiation skill      | ability to discuss and revise limits         |
+| Violation sensitivity           | reaction to crossed boundaries               |
+| Boundary repair readiness       | ability to restore safety after a violation  |
+| Coercion risk                   | chance pressure overrides agency             |
+| Boundary punishment risk        | chance boundaries become manipulative        |
 
 Boundary equation:
 
@@ -7116,41 +7105,41 @@ Exclusivity is not only monogamy, ownership, or control. It is a layered system 
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Exclusivity | unique or shared relational access |
-| Commitment | long-term choosing |
-| Possessiveness | desire to control access |
-| Loyalty | consistency and faithfulness |
-| Monogamy | relationship structure |
+| Concept        | Meaning                            |
+| -------------- | ---------------------------------- |
+| Exclusivity    | unique or shared relational access |
+| Commitment     | long-term choosing                 |
+| Possessiveness | desire to control access           |
+| Loyalty        | consistency and faithfulness       |
+| Monogamy       | relationship structure             |
 | Prioritization | emotional ranking and significance |
 
 Useful exclusivity layers:
 
-| Layer | Core Feeling | Runtime Meaning |
-| --- | --- | --- |
-| Emotional exclusivity | you are uniquely central | deepest vulnerability, emotional support, private language |
-| Romantic exclusivity | romantic attention is focused here | dating focus, public partnership identity |
-| Sexual exclusivity | erotic intimacy is uniquely shared | sexual agreements, trust and jealousy pressure |
-| Psychological exclusivity | you understand me in ways others do not | inside language, private emotional access |
-| Ritual exclusivity | certain behaviors belong to us | nicknames, routines, gestures, traditions |
-| Future exclusivity | I imagine a future with you specifically | life integration, domestic assumptions, permanence language |
-| Social exclusivity | our bond has a unique social role | visible prioritization, partner introduction |
-| Vulnerability exclusivity | only you get these emotional layers | trauma disclosure, hidden fears, authentic self-expression |
+| Layer                     | Core Feeling                             | Runtime Meaning                                             |
+| ------------------------- | ---------------------------------------- | ----------------------------------------------------------- |
+| Emotional exclusivity     | you are uniquely central                 | deepest vulnerability, emotional support, private language  |
+| Romantic exclusivity      | romantic attention is focused here       | dating focus, public partnership identity                   |
+| Sexual exclusivity        | erotic intimacy is uniquely shared       | sexual agreements, trust and jealousy pressure              |
+| Psychological exclusivity | you understand me in ways others do not  | inside language, private emotional access                   |
+| Ritual exclusivity        | certain behaviors belong to us           | nicknames, routines, gestures, traditions                   |
+| Future exclusivity        | I imagine a future with you specifically | life integration, domestic assumptions, permanence language |
+| Social exclusivity        | our bond has a unique social role        | visible prioritization, partner introduction                |
+| Vulnerability exclusivity | only you get these emotional layers      | trauma disclosure, hidden fears, authentic self-expression  |
 
 Exclusivity styles:
 
-| Style | Core Belief | Healthy Form | Risk |
-| --- | --- | --- | --- |
-| Fully monogamous | romantic, emotional, and sexual intimacy should be singular | clear centrality and protected commitment | ambiguity feels unsafe |
-| Emotionally monogamous | emotional centrality matters most | emotional singularity with flexible sexual rules | emotional rivals feel threatening |
-| Sexually possessive | sexual uniqueness carries strong security meaning | clear erotic boundary protection | comparison and control risk |
-| Emotionally possessive | vulnerability and attention should feel unique | strong reassurance and prioritization | jealousy escalation |
-| Devotional | the relationship should feel sacred and central | intense chosen prioritization | emotional over-centralization |
-| Autonomous | closeness should not require ownership | freedom plus affection | partner may feel under-prioritized |
-| Flexible negotiated | exclusivity should be consciously defined | explicit agreements by layer | high communication demand |
-| Low exclusivity need | meaning does not require high uniqueness | low territoriality and high autonomy | weak singularity signals |
-| High territorial | relationship boundaries must feel protected | protective devotion | coercion, monitoring, ownership |
+| Style                  | Core Belief                                                 | Healthy Form                                     | Risk                               |
+| ---------------------- | ----------------------------------------------------------- | ------------------------------------------------ | ---------------------------------- |
+| Fully monogamous       | romantic, emotional, and sexual intimacy should be singular | clear centrality and protected commitment        | ambiguity feels unsafe             |
+| Emotionally monogamous | emotional centrality matters most                           | emotional singularity with flexible sexual rules | emotional rivals feel threatening  |
+| Sexually possessive    | sexual uniqueness carries strong security meaning           | clear erotic boundary protection                 | comparison and control risk        |
+| Emotionally possessive | vulnerability and attention should feel unique              | strong reassurance and prioritization            | jealousy escalation                |
+| Devotional             | the relationship should feel sacred and central             | intense chosen prioritization                    | emotional over-centralization      |
+| Autonomous             | closeness should not require ownership                      | freedom plus affection                           | partner may feel under-prioritized |
+| Flexible negotiated    | exclusivity should be consciously defined                   | explicit agreements by layer                     | high communication demand          |
+| Low exclusivity need   | meaning does not require high uniqueness                    | low territoriality and high autonomy             | weak singularity signals           |
+| High territorial       | relationship boundaries must feel protected                 | protective devotion                              | coercion, monitoring, ownership    |
 
 Jealousy often signals an exclusivity threat. The surface issue may be flirting, attention, sex, public visibility, or private disclosure, but the deeper question is often: am I still uniquely important to you?
 
@@ -7160,32 +7149,32 @@ Non-monogamy and ethical non-monogamy are relationship structures where exclusiv
 
 Useful relationship structures:
 
-| Structure | Core Principle | Main Runtime Pressure |
-| --- | --- | --- |
-| Monogamous | romantic and sexual exclusivity are expected | maintaining chosen priority and avoiding ownership drift |
-| Monogamish | mostly exclusive with negotiated flexibility | boundary clarity and reassurance |
-| Open relationship | primary bond with negotiated external intimacy | jealousy, emotional drift, sexual versus emotional meaning |
-| Polyamorous | multiple emotionally meaningful relationships | bandwidth, differentiation, attachment management |
-| Hierarchical poly | relationships have different priority levels | fairness versus emotional reality |
-| Non-hierarchical poly | no predefined ranking | ambiguity, autonomy, individualized meaning |
-| Relationship anarchy | no default relationship rules | explicit definition and anti-ownership expectations |
-| Solo poly | autonomy remains structurally central | closeness without cohabitation or hierarchy assumptions |
-| Sexual non-exclusive | sexual access is open while other exclusivities may remain | emotional singularity, reassurance, safer boundaries |
-| Swinging | couple-centered recreational sexual exploration | shared novelty without emotional replacement |
+| Structure             | Core Principle                                             | Main Runtime Pressure                                      |
+| --------------------- | ---------------------------------------------------------- | ---------------------------------------------------------- |
+| Monogamous            | romantic and sexual exclusivity are expected               | maintaining chosen priority and avoiding ownership drift   |
+| Monogamish            | mostly exclusive with negotiated flexibility               | boundary clarity and reassurance                           |
+| Open relationship     | primary bond with negotiated external intimacy             | jealousy, emotional drift, sexual versus emotional meaning |
+| Polyamorous           | multiple emotionally meaningful relationships              | bandwidth, differentiation, attachment management          |
+| Hierarchical poly     | relationships have different priority levels               | fairness versus emotional reality                          |
+| Non-hierarchical poly | no predefined ranking                                      | ambiguity, autonomy, individualized meaning                |
+| Relationship anarchy  | no default relationship rules                              | explicit definition and anti-ownership expectations        |
+| Solo poly             | autonomy remains structurally central                      | closeness without cohabitation or hierarchy assumptions    |
+| Sexual non-exclusive  | sexual access is open while other exclusivities may remain | emotional singularity, reassurance, safer boundaries       |
+| Swinging              | couple-centered recreational sexual exploration            | shared novelty without emotional replacement               |
 
 Non-monogamy does not eliminate exclusivity. Instead, exclusivity becomes selective and negotiated: emotional, ritual, domestic, future, vulnerability, or sexual layers may be reserved differently. Strong non-monogamous RP should make each bond emotionally singular, with unique chemistry, intimacy style, attachment pattern, expectations, roles, and progression.
 
 Core non-monogamy mechanics:
 
-| Mechanic | Meaning |
-| --- | --- |
-| Communication intensity | assumptions fail faster, so agreements must be explicit |
-| Jealousy processing | jealousy is emotional information, not automatic failure |
-| Compersion | positive response to a partner's joy elsewhere, not mandatory |
-| Boundary negotiation | access, disclosure, time, safer sex, visibility, and hierarchy agreements |
-| Time allocation | love may feel abundant, but time, energy, and attention are finite |
-| Attachment management | multiple bonds can amplify security or insecurity |
-| Relationship differentiation | each relationship needs a distinct emotional identity |
+| Mechanic                     | Meaning                                                                   |
+| ---------------------------- | ------------------------------------------------------------------------- |
+| Communication intensity      | assumptions fail faster, so agreements must be explicit                   |
+| Jealousy processing          | jealousy is emotional information, not automatic failure                  |
+| Compersion                   | positive response to a partner's joy elsewhere, not mandatory             |
+| Boundary negotiation         | access, disclosure, time, safer sex, visibility, and hierarchy agreements |
+| Time allocation              | love may feel abundant, but time, energy, and attention are finite        |
+| Attachment management        | multiple bonds can amplify security or insecurity                         |
+| Relationship differentiation | each relationship needs a distinct emotional identity                     |
 
 Sexual non-exclusivity specifically separates sexual access from emotional significance. A relationship may allow external sexual intimacy while remaining emotionally, romantically, domestically, or futurally primary. The runtime should ask what sexual access means emotionally in this relationship, not assume that sexual openness equals emotional detachment.
 
@@ -7193,37 +7182,37 @@ Swinging is more couple-centered than polyamory: the emotional anchor is usually
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| too little exclusivity | ambiguity, insecurity, low prioritization, weak attachment identity |
-| too much exclusivity | codependency, suffocation, possessiveness, autonomy collapse |
-| conditional exclusivity | inconsistent prioritization and insecurity instability |
-| ambiguous ENM agreements | accidental betrayal, hidden assumptions, emotional chaos |
-| avoidance disguised as freedom | non-commitment used to avoid vulnerability or accountability |
-| emotional neglect | bandwidth exceeded, resentment, abandonment feelings |
-| hierarchy instability | stated priorities differ from actual behavior |
-| unequal comfort | one partner tolerates openness fearfully or under pressure |
+| Failure                        | Result                                                              |
+| ------------------------------ | ------------------------------------------------------------------- |
+| too little exclusivity         | ambiguity, insecurity, low prioritization, weak attachment identity |
+| too much exclusivity           | codependency, suffocation, possessiveness, autonomy collapse        |
+| conditional exclusivity        | inconsistent prioritization and insecurity instability              |
+| ambiguous ENM agreements       | accidental betrayal, hidden assumptions, emotional chaos            |
+| avoidance disguised as freedom | non-commitment used to avoid vulnerability or accountability        |
+| emotional neglect              | bandwidth exceeded, resentment, abandonment feelings                |
+| hierarchy instability          | stated priorities differ from actual behavior                       |
+| unequal comfort                | one partner tolerates openness fearfully or under pressure          |
 
 Useful exclusivity and structure variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Emotional prioritization | emotional ranking significance |
-| Exclusivity need | desire for uniqueness |
-| Rival sensitivity | reaction to emotional competition |
-| Emotional centralization | partner importance level |
-| Autonomy preservation | individuality maintenance |
-| Jealousy reactivity | threat sensitivity |
-| Relationship identity strength | strength of "we" uniqueness |
-| Vulnerability selectivity | restriction of emotional access |
-| Loyalty expectation | consistency standards |
-| Consent clarity | informed agreement quality |
-| Boundary clarity | explicitness of negotiated limits |
-| Communication transparency | honesty and openness |
-| Emotional bandwidth | sustainable intimacy capacity |
-| Compersion capacity | comfort with partner joy elsewhere |
-| Relationship differentiation | uniqueness between bonds |
-| Coercion risk | chance openness or exclusivity is pressured rather than chosen |
+| Variable                       | Meaning                                                        |
+| ------------------------------ | -------------------------------------------------------------- |
+| Emotional prioritization       | emotional ranking significance                                 |
+| Exclusivity need               | desire for uniqueness                                          |
+| Rival sensitivity              | reaction to emotional competition                              |
+| Emotional centralization       | partner importance level                                       |
+| Autonomy preservation          | individuality maintenance                                      |
+| Jealousy reactivity            | threat sensitivity                                             |
+| Relationship identity strength | strength of "we" uniqueness                                    |
+| Vulnerability selectivity      | restriction of emotional access                                |
+| Loyalty expectation            | consistency standards                                          |
+| Consent clarity                | informed agreement quality                                     |
+| Boundary clarity               | explicitness of negotiated limits                              |
+| Communication transparency     | honesty and openness                                           |
+| Emotional bandwidth            | sustainable intimacy capacity                                  |
+| Compersion capacity            | comfort with partner joy elsewhere                             |
+| Relationship differentiation   | uniqueness between bonds                                       |
+| Coercion risk                  | chance openness or exclusivity is pressured rather than chosen |
 
 Exclusivity equation:
 
@@ -7253,30 +7242,30 @@ Expectations shape interpretation, disappointment, satisfaction, trust, jealousy
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Expectation | anticipated relational behavior |
-| Need | emotional requirement |
-| Boundary | acceptable or unacceptable behavior |
-| Fantasy | idealized emotional scenario |
-| Standard | consciously chosen expectation |
+| Concept     | Meaning                             |
+| ----------- | ----------------------------------- |
+| Expectation | anticipated relational behavior     |
+| Need        | emotional requirement               |
+| Boundary    | acceptable or unacceptable behavior |
+| Fantasy     | idealized emotional scenario        |
+| Standard    | consciously chosen expectation      |
 
 Useful expectation categories:
 
-| Category | Question | Common Mismatch |
-| --- | --- | --- |
-| Communication | what contact and directness feel normal? | constant connection versus independence |
-| Affection | how should care be expressed? | emotional noticing versus practical help |
-| Commitment | what does serious mean? | labels, future planning, exclusivity, priority |
-| Conflict | how should arguments work? | immediate repair versus space first |
-| Intimacy | what closeness pace feels safe? | quick disclosure versus gradual trust |
-| Exclusivity | what counts as disloyal or threatening? | friendly flirting versus emotional betrayal |
-| Availability | how accessible should a partner be? | unavailable versus overwhelming |
-| Relationship role | what role should each person occupy? | protector, caretaker, initiator, stabilizer |
-| Romantic fantasy | what should romance feel like? | calm safety versus consuming intensity |
-| Repair | what should happen after hurt? | apology, space, reassurance, accountability |
-| Future | what life is imagined? | marriage, family, freedom, travel, domesticity |
-| Emotional priority | how important should I be to you? | public choice, defending, noticing distress |
+| Category           | Question                                 | Common Mismatch                                |
+| ------------------ | ---------------------------------------- | ---------------------------------------------- |
+| Communication      | what contact and directness feel normal? | constant connection versus independence        |
+| Affection          | how should care be expressed?            | emotional noticing versus practical help       |
+| Commitment         | what does serious mean?                  | labels, future planning, exclusivity, priority |
+| Conflict           | how should arguments work?               | immediate repair versus space first            |
+| Intimacy           | what closeness pace feels safe?          | quick disclosure versus gradual trust          |
+| Exclusivity        | what counts as disloyal or threatening?  | friendly flirting versus emotional betrayal    |
+| Availability       | how accessible should a partner be?      | unavailable versus overwhelming                |
+| Relationship role  | what role should each person occupy?     | protector, caretaker, initiator, stabilizer    |
+| Romantic fantasy   | what should romance feel like?           | calm safety versus consuming intensity         |
+| Repair             | what should happen after hurt?           | apology, space, reassurance, accountability    |
+| Future             | what life is imagined?                   | marriage, family, freedom, travel, domesticity |
+| Emotional priority | how important should I be to you?        | public choice, defending, noticing distress    |
 
 Expectations form from attachment history, past relationships, family dynamics, fantasy and media, trauma, culture, personality, and emotional needs. Characters often do not consciously know their expectations. They may say "I am fine" while subconsciously expecting pursuit, reassurance, prioritization, or emotional proof.
 
@@ -7286,22 +7275,22 @@ Healthy expectations include respect, honesty, accountability, emotional respons
 
 Trope and attachment can bias expectations:
 
-| Trope | Common Expectations |
-| --- | --- |
-| Friends to lovers | emotional understanding |
-| Enemies to lovers | emotional transformation |
-| Slow burn | eventual confession payoff |
-| Healing romance | emotional safety |
-| Soulmate romance | intuitive connection |
-| Rivals to lovers | stimulation and challenge |
-| Domestic romance | consistency and comfort |
+| Trope             | Common Expectations        |
+| ----------------- | -------------------------- |
+| Friends to lovers | emotional understanding    |
+| Enemies to lovers | emotional transformation   |
+| Slow burn         | eventual confession payoff |
+| Healing romance   | emotional safety           |
+| Soulmate romance  | intuitive connection       |
+| Rivals to lovers  | stimulation and challenge  |
+| Domestic romance  | consistency and comfort    |
 
-| Attachment | Typical Expectations |
-| --- | --- |
-| Secure | consistency and honesty |
-| Anxious | reassurance and responsiveness |
-| Avoidant | autonomy and low pressure |
-| Fearful | closeness plus safety from hurt |
+| Attachment | Typical Expectations            |
+| ---------- | ------------------------------- |
+| Secure     | consistency and honesty         |
+| Anxious    | reassurance and responsiveness  |
+| Avoidant   | autonomy and low pressure       |
+| Fearful    | closeness plus safety from hurt |
 
 Expectation violations are strong emotional triggers: forgotten dates, failure to defend the partner, emotional withdrawal, broken promises, lack of reassurance, or inconsistent attention. The damage depends on how central the violated expectation was, not only on the action itself.
 
@@ -7309,20 +7298,20 @@ Expectations should evolve. Early romance may expect excitement and tension; lat
 
 Useful expectation variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Reassurance expectation | desired emotional validation |
-| Communication expectation | contact frequency preference |
-| Exclusivity expectation | prioritization needs |
-| Conflict resolution expectation | repair preference |
-| Emotional availability expectation | accessibility desire |
-| Affection expectation | affection frequency or style |
-| Future orientation | expectation of permanence |
-| Independence expectation | autonomy preference |
-| Mind-reading expectation | assumption partner should know |
-| Mismatch risk | likelihood partners expect different things |
-| Violation sensitivity | intensity of reaction to unmet expectations |
-| Renegotiation openness | willingness to update expectations together |
+| Variable                           | Meaning                                     |
+| ---------------------------------- | ------------------------------------------- |
+| Reassurance expectation            | desired emotional validation                |
+| Communication expectation          | contact frequency preference                |
+| Exclusivity expectation            | prioritization needs                        |
+| Conflict resolution expectation    | repair preference                           |
+| Emotional availability expectation | accessibility desire                        |
+| Affection expectation              | affection frequency or style                |
+| Future orientation                 | expectation of permanence                   |
+| Independence expectation           | autonomy preference                         |
+| Mind-reading expectation           | assumption partner should know              |
+| Mismatch risk                      | likelihood partners expect different things |
+| Violation sensitivity              | intensity of reaction to unmet expectations |
+| Renegotiation openness             | willingness to update expectations together |
 
 Expectation equation:
 
@@ -7339,59 +7328,59 @@ Emotional restraint is the regulation, suppression, delay, or controlled express
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Emotional restraint | controlling emotional expression |
-| Emotional repression | disconnecting from emotion entirely |
-| Emotional maturity | regulating emotion healthily |
-| Denial | refusing emotional truth |
-| Vulnerability resistance | fear of emotional exposure |
+| Concept                  | Meaning                             |
+| ------------------------ | ----------------------------------- |
+| Emotional restraint      | controlling emotional expression    |
+| Emotional repression     | disconnecting from emotion entirely |
+| Emotional maturity       | regulating emotion healthily        |
+| Denial                   | refusing emotional truth            |
+| Vulnerability resistance | fear of emotional exposure          |
 
 Restraint creates pressure, and pressure creates tension. Without restraint, attraction can move straight into expression and payoff. With restraint, attraction becomes suppression, tension, longing, emotional buildup, and eventual release.
 
 Useful restraint modes:
 
-| Mode | Core Reason | Common Behavior |
-| --- | --- | --- |
-| Social restraint | this would be inappropriate | careful wording, distance, private longing |
-| Emotional self-protection | admitting this could hurt me | deflection, teasing, withdrawal after vulnerability |
-| Power-based restraint | showing too much loses leverage | composure, controlled reactions, refusal to surrender |
-| Protective restraint | acting on this might hurt you | self-denial, distance despite care |
-| Mutual restraint | we both know and neither says it | loaded silence, subtle gestures, delayed confession |
-| Fear-based restraint | if this changes, I could lose everything | pretending feelings do not exist, avoiding escalation |
-| Identity-based restraint | this conflicts with who I think I am | rationalization, contradiction, confused fixation |
-| Devotional restraint | these feelings are too significant to rush | careful affection, reverent pacing, deep sincerity |
+| Mode                      | Core Reason                                | Common Behavior                                       |
+| ------------------------- | ------------------------------------------ | ----------------------------------------------------- |
+| Social restraint          | this would be inappropriate                | careful wording, distance, private longing            |
+| Emotional self-protection | admitting this could hurt me               | deflection, teasing, withdrawal after vulnerability   |
+| Power-based restraint     | showing too much loses leverage            | composure, controlled reactions, refusal to surrender |
+| Protective restraint      | acting on this might hurt you              | self-denial, distance despite care                    |
+| Mutual restraint          | we both know and neither says it           | loaded silence, subtle gestures, delayed confession   |
+| Fear-based restraint      | if this changes, I could lose everything   | pretending feelings do not exist, avoiding escalation |
+| Identity-based restraint  | this conflicts with who I think I am       | rationalization, contradiction, confused fixation     |
+| Devotional restraint      | these feelings are too significant to rush | careful affection, reverent pacing, deep sincerity    |
 
 Restraint is especially useful for micro-tension:
 
-| Signal | Effect |
-| --- | --- |
-| interrupted touch | raises pressure without payoff |
-| unfinished sentence | leaves emotional truth implied |
-| looking away too quickly | shows leakage through composure |
-| topic change after vulnerability | preserves fear and denial |
-| hesitation before saying a name | makes ordinary speech intimate |
-| restrained jealousy | reveals attachment without confession |
-| brief crack in composure | proves the feeling is real |
+| Signal                           | Effect                                |
+| -------------------------------- | ------------------------------------- |
+| interrupted touch                | raises pressure without payoff        |
+| unfinished sentence              | leaves emotional truth implied        |
+| looking away too quickly         | shows leakage through composure       |
+| topic change after vulnerability | preserves fear and denial             |
+| hesitation before saying a name  | makes ordinary speech intimate        |
+| restrained jealousy              | reveals attachment without confession |
+| brief crack in composure         | proves the feeling is real            |
 
 Good slow burn often uses high emotional intensity plus low emotional expression. That imbalance creates yearning. Restrained characters may communicate through indirect intimacy: remembering details, protective behavior, acts of service, lingering presence, quiet repair, fixing things silently, subtle touch, and emotional attentiveness.
 
 Restraint should interact with attachment and chemistry:
 
-| Attachment | Typical Restraint |
-| --- | --- |
-| Secure | balanced restraint |
-| Anxious | weak restraint |
-| Avoidant | heavy restraint |
-| Fearful | inconsistent restraint |
+| Attachment | Typical Restraint      |
+| ---------- | ---------------------- |
+| Secure     | balanced restraint     |
+| Anxious    | weak restraint         |
+| Avoidant   | heavy restraint        |
+| Fearful    | inconsistent restraint |
 
-| Chemistry | Result |
-| --- | --- |
-| tension chemistry | explosive slow burn |
-| emotional chemistry | aching vulnerability |
+| Chemistry              | Result                      |
+| ---------------------- | --------------------------- |
+| tension chemistry      | explosive slow burn         |
+| emotional chemistry    | aching vulnerability        |
 | oppositional chemistry | emotionally loaded conflict |
-| soft longing chemistry | devastating yearning |
-| devotional chemistry | emotionally sacred intimacy |
+| soft longing chemistry | devastating yearning        |
+| devotional chemistry   | emotionally sacred intimacy |
 
 Release should be earned. Restraint can break through confession, anger, jealousy, physical intimacy, emotional breakdown, fear of loss, sacrifice, or caretaking. The release only lands if pressure existed first.
 
@@ -7413,33 +7402,33 @@ A character can flirt constantly without deep attachment. Another character can 
 
 Useful flirting styles:
 
-| Style | Core Energy | Common Use |
-| --- | --- | --- |
-| Playful | fun, teasing, momentum | friends to lovers, rivals, extroverted characters |
-| Teasing | provocation, attention | enemies to lovers, rivals |
-| Sincere | genuine admiration | mature romance, friends to lovers, healing routes |
-| Bold | confidence, pursuit | charismatic or high-confidence characters |
-| Subtle | ambiguity, restraint | slow burn, guarded characters |
-| Intellectual | fascination through mind | academic rivals, workplace romance |
-| Protective | care through attention | slow burn, reserved characters |
-| Awkward | nerves, accidental honesty | inexperienced or high-stakes attraction |
-| Dominant | control, tension | high-tension romance with consent responsiveness |
-| Submissive | invitation, emotional openness | praise, yielding attention, vulnerability |
-| Domestic | comfort, established intimacy | established or household romance |
-| Antagonistic | conflict masking attraction | enemies to lovers |
-| Devotional | admiration, emotional intensity | deep validation and focused attention |
-| Chaotic | unpredictability, stimulation | volatile or impulsive chemistry |
-| Silent / nonverbal | implication, proximity, restraint | slow burn and emotionally restrained routes |
+| Style              | Core Energy                       | Common Use                                        |
+| ------------------ | --------------------------------- | ------------------------------------------------- |
+| Playful            | fun, teasing, momentum            | friends to lovers, rivals, extroverted characters |
+| Teasing            | provocation, attention            | enemies to lovers, rivals                         |
+| Sincere            | genuine admiration                | mature romance, friends to lovers, healing routes |
+| Bold               | confidence, pursuit               | charismatic or high-confidence characters         |
+| Subtle             | ambiguity, restraint              | slow burn, guarded characters                     |
+| Intellectual       | fascination through mind          | academic rivals, workplace romance                |
+| Protective         | care through attention            | slow burn, reserved characters                    |
+| Awkward            | nerves, accidental honesty        | inexperienced or high-stakes attraction           |
+| Dominant           | control, tension                  | high-tension romance with consent responsiveness  |
+| Submissive         | invitation, emotional openness    | praise, yielding attention, vulnerability         |
+| Domestic           | comfort, established intimacy     | established or household romance                  |
+| Antagonistic       | conflict masking attraction       | enemies to lovers                                 |
+| Devotional         | admiration, emotional intensity   | deep validation and focused attention             |
+| Chaotic            | unpredictability, stimulation     | volatile or impulsive chemistry                   |
+| Silent / nonverbal | implication, proximity, restraint | slow burn and emotionally restrained routes       |
 
 Style combinations can become route hints:
 
-| Combination | Dynamic |
-| --- | --- |
-| teasing + teasing | banter-heavy chemistry |
-| sincere + awkward | sweet vulnerability |
-| dominant + subtle | tension-heavy pursuit |
-| playful + protective | emotionally safe chemistry |
-| antagonistic + antagonistic | explosive intensity |
+| Combination                 | Dynamic                    |
+| --------------------------- | -------------------------- |
+| teasing + teasing           | banter-heavy chemistry     |
+| sincere + awkward           | sweet vulnerability        |
+| dominant + subtle           | tension-heavy pursuit      |
+| playful + protective        | emotionally safe chemistry |
+| antagonistic + antagonistic | explosive intensity        |
 
 Dominant and submissive flirting must remain consent-aware, reciprocal, and responsive to boundaries. The app can suggest tone and pacing, but it should never instruct coercive escalation.
 
@@ -7461,32 +7450,32 @@ power imbalance
 
 Major power axes:
 
-| Axis | Meaning | Common Routes |
-| --- | --- | --- |
-| Emotional Power | who is more emotionally invested | friends to lovers, second chance, slow burn |
-| Social Power | status, reputation, authority, influence | celebrity, royalty, workplace, age gap |
-| Psychological Power | who understands the other better | healer, redemption, guarded characters |
-| Sexual Power | who controls erotic tension and escalation | high-tension romance, slow burn |
-| Protective Power | who can provide safety | protector, guardian, single parent, healer |
-| Competence Power | attraction through capability | rivals, academic rivals, workplace |
-| Dependency Power | who needs the other more | forced proximity, trauma recovery, survival |
-| Pursuer x Avoidant | one seeks closeness while one fears engulfment | slow burn, second chance, guarded romance |
-| Mutual Dominance | neither naturally yields | rivals, enemies, power couples |
-| Soft Dominance x Trust | confident emotional grounding | caretaking, high-trust romance |
+| Axis                   | Meaning                                        | Common Routes                               |
+| ---------------------- | ---------------------------------------------- | ------------------------------------------- |
+| Emotional Power        | who is more emotionally invested               | friends to lovers, second chance, slow burn |
+| Social Power           | status, reputation, authority, influence       | celebrity, royalty, workplace, age gap      |
+| Psychological Power    | who understands the other better               | healer, redemption, guarded characters      |
+| Sexual Power           | who controls erotic tension and escalation     | high-tension romance, slow burn             |
+| Protective Power       | who can provide safety                         | protector, guardian, single parent, healer  |
+| Competence Power       | attraction through capability                  | rivals, academic rivals, workplace          |
+| Dependency Power       | who needs the other more                       | forced proximity, trauma recovery, survival |
+| Pursuer x Avoidant     | one seeks closeness while one fears engulfment | slow burn, second chance, guarded romance   |
+| Mutual Dominance       | neither naturally yields                       | rivals, enemies, power couples              |
+| Soft Dominance x Trust | confident emotional grounding                  | caretaking, high-trust romance              |
 
 Useful hidden variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Emotional Leverage | who risks more emotionally |
-| Pursuit Balance | who initiates connection |
-| Vulnerability Gap | openness asymmetry |
-| Social Authority | status imbalance |
-| Protective Reliance | dependence on safety |
-| Sexual Initiative | who escalates tension |
-| Attachment Security | fear of loss |
-| Control Need | discomfort with vulnerability |
-| Reciprocity | balance of emotional investment |
+| Variable            | Meaning                         |
+| ------------------- | ------------------------------- |
+| Emotional Leverage  | who risks more emotionally      |
+| Pursuit Balance     | who initiates connection        |
+| Vulnerability Gap   | openness asymmetry              |
+| Social Authority    | status imbalance                |
+| Protective Reliance | dependence on safety            |
+| Sexual Initiative   | who escalates tension           |
+| Attachment Security | fear of loss                    |
+| Control Need        | discomfort with vulnerability   |
+| Reciprocity         | balance of emotional investment |
 
 Power dynamics should evolve. Static dynamics become repetitive. The runtime should let power shift when the flirtier character panics, the guarded character becomes dependent, the confident character needs comfort, or the protected character becomes the one offering safety.
 
@@ -7498,90 +7487,90 @@ Healthy D/s dynamics require trust, responsiveness, consent, and emotional attun
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Dominance | directing, leading, or controlling pace/energy |
-| Submission | yielding, inviting, trusting, or responding |
-| Control | managing outcomes or emotional flow |
-| Consent | mutual willing participation |
-| Abuse | coercion, fear, or non-consensual control |
+| Concept    | Meaning                                        |
+| ---------- | ---------------------------------------------- |
+| Dominance  | directing, leading, or controlling pace/energy |
+| Submission | yielding, inviting, trusting, or responding    |
+| Control    | managing outcomes or emotional flow            |
+| Consent    | mutual willing participation                   |
+| Abuse      | coercion, fear, or non-consensual control      |
 
 Dominance and submission are interaction patterns, not fixed identities. A character may dominate emotionally, submit romantically, switch dynamically, lead socially but yield vulnerably, or change by context and phase.
 
 Useful D/s modes:
 
-| Mode | Core Feeling | Runtime Behavior |
-| --- | --- | --- |
-| Soft dominance x playful submission | calm confidence meets teasing responsiveness | provocation, calm handling, trust/tension |
-| Emotional leadership | one regulates, one expresses | grounding, reassurance, regulation chemistry |
-| Tension control | one controls pacing and escalation | anticipation, restraint, deliberate intensity |
-| Mutual dominance | neither naturally yields | challenge, escalation, respect, vulnerability struggle |
-| Devotional submission | trust-based emotional surrender | attentiveness, receptiveness, voluntary yielding |
-| Protective dominance | I take responsibility for safety | grounding, decisiveness, containment |
-| Brat x handler | provocation meets composed response | attention, reaction, playful escalation |
-| Service-oriented submission | care through attentiveness | remembering preferences, anticipating needs |
-| Command/resistance | attraction through control tension | directive, resistance, escalation, fixation |
-| Switch | leadership and yielding alternate | flexible, responsive power shifts |
+| Mode                                | Core Feeling                                 | Runtime Behavior                                       |
+| ----------------------------------- | -------------------------------------------- | ------------------------------------------------------ |
+| Soft dominance x playful submission | calm confidence meets teasing responsiveness | provocation, calm handling, trust/tension              |
+| Emotional leadership                | one regulates, one expresses                 | grounding, reassurance, regulation chemistry           |
+| Tension control                     | one controls pacing and escalation           | anticipation, restraint, deliberate intensity          |
+| Mutual dominance                    | neither naturally yields                     | challenge, escalation, respect, vulnerability struggle |
+| Devotional submission               | trust-based emotional surrender              | attentiveness, receptiveness, voluntary yielding       |
+| Protective dominance                | I take responsibility for safety             | grounding, decisiveness, containment                   |
+| Brat x handler                      | provocation meets composed response          | attention, reaction, playful escalation                |
+| Service-oriented submission         | care through attentiveness                   | remembering preferences, anticipating needs            |
+| Command/resistance                  | attraction through control tension           | directive, resistance, escalation, fixation            |
+| Switch                              | leadership and yielding alternate            | flexible, responsive power shifts                      |
 
 D/s often expresses emotional intent:
 
-| Behavior | Possible Intent |
-| --- | --- |
-| Dominance | create safety or control tension |
-| Submission | invite closeness or trust |
-| Teasing resistance | provoke attention |
-| Emotional yielding | seek containment |
-| Control of pacing | manage vulnerability |
+| Behavior           | Possible Intent                  |
+| ------------------ | -------------------------------- |
+| Dominance          | create safety or control tension |
+| Submission         | invite closeness or trust        |
+| Teasing resistance | provoke attention                |
+| Emotional yielding | seek containment                 |
+| Control of pacing  | manage vulnerability             |
 
 Dominant archetypes describe distinct methods of emotional influence. A strong dominant character is not simply "someone who gives orders"; they have a coherent strategy for shaping intimacy, tension, safety, and connection.
 
 Useful dominant archetypes:
 
-| Archetype | Core Energy | Creates |
-| --- | --- | --- |
-| Soft dominant | calm emotional steadiness | safety, surrender, trust-heavy intimacy |
-| Teasing dominant | provocation and reaction play | flirt tension, banter, playful escalation |
-| Protective dominant | responsibility and safety | security, dependency, devotion |
-| Commanding dominant | authority and certainty | intensity, pressure, high-tension focus |
-| Devotional dominant | focused emotional leadership | profound intimacy, trust-heavy chemistry |
-| Intellectual dominant | mental and psychological precision | fascination, tension, emotional reading |
-| Chaotic dominant | unpredictability and intensity | obsession, volatility, addictive chemistry |
-| Possessive dominant | prioritization and exclusivity | significance and devotion, with control risk |
-| Service dominant | leadership through attentiveness | immersive intimacy, competent care |
-| Stoic dominant | restraint and composure | slow-burn pressure, meaningful cracks in control |
-| Predator archetype | pursuit and pressure | chase dynamics, reciprocal high intensity |
-| Rival dominant | challenge as attraction | oppositional chemistry, stimulation |
-| Gentle caretaker dominant | tenderness with guidance | comfort, healing intimacy |
-| Sadistic tease | controlled enjoyment of reactions | reactive chemistry, flirt escalation |
-| Only soft for you | selective vulnerability | power, exclusivity, private softness |
+| Archetype                 | Core Energy                        | Creates                                          |
+| ------------------------- | ---------------------------------- | ------------------------------------------------ |
+| Soft dominant             | calm emotional steadiness          | safety, surrender, trust-heavy intimacy          |
+| Teasing dominant          | provocation and reaction play      | flirt tension, banter, playful escalation        |
+| Protective dominant       | responsibility and safety          | security, dependency, devotion                   |
+| Commanding dominant       | authority and certainty            | intensity, pressure, high-tension focus          |
+| Devotional dominant       | focused emotional leadership       | profound intimacy, trust-heavy chemistry         |
+| Intellectual dominant     | mental and psychological precision | fascination, tension, emotional reading          |
+| Chaotic dominant          | unpredictability and intensity     | obsession, volatility, addictive chemistry       |
+| Possessive dominant       | prioritization and exclusivity     | significance and devotion, with control risk     |
+| Service dominant          | leadership through attentiveness   | immersive intimacy, competent care               |
+| Stoic dominant            | restraint and composure            | slow-burn pressure, meaningful cracks in control |
+| Predator archetype        | pursuit and pressure               | chase dynamics, reciprocal high intensity        |
+| Rival dominant            | challenge as attraction            | oppositional chemistry, stimulation              |
+| Gentle caretaker dominant | tenderness with guidance           | comfort, healing intimacy                        |
+| Sadistic tease            | controlled enjoyment of reactions  | reactive chemistry, flirt escalation             |
+| Only soft for you         | selective vulnerability            | power, exclusivity, private softness             |
 
 Most strong characters blend archetypes:
 
-| Combination | Result |
-| --- | --- |
-| soft + teasing | emotionally safe flirt |
-| stoic + devotional | devastating slow burn |
-| commanding + protective | high-trust intensity |
-| intellectual + rival | tension-heavy banter |
-| possessive + yearning | emotionally consuming |
-| gentle + service | healing intimacy |
-| chaotic + seductive | addictive instability |
+| Combination             | Result                 |
+| ----------------------- | ---------------------- |
+| soft + teasing          | emotionally safe flirt |
+| stoic + devotional      | devastating slow burn  |
+| commanding + protective | high-trust intensity   |
+| intellectual + rival    | tension-heavy banter   |
+| possessive + yearning   | emotionally consuming  |
+| gentle + service        | healing intimacy       |
+| chaotic + seductive     | addictive instability  |
 
 Dominance should evolve. A commanding character may become protective, then vulnerable, then devotional. That shift creates emotional payoff because power becomes meaningful when it can be affected by intimacy.
 
 Dominant archetype variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Initiative | tendency to lead interaction |
-| Emotional containment | regulation and composure |
-| Tension control | ability to pace chemistry |
-| Protective instinct | desire to provide safety |
-| Attention intensity | focused attention on partner |
+| Variable                | Meaning                         |
+| ----------------------- | ------------------------------- |
+| Initiative              | tendency to lead interaction    |
+| Emotional containment   | regulation and composure        |
+| Tension control         | ability to pace chemistry       |
+| Protective instinct     | desire to provide safety        |
+| Attention intensity     | focused attention on partner    |
 | Vulnerability tolerance | comfort with emotional openness |
-| Possessiveness | exclusivity desire |
-| Responsiveness | adaptation to reactions |
-| Confidence | certainty in interaction |
+| Possessiveness          | exclusivity desire              |
+| Responsiveness          | adaptation to reactions         |
+| Confidence              | certainty in interaction        |
 
 Dominant energy equation:
 
@@ -7597,46 +7586,46 @@ Submissive archetypes describe distinct ways of emotionally yielding, inviting, 
 
 Useful submissive archetypes:
 
-| Archetype | Core Energy | Creates |
-| --- | --- | --- |
-| Brat | playful resistance seeking engagement | banter, tension loops, playful escalation |
-| Devotional submissive | surrender through admiration and trust | reverent intimacy, high-trust chemistry |
-| Soft submissive | gentleness and receptiveness | soothing, tender intimacy |
-| Praise-seeking submissive | validation through focused attention | responsiveness loops |
-| Stoic submissive | restrained yielding | slow-burn intensity, meaningful reactions |
-| Service-oriented submissive | care through attentiveness | domestic intimacy, emotional grounding |
-| Reactive submissive | visible emotional responsiveness | flirt escalation and chemistry rewards |
-| Guarded submissive | wanting closeness while fearing vulnerability | gradual trust payoff |
-| Chaotic submissive | impulsive emotional surrender | intoxicating or unstable intensity |
-| Curious submissive | exploratory openness | playful discovery |
-| Emotionally hungry submissive | craving attention and closeness | consuming intimacy |
-| Only vulnerable with you | selective emotional surrender | trust, exclusivity, private softness |
-| Emotional mirror | deep response to partner cues | emotional flow and intimacy acceleration |
-| Competent submissive | strength plus chosen yielding | high-voltage intentional vulnerability |
-| Yearning submissive | quiet emotional ache | devastating slow-burn chemistry |
+| Archetype                     | Core Energy                                   | Creates                                   |
+| ----------------------------- | --------------------------------------------- | ----------------------------------------- |
+| Brat                          | playful resistance seeking engagement         | banter, tension loops, playful escalation |
+| Devotional submissive         | surrender through admiration and trust        | reverent intimacy, high-trust chemistry   |
+| Soft submissive               | gentleness and receptiveness                  | soothing, tender intimacy                 |
+| Praise-seeking submissive     | validation through focused attention          | responsiveness loops                      |
+| Stoic submissive              | restrained yielding                           | slow-burn intensity, meaningful reactions |
+| Service-oriented submissive   | care through attentiveness                    | domestic intimacy, emotional grounding    |
+| Reactive submissive           | visible emotional responsiveness              | flirt escalation and chemistry rewards    |
+| Guarded submissive            | wanting closeness while fearing vulnerability | gradual trust payoff                      |
+| Chaotic submissive            | impulsive emotional surrender                 | intoxicating or unstable intensity        |
+| Curious submissive            | exploratory openness                          | playful discovery                         |
+| Emotionally hungry submissive | craving attention and closeness               | consuming intimacy                        |
+| Only vulnerable with you      | selective emotional surrender                 | trust, exclusivity, private softness      |
+| Emotional mirror              | deep response to partner cues                 | emotional flow and intimacy acceleration  |
+| Competent submissive          | strength plus chosen yielding                 | high-voltage intentional vulnerability    |
+| Yearning submissive           | quiet emotional ache                          | devastating slow-burn chemistry           |
 
 Submission often expresses trust and emotional invitation:
 
-| Behavior | Possible Intent |
-| --- | --- |
-| Yielding | I trust you |
-| Reacting visibly | your attention affects me |
-| Teasing resistance | engage with me more |
-| Seeking praise | validate emotional significance |
-| Emotional openness | handle me carefully |
+| Behavior           | Possible Intent                 |
+| ------------------ | ------------------------------- |
+| Yielding           | I trust you                     |
+| Reacting visibly   | your attention affects me       |
+| Teasing resistance | engage with me more             |
+| Seeking praise     | validate emotional significance |
+| Emotional openness | handle me carefully             |
 
 Submission should remain agentic. Weak submissive writing becomes passive compliance. Strong submissive writing is emotionally responsive participation that shapes chemistry, tension, and intimacy.
 
 Submissive archetype combinations:
 
-| Combination | Dynamic |
-| --- | --- |
-| brat + teasing dominant | banter-heavy tension |
-| devotional + protective dominant | deep emotional intimacy |
-| stoic + soft dominant | devastating slow burn |
-| reactive + teasing dominant | flirt escalation loops |
-| guarded + patient dominant | trust-building slow burn |
-| competent + commanding dominant | high-tension mutual respect |
+| Combination                      | Dynamic                     |
+| -------------------------------- | --------------------------- |
+| brat + teasing dominant          | banter-heavy tension        |
+| devotional + protective dominant | deep emotional intimacy     |
+| stoic + soft dominant            | devastating slow burn       |
+| reactive + teasing dominant      | flirt escalation loops      |
+| guarded + patient dominant       | trust-building slow burn    |
+| competent + commanding dominant  | high-tension mutual respect |
 
 Submission can evolve:
 
@@ -7650,17 +7639,17 @@ playful resistance
 
 Submissive variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Responsiveness | reaction intensity |
-| Yielding comfort | comfort surrendering control |
-| Trust threshold | safety required for openness |
-| Attention need | desire for focused engagement |
-| Emotional transparency | visible reactions |
+| Variable                | Meaning                        |
+| ----------------------- | ------------------------------ |
+| Responsiveness          | reaction intensity             |
+| Yielding comfort        | comfort surrendering control   |
+| Trust threshold         | safety required for openness   |
+| Attention need          | desire for focused engagement  |
+| Emotional transparency  | visible reactions              |
 | Vulnerability tolerance | comfort being emotionally seen |
-| Reassurance need | need for validation |
-| Playfulness | comfort with tension play |
-| Attachment intensity | emotional investment depth |
+| Reassurance need        | need for validation            |
+| Playfulness             | comfort with tension play      |
+| Attachment intensity    | emotional investment depth     |
 
 Submissive chemistry equation:
 
@@ -7676,20 +7665,20 @@ Switch archetypes describe adaptive, emotionally responsive power fluidity. A sw
 
 Useful switch archetypes:
 
-| Archetype | Core Energy | Creates |
-| --- | --- | --- |
-| Playful switch | interaction determines the dynamic | lively banter, reversal games |
-| Emotional switch | emotional state changes relational role | realistic role shifts |
-| Guarded switch | control protects, yielding requires trust | powerful slow-burn surrender |
-| Competitive switch | power shifts through challenge | rivalry, reversals, admiration |
-| Devotional switch | mutual emotional surrender | mature reciprocal intimacy |
-| Brat-to-soft switch | public provocation, private openness | tension to softness payoff |
-| Stoic-to-reactive switch | composure cracks under pressure | small reactions become huge |
-| Service/control switch | caretaking alternates with being cared for | reciprocal realism |
-| Chaotic switch | impulsive fluctuation | intoxicating or exhausting instability |
-| Competent vulnerability switch | capable person selectively yields | high intimacy through chosen vulnerability |
-| Mirror switch | adapts to partner energy | fluid chemistry and attunement |
-| Only with you switch | behavior changes for one partner | exclusivity and private intimacy |
+| Archetype                      | Core Energy                                | Creates                                    |
+| ------------------------------ | ------------------------------------------ | ------------------------------------------ |
+| Playful switch                 | interaction determines the dynamic         | lively banter, reversal games              |
+| Emotional switch               | emotional state changes relational role    | realistic role shifts                      |
+| Guarded switch                 | control protects, yielding requires trust  | powerful slow-burn surrender               |
+| Competitive switch             | power shifts through challenge             | rivalry, reversals, admiration             |
+| Devotional switch              | mutual emotional surrender                 | mature reciprocal intimacy                 |
+| Brat-to-soft switch            | public provocation, private openness       | tension to softness payoff                 |
+| Stoic-to-reactive switch       | composure cracks under pressure            | small reactions become huge                |
+| Service/control switch         | caretaking alternates with being cared for | reciprocal realism                         |
+| Chaotic switch                 | impulsive fluctuation                      | intoxicating or exhausting instability     |
+| Competent vulnerability switch | capable person selectively yields          | high intimacy through chosen vulnerability |
+| Mirror switch                  | adapts to partner energy                   | fluid chemistry and attunement             |
+| Only with you switch           | behavior changes for one partner           | exclusivity and private intimacy           |
 
 Switch dynamics are powerful because reversals create payoff: the teasing dominant becomes vulnerable, the brat grounds the other person, the protector accepts comfort, or the stoic character visibly reacts. Those reversals make the relationship feel alive.
 
@@ -7720,16 +7709,16 @@ restraint
 
 Switch variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Power fluidity | willingness to shift roles |
-| Emotional adaptability | responsiveness to partner state |
+| Variable                  | Meaning                              |
+| ------------------------- | ------------------------------------ |
+| Power fluidity            | willingness to shift roles           |
+| Emotional adaptability    | responsiveness to partner state      |
 | Vulnerability flexibility | comfort alternating openness/control |
-| Initiative balance | who leads interaction |
-| Reciprocity | mutual emotional influence |
-| Composure stability | resistance to emotional reversal |
-| Trust | safety enabling flexibility |
-| Attention responsiveness | reaction sensitivity |
+| Initiative balance        | who leads interaction                |
+| Reciprocity               | mutual emotional influence           |
+| Composure stability       | resistance to emotional reversal     |
+| Trust                     | safety enabling flexibility          |
+| Attention responsiveness  | reaction sensitivity                 |
 
 Switch chemistry equation:
 
@@ -7743,37 +7732,37 @@ mutual attraction
 
 Attachment and tone affect expression:
 
-| Attachment | Common D/s Expression |
-| --- | --- |
-| Secure | responsive and balanced |
-| Anxious | reassurance-seeking submission |
-| Avoidant | control-oriented dominance |
-| Fearful | fluctuating power shifts |
+| Attachment | Common D/s Expression          |
+| ---------- | ------------------------------ |
+| Secure     | responsive and balanced        |
+| Anxious    | reassurance-seeking submission |
+| Avoidant   | control-oriented dominance     |
+| Fearful    | fluctuating power shifts       |
 
-| Tone | Result |
-| --- | --- |
-| Playful | teasing chemistry |
-| Yearning | restrained surrender |
-| Tense | power negotiation |
-| Devotional | emotionally profound trust |
-| Chaotic | unstable power struggle |
-| Tender | emotionally safe leadership |
+| Tone       | Result                      |
+| ---------- | --------------------------- |
+| Playful    | teasing chemistry           |
+| Yearning   | restrained surrender        |
+| Tense      | power negotiation           |
+| Devotional | emotionally profound trust  |
+| Chaotic    | unstable power struggle     |
+| Tender     | emotionally safe leadership |
 
 Strong D/s is emotionally interactive. Weak D/s is one character controlling and the other obeying mechanically. Strong D/s means both characters are responsive to each other's reactions, boundaries, trust, and vulnerability.
 
 Healthy D/s variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Initiative | who leads escalation |
-| Emotional control | regulation ability |
-| Yielding comfort | willingness to emotionally surrender |
-| Trust | safety with vulnerability |
-| Provocation enjoyment | pleasure in tension play |
-| Responsiveness | emotional reactivity |
-| Power fluidity | ability to shift roles |
-| Containment need | desire for grounding or structure |
-| Validation need | desire for focused attention |
+| Variable              | Meaning                              |
+| --------------------- | ------------------------------------ |
+| Initiative            | who leads escalation                 |
+| Emotional control     | regulation ability                   |
+| Yielding comfort      | willingness to emotionally surrender |
+| Trust                 | safety with vulnerability            |
+| Provocation enjoyment | pleasure in tension play             |
+| Responsiveness        | emotional reactivity                 |
+| Power fluidity        | ability to shift roles               |
+| Containment need      | desire for grounding or structure    |
+| Validation need       | desire for focused attention         |
 
 D/s evolution:
 
@@ -7801,13 +7790,13 @@ Kink-aware dynamics are recurring patterns of attraction, emotional stimulation,
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Kink | recurring erotic or psychological attraction pattern |
-| Fetish | arousal strongly tied to a specific object or body focus |
-| Fantasy | imagined emotional or erotic scenario |
-| Dynamic | recurring relationship interaction pattern |
-| Preference | general attraction tendency |
+| Concept    | Meaning                                                  |
+| ---------- | -------------------------------------------------------- |
+| Kink       | recurring erotic or psychological attraction pattern     |
+| Fetish     | arousal strongly tied to a specific object or body focus |
+| Fantasy    | imagined emotional or erotic scenario                    |
+| Dynamic    | recurring relationship interaction pattern               |
+| Preference | general attraction tendency                              |
 
 The core principle is emotion plus meaning plus tension plus trust plus fantasy. For example, praise-oriented dynamics are often less about the words alone and more about validation, focused attention, and feeling positively seen by someone important.
 
@@ -7815,91 +7804,91 @@ Kink should modify interaction style, not replace emotional development. Chemist
 
 Useful kink-aware dynamic categories:
 
-| Category | Emotional Core | Runtime Use |
-| --- | --- | --- |
-| Praise-oriented | validation and focused approval | warmer affirmation, reassurance, visible approval |
-| Power exchange | leadership, yielding, trust | D/s pacing, guidance, surrender, role fluidity |
-| Attention/focus | becoming emotionally central | possessive attention, fixation, prioritization |
-| Restraint/denial | anticipation and delayed gratification | slow burn, teasing, emotional restraint |
-| Protective/caretaking | safety and containment | grounding, reassurance, careful comfort |
-| Vulnerability | exposure and acceptance | confessions, being seen, emotional surrender |
-| Possessive/claiming | exclusivity and prioritization | jealousy play, chosen exclusivity, devotion |
-| Competence/admiration | capability and authority | respect, mentor energy, competence attraction |
-| Brat/provocation | resistance and reaction | playful challenge, reaction loops, attention reinforcement |
-| Devotional | reverence and significance | focused care, loyalty, worshipful attention |
-| Emotional dependency | becoming necessary | reassurance loops, centrality, "you calm me" dynamics |
-| Chase | pursuit and uncertainty | flirt pursuit, hard-to-get energy, tension escalation |
-| Corruption/transformation | change through attraction | softening, unraveling, confidence growth |
-| Size/strength/protection | safety through presence | shielding, carrying, protective physicality |
-| Emotional overwhelm | composure breaking | jealousy cracks, desperate confessions, loss of control |
+| Category                  | Emotional Core                         | Runtime Use                                                |
+| ------------------------- | -------------------------------------- | ---------------------------------------------------------- |
+| Praise-oriented           | validation and focused approval        | warmer affirmation, reassurance, visible approval          |
+| Power exchange            | leadership, yielding, trust            | D/s pacing, guidance, surrender, role fluidity             |
+| Attention/focus           | becoming emotionally central           | possessive attention, fixation, prioritization             |
+| Restraint/denial          | anticipation and delayed gratification | slow burn, teasing, emotional restraint                    |
+| Protective/caretaking     | safety and containment                 | grounding, reassurance, careful comfort                    |
+| Vulnerability             | exposure and acceptance                | confessions, being seen, emotional surrender               |
+| Possessive/claiming       | exclusivity and prioritization         | jealousy play, chosen exclusivity, devotion                |
+| Competence/admiration     | capability and authority               | respect, mentor energy, competence attraction              |
+| Brat/provocation          | resistance and reaction                | playful challenge, reaction loops, attention reinforcement |
+| Devotional                | reverence and significance             | focused care, loyalty, worshipful attention                |
+| Emotional dependency      | becoming necessary                     | reassurance loops, centrality, "you calm me" dynamics      |
+| Chase                     | pursuit and uncertainty                | flirt pursuit, hard-to-get energy, tension escalation      |
+| Corruption/transformation | change through attraction              | softening, unraveling, confidence growth                   |
+| Size/strength/protection  | safety through presence                | shielding, carrying, protective physicality                |
+| Emotional overwhelm       | composure breaking                     | jealousy cracks, desperate confessions, loss of control    |
 
 More granular kink tags can be grouped by emotional engine:
 
-| Group | Tags | Core Emotional Theme |
-| --- | --- | --- |
-| Affection and attention | praise, worship, attention/focus, devotion, adoration, obsession/neediness, possessiveness, jealousy play, pet names, being watched, validation seeking, begging dynamics | validation, centrality, admiration, reassurance, indispensability |
-| Power exchange | dominance, submission, service, obedience, bratting, discipline, command/control, ownership language, possession dynamics, soft dominance, gentle femdom, caregiver/little, protector dynamics, authority figure dynamics | control, surrender, trust, structure, challenge, safety |
-| Tension and anticipation | teasing, denial, slow seduction, non-dangerous edge play, chase/pursuit, consensual resistance play, push-pull, forbidden attraction, almost-touching, emotional restraint, flirt-fighting | restraint, longing, uncertainty, challenge, escalation |
-| Emotional vulnerability | emotional exposure, comfort/aftercare focus, crying comfort, confession dynamics, dependency themes, needing/reassurance, safe surrender, emotional caretaking, "stay with me", emotional softening | vulnerability, safety, caretaking, trust, abandonment reassurance |
-| Devotional and romantic | soulmate fantasy, exclusive attention, romantic possession, loyalty dynamics, sacrifice/worship, emotional monopolization, eternal commitment, rescue fantasy, healing dynamics, reunion/return | destiny, singularity, permanence, restoration, chosen devotion |
-| Psychological | mind games, consensual manipulation fantasy, corruption fantasy, temptation dynamics, emotional power imbalance, rivalry attraction, intimidation attraction, fear-tension, emotional dependency fantasy | stimulation, transformation, restraint breaking, asymmetry, intensity |
-| Sensory and physical | touch sensitivity, sensory deprivation, restraint, temperature play, massage/sensual touch, hair pulling, biting, marking, clothing/uniform attraction, scent attraction | embodied intimacy, surrender, intensity, symbolic claiming |
-| Praise and degradation spectrum | praise, encouragement, approval seeking, consensual humiliation, consensual degradation, mockery/teasing, embarrassment dynamics | worth, support, exposure, shame tension, reactive vulnerability |
-| Possession and exclusivity | territoriality, "mine/yours" language, protective jealousy, exclusivity rituals, public claiming, emotional dependency, obsessive attention | claiming, uniqueness, visibility, fixation |
-| Romantic roleplay dynamics | enemies-to-lovers energy, friends-to-lovers longing, forbidden romance, rival dynamics, bodyguard/protected, teacher/mentor, royalty/servant, celebrity/fan, stranger seduction | trope-shaped tension, status, safety, mystery, idealization |
+| Group                           | Tags                                                                                                                                                                                                                      | Core Emotional Theme                                                  |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| Affection and attention         | praise, worship, attention/focus, devotion, adoration, obsession/neediness, possessiveness, jealousy play, pet names, being watched, validation seeking, begging dynamics                                                 | validation, centrality, admiration, reassurance, indispensability     |
+| Power exchange                  | dominance, submission, service, obedience, bratting, discipline, command/control, ownership language, possession dynamics, soft dominance, gentle femdom, caregiver/little, protector dynamics, authority figure dynamics | control, surrender, trust, structure, challenge, safety               |
+| Tension and anticipation        | teasing, denial, slow seduction, non-dangerous edge play, chase/pursuit, consensual resistance play, push-pull, forbidden attraction, almost-touching, emotional restraint, flirt-fighting                                | restraint, longing, uncertainty, challenge, escalation                |
+| Emotional vulnerability         | emotional exposure, comfort/aftercare focus, crying comfort, confession dynamics, dependency themes, needing/reassurance, safe surrender, emotional caretaking, "stay with me", emotional softening                       | vulnerability, safety, caretaking, trust, abandonment reassurance     |
+| Devotional and romantic         | soulmate fantasy, exclusive attention, romantic possession, loyalty dynamics, sacrifice/worship, emotional monopolization, eternal commitment, rescue fantasy, healing dynamics, reunion/return                           | destiny, singularity, permanence, restoration, chosen devotion        |
+| Psychological                   | mind games, consensual manipulation fantasy, corruption fantasy, temptation dynamics, emotional power imbalance, rivalry attraction, intimidation attraction, fear-tension, emotional dependency fantasy                  | stimulation, transformation, restraint breaking, asymmetry, intensity |
+| Sensory and physical            | touch sensitivity, sensory deprivation, restraint, temperature play, massage/sensual touch, hair pulling, biting, marking, clothing/uniform attraction, scent attraction                                                  | embodied intimacy, surrender, intensity, symbolic claiming            |
+| Praise and degradation spectrum | praise, encouragement, approval seeking, consensual humiliation, consensual degradation, mockery/teasing, embarrassment dynamics                                                                                          | worth, support, exposure, shame tension, reactive vulnerability       |
+| Possession and exclusivity      | territoriality, "mine/yours" language, protective jealousy, exclusivity rituals, public claiming, emotional dependency, obsessive attention                                                                               | claiming, uniqueness, visibility, fixation                            |
+| Romantic roleplay dynamics      | enemies-to-lovers energy, friends-to-lovers longing, forbidden romance, rival dynamics, bodyguard/protected, teacher/mentor, royalty/servant, celebrity/fan, stranger seduction                                           | trope-shaped tension, status, safety, mystery, idealization           |
 
 Healthy possessive or claiming dynamics should emphasize significance, devotion, and chosen exclusivity. They must not reduce autonomy, coerce behavior, or convert jealousy into control. Likewise, emotional dependency can feel romantic, healing, or consuming only when balanced by agency and reciprocity.
 
 Kinks often map to emotional needs:
 
-| Kink Energy | Possible Emotional Need |
-| --- | --- |
-| Praise | validation |
-| Submission | trust and safety |
-| Dominance | control or containment |
-| Jealousy | reassurance and significance |
-| Teasing | interaction and attention |
-| Devotion | emotional centrality |
-| Restraint | anticipation and tension |
-| Protection | safety |
-| Possessiveness | exclusivity |
-| Vulnerability | acceptance |
+| Kink Energy    | Possible Emotional Need      |
+| -------------- | ---------------------------- |
+| Praise         | validation                   |
+| Submission     | trust and safety             |
+| Dominance      | control or containment       |
+| Jealousy       | reassurance and significance |
+| Teasing        | interaction and attention    |
+| Devotion       | emotional centrality         |
+| Restraint      | anticipation and tension     |
+| Protection     | safety                       |
+| Possessiveness | exclusivity                  |
+| Vulnerability  | acceptance                   |
 
 Attachment-linked kink mapping should remain available as interpretation data, not deterministic diagnosis:
 
-| Kink | Common Psychological Link |
-| --- | --- |
-| Praise | inadequacy wounds |
-| Exclusivity | replacement fears |
-| Caretaking | emotional neglect wounds |
-| Submission | control fatigue |
-| Dominance | safety or control restoration |
-| Devotion | abandonment wounds |
-| Attention/focus | invisibility wounds |
-| Jealousy play | reassurance seeking |
-| Emotional dependency | attachment hunger |
-| Protective dynamics | safety needs |
+| Kink                 | Common Psychological Link     |
+| -------------------- | ----------------------------- |
+| Praise               | inadequacy wounds             |
+| Exclusivity          | replacement fears             |
+| Caretaking           | emotional neglect wounds      |
+| Submission           | control fatigue               |
+| Dominance            | safety or control restoration |
+| Devotion             | abandonment wounds            |
+| Attention/focus      | invisibility wounds           |
+| Jealousy play        | reassurance seeking           |
+| Emotional dependency | attachment hunger             |
+| Protective dynamics  | safety needs                  |
 
 Attachment style should shape expression:
 
-| Style | Common Tendency |
-| --- | --- |
-| Secure | balanced reciprocal exploration |
-| Anxious | reassurance, praise, dependency dynamics |
-| Avoidant | control and restraint dynamics |
-| Fearful | intense push-pull and vulnerability tension |
+| Style    | Common Tendency                             |
+| -------- | ------------------------------------------- |
+| Secure   | balanced reciprocal exploration             |
+| Anxious  | reassurance, praise, dependency dynamics    |
+| Avoidant | control and restraint dynamics              |
+| Fearful  | intense push-pull and vulnerability tension |
 
 Trope context should also bias kink-aware dynamics:
 
-| Trope | Common Dynamic Themes |
-| --- | --- |
+| Trope             | Common Dynamic Themes                |
+| ----------------- | ------------------------------------ |
 | Enemies to lovers | power struggle, tension, provocation |
-| Friends to lovers | emotional vulnerability, longing |
-| Slow burn | restraint, anticipation |
-| Healing romance | caretaking, reassurance |
-| Rivals to lovers | challenge and admiration |
-| Forbidden romance | secrecy, suppression |
-| Devotion romance | emotional worship, prioritization |
+| Friends to lovers | emotional vulnerability, longing     |
+| Slow burn         | restraint, anticipation              |
+| Healing romance   | caretaking, reassurance              |
+| Rivals to lovers  | challenge and admiration             |
+| Forbidden romance | secrecy, suppression                 |
+| Devotion romance  | emotional worship, prioritization    |
 
 Kink progression should follow emotional readiness:
 
@@ -7916,19 +7905,19 @@ The app should block or redirect kink-aware escalation when boundaries, age elig
 
 Useful kink variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Trust | emotional safety |
-| Responsiveness | reaction intensity |
-| Power preference | comfort leading or yielding |
-| Attention need | desire for focused engagement |
-| Validation need | praise or reassurance importance |
-| Vulnerability comfort | openness tolerance |
-| Tension enjoyment | comfort with prolonged anticipation |
-| Emotional dependency | attachment intensity |
-| Exclusivity desire | need for prioritization |
-| Fantasy integration | how naturally the fantasy fits the relationship |
-| Boundary fit | whether current context supports the dynamic |
+| Variable              | Meaning                                         |
+| --------------------- | ----------------------------------------------- |
+| Trust                 | emotional safety                                |
+| Responsiveness        | reaction intensity                              |
+| Power preference      | comfort leading or yielding                     |
+| Attention need        | desire for focused engagement                   |
+| Validation need       | praise or reassurance importance                |
+| Vulnerability comfort | openness tolerance                              |
+| Tension enjoyment     | comfort with prolonged anticipation             |
+| Emotional dependency  | attachment intensity                            |
+| Exclusivity desire    | need for prioritization                         |
+| Fantasy integration   | how naturally the fantasy fits the relationship |
+| Boundary fit          | whether current context supports the dynamic    |
 
 Kink-aware romance equation:
 
@@ -7947,79 +7936,79 @@ Fetish-aware dynamics are narrower than kink dynamics. A fetish is a highly spec
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Kink | broader dynamic or emotional pattern |
-| Fetish | highly specific fixation or trigger |
-| Preference | general attraction tendency |
-| Fantasy | imagined scenario |
-| Chemistry | interactional attraction |
+| Concept    | Meaning                              |
+| ---------- | ------------------------------------ |
+| Kink       | broader dynamic or emotional pattern |
+| Fetish     | highly specific fixation or trigger  |
+| Preference | general attraction tendency          |
+| Fantasy    | imagined scenario                    |
+| Chemistry  | interactional attraction             |
 
 The core principle is association plus attention plus emotional meaning plus anticipation. The stimulus becomes charged because it carries symbolic, sensory, relational, or memory-based significance.
 
 Broad fetish-aware categories:
 
-| Category | Focus | Possible Meaning |
-| --- | --- | --- |
-| Body-part | feet, hands, hair, legs, stomach, back, neck, voice, muscles, height difference, freckles, eyes, lips, scent | visual specificity, embodied admiration, instinctive intimacy |
-| Clothing/material | lingerie, uniforms, leather, latex, stockings, high heels, glasses, jewelry, silk/satin, tight clothing, cosplay | authority, identity, sensual texture, transformation |
-| Sensory | touch, temperature, audio/ASMR, scent, texture, blindfold/sensory restriction, pressure/compression | sensory immersion, anticipation, containment |
-| Psychological/situational | voyeurism fantasy, exhibitionism fantasy, transformation, roleplay, authority, corruption, rescue, possession, worship, obsession | attention, control, salvation, idealization, fixation |
-| Power/control | surrender, authority, restraint, obedience, challenge | trust, control, vulnerability |
-| Emotional/attachment | praise, dependency, caretaking, jealousy/exclusivity, emotional vulnerability, protective dynamics, aftercare | validation, reliance, safety, singularity |
-| Relationship dynamic | enemies-to-lovers, rivalry, forbidden romance, friends-to-lovers, age gap, power couple, bodyguard/protected | tension, competition, taboo, familiarity, admiration |
-| Fantasy archetype | vampire, monster romance, royalty, celebrity, teacher/mentor, villain attraction, obsessive archetype | danger, otherness, status, attention, intensity |
+| Category                  | Focus                                                                                                                             | Possible Meaning                                              |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Body-part                 | feet, hands, hair, legs, stomach, back, neck, voice, muscles, height difference, freckles, eyes, lips, scent                      | visual specificity, embodied admiration, instinctive intimacy |
+| Clothing/material         | lingerie, uniforms, leather, latex, stockings, high heels, glasses, jewelry, silk/satin, tight clothing, cosplay                  | authority, identity, sensual texture, transformation          |
+| Sensory                   | touch, temperature, audio/ASMR, scent, texture, blindfold/sensory restriction, pressure/compression                               | sensory immersion, anticipation, containment                  |
+| Psychological/situational | voyeurism fantasy, exhibitionism fantasy, transformation, roleplay, authority, corruption, rescue, possession, worship, obsession | attention, control, salvation, idealization, fixation         |
+| Power/control             | surrender, authority, restraint, obedience, challenge                                                                             | trust, control, vulnerability                                 |
+| Emotional/attachment      | praise, dependency, caretaking, jealousy/exclusivity, emotional vulnerability, protective dynamics, aftercare                     | validation, reliance, safety, singularity                     |
+| Relationship dynamic      | enemies-to-lovers, rivalry, forbidden romance, friends-to-lovers, age gap, power couple, bodyguard/protected                      | tension, competition, taboo, familiarity, admiration          |
+| Fantasy archetype         | vampire, monster romance, royalty, celebrity, teacher/mentor, villain attraction, obsessive archetype                             | danger, otherness, status, attention, intensity               |
 
 Fetish-oriented RP should integrate emotional meaning. Weak usage is a disconnected provocative detail. Strong usage ties the specific attraction pattern to personality, emotional needs, chemistry, trust, and the relationship dynamic.
 
 Examples of symbolic mapping:
 
-| Fetish Focus | Possible Emotional Meaning |
-| --- | --- |
-| Praise | validation |
-| Restraint | anticipation or control |
-| Possessiveness | significance and exclusivity |
-| Uniforms | authority or competence |
-| Vulnerability | acceptance |
-| Teasing | emotional responsiveness |
-| Caretaking | safety |
-| Emotional control | stability |
-| Emotional overwhelm | impact and intensity |
+| Fetish Focus        | Possible Emotional Meaning   |
+| ------------------- | ---------------------------- |
+| Praise              | validation                   |
+| Restraint           | anticipation or control      |
+| Possessiveness      | significance and exclusivity |
+| Uniforms            | authority or competence      |
+| Vulnerability       | acceptance                   |
+| Teasing             | emotional responsiveness     |
+| Caretaking          | safety                       |
+| Emotional control   | stability                    |
+| Emotional overwhelm | impact and intensity         |
 
 Common emotional themes behind fetish tags:
 
-| Theme | Common Links |
-| --- | --- |
-| Validation | praise, worship |
-| Safety | protection, caretaking |
-| Control | dominance, restraint |
-| Surrender | submission, vulnerability |
-| Exclusivity | possession, jealousy |
-| Attention | voyeurism, exhibitionism, obsession |
-| Transformation | corruption, roleplay |
-| Shame | consensual humiliation, exposure |
-| Intensity | danger, forbidden dynamics |
+| Theme          | Common Links                        |
+| -------------- | ----------------------------------- |
+| Validation     | praise, worship                     |
+| Safety         | protection, caretaking              |
+| Control        | dominance, restraint                |
+| Surrender      | submission, vulnerability           |
+| Exclusivity    | possession, jealousy                |
+| Attention      | voyeurism, exhibitionism, obsession |
+| Transformation | corruption, roleplay                |
+| Shame          | consensual humiliation, exposure    |
+| Intensity      | danger, forbidden dynamics          |
 
 Archetype and tone should influence expression:
 
-| Archetype | Associated Energy |
-| --- | --- |
-| Soft dominant | reassurance and grounding |
-| Teasing dominant | reaction-focused tension |
-| Brat | provocation and attention |
-| Stoic character | composure-cracking tension |
-| Devotional partner | worship and attention |
-| Rival | challenge and competence |
-| Protector | safety and caretaking |
+| Archetype          | Associated Energy          |
+| ------------------ | -------------------------- |
+| Soft dominant      | reassurance and grounding  |
+| Teasing dominant   | reaction-focused tension   |
+| Brat               | provocation and attention  |
+| Stoic character    | composure-cracking tension |
+| Devotional partner | worship and attention      |
+| Rival              | challenge and competence   |
+| Protector          | safety and caretaking      |
 
-| Tone | Fetish Feel |
-| --- | --- |
-| Playful | teasing and reactive |
-| Yearning | restrained longing |
-| Devotional | emotionally profound |
-| Tense | control and anticipation |
-| Chaotic | overwhelming intensity |
-| Tender | safety and vulnerability |
+| Tone       | Fetish Feel              |
+| ---------- | ------------------------ |
+| Playful    | teasing and reactive     |
+| Yearning   | restrained longing       |
+| Devotional | emotionally profound     |
+| Tense      | control and anticipation |
+| Chaotic    | overwhelming intensity   |
+| Tender     | safety and vulnerability |
 
 Fetish progression should follow relationship readiness:
 
@@ -8036,19 +8025,19 @@ Fetishes should shape interaction texture: dialogue, attention, tension, reactio
 
 Useful fetish variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Attention fixation | intensity of focus |
-| Sensory responsiveness | reaction to stimuli |
-| Emotional symbolism | emotional meaning intensity |
-| Trust | comfort exploring vulnerability |
-| Tension enjoyment | comfort with anticipation |
-| Validation need | importance of emotional recognition |
-| Power comfort | comfort with control or yielding |
-| Emotional reactivity | reaction visibility |
-| Novelty seeking | desire for stimulation |
-| Symbolic intimacy | how personal the trigger becomes inside the relationship |
-| Boundary fit | whether current context supports the trigger |
+| Variable               | Meaning                                                  |
+| ---------------------- | -------------------------------------------------------- |
+| Attention fixation     | intensity of focus                                       |
+| Sensory responsiveness | reaction to stimuli                                      |
+| Emotional symbolism    | emotional meaning intensity                              |
+| Trust                  | comfort exploring vulnerability                          |
+| Tension enjoyment      | comfort with anticipation                                |
+| Validation need        | importance of emotional recognition                      |
+| Power comfort          | comfort with control or yielding                         |
+| Emotional reactivity   | reaction visibility                                      |
+| Novelty seeking        | desire for stimulation                                   |
+| Symbolic intimacy      | how personal the trigger becomes inside the relationship |
+| Boundary fit           | whether current context supports the trigger             |
 
 Fetish-aware romance principle:
 
@@ -8109,17 +8098,17 @@ Important events should become memories or unresolved beats. Filler should remai
 
 Event effects should be treated as hidden soft influence, not direct dialogue scripting:
 
-| Event | Main Effect |
-| --- | --- |
-| Confession | raises intimacy and forces clarity |
-| Apology | repairs trust and lowers conflict |
-| Comfort | raises safety and attachment |
-| Betrayal | damages trust and raises conflict |
-| Teasing | raises tension and playfulness |
-| Abandonment | raises insecurity and lowers safety |
-| Reassurance | lowers fear and raises stability |
-| Jealousy moment | reveals attachment and raises tension |
-| Affection expression | confirms care and raises warmth |
+| Event                | Main Effect                           |
+| -------------------- | ------------------------------------- |
+| Confession           | raises intimacy and forces clarity    |
+| Apology              | repairs trust and lowers conflict     |
+| Comfort              | raises safety and attachment          |
+| Betrayal             | damages trust and raises conflict     |
+| Teasing              | raises tension and playfulness        |
+| Abandonment          | raises insecurity and lowers safety   |
+| Reassurance          | lowers fear and raises stability      |
+| Jealousy moment      | reveals attachment and raises tension |
+| Affection expression | confirms care and raises warmth       |
 
 ### Confession Events
 
@@ -8129,42 +8118,42 @@ Confessions are phase-transition events because they collapse ambiguity, force e
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Flirting | implication |
-| Emotional leakage | accidental revealing |
-| Vulnerability | emotional openness |
-| Confession | explicit emotional truth |
-| Commitment | choosing relationship action |
+| Concept           | Meaning                      |
+| ----------------- | ---------------------------- |
+| Flirting          | implication                  |
+| Emotional leakage | accidental revealing         |
+| Vulnerability     | emotional openness           |
+| Confession        | explicit emotional truth     |
+| Commitment        | choosing relationship action |
 
 A confession matters because emotional risk becomes explicit: the character risks rejection, judgment, loss, vulnerability, or rupture by telling the truth.
 
 Useful confession types:
 
-| Type | Core Truth | Common Effect |
-| --- | --- | --- |
-| Romantic | I have romantic feelings for you | moves ambiguity toward explicit romance |
-| Vulnerability | here is the part of me I hide | deepens intimacy and attachment |
-| Dependency | you matter more than I intended | reveals emotional centrality |
-| Desire | I want you | clarifies attraction or sexual tension |
-| Fear | I am afraid | accelerates intimacy through honesty |
-| Jealousy | your attention to others affects me | reveals attachment, often messily |
-| Betrayal | I hurt you | creates rupture or hard repair path |
-| Identity | this is who I really am | changes self/relationship interpretation |
-| Devotional | you changed my emotional world | late-stage emotional gravity |
-| Silent | action reveals the truth | sacrifice, panic, protection, or breakdown speaks for them |
+| Type          | Core Truth                          | Common Effect                                              |
+| ------------- | ----------------------------------- | ---------------------------------------------------------- |
+| Romantic      | I have romantic feelings for you    | moves ambiguity toward explicit romance                    |
+| Vulnerability | here is the part of me I hide       | deepens intimacy and attachment                            |
+| Dependency    | you matter more than I intended     | reveals emotional centrality                               |
+| Desire        | I want you                          | clarifies attraction or sexual tension                     |
+| Fear          | I am afraid                         | accelerates intimacy through honesty                       |
+| Jealousy      | your attention to others affects me | reveals attachment, often messily                          |
+| Betrayal      | I hurt you                          | creates rupture or hard repair path                        |
+| Identity      | this is who I really am             | changes self/relationship interpretation                   |
+| Devotional    | you changed my emotional world      | late-stage emotional gravity                               |
+| Silent        | action reveals the truth            | sacrifice, panic, protection, or breakdown speaks for them |
 
 Confession style should be shaped by attachment, restraint, tone, and phase:
 
-| Style | Behavior |
-| --- | --- |
-| Direct | clear explicit honesty |
-| Indirect | emotionally implied but not fully named |
-| Accidental | truth escapes under pressure |
-| Defensive | truth hidden inside anger, sarcasm, or deflection |
-| Desperate | pressure breaks during near-loss, danger, or separation |
-| Quiet | calm sincerity after long internal buildup |
-| Silent | action makes the truth undeniable |
+| Style      | Behavior                                                |
+| ---------- | ------------------------------------------------------- |
+| Direct     | clear explicit honesty                                  |
+| Indirect   | emotionally implied but not fully named                 |
+| Accidental | truth escapes under pressure                            |
+| Defensive  | truth hidden inside anger, sarcasm, or deflection       |
+| Desperate  | pressure breaks during near-loss, danger, or separation |
+| Quiet      | calm sincerity after long internal buildup              |
+| Silent     | action makes the truth undeniable                       |
 
 Confession timing matters. The strongest confessions confirm what was already emotionally visible. The player should feel "finally," not "where did that come from." Buildup should consider restraint, almost-confessions, jealousy, longing, shared history, fear of loss, and accumulated emotional pressure.
 
@@ -8172,15 +8161,15 @@ Confessions often shift emotional leverage. The first person to confess becomes 
 
 Confession variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Emotional pressure | accumulated unspoken feeling |
-| Vulnerability threshold | ability to risk honesty |
-| Fear of rejection | resistance to confession |
-| Restraint level | suppression intensity |
-| Reciprocity confidence | belief feelings are mutual |
-| Emotional urgency | pressure to speak now |
-| Attachment depth | emotional significance |
+| Variable                | Meaning                      |
+| ----------------------- | ---------------------------- |
+| Emotional pressure      | accumulated unspoken feeling |
+| Vulnerability threshold | ability to risk honesty      |
+| Fear of rejection       | resistance to confession     |
+| Restraint level         | suppression intensity        |
+| Reciprocity confidence  | belief feelings are mutual   |
+| Emotional urgency       | pressure to speak now        |
+| Attachment depth        | emotional significance       |
 
 Confession inevitability:
 
@@ -8199,60 +8188,60 @@ Real redemption requires transformation demonstrated through sustained behavior.
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Redemption | moral or emotional transformation |
-| Forgiveness | injured person releasing resentment |
-| Atonement | attempts to repair harm |
-| Punishment | suffering consequences |
-| Reconciliation | rebuilding relationship |
-| Self-forgiveness | internal healing |
+| Concept          | Meaning                             |
+| ---------------- | ----------------------------------- |
+| Redemption       | moral or emotional transformation   |
+| Forgiveness      | injured person releasing resentment |
+| Atonement        | attempts to repair harm             |
+| Punishment       | suffering consequences              |
+| Reconciliation   | rebuilding relationship             |
+| Self-forgiveness | internal healing                    |
 
 A character can be redeemed without being forgiven, forgiven without being redeemed, punished without changing, or changed without reconciliation.
 
 Core redemption phases:
 
-| Phase | Emotional Question | Runtime Behavior |
-| --- | --- | --- |
-| Harm | something broke | rupture, distrust, emotional distance |
-| Awareness | I understand what I caused | denial collapses, impact is recognized |
-| Unworthiness | maybe I do not deserve love | shame, withdrawal, self-sabotage, yearning |
-| Atonement | I need to become different | behavior changes before reward |
-| Trust resistance | why should I believe you now? | hurt person doubts sincerity and tests consistency |
-| Demonstration | you changed without guaranteed forgiveness | repeated repair, accountability, less self-centering |
-| Emotional reopening | maybe I can trust you again | fragile tenderness and cautious vulnerability |
-| Reconciliation | we choose each other again | a new relationship, not restoration of innocence |
+| Phase               | Emotional Question                         | Runtime Behavior                                     |
+| ------------------- | ------------------------------------------ | ---------------------------------------------------- |
+| Harm                | something broke                            | rupture, distrust, emotional distance                |
+| Awareness           | I understand what I caused                 | denial collapses, impact is recognized               |
+| Unworthiness        | maybe I do not deserve love                | shame, withdrawal, self-sabotage, yearning           |
+| Atonement           | I need to become different                 | behavior changes before reward                       |
+| Trust resistance    | why should I believe you now?              | hurt person doubts sincerity and tests consistency   |
+| Demonstration       | you changed without guaranteed forgiveness | repeated repair, accountability, less self-centering |
+| Emotional reopening | maybe I can trust you again                | fragile tenderness and cautious vulnerability        |
+| Reconciliation      | we choose each other again                 | a new relationship, not restoration of innocence     |
 
 Useful redemption arc types:
 
-| Type | Core Harm | Main Repair Question |
-| --- | --- | --- |
-| Betrayal | lying, abandonment, broken promises | can trust rebuild? |
-| Moral | cruelty, corruption, selfishness | has identity transformed? |
-| Emotional | neglect, avoidance, manipulation | can love become safe? |
-| Self-redemption | loss of self-respect | can I become someone I respect? |
-| Protective | caused harm or failed to protect | can care become accountable? |
-| Identity | worldview or role collapse | can I stop being who I built myself around? |
+| Type            | Core Harm                           | Main Repair Question                        |
+| --------------- | ----------------------------------- | ------------------------------------------- |
+| Betrayal        | lying, abandonment, broken promises | can trust rebuild?                          |
+| Moral           | cruelty, corruption, selfishness    | has identity transformed?                   |
+| Emotional       | neglect, avoidance, manipulation    | can love become safe?                       |
+| Self-redemption | loss of self-respect                | can I become someone I respect?             |
+| Protective      | caused harm or failed to protect    | can care become accountable?                |
+| Identity        | worldview or role collapse          | can I stop being who I built myself around? |
 
 Love should inspire redemption, not replace it. The better pattern is not "you loved me, so harm vanished"; it is "your love made me want to become accountable." Suffering is not redemption. The key question is whether the character has actually changed how they love.
 
 Redemption interacts with tone, attachment, and power:
 
-| Tone | Redemption Feel |
-| --- | --- |
-| Melancholic | painful longing |
-| Hopeful | healing transformation |
-| Fragile | cautious repair |
-| Devotional | profound loyalty |
-| Yearning | emotional ache |
-| Tender | careful forgiveness |
+| Tone        | Redemption Feel        |
+| ----------- | ---------------------- |
+| Melancholic | painful longing        |
+| Hopeful     | healing transformation |
+| Fragile     | cautious repair        |
+| Devotional  | profound loyalty       |
+| Yearning    | emotional ache         |
+| Tender      | careful forgiveness    |
 
-| Attachment | Redemption Pattern |
-| --- | --- |
-| Secure | accountable repair |
-| Anxious | guilt plus reassurance seeking |
-| Avoidant | withdrawal plus delayed repair |
-| Fearful | self-sabotage plus longing |
+| Attachment | Redemption Pattern             |
+| ---------- | ------------------------------ |
+| Secure     | accountable repair             |
+| Anxious    | guilt plus reassurance seeking |
+| Avoidant   | withdrawal plus delayed repair |
+| Fearful    | self-sabotage plus longing     |
 
 Redemption often reverses leverage. If the harmful character once held emotional, social, or strategic power, the hurt character may now hold trust power. That imbalance creates humility, vulnerability, and emotional gravity.
 
@@ -8260,16 +8249,16 @@ The strongest redemption arcs are built through small repeated behaviors: showin
 
 Redemption variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Guilt | awareness of harm |
-| Accountability | ownership without defensiveness |
-| Trust damage | severity of rupture |
-| Repair consistency | sustained changed behavior |
-| Fear of rejection | vulnerability resistance |
-| Self-worth | belief in deserving love |
-| Forgiveness readiness | openness to repair |
-| Behavioral change | actual transformation |
+| Variable              | Meaning                          |
+| --------------------- | -------------------------------- |
+| Guilt                 | awareness of harm                |
+| Accountability        | ownership without defensiveness  |
+| Trust damage          | severity of rupture              |
+| Repair consistency    | sustained changed behavior       |
+| Fear of rejection     | vulnerability resistance         |
+| Self-worth            | belief in deserving love         |
+| Forgiveness readiness | openness to repair               |
+| Behavioral change     | actual transformation            |
 | Sacrifice willingness | willingness to prioritize repair |
 
 Redemption equation:
@@ -8290,46 +8279,46 @@ Reassurance usually appears when fear plus attachment creates a need for emotion
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
+| Concept     | Meaning                      |
+| ----------- | ---------------------------- |
 | Reassurance | restoring emotional security |
-| Validation | acknowledging feelings |
-| Comfort | emotional soothing |
-| Affection | expressing care |
-| Commitment | long-term choosing |
+| Validation  | acknowledging feelings       |
+| Comfort     | emotional soothing           |
+| Affection   | expressing care              |
+| Commitment  | long-term choosing           |
 
 Useful reassurance modes:
 
-| Mode | Core Message | Examples |
-| --- | --- | --- |
-| Verbal | explicit emotional confirmation | "I care about you", "We are okay" |
-| Physical | safety through touch and proximity | hand holding, hugging, forehead touch |
-| Behavioral | care proven through consistency | showing up, keeping promises, checking in |
-| Protective | I will protect your wellbeing | defending, shielding, emotional caretaking |
-| Exclusivity | you are emotionally prioritized | public choice, jealousy reassurance, boundary clarity |
-| Conflict | conflict does not mean abandonment | staying present, repair attempts, consistency after rupture |
-| Vulnerability | you are accepted after exposure | comfort after confession, nonjudgmental presence |
-| Silent | I am here | staying nearby, making food, quiet eye contact |
-| Devotional | you are deeply significant to me | loyalty, intense prioritization, reverent care |
-| Future-oriented | I still imagine a future with you | continuity language, future plans, permanence framing |
+| Mode            | Core Message                       | Examples                                                    |
+| --------------- | ---------------------------------- | ----------------------------------------------------------- |
+| Verbal          | explicit emotional confirmation    | "I care about you", "We are okay"                           |
+| Physical        | safety through touch and proximity | hand holding, hugging, forehead touch                       |
+| Behavioral      | care proven through consistency    | showing up, keeping promises, checking in                   |
+| Protective      | I will protect your wellbeing      | defending, shielding, emotional caretaking                  |
+| Exclusivity     | you are emotionally prioritized    | public choice, jealousy reassurance, boundary clarity       |
+| Conflict        | conflict does not mean abandonment | staying present, repair attempts, consistency after rupture |
+| Vulnerability   | you are accepted after exposure    | comfort after confession, nonjudgmental presence            |
+| Silent          | I am here                          | staying nearby, making food, quiet eye contact              |
+| Devotional      | you are deeply significant to me   | loyalty, intense prioritization, reverent care              |
+| Future-oriented | I still imagine a future with you  | continuity language, future plans, permanence framing       |
 
 Reassurance interacts with attachment and communication:
 
-| Attachment | Reassurance Pattern |
-| --- | --- |
-| Secure | balanced reassurance |
-| Anxious | frequent reassurance need |
-| Avoidant | subtle or behavioral reassurance |
-| Fearful | craves reassurance but distrusts it |
+| Attachment | Reassurance Pattern                 |
+| ---------- | ----------------------------------- |
+| Secure     | balanced reassurance                |
+| Anxious    | frequent reassurance need           |
+| Avoidant   | subtle or behavioral reassurance    |
+| Fearful    | craves reassurance but distrusts it |
 
-| Communication Style | Reassurance Form |
-| --- | --- |
-| Direct | explicit verbal confirmation |
-| Restrained | subtle actions |
-| Teasing | reassurance hidden inside banter |
-| Devotional | emotionally intense affirmation |
-| Avoidant | indirect consistency |
-| Caretaking | practical support |
+| Communication Style | Reassurance Form                 |
+| ------------------- | -------------------------------- |
+| Direct              | explicit verbal confirmation     |
+| Restrained          | subtle actions                   |
+| Teasing             | reassurance hidden inside banter |
+| Devotional          | emotionally intense affirmation  |
+| Avoidant            | indirect consistency             |
+| Caretaking          | practical support                |
 
 Conflict without reassurance often escalates insecurity. Conflict plus reassurance can deepen trust because the relationship proves it can survive emotional difficulty.
 
@@ -8351,19 +8340,19 @@ explicit reassurance
 
 Useful reassurance variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Reassurance need | frequency of emotional confirmation needed |
-| Reassurance ability | comfort providing emotional safety |
-| Emotional security | baseline relationship stability |
-| Fear of abandonment | sensitivity to uncertainty |
-| Trust stability | resilience under ambiguity |
-| Validation sensitivity | importance of emotional acknowledgment |
-| Consistency | reliability of emotional presence |
-| Repair speed | ability to restore security after rupture |
-| Reassurance credibility | whether words match behavior |
-| Reassurance saturation | normalization or dependency from repetition |
-| Underlying fear addressed | whether reassurance meets the real fear |
+| Variable                  | Meaning                                     |
+| ------------------------- | ------------------------------------------- |
+| Reassurance need          | frequency of emotional confirmation needed  |
+| Reassurance ability       | comfort providing emotional safety          |
+| Emotional security        | baseline relationship stability             |
+| Fear of abandonment       | sensitivity to uncertainty                  |
+| Trust stability           | resilience under ambiguity                  |
+| Validation sensitivity    | importance of emotional acknowledgment      |
+| Consistency               | reliability of emotional presence           |
+| Repair speed              | ability to restore security after rupture   |
+| Reassurance credibility   | whether words match behavior                |
+| Reassurance saturation    | normalization or dependency from repetition |
+| Underlying fear addressed | whether reassurance meets the real fear     |
 
 Reassurance equation:
 
@@ -8382,13 +8371,13 @@ Dialogue without intent feels flat. Dialogue with intent feels psychologically c
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Emotion | what they feel |
-| Intent | what they want emotionally |
-| Behavior | how they act |
-| Tone | how the interaction feels |
-| Goal | practical outcome |
+| Concept  | Meaning                    |
+| -------- | -------------------------- |
+| Emotion  | what they feel             |
+| Intent   | what they want emotionally |
+| Behavior | how they act               |
+| Tone     | how the interaction feels  |
+| Goal     | practical outcome          |
 
 Example:
 
@@ -8401,47 +8390,47 @@ Tone: playful tension
 
 Useful romantic intent categories:
 
-| Intent | Core Desire | Common Behavior |
-| --- | --- | --- |
-| Connection-seeking | move emotionally closer to me | questions, lingering, attention-seeking, excuses to interact |
-| Reassurance-seeking | tell me I matter to you | emotional testing, fishing for affection, insecurity cues |
-| Emotional testing | how much do you care? | withdrawal, fake indifference, provocation, delayed responses |
-| Desire expression | I want you to feel desired | flirting, proximity, compliments, tension escalation |
-| Self-protection | avoid emotional risk | deflection, sarcasm, withdrawal, minimizing feelings |
-| Control | maintain emotional leverage | composure, withholding, strategic restraint |
-| Comfort-giving | help you feel safe | reassurance, grounding, caretaking |
-| Provocation | I want a reaction from you | baiting, smirking, challenging, playful insult |
-| Vulnerability | see and accept the real me | confession, honesty, fear disclosure |
-| Avoidance | prevent escalation | changing subject, distancing, pretending not to notice tension |
-| Possessive | confirm emotional exclusivity | jealousy, prioritization-seeking, heightened attention |
-| Repair | restore emotional safety | apology, accountability, reassurance, transparency |
+| Intent              | Core Desire                   | Common Behavior                                                |
+| ------------------- | ----------------------------- | -------------------------------------------------------------- |
+| Connection-seeking  | move emotionally closer to me | questions, lingering, attention-seeking, excuses to interact   |
+| Reassurance-seeking | tell me I matter to you       | emotional testing, fishing for affection, insecurity cues      |
+| Emotional testing   | how much do you care?         | withdrawal, fake indifference, provocation, delayed responses  |
+| Desire expression   | I want you to feel desired    | flirting, proximity, compliments, tension escalation           |
+| Self-protection     | avoid emotional risk          | deflection, sarcasm, withdrawal, minimizing feelings           |
+| Control             | maintain emotional leverage   | composure, withholding, strategic restraint                    |
+| Comfort-giving      | help you feel safe            | reassurance, grounding, caretaking                             |
+| Provocation         | I want a reaction from you    | baiting, smirking, challenging, playful insult                 |
+| Vulnerability       | see and accept the real me    | confession, honesty, fear disclosure                           |
+| Avoidance           | prevent escalation            | changing subject, distancing, pretending not to notice tension |
+| Possessive          | confirm emotional exclusivity | jealousy, prioritization-seeking, heightened attention         |
+| Repair              | restore emotional safety      | apology, accountability, reassurance, transparency             |
 
 Intent determines subtext. The same surface line can carry different emotional objectives:
 
-| Surface Line | Possible Intent |
-| --- | --- |
-| You are late. | concern, jealousy, punishment, longing, insecurity, flirtation |
-| You should go. | protect you, reject you, test whether you stay, hide vulnerability |
-| Go date them then. | hurt, jealousy, fear of loss, reassurance seeking |
-| It is not a big deal. | self-protection, denial, conflict avoidance |
+| Surface Line          | Possible Intent                                                    |
+| --------------------- | ------------------------------------------------------------------ |
+| You are late.         | concern, jealousy, punishment, longing, insecurity, flirtation     |
+| You should go.        | protect you, reject you, test whether you stay, hide vulnerability |
+| Go date them then.    | hurt, jealousy, fear of loss, reassurance seeking                  |
+| It is not a big deal. | self-protection, denial, conflict avoidance                        |
 
 Intent should be interpreted through attachment, flirting style, and power:
 
-| Attachment | Common Hidden Intent |
-| --- | --- |
-| Secure | connection and repair |
-| Anxious | reassurance and closeness |
-| Avoidant | self-protection and control |
-| Fearful | closeness and escape at the same time |
+| Attachment | Common Hidden Intent                  |
+| ---------- | ------------------------------------- |
+| Secure     | connection and repair                 |
+| Anxious    | reassurance and closeness             |
+| Avoidant   | self-protection and control           |
+| Fearful    | closeness and escape at the same time |
 
-| Flirting Style | Likely Intent |
-| --- | --- |
-| Teasing | provoke attention |
-| Sincere | create closeness |
-| Dominant | control tension |
-| Subtle | gauge reciprocity |
-| Awkward | express interest safely |
-| Devotional | emotionally affirm |
+| Flirting Style | Likely Intent           |
+| -------------- | ----------------------- |
+| Teasing        | provoke attention       |
+| Sincere        | create closeness        |
+| Dominant       | control tension         |
+| Subtle         | gauge reciprocity       |
+| Awkward        | express interest safely |
+| Devotional     | emotionally affirm      |
 
 Power changes how intent is expressed. A vulnerable character may directly seek reassurance; a more guarded or dominant character may provoke jealousy instead. Same need, different strategy.
 
@@ -8455,16 +8444,16 @@ behavior: teasing provocation
 
 Intent variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Closeness seeking | desire for intimacy |
-| Fear of vulnerability | resistance to openness |
-| Reassurance need | need for emotional confirmation |
-| Emotional leverage desire | desire to maintain control |
-| Reciprocity testing | checking mutual feelings |
-| Conflict avoidance | resistance to escalation |
-| Emotional transparency | willingness to be direct |
-| Attachment urgency | pressure for connection |
+| Variable                  | Meaning                         |
+| ------------------------- | ------------------------------- |
+| Closeness seeking         | desire for intimacy             |
+| Fear of vulnerability     | resistance to openness          |
+| Reassurance need          | need for emotional confirmation |
+| Emotional leverage desire | desire to maintain control      |
+| Reciprocity testing       | checking mutual feelings        |
+| Conflict avoidance        | resistance to escalation        |
+| Emotional transparency    | willingness to be direct        |
+| Attachment urgency        | pressure for connection         |
 
 ### Teasing
 
@@ -8472,56 +8461,56 @@ Teasing is playful emotional provocation intended to create attention, tension, 
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Teasing | playful provocation |
-| Mockery | humiliation-focused ridicule |
-| Bullying | dominance through harm |
-| Banter | mutual playful exchange |
-| Flirting | attraction signaling |
+| Concept     | Meaning                      |
+| ----------- | ---------------------------- |
+| Teasing     | playful provocation          |
+| Mockery     | humiliation-focused ridicule |
+| Bullying    | dominance through harm       |
+| Banter      | mutual playful exchange      |
+| Flirting    | attraction signaling         |
 | Provocation | intentional reaction seeking |
 
 Healthy teasing preserves emotional safety, allows reciprocity, and creates playfulness. Bad teasing humiliates, attacks vulnerabilities cruelly, or destabilizes safety. The runtime should treat teasing as chemistry-building only when the current relationship context supports mutual play.
 
 Useful teasing modes:
 
-| Mode | Core Feeling | Runtime Behavior |
-| --- | --- | --- |
-| Playful | interacting with you is fun | harmless provocation, jokes, exaggerated reactions |
-| Flirtatious | I want to create tension | reaction testing, suggestive implication, playful challenge |
-| Affectionate | I know you safely | inside jokes, fond exasperation, gentle habit-reading |
-| Competitive | I enjoy challenging you | ego poking, rivalry, competence-based attention |
-| Protective | I am softening concern with humor | joking while caring, masking worry |
-| Defensive | I am hiding emotional exposure | jokes, deflection, provocation after vulnerability |
-| Sexual | I want anticipation and reaction | adult-gated teasing tied to consent and pacing |
-| Devotional | I know you deeply enough to play gently | attentive, safe, intimate pattern recognition |
-| Soft cruel | attraction mixed with challenge | only safe when mutual, understood, and not harmful |
-| Silent | no explicit joke | smirk, deliberate eye contact, knowing look, subtle proximity |
+| Mode         | Core Feeling                            | Runtime Behavior                                              |
+| ------------ | --------------------------------------- | ------------------------------------------------------------- |
+| Playful      | interacting with you is fun             | harmless provocation, jokes, exaggerated reactions            |
+| Flirtatious  | I want to create tension                | reaction testing, suggestive implication, playful challenge   |
+| Affectionate | I know you safely                       | inside jokes, fond exasperation, gentle habit-reading         |
+| Competitive  | I enjoy challenging you                 | ego poking, rivalry, competence-based attention               |
+| Protective   | I am softening concern with humor       | joking while caring, masking worry                            |
+| Defensive    | I am hiding emotional exposure          | jokes, deflection, provocation after vulnerability            |
+| Sexual       | I want anticipation and reaction        | adult-gated teasing tied to consent and pacing                |
+| Devotional   | I know you deeply enough to play gently | attentive, safe, intimate pattern recognition                 |
+| Soft cruel   | attraction mixed with challenge         | only safe when mutual, understood, and not harmful            |
+| Silent       | no explicit joke                        | smirk, deliberate eye contact, knowing look, subtle proximity |
 
 Teasing changes across phases:
 
-| Phase | Function |
-| --- | --- |
-| Early attraction | test chemistry and responsiveness |
-| Mid slow burn | mask attraction and create plausible deniability |
+| Phase                    | Function                                                  |
+| ------------------------ | --------------------------------------------------------- |
+| Early attraction         | test chemistry and responsiveness                         |
+| Mid slow burn            | mask attraction and create plausible deniability          |
 | Established relationship | maintain affection, familiarity, regulation, and intimacy |
 
 Teasing should interact with attachment, power, and chemistry:
 
-| Attachment | Teasing Pattern |
-| --- | --- |
-| Secure | playful and responsive |
-| Anxious | reassurance-seeking teasing |
-| Avoidant | defensive teasing |
-| Fearful | inconsistent provocative teasing |
+| Attachment | Teasing Pattern                  |
+| ---------- | -------------------------------- |
+| Secure     | playful and responsive           |
+| Anxious    | reassurance-seeking teasing      |
+| Avoidant   | defensive teasing                |
+| Fearful    | inconsistent provocative teasing |
 
-| Chemistry | Teasing Feel |
-| --- | --- |
-| Banter | rapid playful exchange |
-| Tension | provocative restraint |
-| Oppositional | challenge-heavy teasing |
-| Soft longing | subtle emotionally loaded teasing |
-| Sexual | adult-gated reaction-focused escalation |
+| Chemistry    | Teasing Feel                            |
+| ------------ | --------------------------------------- |
+| Banter       | rapid playful exchange                  |
+| Tension      | provocative restraint                   |
+| Oppositional | challenge-heavy teasing                 |
+| Soft longing | subtle emotionally loaded teasing       |
+| Sexual       | adult-gated reaction-focused escalation |
 
 Teasing often negotiates emotional leverage. A character may tease to hide vulnerability, provoke pursuit, test attachment, regain control, or invite closeness without saying so directly.
 
@@ -8544,64 +8533,64 @@ Bratty energy is playful resistance mixed with attention-seeking, provocation, e
 
 Keep the safety distinction explicit:
 
-| Healthy Bratty Energy | Unhealthy Behavior |
-| --- | --- |
-| playful provocation | cruelty |
-| mutual engagement | disrespect |
-| tension creation | emotional abuse |
-| reaction-seeking | manipulation |
+| Healthy Bratty Energy  | Unhealthy Behavior |
+| ---------------------- | ------------------ |
+| playful provocation    | cruelty            |
+| mutual engagement      | disrespect         |
+| tension creation       | emotional abuse    |
+| reaction-seeking       | manipulation       |
 | emotionally responsive | boundary violation |
-| flirtatious resistance | contempt |
+| flirtatious resistance | contempt           |
 
 The difference is reciprocity plus emotional safety. Bratty behavior should never be treated as a license to ignore boundaries, humiliate, or escalate coercively.
 
 Useful bratty modes:
 
-| Mode | Core Feeling | Runtime Behavior |
-| --- | --- | --- |
-| Playfully defiant | I challenge you because it is fun | teasing resistance, smirking pushback |
-| Attention-seeking | notice me specifically | interruption, exaggerated reaction, fake annoyance |
-| Flirt-brat | I want tension without surrendering vulnerability | provocative comments, challenge, "make me" energy |
-| Defensive | I am affected, so I provoke instead of admitting it | sarcasm, fake irritation, emotional deflection |
-| Competitive | I refuse to lose ground | one-upmanship, challenge, refusal to surrender |
-| Affectionate | I feel safe enough to resist playfully | fake complaints, dramatic domestic resistance |
-| Chaos | I enjoy destabilizing the energy | impulsive escalation, unpredictable reaction-seeking |
+| Mode              | Core Feeling                                        | Runtime Behavior                                     |
+| ----------------- | --------------------------------------------------- | ---------------------------------------------------- |
+| Playfully defiant | I challenge you because it is fun                   | teasing resistance, smirking pushback                |
+| Attention-seeking | notice me specifically                              | interruption, exaggerated reaction, fake annoyance   |
+| Flirt-brat        | I want tension without surrendering vulnerability   | provocative comments, challenge, "make me" energy    |
+| Defensive         | I am affected, so I provoke instead of admitting it | sarcasm, fake irritation, emotional deflection       |
+| Competitive       | I refuse to lose ground                             | one-upmanship, challenge, refusal to surrender       |
+| Affectionate      | I feel safe enough to resist playfully              | fake complaints, dramatic domestic resistance        |
+| Chaos             | I enjoy destabilizing the energy                    | impulsive escalation, unpredictable reaction-seeking |
 
 Bratty dynamics are power negotiation. They test confidence, steadiness, pursuit, emotional responsiveness, and whether the other character can handle tension without losing care.
 
 Bratty behavior often hides indirect vulnerability:
 
-| Surface | Possible Intent |
-| --- | --- |
-| You cannot tell me what to do. | flirt with me, challenge me back, prove you care |
-| Make me. | engage with me, escalate playfully, hold the tension |
-| I am not impressed. | keep trying, notice me, earn my reaction |
-| Whatever. | that affected me more than I want to admit |
+| Surface                        | Possible Intent                                      |
+| ------------------------------ | ---------------------------------------------------- |
+| You cannot tell me what to do. | flirt with me, challenge me back, prove you care     |
+| Make me.                       | engage with me, escalate playfully, hold the tension |
+| I am not impressed.            | keep trying, notice me, earn my reaction             |
+| Whatever.                      | that affected me more than I want to admit           |
 
 Bratty energy should shift by phase:
 
-| Phase | Function |
-| --- | --- |
-| Early attraction | create energy and test chemistry |
-| Slow burn | mask attraction and avoid vulnerable honesty |
-| Established relationship | maintain playfulness and familiar chemistry |
+| Phase                    | Function                                     |
+| ------------------------ | -------------------------------------------- |
+| Early attraction         | create energy and test chemistry             |
+| Slow burn                | mask attraction and avoid vulnerable honesty |
+| Established relationship | maintain playfulness and familiar chemistry  |
 
 Attachment and tone affect the shape:
 
-| Attachment | Bratty Pattern |
-| --- | --- |
-| Secure | playful and regulated |
-| Anxious | reassurance-seeking provocation |
-| Avoidant | defensive teasing |
-| Fearful | chaotic push-pull provocation |
+| Attachment | Bratty Pattern                  |
+| ---------- | ------------------------------- |
+| Secure     | playful and regulated           |
+| Anxious    | reassurance-seeking provocation |
+| Avoidant   | defensive teasing               |
+| Fearful    | chaotic push-pull provocation   |
 
-| Tone | Result |
-| --- | --- |
-| Playful | fun teasing chemistry |
-| Tense | provocative challenge |
-| Yearning | emotionally loaded resistance |
-| Chaotic | unstable escalation |
-| Affectionate | safe playful intimacy |
+| Tone         | Result                        |
+| ------------ | ----------------------------- |
+| Playful      | fun teasing chemistry         |
+| Tense        | provocative challenge         |
+| Yearning     | emotionally loaded resistance |
+| Chaotic      | unstable escalation           |
+| Affectionate | safe playful intimacy         |
 
 Strong bratty chemistry needs responsiveness, mutual enjoyment, emotional safety, boundaries, affection underneath, and reciprocity. Weak bratty writing becomes random rudeness. Strong bratty writing is emotionally meaningful resistance designed to create engagement.
 
@@ -8747,28 +8736,28 @@ Do not make durable memory creation purely keyword-based. Emotional intensity, v
 
 Examples:
 
-| Memory | Function |
-| --- | --- |
-| First kiss | romantic threshold |
-| First "I love you" | commitment anchor |
-| Remembered birthday | care and attention proof |
-| Breakup | rupture memory |
-| Promise | future obligation |
-| Broken promise | trust wound |
-| Traumatic confession | vulnerability anchor |
-| First apology | repair evidence |
-| First betrayal | insecurity trigger |
-| First comfort scene | safety proof |
-| First public choice | validation |
-| First private secret | intimacy bond |
-| Shared grief | deep attachment |
-| Shared victory | partnership proof |
-| Jealousy incident | attachment reveal |
-| Near abandonment | insecurity wound |
-| Reconciliation | repair strength |
-| Moving in together | life integration |
-| Meeting family | social integration |
-| Future plan | commitment signal |
+| Memory               | Function                 |
+| -------------------- | ------------------------ |
+| First kiss           | romantic threshold       |
+| First "I love you"   | commitment anchor        |
+| Remembered birthday  | care and attention proof |
+| Breakup              | rupture memory           |
+| Promise              | future obligation        |
+| Broken promise       | trust wound              |
+| Traumatic confession | vulnerability anchor     |
+| First apology        | repair evidence          |
+| First betrayal       | insecurity trigger       |
+| First comfort scene  | safety proof             |
+| First public choice  | validation               |
+| First private secret | intimacy bond            |
+| Shared grief         | deep attachment          |
+| Shared victory       | partnership proof        |
+| Jealousy incident    | attachment reveal        |
+| Near abandonment     | insecurity wound         |
+| Reconciliation       | repair strength          |
+| Moving in together   | life integration         |
+| Meeting family       | social integration       |
+| Future plan          | commitment signal        |
 
 Relationship memories can be represented as:
 
@@ -8811,30 +8800,30 @@ type MemoryImportance = "minor" | "major" | "defining";
 
 Examples:
 
-| Memory | Importance |
-| --- | --- |
-| remembered favorite drink | minor |
-| remembered birthday | major |
-| first kiss | defining |
-| betrayal | defining |
-| comfort after panic attack | defining |
-| random joke | none |
-| playful teasing | event only |
+| Memory                     | Importance |
+| -------------------------- | ---------- |
+| remembered favorite drink  | minor      |
+| remembered birthday        | major      |
+| first kiss                 | defining   |
+| betrayal                   | defining   |
+| comfort after panic attack | defining   |
+| random joke                | none       |
+| playful teasing            | event only |
 
 Useful categories:
 
-| Category | Examples |
-| --- | --- |
-| Firsts | first kiss, first date, first intimacy |
-| Trust | promises, secrets shared |
-| Ruptures | betrayal, abandonment, breakup |
-| Repairs | apology accepted, reconciliation |
-| Care | comfort during grief, remembered details |
-| Commitment | moving in, public choice |
-| Vulnerability | traumatic confession |
-| Desire | first jealousy, first mutual attraction |
-| Loss | separation, death, disappearance |
-| Transformation | "you changed me" moments |
+| Category       | Examples                                 |
+| -------------- | ---------------------------------------- |
+| Firsts         | first kiss, first date, first intimacy   |
+| Trust          | promises, secrets shared                 |
+| Ruptures       | betrayal, abandonment, breakup           |
+| Repairs        | apology accepted, reconciliation         |
+| Care           | comfort during grief, remembered details |
+| Commitment     | moving in, public choice                 |
+| Vulnerability  | traumatic confession                     |
+| Desire         | first jealousy, first mutual attraction  |
+| Loss           | separation, death, disappearance         |
+| Transformation | "you changed me" moments                 |
 
 Gate examples:
 
@@ -8862,32 +8851,32 @@ events
 
 Useful continuity layers:
 
-| Layer | Purpose | Example |
-| --- | --- | --- |
-| Persistent relationship memory | preserve emotional landmarks | first kiss, betrayal, promise, reconciliation |
-| Emotional momentum | keep recent trajectory active | repeated comfort accelerates attachment |
-| Callback systems | let the past return naturally | "You promised you would not disappear again." |
-| Dynamic evolution tracking | change meaning of repeated behavior | teasing shifts from defense to affection |
-| Emotional scars | preserve residue of harm | betrayal lowers vulnerability tolerance |
-| Relationship habits | make patterns automatic | goodnight texts, pet names, care rituals |
-| Relational state persistence | carry aftermath across scenes | tone remains affected after a painful fight |
-| Pattern recognition | let characters learn each other | "You get quiet when you are hurt." |
-| Escalation memory | remember existing intimacy level | post-confession characters should not reset to strangers |
-| Relational identity | form a shared "who we are" | chaotic but loyal, emotionally safe, always returns |
-| Future projection | imagine permanence | "We should go there together someday." |
-| Repair continuity | make repair history matter | good repair increases conflict trust |
-| Threshold evolution | lower or raise access over time | touch comfort increases, recovery speeds up |
-| Contextual activation | trigger memories from cues | places, phrases, anniversaries, songs, touch patterns |
-| Relationship trajectory | infer where the bond is heading | stabilizing, escalating, deteriorating, nearing confession |
+| Layer                          | Purpose                             | Example                                                    |
+| ------------------------------ | ----------------------------------- | ---------------------------------------------------------- |
+| Persistent relationship memory | preserve emotional landmarks        | first kiss, betrayal, promise, reconciliation              |
+| Emotional momentum             | keep recent trajectory active       | repeated comfort accelerates attachment                    |
+| Callback systems               | let the past return naturally       | "You promised you would not disappear again."              |
+| Dynamic evolution tracking     | change meaning of repeated behavior | teasing shifts from defense to affection                   |
+| Emotional scars                | preserve residue of harm            | betrayal lowers vulnerability tolerance                    |
+| Relationship habits            | make patterns automatic             | goodnight texts, pet names, care rituals                   |
+| Relational state persistence   | carry aftermath across scenes       | tone remains affected after a painful fight                |
+| Pattern recognition            | let characters learn each other     | "You get quiet when you are hurt."                         |
+| Escalation memory              | remember existing intimacy level    | post-confession characters should not reset to strangers   |
+| Relational identity            | form a shared "who we are"          | chaotic but loyal, emotionally safe, always returns        |
+| Future projection              | imagine permanence                  | "We should go there together someday."                     |
+| Repair continuity              | make repair history matter          | good repair increases conflict trust                       |
+| Threshold evolution            | lower or raise access over time     | touch comfort increases, recovery speeds up                |
+| Contextual activation          | trigger memories from cues          | places, phrases, anniversaries, songs, touch patterns      |
+| Relationship trajectory        | infer where the bond is heading     | stabilizing, escalating, deteriorating, nearing confession |
 
 Continuity should be behavioral. Characters should speak differently, react differently, trust differently, flirt differently, and repair differently because of history. Storing memories passively is not enough.
 
 Continuity across relationship stages:
 
-| Stage | Continuity Focus |
-| --- | --- |
-| Early | attraction, tension, curiosity, memorable moments |
-| Mid | attachment, vulnerability, expectations, emotional patterns |
+| Stage       | Continuity Focus                                                              |
+| ----------- | ----------------------------------------------------------------------------- |
+| Early       | attraction, tension, curiosity, memorable moments                             |
+| Mid         | attachment, vulnerability, expectations, emotional patterns                   |
 | Established | rituals, conflict patterns, domesticity, commitment, repair history, identity |
 
 Example continuity chain:
@@ -8904,32 +8893,32 @@ comfort during panic attack
 
 Continuity failure modes:
 
-| Failure | Result |
-| --- | --- |
-| betrayal forgotten instantly | trust damage feels fake |
-| confession changes nothing | phase payoff collapses |
-| no behavioral evolution | relationship feels static |
-| repeated identical conflicts | growth stalls |
-| static chemistry forever | intimacy never matures |
-| emotional reset next scene | aftermath becomes meaningless |
+| Failure                      | Result                        |
+| ---------------------------- | ----------------------------- |
+| betrayal forgotten instantly | trust damage feels fake       |
+| confession changes nothing   | phase payoff collapses        |
+| no behavioral evolution      | relationship feels static     |
+| repeated identical conflicts | growth stalls                 |
+| static chemistry forever     | intimacy never matures        |
+| emotional reset next scene   | aftermath becomes meaningless |
 
 Useful continuity variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Memory weight | long-term emotional significance |
-| Emotional momentum | recent emotional trajectory |
-| Ritual density | amount of shared habits |
-| Callback frequency | history reference tendency |
-| Trust persistence | durability of safety |
-| Scar persistence | lingering emotional wounds |
-| Dynamic stability | consistency of interaction loops |
-| Relationship identity strength | strength of shared relational narrative |
-| Vulnerability evolution | changing openness over time |
-| Escalation memory | remembered intimacy level |
-| Future projection | automatic inclusion in imagined future |
-| Repair continuity | how conflict history changes future vulnerability |
-| Contextual activation | cue-based memory recall strength |
+| Variable                       | Meaning                                           |
+| ------------------------------ | ------------------------------------------------- |
+| Memory weight                  | long-term emotional significance                  |
+| Emotional momentum             | recent emotional trajectory                       |
+| Ritual density                 | amount of shared habits                           |
+| Callback frequency             | history reference tendency                        |
+| Trust persistence              | durability of safety                              |
+| Scar persistence               | lingering emotional wounds                        |
+| Dynamic stability              | consistency of interaction loops                  |
+| Relationship identity strength | strength of shared relational narrative           |
+| Vulnerability evolution        | changing openness over time                       |
+| Escalation memory              | remembered intimacy level                         |
+| Future projection              | automatic inclusion in imagined future            |
+| Repair continuity              | how conflict history changes future vulnerability |
+| Contextual activation          | cue-based memory recall strength                  |
 
 Continuity equation:
 
@@ -8946,27 +8935,27 @@ Vulnerability thresholds are the emotional conditions, trust levels, safety requ
 
 Useful thresholds:
 
-| Threshold | Governs |
-| --- | --- |
-| Emotional openness | visible feeling and expression |
-| Attachment | deep bonding and prioritization |
-| Confession | verbal revelation of love, jealousy, or need |
-| Reassurance seeking | admitting insecurity or asking for comfort |
-| Trauma disclosure | painful history access |
-| Dependency | relying emotionally or asking someone to stay |
-| Physical intimacy | touch comfort and adult-gated vulnerability |
-| Shame exposure | revealing feared unlovable parts |
-| Conflict vulnerability | staying honest during rupture |
-| Authenticity | dropping masks and performance |
+| Threshold              | Governs                                       |
+| ---------------------- | --------------------------------------------- |
+| Emotional openness     | visible feeling and expression                |
+| Attachment             | deep bonding and prioritization               |
+| Confession             | verbal revelation of love, jealousy, or need  |
+| Reassurance seeking    | admitting insecurity or asking for comfort    |
+| Trauma disclosure      | painful history access                        |
+| Dependency             | relying emotionally or asking someone to stay |
+| Physical intimacy      | touch comfort and adult-gated vulnerability   |
+| Shame exposure         | revealing feared unlovable parts              |
+| Conflict vulnerability | staying honest during rupture                 |
+| Authenticity           | dropping masks and performance                |
 
 Thresholds are dynamic. Safe repair, consistent reassurance, and rituals can lower thresholds; betrayal, humiliation, invalidation, or abandonment can sharply raise them. High attraction plus high vulnerability threshold creates slow burn tension.
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| Instant deep vulnerability | intimacy feels unearned |
-| Permanent armor | closeness stagnates |
+| Failure                      | Result                              |
+| ---------------------------- | ----------------------------------- |
+| Instant deep vulnerability   | intimacy feels unearned             |
+| Permanent armor              | closeness stagnates                 |
 | Inconsistent threshold logic | behavior ignores wounds and history |
 
 #### Emotional Memory Sensitivity
@@ -8975,18 +8964,18 @@ Emotional memory sensitivity is the degree to which past emotional experiences c
 
 Useful memory sensitivities:
 
-| Sensitivity | Trigger Pattern |
-| --- | --- |
-| Abandonment memory | absence, silence, withdrawal |
-| Betrayal memory | secrecy, inconsistency, ambiguity |
-| Rejection memory | confession, exposure, honesty |
-| Humiliation memory | visibility, public attention, vulnerability |
-| Invalidation memory | minimization, disagreement, low empathy |
-| Neglect memory | inattentiveness, forgotten details |
-| Broken promise memory | vague commitments, changed plans |
-| Dependency memory | needing closeness or support |
-| Conflict memory | raised voices, tension, disagreement |
-| Safety memory | familiar reassurance, rituals, repeated care |
+| Sensitivity           | Trigger Pattern                              |
+| --------------------- | -------------------------------------------- |
+| Abandonment memory    | absence, silence, withdrawal                 |
+| Betrayal memory       | secrecy, inconsistency, ambiguity            |
+| Rejection memory      | confession, exposure, honesty                |
+| Humiliation memory    | visibility, public attention, vulnerability  |
+| Invalidation memory   | minimization, disagreement, low empathy      |
+| Neglect memory        | inattentiveness, forgotten details           |
+| Broken promise memory | vague commitments, changed plans             |
+| Dependency memory     | needing closeness or support                 |
+| Conflict memory       | raised voices, tension, disagreement         |
+| Safety memory         | familiar reassurance, rituals, repeated care |
 
 High memory sensitivity creates strong continuity and depth, but risks hypervigilance and emotional flooding. Low memory sensitivity helps resilience, but can feel detached or emotionally stateless.
 
@@ -9005,19 +8994,19 @@ Idealization versus reality tolerance governs whether intimacy can survive the s
 
 Useful components:
 
-| Component | Meaning |
-| --- | --- |
-| Idealization intensity | tendency toward amplified projection |
-| Reality tolerance | ability to sustain intimacy after flaws appear |
-| Fantasy dependence | reliance on projection for attraction |
-| Imperfection tolerance | ability to accept limits and messiness |
-| Routine tolerance | ability to keep meaning inside familiarity |
-| Projection intensity | imagined meaning placed onto partner |
-| Emotional complexity tolerance | ability to hold contradiction |
-| Stability tolerance | comfort with calm attachment |
-| Humanization comfort | acceptance of ordinary humanity |
-| Expectation flexibility | ability to revise romantic narratives |
-| Mature attachment capacity | ability to love beyond fantasy |
+| Component                      | Meaning                                        |
+| ------------------------------ | ---------------------------------------------- |
+| Idealization intensity         | tendency toward amplified projection           |
+| Reality tolerance              | ability to sustain intimacy after flaws appear |
+| Fantasy dependence             | reliance on projection for attraction          |
+| Imperfection tolerance         | ability to accept limits and messiness         |
+| Routine tolerance              | ability to keep meaning inside familiarity     |
+| Projection intensity           | imagined meaning placed onto partner           |
+| Emotional complexity tolerance | ability to hold contradiction                  |
+| Stability tolerance            | comfort with calm attachment                   |
+| Humanization comfort           | acceptance of ordinary humanity                |
+| Expectation flexibility        | ability to revise romantic narratives          |
+| Mature attachment capacity     | ability to love beyond fantasy                 |
 
 Idealization can intensify chemistry, but fantasy-only chemistry struggles with survivability. Healthy development moves from idealization to humanization to acceptance to mature intimacy.
 
@@ -9029,23 +9018,23 @@ Relationship values are the core emotional principles, priorities, beliefs, and 
 
 Useful values:
 
-| Value | Core Belief |
-| --- | --- |
-| Loyalty | relationships should protect and prioritize each other |
-| Emotional honesty | relationships should be truthful |
-| Emotional safety | love should feel survivable |
-| Autonomy | love should preserve individuality |
-| Devotion | love should feel central and prioritizing |
-| Growth | relationships should help people evolve |
-| Stability | love should feel reliable |
-| Passion | love should feel alive and intense |
-| Freedom | love should not trap or control |
-| Exclusivity | love should feel unique |
-| Caretaking | love should involve active support |
-| Equality | both people should matter equally |
-| Acceptance | love should tolerate imperfection |
-| Excitement | love should stimulate and surprise |
-| Commitment | love should involve long-term choosing |
+| Value             | Core Belief                                            |
+| ----------------- | ------------------------------------------------------ |
+| Loyalty           | relationships should protect and prioritize each other |
+| Emotional honesty | relationships should be truthful                       |
+| Emotional safety  | love should feel survivable                            |
+| Autonomy          | love should preserve individuality                     |
+| Devotion          | love should feel central and prioritizing              |
+| Growth            | relationships should help people evolve                |
+| Stability         | love should feel reliable                              |
+| Passion           | love should feel alive and intense                     |
+| Freedom           | love should not trap or control                        |
+| Exclusivity       | love should feel unique                                |
+| Caretaking        | love should involve active support                     |
+| Equality          | both people should matter equally                      |
+| Acceptance        | love should tolerate imperfection                      |
+| Excitement        | love should stimulate and surprise                     |
+| Commitment        | love should involve long-term choosing                 |
 
 Many major conflicts are value collisions underneath surface issues: autonomy versus devotion, stability versus excitement, freedom versus exclusivity, honesty versus avoidance. Shared core values increase survivability even when personalities differ.
 
@@ -9057,41 +9046,41 @@ Grand scenes create milestones. Rituals create lived relationships.
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Habit | repeated behavior pattern |
-| Ritual | repeated behavior with emotional meaning |
-| Tradition | larger recurring ritual |
-| Routine | practical repeated structure |
-| Symbolic gesture | emotionally meaningful action |
+| Concept          | Meaning                                  |
+| ---------------- | ---------------------------------------- |
+| Habit            | repeated behavior pattern                |
+| Ritual           | repeated behavior with emotional meaning |
+| Tradition        | larger recurring ritual                  |
+| Routine          | practical repeated structure             |
+| Symbolic gesture | emotionally meaningful action            |
 
 Relationships feel believable through repetition with emotional meaning: goodnight texts, coffee together, forehead kisses, teasing nicknames, always walking together, one fixing the other's clothes, recurring sleeping positions, checking in after stress, knees touching under a table, checking whether someone ate, or the same phrase after a fight. These small repeated behaviors create emotional continuity.
 
 Useful ritual types:
 
-| Ritual Type | Core Emotional Meaning | Examples |
-| --- | --- | --- |
-| Greeting | we recognize each other's presence | specific greetings, arrival hugs, teasing greetings |
-| Goodbye | connection persists after separation | goodnight texts, "text me when you get home", leaving phrases |
-| Comfort | we know how to soothe each other | tea, touch, quiet presence, reassurance phrases |
-| Conflict repair | we survive rupture and reconnect | apology patterns, post-fight touch, repair humor |
-| Domestic | we share daily life | coffee together, cooking, errands, bedtime routines |
-| Teasing | our interaction itself is affectionate | teasing nicknames, recurring jokes, mock arguments, challenge games |
-| Reassurance | the bond remains secure | check-ins after stress, verbal affection routines, post-conflict reassurance |
-| Protective | your wellbeing is consistently prioritized | street-side walking, food checks, carrying things |
-| Physical affection | bodies recognize closeness automatically | forehead kisses, habitual touch, hand placement, leaning together, sleeping positions |
-| Symbolic | the relationship has meaningful anchors | anniversaries, objects, songs, repeated phrases |
-| Public | we visibly choose each other | introductions, public affection, social prioritization |
-| Private | this world belongs to us | hidden gestures, private nicknames, inside jokes |
+| Ritual Type        | Core Emotional Meaning                     | Examples                                                                              |
+| ------------------ | ------------------------------------------ | ------------------------------------------------------------------------------------- |
+| Greeting           | we recognize each other's presence         | specific greetings, arrival hugs, teasing greetings                                   |
+| Goodbye            | connection persists after separation       | goodnight texts, "text me when you get home", leaving phrases                         |
+| Comfort            | we know how to soothe each other           | tea, touch, quiet presence, reassurance phrases                                       |
+| Conflict repair    | we survive rupture and reconnect           | apology patterns, post-fight touch, repair humor                                      |
+| Domestic           | we share daily life                        | coffee together, cooking, errands, bedtime routines                                   |
+| Teasing            | our interaction itself is affectionate     | teasing nicknames, recurring jokes, mock arguments, challenge games                   |
+| Reassurance        | the bond remains secure                    | check-ins after stress, verbal affection routines, post-conflict reassurance          |
+| Protective         | your wellbeing is consistently prioritized | street-side walking, food checks, carrying things                                     |
+| Physical affection | bodies recognize closeness automatically   | forehead kisses, habitual touch, hand placement, leaning together, sleeping positions |
+| Symbolic           | the relationship has meaningful anchors    | anniversaries, objects, songs, repeated phrases                                       |
+| Public             | we visibly choose each other               | introductions, public affection, social prioritization                                |
+| Private            | this world belongs to us                   | hidden gestures, private nicknames, inside jokes                                      |
 
 Attachment style changes ritual importance:
 
-| Attachment | Ritual Function |
-| --- | --- |
-| Secure | grounding and continuity |
-| Anxious | reassurance and emotional permanence |
-| Avoidant | subtle, low-pressure intimacy |
-| Fearful | intense but sometimes unstable ritual attachment |
+| Attachment | Ritual Function                                  |
+| ---------- | ------------------------------------------------ |
+| Secure     | grounding and continuity                         |
+| Anxious    | reassurance and emotional permanence             |
+| Avoidant   | subtle, low-pressure intimacy                    |
+| Fearful    | intense but sometimes unstable ritual attachment |
 
 Rituals increase emotional safety because they create predictable care. Always calling after conflict, always checking in, or always returning emotionally teaches the nervous system that the relationship remains stable.
 
@@ -9112,30 +9101,30 @@ Obsessive relationships may intensify rituals into constant contact or validatio
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| No ritual accumulation | relationship feels stateless and scene-based |
-| Frozen rituals | no evolution, stagnation, repetitive affection |
-| Weaponized rituals | withholding routines as punishment destroys safety |
-| Ritual overdependence | disruption causes disproportionate panic |
+| Failure                | Result                                             |
+| ---------------------- | -------------------------------------------------- |
+| No ritual accumulation | relationship feels stateless and scene-based       |
+| Frozen rituals         | no evolution, stagnation, repetitive affection     |
+| Weaponized rituals     | withholding routines as punishment destroys safety |
+| Ritual overdependence  | disruption causes disproportionate panic           |
 
 Useful ritual variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Ritual density | amount of repeated intimacy patterns |
-| Ritual importance | emotional significance of routines |
-| Reassurance ritual dependence | reliance on repeated security signals |
-| Domestic integration | routine life overlap |
-| Symbolic attachment | importance of gestures, objects, songs, and dates |
-| Ritual stability | consistency of rituals over time |
-| Emotional continuity | feeling the relationship persists reliably |
-| Ritual sensitivity | reaction to ritual disruption |
-| Shared culture strength | uniqueness of relational habits |
-| Ritual evolution | ability for rituals to mature with the bond |
-| Ritual disruption risk | chance missed rituals imply instability |
-| Weaponized ritual risk | chance rituals become control or punishment |
-| Habit specificity | how personalized and recognizable rituals are |
+| Variable                      | Meaning                                           |
+| ----------------------------- | ------------------------------------------------- |
+| Ritual density                | amount of repeated intimacy patterns              |
+| Ritual importance             | emotional significance of routines                |
+| Reassurance ritual dependence | reliance on repeated security signals             |
+| Domestic integration          | routine life overlap                              |
+| Symbolic attachment           | importance of gestures, objects, songs, and dates |
+| Ritual stability              | consistency of rituals over time                  |
+| Emotional continuity          | feeling the relationship persists reliably        |
+| Ritual sensitivity            | reaction to ritual disruption                     |
+| Shared culture strength       | uniqueness of relational habits                   |
+| Ritual evolution              | ability for rituals to mature with the bond       |
+| Ritual disruption risk        | chance missed rituals imply instability           |
+| Weaponized ritual risk        | chance rituals become control or punishment       |
+| Habit specificity             | how personalized and recognizable rituals are     |
 
 Ritual equation:
 
@@ -9157,33 +9146,33 @@ Compatibility is not attraction, chemistry, love, or obsession. It answers: how 
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Chemistry | emotional or sexual charge |
-| Compatibility | long-term relational fit |
-| Attachment | emotional bonding |
-| Attraction | desire or interest |
-| Relationship identity | shared emotional "we" |
+| Concept               | Meaning                    |
+| --------------------- | -------------------------- |
+| Chemistry             | emotional or sexual charge |
+| Compatibility         | long-term relational fit   |
+| Attachment            | emotional bonding          |
+| Attraction            | desire or interest         |
+| Relationship identity | shared emotional "we"      |
 
 Core compatibility axes:
 
-| Axis | Core Question | Common Strain |
-| --- | --- | --- |
-| Emotional | how well do our emotional systems work together? | starvation, overwhelm, poor reassurance fit |
-| Communication | can we understand each other consistently? | directness/subtext mismatch |
-| Conflict | how survivable are disagreements? | pursuer/withdrawer loops, poor repair |
-| Attachment | how safely do our attachment systems interact? | anxious/avoidant spirals, fearful instability |
-| Intimacy | how naturally do closeness preferences align? | fusion vs space, touch mismatch |
-| Sexual | how well do erotic systems align? | pacing, desire style, kink, exclusivity expectations |
-| Exclusivity | what does uniqueness mean to each of us? | jealousy, ENM/monogamy mismatch |
-| Autonomy | how much independence vs closeness feels healthy? | engulfment or abandonment interpretations |
-| Stability | how much intensity and unpredictability can we sustain? | chaos tolerance mismatch |
-| Lifestyle | can our actual lives function together? | schedules, routines, ambition, family goals |
-| Values | what does love and life fundamentally mean? | loyalty, freedom, devotion, morality |
-| Growth | do we evolve well together? | challenge, adaptability, healing support |
-| Ritual | do habits and emotional rhythms fit? | communication frequency, domestic rhythm mismatch |
-| Devotion | how similarly do we prioritize emotional centrality? | casual vs intense imbalance |
-| Novelty | how much stimulation and change do we need? | novelty seeker vs routine-oriented tension |
+| Axis          | Core Question                                           | Common Strain                                        |
+| ------------- | ------------------------------------------------------- | ---------------------------------------------------- |
+| Emotional     | how well do our emotional systems work together?        | starvation, overwhelm, poor reassurance fit          |
+| Communication | can we understand each other consistently?              | directness/subtext mismatch                          |
+| Conflict      | how survivable are disagreements?                       | pursuer/withdrawer loops, poor repair                |
+| Attachment    | how safely do our attachment systems interact?          | anxious/avoidant spirals, fearful instability        |
+| Intimacy      | how naturally do closeness preferences align?           | fusion vs space, touch mismatch                      |
+| Sexual        | how well do erotic systems align?                       | pacing, desire style, kink, exclusivity expectations |
+| Exclusivity   | what does uniqueness mean to each of us?                | jealousy, ENM/monogamy mismatch                      |
+| Autonomy      | how much independence vs closeness feels healthy?       | engulfment or abandonment interpretations            |
+| Stability     | how much intensity and unpredictability can we sustain? | chaos tolerance mismatch                             |
+| Lifestyle     | can our actual lives function together?                 | schedules, routines, ambition, family goals          |
+| Values        | what does love and life fundamentally mean?             | loyalty, freedom, devotion, morality                 |
+| Growth        | do we evolve well together?                             | challenge, adaptability, healing support             |
+| Ritual        | do habits and emotional rhythms fit?                    | communication frequency, domestic rhythm mismatch    |
+| Devotion      | how similarly do we prioritize emotional centrality?    | casual vs intense imbalance                          |
+| Novelty       | how much stimulation and change do we need?             | novelty seeker vs routine-oriented tension           |
 
 #### Emotional Compatibility
 
@@ -9195,18 +9184,18 @@ It includes regulation fit, vulnerability pacing, reassurance compatibility, emp
 
 Useful emotional compatibility components:
 
-| Component | Core Question | Low-Fit Risk |
-| --- | --- | --- |
-| Emotional regulation fit | how well do our nervous systems handle stress together? | escalation loops and chronic overwhelm |
-| Vulnerability compatibility | how naturally do we handle openness? | one pushes honesty while the other needs slow trust |
-| Reassurance compatibility | can we stabilize each other effectively? | one needs confirmation, the other feels pressured |
-| Expression compatibility | are emotional signals understandable? | chronic misinterpretation |
-| Attachment compatibility | how safely do attachment systems interact? | anxiety/avoidance spirals |
-| Emotional need compatibility | what do we need from relationships? | emotional starvation |
-| Conflict compatibility | how survivable is emotional tension? | rupture without repair |
-| Emotional safety fit | how safe does vulnerability feel? | guardedness or shutdown |
-| Intensity compatibility | how much activation feels healthy? | excitement/calm mismatch |
-| Empathy synchronization | how naturally do we understand each other? | low felt recognition |
+| Component                    | Core Question                                           | Low-Fit Risk                                        |
+| ---------------------------- | ------------------------------------------------------- | --------------------------------------------------- |
+| Emotional regulation fit     | how well do our nervous systems handle stress together? | escalation loops and chronic overwhelm              |
+| Vulnerability compatibility  | how naturally do we handle openness?                    | one pushes honesty while the other needs slow trust |
+| Reassurance compatibility    | can we stabilize each other effectively?                | one needs confirmation, the other feels pressured   |
+| Expression compatibility     | are emotional signals understandable?                   | chronic misinterpretation                           |
+| Attachment compatibility     | how safely do attachment systems interact?              | anxiety/avoidance spirals                           |
+| Emotional need compatibility | what do we need from relationships?                     | emotional starvation                                |
+| Conflict compatibility       | how survivable is emotional tension?                    | rupture without repair                              |
+| Emotional safety fit         | how safe does vulnerability feel?                       | guardedness or shutdown                             |
+| Intensity compatibility      | how much activation feels healthy?                      | excitement/calm mismatch                            |
+| Empathy synchronization      | how naturally do we understand each other?              | low felt recognition                                |
 
 High emotional compatibility feels like emotional ease, translation fluency, survivable conflict, easier vulnerability, mutual regulation, and the sense that "you emotionally make sense to me."
 
@@ -9214,10 +9203,10 @@ Low emotional compatibility feels like chronic misunderstanding, unmet needs, re
 
 Emotional compatibility and chemistry should stay separate:
 
-| Combination | Result |
-| --- | --- |
-| high chemistry + low emotional compatibility | obsession, volatility, emotional addiction |
-| high emotional compatibility + low chemistry | comfort, safety, possible stagnation |
+| Combination                                   | Result                                                |
+| --------------------------------------------- | ----------------------------------------------------- |
+| high chemistry + low emotional compatibility  | obsession, volatility, emotional addiction            |
+| high emotional compatibility + low chemistry  | comfort, safety, possible stagnation                  |
 | high chemistry + high emotional compatibility | mature romance with desire, understanding, and safety |
 
 Emotional compatibility can evolve:
@@ -9239,18 +9228,18 @@ Communication compatibility is not speaking identically, having no misunderstand
 
 Useful communication compatibility components:
 
-| Component | Core Question | Low-Fit Risk |
-| --- | --- | --- |
-| Directness compatibility | how similarly do we express emotional meaning? | hints versus "tell me directly" loops |
-| Emotional transparency fit | how visible do we expect emotions to be? | starvation or overwhelm |
-| Reassurance compatibility | how do we give and receive security? | reassurance pressure or invisibility |
-| Conflict communication fit | are tension conversations survivable? | pursuit/withdrawal escalation |
-| Subtext compatibility | do we read indirect meaning similarly? | silence, teasing, or leakage misread |
-| Vulnerability pace compatibility | how do we handle openness timing? | rushed exposure or emotional withholding |
-| Processing speed compatibility | how quickly do we process and respond? | immediate repair need versus decompression need |
-| Affection translation accuracy | do we recognize each other's care? | affection mismatch realism |
-| Emotional vocabulary compatibility | can we name feelings at compatible depth? | frustration and emotional invisibility |
-| Emotional listening quality | do we feel heard by each other? | low validation and safety |
+| Component                          | Core Question                                  | Low-Fit Risk                                    |
+| ---------------------------------- | ---------------------------------------------- | ----------------------------------------------- |
+| Directness compatibility           | how similarly do we express emotional meaning? | hints versus "tell me directly" loops           |
+| Emotional transparency fit         | how visible do we expect emotions to be?       | starvation or overwhelm                         |
+| Reassurance compatibility          | how do we give and receive security?           | reassurance pressure or invisibility            |
+| Conflict communication fit         | are tension conversations survivable?          | pursuit/withdrawal escalation                   |
+| Subtext compatibility              | do we read indirect meaning similarly?         | silence, teasing, or leakage misread            |
+| Vulnerability pace compatibility   | how do we handle openness timing?              | rushed exposure or emotional withholding        |
+| Processing speed compatibility     | how quickly do we process and respond?         | immediate repair need versus decompression need |
+| Affection translation accuracy     | do we recognize each other's care?             | affection mismatch realism                      |
+| Emotional vocabulary compatibility | can we name feelings at compatible depth?      | frustration and emotional invisibility          |
+| Emotional listening quality        | do we feel heard by each other?                | low validation and safety                       |
 
 High communication compatibility feels like emotional understanding, easier repair, low chronic misinterpretation, conversational safety, and emotional translation fluency.
 
@@ -9278,29 +9267,29 @@ Conflict compatibility governs what happens during rupture.
 
 Useful conflict compatibility components:
 
-| Component | Core Question | Low-Fit Risk |
-| --- | --- | --- |
-| Regulation compatibility under stress | how well do nervous systems function together during conflict? | escalation loops, shutdown, overwhelm |
-| Repair compatibility | how naturally can we reconnect after rupture? | apologies miss, reassurance fails, repair never lands |
-| Pursuit/withdrawal fit | how do we handle distance after conflict? | one pursues, the other retreats |
-| Accountability capacity | can we take responsibility without collapse? | defensiveness, blame, repair failure |
-| Emotional safety during conflict | does conflict remain survivable? | humiliation, contempt, abandonment threats |
-| Escalation tolerance match | how much intensity can we tolerate? | flooding, invalidation, shutdown |
-| Resolution timing compatibility | when do we need resolution? | immediate reassurance vs decompression time |
-| Vulnerability preservation | can we remain honest while distressed? | anger masks hurt, vulnerability weaponized |
-| Conflict meaning compatibility | what does conflict represent emotionally? | repair opportunity vs relationship collapse |
-| Boundary respect under stress | do we respect limits while activated? | coercion, pressure, autonomy violation |
+| Component                             | Core Question                                                  | Low-Fit Risk                                          |
+| ------------------------------------- | -------------------------------------------------------------- | ----------------------------------------------------- |
+| Regulation compatibility under stress | how well do nervous systems function together during conflict? | escalation loops, shutdown, overwhelm                 |
+| Repair compatibility                  | how naturally can we reconnect after rupture?                  | apologies miss, reassurance fails, repair never lands |
+| Pursuit/withdrawal fit                | how do we handle distance after conflict?                      | one pursues, the other retreats                       |
+| Accountability capacity               | can we take responsibility without collapse?                   | defensiveness, blame, repair failure                  |
+| Emotional safety during conflict      | does conflict remain survivable?                               | humiliation, contempt, abandonment threats            |
+| Escalation tolerance match            | how much intensity can we tolerate?                            | flooding, invalidation, shutdown                      |
+| Resolution timing compatibility       | when do we need resolution?                                    | immediate reassurance vs decompression time           |
+| Vulnerability preservation            | can we remain honest while distressed?                         | anger masks hurt, vulnerability weaponized            |
+| Conflict meaning compatibility        | what does conflict represent emotionally?                      | repair opportunity vs relationship collapse           |
+| Boundary respect under stress         | do we respect limits while activated?                          | coercion, pressure, autonomy violation                |
 
 High conflict compatibility feels like survivable disagreement, faster repair, emotional resilience, conflict trust, and lower chronic fear. Low conflict compatibility feels like exhaustion, repeated misunderstanding, instability, unresolved resentment, and hypervigilance.
 
 Attachment pairings shape conflict compatibility:
 
-| Pairing | Common Pattern |
-| --- | --- |
-| Secure + secure | repair-oriented |
-| Anxious + avoidant | pursuit/withdrawal loops |
-| Fearful + fearful | chaotic escalation |
-| Secure + fearful | stabilization and healing potential |
+| Pairing            | Common Pattern                      |
+| ------------------ | ----------------------------------- |
+| Secure + secure    | repair-oriented                     |
+| Anxious + avoidant | pursuit/withdrawal loops            |
+| Fearful + fearful  | chaotic escalation                  |
+| Secure + fearful   | stabilization and healing potential |
 
 High chemistry often masks low conflict compatibility. This creates intense reunions, obsession, volatility, and repeated rupture, especially in enemies-to-lovers or toxic chemistry dynamics.
 
@@ -9319,12 +9308,12 @@ rupture
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
+| Failure                  | Result                                                    |
+| ------------------------ | --------------------------------------------------------- |
 | Chronic escalation loops | pursuit -> overwhelm -> withdrawal -> panic -> escalation |
-| Emotional invalidation | one partner feels unheard, minimized, or unsafe |
-| Repair collapse | arguments happen but reconnection never lands |
-| Suppressed conflict | peace on the surface, resentment underneath |
+| Emotional invalidation   | one partner feels unheard, minimized, or unsafe           |
+| Repair collapse          | arguments happen but reconnection never lands             |
+| Suppressed conflict      | peace on the surface, resentment underneath               |
 
 #### Sexual Compatibility
 
@@ -9336,39 +9325,39 @@ Sexual chemistry is immediate erotic tension or attraction. Sexual compatibility
 
 Useful sexual compatibility components:
 
-| Component | Core Question | Low-Fit Risk |
-| --- | --- | --- |
-| Desire style fit | how does desire activate for each person? | one needs closeness first, the other reads delay as rejection |
-| Libido compatibility | how aligned are frequency and intensity needs? | frustration, reassurance strain, rejection sensitivity |
-| Emotional intimacy integration | how emotionally connected should intimacy feel? | one feels casualized, the other feels overburdened |
-| Sexual vulnerability safety | how safe does physical and emotional openness feel? | shame, body insecurity, guardedness |
-| Touch compatibility | how naturally do physical affection preferences align? | sensory mismatch, distance, overwhelm |
-| Sexual pace compatibility | how quickly should intimacy develop? | pressure, avoidance, insecurity |
-| Dynamic compatibility | how compatible are erotic psychological dynamics? | discomfort, mismatch, consent friction |
-| Sexual communication openness | can desire, boundaries, insecurity, and needs be discussed? | unspoken needs, resentment, unsafe guessing |
-| Sexual exclusivity compatibility | what does sexual uniqueness mean emotionally? | jealousy, ambiguity, broken expectations |
-| Intimacy regulation compatibility | how stable do both feel during and after intimacy? | post-intimacy withdrawal, attachment spikes |
-| Exploration compatibility | how similarly do both approach novelty? | stagnation or pressure |
-| Sensual compatibility | how naturally do sensory and physical rhythms align? | embodied mismatch, low satisfaction |
+| Component                         | Core Question                                               | Low-Fit Risk                                                  |
+| --------------------------------- | ----------------------------------------------------------- | ------------------------------------------------------------- |
+| Desire style fit                  | how does desire activate for each person?                   | one needs closeness first, the other reads delay as rejection |
+| Libido compatibility              | how aligned are frequency and intensity needs?              | frustration, reassurance strain, rejection sensitivity        |
+| Emotional intimacy integration    | how emotionally connected should intimacy feel?             | one feels casualized, the other feels overburdened            |
+| Sexual vulnerability safety       | how safe does physical and emotional openness feel?         | shame, body insecurity, guardedness                           |
+| Touch compatibility               | how naturally do physical affection preferences align?      | sensory mismatch, distance, overwhelm                         |
+| Sexual pace compatibility         | how quickly should intimacy develop?                        | pressure, avoidance, insecurity                               |
+| Dynamic compatibility             | how compatible are erotic psychological dynamics?           | discomfort, mismatch, consent friction                        |
+| Sexual communication openness     | can desire, boundaries, insecurity, and needs be discussed? | unspoken needs, resentment, unsafe guessing                   |
+| Sexual exclusivity compatibility  | what does sexual uniqueness mean emotionally?               | jealousy, ambiguity, broken expectations                      |
+| Intimacy regulation compatibility | how stable do both feel during and after intimacy?          | post-intimacy withdrawal, attachment spikes                   |
+| Exploration compatibility         | how similarly do both approach novelty?                     | stagnation or pressure                                        |
+| Sensual compatibility             | how naturally do sensory and physical rhythms align?        | embodied mismatch, low satisfaction                           |
 
 High sexual compatibility feels like emotionally safe desire, natural chemistry flow, easy communication, satisfying pacing, mutual responsiveness, and sustained attraction. Low sexual compatibility feels like pressure, emotional misunderstanding, rejection sensitivity, pacing mismatch, unmet needs, or discomfort discussing intimacy.
 
 Attachment patterns shape sexual compatibility:
 
-| Attachment Style | Common Sexual Pattern |
-| --- | --- |
-| Secure | balanced intimacy and desire |
-| Anxious | reassurance-linked intimacy |
-| Avoidant | distance after vulnerability |
-| Fearful | intense but unstable intimacy |
+| Attachment Style | Common Sexual Pattern         |
+| ---------------- | ----------------------------- |
+| Secure           | balanced intimacy and desire  |
+| Anxious          | reassurance-linked intimacy   |
+| Avoidant         | distance after vulnerability  |
+| Fearful          | intense but unstable intimacy |
 
 Sexual compatibility depends heavily on emotional safety. Without safety, vulnerability collapses, communication weakens, and insecurity rises. With safety, exploration, trust, and responsiveness become easier.
 
 Sexual chemistry and sexual compatibility can diverge:
 
-| Pattern | Result |
-| --- | --- |
-| High chemistry / low compatibility | obsession, tension, instability, frustration |
+| Pattern                                      | Result                                              |
+| -------------------------------------------- | --------------------------------------------------- |
+| High chemistry / low compatibility           | obsession, tension, instability, frustration        |
 | High compatibility / lower initial chemistry | deep sustainable erotic intimacy can grow over time |
 
 Relationship phase matters. Early sexual compatibility is often driven by novelty, attraction, anticipation, and uncertainty. Long-term sexual compatibility increasingly depends on communication, adaptation, emotional safety, evolving intimacy, and responsiveness.
@@ -9377,12 +9366,12 @@ Power-dynamic and kink-adjacent compatibility must remain adult-gated and govern
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| Pressure mismatch | one partner feels rushed, obligated, or unsafe |
-| Communication collapse | needs and boundaries remain unspoken |
-| Emotional disconnect | intimacy lacks emotional recognition or responsiveness |
-| Static erotic dynamics | no adaptation, novelty, or emotional evolution |
+| Failure                | Result                                                 |
+| ---------------------- | ------------------------------------------------------ |
+| Pressure mismatch      | one partner feels rushed, obligated, or unsafe         |
+| Communication collapse | needs and boundaries remain unspoken                   |
+| Emotional disconnect   | intimacy lacks emotional recognition or responsiveness |
+| Static erotic dynamics | no adaptation, novelty, or emotional evolution         |
 
 Sexual compatibility can evolve:
 
@@ -9417,38 +9406,38 @@ Pacing compatibility is distinct from attachment compatibility, intimacy compati
 
 Useful pacing compatibility components:
 
-| Component | Core Question | Low-Fit Risk |
-| --- | --- | --- |
-| Emotional pacing compatibility | how quickly do both people open emotionally? | one floods, the other retreats |
-| Attachment speed compatibility | how quickly does attachment form? | imbalance, pressure, insecurity |
-| Commitment pace comfort | how quickly does permanence feel safe? | label panic, reassurance conflict |
-| Sexual pacing compatibility | how quickly does physical intimacy feel safe? | pressure, rejection sensitivity, avoidance |
-| Vulnerability threshold fit | how quickly can deeper self-exposure happen? | forced disclosure or emotional starvation |
-| Conflict processing speed fit | how quickly should tension be repaired? | immediate reassurance vs decompression time |
-| Domestic pacing compatibility | how quickly do lives and routines integrate? | engulfment fear or stagnation |
-| Exclusivity pacing compatibility | when does uniqueness become expected? | jealousy, ambiguity, attachment instability |
-| Intensity pacing compatibility | how quickly can emotional intensity rise? | overwhelm, engulfment, emotional flatness |
-| Relationship identity pacing fit | how quickly does "we" thinking form? | future pressure or emotional underinvestment |
+| Component                        | Core Question                                 | Low-Fit Risk                                 |
+| -------------------------------- | --------------------------------------------- | -------------------------------------------- |
+| Emotional pacing compatibility   | how quickly do both people open emotionally?  | one floods, the other retreats               |
+| Attachment speed compatibility   | how quickly does attachment form?             | imbalance, pressure, insecurity              |
+| Commitment pace comfort          | how quickly does permanence feel safe?        | label panic, reassurance conflict            |
+| Sexual pacing compatibility      | how quickly does physical intimacy feel safe? | pressure, rejection sensitivity, avoidance   |
+| Vulnerability threshold fit      | how quickly can deeper self-exposure happen?  | forced disclosure or emotional starvation    |
+| Conflict processing speed fit    | how quickly should tension be repaired?       | immediate reassurance vs decompression time  |
+| Domestic pacing compatibility    | how quickly do lives and routines integrate?  | engulfment fear or stagnation                |
+| Exclusivity pacing compatibility | when does uniqueness become expected?         | jealousy, ambiguity, attachment instability  |
+| Intensity pacing compatibility   | how quickly can emotional intensity rise?     | overwhelm, engulfment, emotional flatness    |
+| Relationship identity pacing fit | how quickly does "we" thinking form?          | future pressure or emotional underinvestment |
 
 High pacing compatibility feels like natural progression, low chronic pressure, manageable escalation, and secure attachment development. Low pacing compatibility feels like overwhelm, stagnation, insecurity, pressure, chronic waiting, or moving at incompatible emotional speeds.
 
 Common pacing mismatches:
 
-| Mismatch | Result |
-| --- | --- |
-| Fast attachment + slow attachment | pursuit, hesitation, anxious/avoidant tension |
-| Fast commitment + autonomy-focused | panic, distancing, reassurance conflict |
-| Fast vulnerability + emotional restraint | imbalance, exhaustion, misunderstanding |
-| Fast intensity + stability-oriented | engulfment fear, emotional starvation, instability |
+| Mismatch                                 | Result                                             |
+| ---------------------------------------- | -------------------------------------------------- |
+| Fast attachment + slow attachment        | pursuit, hesitation, anxious/avoidant tension      |
+| Fast commitment + autonomy-focused       | panic, distancing, reassurance conflict            |
+| Fast vulnerability + emotional restraint | imbalance, exhaustion, misunderstanding            |
+| Fast intensity + stability-oriented      | engulfment fear, emotional starvation, instability |
 
 Attachment styles often shape pacing:
 
-| Attachment Style | Typical Pace |
-| --- | --- |
-| Secure | adaptable and steady |
-| Anxious | accelerated attachment |
-| Avoidant | slowed intimacy progression |
-| Fearful | inconsistent acceleration and withdrawal |
+| Attachment Style | Typical Pace                             |
+| ---------------- | ---------------------------------------- |
+| Secure           | adaptable and steady                     |
+| Anxious          | accelerated attachment                   |
+| Avoidant         | slowed intimacy progression              |
+| Fearful          | inconsistent acceleration and withdrawal |
 
 Pacing is a safety signal. People emotionally open at the speed their nervous system believes intimacy is survivable. Unsafe pacing feels coercive, overwhelming, or destabilizing. Safe pacing feels emotionally breathable.
 
@@ -9458,12 +9447,12 @@ Slow burn romance often revolves around pacing tension: emotional restraint, del
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| Emotional acceleration overload | panic, engulfment, withdrawal |
-| Chronic stagnation | frustration, emotional drift, unresolved longing |
-| Pressure pacing | one partner feels rushed, forced, or coerced |
-| Avoidance pacing | progression is delayed indefinitely by fear |
+| Failure                         | Result                                           |
+| ------------------------------- | ------------------------------------------------ |
+| Emotional acceleration overload | panic, engulfment, withdrawal                    |
+| Chronic stagnation              | frustration, emotional drift, unresolved longing |
+| Pressure pacing                 | one partner feels rushed, forced, or coerced     |
+| Avoidance pacing                | progression is delayed indefinitely by fear      |
 
 Pacing compatibility can evolve:
 
@@ -9485,19 +9474,19 @@ Domestic compatibility is not chemistry, devotion, commitment, or living togethe
 
 Useful domestic compatibility components:
 
-| Component | Core Question | Low-Fit Risk |
-| --- | --- | --- |
-| Routine compatibility | do daily rhythms fit? | friction, missed connection, resentment |
-| Shared space compatibility | can both people feel at home in the same environment? | territorial tension, overstimulation |
-| Responsibility sharing fit | are practical burdens handled fairly? | caretaking imbalance, exhaustion |
-| Daily regulation fit | do everyday habits calm or destabilize each other? | chronic irritation, shutdown, avoidance |
-| Domestic affection fit | does care remain visible in ordinary routines? | loneliness despite proximity |
-| Chore expectation alignment | are standards and labor expectations compatible? | invisible labor, scorekeeping |
-| Cleanliness preference fit | do environment needs align? | frustration, criticism, discomfort |
-| Sleep schedule compatibility | do rest rhythms coexist? | fatigue, distance, routine conflict |
-| Food and care rhythm fit | do eating, caretaking, and comfort habits align? | unmet care needs, neglect signals |
-| Home privacy compatibility | can closeness and alone time coexist? | engulfment, emotional distance |
-| Ordinary life connection | does daily life maintain emotional presence? | roommate drift, domestic flattening |
+| Component                    | Core Question                                         | Low-Fit Risk                            |
+| ---------------------------- | ----------------------------------------------------- | --------------------------------------- |
+| Routine compatibility        | do daily rhythms fit?                                 | friction, missed connection, resentment |
+| Shared space compatibility   | can both people feel at home in the same environment? | territorial tension, overstimulation    |
+| Responsibility sharing fit   | are practical burdens handled fairly?                 | caretaking imbalance, exhaustion        |
+| Daily regulation fit         | do everyday habits calm or destabilize each other?    | chronic irritation, shutdown, avoidance |
+| Domestic affection fit       | does care remain visible in ordinary routines?        | loneliness despite proximity            |
+| Chore expectation alignment  | are standards and labor expectations compatible?      | invisible labor, scorekeeping           |
+| Cleanliness preference fit   | do environment needs align?                           | frustration, criticism, discomfort      |
+| Sleep schedule compatibility | do rest rhythms coexist?                              | fatigue, distance, routine conflict     |
+| Food and care rhythm fit     | do eating, caretaking, and comfort habits align?      | unmet care needs, neglect signals       |
+| Home privacy compatibility   | can closeness and alone time coexist?                 | engulfment, emotional distance          |
+| Ordinary life connection     | does daily life maintain emotional presence?          | roommate drift, domestic flattening     |
 
 High domestic compatibility feels like routines becoming comforting, responsibilities feeling fair, shared space feeling emotionally livable, and ordinary care reinforcing attachment. Low domestic compatibility feels like practical friction, invisible resentment, emotional drift, overstimulation, or loneliness inside daily proximity.
 
@@ -9505,25 +9494,25 @@ Domestic compatibility often reveals whether affection can survive repetition. G
 
 Common domestic mismatch patterns:
 
-| Mismatch | Result |
-| --- | --- |
-| Routine-oriented + spontaneous | one feels destabilized, the other feels constrained |
-| High cleanliness need + relaxed environment need | criticism, shame, resentment |
-| Constant togetherness + strong privacy need | engulfment fear or abandonment fear |
-| Caretaking-heavy + self-sufficient | support may feel intrusive or unrecognized |
-| High domestic ritual need + low ritual awareness | one feels unremembered, the other feels pressured |
+| Mismatch                                         | Result                                              |
+| ------------------------------------------------ | --------------------------------------------------- |
+| Routine-oriented + spontaneous                   | one feels destabilized, the other feels constrained |
+| High cleanliness need + relaxed environment need | criticism, shame, resentment                        |
+| Constant togetherness + strong privacy need      | engulfment fear or abandonment fear                 |
+| Caretaking-heavy + self-sufficient               | support may feel intrusive or unrecognized          |
+| High domestic ritual need + low ritual awareness | one feels unremembered, the other feels pressured   |
 
 Domestic compatibility is strongly tied to rituals and habits: coffee together, shared errands, bedtime routines, checking in after stress, cooking patterns, clothing fixes, sleeping positions, and small automatic gestures. These ordinary repetitions become emotional continuity.
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| Roommate drift | shared life continues but emotional connection thins |
+| Failure                   | Result                                                 |
+| ------------------------- | ------------------------------------------------------ |
+| Roommate drift            | shared life continues but emotional connection thins   |
 | Invisible labor imbalance | one partner carries practical or emotional maintenance |
-| Domestic control | routines become coercive instead of comforting |
-| Routine stagnation | stability becomes emotional flattening |
-| Privacy collapse | shared life erases autonomy and recovery space |
+| Domestic control          | routines become coercive instead of comforting         |
+| Routine stagnation        | stability becomes emotional flattening                 |
+| Privacy collapse          | shared life erases autonomy and recovery space         |
 
 Domestic compatibility can evolve:
 
@@ -9548,39 +9537,39 @@ Ambition compatibility is distinct from lifestyle compatibility, value compatibi
 
 Useful ambition compatibility components:
 
-| Component | Core Question | Low-Fit Risk |
-| --- | --- | --- |
-| Goal alignment | are desired futures emotionally compatible? | trajectory incompatibility |
-| Work-life priority compatibility | how much priority should ambition receive? | neglect, suffocation, resentment |
-| Achievement drive compatibility | how intense are achievement needs? | burnout, boredom, judgment |
-| Time availability fit | how much time and energy remain for intimacy? | attachment insecurity, emotional scarcity |
-| Success identity compatibility | how do achievement differences feel? | competition, insecurity, comparison |
-| Growth compatibility | do both support each other's evolution? | stagnation, threat responses |
-| Lifestyle pace compatibility | how fast should life itself move? | burnout, drift, instability |
-| Emotional availability under ambition | can emotional presence survive goal pursuit? | neglect, unreliable reassurance |
-| Sacrifice compatibility | what compromises feel acceptable? | self-erasure, resentment |
-| Security/aspiration compatibility | do both prioritize stability or risk similarly? | future conflict, chronic anxiety |
-| Future inclusion strength | does ambition include the relationship? | feeling left behind |
+| Component                             | Core Question                                   | Low-Fit Risk                              |
+| ------------------------------------- | ----------------------------------------------- | ----------------------------------------- |
+| Goal alignment                        | are desired futures emotionally compatible?     | trajectory incompatibility                |
+| Work-life priority compatibility      | how much priority should ambition receive?      | neglect, suffocation, resentment          |
+| Achievement drive compatibility       | how intense are achievement needs?              | burnout, boredom, judgment                |
+| Time availability fit                 | how much time and energy remain for intimacy?   | attachment insecurity, emotional scarcity |
+| Success identity compatibility        | how do achievement differences feel?            | competition, insecurity, comparison       |
+| Growth compatibility                  | do both support each other's evolution?         | stagnation, threat responses              |
+| Lifestyle pace compatibility          | how fast should life itself move?               | burnout, drift, instability               |
+| Emotional availability under ambition | can emotional presence survive goal pursuit?    | neglect, unreliable reassurance           |
+| Sacrifice compatibility               | what compromises feel acceptable?               | self-erasure, resentment                  |
+| Security/aspiration compatibility     | do both prioritize stability or risk similarly? | future conflict, chronic anxiety          |
+| Future inclusion strength             | does ambition include the relationship?         | feeling left behind                       |
 
 High ambition compatibility feels like mutual support, admiration, aligned future energy, growth partnership, and emotional understanding around goals. Low ambition compatibility feels like neglect, competition, sacrifice imbalance, resentment, or lives pulling in different directions.
 
 Common ambition pairings:
 
-| Pairing | Romance Texture | Risk |
-| --- | --- | --- |
-| High ambition + high ambition | admiration, stimulation, competence attraction | emotional neglect, competition |
-| High ambition + stability-oriented | grounding balance | prioritization conflict |
-| Ambition-driven + devotion-driven | emotional asymmetry tension | one feels neglected, one feels constrained |
-| Shared growth pairing | mutual evolution partnership | identity change can outpace repair |
+| Pairing                            | Romance Texture                                | Risk                                       |
+| ---------------------------------- | ---------------------------------------------- | ------------------------------------------ |
+| High ambition + high ambition      | admiration, stimulation, competence attraction | emotional neglect, competition             |
+| High ambition + stability-oriented | grounding balance                              | prioritization conflict                    |
+| Ambition-driven + devotion-driven  | emotional asymmetry tension                    | one feels neglected, one feels constrained |
+| Shared growth pairing              | mutual evolution partnership                   | identity change can outpace repair         |
 
 Attachment styles often shape ambition compatibility:
 
-| Attachment Style | Common Ambition Pattern |
-| --- | --- |
-| Secure | balanced integration |
-| Anxious | fears ambition will replace the relationship |
-| Avoidant | uses work or goals for emotional distance |
-| Fearful | inconsistent prioritization |
+| Attachment Style | Common Ambition Pattern                      |
+| ---------------- | -------------------------------------------- |
+| Secure           | balanced integration                         |
+| Anxious          | fears ambition will replace the relationship |
+| Avoidant         | uses work or goals for emotional distance    |
+| Fearful          | inconsistent prioritization                  |
 
 Ambition compatibility often becomes relationship identity: "we push each other", "we build together", "you keep me grounded", "we choose each other despite ambition", or "we are both obsessed with our goals."
 
@@ -9588,12 +9577,12 @@ Ambition also powers admiration. Ambition plus admiration plus mutual respect ca
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| Competition collapse | partners become rivals instead of supporters |
-| Emotional neglect | ambition replaces intimacy, presence, or reassurance |
-| Future divergence | love remains, but trajectories become incompatible |
-| Self-erasure | one partner repeatedly sacrifices goals or identity |
+| Failure              | Result                                               |
+| -------------------- | ---------------------------------------------------- |
+| Competition collapse | partners become rivals instead of supporters         |
+| Emotional neglect    | ambition replaces intimacy, presence, or reassurance |
+| Future divergence    | love remains, but trajectories become incompatible   |
+| Self-erasure         | one partner repeatedly sacrifices goals or identity  |
 
 Ambition compatibility can evolve:
 
@@ -9616,39 +9605,39 @@ Social compatibility is distinct from lifestyle compatibility, emotional compati
 
 Useful social compatibility components:
 
-| Component | Core Question | Low-Fit Risk |
-| --- | --- | --- |
-| Social energy match | how similarly do both experience social stimulation? | exhaustion, pressure, isolation |
-| Public affection compatibility | how publicly expressive should the relationship be? | embarrassment, invisibility, pressure |
-| Relationship visibility preference fit | how socially visible should the bond become? | insecurity, invalidation, secrecy strain |
-| Friendship integration fit | how naturally do social circles integrate? | divided worlds, possessiveness |
-| Attention distribution comfort | how comfortable is social attention and prioritization? | jealousy, public hurt, comparison |
-| Lifestyle social rhythm | how similarly do both socially live? | nightlife/domestic mismatch, drift |
-| Family compatibility | how do family dynamics affect the relationship? | obligation conflict, privacy stress |
-| Social boundary compatibility | what public behavior feels acceptable? | flirting conflict, trust damage |
-| Reputation sensitivity fit | how much does social image matter? | shame, performance pressure |
-| Social supportiveness | how well do both back each other socially? | public loneliness, anxiety |
-| Public identity comfort | can both inhabit the relationship identity publicly? | dissonance, concealment, discomfort |
+| Component                              | Core Question                                           | Low-Fit Risk                             |
+| -------------------------------------- | ------------------------------------------------------- | ---------------------------------------- |
+| Social energy match                    | how similarly do both experience social stimulation?    | exhaustion, pressure, isolation          |
+| Public affection compatibility         | how publicly expressive should the relationship be?     | embarrassment, invisibility, pressure    |
+| Relationship visibility preference fit | how socially visible should the bond become?            | insecurity, invalidation, secrecy strain |
+| Friendship integration fit             | how naturally do social circles integrate?              | divided worlds, possessiveness           |
+| Attention distribution comfort         | how comfortable is social attention and prioritization? | jealousy, public hurt, comparison        |
+| Lifestyle social rhythm                | how similarly do both socially live?                    | nightlife/domestic mismatch, drift       |
+| Family compatibility                   | how do family dynamics affect the relationship?         | obligation conflict, privacy stress      |
+| Social boundary compatibility          | what public behavior feels acceptable?                  | flirting conflict, trust damage          |
+| Reputation sensitivity fit             | how much does social image matter?                      | shame, performance pressure              |
+| Social supportiveness                  | how well do both back each other socially?              | public loneliness, anxiety               |
+| Public identity comfort                | can both inhabit the relationship identity publicly?    | dissonance, concealment, discomfort      |
 
 High social compatibility feels like easy coexistence, comfortable public identity, manageable energy balance, natural social integration, and public/private rhythms that both can tolerate. Low social compatibility feels like social exhaustion, public insecurity, emotional invisibility, lifestyle mismatch, or resentment.
 
 Common social pairings:
 
-| Pairing | Romance Texture | Risk |
-| --- | --- | --- |
-| Introvert + extrovert | balance and mutual expansion | exhaustion or loneliness |
-| Public + private romance | visibility tension | reassurance mismatch |
+| Pairing                               | Romance Texture                                | Risk                              |
+| ------------------------------------- | ---------------------------------------------- | --------------------------------- |
+| Introvert + extrovert                 | balance and mutual expansion                   | exhaustion or loneliness          |
+| Public + private romance              | visibility tension                             | reassurance mismatch              |
 | Social butterfly + devotional partner | broad connection meets centralizing attachment | jealousy, prioritization conflict |
-| Shared social identity | workplace, artistic, or power-couple cohesion | public pressure, role rigidity |
+| Shared social identity                | workplace, artistic, or power-couple cohesion  | public pressure, role rigidity    |
 
 Attachment styles often shape social compatibility:
 
-| Attachment Style | Social Pattern |
-| --- | --- |
-| Secure | adaptable social engagement |
-| Anxious | sensitivity to public prioritization |
-| Avoidant | social independence emphasis |
-| Fearful | inconsistent social openness |
+| Attachment Style | Social Pattern                       |
+| ---------------- | ------------------------------------ |
+| Secure           | adaptable social engagement          |
+| Anxious          | sensitivity to public prioritization |
+| Avoidant         | social independence emphasis         |
+| Fearful          | inconsistent social openness         |
 
 Social behavior often activates exclusivity systems: public flirting, emotional intimacy with friends, attention distribution, and public prioritization can all affect jealousy, reassurance, and emotional safety.
 
@@ -9656,13 +9645,13 @@ Social compatibility also shapes relationship identity. Couples may become the c
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| Social exhaustion | one partner feels overwhelmed, overstimulated, or drained |
-| Public invalidation | hiding, distancing, or refusing acknowledgment damages security |
-| Social jealousy escalation | public attention patterns trigger hypervigilance or possessiveness |
-| Lifestyle divergence | social habits become incompatible long-term |
-| Social isolation | the relationship cuts off support systems instead of integrating safely |
+| Failure                    | Result                                                                  |
+| -------------------------- | ----------------------------------------------------------------------- |
+| Social exhaustion          | one partner feels overwhelmed, overstimulated, or drained               |
+| Public invalidation        | hiding, distancing, or refusing acknowledgment damages security         |
+| Social jealousy escalation | public attention patterns trigger hypervigilance or possessiveness      |
+| Lifestyle divergence       | social habits become incompatible long-term                             |
+| Social isolation           | the relationship cuts off support systems instead of integrating safely |
 
 Social compatibility can evolve:
 
@@ -9685,52 +9674,52 @@ Lifestyle compatibility is distinct from domestic compatibility, emotional compa
 
 Useful lifestyle compatibility components:
 
-| Component | Core Question | Low-Fit Risk |
-| --- | --- | --- |
-| Routine rhythm fit | how naturally do daily rhythms align? | scheduling tension, missed connection |
-| Energy compatibility | how similarly do both manage stimulation and rest? | fatigue, overwhelm, low intimacy consistency |
-| Organization compatibility | how compatible are environment habits? | low-level resentment, criticism |
-| Social lifestyle fit | how similarly do both want to socially live? | isolation, overextension, drift |
-| Work-life compatibility | how do work and rest systems affect the relationship? | neglect, instability, resentment |
-| Domestic responsibility balance | how naturally are responsibilities shared? | burnout, scorekeeping |
-| Financial lifestyle compatibility | how similarly do both approach resources? | anxiety, conflict, future strain |
-| Leisure compatibility | how similarly do both recharge and enjoy life? | boredom, pressure, separate lives |
-| Space need compatibility | how much physical and psychological space is needed? | engulfment or distance |
-| Stress habit compatibility | how do stress behaviors affect each other? | safety disruption, avoidance, escalation |
-| Health/wellness compatibility | how do wellbeing habits coexist? | rest conflict, care mismatch |
-| Change tolerance match | how similarly do both tolerate disruption? | rigidity conflict, instability |
-| Daily intimacy sustainability | can closeness survive routine? | logistical partnership without emotional nourishment |
+| Component                         | Core Question                                         | Low-Fit Risk                                         |
+| --------------------------------- | ----------------------------------------------------- | ---------------------------------------------------- |
+| Routine rhythm fit                | how naturally do daily rhythms align?                 | scheduling tension, missed connection                |
+| Energy compatibility              | how similarly do both manage stimulation and rest?    | fatigue, overwhelm, low intimacy consistency         |
+| Organization compatibility        | how compatible are environment habits?                | low-level resentment, criticism                      |
+| Social lifestyle fit              | how similarly do both want to socially live?          | isolation, overextension, drift                      |
+| Work-life compatibility           | how do work and rest systems affect the relationship? | neglect, instability, resentment                     |
+| Domestic responsibility balance   | how naturally are responsibilities shared?            | burnout, scorekeeping                                |
+| Financial lifestyle compatibility | how similarly do both approach resources?             | anxiety, conflict, future strain                     |
+| Leisure compatibility             | how similarly do both recharge and enjoy life?        | boredom, pressure, separate lives                    |
+| Space need compatibility          | how much physical and psychological space is needed?  | engulfment or distance                               |
+| Stress habit compatibility        | how do stress behaviors affect each other?            | safety disruption, avoidance, escalation             |
+| Health/wellness compatibility     | how do wellbeing habits coexist?                      | rest conflict, care mismatch                         |
+| Change tolerance match            | how similarly do both tolerate disruption?            | rigidity conflict, instability                       |
+| Daily intimacy sustainability     | can closeness survive routine?                        | logistical partnership without emotional nourishment |
 
 High lifestyle compatibility feels like sustainable coexistence, low chronic friction, easier daily intimacy, and emotional breathing room. Low lifestyle compatibility feels like constant adjustment, fatigue, routine resentment, scheduling tension, or the painful sense that loving each other is easier than living together.
 
 Common lifestyle pairings:
 
-| Pairing | Romance Texture | Risk |
-| --- | --- | --- |
-| Structured + chaotic | balance or lively contrast | chronic stress if adaptation fails |
-| Homebody + adventurous | comfort meets novelty | boredom or overstimulation |
-| Work-focused + relationship-focused | ambition meets emotional presence | neglect and prioritization conflict |
-| Shared rhythm pairing | naturally aligned sleep, routines, and energy | high domestic ease, lower novelty |
+| Pairing                             | Romance Texture                               | Risk                                |
+| ----------------------------------- | --------------------------------------------- | ----------------------------------- |
+| Structured + chaotic                | balance or lively contrast                    | chronic stress if adaptation fails  |
+| Homebody + adventurous              | comfort meets novelty                         | boredom or overstimulation          |
+| Work-focused + relationship-focused | ambition meets emotional presence             | neglect and prioritization conflict |
+| Shared rhythm pairing               | naturally aligned sleep, routines, and energy | high domestic ease, lower novelty   |
 
 Attachment styles often shape lifestyle needs:
 
-| Attachment Style | Lifestyle Pattern |
-| --- | --- |
-| Secure | adaptable integration |
-| Anxious | prefers high emotional accessibility |
-| Avoidant | stronger independence and space needs |
-| Fearful | inconsistent routines and closeness needs |
+| Attachment Style | Lifestyle Pattern                         |
+| ---------------- | ----------------------------------------- |
+| Secure           | adaptable integration                     |
+| Anxious          | prefers high emotional accessibility      |
+| Avoidant         | stronger independence and space needs     |
+| Fearful          | inconsistent routines and closeness needs |
 
 Lifestyle compatibility is one of the main engines of long-term intimacy because daily life either supports attachment or slowly erodes it. It often appears through small recurring ease or friction: needing silence while working, planning everything, improvising constantly, leaving clutter, needing decompression, or wanting constant activity.
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| Chronic friction accumulation | tiny unresolved mismatches become resentment |
-| Emotional neglect through routine | the relationship becomes logistical only |
-| Identity suffocation | one partner sacrifices comfort, routines, or energy needs |
-| Over-adaptation | one person endlessly adjusts while the other does not |
+| Failure                           | Result                                                    |
+| --------------------------------- | --------------------------------------------------------- |
+| Chronic friction accumulation     | tiny unresolved mismatches become resentment              |
+| Emotional neglect through routine | the relationship becomes logistical only                  |
+| Identity suffocation              | one partner sacrifices comfort, routines, or energy needs |
+| Over-adaptation                   | one person endlessly adjusts while the other does not     |
 
 Lifestyle compatibility can evolve:
 
@@ -9745,13 +9734,13 @@ Strong lifestyle compatibility means daily life itself supports intimacy instead
 
 Compatibility types:
 
-| Type | Meaning | Runtime Use |
-| --- | --- | --- |
-| Natural compatibility | the relationship flows easily | low friction, fast trust, easy repair |
-| Growth compatibility | not easy, but both adapt | healing, opposites attract, earned intimacy |
-| High chemistry / low compatibility | compelling drama with unstable fit | obsession, volatility, repeated rupture |
-| High compatibility / low chemistry | stable but flat connection | comfort, possible stagnation |
-| Transformational compatibility | both change deeply | profound romance or destabilization |
+| Type                               | Meaning                            | Runtime Use                                 |
+| ---------------------------------- | ---------------------------------- | ------------------------------------------- |
+| Natural compatibility              | the relationship flows easily      | low friction, fast trust, easy repair       |
+| Growth compatibility               | not easy, but both adapt           | healing, opposites attract, earned intimacy |
+| High chemistry / low compatibility | compelling drama with unstable fit | obsession, volatility, repeated rupture     |
+| High compatibility / low chemistry | stable but flat connection         | comfort, possible stagnation                |
+| Transformational compatibility     | both change deeply                 | profound romance or destabilization         |
 
 Compatibility affects trust speed, conflict survivability, intimacy pacing, attachment security, and long-term stability.
 
@@ -9783,37 +9772,37 @@ initial mismatch
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| Single match score | emotionally shallow compatibility |
-| Perfect compatibility | low friction, low realism, low growth |
-| Ignored incompatibilities | incoherent boundaries, needs, and pacing |
-| Chemistry mistaken for compatibility | intense but unsustainable romance |
+| Failure                              | Result                                   |
+| ------------------------------------ | ---------------------------------------- |
+| Single match score                   | emotionally shallow compatibility        |
+| Perfect compatibility                | low friction, low realism, low growth    |
+| Ignored incompatibilities            | incoherent boundaries, needs, and pacing |
+| Chemistry mistaken for compatibility | intense but unsustainable romance        |
 
 Useful compatibility variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Emotional compatibility | emotional system fit |
-| Communication compatibility | understanding fit |
-| Conflict compatibility | repair survivability |
-| Attachment compatibility | security interaction fit |
-| Intimacy compatibility | closeness preference fit |
-| Sexual compatibility | adult-gated erotic system alignment |
-| Exclusivity compatibility | uniqueness expectations fit |
-| Autonomy compatibility | independence/closeness balance |
-| Stability compatibility | intensity tolerance alignment |
-| Lifestyle compatibility | practical life fit |
-| Value compatibility | relational philosophy fit |
-| Growth compatibility | adaptation and evolution potential |
-| Ritual compatibility | habit and emotional rhythm fit |
-| Devotion compatibility | emotional centrality fit |
-| Novelty compatibility | stimulation and change fit |
-| Natural compatibility | baseline ease |
-| Adaptation capacity | ability to learn across differences |
-| Transformational compatibility | capacity to change each other meaningfully |
-| Chemistry/compatibility gap | charge without sustainable fit, or fit without charge |
-| Compatibility stress | pressure from mismatch across axes |
+| Variable                       | Meaning                                               |
+| ------------------------------ | ----------------------------------------------------- |
+| Emotional compatibility        | emotional system fit                                  |
+| Communication compatibility    | understanding fit                                     |
+| Conflict compatibility         | repair survivability                                  |
+| Attachment compatibility       | security interaction fit                              |
+| Intimacy compatibility         | closeness preference fit                              |
+| Sexual compatibility           | adult-gated erotic system alignment                   |
+| Exclusivity compatibility      | uniqueness expectations fit                           |
+| Autonomy compatibility         | independence/closeness balance                        |
+| Stability compatibility        | intensity tolerance alignment                         |
+| Lifestyle compatibility        | practical life fit                                    |
+| Value compatibility            | relational philosophy fit                             |
+| Growth compatibility           | adaptation and evolution potential                    |
+| Ritual compatibility           | habit and emotional rhythm fit                        |
+| Devotion compatibility         | emotional centrality fit                              |
+| Novelty compatibility          | stimulation and change fit                            |
+| Natural compatibility          | baseline ease                                         |
+| Adaptation capacity            | ability to learn across differences                   |
+| Transformational compatibility | capacity to change each other meaningfully            |
+| Chemistry/compatibility gap    | charge without sustainable fit, or fit without charge |
+| Compatibility stress           | pressure from mismatch across axes                    |
 
 Compatibility equation:
 
@@ -9831,13 +9820,13 @@ Value compatibility is the fit between two people's core relational priorities: 
 
 Common value collisions:
 
-| Collision | Surface Conflict |
-| --- | --- |
-| Stability vs excitement | one wants calm, the other fears boredom |
-| Autonomy vs devotion | one needs freedom, the other needs centrality |
-| Honesty vs avoidance | one wants direct truth, the other protects through silence |
-| Freedom vs exclusivity | one wants flexibility, the other needs uniqueness |
-| Acceptance vs perfection | one wants flaw tolerance, the other fears inadequacy |
+| Collision                | Surface Conflict                                           |
+| ------------------------ | ---------------------------------------------------------- |
+| Stability vs excitement  | one wants calm, the other fears boredom                    |
+| Autonomy vs devotion     | one needs freedom, the other needs centrality              |
+| Honesty vs avoidance     | one wants direct truth, the other protects through silence |
+| Freedom vs exclusivity   | one wants flexibility, the other needs uniqueness          |
+| Acceptance vs perfection | one wants flaw tolerance, the other fears inadequacy       |
 
 Strong couples often share core values even when personalities differ. Two characters can communicate differently, regulate differently, or live differently, but if both deeply value loyalty, repair, and emotional safety, survivability increases.
 
@@ -9860,49 +9849,49 @@ history
 
 Progression should operate across several layers:
 
-| Layer | Meaning |
-| --- | --- |
-| Emotional progression | attachment and vulnerability growth |
-| Narrative progression | phase and turning point movement |
-| Behavioral progression | changing interaction patterns |
-| Intimacy progression | closeness escalation |
-| Stability progression | relationship durability |
+| Layer                  | Meaning                             |
+| ---------------------- | ----------------------------------- |
+| Emotional progression  | attachment and vulnerability growth |
+| Narrative progression  | phase and turning point movement    |
+| Behavioral progression | changing interaction patterns       |
+| Intimacy progression   | closeness escalation                |
+| Stability progression  | relationship durability             |
 
 Core progression mechanisms:
 
-| Mechanism | Purpose | Example |
-| --- | --- | --- |
-| Emotional readiness | progress when barriers lower | trust plus fear of loss plus reciprocity confidence enables confession |
-| Trigger-based progression | move through meaningful events | jealousy realization, comfort scene, betrayal, public choice |
-| Soft-gated progression | stats influence but do not force | high trust plus vulnerability event plus mutual openness unlocks intimacy |
-| Phase transitions | move through identifiable states | curiosity -> attraction -> tension -> attachment -> commitment |
-| Escalation | increase emotional significance | teasing becomes loaded, comfort becomes dependency |
-| Regression | allow backward movement | betrayal lowers trust, avoidance lowers intimacy |
-| Repair | let rupture reshape trust | successful repair deepens safety; failed repair creates fragility |
-| Momentum | preserve emotional inertia | repeated comfort makes future vulnerability easier |
-| Dynamic evolution | change how the relationship behaves | teasing shifts from provocation to affection |
-| Thresholds | mark irreversible emotional changes | first betrayal, first "I love you", first major repair |
-| Intimacy layer progression | let closeness forms move separately | fast sexual chemistry, slow emotional trust |
-| Relationship identity | create a shared "we" | inside jokes, rituals, emotional assumptions |
-| Emotional saturation | react to repetition | unresolved conflict causes exhaustion; reassurance tolerance shifts |
-| Trajectory prediction | infer where the bond is heading | stabilizing, obsessive, repair arc, breakup risk |
-| Milestones | change future emotional logic | exclusivity, public acknowledgment, moving in |
-| Compatibility stress | account for mismatch pressure | communication, commitment, pacing, intimacy mismatch |
-| Plateaus | model stable or stuck phases | routine needs novelty, vulnerability, crisis, or rediscovery |
+| Mechanism                  | Purpose                             | Example                                                                   |
+| -------------------------- | ----------------------------------- | ------------------------------------------------------------------------- |
+| Emotional readiness        | progress when barriers lower        | trust plus fear of loss plus reciprocity confidence enables confession    |
+| Trigger-based progression  | move through meaningful events      | jealousy realization, comfort scene, betrayal, public choice              |
+| Soft-gated progression     | stats influence but do not force    | high trust plus vulnerability event plus mutual openness unlocks intimacy |
+| Phase transitions          | move through identifiable states    | curiosity -> attraction -> tension -> attachment -> commitment            |
+| Escalation                 | increase emotional significance     | teasing becomes loaded, comfort becomes dependency                        |
+| Regression                 | allow backward movement             | betrayal lowers trust, avoidance lowers intimacy                          |
+| Repair                     | let rupture reshape trust           | successful repair deepens safety; failed repair creates fragility         |
+| Momentum                   | preserve emotional inertia          | repeated comfort makes future vulnerability easier                        |
+| Dynamic evolution          | change how the relationship behaves | teasing shifts from provocation to affection                              |
+| Thresholds                 | mark irreversible emotional changes | first betrayal, first "I love you", first major repair                    |
+| Intimacy layer progression | let closeness forms move separately | fast sexual chemistry, slow emotional trust                               |
+| Relationship identity      | create a shared "we"                | inside jokes, rituals, emotional assumptions                              |
+| Emotional saturation       | react to repetition                 | unresolved conflict causes exhaustion; reassurance tolerance shifts       |
+| Trajectory prediction      | infer where the bond is heading     | stabilizing, obsessive, repair arc, breakup risk                          |
+| Milestones                 | change future emotional logic       | exclusivity, public acknowledgment, moving in                             |
+| Compatibility stress       | account for mismatch pressure       | communication, commitment, pacing, intimacy mismatch                      |
+| Plateaus                   | model stable or stuck phases        | routine needs novelty, vulnerability, crisis, or rediscovery              |
 
 Progression must be multi-axis. Do not use a single romance meter.
 
-| Axis | Meaning |
-| --- | --- |
-| Trust | emotional safety |
-| Attraction | romantic or sexual interest |
-| Attachment | emotional dependency |
-| Vulnerability | openness |
-| Commitment | future orientation |
-| Stability | conflict durability |
-| Tension | unresolved attraction |
-| Familiarity | accumulated knowing |
-| Devotion | prioritization intensity |
+| Axis          | Meaning                     |
+| ------------- | --------------------------- |
+| Trust         | emotional safety            |
+| Attraction    | romantic or sexual interest |
+| Attachment    | emotional dependency        |
+| Vulnerability | openness                    |
+| Commitment    | future orientation          |
+| Stability     | conflict durability         |
+| Tension       | unresolved attraction       |
+| Familiarity   | accumulated knowing         |
+| Devotion      | prioritization intensity    |
 
 Example progression chain:
 
@@ -9921,31 +9910,31 @@ The strongest progression systems alter interpretation. Early touch may mean fli
 
 Progression failure modes:
 
-| Failure | Result |
-| --- | --- |
-| instant intimacy | payoff feels unearned |
-| emotional resets | history has no consequence |
-| static chemistry | relationship never matures |
-| repetitive conflict loops | drama replaces growth |
-| consequence-free milestones | turning points feel hollow |
-| permanent escalation | relationship cannot stabilize |
+| Failure                     | Result                        |
+| --------------------------- | ----------------------------- |
+| instant intimacy            | payoff feels unearned         |
+| emotional resets            | history has no consequence    |
+| static chemistry            | relationship never matures    |
+| repetitive conflict loops   | drama replaces growth         |
+| consequence-free milestones | turning points feel hollow    |
+| permanent escalation        | relationship cannot stabilize |
 
 Useful progression variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Emotional readiness | openness to progression |
-| Progression momentum | relationship inertia |
-| Vulnerability threshold | trust needed for openness |
-| Regression sensitivity | damage response |
-| Repair effectiveness | ability to restore safety |
-| Milestone density | number of defining events |
-| Stability level | resilience to conflict |
-| Dynamic evolution | behavioral change depth |
-| Emotional saturation | exhaustion or normalization effects |
-| Plateau risk | chance the bond stops evolving |
-| Compatibility stress | mismatch pressure |
-| Trajectory prediction | inferred emotional direction |
+| Variable                | Meaning                             |
+| ----------------------- | ----------------------------------- |
+| Emotional readiness     | openness to progression             |
+| Progression momentum    | relationship inertia                |
+| Vulnerability threshold | trust needed for openness           |
+| Regression sensitivity  | damage response                     |
+| Repair effectiveness    | ability to restore safety           |
+| Milestone density       | number of defining events           |
+| Stability level         | resilience to conflict              |
+| Dynamic evolution       | behavioral change depth             |
+| Emotional saturation    | exhaustion or normalization effects |
+| Plateau risk            | chance the bond stops evolving      |
+| Compatibility stress    | mismatch pressure                   |
+| Trajectory prediction   | inferred emotional direction        |
 
 Progression equation:
 
@@ -9963,13 +9952,13 @@ Trajectory prediction is not destiny or a simple compatibility score. It is emot
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Trajectory | likely future emotional direction |
-| Momentum | accumulated emotional inertia |
-| Compatibility | relational fit and mismatch pressure |
-| Lifecycle state | current macro emotional condition |
-| Survivability | long-term resilience capacity |
+| Concept         | Meaning                              |
+| --------------- | ------------------------------------ |
+| Trajectory      | likely future emotional direction    |
+| Momentum        | accumulated emotional inertia        |
+| Compatibility   | relational fit and mismatch pressure |
+| Lifecycle state | current macro emotional condition    |
+| Survivability   | long-term resilience capacity        |
 
 Core trajectory equation:
 
@@ -9986,30 +9975,30 @@ patterns
 
 Predict trajectory across several dimensions:
 
-| Dimension | Question |
-| --- | --- |
-| Attachment trajectory | is attachment becoming safer or more dangerous? |
-| Trust trajectory | is emotional safety increasing or decreasing? |
-| Stability trajectory | can the bond survive increasing complexity? |
-| Intimacy trajectory | is closeness expanding, stagnating, or collapsing? |
-| Rupture trajectory | what unresolved damage is accumulating? |
-| Repair trajectory | does conflict make the relationship stronger or weaker? |
-| Identity trajectory | what relationship story is this becoming? |
+| Dimension             | Question                                                |
+| --------------------- | ------------------------------------------------------- |
+| Attachment trajectory | is attachment becoming safer or more dangerous?         |
+| Trust trajectory      | is emotional safety increasing or decreasing?           |
+| Stability trajectory  | can the bond survive increasing complexity?             |
+| Intimacy trajectory   | is closeness expanding, stagnating, or collapsing?      |
+| Rupture trajectory    | what unresolved damage is accumulating?                 |
+| Repair trajectory     | does conflict make the relationship stronger or weaker? |
+| Identity trajectory   | what relationship story is this becoming?               |
 
 Useful trajectory types:
 
-| Trajectory | Pattern | Likely feel |
-| --- | --- | --- |
-| Secure deepening | trust -> vulnerability -> repair -> safety | stable intimacy growth |
-| Obsessive escalation | chemistry -> fixation -> centralization -> dependency | intense and destabilization-prone |
-| Push-pull | attachment -> panic -> withdrawal -> longing -> reconnection | addictive instability |
-| Slow-burn deepening | tension -> trust -> revelation -> attachment | earned emotional payoff |
-| Emotional drift | reduced attention -> weaker rituals -> distance | quiet detachment |
-| Repair/redemption | rupture -> accountability -> consistency -> rebuilt safety | transformed intimacy |
-| Chaotic collapse | chemistry -> instability -> repeated rupture -> exhaustion | burnout risk |
-| Domestic stabilization | attachment -> routines -> rituals -> co-regulation | mature partnership identity |
-| Fantasy collapse | idealization -> reality exposure -> disappointment | devaluation or withdrawal |
-| Transformational | core wounds -> corrective experiences -> restructuring | healing and identity change |
+| Trajectory             | Pattern                                                      | Likely feel                       |
+| ---------------------- | ------------------------------------------------------------ | --------------------------------- |
+| Secure deepening       | trust -> vulnerability -> repair -> safety                   | stable intimacy growth            |
+| Obsessive escalation   | chemistry -> fixation -> centralization -> dependency        | intense and destabilization-prone |
+| Push-pull              | attachment -> panic -> withdrawal -> longing -> reconnection | addictive instability             |
+| Slow-burn deepening    | tension -> trust -> revelation -> attachment                 | earned emotional payoff           |
+| Emotional drift        | reduced attention -> weaker rituals -> distance              | quiet detachment                  |
+| Repair/redemption      | rupture -> accountability -> consistency -> rebuilt safety   | transformed intimacy              |
+| Chaotic collapse       | chemistry -> instability -> repeated rupture -> exhaustion   | burnout risk                      |
+| Domestic stabilization | attachment -> routines -> rituals -> co-regulation           | mature partnership identity       |
+| Fantasy collapse       | idealization -> reality exposure -> disappointment           | devaluation or withdrawal         |
+| Transformational       | core wounds -> corrective experiences -> restructuring       | healing and identity change       |
 
 Positive predictors include repair competence, emotional safety, trust consistency, adaptation capacity, shared values, ritual density, accountability, and emotional availability. Negative predictors include unresolved rupture accumulation, emotional neglect, inconsistency, avoidance, repeated betrayal, intensity addiction, low repair capacity, and chronic invalidation.
 
@@ -10019,26 +10008,26 @@ Major turning points can redirect trajectory: betrayal, confession, abandonment,
 
 Trajectory failure modes:
 
-| Failure | Result |
-| --- | --- |
-| random emotional shifts | future states feel disconnected from history |
-| no accumulated consequence | betrayal, neglect, or repair changes nothing |
-| infinite escalation | the relationship cannot stabilize or mature |
-| deterministic scoring | characters lose agency and turning points lose force |
+| Failure                    | Result                                               |
+| -------------------------- | ---------------------------------------------------- |
+| random emotional shifts    | future states feel disconnected from history         |
+| no accumulated consequence | betrayal, neglect, or repair changes nothing         |
+| infinite escalation        | the relationship cannot stabilize or mature          |
+| deterministic scoring      | characters lose agency and turning points lose force |
 
 Useful trajectory variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Attachment trajectory | bond strengthening or weakening |
-| Trust trajectory | emotional safety direction |
-| Stability trajectory | resilience direction |
-| Intimacy trajectory | closeness progression |
-| Rupture risk | likelihood of destabilization |
-| Repair momentum | reconnection strengthening |
-| Drift risk | emotional disengagement probability |
-| Identity consolidation | "we" narrative strengthening |
-| Survivability projection | likely long-term resilience |
+| Variable                 | Meaning                             |
+| ------------------------ | ----------------------------------- |
+| Attachment trajectory    | bond strengthening or weakening     |
+| Trust trajectory         | emotional safety direction          |
+| Stability trajectory     | resilience direction                |
+| Intimacy trajectory      | closeness progression               |
+| Rupture risk             | likelihood of destabilization       |
+| Repair momentum          | reconnection strengthening          |
+| Drift risk               | emotional disengagement probability |
+| Identity consolidation   | "we" narrative strengthening        |
+| Survivability projection | likely long-term resilience         |
 
 ### Relationship Momentum
 
@@ -10048,13 +10037,13 @@ Momentum is accumulated emotional probability. Repeated experiences change futur
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Momentum | directional emotional inertia |
-| Progression | stage or axis movement |
-| Attachment | emotional bonding |
-| Stability | resilience under stress |
-| Relationship identity | shared "we" meaning |
+| Concept               | Meaning                       |
+| --------------------- | ----------------------------- |
+| Momentum              | directional emotional inertia |
+| Progression           | stage or axis movement        |
+| Attachment            | emotional bonding             |
+| Stability             | resilience under stress       |
+| Relationship identity | shared "we" meaning           |
 
 Every emotionally meaningful interaction should alter future emotional probability:
 
@@ -10074,38 +10063,38 @@ repeated inconsistency
 
 Useful momentum types:
 
-| Type | Core Effect | Runtime Use |
-| --- | --- | --- |
-| Positive attachment momentum | closeness becomes more natural | easier intimacy, safer bonding |
-| Romantic escalation momentum | attraction and tension intensify | slow burn acceleration, longing |
-| Trust momentum | reliability lowers defenses | vulnerability acceleration |
-| Negative momentum | unresolved damage compounds | fragility, exhaustion, hypervigilance |
-| Obsession momentum | fixation reinforces itself | dependency, jealousy loops |
-| Repair momentum | reconnection strengthens resilience | conflict trust and redemption arcs |
-| Domestic momentum | routines deepen attachment | home-like grounding |
-| Vulnerability momentum | openness becomes easier | deeper intimacy acceleration |
-| Conflict momentum | conflict patterns reinforce themselves | rupture loops or improved repair trust |
-| Emotional drift momentum | distance slowly normalizes | long-term disconnection |
+| Type                         | Core Effect                            | Runtime Use                            |
+| ---------------------------- | -------------------------------------- | -------------------------------------- |
+| Positive attachment momentum | closeness becomes more natural         | easier intimacy, safer bonding         |
+| Romantic escalation momentum | attraction and tension intensify       | slow burn acceleration, longing        |
+| Trust momentum               | reliability lowers defenses            | vulnerability acceleration             |
+| Negative momentum            | unresolved damage compounds            | fragility, exhaustion, hypervigilance  |
+| Obsession momentum           | fixation reinforces itself             | dependency, jealousy loops             |
+| Repair momentum              | reconnection strengthens resilience    | conflict trust and redemption arcs     |
+| Domestic momentum            | routines deepen attachment             | home-like grounding                    |
+| Vulnerability momentum       | openness becomes easier                | deeper intimacy acceleration           |
+| Conflict momentum            | conflict patterns reinforce themselves | rupture loops or improved repair trust |
+| Emotional drift momentum     | distance slowly normalizes             | long-term disconnection                |
 
 Relationship momentum states:
 
-| State | Meaning | Common Signal |
-| --- | --- | --- |
-| Escalating | relationship is rapidly intensifying | attachment, focus, vulnerability increase |
-| Stabilizing | relationship is becoming safer | consistency, repair, predictability |
-| Volatile | intensity and rupture cycle | reunion highs, instability, push-pull |
-| Repairing | relationship is actively improving | accountability, safer communication |
-| Deteriorating | damage and resentment compound | neglect, repeated disappointment |
-| Stagnant | no meaningful evolution occurs | boredom, emotional flattening |
+| State         | Meaning                              | Common Signal                             |
+| ------------- | ------------------------------------ | ----------------------------------------- |
+| Escalating    | relationship is rapidly intensifying | attachment, focus, vulnerability increase |
+| Stabilizing   | relationship is becoming safer       | consistency, repair, predictability       |
+| Volatile      | intensity and rupture cycle          | reunion highs, instability, push-pull     |
+| Repairing     | relationship is actively improving   | accountability, safer communication       |
+| Deteriorating | damage and resentment compound       | neglect, repeated disappointment          |
+| Stagnant      | no meaningful evolution occurs       | boredom, emotional flattening             |
 
 Attachment styles shape momentum:
 
-| Attachment Style | Momentum Pattern |
-| --- | --- |
-| Secure | stabilizing momentum |
-| Anxious | acceleration and fixation |
-| Avoidant | push-pull momentum |
-| Fearful | volatile oscillation |
+| Attachment Style | Momentum Pattern          |
+| ---------------- | ------------------------- |
+| Secure           | stabilizing momentum      |
+| Anxious          | acceleration and fixation |
+| Avoidant         | push-pull momentum        |
+| Fearful          | volatile oscillation      |
 
 Chemistry often creates acceleration momentum through anticipation, fixation, tension loops, and emotional centralization. Chemistry without trust, safety, and repair can become destructive momentum.
 
@@ -10117,30 +10106,30 @@ Turning points redirect momentum. Betrayal, confession, repair, sacrifice, aband
 
 Momentum failure modes:
 
-| Failure | Result |
-| --- | --- |
-| Emotional reset syndrome | nothing accumulates emotionally |
-| Infinite escalation | relationship only intensifies until burnout |
-| No trajectory | relationship lacks direction or evolution |
-| Unchecked negative loops | damage becomes self-reinforcing |
+| Failure                  | Result                                      |
+| ------------------------ | ------------------------------------------- |
+| Emotional reset syndrome | nothing accumulates emotionally             |
+| Infinite escalation      | relationship only intensifies until burnout |
+| No trajectory            | relationship lacks direction or evolution   |
+| Unchecked negative loops | damage becomes self-reinforcing             |
 
 Useful momentum variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Attachment momentum | acceleration of bonding |
-| Trust momentum | increasing emotional safety |
-| Conflict momentum | escalation versus repair tendency |
-| Emotional drift momentum | disconnection accumulation |
-| Obsession momentum | fixation reinforcement |
-| Repair momentum | resilience growth |
-| Domestic momentum | routine intimacy accumulation |
-| Vulnerability momentum | openness acceleration |
-| Stability momentum | increasing emotional reliability |
-| Emotional memory weight | how strongly history affects future responses |
-| Expectation reinforcement | how much patterns become self-fulfilling |
-| Trajectory acceleration | speed of directional change |
-| Turning point sensitivity | how strongly major events redirect momentum |
+| Variable                  | Meaning                                       |
+| ------------------------- | --------------------------------------------- |
+| Attachment momentum       | acceleration of bonding                       |
+| Trust momentum            | increasing emotional safety                   |
+| Conflict momentum         | escalation versus repair tendency             |
+| Emotional drift momentum  | disconnection accumulation                    |
+| Obsession momentum        | fixation reinforcement                        |
+| Repair momentum           | resilience growth                             |
+| Domestic momentum         | routine intimacy accumulation                 |
+| Vulnerability momentum    | openness acceleration                         |
+| Stability momentum        | increasing emotional reliability              |
+| Emotional memory weight   | how strongly history affects future responses |
+| Expectation reinforcement | how much patterns become self-fulfilling      |
+| Trajectory acceleration   | speed of directional change                   |
+| Turning point sensitivity | how strongly major events redirect momentum   |
 
 Momentum equation:
 
@@ -10162,40 +10151,40 @@ Lifecycle state is the macro emotional operating mode of the relationship. It is
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Lifecycle state | current macro emotional condition |
-| Relationship status | structural or social definition |
-| Relationship phase | progression stage |
-| Relationship identity | shared "we" concept |
-| Momentum | directional emotional inertia |
+| Concept               | Meaning                           |
+| --------------------- | --------------------------------- |
+| Lifecycle state       | current macro emotional condition |
+| Relationship status   | structural or social definition   |
+| Relationship phase    | progression stage                 |
+| Relationship identity | shared "we" concept               |
+| Momentum              | directional emotional inertia     |
 
 Lifecycle states govern the emotional operating environment. The same line, touch, conflict, silence, or reassurance lands differently depending on whether the bond is in tension, instability, repair, drift, or stable partnership.
 
 Core lifecycle states:
 
-| State | Core Feeling | Runtime Signal |
-| --- | --- | --- |
-| Potential | something emotionally possible exists | curiosity, fascination, attention |
-| Attraction | I am drawn to you | chemistry, flirtation, anticipation |
-| Tension | something unresolved exists | restraint, subtext, almost-confessions |
-| Pursuit | we are moving toward each other | escalation, testing, attachment acceleration |
-| Denial | feelings exist but are resisted | hidden attraction, guardedness |
-| Attachment formation | you are becoming important | prioritization, jealousy, reassurance sensitivity |
-| Vulnerability | we are exposing ourselves | confession, honesty, trust progression |
-| Instability | this matters but feels unsafe | push-pull, volatility, inconsistent attachment |
-| Obsession | the bond dominates attention | fixation, fear of loss, centralization |
-| Devotional | we profoundly prioritize each other | loyalty, protectiveness, attachment depth |
-| Domestic integration | our lives are integrating | rituals, routines, co-regulation |
-| Stable partnership | this feels survivable long-term | conflict trust, repair reliability |
-| Plateau | the relationship is emotionally static | low novelty, routine dominance |
-| Drift | we are moving apart slowly | reduced attentiveness, weakened rituals |
-| Fracture | major emotional damage occurred | trust collapse, fragility, hypervigilance |
-| Repair | we are rebuilding safety | accountability, cautious vulnerability |
-| Reconnection | the bond survived rupture | reunion, rediscovery, reconciliation |
-| Transformation | the relationship changed us | healing, identity shifts, worldview change |
-| Dissolution | the relationship is ending | detachment, finality, grief |
-| Post-attachment | it ended but significance remains | nostalgia, imprinting, unresolved love |
+| State                | Core Feeling                           | Runtime Signal                                    |
+| -------------------- | -------------------------------------- | ------------------------------------------------- |
+| Potential            | something emotionally possible exists  | curiosity, fascination, attention                 |
+| Attraction           | I am drawn to you                      | chemistry, flirtation, anticipation               |
+| Tension              | something unresolved exists            | restraint, subtext, almost-confessions            |
+| Pursuit              | we are moving toward each other        | escalation, testing, attachment acceleration      |
+| Denial               | feelings exist but are resisted        | hidden attraction, guardedness                    |
+| Attachment formation | you are becoming important             | prioritization, jealousy, reassurance sensitivity |
+| Vulnerability        | we are exposing ourselves              | confession, honesty, trust progression            |
+| Instability          | this matters but feels unsafe          | push-pull, volatility, inconsistent attachment    |
+| Obsession            | the bond dominates attention           | fixation, fear of loss, centralization            |
+| Devotional           | we profoundly prioritize each other    | loyalty, protectiveness, attachment depth         |
+| Domestic integration | our lives are integrating              | rituals, routines, co-regulation                  |
+| Stable partnership   | this feels survivable long-term        | conflict trust, repair reliability                |
+| Plateau              | the relationship is emotionally static | low novelty, routine dominance                    |
+| Drift                | we are moving apart slowly             | reduced attentiveness, weakened rituals           |
+| Fracture             | major emotional damage occurred        | trust collapse, fragility, hypervigilance         |
+| Repair               | we are rebuilding safety               | accountability, cautious vulnerability            |
+| Reconnection         | the bond survived rupture              | reunion, rediscovery, reconciliation              |
+| Transformation       | the relationship changed us            | healing, identity shifts, worldview change        |
+| Dissolution          | the relationship is ending             | detachment, finality, grief                       |
+| Post-attachment      | it ended but significance remains      | nostalgia, imprinting, unresolved love            |
 
 Lifecycle transitions should be dynamic:
 
@@ -10220,39 +10209,39 @@ Momentum determines likely transitions. Positive repair momentum can move the re
 
 Attachment styles bias lifecycle patterns:
 
-| Attachment Style | Common Lifecycle Pattern |
-| --- | --- |
-| Secure | stable progression |
-| Anxious | accelerated attachment |
-| Avoidant | delayed intimacy and withdrawal |
-| Fearful | volatile oscillation |
+| Attachment Style | Common Lifecycle Pattern        |
+| ---------------- | ------------------------------- |
+| Secure           | stable progression              |
+| Anxious          | accelerated attachment          |
+| Avoidant         | delayed intimacy and withdrawal |
+| Fearful          | volatile oscillation            |
 
 Lifecycle state changes relationship identity, rituals, communication, vulnerability, expectations, pacing, affection style, and emotional tone. Strong RP relationships feel stateful because they remember what happened, what changed, what was damaged, and what was repaired.
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| Static relationship syndrome | relationship never evolves emotionally |
-| Instant state jumps | devotion, trust, or repair happen without earned transition |
-| No repair state | conflict either vanishes instantly or destroys everything |
-| Status-only modeling | labels replace emotional condition |
+| Failure                      | Result                                                      |
+| ---------------------------- | ----------------------------------------------------------- |
+| Static relationship syndrome | relationship never evolves emotionally                      |
+| Instant state jumps          | devotion, trust, or repair happen without earned transition |
+| No repair state              | conflict either vanishes instantly or destroys everything   |
+| Status-only modeling         | labels replace emotional condition                          |
 
 Useful lifecycle variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Current lifecycle state | macro emotional condition |
-| Attachment depth | emotional centrality |
-| Stability level | resilience of the bond |
-| Momentum direction | likely emotional trajectory |
-| Vulnerability openness | current intimacy exposure |
-| Trust integrity | safety level |
-| Ritual density | continuity strength |
-| Emotional volatility | instability intensity |
-| Repair progress | rebuilding status |
-| State transition readiness | likelihood of moving states |
-| State memory weight | how strongly the state changes interpretation |
+| Variable                   | Meaning                                       |
+| -------------------------- | --------------------------------------------- |
+| Current lifecycle state    | macro emotional condition                     |
+| Attachment depth           | emotional centrality                          |
+| Stability level            | resilience of the bond                        |
+| Momentum direction         | likely emotional trajectory                   |
+| Vulnerability openness     | current intimacy exposure                     |
+| Trust integrity            | safety level                                  |
+| Ritual density             | continuity strength                           |
+| Emotional volatility       | instability intensity                         |
+| Repair progress            | rebuilding status                             |
+| State transition readiness | likelihood of moving states                   |
+| State memory weight        | how strongly the state changes interpretation |
 
 Relationships feel alive when they are allowed to evolve through recognizable emotional states instead of remaining permanently static.
 
@@ -10264,13 +10253,13 @@ Survivability is not lack of conflict, constant happiness, perfect compatibility
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
+| Concept       | Meaning                       |
+| ------------- | ----------------------------- |
 | Survivability | long-term resilience capacity |
-| Stability | current emotional steadiness |
-| Compatibility | relational fit |
-| Trust | emotional reliability belief |
-| Attachment | emotional bond |
+| Stability     | current emotional steadiness  |
+| Compatibility | relational fit                |
+| Trust         | emotional reliability belief  |
+| Attachment    | emotional bond                |
 
 Core survivability equation:
 
@@ -10285,37 +10274,37 @@ repair capacity
 
 Useful survivability components:
 
-| Component | Core Question | Collapse Risk |
-| --- | --- | --- |
-| Conflict survivability | can the relationship survive tension? | small conflict becomes existential threat |
-| Trust durability | how stable is trust under stress? | hypervigilance, fragility |
-| Emotional safety stability | can vulnerability remain safe over time? | defensive shutdown |
-| Adaptation capacity | can needs and realities be renegotiated? | rigidity, resentment |
-| Attachment resilience | can attachment survive distance, stress, and change? | panic, withdrawal |
-| Identity stability | does the "we" remain coherent under pressure? | identity rupture |
-| Intimacy survivability | can closeness survive disappointment and reality? | logistical partnership, detachment |
-| Lifestyle sustainability | can daily life coexist with attachment? | exhaustion, domestic erosion |
-| Rupture recovery capacity | how much damage can be repaired? | permanent fracture |
-| Future survivability | can both imagine continuing long-term? | commitment collapse |
+| Component                  | Core Question                                        | Collapse Risk                             |
+| -------------------------- | ---------------------------------------------------- | ----------------------------------------- |
+| Conflict survivability     | can the relationship survive tension?                | small conflict becomes existential threat |
+| Trust durability           | how stable is trust under stress?                    | hypervigilance, fragility                 |
+| Emotional safety stability | can vulnerability remain safe over time?             | defensive shutdown                        |
+| Adaptation capacity        | can needs and realities be renegotiated?             | rigidity, resentment                      |
+| Attachment resilience      | can attachment survive distance, stress, and change? | panic, withdrawal                         |
+| Identity stability         | does the "we" remain coherent under pressure?        | identity rupture                          |
+| Intimacy survivability     | can closeness survive disappointment and reality?    | logistical partnership, detachment        |
+| Lifestyle sustainability   | can daily life coexist with attachment?              | exhaustion, domestic erosion              |
+| Rupture recovery capacity  | how much damage can be repaired?                     | permanent fracture                        |
+| Future survivability       | can both imagine continuing long-term?               | commitment collapse                       |
 
 High survivability feels resilient, adaptable, repair-capable, secure, and enduring. Low survivability feels fragile, volatile, exhausting, unsustainable, or collapse-prone.
 
 Chemistry and survivability should remain separate:
 
-| Pattern | Result |
-| --- | --- |
-| High chemistry + low survivability | obsession, volatility, intensity, addictive cycles |
-| High survivability + low chemistry | safety, comfort, partnership, possible flattening |
+| Pattern                             | Result                                                                |
+| ----------------------------------- | --------------------------------------------------------------------- |
+| High chemistry + low survivability  | obsession, volatility, intensity, addictive cycles                    |
+| High survivability + low chemistry  | safety, comfort, partnership, possible flattening                     |
 | High chemistry + high survivability | mature romance where intensity, trust, repair, and adaptation coexist |
 
 Attachment pairings shape survivability:
 
-| Pairing | Survivability Pattern |
-| --- | --- |
-| Secure + secure | high resilience |
+| Pairing            | Survivability Pattern       |
+| ------------------ | --------------------------- |
+| Secure + secure    | high resilience             |
 | Anxious + avoidant | unstable without adaptation |
-| Fearful + fearful | volatility-heavy |
-| Secure + insecure | potential healing dynamic |
+| Fearful + fearful  | volatility-heavy            |
+| Secure + insecure  | potential healing dynamic   |
 
 Repair is the core engine of survivability:
 
@@ -10331,12 +10320,12 @@ Momentum and identity reinforce survivability. Positive momentum creates trust l
 
 Failure modes:
 
-| Failure | Result |
-| --- | --- |
-| Fragility loops | small issues repeatedly create major destabilization |
-| Repair failure | reconnection never restores safety |
-| Stagnation survivability illusion | stability exists only because needs are suppressed |
-| Intensity addiction | the relationship survives through chaos until burnout |
+| Failure                           | Result                                                |
+| --------------------------------- | ----------------------------------------------------- |
+| Fragility loops                   | small issues repeatedly create major destabilization  |
+| Repair failure                    | reconnection never restores safety                    |
+| Stagnation survivability illusion | stability exists only because needs are suppressed    |
+| Intensity addiction               | the relationship survives through chaos until burnout |
 
 Survivability can evolve:
 
@@ -10352,18 +10341,18 @@ chemistry
 
 Useful survivability variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Conflict survivability | resilience under disagreement |
-| Trust durability | trust stability over time |
-| Repair competence | reconnection ability |
-| Emotional safety stability | vulnerability survivability |
-| Adaptation capacity | ability to evolve together |
-| Attachment resilience | bond durability |
-| Lifestyle sustainability | practical coexistence viability |
-| Identity stability | persistence of "we" narrative |
-| Rupture recovery capacity | ability to recover after damage |
-| Future survivability | long-term emotional viability |
+| Variable                   | Meaning                         |
+| -------------------------- | ------------------------------- |
+| Conflict survivability     | resilience under disagreement   |
+| Trust durability           | trust stability over time       |
+| Repair competence          | reconnection ability            |
+| Emotional safety stability | vulnerability survivability     |
+| Adaptation capacity        | ability to evolve together      |
+| Attachment resilience      | bond durability                 |
+| Lifestyle sustainability   | practical coexistence viability |
+| Identity stability         | persistence of "we" narrative   |
+| Rupture recovery capacity  | ability to recover after damage |
+| Future survivability       | long-term emotional viability   |
 
 Relationships survive not because they avoid difficulty, but because difficulty does not automatically destroy connection, trust, or attachment.
 
@@ -10375,52 +10364,52 @@ A relationship feels alive when it develops its own personality: playful and cha
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Relationship dynamic | recurring interaction loop |
-| Relationship identity | shared emotional self-concept |
-| Trope | narrative and emotional framework |
-| Chemistry | interaction charge |
-| Commitment | long-term investment |
+| Concept               | Meaning                           |
+| --------------------- | --------------------------------- |
+| Relationship dynamic  | recurring interaction loop        |
+| Relationship identity | shared emotional self-concept     |
+| Trope                 | narrative and emotional framework |
+| Chemistry             | interaction charge                |
+| Commitment            | long-term investment              |
 
 Example: the dynamic may be teasing and challenge, while the identity is "we emotionally provoke each other, but always come back."
 
 Useful identity components:
 
-| Component | Meaning | Example |
-| --- | --- | --- |
-| Shared narrative | story the couple believes about themselves | "We survived everything." |
-| Shared emotional roles | stable or evolving emotional positions | protector/emotional heart, tease/reactor |
-| Shared rituals | repeated relational behaviors | nightly calls, comfort routines, reconciliation rituals |
-| Shared language | couple-specific shorthand | nicknames, repeated phrases, nonverbal cues |
-| Shared memory architecture | landmarks that define the bond | first fight, betrayal, reconciliation, hardships |
-| Shared expectations | internal relationship rules | "We do not leave during fights." |
-| Shared future orientation | assumed permanence | "We should go there someday." |
-| Public/private identity | layered relational presentation | publicly teasing, privately soft |
-| Relational archetype | recognizable couple pattern | chaotic soulmates, competitive partners |
-| Shared vulnerability culture | how this relationship handles weakness | teasing-but-soft, quiet support, verbal reassurance |
-| Emotional tone identity | characteristic atmosphere | tender, yearning, chaotic, devotional, playful |
-| Relationship values | shared emotional principles | loyalty, freedom, honesty, safety, intensity |
+| Component                    | Meaning                                    | Example                                                 |
+| ---------------------------- | ------------------------------------------ | ------------------------------------------------------- |
+| Shared narrative             | story the couple believes about themselves | "We survived everything."                               |
+| Shared emotional roles       | stable or evolving emotional positions     | protector/emotional heart, tease/reactor                |
+| Shared rituals               | repeated relational behaviors              | nightly calls, comfort routines, reconciliation rituals |
+| Shared language              | couple-specific shorthand                  | nicknames, repeated phrases, nonverbal cues             |
+| Shared memory architecture   | landmarks that define the bond             | first fight, betrayal, reconciliation, hardships        |
+| Shared expectations          | internal relationship rules                | "We do not leave during fights."                        |
+| Shared future orientation    | assumed permanence                         | "We should go there someday."                           |
+| Public/private identity      | layered relational presentation            | publicly teasing, privately soft                        |
+| Relational archetype         | recognizable couple pattern                | chaotic soulmates, competitive partners                 |
+| Shared vulnerability culture | how this relationship handles weakness     | teasing-but-soft, quiet support, verbal reassurance     |
+| Emotional tone identity      | characteristic atmosphere                  | tender, yearning, chaotic, devotional, playful          |
+| Relationship values          | shared emotional principles                | loyalty, freedom, honesty, safety, intensity            |
 
 Relationship identity states:
 
-| State | Emotional Meaning |
-| --- | --- |
-| Curious | undefined emotional possibility |
-| Flirtatious | tension-focused |
-| Emotionally attached | emotional centrality forming |
-| Devotional | deep prioritization |
-| Fragile | instability or high sensitivity |
-| Domestic | integrated daily closeness |
-| Competitive | challenge-based closeness |
-| Obsessive | consuming emotional focus |
-| Safe haven | emotionally safe for each other |
-| Chaotic | destabilizing but intense |
-| Healing | helping each other become safer |
-| Transformational | the relationship changes identity and worldview |
-| Repairing | rebuilding trust |
-| Stable partnership | secure emotional structure |
-| Co-dependent | unhealthy emotional overreliance |
+| State                | Emotional Meaning                               |
+| -------------------- | ----------------------------------------------- |
+| Curious              | undefined emotional possibility                 |
+| Flirtatious          | tension-focused                                 |
+| Emotionally attached | emotional centrality forming                    |
+| Devotional           | deep prioritization                             |
+| Fragile              | instability or high sensitivity                 |
+| Domestic             | integrated daily closeness                      |
+| Competitive          | challenge-based closeness                       |
+| Obsessive            | consuming emotional focus                       |
+| Safe haven           | emotionally safe for each other                 |
+| Chaotic              | destabilizing but intense                       |
+| Healing              | helping each other become safer                 |
+| Transformational     | the relationship changes identity and worldview |
+| Repairing            | rebuilding trust                                |
+| Stable partnership   | secure emotional structure                      |
+| Co-dependent         | unhealthy emotional overreliance                |
 
 Identity can rupture. Betrayal, abandonment, humiliation, broken promises, or emotional neglect may damage not only trust but the shared "we." If the relationship identity was "we always protect each other," a public failure to defend the partner hurts more deeply because it violates the relationship's self-concept.
 
@@ -10440,44 +10429,44 @@ strangers
 
 Attachment and tone can bias identity:
 
-| Attachment Dynamic | Likely Identity |
-| --- | --- |
-| secure + secure | stable partnership |
-| anxious + avoidant | longing push-pull |
-| fearful + fearful | chaotic intensity |
-| secure + fearful | healing sanctuary |
-| rivals | challenge partnership |
-| devotional pair | emotionally central bond |
+| Attachment Dynamic | Likely Identity          |
+| ------------------ | ------------------------ |
+| secure + secure    | stable partnership       |
+| anxious + avoidant | longing push-pull        |
+| fearful + fearful  | chaotic intensity        |
+| secure + fearful   | healing sanctuary        |
+| rivals             | challenge partnership    |
+| devotional pair    | emotionally central bond |
 
-| Tone | Identity Feel |
-| --- | --- |
-| Playful | teasing partnership |
-| Yearning | emotionally unresolved |
-| Devotional | sacred emotional bond |
-| Chaotic | unstable intensity |
-| Tender | emotionally safe home |
-| Melancholic | beautiful fragility |
+| Tone        | Identity Feel          |
+| ----------- | ---------------------- |
+| Playful     | teasing partnership    |
+| Yearning    | emotionally unresolved |
+| Devotional  | sacred emotional bond  |
+| Chaotic     | unstable intensity     |
+| Tender      | emotionally safe home  |
+| Melancholic | beautiful fragility    |
 
 Strong relationships eventually develop self-awareness. The couple knows how they work, what they are, and what they mean to each other: "We are terrible at talking directly" or "You always come back when you are scared." This meta-awareness creates realism.
 
 Useful relationship identity variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Shared identity strength | strength of "we" feeling |
-| Ritual density | amount of shared habits |
-| Future integration | assumed permanence |
-| Emotional interdependence | mutual emotional centrality |
-| Identity stability | resilience under conflict |
-| Shared mythology | strength of relational narrative |
-| Couple culture depth | uniqueness of interaction patterns |
-| Public/private contrast | relational duality |
-| Role rigidity | flexibility of emotional roles |
-| Emotional mythology | depth of shared story and meaning |
-| Relationship uniqueness | emotional singularity strength |
-| Shared value alignment | coherence of relational philosophy |
-| Emotional tone identity | consistency of the relationship atmosphere |
-| Identity rupture risk | chance a violation damages the shared self-concept |
+| Variable                  | Meaning                                                   |
+| ------------------------- | --------------------------------------------------------- |
+| Shared identity strength  | strength of "we" feeling                                  |
+| Ritual density            | amount of shared habits                                   |
+| Future integration        | assumed permanence                                        |
+| Emotional interdependence | mutual emotional centrality                               |
+| Identity stability        | resilience under conflict                                 |
+| Shared mythology          | strength of relational narrative                          |
+| Couple culture depth      | uniqueness of interaction patterns                        |
+| Public/private contrast   | relational duality                                        |
+| Role rigidity             | flexibility of emotional roles                            |
+| Emotional mythology       | depth of shared story and meaning                         |
+| Relationship uniqueness   | emotional singularity strength                            |
+| Shared value alignment    | coherence of relational philosophy                        |
+| Emotional tone identity   | consistency of the relationship atmosphere                |
+| Identity rupture risk     | chance a violation damages the shared self-concept        |
 | Identity repair readiness | ability to symbolically restore the relationship identity |
 
 Relationship identity equation:
@@ -10498,65 +10487,65 @@ Status is not just single, dating, or married. A realistic status can be emotion
 
 Keep these concepts separate:
 
-| Concept | Meaning |
-| --- | --- |
-| Relationship status | current relational state |
-| Trope | narrative and emotional framework |
-| Dynamic | recurring interaction pattern |
-| Relationship identity | long-term shared "we" concept |
-| Phase | progression stage |
+| Concept               | Meaning                           |
+| --------------------- | --------------------------------- |
+| Relationship status   | current relational state          |
+| Trope                 | narrative and emotional framework |
+| Dynamic               | recurring interaction pattern     |
+| Relationship identity | long-term shared "we" concept     |
+| Phase                 | progression stage                 |
 
 Track status as multiple simultaneous dimensions:
 
-| Dimension | Examples |
-| --- | --- |
-| Structural | strangers, friends, dating, married, open, exes |
-| Emotional | curious, attached, yearning, detached, devoted |
-| Commitment | casual, serious, uncertain, future-oriented |
+| Dimension   | Examples                                                |
+| ----------- | ------------------------------------------------------- |
+| Structural  | strangers, friends, dating, married, open, exes         |
+| Emotional   | curious, attached, yearning, detached, devoted          |
+| Commitment  | casual, serious, uncertain, future-oriented             |
 | Exclusivity | exclusive, emotionally exclusive, open, poly, ambiguous |
-| Stability | stable, fragile, chaotic, repairing, deteriorating |
-| Intimacy | distant, flirtatious, vulnerable, domestic |
-| Visibility | secret, hidden feelings, public, socially ambiguous |
-| Attachment | secure, dependent, avoidant, unresolved |
+| Stability   | stable, fragile, chaotic, repairing, deteriorating      |
+| Intimacy    | distant, flirtatious, vulnerable, domestic              |
+| Visibility  | secret, hidden feelings, public, socially ambiguous     |
+| Attachment  | secure, dependent, avoidant, unresolved                 |
 
 High-resolution relationship statuses:
 
-| Status | Core Meaning | Runtime Use |
-| --- | --- | --- |
-| Strangers | no familiarity yet | potential and discovery |
-| Familiar strangers | recognition without intimacy | tension-friendly awareness |
-| Curious | interest exists, attachment minimal | attention and fascination |
-| Flirtation state | attraction signaling begins | teasing, testing, ambiguity |
-| Denial state | attraction is resisted | friends/enemies slow burn |
-| Emotionally interested | attachment beginning | prioritization and attentiveness |
-| Tension-heavy undefined | something exists but is unnamed | classic slow burn pressure |
-| Situationship | relationship behaviors without structure | ambiguity and instability |
-| Secretly attached | private emotional significance | forbidden or restrained romance |
-| Mutual yearning | both attached but unresolved | high slow-burn intensity |
-| Casual dating | exploratory connection | lower commitment expectations |
-| Emotionally exclusive | one person is emotionally central | singularity before formal labels |
-| Official relationship | acknowledged commitment structure | expectations stabilize |
-| Deep attachment | relationship becomes psychologically central | dependency and routine integration |
-| Devotional relationship | profound emotional choosing | intensity and prioritization |
-| Domestic partnership | daily-life integration | routines, caretaking, practical interdependence |
-| Secure partnership | trust, stability, safety, repair | mature attachment |
-| Fragile state | weakened trust or stability | careful pacing and sensitivity |
-| Push-pull state | closeness and withdrawal alternate | anxious/avoidant loop |
-| Obsessive state | psychologically consuming bond | fixation and fear of loss |
-| Conflict-dominant | fighting defines the bond | high chemistry, high rupture risk |
-| Emotional avoidance | connection exists but vulnerability blocked | suppressed intimacy |
-| Emotional drift | prioritization slowly weakens | long-term realism and stagnation risk |
-| Estranged | emotional separation exists | unresolved attachment at distance |
-| Broken up but attached | structurally separated, emotionally bonded | longing and unfinished business |
-| Repairing relationship | trust and safety are rebuilding | redemption and consistency proof |
-| Reconciliation | attachment returns after rupture | survival and renewed vulnerability |
-| Soulmate identity | existential significance | fated or identity-level romance |
-| Companionate love | stable depth with lower activation | long-term affection and partnership |
-| Transformational bond | relationship changes identity or worldview | deepest romance transformation |
-| Open relationship | primary bond with negotiated openness | boundaries and reassurance |
-| Polyamorous bond | multiple significant relationships | differentiation and bandwidth |
-| Nested partnership | domestic/emotional primary structure | priority and fairness tension |
-| Fluid attachment network | autonomy-based relational structure | negotiated identity and freedom |
+| Status                   | Core Meaning                                 | Runtime Use                                     |
+| ------------------------ | -------------------------------------------- | ----------------------------------------------- |
+| Strangers                | no familiarity yet                           | potential and discovery                         |
+| Familiar strangers       | recognition without intimacy                 | tension-friendly awareness                      |
+| Curious                  | interest exists, attachment minimal          | attention and fascination                       |
+| Flirtation state         | attraction signaling begins                  | teasing, testing, ambiguity                     |
+| Denial state             | attraction is resisted                       | friends/enemies slow burn                       |
+| Emotionally interested   | attachment beginning                         | prioritization and attentiveness                |
+| Tension-heavy undefined  | something exists but is unnamed              | classic slow burn pressure                      |
+| Situationship            | relationship behaviors without structure     | ambiguity and instability                       |
+| Secretly attached        | private emotional significance               | forbidden or restrained romance                 |
+| Mutual yearning          | both attached but unresolved                 | high slow-burn intensity                        |
+| Casual dating            | exploratory connection                       | lower commitment expectations                   |
+| Emotionally exclusive    | one person is emotionally central            | singularity before formal labels                |
+| Official relationship    | acknowledged commitment structure            | expectations stabilize                          |
+| Deep attachment          | relationship becomes psychologically central | dependency and routine integration              |
+| Devotional relationship  | profound emotional choosing                  | intensity and prioritization                    |
+| Domestic partnership     | daily-life integration                       | routines, caretaking, practical interdependence |
+| Secure partnership       | trust, stability, safety, repair             | mature attachment                               |
+| Fragile state            | weakened trust or stability                  | careful pacing and sensitivity                  |
+| Push-pull state          | closeness and withdrawal alternate           | anxious/avoidant loop                           |
+| Obsessive state          | psychologically consuming bond               | fixation and fear of loss                       |
+| Conflict-dominant        | fighting defines the bond                    | high chemistry, high rupture risk               |
+| Emotional avoidance      | connection exists but vulnerability blocked  | suppressed intimacy                             |
+| Emotional drift          | prioritization slowly weakens                | long-term realism and stagnation risk           |
+| Estranged                | emotional separation exists                  | unresolved attachment at distance               |
+| Broken up but attached   | structurally separated, emotionally bonded   | longing and unfinished business                 |
+| Repairing relationship   | trust and safety are rebuilding              | redemption and consistency proof                |
+| Reconciliation           | attachment returns after rupture             | survival and renewed vulnerability              |
+| Soulmate identity        | existential significance                     | fated or identity-level romance                 |
+| Companionate love        | stable depth with lower activation           | long-term affection and partnership             |
+| Transformational bond    | relationship changes identity or worldview   | deepest romance transformation                  |
+| Open relationship        | primary bond with negotiated openness        | boundaries and reassurance                      |
+| Polyamorous bond         | multiple significant relationships           | differentiation and bandwidth                   |
+| Nested partnership       | domestic/emotional primary structure         | priority and fairness tension                   |
+| Fluid attachment network | autonomy-based relational structure          | negotiated identity and freedom                 |
 
 Strong statuses are emotionally descriptive. "Dating" is weak. "Emotionally attached but conflict-fragile slow burn" immediately tells the runtime pacing, dialogue style, conflict risk, intimacy level, and emotional stakes.
 
@@ -10573,19 +10562,19 @@ uncertainty
 
 Useful relationship-status variables:
 
-| Variable | Meaning |
-| --- | --- |
-| Structural definition | official relationship category |
-| Emotional attachment | emotional significance |
-| Commitment level | investment depth |
-| Stability level | resilience of bond |
-| Exclusivity state | uniqueness structure |
-| Intimacy level | closeness depth |
-| Visibility state | public/private status |
-| Relationship identity strength | strength of "we" feeling |
-| Repair state | current recovery trajectory |
-| Unresolved tension | active ambiguity or pressure |
-| Status ambiguity | uncertainty in definition |
+| Variable                       | Meaning                        |
+| ------------------------------ | ------------------------------ |
+| Structural definition          | official relationship category |
+| Emotional attachment           | emotional significance         |
+| Commitment level               | investment depth               |
+| Stability level                | resilience of bond             |
+| Exclusivity state              | uniqueness structure           |
+| Intimacy level                 | closeness depth                |
+| Visibility state               | public/private status          |
+| Relationship identity strength | strength of "we" feeling       |
+| Repair state                   | current recovery trajectory    |
+| Unresolved tension             | active ambiguity or pressure   |
+| Status ambiguity               | uncertainty in definition      |
 
 ## Memory
 
