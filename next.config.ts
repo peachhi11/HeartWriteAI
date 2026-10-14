@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 const isProd = process.env.NODE_ENV === "production";
+const isTauriDev = Boolean(process.env.TAURI_DEV_HOST);
 
 const internalHost = process.env.TAURI_DEV_HOST || "localhost";
 const nextConfig: NextConfig = {
@@ -12,7 +13,8 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
   // Configure assetPrefix or else the server won't properly resolve your assets.
-  assetPrefix: isProd ? undefined : `http://${internalHost}:3000`,
+  assetPrefix:
+    isProd || !isTauriDev ? undefined : `http://${internalHost}:${process.env.PORT ?? "3000"}`,
   allowedDevOrigins: ["127.0.0.1"],
   /* config options here */
 };

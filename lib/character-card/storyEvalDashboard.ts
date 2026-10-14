@@ -23,6 +23,17 @@ export type StoryEvalDashboardState = {
   statusText: string;
 };
 
+export const storyEvalPrivateToolsRenderContract = {
+  title: "StoryEval Review Dashboard",
+  privacyDescription:
+    "Private power-user review surface for aggregate-only local eval runs. Hidden from public app surfaces by default.",
+  fixtureLoaderTitle: "Fixture Loader",
+  runAction: "Run Fixture",
+  refreshAction: "Refresh History",
+  compareAction: "Compare",
+  exportAction: "Export Selected CI",
+} as const;
+
 export function createStoryEvalDashboardState(
   history: StoryEvalRunHistoryFile,
   selection: {

@@ -2,7 +2,11 @@ import { invoke } from "@tauri-apps/api/core";
 import { emit, listen, UnlistenFn } from "@tauri-apps/api/event";
 
 export function isTauriRuntime() {
-  return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
+  if (typeof window === "undefined") {
+    return false;
+  }
+
+  return "__TAURI_INTERNALS__" in window || window.location.protocol === "tauri:";
 }
 
 export async function greetNative(name: string) {
@@ -21,10 +25,7 @@ export async function getNativeAppVersion() {
   return invoke<string>("get_app_version");
 }
 
-export async function emitNativeEvent<TPayload>(
-  eventName: string,
-  payload: TPayload,
-) {
+export async function emitNativeEvent<TPayload>(eventName: string, payload: TPayload) {
   if (!isTauriRuntime()) {
     return;
   }

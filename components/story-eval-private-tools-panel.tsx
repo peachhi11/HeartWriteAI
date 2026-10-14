@@ -17,6 +17,7 @@ import {
   createStoryEvalCiReportDownload,
   createStoryEvalDashboardState,
   formatStoryEvalComparisonSummary,
+  storyEvalPrivateToolsRenderContract,
   type StoryEvalDashboardState,
 } from "@/lib/character-card/storyEvalDashboard";
 import type {
@@ -204,11 +205,10 @@ export function StoryEvalPrivateToolsPanel() {
       <div className="space-y-1">
         <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-violet-300">
           <ClipboardCheck className="size-4" />
-          StoryEval Review Dashboard
+          {storyEvalPrivateToolsRenderContract.title}
         </h2>
         <p className="text-xs text-zinc-400">
-          Private power-user review surface for aggregate-only local eval runs. Hidden from public
-          app surfaces by default.
+          {storyEvalPrivateToolsRenderContract.privacyDescription}
         </p>
       </div>
 
@@ -225,7 +225,9 @@ export function StoryEvalPrivateToolsPanel() {
       <div className="space-y-3 rounded-lg border border-zinc-800 bg-zinc-950/35 p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h3 className="text-sm font-semibold text-zinc-100">Fixture Loader</h3>
+            <h3 className="text-sm font-semibold text-zinc-100">
+              {storyEvalPrivateToolsRenderContract.fixtureLoaderTitle}
+            </h3>
             <p className="text-xs text-zinc-500">
               Paste JSON/JSONL or load a local fixture file. Only aggregate summaries are saved.
             </p>
@@ -255,11 +257,11 @@ export function StoryEvalPrivateToolsPanel() {
       <div className="flex flex-wrap gap-3">
         <Button type="button" disabled={isLoading} onClick={handleRun}>
           {isLoading ? <Loader2 className="animate-spin" /> : null}
-          Run Fixture
+          {storyEvalPrivateToolsRenderContract.runAction}
         </Button>
         <Button type="button" variant="outline" disabled={isLoading} onClick={handleRefresh}>
           <RefreshCw className="size-4" />
-          Refresh History
+          {storyEvalPrivateToolsRenderContract.refreshAction}
         </Button>
       </div>
 
@@ -286,7 +288,7 @@ export function StoryEvalPrivateToolsPanel() {
             onClick={handleCompare}
           >
             <GitCompare className="size-4" />
-            Compare
+            {storyEvalPrivateToolsRenderContract.compareAction}
           </Button>
         </div>
       </div>
@@ -299,7 +301,7 @@ export function StoryEvalPrivateToolsPanel() {
           onClick={handleExportLatest}
         >
           <FileJson className="size-4" />
-          Export Selected CI
+          {storyEvalPrivateToolsRenderContract.exportAction}
         </Button>
         <Button
           type="button"
