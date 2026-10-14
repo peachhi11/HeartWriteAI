@@ -12,6 +12,7 @@
     "validate:vault-skills": "node scripts/validate-story-runtime-skills-vault.mjs",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
+    "dev:tauri": "node scripts/start-tauri-dev.mjs",
     "tauri:build": "tauri build",
     "prepare": "husky"
   },
