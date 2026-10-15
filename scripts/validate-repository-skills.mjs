@@ -4,10 +4,12 @@ import { fileURLToPath } from "node:url";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const manifestPath = path.join(repoRoot, "skills", "manifest.json");
+const bodySchemaPath = path.join(repoRoot, "skills", "skill.schema.json");
 const registryPath = path.join(repoRoot, "lib", "character-card", "storyRuntimeSkills.ts");
 
 const failures = [];
 const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+const bodySchema = JSON.parse(fs.readFileSync(bodySchemaPath, "utf8"));
 const registrySource = fs.readFileSync(registryPath, "utf8");
 const registryEntries = [];
 const entryPattern =
@@ -25,6 +27,24 @@ for (const match of registrySource.matchAll(entryPattern)) {
 if (manifest.schema_version !== 1) {
   failures.push("skills/manifest.json must use schema_version 1");
 }
+
+if (manifest.body_schema !== "skills/skill.schema.json") {
+  failures.push("manifest body_schema must point to skills/skill.schema.json");
+}
+
+if (bodySchema.schema_version !== 1) {
+  failures.push("skills/skill.schema.json must use schema_version 1");
+}
+
+const frontmatterValue = (frontmatter, key) => {
+  const match = frontmatter.match(new RegExp(`^\\s*${key}:\\s*(.+)$`, "m"));
+  return match?.[1]?.trim().replace(/^['\"]|['\"]$/g, "");
+};
+
+const hasSection = (body, section) => {
+  const escapedSection = section.replace(/[.*+?^${}()|[\\]\\\\]/g, "\\\\$&");
+  return new RegExp(`^##\\s+${escapedSection}\\s*$`, "m").test(body);
+};
 
 const checkUniqueSlugs = (name, entries) => {
   const seen = new Set();
@@ -79,6 +99,30 @@ for (const entry of manifest.entries) {
   const body = fs.readFileSync(repositoryPath, "utf8");
   if (!body.includes(`name: ${entry.slug}`)) {
     failures.push(`reviewed skill body has no matching frontmatter name: ${entry.slug}`);
+  }
+
+  const frontmatterMatch = body.match(/^---\n([\s\S]*?)\n---\n/);
+  if (!frontmatterMatch) {
+    failures.push(`reviewed skill body has invalid frontmatter: ${entry.slug}`);
+    continue;
+  }
+
+  for (const key of bodySchema.required_frontmatter) {
+    if (!frontmatterValue(frontmatterMatch[1], key)) {
+      failures.push(`${entry.slug}: missing required frontmatter field ${key}`);
+    }
+  }
+
+  for (const [key, expected] of Object.entries(bodySchema.reviewed_values)) {
+    if (frontmatterValue(frontmatterMatch[1], key) !== expected) {
+      failures.push(`${entry.slug}: frontmatter ${key} must be ${expected}`);
+    }
+  }
+
+  for (const section of bodySchema.required_sections) {
+    if (!hasSection(body, section)) {
+      failures.push(`${entry.slug}: missing required section ${section}`);
+    }
   }
 }
 

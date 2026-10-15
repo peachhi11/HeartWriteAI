@@ -15,6 +15,10 @@ reviewed.
 `lib/character-card/storyRuntimeSkills.ts`. It is an organizational contract,
 not a second prompt registry and not yet a source of runtime behavior.
 
+`skill.schema.json` defines the minimum contract for a reviewed skill body:
+frontmatter must carry ownership and provenance, and the body must include
+`Purpose`, `Guardrails`, and `Provenance` sections.
+
 Run `npm run validate:skills` to verify that the manifest and runtime registry
 have the same stable slugs, labels, categories, and source classifications.
 

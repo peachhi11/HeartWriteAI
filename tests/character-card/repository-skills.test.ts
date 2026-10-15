@@ -54,6 +54,7 @@ test("repository skill manifest has unique stable slugs", () => {
 
 test("reviewed skill entries point to repository-owned bodies", () => {
   const manifestPath = path.resolve(process.cwd(), "skills/manifest.json");
+  const schemaPath = path.resolve(process.cwd(), "skills/skill.schema.json");
   const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8")) as {
     entries: Array<
       SkillInventoryEntry & {
@@ -61,6 +62,11 @@ test("reviewed skill entries point to repository-owned bodies", () => {
         repository_path?: string;
       }
     >;
+  };
+  const schema = JSON.parse(fs.readFileSync(schemaPath, "utf8")) as {
+    schema_version: number;
+    required_frontmatter: string[];
+    required_sections: string[];
   };
   const reviewedEntries = manifest.entries.filter((entry) => entry.migration_status === "reviewed");
 
@@ -74,5 +80,13 @@ test("reviewed skill entries point to repository-owned bodies", () => {
     assert.match(body, new RegExp(`name: ${entry.slug}`));
     assert.match(body, /runtime_safe: true/);
     assert.match(body, /source: heartwrite_memory_vault/);
+    assert.match(body, /^---\n[\s\S]*\n---\n/);
+    for (const field of schema.required_frontmatter) {
+      assert.match(body, new RegExp(`^\\s*${field}:\\s+.+$`, "m"));
+    }
+    for (const section of schema.required_sections) {
+      assert.match(body, new RegExp(`^## ${section}$`, "m"));
+    }
   }
+  assert.equal(schema.schema_version, 1);
 });

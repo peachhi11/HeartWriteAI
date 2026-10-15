@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "required_frontmatter": [
+    "name",
+    "description",
+    "owner",
+    "version",
+    "category",
+    "migration_status",
+    "runtime_safe",
+    "source",
+    "source_path"
+  ],
+  "required_sections": ["Purpose", "Guardrails", "Provenance"],
+  "reviewed_values": {
+    "migration_status": "reviewed",
+    "runtime_safe": "true"
+  }
+}

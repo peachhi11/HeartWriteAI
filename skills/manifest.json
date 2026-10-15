@@ -2,6 +2,7 @@
   "schema_version": 1,
   "purpose": "reviewed-app-skill-inventory",
   "runtime_registry": "lib/character-card/storyRuntimeSkills.ts",
+  "body_schema": "skills/skill.schema.json",
   "entries": [
     {
       "slug": "erotic-romance-writing-mentor",
