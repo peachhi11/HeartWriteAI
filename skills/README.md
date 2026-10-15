@@ -21,6 +21,8 @@ frontmatter must carry ownership and provenance, and the body must include
 
 Run `npm run validate:skills` to verify that the manifest and runtime registry
 have the same stable slugs, labels, categories, and source classifications.
+Run `npm run check:skill-equivalence` for the focused runtime-metadata check;
+this does not change runtime imports or prompt selection.
 
 ## Migration rule
 

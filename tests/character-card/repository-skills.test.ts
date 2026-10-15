@@ -72,7 +72,14 @@ test("reviewed skill entries point to repository-owned bodies", () => {
 
   assert.deepEqual(
     reviewedEntries.map((entry) => entry.slug),
-    ["knowledge-boundary-response", "explicit-memory-core", "relationship-tracker"],
+    [
+      "story-idea-generator",
+      "narrative-complications-engine",
+      "character-gmcs",
+      "knowledge-boundary-response",
+      "explicit-memory-core",
+      "relationship-tracker",
+    ],
   );
   for (const entry of reviewedEntries) {
     assert.ok(entry.repository_path);

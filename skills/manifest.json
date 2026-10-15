@@ -20,19 +20,25 @@
       "slug": "story-idea-generator",
       "label": "Story idea generator",
       "category": "story-development",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/story-idea-generator/SKILL.md"
     },
     {
       "slug": "narrative-complications-engine",
       "label": "Narrative complications engine",
       "category": "story-development",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/narrative-complications-engine/SKILL.md"
     },
     {
       "slug": "character-gmcs",
       "label": "Character GMCS",
       "category": "story-development",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/character-gmcs/SKILL.md"
     },
     {
       "slug": "character-arc-structure",
