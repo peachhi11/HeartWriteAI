@@ -189,7 +189,9 @@
       "slug": "relationship-tracker",
       "label": "Relationship tracker",
       "category": "relationship-continuity",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/relationship-tracker/SKILL.md"
     },
     {
       "slug": "dominance-and-intimacy-flow",
