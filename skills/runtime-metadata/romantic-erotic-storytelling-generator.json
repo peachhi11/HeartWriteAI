@@ -1,0 +1,84 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "romantic-erotic-storytelling-generator",
+    "label": "Romantic and erotic storytelling generator",
+    "category": "roleplay-response",
+    "summary": "Scene-direction and dialogue-support skill for romantic and erotic storytelling, generating 2-3 distinct paths that connect desire, obstacle, emotional stakes, and narrative consequence."
+  },
+  "provenance": {
+    "source": "agents_md",
+    "source_links": ["AGENTS.md: AI Roleplay Generation for Romantic and Erotic Storytelling"],
+    "repository_body": "skills/romantic-erotic-storytelling-generator/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["prompt_book", "scenario_book", "character_book", "memory_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "scene_directions",
+      "dialogue_samples",
+      "romantic_tension",
+      "storytelling_options",
+      "emotional_stakes"
+    ],
+    "trigger_seeds": [
+      "give me options",
+      "scene directions",
+      "dialogue samples",
+      "what happens next",
+      "romance beat",
+      "erotic storytelling",
+      "tension variations",
+      "character interaction"
+    ]
+  },
+  "state": {
+    "fields": [
+      "desire",
+      "obstacle",
+      "emotional_stakes",
+      "relationship_context",
+      "tone_direction",
+      "scene_option_count",
+      "dialogue_sample",
+      "craft_note"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "generate-scene-options",
+      "dialogue-samples",
+      "short-craft-note",
+      "relationship-stakes-check"
+    ],
+    "memory_routing": [
+      "Use for brainstorming and scenario variation; do not automatically persist unless the user chooses a direction.",
+      "If the user selects a path, route chosen stakes, tone, and relationship consequence to Scenario Book or Memory Book."
+    ],
+    "continuity_links": [
+      "relationship-pressure-skill",
+      "romantic-tension-builder",
+      "emotional-escalation",
+      "intimacy-shift",
+      "scene-escalation"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Keep options concise and distinct.",
+      "Do not flatten romance, erotica, and kink into the same generic mode.",
+      "Avoid purely mechanical or gratuitous description without character or story purpose."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "exclude_raw_fixtures"
+  },
+  "extensions": {
+    "notes": "Proof-of-shape record only; runtime imports remain on the existing registry until generated equivalence is implemented."
+  }
+}

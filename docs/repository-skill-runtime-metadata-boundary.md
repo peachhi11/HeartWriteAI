@@ -24,6 +24,14 @@ Add a structured metadata file or directory with one complete record per runtime
 skills/runtime-metadata/<slug>.json
 ```
 
+The proof-of-shape contract is now present in
+`skills/runtime-metadata.schema.json`, with one linked record at
+`skills/runtime-metadata/romantic-erotic-storytelling-generator.json`. The
+record is deliberately richer than the current TypeScript interface: it adds
+runtime status, activation mode, public-safety status, explicit agency and
+consent handling, and a namespaced `extensions` object for future metadata
+without forcing an immediate registry migration.
+
 Each record should contain the complete `StoryRuntimeSkill` shape. The generator should:
 
 - validate the slug, label, category, and source against `skills/manifest.json`
@@ -37,7 +45,7 @@ The first generated artifact should be compared against the existing registry wi
 
 ## Migration Sequence
 
-1. Add the structured metadata schema and one complete metadata record as a proof of shape.
+1. Add the structured metadata schema and one complete metadata record as a proof of shape. (Complete.)
 2. Add a generator that produces a temporary or checked-in artifact.
 3. Compare generated metadata to the current registry for all 37 entries.
 4. Add a CI/pre-commit stale-generated-output check.

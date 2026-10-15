@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://heartwriteai.local/schemas/runtime-skill-metadata.json",
+  "title": "HeartWrite Story Runtime Skill Metadata",
+  "description": "Structured compiler metadata for a reviewed HeartWrite runtime skill. Human-readable skill bodies remain separate.",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "record_type",
+    "identity",
+    "provenance",
+    "runtime",
+    "activation",
+    "state",
+    "routing",
+    "safety"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "const": 1 },
+    "record_type": { "type": "string", "const": "story-runtime-skill-metadata" },
+    "identity": {
+      "type": "object",
+      "required": ["slug", "label", "category", "summary"],
+      "properties": {
+        "slug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "label": { "type": "string", "minLength": 1 },
+        "category": { "type": "string", "minLength": 1 },
+        "summary": { "type": "string", "minLength": 1 }
+      },
+      "additionalProperties": false
+    },
+    "provenance": {
+      "type": "object",
+      "required": ["source", "source_links", "repository_body"],
+      "properties": {
+        "source": {
+          "type": "string",
+          "enum": ["agents_md", "heartwrite_memory_vault", "source_material"]
+        },
+        "source_links": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        },
+        "repository_body": { "type": "string", "pattern": "^skills/[a-z0-9-]+/SKILL\\.md$" }
+      },
+      "additionalProperties": false
+    },
+    "runtime": {
+      "type": "object",
+      "required": ["status", "public_safe", "scopes"],
+      "properties": {
+        "status": { "type": "string", "enum": ["reviewed", "experimental", "disabled"] },
+        "public_safe": { "type": "boolean" },
+        "scopes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "character_book",
+              "user_book",
+              "world_book",
+              "scenario_book",
+              "memory_book",
+              "prompt_book"
+            ]
+          },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "activation": {
+      "type": "object",
+      "required": ["mode", "tags", "trigger_seeds"],
+      "properties": {
+        "mode": { "type": "string", "enum": ["explicit", "contextual", "manual", "always"] },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "uniqueItems": true
+        },
+        "trigger_seeds": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1,
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "state": {
+      "type": "object",
+      "required": ["fields"],
+      "properties": {
+        "fields": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "routing": {
+      "type": "object",
+      "required": ["prompt_compiler_signals", "memory_routing", "continuity_links"],
+      "properties": {
+        "prompt_compiler_signals": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        },
+        "memory_routing": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        },
+        "continuity_links": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "uniqueItems": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "safety": {
+      "type": "object",
+      "required": ["guardrails", "user_agency", "consent_context", "private_data_policy"],
+      "properties": {
+        "guardrails": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "minItems": 1
+        },
+        "user_agency": { "type": "string", "enum": ["preserve", "not_applicable"] },
+        "consent_context": { "type": "string", "enum": ["required", "not_applicable"] },
+        "private_data_policy": {
+          "type": "string",
+          "enum": ["exclude_raw_fixtures", "approved_source_only"]
+        }
+      },
+      "additionalProperties": false
+    },
+    "extensions": {
+      "type": "object",
+      "description": "Namespaced future fields may be added here without changing the core schema contract.",
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": false
+}

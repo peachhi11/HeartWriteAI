@@ -20,8 +20,16 @@ registry and not yet a source of runtime behavior.
 frontmatter must carry ownership and provenance, and the body must include
 `Purpose`, `Guardrails`, and `Provenance` sections.
 
+`runtime-metadata.schema.json` defines the separate, structured compiler
+metadata boundary. It supports stable identity, provenance, runtime status,
+activation, state fields, routing, safety, and a namespaced `extensions` object
+for future fields. The first proof-of-shape record is in
+`runtime-metadata/romantic-erotic-storytelling-generator.json`; it is not yet
+consumed by runtime imports.
+
 Run `npm run validate:skills` to verify that the manifest and runtime registry
-have the same stable slugs, labels, categories, and source classifications.
+have the same stable slugs, labels, categories, and source classifications, and
+that any linked runtime metadata records agree with the manifest.
 Run `npm run check:skill-equivalence` for the focused runtime-metadata check;
 this does not change runtime imports or prompt selection.
 

@@ -128,3 +128,78 @@ test("reviewed skill entries point to repository-owned bodies", () => {
   }
   assert.equal(schema.schema_version, 1);
 });
+
+test("runtime metadata proof record preserves the extensible compiler boundary", () => {
+  const manifestPath = path.resolve(process.cwd(), "skills/manifest.json");
+  const metadataSchemaPath = path.resolve(process.cwd(), "skills/runtime-metadata.schema.json");
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8")) as {
+    runtime_metadata_schema: string;
+    entries: Array<{
+      slug: string;
+      label: string;
+      category: string;
+      source: string;
+      repository_path?: string;
+      runtime_metadata_path?: string;
+    }>;
+  };
+  const schema = JSON.parse(fs.readFileSync(metadataSchemaPath, "utf8")) as {
+    $id: string;
+    properties: { extensions?: { additionalProperties?: boolean } };
+  };
+  const entry = manifest.entries.find((candidate) => candidate.runtime_metadata_path);
+
+  assert.equal(manifest.runtime_metadata_schema, "skills/runtime-metadata.schema.json");
+  assert.equal(schema.$id, "https://heartwriteai.local/schemas/runtime-skill-metadata.json");
+  assert.equal(schema.properties.extensions?.additionalProperties, true);
+  assert.ok(entry?.runtime_metadata_path);
+
+  const metadata = JSON.parse(
+    fs.readFileSync(path.resolve(process.cwd(), entry!.runtime_metadata_path!), "utf8"),
+  ) as {
+    schema_version: number;
+    record_type: string;
+    identity: { slug: string; label: string; category: string; summary: string };
+    provenance: { source: string; repository_body: string };
+    runtime: { status: string; public_safe: boolean; scopes: string[] };
+    activation: { mode: string; tags: string[]; trigger_seeds: string[] };
+    state: { fields: string[] };
+    routing: {
+      prompt_compiler_signals: string[];
+      memory_routing: string[];
+      continuity_links: string[];
+    };
+    safety: {
+      guardrails: string[];
+      user_agency: string;
+      consent_context: string;
+      private_data_policy: string;
+    };
+    extensions: Record<string, unknown>;
+  };
+
+  assert.equal(metadata.schema_version, 1);
+  assert.equal(metadata.record_type, "story-runtime-skill-metadata");
+  assert.deepEqual(metadata.identity, {
+    slug: entry!.slug,
+    label: entry!.label,
+    category: entry!.category,
+    summary: metadata.identity.summary,
+  });
+  assert.equal(metadata.provenance.source, entry!.source);
+  assert.equal(metadata.provenance.repository_body, entry!.repository_path);
+  assert.equal(metadata.runtime.status, "reviewed");
+  assert.equal(metadata.runtime.public_safe, true);
+  assert.ok(metadata.runtime.scopes.length > 0);
+  assert.equal(metadata.activation.mode, "contextual");
+  assert.ok(metadata.activation.tags.length > 0);
+  assert.ok(metadata.activation.trigger_seeds.length > 0);
+  assert.ok(metadata.state.fields.length > 0);
+  assert.ok(metadata.routing.prompt_compiler_signals.length > 0);
+  assert.ok(metadata.routing.memory_routing.length > 0);
+  assert.ok(metadata.safety.guardrails.length > 0);
+  assert.equal(metadata.safety.user_agency, "preserve");
+  assert.equal(metadata.safety.consent_context, "required");
+  assert.equal(metadata.safety.private_data_policy, "exclude_raw_fixtures");
+  assert.equal(typeof metadata.extensions, "object");
+});

@@ -3,6 +3,7 @@
   "purpose": "reviewed-app-skill-inventory",
   "runtime_registry": "lib/character-card/storyRuntimeSkills.ts",
   "body_schema": "skills/skill.schema.json",
+  "runtime_metadata_schema": "skills/runtime-metadata.schema.json",
   "entries": [
     {
       "slug": "erotic-romance-writing-mentor",
@@ -18,7 +19,8 @@
       "category": "roleplay-response",
       "source": "agents_md",
       "migration_status": "reviewed",
-      "repository_path": "skills/romantic-erotic-storytelling-generator/SKILL.md"
+      "repository_path": "skills/romantic-erotic-storytelling-generator/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/romantic-erotic-storytelling-generator.json"
     },
     {
       "slug": "story-idea-generator",
