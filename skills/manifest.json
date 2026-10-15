@@ -170,7 +170,9 @@
       "slug": "power-dynamics-scene-writing",
       "label": "Power dynamics scene writing",
       "category": "roleplay-response",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/power-dynamics-scene-writing/SKILL.md"
     },
     {
       "slug": "erotic-dynamics-prose",
@@ -234,7 +236,9 @@
       "slug": "dominance-and-intimacy-flow",
       "label": "Dominance and intimacy flow",
       "category": "roleplay-response",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/dominance-and-intimacy-flow/SKILL.md"
     },
     {
       "slug": "escalating-proximity",
@@ -272,7 +276,9 @@
       "slug": "intimacy-shift",
       "label": "Intimacy shift",
       "category": "roleplay-response",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/intimacy-shift/SKILL.md"
     }
   ]
 }

@@ -88,15 +88,18 @@ test("reviewed skill entries point to repository-owned bodies", () => {
       "modern-real-world-setting",
       "weather-natural-phenomena",
       "explicit-memory-core",
+      "power-dynamics-scene-writing",
       "emotional-continuity",
       "emotional-escalation",
       "romantic-tension-builder",
       "emotional-subtext-engine",
       "relationship-tracker",
+      "dominance-and-intimacy-flow",
       "escalating-proximity",
       "space-distance-blocking",
       "scene-coherence-playfield",
       "multi-character-world-narration",
+      "intimacy-shift",
     ],
   );
   for (const entry of reviewedEntries) {
