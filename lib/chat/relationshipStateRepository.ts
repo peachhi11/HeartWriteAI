@@ -1,33 +1,19 @@
 "use client";
 
-import { Store } from "@tauri-apps/plugin-store";
-
 import {
   RelationshipStateSchema,
   createDefaultRelationshipState,
   normalizeRelationshipState,
   type RelationshipState,
 } from "./relationshipState.schema";
+import {
+  createLocalPersistenceAdapter,
+  createMemoryPersistenceAdapter,
+  type LocalPersistenceAdapter,
+} from "../storage/localPersistence";
 
 const relationshipStorePath = "relationship-state.json";
-
-let storePromise: Promise<Store> | null = null;
-
-interface BrowserLikeGlobal {
-  __TAURI_INTERNALS__?: unknown;
-  localStorage?: {
-    getItem(key: string): string | null;
-    removeItem(key: string): void;
-    setItem(key: string, value: string): void;
-  };
-  window?: unknown;
-}
-
-export interface RelationshipStateStorageAdapter {
-  delete(key: string): Promise<void>;
-  get(key: string): Promise<unknown | null>;
-  set(key: string, value: RelationshipState): Promise<void>;
-}
+export type RelationshipStateStorageAdapter = LocalPersistenceAdapter;
 
 export interface RelationshipStateRepository {
   delete(scenarioId: string, aId: string, bId: string): Promise<void>;
@@ -110,26 +96,10 @@ export function createRelationshipStateRepository(
 export function createMemoryRelationshipStateStorage(
   seed?: Record<string, RelationshipState>,
 ): RelationshipStateStorageAdapter {
-  const values = new Map<string, RelationshipState>(Object.entries(seed ?? {}));
-
-  return {
-    async delete(key) {
-      values.delete(key);
-    },
-    async get(key) {
-      return values.get(key) ?? null;
-    },
-    async set(key, value) {
-      values.set(key, value);
-    },
-  };
+  return createMemoryPersistenceAdapter(seed);
 }
 
-export function getRelationshipState(
-  scenarioId: string,
-  aId: string,
-  bId: string,
-) {
+export function getRelationshipState(scenarioId: string, aId: string, bId: string) {
   return defaultRelationshipStateRepository.get(scenarioId, aId, bId);
 }
 
@@ -146,96 +116,12 @@ export function patchRelationshipState(
   return defaultRelationshipStateRepository.patch(scenarioId, aId, bId, patch);
 }
 
-export function deleteRelationshipState(
-  scenarioId: string,
-  aId: string,
-  bId: string,
-) {
+export function deleteRelationshipState(scenarioId: string, aId: string, bId: string) {
   return defaultRelationshipStateRepository.delete(scenarioId, aId, bId);
 }
 
 function createBrowserRelationshipStateStorage(): RelationshipStateStorageAdapter {
-  return {
-    async delete(key) {
-      const tauriStore = await loadRelationshipStateStore();
-
-      if (tauriStore) {
-        await tauriStore.delete(key);
-        await tauriStore.save();
-        return;
-      }
-
-      getLocalStorage()?.removeItem(key);
-    },
-    async get(key) {
-      const tauriStore = await loadRelationshipStateStore();
-
-      if (tauriStore) {
-        return (await tauriStore.get(key)) ?? null;
-      }
-
-      const rawValue = getLocalStorage()?.getItem(key);
-
-      if (!rawValue) {
-        return null;
-      }
-
-      try {
-        return JSON.parse(rawValue) as unknown;
-      } catch {
-        return null;
-      }
-    },
-    async set(key, value) {
-      const normalized = normalizeRelationshipState(value);
-      const tauriStore = await loadRelationshipStateStore();
-
-      if (tauriStore) {
-        await tauriStore.set(key, normalized);
-        await tauriStore.save();
-        return;
-      }
-
-      getLocalStorage()?.setItem(key, JSON.stringify(normalized));
-    },
-  };
-}
-
-async function loadRelationshipStateStore() {
-  if (!isRelationshipStateBrowserRuntime()) {
-    return null;
-  }
-
-  try {
-    storePromise ??= Store.load(relationshipStorePath, {
-      autoSave: false,
-      defaults: {},
-    });
-
-    return await storePromise;
-  } catch {
-    return null;
-  }
-}
-
-function getLocalStorage() {
-  const browserGlobal = getBrowserGlobal();
-
-  if (!isRelationshipStateBrowserRuntime()) {
-    return null;
-  }
-
-  return browserGlobal.localStorage ?? null;
+  return createLocalPersistenceAdapter({ storeFile: relationshipStorePath });
 }
 
 const defaultRelationshipStateRepository = createRelationshipStateRepository();
-
-function isRelationshipStateBrowserRuntime() {
-  const browserGlobal = getBrowserGlobal();
-
-  return typeof browserGlobal.window !== "undefined";
-}
-
-function getBrowserGlobal() {
-  return globalThis as BrowserLikeGlobal;
-}
