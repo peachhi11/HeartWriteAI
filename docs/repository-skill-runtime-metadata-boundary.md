@@ -41,12 +41,16 @@ Each record should contain the complete `StoryRuntimeSkill` shape. The generator
 - emit stable, formatted TypeScript in manifest order
 - fail when generated output differs from the checked-in runtime artifact
 
-The first generated artifact should be compared against the existing registry without changing imports. Only after the comparison is exact should `storyRuntimeSkills.ts` become a thin compatibility export or be replaced by the generated module.
+The first generated artifact is `lib/character-card/generatedRuntimeSkillMetadata.ts`.
+It is currently a separate checked-in intermediate artifact; runtime imports
+still use the existing registry. Only after the comparison is exact should
+`storyRuntimeSkills.ts` become a thin compatibility export or be replaced by
+the generated module.
 
 ## Migration Sequence
 
 1. Add the structured metadata schema and one complete metadata record as a proof of shape. (Complete.)
-2. Add a generator that produces a temporary or checked-in artifact.
+2. Add a generator that produces a temporary or checked-in artifact. (Complete; the artifact currently contains the linked proof record.)
 3. Compare generated metadata to the current registry for all 37 entries.
 4. Add a CI/pre-commit stale-generated-output check.
 5. Switch runtime imports only after equivalence is exact and focused compiler tests remain green.

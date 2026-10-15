@@ -25,7 +25,11 @@ metadata boundary. It supports stable identity, provenance, runtime status,
 activation, state fields, routing, safety, and a namespaced `extensions` object
 for future fields. The first proof-of-shape record is in
 `runtime-metadata/romantic-erotic-storytelling-generator.json`; it is not yet
-consumed by runtime imports.
+consumed by runtime imports. `npm run generate:runtime-skill-metadata` emits
+the linked records into `lib/character-card/generatedRuntimeSkillMetadata.ts`,
+and `npm run check:generated-runtime-skill-metadata` verifies that artifact is
+current. The generated module is an intermediate artifact, not yet the live
+skill registry.
 
 Run `npm run validate:skills` to verify that the manifest and runtime registry
 have the same stable slugs, labels, categories, and source classifications, and

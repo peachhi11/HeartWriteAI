@@ -3,6 +3,7 @@ import path from "node:path";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { storyRuntimeSkills } from "../../lib/character-card/storyRuntimeSkills";
+import { runtimeSkillMetadataRecords } from "../../lib/character-card/generatedRuntimeSkillMetadata";
 
 type SkillInventoryEntry = {
   slug: string;
@@ -202,4 +203,23 @@ test("runtime metadata proof record preserves the extensible compiler boundary",
   assert.equal(metadata.safety.consent_context, "required");
   assert.equal(metadata.safety.private_data_policy, "exclude_raw_fixtures");
   assert.equal(typeof metadata.extensions, "object");
+});
+
+test("generated runtime metadata follows manifest order and contains only linked records", () => {
+  const manifestPath = path.resolve(process.cwd(), "skills/manifest.json");
+  const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8")) as {
+    entries: Array<{ slug: string; runtime_metadata_path?: string }>;
+  };
+  const linkedSlugs = manifest.entries
+    .filter((entry) => entry.runtime_metadata_path)
+    .map((entry) => entry.slug);
+
+  assert.deepEqual(
+    runtimeSkillMetadataRecords.map((record) => record.identity.slug),
+    linkedSlugs,
+  );
+  assert.equal(
+    new Set(runtimeSkillMetadataRecords.map((record) => record.identity.slug)).size,
+    linkedSlugs.length,
+  );
 });

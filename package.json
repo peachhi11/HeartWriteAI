@@ -11,6 +11,8 @@
     "check:agent-setup": "node scripts/check-agent-setup.mjs",
     "check:skill-equivalence": "node scripts/check-runtime-skill-equivalence.mjs",
     "validate:skills": "node scripts/validate-repository-skills.mjs",
+    "generate:runtime-skill-metadata": "node scripts/generate-runtime-skill-metadata.mjs",
+    "check:generated-runtime-skill-metadata": "node scripts/generate-runtime-skill-metadata.mjs --check",
     "validate:vault-skills": "node scripts/validate-story-runtime-skills-vault.mjs",
     "tauri": "tauri",
     "tauri:dev": "tauri dev",
