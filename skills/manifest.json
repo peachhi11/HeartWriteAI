@@ -1,0 +1,229 @@
+{
+  "schema_version": 1,
+  "purpose": "reviewed-app-skill-inventory",
+  "runtime_registry": "lib/character-card/storyRuntimeSkills.ts",
+  "entries": [
+    {
+      "slug": "erotic-romance-writing-mentor",
+      "label": "Erotic romance writing mentor",
+      "category": "writing-mentor",
+      "source": "agents_md"
+    },
+    {
+      "slug": "romantic-erotic-storytelling-generator",
+      "label": "Romantic and erotic storytelling generator",
+      "category": "roleplay-response",
+      "source": "agents_md"
+    },
+    {
+      "slug": "story-idea-generator",
+      "label": "Story idea generator",
+      "category": "story-development",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "narrative-complications-engine",
+      "label": "Narrative complications engine",
+      "category": "story-development",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "character-gmcs",
+      "label": "Character GMCS",
+      "category": "story-development",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "character-arc-structure",
+      "label": "Character arc structure",
+      "category": "story-development",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "archetypal-character-arcs",
+      "label": "Archetypal character arcs",
+      "category": "story-development",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "flaw-preservation",
+      "label": "Flaw preservation",
+      "category": "roleplay-response",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "story-grid-engine",
+      "label": "Story grid engine",
+      "category": "story-development",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "motive-tracker",
+      "label": "Motive tracker",
+      "category": "roleplay-response",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "scene-sequel-structure",
+      "label": "Scene sequel structure",
+      "category": "story-development",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "trope-world-builder",
+      "label": "Trope world builder",
+      "category": "world-setting",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "crafting-satisfying-ending",
+      "label": "Crafting satisfying ending",
+      "category": "story-development",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "chapter-cut-evaluator",
+      "label": "Chapter cut evaluator",
+      "category": "story-development",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "romance-conflict-outliner",
+      "label": "Romance conflict outliner",
+      "category": "story-development",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "explicit-tbrp-scene-guidance",
+      "label": "Explicit TBRP scene guidance",
+      "category": "explicit-romantic-roleplay-skill-framework",
+      "source": "agents_md"
+    },
+    {
+      "slug": "roleplay-keyword-discovery",
+      "label": "Roleplay keyword discovery",
+      "category": "keyword-discovery",
+      "source": "agents_md"
+    },
+    {
+      "slug": "character-persona-creation",
+      "label": "Character persona creation",
+      "category": "character-persona",
+      "source": "agents_md"
+    },
+    {
+      "slug": "knowledge-boundary-response",
+      "label": "Knowledge boundary response",
+      "category": "roleplay-response",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "modern-real-world-setting",
+      "label": "Modern real-world setting",
+      "category": "world-setting",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "weather-natural-phenomena",
+      "label": "Weather natural phenomena",
+      "category": "world-setting",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "explicit-memory-core",
+      "label": "Explicit memory core",
+      "category": "memory-core",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "power-dynamics-scene-writing",
+      "label": "Power dynamics scene writing",
+      "category": "roleplay-response",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "erotic-dynamics-prose",
+      "label": "Erotic dynamics prose",
+      "category": "roleplay-response",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "erotic-archetypes-engine",
+      "label": "Erotic archetypes engine",
+      "category": "roleplay-response",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "emotional-continuity",
+      "label": "Emotional continuity",
+      "category": "roleplay-response",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "emotional-escalation",
+      "label": "Emotional escalation",
+      "category": "roleplay-response",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "romantic-tension-builder",
+      "label": "Romantic tension builder",
+      "category": "roleplay-response",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "emotional-subtext-engine",
+      "label": "Emotional subtext engine",
+      "category": "roleplay-response",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "romantic-roleplay-skill-creator",
+      "label": "Romantic roleplay skill creator",
+      "category": "explicit-romantic-roleplay-skill-framework",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "relationship-tracker",
+      "label": "Relationship tracker",
+      "category": "relationship-continuity",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "dominance-and-intimacy-flow",
+      "label": "Dominance and intimacy flow",
+      "category": "roleplay-response",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "escalating-proximity",
+      "label": "Escalating proximity",
+      "category": "roleplay-response",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "space-distance-blocking",
+      "label": "Space distance blocking",
+      "category": "roleplay-response",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "scene-coherence-playfield",
+      "label": "Scene coherence playfield",
+      "category": "roleplay-response",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "multi-character-world-narration",
+      "label": "Multi-character world narration",
+      "category": "roleplay-response",
+      "source": "heartwrite_memory_vault"
+    },
+    {
+      "slug": "intimacy-shift",
+      "label": "Intimacy shift",
+      "category": "roleplay-response",
+      "source": "heartwrite_memory_vault"
+    }
+  ]
+}
