@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "chapter-cut-evaluator",
+    "label": "Chapter cut evaluator",
+    "category": "story-development",
+    "summary": "Chapter-ending and cliffhanger diagnostic skill for cut timing, peak placement, under-built climb, unrelated cliffhangers, fallout placement, and reader momentum."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "chapter-cut-evaluator/SKILL.md",
+      "chapter-cut-evaluator/references/cliffhanger_and_chapter_cut_evaluation.md",
+      "crafting-satisfying-ending/SKILL.md",
+      "crafting-satisfying-ending/references/storycoaster_planning_template.md",
+      "scene-sequel-structure/SKILL.md"
+    ],
+    "repository_body": "skills/chapter-cut-evaluator/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["prompt_book", "scenario_book", "memory_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "chapter_cut_evaluation",
+      "cliffhanger_placement",
+      "cut_timing",
+      "not_enough_climb",
+      "unrelated_cliffhanger",
+      "fallout_placement"
+    ],
+    "trigger_seeds": [
+      "chapter ending",
+      "chapter cut",
+      "cliffhanger",
+      "too early",
+      "too late",
+      "not enough climb",
+      "unrelated cliffhanger",
+      "where should this chapter end",
+      "fallout placement",
+      "scene ending"
+    ]
+  },
+  "state": {
+    "fields": [
+      "chapter_goal",
+      "core_conflict",
+      "climb_strength",
+      "conflict_peak",
+      "current_cut_point",
+      "recommended_cut_point",
+      "cliffhanger_type",
+      "fallout_placement",
+      "reader_question",
+      "next_chapter_hook"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "chapter-cut-evaluation",
+      "cliffhanger-placement",
+      "too-early-cut",
+      "too-late-cut",
+      "unrelated-cliffhanger",
+      "not-enough-climb",
+      "fallout-placement",
+      "emotional-cliffhanger"
+    ],
+    "memory_routing": [
+      "Use for author-support editing, chapter-ending diagnosis, and revision planning rather than live scene control.",
+      "Route selected unresolved questions, fallout placement, and next-chapter hook decisions into Scenario Book or Memory Book when the author saves them.",
+      "Use Prompt Book for reusable cut-point diagnostics and cliffhanger placement rules."
+    ],
+    "continuity_links": [
+      "crafting-satisfying-ending",
+      "scene-sequel-structure",
+      "romance-conflict-outliner",
+      "story-idea-generator",
+      "erotic-romance-writing-mentor"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not recommend cutting before the emotional or narrative peak unless the author intentionally wants withheld revelation.",
+      "Do not use life-or-death shock cliffhangers as the default solution.",
+      "Do not replace a promised emotional payoff with an unrelated external interruption.",
+      "Do not over-resolve the chapter if next-chapter momentum depends on unresolved fallout.",
+      "Preserve author control over genre promise, point of view, canon, and final revision choice."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "exclude_raw_fixtures"
+  },
+  "extensions": {}
+}

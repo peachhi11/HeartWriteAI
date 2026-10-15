@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "scene-sequel-structure",
+    "label": "Scene sequel structure",
+    "category": "story-development",
+    "summary": "Story-development skill for diagnosing and designing scene chains through goal, conflict, disaster, reaction, dilemma, decision, half-scene handling, and next-goal handoff."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "scene-sequel-structure/SKILL.md",
+      "scene-sequel-structure/references/scene_sequel_structure_guide.md",
+      "scene-coherence-playfield/SKILL.md",
+      "chapter-cut-evaluator/SKILL.md",
+      "romance-conflict-outliner/SKILL.md",
+      "character-gmcs/SKILL.md",
+      "character-arc-structure/SKILL.md"
+    ],
+    "repository_body": "skills/scene-sequel-structure/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["prompt_book", "scenario_book", "character_book", "memory_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "scene_sequel_structure",
+      "goal_conflict_disaster",
+      "reaction_dilemma_decision",
+      "scene_question",
+      "yes_but_disaster",
+      "next_goal_handoff"
+    ],
+    "trigger_seeds": [
+      "scene structure",
+      "scene sequel",
+      "goal conflict disaster",
+      "reaction dilemma decision",
+      "scene goal",
+      "scene conflict",
+      "scene disaster",
+      "yes but disaster",
+      "half scene",
+      "sequel scene",
+      "scene pacing",
+      "scene breakdown"
+    ]
+  },
+  "state": {
+    "fields": [
+      "scene_goal",
+      "goal_owner",
+      "goal_type",
+      "scene_question",
+      "conflict_obstacle",
+      "conflict_type",
+      "disaster_type",
+      "disaster_intensity",
+      "sequel_reaction",
+      "sequel_dilemma",
+      "dilemma_question",
+      "sequel_decision",
+      "next_scene_goal",
+      "half_scene_dead_end",
+      "scene_variation",
+      "pacing_length"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "scene-goal-check",
+      "goal-conflict-disaster",
+      "scene-question",
+      "disaster-organic-check",
+      "yes-but-disaster",
+      "reaction-dilemma-decision",
+      "sequel-pacing-check",
+      "half-scene-routing",
+      "next-goal-bridge",
+      "scene-sequel-chain"
+    ],
+    "memory_routing": [
+      "Use for author-support scene diagnosis, revision, outline chaining, and prompt-pack scaffolding rather than direct live-scene control.",
+      "Route active scene goal, owner, scene question, obstacle, disaster/outcome, aftermath, decision, and next scene goal to Scenario Book.",
+      "Route recurring goal style, reaction style, dilemma habits, and decision patterns to Character Book when the author saves them.",
+      "Route meaningful disasters, hollow victories, injuries, mistakes, decisions, unresolved consequences, and new commitments to Memory Book."
+    ],
+    "continuity_links": [
+      "scene-coherence-playfield",
+      "chapter-cut-evaluator",
+      "romance-conflict-outliner",
+      "crafting-satisfying-ending",
+      "character-gmcs",
+      "character-arc-structure",
+      "goal-stakes-tracking",
+      "relationship-conflict-tracker",
+      "erotic-romance-writing-mentor"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not force every scene into a visible worksheet or rigid formula.",
+      "Do not invent random disasters; outcomes should grow from the goal and conflict.",
+      "Do not skip reaction, dilemma, and decision when a setback needs emotional or practical processing.",
+      "Do not make every disaster maximum intensity; scale to genre, arc position, scene purpose, and reader promise.",
+      "Preserve {{user}} agency and author control over canon, tone, point of view, and final revision choices."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "exclude_raw_fixtures"
+  },
+  "extensions": {}
+}

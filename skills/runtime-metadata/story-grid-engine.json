@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "story-grid-engine",
+    "label": "Story grid engine",
+    "category": "story-development",
+    "summary": "Story-development skill for aligning core need, value, emotion, and event with antagonist pressure, love-story conventions, proof-of-love payoffs, and purposeful love triangle dynamics."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "story-grid-engine/SKILL.md",
+      "story-grid-engine/references/four_core_framework.md",
+      "story-grid-engine/references/antagonist_design.md",
+      "story-grid-engine/references/love_genre_mechanics.md",
+      "story-grid-engine/references/love_triangle_dynamics.md",
+      "story-idea-generator/SKILL.md",
+      "romance-conflict-outliner/SKILL.md",
+      "relationship-tracker/SKILL.md",
+      "character-gmcs/SKILL.md",
+      "character-arc-structure/SKILL.md",
+      "motive-tracker/SKILL.md"
+    ],
+    "repository_body": "skills/story-grid-engine/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["prompt_book", "character_book", "scenario_book", "memory_book", "world_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "story_grid_engine",
+      "four_core_framework",
+      "core_need",
+      "core_value",
+      "core_emotion",
+      "core_event",
+      "antagonist_pressure",
+      "love_story_conventions",
+      "proof_of_love",
+      "love_triangle_dynamics"
+    ],
+    "trigger_seeds": [
+      "story grid",
+      "core need",
+      "core value",
+      "core emotion",
+      "core event",
+      "antagonist design",
+      "villain design",
+      "love story conventions",
+      "obligatory moments",
+      "proof of love",
+      "love triangle",
+      "helpers and harmers",
+      "romance triangle"
+    ]
+  },
+  "state": {
+    "fields": [
+      "core_need",
+      "core_value_spectrum",
+      "core_emotion",
+      "core_event",
+      "story_promise",
+      "promise_mismatch",
+      "antagonist_function",
+      "antagonist_drive",
+      "antagonist_pressure_trait",
+      "love_story_subtype",
+      "love_story_conventions",
+      "obligatory_moment_status",
+      "proof_of_love_cost",
+      "triangle_pressure",
+      "triangle_option_futures",
+      "triangle_active_choice"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "story-grid-route",
+      "four-core-check",
+      "core-promise-alignment",
+      "antagonist-pressure-check",
+      "love-genre-convention-check",
+      "obligatory-moment-check",
+      "proof-of-love-check",
+      "love-triangle-viability-check",
+      "active-choice-check"
+    ],
+    "memory_routing": [
+      "Use for author-support outlining, story diagnosis, prompt-pack scaffolding, and romance-structure checks rather than direct live-scene control.",
+      "Route core need, value spectrum, protagonist desire, antagonist design, and love-triangle identity pressure to Character Book when accepted.",
+      "Route active helpers, harmers, secrets, rituals, triangle complications, antagonist moves, and obligatory moments to Scenario Book.",
+      "Route proof-of-love evidence, breakup/reunion history, triangle consequences, sacrifice, and changed baseline to Memory Book.",
+      "Route social opposition, genre promises, external rules, and institutional pressure to World Book when durable."
+    ],
+    "continuity_links": [
+      "story-idea-generator",
+      "romance-conflict-outliner",
+      "relationship-tracker",
+      "character-gmcs",
+      "character-arc-structure",
+      "archetypal-character-arcs",
+      "motive-tracker",
+      "trope-world-builder",
+      "crafting-satisfying-ending",
+      "chapter-cut-evaluator",
+      "emotional-escalation",
+      "romantic-tension-builder"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not treat the framework as mandatory formula; use it to clarify promise, pressure, and payoff.",
+      "Do not force romance, breakup, reunion, triangle, or proof-of-love beats where the author's premise does not support them.",
+      "Do not decide {{user}} feelings, romantic choice, consent, final action, or emotional conclusion.",
+      "Do not moralize through the narrator; treat moral weight as genre pressure or character worldview, not universal judgment.",
+      "Do not dump story theory into live scene prose."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "exclude_raw_fixtures"
+  },
+  "extensions": {}
+}

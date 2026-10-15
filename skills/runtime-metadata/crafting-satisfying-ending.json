@@ -1,0 +1,103 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "crafting-satisfying-ending",
+    "label": "Crafting satisfying ending",
+    "category": "story-development",
+    "summary": "Storycoaster plotting and pacing skill for endings, cliffhangers, escalation arcs, story peaks, plunges, valleys, highest peak placement, and post-climax resolution."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "crafting-satisfying-ending/SKILL.md",
+      "crafting-satisfying-ending/references/storycoaster_planning_template.md",
+      "character-arc-structure/SKILL.md",
+      "scene-sequel-structure/SKILL.md",
+      "story-idea-generator/SKILL.md",
+      "erotic-romance-writing-mentor/references/commercial_pulp_romance_patterns.md"
+    ],
+    "repository_body": "skills/crafting-satisfying-ending/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["prompt_book", "scenario_book", "memory_book", "character_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "storycoaster",
+      "satisfying_ending",
+      "highest_peak",
+      "cliffhanger_diagnosis",
+      "pacing_arc",
+      "post_climax_resolution"
+    ],
+    "trigger_seeds": [
+      "satisfying ending",
+      "storycoaster",
+      "highest peak",
+      "cliffhanger",
+      "plot escalation",
+      "pacing arc",
+      "story peak",
+      "plunge",
+      "valley",
+      "resolution"
+    ]
+  },
+  "state": {
+    "fields": [
+      "protagonist",
+      "story_level_goal",
+      "core_conflict",
+      "genre_promise",
+      "relationship_promise",
+      "storycoaster_sequence",
+      "highest_peak",
+      "decisive_moment",
+      "plunge_or_aftermath",
+      "new_baseline",
+      "pacing_pitfall"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "storycoaster-map",
+      "highest-peak-check",
+      "cliffhanger-diagnosis",
+      "post-climax-resolution",
+      "pacing-arc-repair",
+      "ending-payoff-check"
+    ],
+    "memory_routing": [
+      "Use for author-support plotting, pacing diagnosis, ending design, and revision planning rather than live scene control.",
+      "Route selected climax, fallout, unresolved promises, and new-baseline decisions into Scenario Book or Memory Book when the author saves them.",
+      "Use Character Book for protagonist fear, decisive action, arc completion, and changed behavior when a final ending choice is accepted."
+    ],
+    "continuity_links": [
+      "story-idea-generator",
+      "character-arc-structure",
+      "scene-sequel-structure",
+      "erotic-romance-writing-mentor",
+      "relationship-tracker",
+      "emotional-escalation",
+      "relationship-conflict-tracker",
+      "world-bible-builder"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not force a happy ending if the author requests a different genre promise.",
+      "Do not solve the climax with an unrelated external event.",
+      "Do not skip fallout, consequence, repair, or new baseline after the highest peak.",
+      "Do not turn every ending into a neat moral lesson.",
+      "Preserve author control over canon, theme, final relationship outcome, and genre promise."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "exclude_raw_fixtures"
+  },
+  "extensions": {}
+}

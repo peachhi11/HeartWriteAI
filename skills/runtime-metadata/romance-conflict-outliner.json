@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "romance-conflict-outliner",
+    "label": "Romance conflict outliner",
+    "category": "story-development",
+    "summary": "Romance plotting skill for internal and external conflict, GMCS, relationship obstacles, meet-to-fall-back progression, escalation, and resolution planning."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "romance-conflict-outliner/SKILL.md",
+      "romance-conflict-outliner/references/romance_gmcs_conflict_outline.md",
+      "character-gmcs/SKILL.md",
+      "character-arc-structure/SKILL.md",
+      "story-idea-generator/SKILL.md",
+      "crafting-satisfying-ending/SKILL.md",
+      "scene-sequel-structure/SKILL.md"
+    ],
+    "repository_body": "skills/romance-conflict-outliner/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["prompt_book", "character_book", "scenario_book", "memory_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "romance_conflict",
+      "gmcs",
+      "internal_external_conflict",
+      "relationship_obstacles",
+      "fall_back_beat",
+      "romance_progression"
+    ],
+    "trigger_seeds": [
+      "romance conflict",
+      "internal conflict",
+      "external conflict",
+      "GMCS",
+      "goals motivation conflict stakes",
+      "keep a romance engaging",
+      "obstacles keeping them apart",
+      "fall back",
+      "romance outline",
+      "relationship obstacles"
+    ]
+  },
+  "state": {
+    "fields": [
+      "story_type",
+      "trope_stack",
+      "lead_goals",
+      "lead_motivations",
+      "internal_conflicts",
+      "external_conflicts",
+      "relationship_obstacles",
+      "stakes",
+      "meet_setup",
+      "falling_in_love_pressure",
+      "fall_back_trigger",
+      "climax_conflict",
+      "resolution_path"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "romance-conflict-outline",
+      "gmcs-map",
+      "internal-external-conflict-check",
+      "fall-back-beat",
+      "relationship-obstacle-map",
+      "conflict-resolution-check"
+    ],
+    "memory_routing": [
+      "Use for author-support outlining, conflict diagnosis, and story planning rather than live scene control.",
+      "Route selected internal barriers, external obstacles, stakes, and fall-back beats into Scenario Book or Memory Book when the author saves them.",
+      "Use Character Book for each lead's goals, motivations, fears, avoidance patterns, and growth pressure."
+    ],
+    "continuity_links": [
+      "story-idea-generator",
+      "character-gmcs",
+      "character-arc-structure",
+      "crafting-satisfying-ending",
+      "scene-sequel-structure",
+      "relationship-conflict-tracker",
+      "relationship-tracker",
+      "emotional-escalation",
+      "erotic-romance-writing-mentor"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not force conflict to come only from misunderstandings.",
+      "Do not add external stakes that do not affect intimacy, trust, choice, access, reputation, or character growth.",
+      "Do not make characters act irrationally just to delay the romance.",
+      "Preserve author control over trope, tone, canon, and final relationship outcome.",
+      "Keep romance and erotic romance conflict adult, fiction-framed, and character-driven."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "exclude_raw_fixtures"
+  },
+  "extensions": {}
+}

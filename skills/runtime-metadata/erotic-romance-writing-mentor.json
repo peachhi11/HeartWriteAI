@@ -1,0 +1,93 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "erotic-romance-writing-mentor",
+    "label": "Erotic romance writing mentor",
+    "category": "writing-mentor",
+    "summary": "Craft-support skill for immersive, emotionally resonant erotic romance writing, focused on high-heat content, characterization, plotting, dialogue, diction, symbolism, foreshadowing, and actionable revision."
+  },
+  "provenance": {
+    "source": "agents_md",
+    "source_links": [
+      "[[Erotic Romance Writing Mentor]]",
+      "erotic-romance-writing-mentor/references/mentor_prompt_resource.md",
+      "erotic-romance-writing-mentor/references/commercial_pulp_romance_patterns.md",
+      "AGENTS.md: AI Roleplay Generation for Erotic Romance Writing"
+    ],
+    "repository_body": "skills/erotic-romance-writing-mentor/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["prompt_book", "character_book", "scenario_book", "memory_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "erotic_romance_craft",
+      "revision_feedback",
+      "character_driven_heat",
+      "sensory_language",
+      "author_style_support",
+      "commercial_romance_patterns"
+    ],
+    "trigger_seeds": [
+      "revise this scene",
+      "make it hotter",
+      "character-driven erotica",
+      "erotic romance feedback",
+      "dialogue polish",
+      "sensory detail",
+      "emotional stakes",
+      "professional erotic romance",
+      "commercial romance",
+      "pulp romance"
+    ]
+  },
+  "state": {
+    "fields": [
+      "subgenre",
+      "trope_stack",
+      "character_motivation",
+      "emotional_stakes",
+      "heat_level",
+      "voice_constraints",
+      "revision_target",
+      "scene_function",
+      "reader_promise",
+      "trope_engine"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "craft-mentor",
+      "revision-plan",
+      "annotated-feedback",
+      "style-preserving-rewrite",
+      "commercial-pattern-check"
+    ],
+    "memory_routing": [
+      "Use for author-support outputs, critique, and prompt-framework generation rather than direct runtime scene control.",
+      "Store durable author preferences, style rules, and reusable prompt tactics only when explicitly saved."
+    ],
+    "continuity_links": [
+      "explicit-tbrp-scene-guidance",
+      "romantic-erotic-storytelling-generator",
+      "romantic-roleplay-skill-creator",
+      "characterisation",
+      "dialogue-behavior"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Use original examples and do not reproduce copyrighted prose.",
+      "Do not sanitize heat when the user is asking for erotic-romance craft support.",
+      "Keep feedback specific, practical, and tied to character, plot, dialogue, diction, or pacing."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "exclude_raw_fixtures"
+  },
+  "extensions": {}
+}

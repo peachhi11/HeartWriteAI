@@ -11,7 +11,8 @@
       "category": "writing-mentor",
       "source": "agents_md",
       "migration_status": "reviewed",
-      "repository_path": "skills/erotic-romance-writing-mentor/SKILL.md"
+      "repository_path": "skills/erotic-romance-writing-mentor/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/erotic-romance-writing-mentor.json"
     },
     {
       "slug": "romantic-erotic-storytelling-generator",
@@ -55,7 +56,8 @@
       "category": "story-development",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/character-arc-structure/SKILL.md"
+      "repository_path": "skills/character-arc-structure/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/character-arc-structure.json"
     },
     {
       "slug": "archetypal-character-arcs",
@@ -63,7 +65,8 @@
       "category": "story-development",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/archetypal-character-arcs/SKILL.md"
+      "repository_path": "skills/archetypal-character-arcs/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/archetypal-character-arcs.json"
     },
     {
       "slug": "flaw-preservation",
@@ -80,7 +83,8 @@
       "category": "story-development",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/story-grid-engine/SKILL.md"
+      "repository_path": "skills/story-grid-engine/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/story-grid-engine.json"
     },
     {
       "slug": "motive-tracker",
@@ -97,7 +101,8 @@
       "category": "story-development",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/scene-sequel-structure/SKILL.md"
+      "repository_path": "skills/scene-sequel-structure/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/scene-sequel-structure.json"
     },
     {
       "slug": "trope-world-builder",
@@ -114,7 +119,8 @@
       "category": "story-development",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/crafting-satisfying-ending/SKILL.md"
+      "repository_path": "skills/crafting-satisfying-ending/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/crafting-satisfying-ending.json"
     },
     {
       "slug": "chapter-cut-evaluator",
@@ -122,7 +128,8 @@
       "category": "story-development",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/chapter-cut-evaluator/SKILL.md"
+      "repository_path": "skills/chapter-cut-evaluator/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/chapter-cut-evaluator.json"
     },
     {
       "slug": "romance-conflict-outliner",
@@ -130,7 +137,8 @@
       "category": "story-development",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/romance-conflict-outliner/SKILL.md"
+      "repository_path": "skills/romance-conflict-outliner/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/romance-conflict-outliner.json"
     },
     {
       "slug": "explicit-tbrp-scene-guidance",

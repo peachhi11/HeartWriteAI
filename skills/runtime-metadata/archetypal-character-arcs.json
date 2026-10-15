@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "archetypal-character-arcs",
+    "label": "Archetypal character arcs",
+    "category": "story-development",
+    "summary": "Story-development skill for designing life-cycle archetypal arcs, shadow temptations, flat impact roles, and initiatory structural beats without reducing characters to fixed labels."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "archetypal-character-arcs/SKILL.md",
+      "archetypal-character-arcs/references/positive_change_arcs.md",
+      "archetypal-character-arcs/references/shadow_archetypes.md",
+      "archetypal-character-arcs/references/flat_archetypes.md",
+      "archetypal-character-arcs/references/structural_beats.md",
+      "character-arc-structure/SKILL.md",
+      "character-gmcs/SKILL.md",
+      "flaw-preservation/SKILL.md",
+      "personality-gradual-development/SKILL.md"
+    ],
+    "repository_body": "skills/archetypal-character-arcs/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["prompt_book", "character_book", "scenario_book", "memory_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "archetypal_character_arcs",
+      "life_cycle_arcs",
+      "positive_change_archetypes",
+      "shadow_archetypes",
+      "flat_impact_archetypes",
+      "initiatory_arc",
+      "symbolic_threshold",
+      "death_rebirth_beat",
+      "impact_character_role"
+    ],
+    "trigger_seeds": [
+      "archetype",
+      "archetypal arc",
+      "life-cycle arc",
+      "Maiden Arc",
+      "Hero Arc",
+      "Queen Arc",
+      "King Arc",
+      "Crone Arc",
+      "Mage Arc",
+      "shadow archetype",
+      "flat archetype",
+      "impact character",
+      "initiatory journey",
+      "death and rebirth"
+    ]
+  },
+  "state": {
+    "fields": [
+      "archetypal_role",
+      "life_cycle_act",
+      "current_identity_stage",
+      "archetypal_lie",
+      "archetypal_truth",
+      "threshold_event",
+      "antagonist_pressure",
+      "shadow_polarity",
+      "flat_impact_role",
+      "symbolic_test",
+      "false_victory",
+      "death_rebirth_beat",
+      "resolution_proof"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "archetypal-arc-route",
+      "life-cycle-act-check",
+      "positive-change-archetype-check",
+      "shadow-polarity-check",
+      "flat-impact-role-check",
+      "initiatory-threshold-check",
+      "death-rebirth-beat",
+      "archetype-not-label-check",
+      "structural-beat-check"
+    ],
+    "memory_routing": [
+      "Use for author-support outlining, arc diagnosis, romance-lead design, antagonist pressure, and prompt-pack scaffolding rather than direct live-scene control.",
+      "Route accepted archetypal role, Lie, Truth, shadow pressure, and impact role to Character Book.",
+      "Route active thresholds, symbolic tests, pinch points, false victories, and death/rebirth beats to Scenario Book.",
+      "Route proof of growth, refusal, regression, sacrifice, and shadow temptation to Memory Book when the author saves them."
+    ],
+    "continuity_links": [
+      "character-arc-structure",
+      "character-gmcs",
+      "story-idea-generator",
+      "romance-conflict-outliner",
+      "flaw-preservation",
+      "personality-gradual-development",
+      "motive-tracker"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not force a character into an archetype because of age, gender, role title, or relationship status.",
+      "Do not reduce a character to a single label; preserve motive, contradiction, flaw, agency, and context.",
+      "Do not treat shadow archetypes as automatic villainy; they are pressure patterns, tragic temptations, or refusal modes.",
+      "Do not overwrite {{user}}'s inner life, choices, feelings, or final transformation unless the user explicitly asks for authoring or impersonation support.",
+      "Do not dump archetype theory into scene prose."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "exclude_raw_fixtures"
+  },
+  "extensions": {}
+}

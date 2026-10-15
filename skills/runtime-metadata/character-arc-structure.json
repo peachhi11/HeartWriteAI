@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "character-arc-structure",
+    "label": "Character arc structure",
+    "category": "story-development",
+    "summary": "Story-development skill for mapping Lie, Truth, Want, Need, Ghost, Characteristic Moment, Normal World, plot-point decisions, Midpoint revelation, Third Plot Point sacrifice, Climax proof, and Resolution evidence."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "character-arc-structure/SKILL.md",
+      "character-arc-structure/references/internal_elements.md",
+      "character-arc-structure/references/act_one_setup.md",
+      "character-arc-structure/references/act_two_struggle.md",
+      "character-arc-structure/references/act_three_climax.md",
+      "character-gmcs/SKILL.md",
+      "story-idea-generator/references/character_arc_need_desire_engine.md",
+      "story-idea-generator/SKILL.md",
+      "scene-sequel-structure/SKILL.md",
+      "crafting-satisfying-ending/SKILL.md",
+      "romance-conflict-outliner/SKILL.md"
+    ],
+    "repository_body": "skills/character-arc-structure/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["prompt_book", "character_book", "scenario_book", "memory_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "character_arc_structure",
+      "positive_change_arc",
+      "lie_truth_arc",
+      "want_need_split",
+      "ghost_wound",
+      "normal_world",
+      "inciting_event",
+      "plot_point_decisions",
+      "reactive_to_active_shift",
+      "transformation_evidence"
+    ],
+    "trigger_seeds": [
+      "character arc",
+      "positive change arc",
+      "flat arc",
+      "negative arc",
+      "the Lie",
+      "the Truth",
+      "want versus need",
+      "character ghost",
+      "characteristic moment",
+      "Normal World",
+      "Inciting Event",
+      "First Plot Point",
+      "Midpoint",
+      "Third Plot Point",
+      "Climax proof",
+      "Resolution baseline"
+    ]
+  },
+  "state": {
+    "fields": [
+      "arc_type",
+      "character_lie",
+      "counter_truth",
+      "external_want",
+      "internal_need",
+      "ghost_wound",
+      "characteristic_moment",
+      "normal_world",
+      "first_plot_point_decision",
+      "midpoint_revelation",
+      "third_plot_point_choice",
+      "climax_proof",
+      "resolution_baseline",
+      "transformation_evidence",
+      "lie_symptoms",
+      "want_blocks_need",
+      "first_truth_hint",
+      "lie_based_tactics",
+      "truth_tools",
+      "reactive_to_active_shift",
+      "false_victory",
+      "truth_choice",
+      "behavior_contrast"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "character-arc-map",
+      "internal-elements-check",
+      "lie-truth-check",
+      "want-need-split",
+      "ghost-wound-routing",
+      "act-one-setup-check",
+      "normal-world-check",
+      "inciting-event-check",
+      "plot-point-choice-test",
+      "act-two-struggle-check",
+      "midpoint-revelation",
+      "reactive-to-active-shift",
+      "act-three-climax-check",
+      "third-plot-point-sacrifice",
+      "truth-choice-check",
+      "climax-proof",
+      "resolution-baseline",
+      "transformation-evidence"
+    ],
+    "memory_routing": [
+      "Use for author-support outlining, arc diagnosis, and prompt-pack scaffolding rather than direct live-scene control.",
+      "Route accepted Lie, Truth, Want, Need, Ghost, strengths, flaws, and transformation pressure to Character Book.",
+      "Route active arc tests, plot-point decisions, and immediate consequences to Scenario Book.",
+      "Route evidence of change, regression, sacrifice, and repeated Lie/Truth conflicts to Memory Book when the author saves them."
+    ],
+    "continuity_links": [
+      "story-idea-generator",
+      "character-gmcs",
+      "scene-sequel-structure",
+      "romance-conflict-outliner",
+      "crafting-satisfying-ending",
+      "chapter-cut-evaluator",
+      "relationship-tracker",
+      "flaw-preservation",
+      "personality-gradual-development",
+      "erotic-romance-writing-mentor"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not force growth before the plot has earned it.",
+      "Do not turn every arc into moral correction; characters may grow, hold steady, regress, fall, or choose badly.",
+      "Do not overwrite {{user}}'s arc, feelings, choices, or transformation unless the user explicitly asks for authoring or impersonation help.",
+      "Do not reduce romance or erotic arcs to generic healing; route change through specific desire, intimacy, power, trust, secrecy, reputation, and choice pressure.",
+      "Do not treat a revelation as full transformation; realization, choice, proof, and new baseline are separate story events.",
+      "Do not dump arc theory into scene prose."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "exclude_raw_fixtures"
+  },
+  "extensions": {}
+}
