@@ -68,7 +68,9 @@
       "slug": "story-grid-engine",
       "label": "Story grid engine",
       "category": "story-development",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/story-grid-engine/SKILL.md"
     },
     {
       "slug": "motive-tracker",
@@ -80,7 +82,9 @@
       "slug": "scene-sequel-structure",
       "label": "Scene sequel structure",
       "category": "story-development",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/scene-sequel-structure/SKILL.md"
     },
     {
       "slug": "trope-world-builder",
@@ -104,7 +108,9 @@
       "slug": "romance-conflict-outliner",
       "label": "Romance conflict outliner",
       "category": "story-development",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/romance-conflict-outliner/SKILL.md"
     },
     {
       "slug": "explicit-tbrp-scene-guidance",
