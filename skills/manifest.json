@@ -14,7 +14,9 @@
       "slug": "romantic-erotic-storytelling-generator",
       "label": "Romantic and erotic storytelling generator",
       "category": "roleplay-response",
-      "source": "agents_md"
+      "source": "agents_md",
+      "migration_status": "reviewed",
+      "repository_path": "skills/romantic-erotic-storytelling-generator/SKILL.md"
     },
     {
       "slug": "story-idea-generator",
@@ -124,19 +126,25 @@
       "slug": "explicit-tbrp-scene-guidance",
       "label": "Explicit TBRP scene guidance",
       "category": "explicit-romantic-roleplay-skill-framework",
-      "source": "agents_md"
+      "source": "agents_md",
+      "migration_status": "reviewed",
+      "repository_path": "skills/explicit-tbrp-scene-guidance/SKILL.md"
     },
     {
       "slug": "roleplay-keyword-discovery",
       "label": "Roleplay keyword discovery",
       "category": "keyword-discovery",
-      "source": "agents_md"
+      "source": "agents_md",
+      "migration_status": "reviewed",
+      "repository_path": "skills/roleplay-keyword-discovery/SKILL.md"
     },
     {
       "slug": "character-persona-creation",
       "label": "Character persona creation",
       "category": "character-persona",
-      "source": "agents_md"
+      "source": "agents_md",
+      "migration_status": "reviewed",
+      "repository_path": "skills/character-persona-creation/SKILL.md"
     },
     {
       "slug": "knowledge-boundary-response",
@@ -230,7 +238,9 @@
       "slug": "romantic-roleplay-skill-creator",
       "label": "Romantic roleplay skill creator",
       "category": "explicit-romantic-roleplay-skill-framework",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/romantic-roleplay-skill-creator/SKILL.md"
     },
     {
       "slug": "relationship-tracker",

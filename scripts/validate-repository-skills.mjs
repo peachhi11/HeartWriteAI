@@ -119,6 +119,10 @@ for (const entry of manifest.entries) {
     }
   }
 
+  if (frontmatterValue(frontmatterMatch[1], "source") !== entry.source) {
+    failures.push(`${entry.slug}: frontmatter source must match manifest source ${entry.source}`);
+  }
+
   for (const section of bodySchema.required_sections) {
     if (!hasSection(body, section)) {
       failures.push(`${entry.slug}: missing required section ${section}`);

@@ -73,6 +73,7 @@ test("reviewed skill entries point to repository-owned bodies", () => {
   assert.deepEqual(
     reviewedEntries.map((entry) => entry.slug),
     [
+      "romantic-erotic-storytelling-generator",
       "story-idea-generator",
       "narrative-complications-engine",
       "character-gmcs",
@@ -86,6 +87,9 @@ test("reviewed skill entries point to repository-owned bodies", () => {
       "crafting-satisfying-ending",
       "chapter-cut-evaluator",
       "romance-conflict-outliner",
+      "explicit-tbrp-scene-guidance",
+      "roleplay-keyword-discovery",
+      "character-persona-creation",
       "knowledge-boundary-response",
       "modern-real-world-setting",
       "weather-natural-phenomena",
@@ -97,6 +101,7 @@ test("reviewed skill entries point to repository-owned bodies", () => {
       "emotional-escalation",
       "romantic-tension-builder",
       "emotional-subtext-engine",
+      "romantic-roleplay-skill-creator",
       "relationship-tracker",
       "dominance-and-intimacy-flow",
       "escalating-proximity",
@@ -111,7 +116,7 @@ test("reviewed skill entries point to repository-owned bodies", () => {
     const body = fs.readFileSync(path.resolve(process.cwd(), entry.repository_path), "utf8");
     assert.match(body, new RegExp(`name: ${entry.slug}`));
     assert.match(body, /runtime_safe: true/);
-    assert.match(body, /source: heartwrite_memory_vault/);
+    assert.match(body, new RegExp(`source: ${entry.source}`));
     assert.match(body, /^---\n[\s\S]*\n---\n/);
     for (const field of schema.required_frontmatter) {
       assert.match(body, new RegExp(`^\\s*${field}:\\s+.+$`, "m"));
