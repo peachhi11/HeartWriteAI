@@ -115,7 +115,9 @@
       "slug": "knowledge-boundary-response",
       "label": "Knowledge boundary response",
       "category": "roleplay-response",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/knowledge-boundary-response/SKILL.md"
     },
     {
       "slug": "modern-real-world-setting",

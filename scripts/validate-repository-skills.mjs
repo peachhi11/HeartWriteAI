@@ -63,6 +63,25 @@ for (const entry of registryEntries) {
   }
 }
 
+for (const entry of manifest.entries) {
+  if (entry.migration_status !== "reviewed") continue;
+  if (!entry.repository_path) {
+    failures.push(`reviewed skill has no repository_path: ${entry.slug}`);
+    continue;
+  }
+
+  const repositoryPath = path.join(repoRoot, entry.repository_path);
+  if (!fs.existsSync(repositoryPath)) {
+    failures.push(`reviewed skill body is missing: ${entry.repository_path}`);
+    continue;
+  }
+
+  const body = fs.readFileSync(repositoryPath, "utf8");
+  if (!body.includes(`name: ${entry.slug}`)) {
+    failures.push(`reviewed skill body has no matching frontmatter name: ${entry.slug}`);
+  }
+}
+
 if (failures.length > 0) {
   console.error("Repository skill manifest validation failed:");
   for (const failure of failures) console.error(`- ${failure}`);
