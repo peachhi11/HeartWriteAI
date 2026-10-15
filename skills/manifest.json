@@ -135,7 +135,9 @@
       "slug": "explicit-memory-core",
       "label": "Explicit memory core",
       "category": "memory-core",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/explicit-memory-core/SKILL.md"
     },
     {
       "slug": "power-dynamics-scene-writing",
