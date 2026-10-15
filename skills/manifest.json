@@ -90,7 +90,9 @@
       "slug": "trope-world-builder",
       "label": "Trope world builder",
       "category": "world-setting",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/trope-world-builder/SKILL.md"
     },
     {
       "slug": "crafting-satisfying-ending",
@@ -142,13 +144,17 @@
       "slug": "modern-real-world-setting",
       "label": "Modern real-world setting",
       "category": "world-setting",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/modern-real-world-setting/SKILL.md"
     },
     {
       "slug": "weather-natural-phenomena",
       "label": "Weather natural phenomena",
       "category": "world-setting",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/weather-natural-phenomena/SKILL.md"
     },
     {
       "slug": "explicit-memory-core",
