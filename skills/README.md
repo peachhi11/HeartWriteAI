@@ -12,10 +12,9 @@ reviewed.
 ## Current slice
 
 `manifest.json` inventories the 37 skills already represented by
-`lib/character-card/storyRuntimeSkills.ts`. Thirty-six have reviewed repository
-bodies; `erotic-romance-writing-mentor` remains pending. The manifest is an
-organizational contract, not a second prompt registry and not yet a source of
-runtime behavior.
+`lib/character-card/storyRuntimeSkills.ts`. All 37 now have reviewed repository
+bodies. The manifest is an organizational contract, not a second prompt
+registry and not yet a source of runtime behavior.
 
 `skill.schema.json` defines the minimum contract for a reviewed skill body:
 frontmatter must carry ownership and provenance, and the body must include

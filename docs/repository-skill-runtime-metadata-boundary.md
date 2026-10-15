@@ -4,7 +4,7 @@
 
 Design only. Runtime imports still use `lib/character-card/storyRuntimeSkills.ts`.
 
-The repository currently has 37 runtime skill entries. Thirty-six have reviewed `SKILL.md` bodies; `erotic-romance-writing-mentor` remains pending because its source and reference-heavy material still need a separate privacy and scope review.
+The repository currently has 37 runtime skill entries, all with reviewed `SKILL.md` bodies. The richer mentor-voice and commercial-pattern references remain vault-owned.
 
 ## Boundary
 
@@ -37,12 +37,11 @@ The first generated artifact should be compared against the existing registry wi
 
 ## Migration Sequence
 
-1. Migrate and review the remaining `erotic-romance-writing-mentor` body.
-2. Add the structured metadata schema and one complete metadata record as a proof of shape.
-3. Add a generator that produces a temporary or checked-in artifact.
-4. Compare generated metadata to the current registry for all 37 entries.
-5. Add a CI/pre-commit stale-generated-output check.
-6. Switch runtime imports only after equivalence is exact and focused compiler tests remain green.
+1. Add the structured metadata schema and one complete metadata record as a proof of shape.
+2. Add a generator that produces a temporary or checked-in artifact.
+3. Compare generated metadata to the current registry for all 37 entries.
+4. Add a CI/pre-commit stale-generated-output check.
+5. Switch runtime imports only after equivalence is exact and focused compiler tests remain green.
 
 ## Non-Goals
 

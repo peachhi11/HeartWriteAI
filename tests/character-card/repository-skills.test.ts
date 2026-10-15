@@ -73,6 +73,7 @@ test("reviewed skill entries point to repository-owned bodies", () => {
   assert.deepEqual(
     reviewedEntries.map((entry) => entry.slug),
     [
+      "erotic-romance-writing-mentor",
       "romantic-erotic-storytelling-generator",
       "story-idea-generator",
       "narrative-complications-engine",

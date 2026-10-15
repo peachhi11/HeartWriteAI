@@ -8,7 +8,9 @@
       "slug": "erotic-romance-writing-mentor",
       "label": "Erotic romance writing mentor",
       "category": "writing-mentor",
-      "source": "agents_md"
+      "source": "agents_md",
+      "migration_status": "reviewed",
+      "repository_path": "skills/erotic-romance-writing-mentor/SKILL.md"
     },
     {
       "slug": "romantic-erotic-storytelling-generator",
