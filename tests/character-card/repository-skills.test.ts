@@ -87,6 +87,9 @@ test("reviewed skill entries point to repository-owned bodies", () => {
       "modern-real-world-setting",
       "weather-natural-phenomena",
       "explicit-memory-core",
+      "emotional-continuity",
+      "emotional-escalation",
+      "emotional-subtext-engine",
       "relationship-tracker",
     ],
   );
