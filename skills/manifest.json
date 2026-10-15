@@ -44,19 +44,25 @@
       "slug": "character-arc-structure",
       "label": "Character arc structure",
       "category": "story-development",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/character-arc-structure/SKILL.md"
     },
     {
       "slug": "archetypal-character-arcs",
       "label": "Archetypal character arcs",
       "category": "story-development",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/archetypal-character-arcs/SKILL.md"
     },
     {
       "slug": "flaw-preservation",
       "label": "Flaw preservation",
       "category": "roleplay-response",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/flaw-preservation/SKILL.md"
     },
     {
       "slug": "story-grid-engine",
