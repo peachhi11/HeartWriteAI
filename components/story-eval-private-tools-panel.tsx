@@ -13,6 +13,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { RelationshipPersistenceDiagnostic } from "@/components/relationship-persistence-diagnostic";
 import {
   createStoryEvalCiReportDownload,
   createStoryEvalDashboardState,
@@ -202,6 +203,7 @@ export function StoryEvalPrivateToolsPanel() {
 
   return (
     <section className="space-y-5 rounded-lg border border-violet-500/25 bg-violet-500/5 p-5 backdrop-blur-sm">
+      <RelationshipPersistenceDiagnostic />
       <div className="space-y-1">
         <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-violet-300">
           <ClipboardCheck className="size-4" />
