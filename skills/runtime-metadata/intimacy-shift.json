@@ -1,0 +1,99 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "intimacy-shift",
+    "label": "Intimacy shift",
+    "category": "roleplay-response",
+    "summary": "Post-intimacy relationship-state tracker for physical intimacy, near-intimacy, changed boundaries, sexual comfort, emotional comfort, aftercare, and altered assumptions."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "[[Explicit Memory Core]]",
+      "[[Memory Core Model]]",
+      "[[Current Scene Package Bank]]"
+    ],
+    "repository_body": "skills/intimacy-shift/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["scenario_book", "memory_book", "character_book", "user_book", "prompt_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "intimacy_aftermath",
+      "sexual_comfort",
+      "emotional_comfort",
+      "aftercare",
+      "boundary_shift",
+      "relationship_milestone"
+    ],
+    "trigger_seeds": [
+      "kiss",
+      "aftercare",
+      "morning after",
+      "was that a mistake",
+      "stay",
+      "again",
+      "pulling back",
+      "changed expectation",
+      "first public touch"
+    ]
+  },
+  "state": {
+    "fields": [
+      "intimacy_event",
+      "shift_mode",
+      "emotional_comfort",
+      "sexual_comfort",
+      "active_assumption",
+      "boundary_state",
+      "relationship_effect",
+      "immediate_char_response",
+      "followup_drivers"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "comfort-increase",
+      "awkwardness-avoidance",
+      "expectation-possessiveness",
+      "uncertainty-jealousy",
+      "deeper-trust-fear",
+      "changed-boundaries-assumptions",
+      "memory-update"
+    ],
+    "memory_routing": [
+      "Update Scenario Book for the live intimacy shift.",
+      "Update Memory Book when intimacy becomes a milestone, wound, recurring expectation, altered boundary, aftercare pattern, or callback.",
+      "Keep User Book updates limited to explicit user-provided preferences or impersonation-assist material."
+    ],
+    "continuity_links": [
+      "explicit-memory-core",
+      "relationship-tracker",
+      "relationship-dynamics",
+      "relationship-conflict-tracker",
+      "emotional-continuity",
+      "emotional-escalation",
+      "romantic-sensory-tension",
+      "domestic-and-routine-intimacy",
+      "quiet-companionship",
+      "refusal-and-push"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not decide how intimacy changes {{user}}.",
+      "Do not make intimacy automatically create love, repair trust, erase conflict, or guarantee commitment.",
+      "Do not use intimacy to override stated boundaries, withdrawal, distress, meaningful hesitation, or refusal.",
+      "Track emotional comfort and sexual comfort separately."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}

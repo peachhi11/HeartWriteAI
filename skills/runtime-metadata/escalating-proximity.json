@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "escalating-proximity",
+    "label": "Escalating proximity",
+    "category": "roleplay-response",
+    "summary": "Progressive proximity engine for romantic tension, including physical or emotional distance changes, micro-boundaries, interruptions, trope-stack routing, and unresolved closeness."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "[[Relationship Pressure Bank]]",
+      "[[Current Scene Package Bank]]",
+      "[[Prompt Compiler Logic]]"
+    ],
+    "repository_body": "skills/escalating-proximity/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["scenario_book", "memory_book", "character_book", "prompt_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "proximity_engine",
+      "slow_burn",
+      "forced_proximity",
+      "near_miss",
+      "trope_stack_routing",
+      "micro_boundary"
+    ],
+    "trigger_seeds": [
+      "forced proximity",
+      "only one bed",
+      "enemies to lovers",
+      "forbidden love",
+      "rivals",
+      "boss employee",
+      "accidental touch",
+      "near kiss",
+      "pinning",
+      "shared shelter"
+    ]
+  },
+  "state": {
+    "fields": [
+      "trope_profile",
+      "current_stage",
+      "prior_stage",
+      "proximity_type",
+      "distance_state",
+      "micro_action",
+      "micro_boundary",
+      "near_miss_count",
+      "completion_state",
+      "active_pressure"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "escalation_stage:<stage>",
+      "hold-tension",
+      "escalate-one-step",
+      "secret-kiss",
+      "boundary-clarification",
+      "confrontation",
+      "payoff-needed",
+      "scene-pivot"
+    ],
+    "memory_routing": [
+      "Store unresolved almost-moments, repeated proximity patterns, meaningful interruptions, boundary shifts, lingering tension, and callbacks.",
+      "After one or two major near-misses, route to payoff, pivot, confrontation, boundary clarification, consequence-bearing interruption, or deliberate retreat."
+    ],
+    "continuity_links": [
+      "position-tracking",
+      "romantic-sensory-tension",
+      "desire-physical-awareness",
+      "intimacy-shift",
+      "emotional-escalation",
+      "romantic-tension-builder",
+      "refusal-and-push",
+      "natural-interruption",
+      "relationship-tracker"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not treat stillness, hesitation, silence, or proximity as automatic consent.",
+      "Do not force {{user}} movement, emotion, consent, or response.",
+      "Do not advance through every stage in one response unless {{user}} explicitly accelerates and boundaries allow it.",
+      "Let interruption, retreat, or deferment preserve tension instead of erasing it."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}

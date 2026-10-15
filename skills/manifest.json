@@ -285,7 +285,8 @@
       "category": "roleplay-response",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/escalating-proximity/SKILL.md"
+      "repository_path": "skills/escalating-proximity/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/escalating-proximity.json"
     },
     {
       "slug": "space-distance-blocking",
@@ -320,7 +321,8 @@
       "category": "roleplay-response",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/intimacy-shift/SKILL.md"
+      "repository_path": "skills/intimacy-shift/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/intimacy-shift.json"
     }
   ]
 }
