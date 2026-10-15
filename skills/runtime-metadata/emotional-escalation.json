@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "emotional-escalation",
+    "label": "Emotional escalation",
+    "category": "roleplay-response",
+    "summary": "Staged emotional progression driver for romantic roleplay, moving characters from friction through awareness, pressure, partial admission, and consequence without instant confession or melodrama."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "[[Emotional Escalation]]",
+      "emotional-escalation/references/emotional_escalation_framework.md",
+      "emotional-escalation/references/confession_truth_rupture_system.md",
+      "[[Memory Core Model]]"
+    ],
+    "repository_body": "skills/emotional-escalation/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["scenario_book", "memory_book", "character_book", "prompt_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "emotional_escalation",
+      "slow_burn_emotion",
+      "partial_admission",
+      "awareness_leak",
+      "no_instant_confession",
+      "emotional_fatigue",
+      "confession_truth_rupture",
+      "cost_of_truth",
+      "irreversible_shift"
+    ],
+    "trigger_seeds": [
+      "awkwardness",
+      "suppressed feelings",
+      "avoidance",
+      "longing",
+      "jealousy",
+      "charged silence",
+      "almost confession",
+      "defensive humor",
+      "partial truth",
+      "vulnerability cue",
+      "love confession",
+      "deep secret",
+      "truth rupture",
+      "emotional truth",
+      "relationship turning point"
+    ]
+  },
+  "state": {
+    "fields": [
+      "character",
+      "current_stage",
+      "prior_stage",
+      "trigger",
+      "active_pressure",
+      "behavior_mode",
+      "visible_tell",
+      "avoided_truth",
+      "partial_admission",
+      "emotional_truth",
+      "truth_cost",
+      "prior_containment",
+      "rupture_trigger",
+      "emotional_crosscurrent",
+      "energy_level",
+      "consequence",
+      "immediate_fallout",
+      "irreversible_shift",
+      "relationship_structure_change",
+      "unanswered_question"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "emotional-stage-active",
+      "advance-one-stage",
+      "hold-before-confession",
+      "partial-admission",
+      "confession-rupture-check",
+      "truth-cost-check",
+      "impossible-aftermath-check",
+      "relationship-structure-change",
+      "carry-residue-forward",
+      "memory-update"
+    ],
+    "memory_routing": [
+      "Update Scenario Book with the active emotional stage, visible tell, pressure, confession rupture, and immediate consequence.",
+      "Update Memory Book when escalation creates a partial admission, truth-cost moment, confession fallout, unresolved residue, relationship shift, or future callback.",
+      "Use Character Book for durable escalation style, confession threshold, avoidance pattern, and vulnerability tells."
+    ],
+    "continuity_links": [
+      "emotional-continuity",
+      "scene-escalation",
+      "romantic-sensory-tension",
+      "romantic-speech-pattern",
+      "relationship-dynamics",
+      "relationship-tracker",
+      "relationship-conflict-tracker",
+      "refusal-and-push",
+      "romance-silence-pauses",
+      "position-tracking"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not assign {{user}} thoughts, feelings, bodily reactions, choices, dialogue, or emotional conclusions.",
+      "Do not jump from early tension to instant confession unless the scene has clearly earned it.",
+      "Do not reward confession with instant repair unless the story has earned that specific resolution.",
+      "Suppress hyper-emotive, purple, or abstract language when physical behavior can carry the beat.",
+      "Do not resolve the emotional thread in the same beat unless resolution is requested and canon supports it."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}

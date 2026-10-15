@@ -220,7 +220,8 @@
       "category": "roleplay-response",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/emotional-continuity/SKILL.md"
+      "repository_path": "skills/emotional-continuity/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/emotional-continuity.json"
     },
     {
       "slug": "emotional-escalation",
@@ -228,7 +229,8 @@
       "category": "roleplay-response",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/emotional-escalation/SKILL.md"
+      "repository_path": "skills/emotional-escalation/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/emotional-escalation.json"
     },
     {
       "slug": "romantic-tension-builder",
@@ -236,7 +238,8 @@
       "category": "roleplay-response",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/romantic-tension-builder/SKILL.md"
+      "repository_path": "skills/romantic-tension-builder/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/romantic-tension-builder.json"
     },
     {
       "slug": "emotional-subtext-engine",

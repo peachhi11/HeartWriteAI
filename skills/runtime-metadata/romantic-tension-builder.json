@@ -1,0 +1,149 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "romantic-tension-builder",
+    "label": "Romantic tension builder",
+    "category": "roleplay-response",
+    "summary": "Builds sustained romantic tension and slow-burn pacing through subtle behavior, recurring habits, social noticing, ordinary proximity, hesitation, and earned intimacy instead of repeated declarations."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "romantic-tension-builder/SKILL.md",
+      "romantic-tension-builder/references/slow_burn_pacing_system.md",
+      "romantic-tension-builder/references/unspoken_desire_tension_system.md",
+      "[[Relationship Pressure Bank]]",
+      "[[Memory Core Model]]",
+      "[[Prompt Compiler Logic]]"
+    ],
+    "repository_body": "skills/romantic-tension-builder/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["scenario_book", "memory_book", "character_book", "prompt_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "romantic_tension_builder",
+      "slow_burn_system",
+      "earned_intimacy",
+      "no_fast_forwarding",
+      "routine_pattern",
+      "social_recognition",
+      "absence_awareness",
+      "half_brave_gesture",
+      "testing_safety",
+      "unspoken_desire_tension",
+      "motivated_silence",
+      "internal_wall",
+      "desire_cost"
+    ],
+    "trigger_seeds": [
+      "slow burn",
+      "slow-burn",
+      "earned intimacy",
+      "trust is earned",
+      "no fast-forwarding",
+      "romantic tension",
+      "private joke",
+      "saved seat",
+      "noticing absence",
+      "half-brave gesture",
+      "misread intentions",
+      "testing safety",
+      "push pull",
+      "charged silence",
+      "unspoken desire",
+      "forbidden attraction",
+      "motivated silence",
+      "fear of ruining a friendship",
+      "fear of rejection"
+    ]
+  },
+  "state": {
+    "fields": [
+      "trigger",
+      "tension_cue",
+      "mode",
+      "active_pressure",
+      "occurrence_type",
+      "slow_burn_pacing_state",
+      "attraction_evidence",
+      "trust_evidence",
+      "safety_test",
+      "hesitation_or_pullback",
+      "friction_source",
+      "half_brave_gesture",
+      "ordinary_proximity",
+      "specific_desire",
+      "desire_cost",
+      "internal_wall",
+      "silence_motivation",
+      "surface_cover",
+      "leak_or_tell",
+      "pullback_or_deflection",
+      "routine_pattern",
+      "social_perception",
+      "earned_next_step",
+      "unresolved_edge",
+      "missing_evidence",
+      "callback_potential",
+      "user_agency_check"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "romantic-tension-active",
+      "slow-burn-active",
+      "tension-evidence-check",
+      "no-fast-forward",
+      "earned-intimacy-check",
+      "routine-pattern-update",
+      "social-recognition-check",
+      "absence-awareness-check",
+      "hold-before-confession",
+      "motivated-silence-check",
+      "desire-cost-check",
+      "internal-wall-check",
+      "leak-pullback-check",
+      "memory-update"
+    ],
+    "memory_routing": [
+      "Update Scenario Book with the live tension cue, active pressure, ordinary proximity, safety test, hesitation, motivated silence, internal wall, social context, and immediate behavioral beat.",
+      "Update Memory Book when repeated gestures, habit markers, private jokes, disrupted routines, social recognition, half-brave gestures, desire-cost moments, unresolved edges, or earned intimacy become callback material.",
+      "Use Character Book for durable attachment display, avoidance, teasing, protectiveness, proximity-seeking, absence awareness, and confession threshold.",
+      "Use Prompt Book for no-fast-forwarding, earned-intimacy checks, motivated-silence checks, and slow-burn pacing rules."
+    ],
+    "continuity_links": [
+      "relationship-tracker",
+      "relationship-dynamics",
+      "domestic-and-routine-intimacy",
+      "emotional-escalation",
+      "emotional-continuity",
+      "romantic-sensory-tension",
+      "desire-physical-awareness",
+      "quiet-companionship",
+      "escalating-proximity",
+      "social-worldbuilding-driver",
+      "callback-opportunity"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not narrate {{user}} thoughts, feelings, attraction, confession, consent, choices, dialogue, or emotional conclusions.",
+      "Do not force confession, reciprocation, commitment, romance route, or relationship outcome.",
+      "Do not equate physical attraction with trust, comfort, safety, or commitment.",
+      "Do not make silence melodramatic without a concrete wall such as history, fear, loyalty, reputation, obligation, or consequence.",
+      "Do not use slow burn to stall forever; accumulated evidence should eventually create payoff, pivot, confrontation, choice, rupture, or new boundary.",
+      "Do not make every attentive gesture romantic; care can also be friendship, duty, guilt, protectiveness, manipulation, obligation, or practical competence.",
+      "Preserve character knowledge boundaries; NPCs can notice visible patterns, not private thoughts."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}

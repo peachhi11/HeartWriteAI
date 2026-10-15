@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "emotional-continuity",
+    "label": "Emotional continuity",
+    "category": "roleplay-response",
+    "summary": "Personality-aware emotional state tracker for strong emotions, preserving cause, intensity, display, masking, residue, decay, and plausible resolution across nearby roleplay turns."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "[[Emotional Continuity]]",
+      "emotional-continuity/references/emotional_continuity_examples.md",
+      "[[Memory Core Model]]"
+    ],
+    "repository_body": "skills/emotional-continuity/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["character_book", "scenario_book", "memory_book", "prompt_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "emotional_continuity",
+      "personality_skill",
+      "emotional_residue",
+      "coping_style",
+      "nearby_turn_state",
+      "masking_not_resolution"
+    ],
+    "trigger_seeds": [
+      "angry",
+      "furious",
+      "upset",
+      "sad",
+      "afraid",
+      "scared",
+      "jealous",
+      "embarrassed",
+      "nervous",
+      "excited",
+      "hurt",
+      "ashamed",
+      "guilty"
+    ]
+  },
+  "state": {
+    "fields": [
+      "character",
+      "emotion_type",
+      "intensity",
+      "cause",
+      "target",
+      "display_behavior",
+      "suppression_or_mask",
+      "coping_style",
+      "residue",
+      "decay",
+      "resolution_tracker"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "emotional-state-active",
+      "carry-residue-forward",
+      "masking-not-resolution",
+      "gradual-resolution",
+      "memory-update"
+    ],
+    "memory_routing": [
+      "Update Scenario Book while the emotion is active across nearby turns.",
+      "Update Memory Book when the emotion creates residue, a wound, repair, promise, callback, relationship shift, or recurring pattern.",
+      "Use Character Book for durable emotional range, coping style, and expression patterns."
+    ],
+    "continuity_links": [
+      "personality-trait-expression",
+      "emotional-logic-character-creation",
+      "relationship-dynamics",
+      "relationship-conflict-tracker",
+      "romantic-speech-pattern",
+      "callback-opportunity",
+      "explicit-recall-memory"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not prescribe {{user}} emotions, thoughts, consent, bodily reactions, choices, or dialogue.",
+      "Do not reset strong emotion to neutral without plausible masking, time passage, interruption, transformation, or resolution.",
+      "Do not treat masking as resolution.",
+      "Let emotion color personality without replacing durable character traits."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}
