@@ -1,0 +1,122 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "weather-natural-phenomena",
+    "label": "Weather natural phenomena",
+    "category": "world-setting",
+    "summary": "World and scene support for weather, seasons, geology, natural laws, magical environmental phenomena, hazards, and environmental continuity."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "weather-natural-phenomena/SKILL.md",
+      "weather-natural-phenomena/references/weather_natural_law_magic_system_guide.md",
+      "environmental-movement/SKILL.md",
+      "world-bible-builder/SKILL.md",
+      "world-bible-builder/references/worldbuilding_prompt_taxonomy.md",
+      "scene-coherence-playfield/SKILL.md"
+    ],
+    "repository_body": "skills/weather-natural-phenomena/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["world_book", "scenario_book", "memory_book", "prompt_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "weather_state",
+      "seasonal_cycle",
+      "natural_law",
+      "geological_event",
+      "magical_phenomenon",
+      "environmental_hazard"
+    ],
+    "trigger_seeds": [
+      "weather",
+      "storm",
+      "season",
+      "climate",
+      "magical storm",
+      "natural law",
+      "earthquake",
+      "geological event",
+      "three moons",
+      "tides",
+      "drought",
+      "flood",
+      "volcanic ash",
+      "strange weather"
+    ]
+  },
+  "state": {
+    "fields": [
+      "weather_state",
+      "weather_trend",
+      "season",
+      "climate_zone",
+      "natural_phenomenon",
+      "phenomenon_scope",
+      "manifestation",
+      "localization",
+      "recurrence_pattern",
+      "warning_signs",
+      "environmental_hazard",
+      "geological_state",
+      "travel_impact",
+      "visibility_state",
+      "temperature_state",
+      "cultural_adaptation",
+      "natural_law_limits",
+      "magic_system_rules",
+      "continuity_traces"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "weather-natural-phenomena",
+      "weather-state",
+      "weather-trend",
+      "seasonal-cycle",
+      "geological-event",
+      "natural-law",
+      "magical-phenomenon",
+      "environmental-hazard",
+      "climate-worldbuilding",
+      "phenomenon-continuity",
+      "manifestation-localization",
+      "magic-system-law"
+    ],
+    "memory_routing": [
+      "Route stable climate, seasonal cycles, tides, geology, natural laws, magic weather rules, and cultural adaptations to World Book.",
+      "Route current weather, visibility, temperature, terrain, travel impact, hazards, and active environmental pressure to Scenario Book.",
+      "Promote emotionally significant storms, rare phenomena, scars on locations, recurring seasonal associations, or past environmental events to Memory Book."
+    ],
+    "continuity_links": [
+      "environmental-movement",
+      "world-bible-builder",
+      "trope-world-builder",
+      "modern-real-world-setting",
+      "scene-coherence-playfield",
+      "space-distance-blocking",
+      "time-anchor",
+      "state-tracking-and-continuity"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not introduce sudden disasters or magical weather solely to force drama.",
+      "Do not contradict established World Book or Scenario Book environmental facts.",
+      "Do not anthropomorphize weather, silence, rooms, cities, or landscapes.",
+      "Do not turn every response into weather reporting; foreground phenomena only when they affect action, perception, culture, danger, intimacy, or consequence.",
+      "Do not use environmental conditions to decide {{user}} thoughts, feelings, bodily responses, consent, dialogue, or final actions.",
+      "Do not let magic or natural phenomena solve plot problems without established mechanism, cost, limit, or consequence."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}

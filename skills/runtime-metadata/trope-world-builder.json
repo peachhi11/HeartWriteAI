@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "trope-world-builder",
+    "label": "Trope world builder",
+    "category": "world-setting",
+    "summary": "Subgenre worldbuilding skill for reader expectations, foundational conventions, everyday-reality divergences, flexible elements, controlled subversion, and promise-break audits."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "trope-world-builder/SKILL.md",
+      "trope-world-builder/references/trope_world_contract_checklist.md",
+      "world-bible-builder/SKILL.md",
+      "world-bible-builder/references/worldbuilding_prompt_taxonomy.md",
+      "story-idea-generator/SKILL.md"
+    ],
+    "repository_body": "skills/trope-world-builder/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["world_book", "prompt_book", "scenario_book", "character_book", "memory_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "trope_world",
+      "reader_promise",
+      "subgenre_conventions",
+      "foundational_elements",
+      "controlled_subversion",
+      "worldbook_trope_rules",
+      "worldbuilding_prompt_taxonomy"
+    ],
+    "trigger_seeds": [
+      "trope world",
+      "reader expectations",
+      "subgenre conventions",
+      "foundational elements",
+      "Regency romance",
+      "werewolf romance",
+      "mafia romance",
+      "academy romance",
+      "billionaire romance",
+      "small-town romance",
+      "400 worldbuilding prompts",
+      "worldbuilding gap"
+    ]
+  },
+  "state": {
+    "fields": [
+      "target_trope_world",
+      "subgenre",
+      "reader_promise",
+      "foundational_elements",
+      "flexible_elements",
+      "world_divergences",
+      "social_rules",
+      "power_structures",
+      "relationship_rituals",
+      "deliberate_subversions",
+      "worldbuilding_gap",
+      "question_function",
+      "promise_break_risk"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "trope-world-contract",
+      "reader-promise-check",
+      "foundational-conventions",
+      "trope-world-divergence",
+      "subgenre-expectation-audit",
+      "controlled-subversion",
+      "promise-break-risk",
+      "worldbook-trope-rules",
+      "worldbuilding-question-routing"
+    ],
+    "memory_routing": [
+      "Use for author-support worldbuilding, concept audit, World Book setup, and prompt-pack trope-world rules rather than live scene control.",
+      "Route selected subgenre conventions, world divergences, social rules, and reader-promise decisions into World Book or Prompt Book when the author saves them.",
+      "Use Scenario Book for active rituals, access barriers, stakes, and social or supernatural constraints in the current premise."
+    ],
+    "continuity_links": [
+      "world-bible-builder",
+      "story-idea-generator",
+      "modern-real-world-setting",
+      "institutional-worldbuilding",
+      "social-worldbuilding-driver",
+      "erotic-romance-writing-mentor",
+      "domain-vocabulary-seeds"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not treat historical period, location, or surface aesthetic as enough to satisfy a Trope World.",
+      "Do not erase the core appeal of the subgenre while claiming to fulfil it.",
+      "Do not overfill the world with generic lore that does not affect reader promise, relationship pressure, or story stakes.",
+      "Mark deliberate subversions clearly so the author knows what reader expectation is being bent.",
+      "Preserve author control over subgenre, reader promise, canon, and final worldbuilding choices."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}

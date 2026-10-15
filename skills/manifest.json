@@ -103,7 +103,8 @@
       "category": "world-setting",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/trope-world-builder/SKILL.md"
+      "repository_path": "skills/trope-world-builder/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/trope-world-builder.json"
     },
     {
       "slug": "crafting-satisfying-ending",
@@ -169,7 +170,8 @@
       "category": "world-setting",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/modern-real-world-setting/SKILL.md"
+      "repository_path": "skills/modern-real-world-setting/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/modern-real-world-setting.json"
     },
     {
       "slug": "weather-natural-phenomena",
@@ -177,7 +179,8 @@
       "category": "world-setting",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/weather-natural-phenomena/SKILL.md"
+      "repository_path": "skills/weather-natural-phenomena/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/weather-natural-phenomena.json"
     },
     {
       "slug": "explicit-memory-core",

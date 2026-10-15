@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "modern-real-world-setting",
+    "label": "Modern real-world setting",
+    "category": "world-setting",
+    "summary": "Default present-day world baseline for contemporary erotic-romantic roleplay, using moderate embedded density, concrete logistics, public/private pressure, technology, timing, money, and social consequence."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "[[Modern Real World Setting]]",
+      "[[Prompt Compiler Logic]]",
+      "[[Memory Core Model]]"
+    ],
+    "repository_body": "skills/modern-real-world-setting/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["world_book", "scenario_book", "memory_book", "prompt_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "contemporary_present_day",
+      "modern_logistics",
+      "social_consequence",
+      "public_private_pressure",
+      "no_anthropomorphic_setting"
+    ],
+    "trigger_seeds": [
+      "phone buzz",
+      "security cameras",
+      "group chat",
+      "shared calendar",
+      "roommate home",
+      "workplace visibility",
+      "money pressure",
+      "traffic delay",
+      "public reputation",
+      "privacy risk"
+    ]
+  },
+  "state": {
+    "fields": [
+      "active_logistics",
+      "technology_pressure",
+      "social_visibility",
+      "privacy_state",
+      "timing_pressure",
+      "money_or_access_pressure",
+      "environmental_pressure",
+      "relationship_effect"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "modern-setting-baseline",
+      "world-detail-as-pressure",
+      "logistics-over-poetics"
+    ],
+    "memory_routing": [
+      "Store public incidents, screenshots, missed calls, private reveals, social fallout, obligations, and recurring logistics only when they affect future scenes.",
+      "Route enduring contemporary rules to World Book and live scene pressure to Scenario Book."
+    ],
+    "continuity_links": [
+      "social-worldbuilding-driver",
+      "institutional-worldbuilding",
+      "environmental-movement",
+      "place-location-memory",
+      "natural-interruption",
+      "time-anchor"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not make every modern detail intrusive or dramatic.",
+      "Avoid encyclopedic worldbuilding and abstract setting mood.",
+      "Do not anthropomorphize rooms, silence, weather, cities, or the world.",
+      "Every world detail should affect intimacy, friction, continuity, progression, privacy, timing, reputation, or consequence."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}
