@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "narrative-complications-engine",
+    "label": "Narrative complications engine",
+    "category": "story-development",
+    "summary": "Story-pressure toolkit for consequential subplots, secrets, revelations, and MacGuffins that make choices harder, reveal character, and complicate the main conflict."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "narrative-complications-engine/SKILL.md",
+      "narrative-complications-engine/references/subplots_engine.md",
+      "narrative-complications-engine/references/secrets_revelations_engine.md",
+      "narrative-complications-engine/references/macguffin_quest_object_engine.md",
+      "story-idea-generator/SKILL.md",
+      "relationship-tracker/SKILL.md",
+      "knowledge-boundary-response/SKILL.md"
+    ],
+    "repository_body": "skills/narrative-complications-engine/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["prompt_book", "scenario_book", "memory_book", "character_book", "world_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "narrative_complications",
+      "subplot_engine",
+      "secrets_revelations",
+      "macguffin_engine",
+      "secondary_pressure",
+      "story_stakes",
+      "reveal_aftermath",
+      "quest_object"
+    ],
+    "trigger_seeds": [
+      "subplot",
+      "relationship subplot",
+      "personal stakes",
+      "external pressure",
+      "mystery subplot",
+      "secret reveal",
+      "hidden truth",
+      "dramatic irony",
+      "MacGuffin",
+      "quest object",
+      "contested object",
+      "living MacGuffin",
+      "make the story more complicated",
+      "add pressure"
+    ]
+  },
+  "state": {
+    "fields": [
+      "mode",
+      "family",
+      "specific_pattern",
+      "affected_characters",
+      "hook",
+      "pressure_created",
+      "how_it_complicates_main_goal",
+      "timing",
+      "reveal_or_escalation_cues",
+      "consequence_if_ignored",
+      "failure_mode_to_avoid",
+      "secret_holder",
+      "secret_seeker",
+      "macguffin_status",
+      "legitimate_claimants",
+      "user_agency_check"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "narrative-complication-route",
+      "subplot-build-check",
+      "secret-revelation-check",
+      "macguffin-pressure-check",
+      "reveal-aftermath-check",
+      "failure-mode-check",
+      "memory-update"
+    ],
+    "memory_routing": [
+      "Route active subplot beats, immediate complication, secret pressure, clue trails, contested objects, and live consequences to Scenario Book.",
+      "Route revealed truths, unresolved subplot arcs, recurring symbols, promise/debt history, relationship fallout, MacGuffin ownership changes, and clue trails to Memory Book.",
+      "Use Character Book for durable secrets, personal stakes, hidden identity, motives, debts, promises, flaws, guilt, divided loyalty, or relationship pressure.",
+      "Use World Book for institutional secrets, world truths, faction claims, sacred keepers, hidden populations, resource scarcity, or location MacGuffins."
+    ],
+    "continuity_links": [
+      "story-idea-generator",
+      "romance-conflict-outliner",
+      "relationship-tracker",
+      "knowledge-boundary-response",
+      "motive-tracker",
+      "crafting-satisfying-ending",
+      "chapter-cut-evaluator",
+      "scene-sequel-structure",
+      "character-arc-structure"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Preserve {{user}} agency; do not decide {{user}} feelings, dialogue, consent, pursuit, forgiveness, revelation, or final action.",
+      "Do not force romance when friendship, family, rivalry, duty, guilt, dependency, politics, or mystery fits better.",
+      "Do not withhold information without present-tense pressure, evidence, or changed choices.",
+      "Do not add a twist, subplot, or object that can disappear without altering the main story.",
+      "Do not let secrets leak into character dialogue, narration, summary, or decisions before the story frontier allows it.",
+      "Do not make living MacGuffins passive objects; preserve their agency, motives, limits, and knowledge boundaries."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}

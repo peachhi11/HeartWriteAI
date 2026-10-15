@@ -1,0 +1,123 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "character-gmcs",
+    "label": "Character GMCS",
+    "category": "story-development",
+    "summary": "Story-development skill for defining and auditing a character's goal, motivation, conflict, and stakes against the larger story GMCS so actions, scenes, and arcs stay purposeful."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "character-gmcs/SKILL.md",
+      "character-gmcs/references/character_gmcs_alignment_worksheet.md",
+      "character-gmcs/references/gmcs_agency_plot_integration.md",
+      "story-idea-generator/SKILL.md",
+      "character-arc-structure/SKILL.md",
+      "romance-conflict-outliner/SKILL.md",
+      "scene-sequel-structure/SKILL.md"
+    ],
+    "repository_body": "skills/character-gmcs/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["prompt_book", "character_book", "scenario_book", "memory_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "character_gmcs",
+      "story_gmcs_alignment",
+      "character_goal",
+      "character_motivation",
+      "internal_conflict",
+      "personal_stakes",
+      "character_agency_check",
+      "action_reaction_loop"
+    ],
+    "trigger_seeds": [
+      "character GMCS",
+      "Goals Motivation Conflict Stakes",
+      "goals motivations conflicts stakes",
+      "character goal",
+      "character motivation",
+      "character conflict",
+      "character stakes",
+      "story GMCS",
+      "why does this character care",
+      "what does this character want"
+    ]
+  },
+  "state": {
+    "fields": [
+      "story_goal",
+      "story_motivation",
+      "story_conflict",
+      "story_stakes",
+      "character_goal",
+      "character_motivation",
+      "character_conflict",
+      "character_stakes",
+      "unique_want",
+      "personal_reason",
+      "personal_loss",
+      "story_alignment",
+      "scene_application",
+      "arc_refinement",
+      "external_pressure",
+      "character_reaction",
+      "character_action",
+      "plot_reaction",
+      "choice_cost"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "character-gmcs-map",
+      "story-gmcs-alignment",
+      "character-goal-check",
+      "motivation-specificity-check",
+      "internal-conflict-check",
+      "personal-stakes-check",
+      "scene-action-alignment",
+      "character-agency-check",
+      "action-reaction-loop",
+      "passive-character-diagnostic",
+      "overpowered-character-diagnostic",
+      "arc-gmcs-refinement"
+    ],
+    "memory_routing": [
+      "Use for author-support character design, scene diagnosis, arc planning, and prompt-pack scaffolding rather than direct live-scene control.",
+      "Route durable character goals, motives, internal conflicts, and personal stakes to Character Book.",
+      "Route active scene goal, immediate motive, obstacle, and scene-level stakes to Scenario Book.",
+      "Route meaningful GMCS changes, abandoned goals, revealed motives, raised stakes, and arc turns to Memory Book when the author saves them."
+    ],
+    "continuity_links": [
+      "story-idea-generator",
+      "character-arc-structure",
+      "romance-conflict-outliner",
+      "scene-sequel-structure",
+      "goal-stakes-tracking",
+      "motive-tracker",
+      "relationship-conflict-tracker",
+      "erotic-romance-writing-mentor"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not make every character share the protagonist's exact goal.",
+      "Do not reduce motivation to abstract virtue; make it personal, practical, emotional, social, or relational.",
+      "Do not confuse external obstacles with internal conflict; track both when both matter.",
+      "Do not make the character passive unless passivity is intentional and carries consequence.",
+      "Do not let competence erase conflict; success should still preserve cost, tradeoff, or pressure when the story calls for it.",
+      "Do not force character actions to obey the plan if the story has clearly changed the character's goal, motive, conflict, or stakes.",
+      "Do not overwrite {{user}} goals, motivations, hidden motives, or final choices unless the user explicitly asks for authoring or impersonation support."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}

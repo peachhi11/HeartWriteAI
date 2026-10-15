@@ -1,0 +1,155 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "story-idea-generator",
+    "label": "Story idea generator",
+    "category": "story-development",
+    "summary": "Erotic romance and romance concept generator for hooks, mismatched protagonists, trope engines, high stakes, sensual dynamics, character need/desire, lies, flaws, and three-act emotional arcs."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "story-idea-generator/SKILL.md",
+      "story-idea-generator/references/story_concept_output_template.md",
+      "story-idea-generator/references/character_arc_need_desire_engine.md",
+      "story-idea-generator/references/story_crafting_engine_router.md",
+      "story-idea-generator/references/meet_cute_first_contact_system.md",
+      "character-gmcs/SKILL.md",
+      "character-arc-structure/SKILL.md",
+      "scene-sequel-structure/SKILL.md",
+      "trope-world-builder/SKILL.md",
+      "erotic-romance-writing-mentor/references/commercial_pulp_romance_patterns.md"
+    ],
+    "repository_body": "skills/story-idea-generator/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["prompt_book", "character_book", "scenario_book", "world_book", "memory_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "story_idea_generator",
+      "erotic_romance_concept",
+      "trope_engine",
+      "trope_world",
+      "character_engine",
+      "opening_hook",
+      "inciting_incident",
+      "meet_cute_system",
+      "first_contact",
+      "spark_obstacle",
+      "three_act_emotional_arc",
+      "high_stakes_romance"
+    ],
+    "trigger_seeds": [
+      "story idea",
+      "erotic romance concept",
+      "generate a concept",
+      "fake engagement",
+      "enemies to lovers",
+      "forced proximity",
+      "trope world",
+      "opening hook",
+      "inciting incident",
+      "first chapter",
+      "meet cute",
+      "meet-cute",
+      "first encounter",
+      "first contact",
+      "spark plus obstacle",
+      "character need",
+      "character desire",
+      "character lie",
+      "psychological flaw",
+      "three-act arc"
+    ]
+  },
+  "state": {
+    "fields": [
+      "subgenre",
+      "trope_stack",
+      "trope_world",
+      "reader_promise",
+      "tone",
+      "heat_level",
+      "working_title",
+      "hook",
+      "status_quo",
+      "interruption",
+      "first_action",
+      "encounter_context",
+      "spark",
+      "obstacle",
+      "same_glance_evidence",
+      "desire_before_safety",
+      "complication_type",
+      "competing_wants",
+      "immediate_consequence",
+      "next_scene_pressure",
+      "protagonists",
+      "character_desire",
+      "character_need",
+      "character_lie",
+      "weakness_or_flaw",
+      "care_goal",
+      "pressure_engine",
+      "high_stakes",
+      "sensory_emotional_dynamic",
+      "three_act_emotional_arc"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "story-concept-generation",
+      "character-engine-check",
+      "trope-engine-check",
+      "trope-world-check",
+      "pressure-engine-check",
+      "opening-hook-route",
+      "inciting-incident-check",
+      "status-quo-interruption-action",
+      "meet-cute-check",
+      "spark-obstacle-pairing",
+      "same-glance-check",
+      "desire-before-safety-check",
+      "gmcs-voice-route",
+      "fresh-romance-strategy-check",
+      "three-act-arc",
+      "concept-refinement"
+    ],
+    "memory_routing": [
+      "Use for author-support concept generation and refinement rather than live scene control.",
+      "Update Memory Book only when the user selects a premise, discards alternatives as useful context, or saves author preferences.",
+      "Route chosen character drives, world pressure, scenario setup, and relationship arc into the appropriate StoryBook inputs."
+    ],
+    "continuity_links": [
+      "erotic-romance-writing-mentor",
+      "romantic-erotic-storytelling-generator",
+      "relationship-tracker",
+      "character-gmcs",
+      "character-arc-structure",
+      "scene-sequel-structure",
+      "relationship-conflict-tracker",
+      "world-bible-builder",
+      "trope-world-builder",
+      "story-world-interviewer",
+      "domain-vocabulary-seeds"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Keep all erotic romance story concepts adult and fiction-framed.",
+      "Do not moralize, sanitize, or flatten mature fictional material.",
+      "Do not invent hard constraints the author did not request.",
+      "Do not produce concepts involving minors or illegal sexual content.",
+      "Avoid generic trope paste; every concept needs a specific pressure engine, mismatch, stakes, and character arc."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}
