@@ -247,7 +247,8 @@
       "category": "roleplay-response",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/emotional-subtext-engine/SKILL.md"
+      "repository_path": "skills/emotional-subtext-engine/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/emotional-subtext-engine.json"
     },
     {
       "slug": "romantic-roleplay-skill-creator",
@@ -264,7 +265,8 @@
       "category": "relationship-continuity",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/relationship-tracker/SKILL.md"
+      "repository_path": "skills/relationship-tracker/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/relationship-tracker.json"
     },
     {
       "slug": "dominance-and-intimacy-flow",

@@ -1,0 +1,135 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "emotional-subtext-engine",
+    "label": "Emotional subtext engine",
+    "category": "roleplay-response",
+    "summary": "Subtext detector, generator, and revision router for narrative writing and romantic roleplay, mapping surface action, subterranean meaning, channel evidence, deniability, dramatic irony, and POV-bounded inference."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "[[Emotional Subtext Engine]]",
+      "emotional-subtext-engine/references/subtext_examples.md",
+      "emotional-subtext-engine/references/subtext_engine_channels.md",
+      "emotional-subtext-engine/references/subtext_writing_principles.md",
+      "emotional-subtext-engine/references/subtext_workshop_exercises.md",
+      "[[Prompt Compiler Logic]]"
+    ],
+    "repository_body": "skills/emotional-subtext-engine/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["character_book", "scenario_book", "memory_book", "prompt_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "emotional_subtext",
+      "surface_subterranean_gap",
+      "subtext_channel_routing",
+      "concealed_feeling",
+      "hidden_thoughts",
+      "behavioral_tells",
+      "dialogue_contrast",
+      "scene_subtext",
+      "object_subtext",
+      "silence_subtext",
+      "relationship_subtext",
+      "structural_subtext",
+      "dramatic_irony",
+      "pov_bounded_inference"
+    ],
+    "trigger_seeds": [
+      "subtext",
+      "hidden feelings",
+      "concealed reaction",
+      "internal thoughts",
+      "what they really feel",
+      "surface conflict",
+      "actual stakes",
+      "proxy conflict",
+      "scene secret",
+      "loaded words",
+      "dramatic irony",
+      "object meaning",
+      "what they refuse to discuss",
+      "make this deeper",
+      "add subtlety",
+      "physical tells",
+      "emotional contrast",
+      "forced smile"
+    ]
+  },
+  "state": {
+    "fields": [
+      "observed_text",
+      "surface_layer",
+      "subterranean_layer",
+      "subtext_channel",
+      "surface_line",
+      "visible_cues",
+      "evidence",
+      "deniability",
+      "reader_clarity",
+      "inferred_subtext",
+      "emotional_contrast",
+      "concealed_pressure",
+      "scene_secret",
+      "actual_stakes",
+      "proxy_conflict",
+      "forbidden_topic",
+      "reader_knowledge_gap",
+      "pov_boundary",
+      "suggested_enhancement",
+      "memory_relevance"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "subtext-analysis",
+      "subtext-generation",
+      "subtext-revision",
+      "surface-subterranean-map",
+      "subtext-channel-routing",
+      "pov-bounded-inference",
+      "show-dont-explain",
+      "remove-subtext-test",
+      "subtext-workshop-check",
+      "deniability-check",
+      "dramatic-irony-check",
+      "memory-update"
+    ],
+    "memory_routing": [
+      "Route live concealed pressure and visible tells to Scenario Book.",
+      "Route scene secrets, proxy conflicts, forbidden topics, active reader knowledge gaps, and current deniability checks to Scenario Book.",
+      "Update Memory Book only when subtext becomes a repeated pattern, partial reveal, consequential evasion, object meaning, ritual, forbidden topic, wound, promise, callback, or relationship shift.",
+      "Use Character Book for recurring emotional tells, concealment habits, subtext channels, relationship rituals, and voice under pressure."
+    ],
+    "continuity_links": [
+      "dialogue-behavior",
+      "characterisation",
+      "emotional-continuity",
+      "emotional-escalation",
+      "romance-silence-pauses",
+      "romantic-speech-pattern"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not dictate {{user}} thoughts, feelings, hidden motives, consent, reactions, or emotional conclusions.",
+      "Do not claim certainty about concealed feelings unless canon, POV, or user-provided context supports it.",
+      "Do not explain every subtle cue after writing it.",
+      "Do not mistake withholding information for subtext unless the surface scene carries meaningful evidence.",
+      "Do not make every line cryptic or subtext-heavy; preserve a playable surface conflict.",
+      "Do not leak author-only knowledge through dramatic irony into character dialogue, narration, or decisions.",
+      "Keep hidden thoughts POV-bounded and allow misreading, uncertainty, or suspicion."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}
