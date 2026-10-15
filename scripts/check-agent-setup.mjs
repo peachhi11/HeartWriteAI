@@ -46,8 +46,9 @@ const contentChecks = [
   },
   {
     file: "docs/agents/work-rules.md",
-    includes: "Push only when explicitly asked.",
-    message: "docs/agents/work-rules.md must preserve explicit push authority.",
+    includes:
+      "For an approved migration or implementation slice, continue through QC, commit, and push by default.",
+    message: "docs/agents/work-rules.md must preserve the default migrate/QC/commit/push workflow.",
   },
   {
     file: "docs/agents/work-rules.md",

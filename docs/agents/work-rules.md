@@ -82,7 +82,9 @@ For targeted work, run focused tests first, then broader checks when the touched
 ## Commit And Push
 
 - Commit only after QC unless the user explicitly asks for a dirty checkpoint.
-- Push only when explicitly asked.
+- For an approved migration or implementation slice, continue through QC, commit, and push by default.
+- Stop before commit or push only when an unresolved issue requires the user's authority, or when the work reaches a natural decision point about a genuinely new action.
+- If the user explicitly asks to pause, inspect only, or leave a local checkpoint, follow that narrower instruction.
 - If a commit includes earlier uncommitted work, say so.
 - Commit messages must describe the actual bundled change.
 - Never rewrite history, hard reset, force push, or delete branches without explicit user approval.
