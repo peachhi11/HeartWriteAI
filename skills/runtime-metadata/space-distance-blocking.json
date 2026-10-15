@@ -1,0 +1,109 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "space-distance-blocking",
+    "label": "Space distance blocking",
+    "category": "roleplay-response",
+    "summary": "Scene-continuity skill for tracking distance, orientation, cover, leverage, barriers, usable environment, sensory reach, and spatially plausible actions."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "space-distance-blocking/SKILL.md",
+      "space-distance-blocking/references/spatial_blocking_scene_continuity.md",
+      "position-tracking/SKILL.md",
+      "environmental-movement/SKILL.md"
+    ],
+    "repository_body": "skills/space-distance-blocking/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["scenario_book", "prompt_book", "memory_book", "world_book", "character_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "spatial_blocking",
+      "distance_band",
+      "orientation_cover",
+      "usable_environment",
+      "barrier_check",
+      "spatial_continuity"
+    ],
+    "trigger_seeds": [
+      "across a table",
+      "shoulder-to-shoulder",
+      "one step away",
+      "behind glass",
+      "locked door",
+      "pinned against a wall",
+      "hidden behind a curtain",
+      "braced in a doorway",
+      "shielded by furniture",
+      "knee-deep in mud",
+      "ankle-deep in water",
+      "no leverage"
+    ]
+  },
+  "state": {
+    "fields": [
+      "location",
+      "participants",
+      "distance_band",
+      "barriers",
+      "orientation",
+      "cover",
+      "leverage",
+      "usable_objects",
+      "hazards",
+      "privacy",
+      "sensory_reach",
+      "plausible_actions"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "spatial-blocking",
+      "distance-band",
+      "orientation-cover",
+      "usable-environment",
+      "barrier-check",
+      "leverage-check",
+      "spatial-continuity",
+      "touch-range-check",
+      "whisper-range-check",
+      "visibility-check"
+    ],
+    "memory_routing": [
+      "Use for live scene spatial continuity, action plausibility, intimacy distance, cover, barriers, leverage, and environmental consequence.",
+      "Route current positions, barriers, usable objects, hazards, privacy, sensory reach, and plausible actions to Scenario Book while the scene is active.",
+      "Promote only durable location consequences, damage, blocked access, or recurring spatial associations into Memory Book or World Book."
+    ],
+    "continuity_links": [
+      "position-tracking",
+      "environmental-movement",
+      "place-location-memory",
+      "competence-evaluation",
+      "response-protocol",
+      "scene-escalation",
+      "desire-physical-awareness",
+      "escalating-proximity",
+      "state-tracking-and-continuity"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not let characters touch, whisper, block, overhear, or see details through impossible distance or barriers.",
+      "Do not teleport or reorient characters without a plausible movement beat.",
+      "Do not narrate {{user}} actions, thoughts, feelings, consent, arousal, or bodily reactions; track only user-stated or observable position.",
+      "Do not turn every response into a spatial inventory.",
+      "Use spatial detail only when it changes tension, intimacy, risk, access, perception, or consequence."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}

@@ -162,7 +162,8 @@
       "category": "roleplay-response",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/knowledge-boundary-response/SKILL.md"
+      "repository_path": "skills/knowledge-boundary-response/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/knowledge-boundary-response.json"
     },
     {
       "slug": "modern-real-world-setting",
@@ -290,7 +291,8 @@
       "category": "roleplay-response",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/space-distance-blocking/SKILL.md"
+      "repository_path": "skills/space-distance-blocking/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/space-distance-blocking.json"
     },
     {
       "slug": "scene-coherence-playfield",
@@ -298,7 +300,8 @@
       "category": "roleplay-response",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/scene-coherence-playfield/SKILL.md"
+      "repository_path": "skills/scene-coherence-playfield/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/scene-coherence-playfield.json"
     },
     {
       "slug": "multi-character-world-narration",

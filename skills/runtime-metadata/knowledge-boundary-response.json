@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "knowledge-boundary-response",
+    "label": "Knowledge boundary response",
+    "category": "roleplay-response",
+    "summary": "Continuity skill for preventing meta-knowledge, spoiler leaks, POV bleed, impossible character knowledge, and premature disclosure of canon truth in dialogue, narration, summaries, and prompt packs."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "knowledge-boundary-response/SKILL.md",
+      "knowledge-boundary-response/references/spoiler_control_and_knowledge_ledgers.md",
+      "knowledge-boundary-response/references/cue_uncertainty_and_baseline.md",
+      "knowledge-boundary-response/references/cognitive_bias_misreading_patterns.md",
+      "knowledge-boundary-response/references/structured_knowledge_tree_epistemic_pacing.md"
+    ],
+    "repository_body": "skills/knowledge-boundary-response/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["prompt_book", "character_book", "scenario_book", "memory_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "knowledge_boundary",
+      "spoiler_control",
+      "canon_truth_disclosure",
+      "character_knowledge_ledger",
+      "pov_integrity",
+      "reader_knowledge",
+      "epistemic_pacing",
+      "structured_knowledge_tree"
+    ],
+    "trigger_seeds": [
+      "how did you know",
+      "you weren't there",
+      "you couldn't know",
+      "are you guessing",
+      "secret identity",
+      "hidden motive",
+      "future reveal",
+      "spoiler",
+      "unreliable narrator",
+      "reader knows",
+      "premature disclosure",
+      "revealed too early",
+      "contradiction check"
+    ]
+  },
+  "state": {
+    "fields": [
+      "story_frontier",
+      "narration_mode",
+      "canon_truth_state",
+      "disclosure_permission",
+      "reader_knowledge_state",
+      "character_knowledge_state",
+      "in_world_source",
+      "rumor_or_misinformation",
+      "knows_but_conceals",
+      "reveal_prerequisites",
+      "contradicts_with",
+      "verification_status",
+      "intended_next_knowledge_update"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "knowledge-boundary-check",
+      "spoiler-safe-narration",
+      "character-ledger-update",
+      "truth-vs-disclosure-split",
+      "pov-integrity-check",
+      "epistemic-pacing-check",
+      "premature-disclosure-check",
+      "response-verification-check"
+    ],
+    "memory_routing": [
+      "Update Memory Book when a fact becomes learned, suspected, misreported, concealed, corrected, forgotten, or disclosed.",
+      "Use Scenario Book for the current story frontier, viewpoint, narration mode, witnesses, and allowed reveals.",
+      "Keep canon truth and disclosure permission separate so author-only facts do not leak into character speech, narration, or summaries."
+    ],
+    "continuity_links": [
+      "explicit-recall-memory",
+      "state-tracking-and-continuity",
+      "position-tracking",
+      "npc-continuity",
+      "event-recognition",
+      "callback-opportunity",
+      "character-persona-creation",
+      "characterisation"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Never give a character knowledge they cannot justify through a credible in-world source.",
+      "Do not treat canon truth, outline notes, character cards, or future chapters as reader or character knowledge.",
+      "Do not let later development contaminate an earlier story frontier unless the author changes reveal chronology.",
+      "Do not invent off-page conversations, gossip, investigations, or document access merely to patch a knowledge leak.",
+      "Preserve {{user}} agency and private state."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}

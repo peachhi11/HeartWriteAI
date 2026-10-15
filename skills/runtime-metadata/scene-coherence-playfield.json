@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "scene-coherence-playfield",
+    "label": "Scene coherence playfield",
+    "category": "roleplay-response",
+    "summary": "Visible-playfield scene router for keeping environment, character state, scene type, continuity, aftermath, and next playable actions coherent."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "scene-coherence-playfield/SKILL.md",
+      "scene-coherence-playfield/references/visible_playfield_scene_type_guide.md",
+      "scene-sequel-structure/SKILL.md",
+      "space-distance-blocking/SKILL.md",
+      "position-tracking/SKILL.md",
+      "state-tracking-and-continuity/SKILL.md"
+    ],
+    "repository_body": "skills/scene-coherence-playfield/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["scenario_book", "prompt_book", "memory_book", "world_book", "character_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "scene_coherence",
+      "visible_playfield",
+      "scene_type_routing",
+      "playable_action_options",
+      "aftermath_continuity",
+      "dynamic_factor_check"
+    ],
+    "trigger_seeds": [
+      "scene coherence",
+      "visible field",
+      "scene definition",
+      "arrival scene",
+      "conversation scene",
+      "exploration scene",
+      "chase scene",
+      "fight scene",
+      "care scene",
+      "meal scene",
+      "travel scene",
+      "rest scene",
+      "ritual scene",
+      "aftermath scene"
+    ]
+  },
+  "state": {
+    "fields": [
+      "scene_type",
+      "location",
+      "visible_field",
+      "present_characters",
+      "absent_or_expected_characters",
+      "objects_resources",
+      "exits_hazards",
+      "time_flow",
+      "environmental_factors",
+      "body_states",
+      "relationship_pressure",
+      "continuity_aftermath",
+      "next_playable_actions"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "scene-coherence",
+      "visible-playfield",
+      "scene-type-routing",
+      "arrival-threshold",
+      "exploration-question",
+      "chase-distance",
+      "fight-position",
+      "care-agency",
+      "meal-social-mechanics",
+      "travel-compression",
+      "rest-consequence",
+      "ritual-residue",
+      "aftermath-continuity",
+      "playable-action-options"
+    ],
+    "memory_routing": [
+      "Use for active scene definition when the current beat needs visible field, scene type, usable objects, hazards, character state, or next playable actions.",
+      "Route active play field, scene type, exits, hazards, pressure, participants, and next playable options to Scenario Book.",
+      "Promote only meaningful aftermath, damaged objects, relationship residue, promises, secrets, wounds, altered routines, or unresolved consequences to Memory Book."
+    ],
+    "continuity_links": [
+      "space-distance-blocking",
+      "scene-sequel-structure",
+      "position-tracking",
+      "goal-stakes-tracking",
+      "state-tracking-and-continuity",
+      "environmental-movement",
+      "time-anchor",
+      "event-recognition",
+      "npc-continuity",
+      "natural-interruption"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not treat scenery as decorative filler; include scene details only when they affect perception, choice, pressure, or consequence.",
+      "Do not invent new exits, tools, hazards, witnesses, or resources merely to solve the current beat.",
+      "Do not let all scene types collapse into dialogue; every conversation still has bodies, space, sound, privacy, and risk.",
+      "Do not turn the visible play field into a checklist inside prose.",
+      "Do not control {{user}} thoughts, emotions, choices, movement, dialogue, consent, or final action."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}
