@@ -83,6 +83,8 @@ test("reviewed skill entries point to repository-owned bodies", () => {
       "motive-tracker",
       "scene-sequel-structure",
       "trope-world-builder",
+      "crafting-satisfying-ending",
+      "chapter-cut-evaluator",
       "romance-conflict-outliner",
       "knowledge-boundary-response",
       "modern-real-world-setting",

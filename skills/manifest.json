@@ -100,13 +100,17 @@
       "slug": "crafting-satisfying-ending",
       "label": "Crafting satisfying ending",
       "category": "story-development",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/crafting-satisfying-ending/SKILL.md"
     },
     {
       "slug": "chapter-cut-evaluator",
       "label": "Chapter cut evaluator",
       "category": "story-development",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/chapter-cut-evaluator/SKILL.md"
     },
     {
       "slug": "romance-conflict-outliner",
