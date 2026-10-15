@@ -11,9 +11,11 @@ reviewed.
 
 ## Current slice
 
-`manifest.json` inventories the skills already represented by
-`lib/character-card/storyRuntimeSkills.ts`. It is an organizational contract,
-not a second prompt registry and not yet a source of runtime behavior.
+`manifest.json` inventories the 37 skills already represented by
+`lib/character-card/storyRuntimeSkills.ts`. Thirty-six have reviewed repository
+bodies; `erotic-romance-writing-mentor` remains pending. The manifest is an
+organizational contract, not a second prompt registry and not yet a source of
+runtime behavior.
 
 `skill.schema.json` defines the minimum contract for a reviewed skill body:
 frontmatter must carry ownership and provenance, and the body must include
@@ -30,3 +32,7 @@ Future skill-body migrations should add a directory named after the stable
 slug. Each migrated skill should retain a provenance link to the Memory Vault
 or approved source note, declare whether it is public-runtime safe, and include
 focused tests before the runtime registry is changed to consume it.
+
+The proposed boundary for a future generated runtime registry is documented in
+`docs/repository-skill-runtime-metadata-boundary.md`. Do not change runtime
+imports until generated metadata matches the current registry exactly.
