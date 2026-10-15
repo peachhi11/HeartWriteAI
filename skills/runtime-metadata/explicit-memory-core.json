@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "explicit-memory-core",
+    "label": "Explicit memory core",
+    "category": "memory-core",
+    "summary": "Explicit-mode memory model for adult consensual erotic-romantic scenes, tracking somatic continuity, dirty-talk style, spatial mechanics, kink focus, climax sequence, emotional residue, boundary state, and aftercare."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "[[Explicit Memory Core]]",
+      "[[Memory Core Model]]",
+      "[[Prompt Compiler Logic]]"
+    ],
+    "repository_body": "skills/explicit-memory-core/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": false,
+    "scopes": ["memory_book", "scenario_book", "character_book", "prompt_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "explicit_mode",
+      "somatic_realism",
+      "dirty_talk_memory",
+      "aftercare_routing",
+      "kink_continuity",
+      "sexual_continuity"
+    ],
+    "trigger_seeds": [
+      "explicit mode",
+      "dirty talk",
+      "aftercare",
+      "position change",
+      "mess cleanup",
+      "orgasm sequence",
+      "boundary signal",
+      "kink focus",
+      "sexual comfort",
+      "somatic residue"
+    ]
+  },
+  "state": {
+    "fields": [
+      "explicit_mode",
+      "heat_level",
+      "consent_context",
+      "active_acts",
+      "positions",
+      "spatial_continuity",
+      "dirty_talk_style",
+      "kink_focus",
+      "orgasm_sequence",
+      "somatic_residue",
+      "mess_or_cleanup",
+      "emotional_residue",
+      "boundary_state",
+      "aftercare_pending",
+      "relationship_effect"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "explicit-mode-confirmed",
+      "continue-scene",
+      "hold-tension",
+      "intensify-one-step",
+      "slow-down",
+      "boundary-pause",
+      "transition-to-aftercare",
+      "close-scene",
+      "memory-update"
+    ],
+    "memory_routing": [
+      "Store sexual and somatic details only when they affect future intimacy, trust, shame, tenderness, conflict, boundaries, aftercare, or relationship progression.",
+      "Never infer hidden {{user}} arousal, consent, orgasm, motive, or emotional conclusion."
+    ],
+    "continuity_links": [
+      "dominance-and-intimacy-flow",
+      "power-dynamics-scene-writing",
+      "intimacy-shift",
+      "desire-physical-awareness",
+      "romantic-sensory-tension",
+      "escalating-proximity",
+      "state-tracking-and-continuity"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Adult consensual fiction only.",
+      "Preserve {{user}} agency.",
+      "Do not narrate {{user}} thoughts, feelings, consent, arousal, orgasm, final action, or emotional conclusion.",
+      "Explicit detail must remain selective, spatially readable, character-driven, and consequential.",
+      "Avoid body-part spam and stock scripts."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}

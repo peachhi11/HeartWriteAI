@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "dominance-and-intimacy-flow",
+    "label": "Dominance and intimacy flow",
+    "category": "roleplay-response",
+    "summary": "Active scene-flow driver for adult consensual dominance, passionate intimacy, physical initiative, spatial logistics, tension and release, and aftercare handoff."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "dominance-and-intimacy-flow/SKILL.md",
+      "dominance-and-intimacy-flow/references/sexual_somatic_flow_and_afterglow.md",
+      "dominance-and-intimacy-flow/references/explicit_intimacy_scene_mechanics.md",
+      "dominance-and-intimacy-flow/references/explicit_scene_choreography_router.md",
+      "[[Explicit Memory Core]]",
+      "[[Current Scene Package Bank]]",
+      "[[Relationship Pressure Bank]]"
+    ],
+    "repository_body": "skills/dominance-and-intimacy-flow/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": false,
+    "scopes": ["scenario_book", "memory_book", "character_book", "prompt_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "dominance_flow",
+      "passionate_intimacy",
+      "physical_initiative",
+      "spatial_logistics",
+      "aftercare_handoff",
+      "explicit_scene_flow",
+      "explicit_intimacy_mechanics",
+      "explicit_scene_choreography",
+      "position_family_routing",
+      "sensory_pacing",
+      "practical_realism"
+    ],
+    "trigger_seeds": [
+      "harder",
+      "right there",
+      "don't stop",
+      "sharp inhalation",
+      "sudden surrender",
+      "rougher rhythm",
+      "active body positions",
+      "environmental use",
+      "aftercare signal",
+      "explicit intimacy",
+      "explicit choreography",
+      "position family",
+      "environment risk",
+      "group attention",
+      "anatomical accuracy",
+      "sensory pacing",
+      "physical mechanics",
+      "protection state"
+    ]
+  },
+  "state": {
+    "fields": [
+      "active_dynamic",
+      "mood",
+      "intimacy_level",
+      "physical_initiative",
+      "spatial_relationships",
+      "positions",
+      "environmental_use",
+      "vocal_cues",
+      "fatigue_markers",
+      "explicit_register",
+      "arousal_response",
+      "sensory_focus",
+      "movement_mechanics",
+      "act_category",
+      "position_family",
+      "body_position_state",
+      "clothing_state",
+      "environment_risk_context",
+      "consent_boundary_state",
+      "protection_or_risk_state",
+      "aftermath_state",
+      "tension_release_state",
+      "aftercare_pending"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "continue-scene",
+      "hold-tension",
+      "transition-to-aftercare",
+      "close-scene",
+      "explicit-intimacy-mechanics-check",
+      "explicit-choreography-route",
+      "position-family-check",
+      "environment-risk-check",
+      "group-attention-check",
+      "kink-boundary-check",
+      "fantasy-physiology-check",
+      "aftercare-transition-check",
+      "mechanics-with-agency-check",
+      "sensory-pacing-check",
+      "practical-realism-check"
+    ],
+    "memory_routing": [
+      "Update Scenario Book for live positions, mood, environment, and prompt signal.",
+      "Update Memory Book only when the interaction changes emotional residue, relationship state, boundary knowledge, aftercare needs, or intimacy milestones."
+    ],
+    "continuity_links": [
+      "explicit-memory-core",
+      "escalating-proximity",
+      "romantic-sensory-tension",
+      "desire-physical-awareness",
+      "emotional-escalation",
+      "refusal-and-push",
+      "relationship-tracker",
+      "position-tracking",
+      "state-tracking-and-continuity",
+      "domain-vocabulary-seeds",
+      "power-dynamics-scene-writing"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Use adult consenting-fiction context only.",
+      "Physical progression must arise from established scene cues, relationship context, or {{user}} input.",
+      "If refusal, withdrawal, freezing, distress, boundary language, safeword, or meaningful hesitation appears, pause or pivot instead of escalating.",
+      "Avoid mechanical summaries, disconnected body-part lists, and generic dominance scripts.",
+      "Do not use explicit vocabulary as a substitute for character voice, spatial clarity, pacing, or emotional stakes.",
+      "Do not provide real-world operational instruction for breath play, injury, medical risk, restraint safety, or unsafe public activity; route these as fictional state, boundary, consequence, or aftercare checks.",
+      "CNC, coercive fantasy, and caregiver-style cues require adult fictional framing, established boundaries, and consent-state monitoring."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}

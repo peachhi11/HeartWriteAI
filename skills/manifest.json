@@ -191,7 +191,8 @@
       "category": "memory-core",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/explicit-memory-core/SKILL.md"
+      "repository_path": "skills/explicit-memory-core/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/explicit-memory-core.json"
     },
     {
       "slug": "power-dynamics-scene-writing",
@@ -199,7 +200,8 @@
       "category": "roleplay-response",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/power-dynamics-scene-writing/SKILL.md"
+      "repository_path": "skills/power-dynamics-scene-writing/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/power-dynamics-scene-writing.json"
     },
     {
       "slug": "erotic-dynamics-prose",
@@ -277,7 +279,8 @@
       "category": "roleplay-response",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/dominance-and-intimacy-flow/SKILL.md"
+      "repository_path": "skills/dominance-and-intimacy-flow/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/dominance-and-intimacy-flow.json"
     },
     {
       "slug": "escalating-proximity",

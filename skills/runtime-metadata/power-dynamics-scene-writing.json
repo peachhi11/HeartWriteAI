@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "power-dynamics-scene-writing",
+    "label": "Power dynamics scene writing",
+    "category": "roleplay-response",
+    "summary": "Writing and revision skill for adult consensual erotic-romance scenes focused on dominance, submission, degradation, fetish play, command response, surrender, resistance, and physically grounded power exchange."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "power-dynamics-scene-writing/SKILL.md",
+      "power-dynamics-scene-writing/references/kink_sensation_edgeplay_logic.md",
+      "dominance-and-intimacy-flow/references/explicit_intimacy_scene_mechanics.md",
+      "dominance-and-intimacy-flow/references/explicit_scene_choreography_router.md",
+      "[[Explicit Memory Core]]",
+      "domain-vocabulary-seeds/SKILL.md"
+    ],
+    "repository_body": "skills/power-dynamics-scene-writing/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": false,
+    "scopes": ["prompt_book", "scenario_book", "character_book", "memory_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "power_dynamics_scene",
+      "dominance_submission",
+      "explicit_register",
+      "command_response",
+      "kink_fetish_play",
+      "degradation_praise",
+      "spatial_erotic_clarity",
+      "explicit_intimacy_mechanics",
+      "explicit_scene_choreography"
+    ],
+    "trigger_seeds": [
+      "dominance",
+      "submission",
+      "degradation",
+      "fetish play",
+      "command response",
+      "surrender",
+      "resistance",
+      "power exchange",
+      "write this hotter",
+      "spatial clarity",
+      "explicit intimacy",
+      "intimacy choreography",
+      "position family",
+      "sensory pacing"
+    ]
+  },
+  "state": {
+    "fields": [
+      "active_power_dynamic",
+      "explicit_register",
+      "kink_or_fetish_focus",
+      "command_response",
+      "resistance_or_surrender",
+      "degradation_or_praise_style",
+      "spatial_relationships",
+      "movement_mechanics",
+      "position_family",
+      "environment_risk_context",
+      "sensory_focus",
+      "physical_constraints",
+      "boundary_state",
+      "aftercare_pending"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "power-dynamics-writing",
+      "explicit-register-check",
+      "spatial-clarity-pass",
+      "explicit-choreography-route",
+      "position-family-check",
+      "kink-boundary-check",
+      "intensify-one-step",
+      "boundary-pause",
+      "transition-to-aftercare"
+    ],
+    "memory_routing": [
+      "Use for prose drafting, revision, and QC; route live scene positions and pacing through dominance-and-intimacy-flow when needed.",
+      "Update Scenario Book for active power dynamic, body positions, physical constraints, clothing state, environmental use, prompt signal, and boundary state.",
+      "Update Memory Book only for meaningful kink discoveries, degradation or praise preferences, trust shifts, boundary updates, aftercare patterns, or relationship consequences."
+    ],
+    "continuity_links": [
+      "explicit-memory-core",
+      "dominance-and-intimacy-flow",
+      "domain-vocabulary-seeds",
+      "intimacy-shift",
+      "refusal-and-push",
+      "desire-physical-awareness",
+      "romantic-speech-pattern",
+      "position-tracking",
+      "state-tracking-and-continuity"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Adult consensual fiction only.",
+      "Do not dictate {{user}} thoughts, feelings, arousal, consent, refusal, orgasm, final action, dialogue, or emotional conclusion.",
+      "Do not escalate past refusal, withdrawal, freezing, distress, boundary language, safeword, pain outside the established dynamic, or meaningful hesitation.",
+      "Do not automatically euphemise direct NSFW vocabulary when explicit mode, platform route, adult-consent context, heat, and character voice permit it.",
+      "Do not provide real-world operational instruction for breath play, injury, medical risk, restraint safety, or unsafe public activity; route those cues as fictional state and boundary checks.",
+      "Avoid vague heat, generic dominance scripts, disconnected body-part lists, clinical instruction style, and automatic post-scene sleep endings."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}
