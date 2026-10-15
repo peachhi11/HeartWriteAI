@@ -91,6 +91,8 @@ test("reviewed skill entries point to repository-owned bodies", () => {
       "weather-natural-phenomena",
       "explicit-memory-core",
       "power-dynamics-scene-writing",
+      "erotic-dynamics-prose",
+      "erotic-archetypes-engine",
       "emotional-continuity",
       "emotional-escalation",
       "romantic-tension-builder",

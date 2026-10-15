@@ -182,13 +182,17 @@
       "slug": "erotic-dynamics-prose",
       "label": "Erotic dynamics prose",
       "category": "roleplay-response",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/erotic-dynamics-prose/SKILL.md"
     },
     {
       "slug": "erotic-archetypes-engine",
       "label": "Erotic archetypes engine",
       "category": "roleplay-response",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/erotic-archetypes-engine/SKILL.md"
     },
     {
       "slug": "emotional-continuity",
