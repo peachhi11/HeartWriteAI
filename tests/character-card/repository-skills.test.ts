@@ -223,3 +223,27 @@ test("generated runtime metadata follows manifest order and contains only linked
     linkedSlugs.length,
   );
 });
+
+test("runtime metadata keeps the private surface boundary explicit", () => {
+  const privateSlugs = new Set([
+    "romantic-roleplay-skill-creator",
+    "explicit-memory-core",
+    "power-dynamics-scene-writing",
+    "dominance-and-intimacy-flow",
+    "explicit-tbrp-scene-guidance",
+    "erotic-dynamics-prose",
+    "erotic-archetypes-engine",
+  ]);
+
+  const privateRecords = runtimeSkillMetadataRecords.filter(
+    (record) => record.runtime.public_safe === false,
+  );
+
+  assert.deepEqual(new Set(privateRecords.map((record) => record.identity.slug)), privateSlugs);
+
+  for (const record of privateRecords) {
+    assert.equal(record.safety.user_agency, "preserve");
+    assert.equal(record.safety.consent_context, "required");
+    assert.equal(record.safety.private_data_policy, "approved_source_only");
+  }
+});
