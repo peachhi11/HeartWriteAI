@@ -1,0 +1,81 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "roleplay-keyword-discovery",
+    "label": "Roleplay keyword discovery",
+    "category": "keyword-discovery",
+    "summary": "Discovery skill for choosing precise lorebook, skill, persona, and prompt-trigger keywords that activate entries only in relevant roleplay contexts without broad false positives."
+  },
+  "provenance": {
+    "source": "agents_md",
+    "source_links": ["AGENTS.md: Keyword and Discovery for AI Roleplay Generation"],
+    "repository_body": "skills/roleplay-keyword-discovery/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["prompt_book", "character_book", "world_book", "scenario_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "keyword_discovery",
+      "lorebook_triggering",
+      "entry_activation",
+      "false_positive_reduction",
+      "retrieval_precision"
+    ],
+    "trigger_seeds": [
+      "keywords",
+      "activation keys",
+      "trigger phrases",
+      "lorebook entry",
+      "world book keywords",
+      "what do you look like",
+      "how old are you",
+      "entry misfires"
+    ]
+  },
+  "state": {
+    "fields": [
+      "entry_subject",
+      "specific_names",
+      "nicknames",
+      "titles",
+      "locations",
+      "likely_user_questions",
+      "activation_keywords",
+      "false_positive_terms"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "keyword-selection",
+      "retrieval-trigger",
+      "misfire-check",
+      "entry-activation-qc"
+    ],
+    "memory_routing": [
+      "Store accepted keywords with the entry they activate, not as general prose guidance.",
+      "Revise keywords when testing shows frequent false positives, missed activations, or generic over-triggering."
+    ],
+    "continuity_links": [
+      "memory-vault-retrieval",
+      "lorebook-runtime",
+      "world-book-builder",
+      "character-persona-creation"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Use one to eight precise keywords per entry.",
+      "Avoid broad filler words and terms unlikely to be typed by users.",
+      "Keywords must align directly with the entry subject and retrieval intent."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "not_applicable",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}

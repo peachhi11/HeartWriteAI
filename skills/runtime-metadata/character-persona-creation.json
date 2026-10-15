@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "character-persona-creation",
+    "label": "Character persona creation",
+    "category": "character-persona",
+    "summary": "Persona-building skill for AI roleplay characters, writing concise first-page self-perception that separates character belief from author knowledge and preserves organic emotional discovery."
+  },
+  "provenance": {
+    "source": "agents_md",
+    "source_links": ["AGENTS.md: Character Persona Creation for AI Roleplay"],
+    "repository_body": "skills/character-persona-creation/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["character_book", "prompt_book", "memory_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "persona_creation",
+      "character_self_perception",
+      "author_knowledge_boundary",
+      "organic_revelation",
+      "in_character_identity"
+    ],
+    "trigger_seeds": [
+      "character persona",
+      "who are you",
+      "self perception",
+      "character voice",
+      "first page",
+      "hidden truth",
+      "persona entry",
+      "roleplay character"
+    ]
+  },
+  "state": {
+    "fields": [
+      "self_identification",
+      "stated_goal",
+      "immediate_worldview",
+      "self_belief",
+      "voice_register",
+      "known_history",
+      "hidden_author_knowledge",
+      "revelation_boundary"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "persona-construction",
+      "character-pov-only",
+      "author-knowledge-excluded",
+      "earned-revelation"
+    ],
+    "memory_routing": [
+      "Store persona lines in Character Book only when they reflect what the character could plausibly believe or say early.",
+      "Keep hidden truths, future development, and author-only analysis outside the persona surface unless routed to private author notes."
+    ],
+    "continuity_links": [
+      "characterisation",
+      "personality-trait-expression",
+      "emotional-logic-character-creation",
+      "knowledge-boundary-response",
+      "personality-gradual-development"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not include external analysis, meta-commentary, or future emotional conclusions in the persona.",
+      "Do not short-circuit roleplay discovery by revealing hidden truths too early.",
+      "All persona content must fit character self-awareness and voice."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}

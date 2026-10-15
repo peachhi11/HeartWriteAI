@@ -89,4 +89,261 @@ export const runtimeSkillMetadataRecords = [
         "Proof-of-shape record only; runtime imports remain on the existing registry until generated equivalence is implemented.",
     },
   },
+  {
+    schema_version: 1,
+    record_type: "story-runtime-skill-metadata",
+    identity: {
+      slug: "roleplay-keyword-discovery",
+      label: "Roleplay keyword discovery",
+      category: "keyword-discovery",
+      summary:
+        "Discovery skill for choosing precise lorebook, skill, persona, and prompt-trigger keywords that activate entries only in relevant roleplay contexts without broad false positives.",
+    },
+    provenance: {
+      source: "agents_md",
+      source_links: ["AGENTS.md: Keyword and Discovery for AI Roleplay Generation"],
+      repository_body: "skills/roleplay-keyword-discovery/SKILL.md",
+    },
+    runtime: {
+      status: "reviewed",
+      public_safe: true,
+      scopes: ["prompt_book", "character_book", "world_book", "scenario_book"],
+    },
+    activation: {
+      mode: "contextual",
+      tags: [
+        "keyword_discovery",
+        "lorebook_triggering",
+        "entry_activation",
+        "false_positive_reduction",
+        "retrieval_precision",
+      ],
+      trigger_seeds: [
+        "keywords",
+        "activation keys",
+        "trigger phrases",
+        "lorebook entry",
+        "world book keywords",
+        "what do you look like",
+        "how old are you",
+        "entry misfires",
+      ],
+    },
+    state: {
+      fields: [
+        "entry_subject",
+        "specific_names",
+        "nicknames",
+        "titles",
+        "locations",
+        "likely_user_questions",
+        "activation_keywords",
+        "false_positive_terms",
+      ],
+    },
+    routing: {
+      prompt_compiler_signals: [
+        "keyword-selection",
+        "retrieval-trigger",
+        "misfire-check",
+        "entry-activation-qc",
+      ],
+      memory_routing: [
+        "Store accepted keywords with the entry they activate, not as general prose guidance.",
+        "Revise keywords when testing shows frequent false positives, missed activations, or generic over-triggering.",
+      ],
+      continuity_links: [
+        "memory-vault-retrieval",
+        "lorebook-runtime",
+        "world-book-builder",
+        "character-persona-creation",
+      ],
+    },
+    safety: {
+      guardrails: [
+        "Use one to eight precise keywords per entry.",
+        "Avoid broad filler words and terms unlikely to be typed by users.",
+        "Keywords must align directly with the entry subject and retrieval intent.",
+      ],
+      user_agency: "preserve",
+      consent_context: "not_applicable",
+      private_data_policy: "approved_source_only",
+    },
+    extensions: {},
+  },
+  {
+    schema_version: 1,
+    record_type: "story-runtime-skill-metadata",
+    identity: {
+      slug: "character-persona-creation",
+      label: "Character persona creation",
+      category: "character-persona",
+      summary:
+        "Persona-building skill for AI roleplay characters, writing concise first-page self-perception that separates character belief from author knowledge and preserves organic emotional discovery.",
+    },
+    provenance: {
+      source: "agents_md",
+      source_links: ["AGENTS.md: Character Persona Creation for AI Roleplay"],
+      repository_body: "skills/character-persona-creation/SKILL.md",
+    },
+    runtime: {
+      status: "reviewed",
+      public_safe: true,
+      scopes: ["character_book", "prompt_book", "memory_book"],
+    },
+    activation: {
+      mode: "contextual",
+      tags: [
+        "persona_creation",
+        "character_self_perception",
+        "author_knowledge_boundary",
+        "organic_revelation",
+        "in_character_identity",
+      ],
+      trigger_seeds: [
+        "character persona",
+        "who are you",
+        "self perception",
+        "character voice",
+        "first page",
+        "hidden truth",
+        "persona entry",
+        "roleplay character",
+      ],
+    },
+    state: {
+      fields: [
+        "self_identification",
+        "stated_goal",
+        "immediate_worldview",
+        "self_belief",
+        "voice_register",
+        "known_history",
+        "hidden_author_knowledge",
+        "revelation_boundary",
+      ],
+    },
+    routing: {
+      prompt_compiler_signals: [
+        "persona-construction",
+        "character-pov-only",
+        "author-knowledge-excluded",
+        "earned-revelation",
+      ],
+      memory_routing: [
+        "Store persona lines in Character Book only when they reflect what the character could plausibly believe or say early.",
+        "Keep hidden truths, future development, and author-only analysis outside the persona surface unless routed to private author notes.",
+      ],
+      continuity_links: [
+        "characterisation",
+        "personality-trait-expression",
+        "emotional-logic-character-creation",
+        "knowledge-boundary-response",
+        "personality-gradual-development",
+      ],
+    },
+    safety: {
+      guardrails: [
+        "Do not include external analysis, meta-commentary, or future emotional conclusions in the persona.",
+        "Do not short-circuit roleplay discovery by revealing hidden truths too early.",
+        "All persona content must fit character self-awareness and voice.",
+      ],
+      user_agency: "preserve",
+      consent_context: "required",
+      private_data_policy: "approved_source_only",
+    },
+    extensions: {},
+  },
+  {
+    schema_version: 1,
+    record_type: "story-runtime-skill-metadata",
+    identity: {
+      slug: "romantic-roleplay-skill-creator",
+      label: "Romantic roleplay skill creator",
+      category: "explicit-romantic-roleplay-skill-framework",
+      summary:
+        "Authoring framework for modular HeartWriteAI skills that drive immersive romantic and erotic scenarios through explicit triggers, natural dialogue, state management, prompt routing, and memory packaging.",
+    },
+    provenance: {
+      source: "heartwrite_memory_vault",
+      source_links: [
+        "[[Explicit Memory Core]]",
+        "[[Memory Core Model]]",
+        "[[Prompt Compiler Logic]]",
+      ],
+      repository_body: "skills/romantic-roleplay-skill-creator/SKILL.md",
+    },
+    runtime: {
+      status: "reviewed",
+      public_safe: false,
+      scopes: ["prompt_book", "memory_book", "scenario_book"],
+    },
+    activation: {
+      mode: "manual",
+      tags: [
+        "skill_authoring",
+        "explicit_skill_framework",
+        "prompt_compiler_signal",
+        "memory_routing_instruction",
+        "state_update_object",
+      ],
+      trigger_seeds: [
+        "create skill",
+        "refine skill",
+        "explicit triggers",
+        "dirty talk escalation",
+        "orgasm build-up",
+        "rhythm changes",
+        "memory packaging",
+        "StoryBook routing",
+      ],
+    },
+    state: {
+      fields: [
+        "driver",
+        "trigger_phrases",
+        "scene_signals",
+        "behavior",
+        "modes",
+        "state_tracking",
+        "output_shape",
+        "heartwrite_placement",
+        "guardrails",
+      ],
+    },
+    routing: {
+      prompt_compiler_signals: [
+        "skill-authoring",
+        "prompt-rule",
+        "parser-signal",
+        "memory-router",
+        "state-update-object",
+      ],
+      memory_routing: [
+        "Use this registry entry to create app-facing skill modules, not to generate a live scene by itself.",
+        "Route new skills to Character, User, Scenario, World, Memory, or Prompt Book only where relevant.",
+      ],
+      continuity_links: [
+        "explicit-memory-core",
+        "dominance-and-intimacy-flow",
+        "intimacy-shift",
+        "desire-physical-awareness",
+        "romantic-sensory-tension",
+        "state-tracking-and-continuity",
+      ],
+    },
+    safety: {
+      guardrails: [
+        "Skills must be narrow, reusable, scene-grounded, and testable.",
+        "Do not create broken links for candidate skills that do not exist yet.",
+        "Avoid lore dumps, generic lectures, and uncontrolled {{user}} narration.",
+      ],
+      user_agency: "preserve",
+      consent_context: "required",
+      private_data_policy: "approved_source_only",
+    },
+    extensions: {
+      visibility: "private_power_tool",
+    },
+  },
 ] as const;

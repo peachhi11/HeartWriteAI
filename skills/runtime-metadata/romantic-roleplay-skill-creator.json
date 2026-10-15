@@ -1,0 +1,91 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "romantic-roleplay-skill-creator",
+    "label": "Romantic roleplay skill creator",
+    "category": "explicit-romantic-roleplay-skill-framework",
+    "summary": "Authoring framework for modular HeartWriteAI skills that drive immersive romantic and erotic scenarios through explicit triggers, natural dialogue, state management, prompt routing, and memory packaging."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "[[Explicit Memory Core]]",
+      "[[Memory Core Model]]",
+      "[[Prompt Compiler Logic]]"
+    ],
+    "repository_body": "skills/romantic-roleplay-skill-creator/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": false,
+    "scopes": ["prompt_book", "memory_book", "scenario_book"]
+  },
+  "activation": {
+    "mode": "manual",
+    "tags": [
+      "skill_authoring",
+      "explicit_skill_framework",
+      "prompt_compiler_signal",
+      "memory_routing_instruction",
+      "state_update_object"
+    ],
+    "trigger_seeds": [
+      "create skill",
+      "refine skill",
+      "explicit triggers",
+      "dirty talk escalation",
+      "orgasm build-up",
+      "rhythm changes",
+      "memory packaging",
+      "StoryBook routing"
+    ]
+  },
+  "state": {
+    "fields": [
+      "driver",
+      "trigger_phrases",
+      "scene_signals",
+      "behavior",
+      "modes",
+      "state_tracking",
+      "output_shape",
+      "heartwrite_placement",
+      "guardrails"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "skill-authoring",
+      "prompt-rule",
+      "parser-signal",
+      "memory-router",
+      "state-update-object"
+    ],
+    "memory_routing": [
+      "Use this registry entry to create app-facing skill modules, not to generate a live scene by itself.",
+      "Route new skills to Character, User, Scenario, World, Memory, or Prompt Book only where relevant."
+    ],
+    "continuity_links": [
+      "explicit-memory-core",
+      "dominance-and-intimacy-flow",
+      "intimacy-shift",
+      "desire-physical-awareness",
+      "romantic-sensory-tension",
+      "state-tracking-and-continuity"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Skills must be narrow, reusable, scene-grounded, and testable.",
+      "Do not create broken links for candidate skills that do not exist yet.",
+      "Avoid lore dumps, generic lectures, and uncontrolled {{user}} narration."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {
+    "visibility": "private_power_tool"
+  }
+}
