@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "explicit-tbrp-scene-guidance",
+    "label": "Explicit TBRP scene guidance",
+    "category": "explicit-romantic-roleplay-skill-framework",
+    "summary": "Runtime guidance for adult consensual erotic-romance text-based roleplay, preserving agency, consent context, heat level, spatial clarity, dirty talk, kink continuity, aftermath, and playable handoff."
+  },
+  "provenance": {
+    "source": "agents_md",
+    "source_links": ["AGENTS.md: Explicit Romantic TBRP Scene writing guidance"],
+    "repository_body": "skills/explicit-tbrp-scene-guidance/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": false,
+    "scopes": ["prompt_book", "scenario_book", "memory_book", "character_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "explicit_tbrp",
+      "consensual_adult_scene",
+      "playable_handoff",
+      "spatial_clarity",
+      "dirty_talk_reactivity",
+      "aftermath"
+    ],
+    "trigger_seeds": [
+      "NSFW scene",
+      "explicit roleplay",
+      "dirty talk",
+      "position change",
+      "aftercare",
+      "kink permissions",
+      "high heat",
+      "physical progression",
+      "playable handoff"
+    ]
+  },
+  "state": {
+    "fields": [
+      "adult_status_confirmed",
+      "established_relationship",
+      "kink_permissions",
+      "boundary_state",
+      "heat_level",
+      "active_physical_beats",
+      "spatial_position",
+      "dirty_talk_style",
+      "aftermath_path",
+      "playable_handoff"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "explicit-tbrp-mode",
+      "preserve-user-agency",
+      "track-spatial-continuity",
+      "dirty-talk-reactive",
+      "aftercare-or-aftermath"
+    ],
+    "memory_routing": [
+      "Update Scenario Book for active scene state, physical staging, and heat routing.",
+      "Update Memory Book only for relationship-changing intimacy, boundary changes, kink continuity, aftercare patterns, or emotional residue."
+    ],
+    "continuity_links": [
+      "explicit-memory-core",
+      "dominance-and-intimacy-flow",
+      "intimacy-shift",
+      "state-tracking-and-continuity",
+      "relationship-tracker",
+      "refusal-and-push"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Only adult consensual fictional content.",
+      "Do not narrate {{user}} choices, dialogue, consent, refusal, orgasm, final actions, or emotional conclusions.",
+      "Shift immediately on refusal, withdrawal, distress, pain outside agreed play, meaningful hesitation, or stated boundaries.",
+      "Do not interrupt every scene with mechanical consent questions when consent context is already established."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}

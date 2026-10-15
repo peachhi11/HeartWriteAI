@@ -1,0 +1,105 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "erotic-archetypes-engine",
+    "label": "Erotic archetypes engine",
+    "category": "roleplay-response",
+    "summary": "Design and routing skill for adult romantic and erotic character dynamics, mapping desire profiles, power-role tendencies, trope friction, sensory register, and profile-specific intimacy behavior."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "erotic-archetypes-engine/SKILL.md",
+      "erotic-archetypes-engine/references/erotic_blueprints.md",
+      "erotic-archetypes-engine/references/power_dynamics.md",
+      "erotic-archetypes-engine/references/narrative_friction_and_tropes.md",
+      "erotic-archetypes-engine/references/sensory_textures.md",
+      "[[Explicit Memory Core]]"
+    ],
+    "repository_body": "skills/erotic-archetypes-engine/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": false,
+    "scopes": ["character_book", "scenario_book", "memory_book", "prompt_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "erotic_archetypes",
+      "desire_profiles",
+      "power_role_tendency",
+      "erotic_pairing_friction",
+      "sensory_register_routing",
+      "intimacy_style_mapping"
+    ],
+    "trigger_seeds": [
+      "erotic archetype",
+      "erotic blueprint",
+      "desire profile",
+      "intimacy style",
+      "sexual style",
+      "dominant tendency",
+      "submissive tendency",
+      "brat dynamic",
+      "provider protector",
+      "sensory texture",
+      "pairing friction"
+    ]
+  },
+  "state": {
+    "fields": [
+      "primary_desire_profile",
+      "secondary_desire_profile",
+      "power_role_tendency",
+      "intimacy_triggers",
+      "intimacy_blocks",
+      "sensory_register",
+      "shadow_risk",
+      "pairing_friction",
+      "boundary_or_aftercare_needs",
+      "current_scene_modifier"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "erotic-archetype-route",
+      "desire-profile-check",
+      "power-role-tendency-check",
+      "pairing-friction-check",
+      "sensory-register-route",
+      "profile-not-label-check"
+    ],
+    "memory_routing": [
+      "Use for character-card design, prompt-pack scaffolding, pairing diagnosis, and runtime routing when intimacy style should alter behavior.",
+      "Update Character Book for durable desire profile, erotic voice, sensory preference, power-role tendency, intimacy blocks, aftercare style, and shadow risk.",
+      "Update Scenario Book for current scene modifier, active friction, privacy, pressure, boundary state, and sensory register.",
+      "Update Memory Book only for meaningful intimacy discoveries, repeated patterns, boundary updates, aftercare needs, trust shifts, shame, jealousy, or changed assumptions."
+    ],
+    "continuity_links": [
+      "characterisation",
+      "power-dynamics-scene-writing",
+      "dominance-and-intimacy-flow",
+      "domain-vocabulary-seeds",
+      "relationship-dynamics",
+      "romantic-tension-builder",
+      "intimacy-shift",
+      "explicit-memory-core"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Adult consenting fiction only.",
+      "Do not dictate {{user}} thoughts, feelings, arousal, consent, refusal, orgasm, hidden motive, final action, dialogue, or emotional conclusion.",
+      "Use profiles as flexible story lenses, not fixed identities, diagnoses, or real-world advice.",
+      "Do not force dominance, submission, kink, or explicitness into characters or scenes that do not support it.",
+      "Do not reduce a character to one erotic label; preserve values, wounds, flaws, history, relationship state, context, and contradiction.",
+      "Do not dump archetype theory into scene prose; convert it into behavior, speech, pacing, sensory focus, and consequence."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}

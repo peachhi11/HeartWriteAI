@@ -138,7 +138,8 @@
       "category": "explicit-romantic-roleplay-skill-framework",
       "source": "agents_md",
       "migration_status": "reviewed",
-      "repository_path": "skills/explicit-tbrp-scene-guidance/SKILL.md"
+      "repository_path": "skills/explicit-tbrp-scene-guidance/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/explicit-tbrp-scene-guidance.json"
     },
     {
       "slug": "roleplay-keyword-discovery",
@@ -209,7 +210,8 @@
       "category": "roleplay-response",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/erotic-dynamics-prose/SKILL.md"
+      "repository_path": "skills/erotic-dynamics-prose/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/erotic-dynamics-prose.json"
     },
     {
       "slug": "erotic-archetypes-engine",
@@ -217,7 +219,8 @@
       "category": "roleplay-response",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/erotic-archetypes-engine/SKILL.md"
+      "repository_path": "skills/erotic-archetypes-engine/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/erotic-archetypes-engine.json"
     },
     {
       "slug": "emotional-continuity",
