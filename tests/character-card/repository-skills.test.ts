@@ -80,6 +80,7 @@ test("reviewed skill entries point to repository-owned bodies", () => {
       "archetypal-character-arcs",
       "flaw-preservation",
       "story-grid-engine",
+      "motive-tracker",
       "scene-sequel-structure",
       "trope-world-builder",
       "romance-conflict-outliner",
@@ -89,8 +90,10 @@ test("reviewed skill entries point to repository-owned bodies", () => {
       "explicit-memory-core",
       "emotional-continuity",
       "emotional-escalation",
+      "romantic-tension-builder",
       "emotional-subtext-engine",
       "relationship-tracker",
+      "escalating-proximity",
     ],
   );
   for (const entry of reviewedEntries) {

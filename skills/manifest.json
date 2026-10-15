@@ -76,7 +76,9 @@
       "slug": "motive-tracker",
       "label": "Motive tracker",
       "category": "roleplay-response",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/motive-tracker/SKILL.md"
     },
     {
       "slug": "scene-sequel-structure",
@@ -202,7 +204,9 @@
       "slug": "romantic-tension-builder",
       "label": "Romantic tension builder",
       "category": "roleplay-response",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/romantic-tension-builder/SKILL.md"
     },
     {
       "slug": "emotional-subtext-engine",
@@ -236,7 +240,9 @@
       "slug": "escalating-proximity",
       "label": "Escalating proximity",
       "category": "roleplay-response",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/escalating-proximity/SKILL.md"
     },
     {
       "slug": "space-distance-blocking",
