@@ -1,0 +1,111 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "multi-character-world-narration",
+    "label": "Multi-character world narration",
+    "category": "roleplay-response",
+    "summary": "Differentiates active characters, NPCs, crowds, and responsive world systems through distinct attention, care languages, group blocking, autonomy, and practical world reaction trails."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "multi-character-world-narration/SKILL.md",
+      "multi-character-world-narration/references/multi_character_world_reaction_guide.md",
+      "npc-continuity/SKILL.md",
+      "scene-coherence-playfield/SKILL.md",
+      "social-worldbuilding-driver/SKILL.md",
+      "institutional-worldbuilding/SKILL.md"
+    ],
+    "repository_body": "skills/multi-character-world-narration/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["scenario_book", "memory_book", "world_book", "character_book", "prompt_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "multi_character_differentiation",
+      "npc_autonomy",
+      "group_blocking",
+      "crowd_variation",
+      "world_autonomy",
+      "anti_hivemind_check"
+    ],
+    "trigger_seeds": [
+      "multiple characters",
+      "group scene",
+      "NPC autonomy",
+      "crowd reaction",
+      "companion autonomy",
+      "world reacts",
+      "living world",
+      "guild hall changes",
+      "different reactions",
+      "care languages",
+      "responsive environment"
+    ]
+  },
+  "state": {
+    "fields": [
+      "active_characters",
+      "sensory_focus_map",
+      "reaction_tempo",
+      "conflict_style",
+      "care_language",
+      "fear_tell",
+      "decision_habit",
+      "desire_and_limit",
+      "group_blocking",
+      "npc_relationship_edges",
+      "crowd_variation",
+      "world_reaction_channels",
+      "next_autonomy_beat"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "multi-character-differentiation",
+      "npc-autonomy",
+      "group-blocking",
+      "cross-npc-dynamics",
+      "crowd-variation",
+      "world-autonomy",
+      "institution-reaction",
+      "care-language-differentiation",
+      "sensory-focus-map",
+      "world-reaction-timeline",
+      "anti-hivemind-check"
+    ],
+    "memory_routing": [
+      "Use for group scenes, companion scenes, multi-NPC scenes, crowds, institutions, and world reactions where distinct behavior and autonomy matter.",
+      "Route active cast lenses, group blocking, crowd variation, NPC desires, NPC limits, and immediate world response to Scenario Book.",
+      "Promote recurring NPC habits, cross-NPC relationships, debts, rumors, loyalties, unfinished business, reputation shifts, and world reaction history to Memory Book or World Book."
+    ],
+    "continuity_links": [
+      "npc-continuity",
+      "scene-coherence-playfield",
+      "space-distance-blocking",
+      "position-tracking",
+      "social-worldbuilding-driver",
+      "institutional-worldbuilding",
+      "environmental-movement",
+      "knowledge-boundary-response"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Do not make all NPCs agree, notice the same thing, use the same body language, or emotionally orbit {{user}}.",
+      "Do not make a crowd react as one mind unless canon supports coordination, enchantment, propaganda, panic, or command structure.",
+      "Do not give NPCs knowledge they could not perceive, infer, remember, overhear, read, be told, or learn through an established channel.",
+      "Do not use NPCs, crowds, institutions, or world reaction to force {{user}} thoughts, emotions, movement, consent, dialogue, or final choices.",
+      "Do not let world autonomy become random drama; practical consequences should follow planted events, visibility, routines, or established world logic."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}

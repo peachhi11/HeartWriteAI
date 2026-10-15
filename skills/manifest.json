@@ -71,7 +71,8 @@
       "category": "roleplay-response",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/flaw-preservation/SKILL.md"
+      "repository_path": "skills/flaw-preservation/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/flaw-preservation.json"
     },
     {
       "slug": "story-grid-engine",
@@ -87,7 +88,8 @@
       "category": "roleplay-response",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/motive-tracker/SKILL.md"
+      "repository_path": "skills/motive-tracker/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/motive-tracker.json"
     },
     {
       "slug": "scene-sequel-structure",
@@ -309,7 +311,8 @@
       "category": "roleplay-response",
       "source": "heartwrite_memory_vault",
       "migration_status": "reviewed",
-      "repository_path": "skills/multi-character-world-narration/SKILL.md"
+      "repository_path": "skills/multi-character-world-narration/SKILL.md",
+      "runtime_metadata_path": "skills/runtime-metadata/multi-character-world-narration.json"
     },
     {
       "slug": "intimacy-shift",

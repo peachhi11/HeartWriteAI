@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "record_type": "story-runtime-skill-metadata",
+  "identity": {
+    "slug": "motive-tracker",
+    "label": "Motive tracker",
+    "category": "roleplay-response",
+    "summary": "Tracks stated, implied, blocked, conflicted, and resolved character motives, then interprets how motive and intent reframe action, identity, relationship trust, and narrative consequence."
+  },
+  "provenance": {
+    "source": "heartwrite_memory_vault",
+    "source_links": [
+      "motive-tracker/SKILL.md",
+      "motive-tracker/references/motive_interpretation_and_moral_weight.md",
+      "character-gmcs/SKILL.md",
+      "personality-values-and-morals/SKILL.md",
+      "flaw-preservation/SKILL.md",
+      "knowledge-boundary-response/SKILL.md"
+    ],
+    "repository_body": "skills/motive-tracker/SKILL.md"
+  },
+  "runtime": {
+    "status": "reviewed",
+    "public_safe": true,
+    "scopes": ["character_book", "scenario_book", "memory_book", "prompt_book"]
+  },
+  "activation": {
+    "mode": "contextual",
+    "tags": [
+      "motive_tracker",
+      "active_motive",
+      "blocked_motive",
+      "conflicted_motive",
+      "motive_interpretation",
+      "intent_reframe",
+      "moral_weight"
+    ],
+    "trigger_seeds": [
+      "what do you want",
+      "what do you need",
+      "why are you doing this",
+      "what are you after",
+      "your motive",
+      "your goal",
+      "your plan",
+      "why did they do that",
+      "what was their intention",
+      "moral weight",
+      "ethical weight",
+      "hidden motive"
+    ]
+  },
+  "state": {
+    "fields": [
+      "motive_holder",
+      "motive",
+      "motive_state",
+      "source",
+      "influence",
+      "blockers",
+      "competing_motives",
+      "observed_action",
+      "motive_hypotheses",
+      "moral_weight",
+      "identity_reframe",
+      "confidence",
+      "relationship_impact",
+      "next_possible_action"
+    ]
+  },
+  "routing": {
+    "prompt_compiler_signals": [
+      "motive-state-update",
+      "active-motive-check",
+      "blocked-motive-check",
+      "conflicted-motive-check",
+      "motive-interpretation-check",
+      "intent-reframe-check",
+      "moral-weight-check",
+      "motive-confidence-check"
+    ],
+    "memory_routing": [
+      "Route long-term motives, ambitions, duties, desires, avoidance patterns, vows, values, and identity-level goals to Character Book.",
+      "Route current scene motives, blockers, competing motives, observed actions, motive hypotheses, and confidence levels to Scenario Book.",
+      "Route revealed motives, resolved or abandoned goals, reinterpreted past actions, relationship damage, repair pressure, and unresolved evidence to Memory Book.",
+      "Never infer or store {{user}} motives unless user-defined or requested for impersonation support."
+    ],
+    "continuity_links": [
+      "character-gmcs",
+      "personality-values-and-morals",
+      "flaw-preservation",
+      "relationship-dynamics",
+      "relationship-conflict-tracker",
+      "knowledge-boundary-response",
+      "goal-stakes-tracking",
+      "follow-through",
+      "next-thread-advancement",
+      "scene-escalation"
+    ]
+  },
+  "safety": {
+    "guardrails": [
+      "Preserve {{user}} agency; do not dictate {{user}} motives, thoughts, values, consent, arousal, forgiveness, or final actions.",
+      "Do not moralize through the narrator unless the user asks for ethical analysis or the story style explicitly calls for it.",
+      "Do not excuse harm merely because a motive is sympathetic; motive can explain consequence without erasing it.",
+      "Do not villainize a character when evidence supports ignorance, panic, coercion, false belief, or misperception.",
+      "Keep motive confidence explicit when evidence is incomplete.",
+      "Keep character knowledge bounded; motive-driven choices must use what the character plausibly knows."
+    ],
+    "user_agency": "preserve",
+    "consent_context": "required",
+    "private_data_policy": "approved_source_only"
+  },
+  "extensions": {}
+}
