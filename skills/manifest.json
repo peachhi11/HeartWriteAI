@@ -248,19 +248,25 @@
       "slug": "space-distance-blocking",
       "label": "Space distance blocking",
       "category": "roleplay-response",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/space-distance-blocking/SKILL.md"
     },
     {
       "slug": "scene-coherence-playfield",
       "label": "Scene coherence playfield",
       "category": "roleplay-response",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/scene-coherence-playfield/SKILL.md"
     },
     {
       "slug": "multi-character-world-narration",
       "label": "Multi-character world narration",
       "category": "roleplay-response",
-      "source": "heartwrite_memory_vault"
+      "source": "heartwrite_memory_vault",
+      "migration_status": "reviewed",
+      "repository_path": "skills/multi-character-world-narration/SKILL.md"
     },
     {
       "slug": "intimacy-shift",

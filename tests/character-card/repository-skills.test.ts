@@ -94,6 +94,9 @@ test("reviewed skill entries point to repository-owned bodies", () => {
       "emotional-subtext-engine",
       "relationship-tracker",
       "escalating-proximity",
+      "space-distance-blocking",
+      "scene-coherence-playfield",
+      "multi-character-world-narration",
     ],
   );
   for (const entry of reviewedEntries) {
