@@ -47,3 +47,8 @@ focused tests before the runtime registry is changed to consume it.
 The compatibility boundary and public/private import rules are documented in
 `docs/repository-skill-runtime-metadata-boundary.md`. Do not import the
 all-record registry from a public browser surface.
+
+The focused surface boundary check is
+`tests/character-card/runtime-surface-boundary.test.ts`. It currently verifies
+the public source tree and private desktop gate without introducing a runtime
+selector before an actual public consumer exists.

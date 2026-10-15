@@ -67,6 +67,13 @@ surface would make private metadata eligible for the browser bundle.
 4. Add a CI/pre-commit stale-generated-output check. (Complete.)
 5. Switch runtime imports only after equivalence is exact and focused compiler tests remain green. (Compatibility export complete; public-surface adoption remains a follow-up.)
 
+The current surface audit is covered by
+`tests/character-card/runtime-surface-boundary.test.ts`. It asserts that the
+production source tree cannot import the all-record registry, that the public
+module resolves exactly the public-safe generated records, and that the private
+desktop gate remains disabled for public browser builds. No production route
+currently consumes either registry; adding a selector is a separate slice.
+
 ## Non-Goals
 
 - Do not generate runtime behavior from the human-readable Markdown body.
