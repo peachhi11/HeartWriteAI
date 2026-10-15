@@ -3,6 +3,7 @@ import path from "node:path";
 import test from "node:test";
 import assert from "node:assert/strict";
 import { storyRuntimeSkills } from "../../lib/character-card/storyRuntimeSkills";
+import { publicStoryRuntimeSkills } from "../../lib/character-card/publicStoryRuntimeSkills";
 import { runtimeSkillMetadataRecords } from "../../lib/character-card/generatedRuntimeSkillMetadata";
 
 type SkillInventoryEntry = {
@@ -221,6 +222,21 @@ test("generated runtime metadata follows manifest order and contains only linked
   assert.equal(
     new Set(runtimeSkillMetadataRecords.map((record) => record.identity.slug)).size,
     linkedSlugs.length,
+  );
+});
+
+test("public runtime compatibility registry excludes private metadata records", () => {
+  const publicRecords = runtimeSkillMetadataRecords.filter((record) => record.runtime.public_safe);
+
+  assert.equal(publicStoryRuntimeSkills.length, publicRecords.length);
+  assert.deepEqual(
+    publicStoryRuntimeSkills.map((skill) => skill.slug),
+    publicRecords.map((record) => record.identity.slug),
+  );
+  assert.ok(
+    publicStoryRuntimeSkills.every((skill) =>
+      publicRecords.some((record) => record.identity.slug === skill.slug),
+    ),
   );
 });
 

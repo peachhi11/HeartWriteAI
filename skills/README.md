@@ -11,10 +11,10 @@ reviewed.
 
 ## Current slice
 
-`manifest.json` inventories the 37 skills already represented by
-`lib/character-card/storyRuntimeSkills.ts`. All 37 now have reviewed repository
-bodies. The manifest is an organizational contract, not a second prompt
-registry and not yet a source of runtime behavior.
+`manifest.json` inventories the 37 skills represented by the generated runtime
+metadata. All 37 now have reviewed repository bodies. The manifest is an
+organizational contract, not a second prompt registry and not a source of
+runtime behavior.
 
 `skill.schema.json` defines the minimum contract for a reviewed skill body:
 frontmatter must carry ownership and provenance, and the body must include
@@ -23,17 +23,17 @@ frontmatter must carry ownership and provenance, and the body must include
 `runtime-metadata.schema.json` defines the separate, structured compiler
 metadata boundary. It supports stable identity, provenance, runtime status,
 activation, state fields, routing, safety, and a namespaced `extensions` object
-for future fields. The first proof-of-shape record is in
-`runtime-metadata/romantic-erotic-storytelling-generator.json`; it is not yet
-consumed by runtime imports. `npm run generate:runtime-skill-metadata` emits
-the linked records into `lib/character-card/generatedRuntimeSkillMetadata.ts`,
-and `npm run check:generated-runtime-skill-metadata` verifies that artifact is
-current. The generated module is an intermediate artifact, not yet the live
-skill registry.
+for future fields. `npm run generate:runtime-skill-metadata` emits all linked
+records into an all-record artifact plus separate public and private artifacts.
+`npm run check:generated-runtime-skill-metadata` verifies all three outputs are
+current. `storyRuntimeSkills.ts` remains an internal compatibility export;
+public surfaces should import `publicStoryRuntimeSkills.ts` so private records
+are excluded at module-boundary level.
 
-Run `npm run validate:skills` to verify that the manifest and runtime registry
-have the same stable slugs, labels, categories, and source classifications, and
-that any linked runtime metadata records agree with the manifest.
+Run `npm run validate:skills` to verify that the manifest and generated runtime
+metadata have the same stable slugs, labels, categories, and source
+classifications, and that any linked runtime metadata records agree with the
+manifest.
 Run `npm run check:skill-equivalence` for the focused runtime-metadata check;
 this does not change runtime imports or prompt selection.
 
@@ -44,6 +44,6 @@ slug. Each migrated skill should retain a provenance link to the Memory Vault
 or approved source note, declare whether it is public-runtime safe, and include
 focused tests before the runtime registry is changed to consume it.
 
-The proposed boundary for a future generated runtime registry is documented in
-`docs/repository-skill-runtime-metadata-boundary.md`. Do not change runtime
-imports until generated metadata matches the current registry exactly.
+The compatibility boundary and public/private import rules are documented in
+`docs/repository-skill-runtime-metadata-boundary.md`. Do not import the
+all-record registry from a public browser surface.

@@ -2,7 +2,11 @@
 
 ## Status
 
-Design only. Runtime imports still use `lib/character-card/storyRuntimeSkills.ts`.
+Compatibility boundary implemented. Existing internal imports still use
+`lib/character-card/storyRuntimeSkills.ts`, which now re-exports the generated
+all-record registry. Public surfaces use
+`lib/character-card/publicStoryRuntimeSkills.ts`, which imports only the
+public generated artifact.
 
 The repository currently has 37 runtime skill entries, all with reviewed `SKILL.md` bodies. The richer mentor-voice and commercial-pattern references remain vault-owned.
 
@@ -41,19 +45,27 @@ Each record should contain the complete `StoryRuntimeSkill` shape. The generator
 - emit stable, formatted TypeScript in manifest order
 - fail when generated output differs from the checked-in runtime artifact
 
-The first generated artifact is `lib/character-card/generatedRuntimeSkillMetadata.ts`.
-It is currently a separate checked-in intermediate artifact; runtime imports
-still use the existing registry. Only after the comparison is exact should
-`storyRuntimeSkills.ts` become a thin compatibility export or be replaced by
-the generated module.
+The generated artifacts are:
+
+- `lib/character-card/generatedRuntimeSkillMetadata.ts` for internal validation
+  and private tooling.
+- `lib/character-card/generatedPublicRuntimeSkillMetadata.ts` for public-safe
+  browser surfaces.
+- `lib/character-card/generatedPrivateRuntimeSkillMetadata.ts` for explicit
+  private tooling and audits.
+
+`storyRuntimeSkills.ts` is now a thin compatibility export so existing internal
+imports continue to work. Public code must import
+`publicStoryRuntimeSkills.ts`; importing the all-record registry from a public
+surface would make private metadata eligible for the browser bundle.
 
 ## Migration Sequence
 
 1. Add the structured metadata schema and one complete metadata record as a proof of shape. (Complete.)
 2. Add a generator that produces a temporary or checked-in artifact. (Complete; the artifact currently contains the linked proof record.)
-3. Compare generated metadata to the current registry for all 37 entries.
-4. Add a CI/pre-commit stale-generated-output check.
-5. Switch runtime imports only after equivalence is exact and focused compiler tests remain green.
+3. Compare generated metadata to the current registry for all 37 entries. (Complete.)
+4. Add a CI/pre-commit stale-generated-output check. (Complete.)
+5. Switch runtime imports only after equivalence is exact and focused compiler tests remain green. (Compatibility export complete; public-surface adoption remains a follow-up.)
 
 ## Non-Goals
 

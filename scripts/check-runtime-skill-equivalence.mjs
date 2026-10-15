@@ -7,12 +7,12 @@ const manifest = JSON.parse(
   fs.readFileSync(path.join(repoRoot, "skills", "manifest.json"), "utf8"),
 );
 const registrySource = fs.readFileSync(
-  path.join(repoRoot, "lib", "character-card", "storyRuntimeSkills.ts"),
+  path.join(repoRoot, "lib", "character-card", "generatedRuntimeSkillMetadata.ts"),
   "utf8",
 );
 const registryEntries = [];
 const entryPattern =
-  /\{\n\s+slug: "([^"]+)",\n\s+label: "([^"]+)",\n\s+category: "([^"]+)",[\s\S]*?\n\s+source: "([^"]+)",/g;
+  /identity:\s*\{\s*slug:\s*"([^"]+)",\s*label:\s*"([^"]+)",\s*category:\s*"([^"]+)",[\s\S]*?\n\s*\},\s*provenance:\s*\{\s*source:\s*"([^"]+)",/g;
 
 for (const match of registrySource.matchAll(entryPattern)) {
   registryEntries.push({

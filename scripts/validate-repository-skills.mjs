@@ -6,7 +6,12 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."
 const manifestPath = path.join(repoRoot, "skills", "manifest.json");
 const bodySchemaPath = path.join(repoRoot, "skills", "skill.schema.json");
 const runtimeMetadataSchemaPath = path.join(repoRoot, "skills", "runtime-metadata.schema.json");
-const registryPath = path.join(repoRoot, "lib", "character-card", "storyRuntimeSkills.ts");
+const registryPath = path.join(
+  repoRoot,
+  "lib",
+  "character-card",
+  "generatedRuntimeSkillMetadata.ts",
+);
 
 const failures = [];
 const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
@@ -15,7 +20,7 @@ const runtimeMetadataSchema = JSON.parse(fs.readFileSync(runtimeMetadataSchemaPa
 const registrySource = fs.readFileSync(registryPath, "utf8");
 const registryEntries = [];
 const entryPattern =
-  /\{\n\s+slug: "([^"]+)",\n\s+label: "([^"]+)",\n\s+category: "([^"]+)",[\s\S]*?\n\s+source: "([^"]+)",/g;
+  /identity:\s*\{\s*slug:\s*"([^"]+)",\s*label:\s*"([^"]+)",\s*category:\s*"([^"]+)",[\s\S]*?\n\s*\},\s*provenance:\s*\{\s*source:\s*"([^"]+)",/g;
 
 for (const match of registrySource.matchAll(entryPattern)) {
   registryEntries.push({
