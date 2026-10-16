@@ -27,7 +27,7 @@ export function getMessageText(message: RoleplayMessage) {
     .join("");
 }
 
-export function toOllamaMessages(messages: RoleplayMessage[]) {
+export function toChatCompletionMessages(messages: RoleplayMessage[]) {
   return messages.map((message) => ({
     role: message.role,
     content: getMessageText(message),

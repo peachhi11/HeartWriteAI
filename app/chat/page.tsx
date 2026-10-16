@@ -14,7 +14,7 @@ import {
   createRoleplayMessage,
   getMessageText,
   RoleplayMessage,
-  toOllamaMessages,
+  toChatCompletionMessages,
 } from "@/lib/chat/messages";
 import { cn } from "@/lib/utils";
 import { StudioShell } from "@/components/studio-shell";
@@ -24,8 +24,7 @@ import { StatBar } from "@/features/relationship/components/StatBar";
 import type { RelationshipState } from "@/features/relationship/schema";
 import { compileLocalChatRuntimePrompt } from "@/lib/chat/localChatRuntime";
 
-const OLLAMA_CHAT_ENDPOINT = "http://localhost:11434/api/chat";
-const DEFAULT_MODEL = "llama3";
+const CHAT_ENDPOINT = "/api/chat";
 
 const initialMessages: RoleplayMessage[] = [
   createRoleplayMessage(
@@ -191,11 +190,10 @@ export default function RoleplayChat() {
         scenarioOverride: activeSession.scenarioOverride,
         selectedScenarioTags: selectedScenario?.tags,
       });
-      const response = await fetch(OLLAMA_CHAT_ENDPOINT, {
+      const response = await fetch(CHAT_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: DEFAULT_MODEL,
           messages: [
             {
               role: "system",
@@ -203,14 +201,13 @@ export default function RoleplayChat() {
                 "\n\n",
               ),
             },
-            ...toOllamaMessages(updatedMessages),
+            ...toChatCompletionMessages(updatedMessages),
           ],
-          stream: true,
         }),
       });
 
       if (!response.ok || !response.body) {
-        throw new Error(`Ollama returned ${response.status}`);
+        throw new Error(`Chat provider returned ${response.status}`);
       }
 
       const reader = response.body.getReader();
@@ -234,12 +231,15 @@ export default function RoleplayChat() {
             continue;
           }
 
-          const parsed = JSON.parse(line) as {
-            message?: { content?: string };
+          if (!line.startsWith("data:")) continue;
+          const parsed = JSON.parse(line.slice("data:".length).trim()) as {
+            type?: string;
+            text?: string;
+            message?: string;
           };
 
-          if (parsed.message?.content) {
-            accumulatedResponse += parsed.message.content;
+          if (parsed.type === "text_delta" && parsed.text) {
+            accumulatedResponse += parsed.text;
 
             updateActiveSession({
               messages: [
@@ -250,13 +250,15 @@ export default function RoleplayChat() {
                 },
               ],
             });
+          } else if (parsed.type === "error") {
+            throw new Error(parsed.message ?? "The chat provider returned an error.");
           }
         }
       }
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown inference error.";
 
-      setRuntimeError(`Could not reach local Ollama at ${OLLAMA_CHAT_ENDPOINT}. ${message}`);
+      setRuntimeError(`Could not complete the chat request. ${message}`);
       updateActiveSession({ messages: updatedMessages });
     } finally {
       setIsGenerating(false);
@@ -267,8 +269,8 @@ export default function RoleplayChat() {
     <StudioShell
       eyebrow="Character Chat"
       title="Chat Preview"
-      subtitle="A temporary local-model romance chat surface for testing streaming response shape before the full context compiler lands."
-      actions={<Badge variant="outline">Ollama: {DEFAULT_MODEL}</Badge>}
+      subtitle="A provider-neutral romance chat preview for testing compiled context and streaming response shape."
+      actions={<Badge variant="outline">Provider-neutral preview</Badge>}
     >
       <div className="grid min-h-[calc(100vh-9rem)] gap-5 xl:grid-cols-[20rem_minmax(0,1fr)]">
         <section className="hidden max-h-[calc(100vh-9rem)] flex-col gap-5 overflow-y-auto pr-1 xl:sticky xl:top-24 xl:flex">
@@ -286,7 +288,7 @@ export default function RoleplayChat() {
               </div>
               <div>
                 <p className="text-sm font-medium">HeartWrite Preview</p>
-                <p className="text-xs text-muted-foreground">Local model: {DEFAULT_MODEL}</p>
+                <p className="text-xs text-muted-foreground">Provider-neutral chat preview</p>
               </div>
             </CardContent>
           </Card>

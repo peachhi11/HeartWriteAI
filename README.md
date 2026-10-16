@@ -62,12 +62,19 @@ The Tauri commands require Rust/Cargo. For web-only or docs/process slices, the
 current default health gate is `npm run check:agent-setup`, `npm run lint`,
 `npm test`, and `npm run build`.
 
-Optional AI-assisted generation and chat are provider-generic until a runtime endpoint is supplied. Use `YOUR_API_*` environment values when wiring a provider:
+Optional AI-assisted generation and chat use an OpenAI-compatible `/v1/chat/completions` boundary. OpenRouter is the default-compatible configuration; Ollama or another compatible provider can be selected by changing the base URL. Keep keys server-side:
 
 ```bash
-YOUR_API_KEY=...
-YOUR_API_CHAT_ENDPOINT=...
-YOUR_API_CHAT_MODEL=...
+HEARTWRITE_CHAT_BASE_URL=https://openrouter.ai/api
+HEARTWRITE_CHAT_MODEL=...
+OPENROUTER_API_KEY=...
+```
+
+For an Ollama-compatible local endpoint:
+
+```bash
+HEARTWRITE_CHAT_BASE_URL=http://localhost:11434
+HEARTWRITE_CHAT_MODEL=llama3
 ```
 
 Private power-user tools are allowed in the local desktop app but should stay
@@ -83,7 +90,7 @@ Implemented in the current scaffold:
 - Next.js + Tailwind + shadcn app shell.
 - Tauri v2 desktop wrapper renamed and configured for HeartWriteAI.
 - Workspace-first editor for character card import, editing, and export.
-- Temporary `/chat` preview route for Ollama streaming shape tests.
+- Temporary `/chat` preview route for provider-neutral streaming shape tests.
 - `/api/character-card/classify` and `/api/character-card/build` routes for schema-bound macro routing and generated card previews.
 - Tauri Store plugin registration and typed desktop-library helper for local
   character-card persistence.
