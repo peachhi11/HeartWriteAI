@@ -101,3 +101,32 @@ test("allows an explicitly private compiler caller to inject its own selector", 
   assert.match(compiled.contextBlock, /explicit-memory-core/);
   assert.match(compiled.contextBlock, /transition-to-aftercare/);
 });
+
+test("selects runtime skills by mode, trigger, scope, and state field", () => {
+  const base = {
+    appSystemPrompt: "Use the private romance safety contract.",
+    runtimeSkillSelector: storyRuntimeSkillSelector,
+    card: { data: { name: "Rowan" } },
+  };
+
+  const manual = compileChatPrompt({ ...base, runtimeSkillModes: ["manual"] });
+  assert.match(
+    manual.contextBlock,
+    /Romantic roleplay skill creator \(romantic-roleplay-skill-creator\)/,
+  );
+
+  const trigger = compileChatPrompt({
+    ...base,
+    runtimeSkillTriggers: ["explicit mode"],
+  });
+  assert.match(trigger.contextBlock, /Explicit memory core \(explicit-memory-core\)/);
+
+  const scope = compileChatPrompt({ ...base, runtimeSkillScopes: ["world_book"] });
+  assert.match(scope.contextBlock, /Modern real-world setting \(modern-real-world-setting\)/);
+
+  const state = compileChatPrompt({
+    ...base,
+    runtimeSkillStateFields: ["aftercare_pending"],
+  });
+  assert.match(state.contextBlock, /Explicit memory core \(explicit-memory-core\)/);
+});

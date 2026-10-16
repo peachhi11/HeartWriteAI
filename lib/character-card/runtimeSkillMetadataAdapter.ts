@@ -12,6 +12,7 @@ export type StoryRuntimeSkillCategory =
   | "world-setting";
 
 export type StoryRuntimeSkillSource = "agents_md" | "heartwrite_memory_vault" | "source_material";
+export type StoryRuntimeSkillActivationMode = "explicit" | "contextual" | "manual" | "always";
 
 export interface StoryRuntimeSkill {
   slug: string;
@@ -20,6 +21,7 @@ export interface StoryRuntimeSkill {
   summary: string;
   source: StoryRuntimeSkillSource;
   sourceVaultLinks: string[];
+  activationMode: StoryRuntimeSkillActivationMode;
   scope: MemoryVaultBookType[];
   activationTags: string[];
   triggerSeeds: string[];
@@ -34,7 +36,11 @@ type RuntimeSkillMetadataRecord = {
   identity: { slug: string; label: string; category: StoryRuntimeSkillCategory; summary: string };
   provenance: { source: StoryRuntimeSkillSource; source_links: readonly string[] };
   runtime: { scopes: readonly MemoryVaultBookType[] };
-  activation: { tags: readonly string[]; trigger_seeds: readonly string[] };
+  activation: {
+    mode: StoryRuntimeSkillActivationMode;
+    tags: readonly string[];
+    trigger_seeds: readonly string[];
+  };
   state: { fields: readonly string[] };
   routing: {
     prompt_compiler_signals: readonly string[];
@@ -52,6 +58,7 @@ export function toStoryRuntimeSkill(record: RuntimeSkillMetadataRecord): StoryRu
     summary: record.identity.summary,
     source: record.provenance.source,
     sourceVaultLinks: [...record.provenance.source_links],
+    activationMode: record.activation.mode,
     scope: [...record.runtime.scopes],
     activationTags: [...record.activation.tags],
     triggerSeeds: [...record.activation.trigger_seeds],

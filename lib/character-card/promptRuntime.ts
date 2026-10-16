@@ -40,7 +40,10 @@ export interface CompileChatPromptArgs {
   retrievedMemories?: string[];
   chatHistory?: RuntimeChatMessage[];
   runtimeSkillSlugs?: readonly string[];
+  runtimeSkillModes?: readonly StoryRuntimeSkill["activationMode"][];
   runtimeSkillTags?: readonly string[];
+  runtimeSkillTriggers?: readonly string[];
+  runtimeSkillStateFields?: readonly string[];
   runtimeSkillScopes?: readonly StoryRuntimeSkill["scope"][number][];
   runtimeSkillSelector?: StoryRuntimeSkillSelector;
 }
@@ -62,7 +65,10 @@ export function compileChatPrompt({
   retrievedMemories = [],
   chatHistory = [],
   runtimeSkillSlugs = [],
+  runtimeSkillModes = [],
   runtimeSkillTags = [],
+  runtimeSkillTriggers = [],
+  runtimeSkillStateFields = [],
   runtimeSkillScopes = [],
   runtimeSkillSelector = publicStoryRuntimeSkillSelector,
 }: CompileChatPromptArgs): CompiledChatPrompt {
@@ -78,7 +84,10 @@ export function compileChatPrompt({
   const runtimeSkills = selectRuntimeSkills({
     selector: runtimeSkillSelector,
     slugs: runtimeSkillSlugs,
+    modes: runtimeSkillModes,
     tags: runtimeSkillTags,
+    triggers: runtimeSkillTriggers,
+    stateFields: runtimeSkillStateFields,
     scopes: runtimeSkillScopes,
   });
 
@@ -124,7 +133,10 @@ export function compileChatPrompt({
 function selectRuntimeSkills(input: {
   selector: StoryRuntimeSkillSelector;
   slugs: readonly string[];
+  modes: readonly StoryRuntimeSkill["activationMode"][];
   tags: readonly string[];
+  triggers: readonly string[];
+  stateFields: readonly string[];
   scopes: readonly StoryRuntimeSkill["scope"][number][];
 }): StoryRuntimeSkill[] {
   const selected = new Map<string, StoryRuntimeSkill>();
@@ -133,8 +145,18 @@ function selectRuntimeSkills(input: {
     const skill = input.selector.getBySlug(slug);
     if (skill) selected.set(skill.slug, skill);
   }
+  for (const mode of input.modes) {
+    for (const skill of input.selector.findByMode(mode)) selected.set(skill.slug, skill);
+  }
   for (const tag of input.tags) {
     for (const skill of input.selector.findByTag(tag)) selected.set(skill.slug, skill);
+  }
+  for (const trigger of input.triggers) {
+    for (const skill of input.selector.findByTriggerSeed(trigger)) selected.set(skill.slug, skill);
+  }
+  for (const stateField of input.stateFields) {
+    for (const skill of input.selector.findByStateField(stateField))
+      selected.set(skill.slug, skill);
   }
   for (const scope of input.scopes) {
     for (const skill of input.selector.findByScope(scope)) selected.set(skill.slug, skill);

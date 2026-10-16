@@ -67,7 +67,8 @@ surface catalog; it does not change prompt selection or expose raw fixture
 text.
 
 `compileChatPrompt` is now the first runtime consumer. It defaults to the
-public selector and accepts explicit skill slugs, tags, and scopes. A private
+public selector and accepts explicit skill slugs, activation modes, tags,
+trigger seeds, state fields, and scopes. A private
 caller must inject the all-record selector deliberately; private slugs are not
 available through the default compiler path. The compiler adds only the
 selected records' prompt signals, state fields, and memory-routing hints to a
