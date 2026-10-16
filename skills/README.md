@@ -57,3 +57,9 @@ The shared selector core is in
 `lib/character-card/storyRuntimeSkillSelector.ts`. Public and private entrypoints
 instantiate it with their own catalogs, keeping the surface decision at the
 import boundary.
+
+`compileChatPrompt` is the first runtime consumer. It uses the public selector
+by default and accepts explicit slugs, tags, and scopes. Private callers must
+inject the private selector intentionally. The compiler emits only prompt
+signals, state fields, and memory-routing hints; it does not embed skill bodies
+or private fixture text in the prompt.

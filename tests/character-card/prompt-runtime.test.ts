@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { compileChatPrompt } from "../../lib/character-card/promptRuntime";
+import { storyRuntimeSkillSelector } from "../../lib/character-card/runtimeSkillRegistry";
 
 test("uses the app system prompt when a card does not provide one", () => {
   const compiled = compileChatPrompt({
@@ -45,8 +46,7 @@ test("supports {{original}} when a card wants to extend the app prompt", () => {
     card: {
       data: {
         name: "Elian Frost",
-        system_prompt:
-          "{{original}}\n\nAdd gothic tension and slower emotional trust progression.",
+        system_prompt: "{{original}}\n\nAdd gothic tension and slower emotional trust progression.",
       },
     },
   });
@@ -65,8 +65,7 @@ test("places post-history instructions at the end of the runtime context", () =>
     card: {
       data: {
         name: "Rowan",
-        post_history_instructions:
-          "Never narrate {{user}}'s thoughts or decisions.",
+        post_history_instructions: "Never narrate {{user}}'s thoughts or decisions.",
       },
     },
   });
@@ -77,4 +76,28 @@ test("places post-history instructions at the end of the runtime context", () =>
     compiled.contextBlock,
     /\[FINAL CARD INSTRUCTIONS\]\nNever narrate \{\{user\}\}'s thoughts or decisions\.$/,
   );
+});
+
+test("uses the public runtime selector by default for explicit compiler signals", () => {
+  const compiled = compileChatPrompt({
+    appSystemPrompt: "Use the default romance safety contract.",
+    runtimeSkillSlugs: ["emotional-continuity", "explicit-memory-core"],
+    card: { data: { name: "Rowan" } },
+  });
+
+  assert.match(compiled.contextBlock, /Emotional continuity \(emotional-continuity\)/);
+  assert.doesNotMatch(compiled.contextBlock, /explicit-memory-core/);
+  assert.doesNotMatch(compiled.contextBlock, /Runtime Skill Signals[\s\S]*approved_source_only/);
+});
+
+test("allows an explicitly private compiler caller to inject its own selector", () => {
+  const compiled = compileChatPrompt({
+    appSystemPrompt: "Use the private romance safety contract.",
+    runtimeSkillSlugs: ["explicit-memory-core"],
+    runtimeSkillSelector: storyRuntimeSkillSelector,
+    card: { data: { name: "Rowan" } },
+  });
+
+  assert.match(compiled.contextBlock, /explicit-memory-core/);
+  assert.match(compiled.contextBlock, /transition-to-aftercare/);
 });

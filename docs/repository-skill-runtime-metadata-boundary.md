@@ -66,6 +66,15 @@ selects from all records. The selector only filters the already-approved
 surface catalog; it does not change prompt selection or expose raw fixture
 text.
 
+`compileChatPrompt` is now the first runtime consumer. It defaults to the
+public selector and accepts explicit skill slugs, tags, and scopes. A private
+caller must inject the all-record selector deliberately; private slugs are not
+available through the default compiler path. The compiler adds only the
+selected records' prompt signals, state fields, and memory-routing hints to a
+`Runtime Skill Signals` context section. It does not copy skill bodies,
+summaries, source links, guardrails, or fixture text into the prompt, and it
+does not change the prompt when no runtime-skill inputs are supplied.
+
 ## Migration Sequence
 
 1. Add the structured metadata schema and one complete metadata record as a proof of shape. (Complete.)
@@ -79,7 +88,9 @@ The current surface audit is covered by
 production source tree cannot import the all-record registry, that the public
 module resolves exactly the public-safe generated records, and that the private
 desktop gate remains disabled for public browser builds. No production route
-currently consumes either registry; adding a selector is a separate slice.
+currently consumes the all-record registry directly. The compiler consumer is
+covered by `tests/character-card/prompt-runtime.test.ts`, including the
+negative case where a private slug is requested through the public default.
 
 ## Non-Goals
 

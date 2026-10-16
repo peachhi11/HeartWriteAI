@@ -1,7 +1,7 @@
-import {
-  createSensoryPerceptionContext,
-  extractCardSensoryPerception,
-} from "./sensoryPerception";
+import { createSensoryPerceptionContext, extractCardSensoryPerception } from "./sensoryPerception";
+import { publicStoryRuntimeSkillSelector } from "./publicStoryRuntimeSkills";
+import type { StoryRuntimeSkill } from "./runtimeSkillMetadataAdapter";
+import type { StoryRuntimeSkillSelector } from "./storyRuntimeSkillSelector";
 
 export interface RuntimeLoreEntry {
   name?: string;
@@ -39,6 +39,10 @@ export interface CompileChatPromptArgs {
   activeLoreEntries?: RuntimeLoreEntry[];
   retrievedMemories?: string[];
   chatHistory?: RuntimeChatMessage[];
+  runtimeSkillSlugs?: readonly string[];
+  runtimeSkillTags?: readonly string[];
+  runtimeSkillScopes?: readonly StoryRuntimeSkill["scope"][number][];
+  runtimeSkillSelector?: StoryRuntimeSkillSelector;
 }
 
 export interface CompiledChatPrompt {
@@ -57,6 +61,10 @@ export function compileChatPrompt({
   activeLoreEntries = [],
   retrievedMemories = [],
   chatHistory = [],
+  runtimeSkillSlugs = [],
+  runtimeSkillTags = [],
+  runtimeSkillScopes = [],
+  runtimeSkillSelector = publicStoryRuntimeSkillSelector,
 }: CompileChatPromptArgs): CompiledChatPrompt {
   const data = card.data ?? {};
   const characterName = data.nickname?.trim() || data.name?.trim() || "{{char}}";
@@ -67,6 +75,12 @@ export function compileChatPrompt({
     ? cardSystemPrompt.replaceAll("{{original}}", appSystemPrompt)
     : appSystemPrompt;
   const postHistoryInstructions = data.post_history_instructions?.trim() ?? "";
+  const runtimeSkills = selectRuntimeSkills({
+    selector: runtimeSkillSelector,
+    slugs: runtimeSkillSlugs,
+    tags: runtimeSkillTags,
+    scopes: runtimeSkillScopes,
+  });
 
   const contextBlock = [
     section("Character", [
@@ -88,14 +102,13 @@ export function compileChatPrompt({
       ),
     ),
     section("Retrieved Memories", retrievedMemories),
+    formatRuntimeSkillContext(runtimeSkills),
     createSensoryPerceptionContext(sensoryPerception),
     section(
       "Recent Chat",
       chatHistory.map((message) => `[${message.speaker}]: ${message.content}`),
     ),
-    postHistoryInstructions
-      ? section("Final Card Instructions", [postHistoryInstructions])
-      : "",
+    postHistoryInstructions ? section("Final Card Instructions", [postHistoryInstructions]) : "",
   ]
     .filter(Boolean)
     .join("\n\n");
@@ -108,10 +121,42 @@ export function compileChatPrompt({
   };
 }
 
+function selectRuntimeSkills(input: {
+  selector: StoryRuntimeSkillSelector;
+  slugs: readonly string[];
+  tags: readonly string[];
+  scopes: readonly StoryRuntimeSkill["scope"][number][];
+}): StoryRuntimeSkill[] {
+  const selected = new Map<string, StoryRuntimeSkill>();
+
+  for (const slug of input.slugs) {
+    const skill = input.selector.getBySlug(slug);
+    if (skill) selected.set(skill.slug, skill);
+  }
+  for (const tag of input.tags) {
+    for (const skill of input.selector.findByTag(tag)) selected.set(skill.slug, skill);
+  }
+  for (const scope of input.scopes) {
+    for (const skill of input.selector.findByScope(scope)) selected.set(skill.slug, skill);
+  }
+
+  return [...selected.values()];
+}
+
+function formatRuntimeSkillContext(skills: readonly StoryRuntimeSkill[]): string {
+  if (!skills.length) return "";
+
+  return section(
+    "Runtime Skill Signals",
+    skills.map(
+      (skill) =>
+        `${skill.label} (${skill.slug})\n- PROMPT SIGNALS: ${skill.promptCompilerSignals.join(", ")}\n- STATE FIELDS: ${skill.stateFields.join(", ")}\n- MEMORY ROUTING: ${skill.memoryRouting.join(", ")}`,
+    ),
+  );
+}
+
 function section(title: string, lines: Array<string | undefined>): string {
-  const body = lines
-    .map((line) => line?.trim())
-    .filter((line): line is string => Boolean(line));
+  const body = lines.map((line) => line?.trim()).filter((line): line is string => Boolean(line));
 
   if (!body.length) {
     return "";
