@@ -62,9 +62,11 @@ The Tauri commands require Rust/Cargo. For web-only or docs/process slices, the
 current default health gate is `npm run check:agent-setup`, `npm run lint`,
 `npm test`, and `npm run build`.
 
-Optional AI-assisted generation and chat use an OpenAI-compatible `/v1/chat/completions` boundary. OpenRouter is the default-compatible configuration; Ollama or another compatible provider can be selected by changing the base URL. Keep keys server-side:
+Optional AI-assisted generation and chat use an OpenAI-compatible `/v1/chat/completions` boundary. Chat is disabled unless explicitly enabled for the private app. Choose one provider profile; keys stay server-side:
 
 ```bash
+HEARTWRITE_CHAT_ENABLED=1
+HEARTWRITE_CHAT_PROVIDER=openrouter
 HEARTWRITE_CHAT_BASE_URL=https://openrouter.ai/api
 HEARTWRITE_CHAT_MODEL=...
 OPENROUTER_API_KEY=...
@@ -73,9 +75,16 @@ OPENROUTER_API_KEY=...
 For an Ollama-compatible local endpoint:
 
 ```bash
+HEARTWRITE_CHAT_ENABLED=1
+HEARTWRITE_CHAT_PROVIDER=ollama
 HEARTWRITE_CHAT_BASE_URL=http://localhost:11434
 HEARTWRITE_CHAT_MODEL=llama3
 ```
+
+For another OpenAI-compatible provider, use `HEARTWRITE_CHAT_PROVIDER=openai-compatible`,
+set `HEARTWRITE_CHAT_BASE_URL`, `HEARTWRITE_CHAT_MODEL`, and
+`HEARTWRITE_CHAT_API_KEY` as needed. There is no implicit remote-provider
+fallback when these values are absent.
 
 Private power-user tools are allowed in the local desktop app but should stay
 out of public app surfaces. StoryEval run-history controls are shown in the

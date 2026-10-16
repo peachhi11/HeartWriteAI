@@ -71,6 +71,8 @@ scenario tags, and inactive scenarios contribute no ordinary tags. Summaries
 and free-text scenario prose are not treated as routing instructions.
 
 The private `/chat` preview is the first real consumer of this compiler seam;
-it sends the compiled system prompt and bounded context to local Ollama. The
-public `/api/chat` route is intentionally unchanged until its provider-facing
-request contract is ready for this integration.
+it sends the compiled system prompt and bounded context through `/api/chat`.
+The route uses an explicitly configured OpenAI-compatible provider and is
+disabled unless `HEARTWRITE_CHAT_ENABLED=1` is set. The private route retains
+the public-safe selector until a private-only runtime feature requires an
+explicit private selector injection.

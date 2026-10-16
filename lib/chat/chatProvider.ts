@@ -4,9 +4,17 @@ export interface ChatCompletionMessage {
 }
 
 export interface ChatProviderConfig {
+  provider: "openrouter" | "ollama" | "openai-compatible";
   baseUrl: string;
   apiKey?: string;
   model: string;
+}
+
+export class ChatProviderConfigError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ChatProviderConfigError";
+  }
 }
 
 export type ChatStreamEvent =
@@ -15,13 +23,49 @@ export type ChatStreamEvent =
   | { type: "error"; message: string };
 
 export function getChatProviderConfig(env: NodeJS.ProcessEnv = process.env): ChatProviderConfig {
-  const baseUrl = (env.HEARTWRITE_CHAT_BASE_URL ?? "https://openrouter.ai/api").replace(/\/$/, "");
+  const provider = env.HEARTWRITE_CHAT_PROVIDER;
+
+  if (provider !== "openrouter" && provider !== "ollama" && provider !== "openai-compatible") {
+    throw new ChatProviderConfigError(
+      "Set HEARTWRITE_CHAT_PROVIDER to openrouter, ollama, or openai-compatible before enabling chat.",
+    );
+  }
+
+  const baseUrl = (
+    env.HEARTWRITE_CHAT_BASE_URL ??
+    (provider === "openrouter" ? "https://openrouter.ai/api" : undefined) ??
+    (provider === "ollama" ? "http://localhost:11434" : undefined)
+  )?.replace(/\/$/, "");
+
+  if (!baseUrl) {
+    throw new ChatProviderConfigError(
+      "Set HEARTWRITE_CHAT_BASE_URL for the selected chat provider.",
+    );
+  }
+
+  const apiKey = provider === "openrouter" ? env.OPENROUTER_API_KEY : env.HEARTWRITE_CHAT_API_KEY;
+  if (provider === "openrouter" && !apiKey) {
+    throw new ChatProviderConfigError("Set OPENROUTER_API_KEY before enabling OpenRouter chat.");
+  }
+
+  const model =
+    env.HEARTWRITE_CHAT_MODEL ??
+    (provider === "openrouter" ? env.OPENROUTER_MODEL : undefined) ??
+    (provider === "ollama" ? "llama3" : undefined);
+  if (!model) {
+    throw new ChatProviderConfigError("Set HEARTWRITE_CHAT_MODEL before enabling chat.");
+  }
 
   return {
+    provider,
     baseUrl,
-    apiKey: env.OPENROUTER_API_KEY ?? env.HEARTWRITE_CHAT_API_KEY,
-    model: env.HEARTWRITE_CHAT_MODEL ?? env.OPENROUTER_MODEL ?? "openrouter/auto",
+    apiKey,
+    model,
   };
+}
+
+export function isChatRouteEnabled(env: NodeJS.ProcessEnv = process.env) {
+  return env.HEARTWRITE_CHAT_ENABLED === "1";
 }
 
 export function buildChatCompletionUrl(baseUrl: string) {

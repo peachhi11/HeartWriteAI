@@ -83,11 +83,13 @@ not route their ordinary tags. This bridge does not infer skills from scenario
 summaries, free text, or trope prose.
 
 The private `/chat` preview now uses this seam through
-`lib/chat/localChatRuntime.ts` before sending its local Ollama request. The
-preview passes the selected saved scenario's explicit tags and editable
+`lib/chat/localChatRuntime.ts` before sending its request through `/api/chat`.
+The preview passes the selected saved scenario's explicit tags and editable
 scenario override into the compiler, then sends the resulting system prompt
-and bounded context as one system message. The public `/api/chat` provider
-route remains unchanged.
+and bounded context as one system message. `/api/chat` targets an explicitly
+configured OpenAI-compatible provider and is disabled unless
+`HEARTWRITE_CHAT_ENABLED=1` is set. The private route retains the public-safe
+runtime skill selector until a private-only feature requires deliberate opt-in.
 
 ## Migration Sequence
 

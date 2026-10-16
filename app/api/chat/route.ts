@@ -7,11 +7,17 @@ import { parseActiveLore } from "@/lib/character-card/lorebookParser";
 import { appendRelationshipStateContext } from "@/lib/chat/relationshipStateContext";
 import {
   buildChatCompletionUrl,
+  ChatProviderConfigError,
   createNormalizedChatStream,
   getChatProviderConfig,
+  isChatRouteEnabled,
 } from "@/lib/chat/chatProvider";
 
 export async function POST(request: Request) {
+  if (!isChatRouteEnabled()) {
+    return Response.json({ error: "Private chat is disabled." }, { status: 404 });
+  }
+
   const requestBody = await request.json().catch(() => undefined);
   const requestResult = chatRequestSchema.safeParse(requestBody);
 
@@ -45,20 +51,32 @@ export async function POST(request: Request) {
 }
 
 async function streamChatCompletion(messages: ReturnType<typeof appendPostHistoryOverride>) {
-  const provider = getChatProviderConfig();
+  let provider;
+  try {
+    provider = getChatProviderConfig();
+  } catch (error) {
+    if (error instanceof ChatProviderConfigError) {
+      return Response.json({ error: error.message }, { status: 503 });
+    }
+    return Response.json({ error: "Chat provider configuration is unavailable." }, { status: 503 });
+  }
 
-  const upstreamResponse = await fetch(buildChatCompletionUrl(provider.baseUrl), {
-    body: JSON.stringify({
-      messages,
-      model: provider.model,
-      stream: true,
-    }),
-    headers: {
-      ...(provider.apiKey ? { Authorization: `Bearer ${provider.apiKey}` } : {}),
-      "Content-Type": "application/json",
-    },
-    method: "POST",
-  });
+  let upstreamResponse: Response;
+  try {
+    upstreamResponse = await fetch(buildChatCompletionUrl(provider.baseUrl), {
+      body: JSON.stringify({ messages, model: provider.model, stream: true }),
+      headers: {
+        ...(provider.apiKey ? { Authorization: `Bearer ${provider.apiKey}` } : {}),
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+    });
+  } catch {
+    return Response.json(
+      { error: "The configured chat provider could not be reached." },
+      { status: 502 },
+    );
+  }
 
   if (!upstreamResponse.ok || !upstreamResponse.body) {
     return Response.json(
