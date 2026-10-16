@@ -59,6 +59,13 @@ imports continue to work. Public code must import
 `publicStoryRuntimeSkills.ts`; importing the all-record registry from a public
 surface would make private metadata eligible for the browser bundle.
 
+Both surface entrypoints now instantiate the shared selector core in
+`storyRuntimeSkillSelector.ts`. The public entrypoint selects from the
+public-only generated artifact, while the private compatibility registry
+selects from all records. The selector only filters the already-approved
+surface catalog; it does not change prompt selection or expose raw fixture
+text.
+
 ## Migration Sequence
 
 1. Add the structured metadata schema and one complete metadata record as a proof of shape. (Complete.)

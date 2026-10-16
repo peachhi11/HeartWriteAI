@@ -50,5 +50,10 @@ all-record registry from a public browser surface.
 
 The focused surface boundary check is
 `tests/character-card/runtime-surface-boundary.test.ts`. It currently verifies
-the public source tree and private desktop gate without introducing a runtime
-selector before an actual public consumer exists.
+the public source tree, private desktop gate, and separate public/private
+selector catalogs without changing prompt selection.
+
+The shared selector core is in
+`lib/character-card/storyRuntimeSkillSelector.ts`. Public and private entrypoints
+instantiate it with their own catalogs, keeping the surface decision at the
+import boundary.

@@ -3,9 +3,13 @@ import path from "node:path";
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { publicStoryRuntimeSkills } from "../../lib/character-card/publicStoryRuntimeSkills";
+import {
+  publicStoryRuntimeSkillSelector,
+  publicStoryRuntimeSkills,
+} from "../../lib/character-card/publicStoryRuntimeSkills";
 import { runtimeSkillMetadataRecords } from "../../lib/character-card/generatedRuntimeSkillMetadata";
 import { isPrivatePowerToolsEnabled } from "../../lib/app/privatePowerTools";
+import { storyRuntimeSkillSelector } from "../../lib/character-card/runtimeSkillRegistry";
 
 const productionSurfaceDirectories = ["app", "components", "features", "hooks"];
 
@@ -49,6 +53,16 @@ test("public runtime surface contains only public-safe generated records", () =>
       ),
     ),
     false,
+  );
+});
+
+test("public and private surface selectors retain separate catalog boundaries", () => {
+  assert.equal(publicStoryRuntimeSkillSelector.skills.length, 30);
+  assert.equal(storyRuntimeSkillSelector.skills.length, 37);
+  assert.equal(publicStoryRuntimeSkillSelector.getBySlug("explicit-memory-core"), undefined);
+  assert.equal(
+    storyRuntimeSkillSelector.getBySlug("explicit-memory-core")?.slug,
+    "explicit-memory-core",
   );
 });
 
