@@ -82,6 +82,13 @@ the `prompt_book` scope, while an active scenario contributes the
 not route their ordinary tags. This bridge does not infer skills from scenario
 summaries, free text, or trope prose.
 
+The private `/chat` preview now uses this seam through
+`lib/chat/localChatRuntime.ts` before sending its local Ollama request. The
+preview passes the selected saved scenario's explicit tags and editable
+scenario override into the compiler, then sends the resulting system prompt
+and bounded context as one system message. The public `/api/chat` provider
+route remains unchanged.
+
 ## Migration Sequence
 
 1. Add the structured metadata schema and one complete metadata record as a proof of shape. (Complete.)

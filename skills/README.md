@@ -69,3 +69,8 @@ Active context routing is deliberately narrow: an active StoryBook supplies
 `prompt_book`, an active scenario supplies `scenario_book` plus explicit
 scenario tags, and inactive scenarios contribute no ordinary tags. Summaries
 and free-text scenario prose are not treated as routing instructions.
+
+The private `/chat` preview is the first real consumer of this compiler seam;
+it sends the compiled system prompt and bounded context to local Ollama. The
+public `/api/chat` route is intentionally unchanged until its provider-facing
+request contract is ready for this integration.

@@ -6,13 +6,7 @@ import { Brain, Route, SendHorizontal, Sparkles } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,6 +22,7 @@ import { useScenarioLibrary } from "@/hooks/useScenarioLibrary";
 import { useRelationshipStore } from "@/features/relationship/store";
 import { StatBar } from "@/features/relationship/components/StatBar";
 import type { RelationshipState } from "@/features/relationship/schema";
+import { compileLocalChatRuntimePrompt } from "@/lib/chat/localChatRuntime";
 
 const OLLAMA_CHAT_ENDPOINT = "http://localhost:11434/api/chat";
 const DEFAULT_MODEL = "llama3";
@@ -35,7 +30,7 @@ const DEFAULT_MODEL = "llama3";
 const initialMessages: RoleplayMessage[] = [
   createRoleplayMessage(
     "assistant",
-    "*Rain beads against the high-rise windows while {{char}} pauses beside the conference table, one hand still resting on the unsigned contract.* \"You came back after all.\"",
+    '*Rain beads against the high-rise windows while {{char}} pauses beside the conference table, one hand still resting on the unsigned contract.* "You came back after all."',
   ),
 ];
 
@@ -70,10 +65,7 @@ function formatRoleplayText(text: string) {
     const isAction = part.startsWith("*") && part.endsWith("*");
 
     return (
-      <span
-        key={`${part}-${index}`}
-        className={cn(isAction && "font-medium italic text-primary")}
-      >
+      <span key={`${part}-${index}`} className={cn(isAction && "font-medium italic text-primary")}>
         {part}
       </span>
     );
@@ -87,17 +79,16 @@ export default function RoleplayChat() {
   const relationshipHydrated = useRelationshipStore((state) => state.hydrated);
   const relationshipState = useRelationshipStore((state) => state.state);
   const relationshipTracking = useRelationshipStore((state) => state.tracking);
-  const [sessions, setSessions] =
-    useState<ChatSession[]>(loadInitialChatSessions);
+  const [sessions, setSessions] = useState<ChatSession[]>(loadInitialChatSessions);
   const [activeSessionId, setActiveSessionId] = useState(() => sessions[0]!.id);
   const [input, setInput] = useState("");
   const [scenarioId, setScenarioId] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
-  const activeSession =
-    sessions.find((session) => session.id === activeSessionId) ?? sessions[0]!;
+  const activeSession = sessions.find((session) => session.id === activeSessionId) ?? sessions[0]!;
   const messages = activeSession.messages;
+  const selectedScenario = scenarioLibrary.items.find((item) => item.id === scenarioId);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -120,17 +111,12 @@ export default function RoleplayChat() {
   function updateActiveSession(patch: Partial<ChatSession>) {
     setSessions((current) =>
       current.map((session) =>
-        session.id === activeSession.id
-          ? { ...session, ...patch, updatedAt: Date.now() }
-          : session,
+        session.id === activeSession.id ? { ...session, ...patch, updatedAt: Date.now() } : session,
       ),
     );
   }
 
-  function updateScenarioOverride(
-    key: keyof ScenarioOverride,
-    value: string,
-  ) {
+  function updateScenarioOverride(key: keyof ScenarioOverride, value: string) {
     updateActiveSession({
       scenarioOverride: {
         ...activeSession.scenarioOverride,
@@ -161,12 +147,16 @@ export default function RoleplayChat() {
           scenario.trope,
           scenario.scenario.startingTension,
           scenario.firstMessage.aiOutputConstraint,
-        ].filter(Boolean).join("\n"),
+        ]
+          .filter(Boolean)
+          .join("\n"),
         scene: scenario.scenario.scenePremiseDescription,
         setting: [
           scenario.scenario.settingType.replaceAll("_", " "),
           scenario.scenario.sensoryDetails.join(", "),
-        ].filter(Boolean).join("\n"),
+        ]
+          .filter(Boolean)
+          .join("\n"),
       },
     });
   }
@@ -196,13 +186,23 @@ export default function RoleplayChat() {
     });
 
     try {
+      const localRuntimePrompt = compileLocalChatRuntimePrompt({
+        hasSelectedScenario: Boolean(selectedScenario),
+        scenarioOverride: activeSession.scenarioOverride,
+        selectedScenarioTags: selectedScenario?.tags,
+      });
       const response = await fetch(OLLAMA_CHAT_ENDPOINT, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           model: DEFAULT_MODEL,
           messages: [
-            ...compileScenarioOverrideMessages(activeSession.scenarioOverride),
+            {
+              role: "system",
+              content: [localRuntimePrompt.systemPrompt, localRuntimePrompt.contextBlock].join(
+                "\n\n",
+              ),
+            },
             ...toOllamaMessages(updatedMessages),
           ],
           stream: true,
@@ -254,12 +254,9 @@ export default function RoleplayChat() {
         }
       }
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Unknown inference error.";
+      const message = error instanceof Error ? error.message : "Unknown inference error.";
 
-      setRuntimeError(
-        `Could not reach local Ollama at ${OLLAMA_CHAT_ENDPOINT}. ${message}`,
-      );
+      setRuntimeError(`Could not reach local Ollama at ${OLLAMA_CHAT_ENDPOINT}. ${message}`);
       updateActiveSession({ messages: updatedMessages });
     } finally {
       setIsGenerating(false);
@@ -289,9 +286,7 @@ export default function RoleplayChat() {
               </div>
               <div>
                 <p className="text-sm font-medium">HeartWrite Preview</p>
-                <p className="text-xs text-muted-foreground">
-                  Local model: {DEFAULT_MODEL}
-                </p>
+                <p className="text-xs text-muted-foreground">Local model: {DEFAULT_MODEL}</p>
               </div>
             </CardContent>
           </Card>
@@ -300,9 +295,8 @@ export default function RoleplayChat() {
             <CardHeader>
               <CardTitle className="text-base">Runtime Notes</CardTitle>
               <CardDescription>
-                Chat requires a character and user persona in the full runtime.
-                Scenario overrides are optional because character cards can
-                supply their own opening scenario.
+                Chat requires a character and user persona in the full runtime. Scenario overrides
+                are optional because character cards can supply their own opening scenario.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -310,9 +304,7 @@ export default function RoleplayChat() {
           <Card className="bg-card/85">
             <CardHeader>
               <CardTitle className="text-base">Chat Threads</CardTitle>
-              <CardDescription>
-                Keep separate local chats and return to them later.
-              </CardDescription>
+              <CardDescription>Keep separate local chats and return to them later.</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-2">
               <Button type="button" variant="outline" onClick={startNewChat}>
@@ -328,9 +320,7 @@ export default function RoleplayChat() {
                     session.id === activeSession.id && "bg-muted",
                   )}
                 >
-                  <span className="block truncate font-medium">
-                    {session.title}
-                  </span>
+                  <span className="block truncate font-medium">{session.title}</span>
                   <span className="text-xs text-muted-foreground">
                     {session.messages.length} messages
                   </span>
@@ -343,8 +333,8 @@ export default function RoleplayChat() {
             <CardHeader>
               <CardTitle className="text-base">Scenario Override</CardTitle>
               <CardDescription>
-                Optional. Use this to replace or sharpen the card&apos;s built-in
-                scenario for this chat.
+                Optional. Use this to replace or sharpen the card&apos;s built-in scenario for this
+                chat.
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-3">
@@ -373,30 +363,22 @@ export default function RoleplayChat() {
               </div>
               <Textarea
                 value={activeSession.scenarioOverride.context}
-                onChange={(event) =>
-                  updateScenarioOverride("context", event.currentTarget.value)
-                }
+                onChange={(event) => updateScenarioOverride("context", event.currentTarget.value)}
                 placeholder="Context"
               />
               <Textarea
                 value={activeSession.scenarioOverride.setting}
-                onChange={(event) =>
-                  updateScenarioOverride("setting", event.currentTarget.value)
-                }
+                onChange={(event) => updateScenarioOverride("setting", event.currentTarget.value)}
                 placeholder="Setting"
               />
               <Textarea
                 value={activeSession.scenarioOverride.scene}
-                onChange={(event) =>
-                  updateScenarioOverride("scene", event.currentTarget.value)
-                }
+                onChange={(event) => updateScenarioOverride("scene", event.currentTarget.value)}
                 placeholder="Scene"
               />
               <Textarea
                 value={activeSession.scenarioOverride.dynamic}
-                onChange={(event) =>
-                  updateScenarioOverride("dynamic", event.currentTarget.value)
-                }
+                onChange={(event) => updateScenarioOverride("dynamic", event.currentTarget.value)}
                 placeholder="Dynamic"
               />
             </CardContent>
@@ -409,8 +391,7 @@ export default function RoleplayChat() {
                 Emotional Tracker
               </CardTitle>
               <CardDescription>
-                Small read-only snapshot of what the current chat is doing
-                emotionally.
+                Small read-only snapshot of what the current chat is doing emotionally.
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-3">
@@ -423,98 +404,84 @@ export default function RoleplayChat() {
                 value={relationshipState.trust.emotional}
                 tone="good"
               />
-              <StatBar
-                label="Bond Depth"
-                value={relationshipState.attachment.bondDepth}
-              />
-              <StatBar
-                label="Tension"
-                value={relationshipState.chemistry.tension}
-                tone="warm"
-              />
+              <StatBar label="Bond Depth" value={relationshipState.attachment.bondDepth} />
+              <StatBar label="Tension" value={relationshipState.chemistry.tension} tone="warm" />
               <StatBar
                 label="Rupture Risk"
                 value={relationshipTracking?.trajectory.ruptureRisk ?? 0}
                 tone="risk"
               />
               <Button asChild variant="outline">
-                <Link href="/relationship-tracker">
-                  Open Full Relationship Tracker
-                </Link>
+                <Link href="/relationship-tracker">Open Full Relationship Tracker</Link>
               </Button>
             </CardContent>
           </Card>
         </section>
 
         <section className="flex min-h-[calc(100vh-9rem)] min-w-0 flex-col overflow-hidden rounded-xl border bg-card/70 shadow-xl backdrop-blur">
-        <ScrollArea className="flex-1">
-          <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-5 py-8">
-            {messages.map((message) => (
-              <div
-                key={message.id}
-                className={cn(
-                  "flex gap-4",
-                  message.role === "user" && "flex-row-reverse",
-                )}
-              >
+          <ScrollArea className="flex-1">
+            <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-5 py-8">
+              {messages.map((message) => (
                 <div
-                  className={cn(
-                    "flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
-                    message.role === "user"
-                      ? "bg-secondary text-secondary-foreground"
-                      : "bg-primary text-primary-foreground",
-                  )}
+                  key={message.id}
+                  className={cn("flex gap-4", message.role === "user" && "flex-row-reverse")}
                 >
-                  {message.role === "user" ? "You" : "AI"}
+                  <div
+                    className={cn(
+                      "flex size-9 shrink-0 items-center justify-center rounded-full text-xs font-semibold",
+                      message.role === "user"
+                        ? "bg-secondary text-secondary-foreground"
+                        : "bg-primary text-primary-foreground",
+                    )}
+                  >
+                    {message.role === "user" ? "You" : "AI"}
+                  </div>
+                  <div
+                    className={cn(
+                      "max-w-[85%] rounded-2xl border px-4 py-3 text-sm leading-relaxed shadow-sm",
+                      message.role === "user" ? "bg-secondary/70" : "bg-card/90 backdrop-blur",
+                    )}
+                  >
+                    {getMessageText(message)
+                      ? message.parts.map((part, partIndex) =>
+                          part.type === "text" ? (
+                            <span key={`${message.id}-${partIndex}`}>
+                              {formatRoleplayText(part.text)}
+                            </span>
+                          ) : null,
+                        )
+                      : "Thinking..."}
+                  </div>
                 </div>
-                <div
-                  className={cn(
-                    "max-w-[85%] rounded-2xl border px-4 py-3 text-sm leading-relaxed shadow-sm",
-                    message.role === "user"
-                      ? "bg-secondary/70"
-                      : "bg-card/90 backdrop-blur",
-                  )}
-                >
-                  {getMessageText(message)
-                    ? message.parts.map((part, partIndex) =>
-                        part.type === "text" ? (
-                          <span key={`${message.id}-${partIndex}`}>
-                            {formatRoleplayText(part.text)}
-                          </span>
-                        ) : null,
-                      )
-                    : "Thinking..."}
-                </div>
-              </div>
-            ))}
-            {runtimeError ? (
-              <p className="rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-                {runtimeError}
-              </p>
-            ) : null}
-            <div ref={chatEndRef} />
-          </div>
-        </ScrollArea>
+              ))}
+              {runtimeError ? (
+                <p className="rounded-2xl border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                  {runtimeError}
+                </p>
+              ) : null}
+              <div ref={chatEndRef} />
+            </div>
+          </ScrollArea>
 
-        <div className="border-t bg-card/80 p-5 backdrop-blur">
-          <form
-            onSubmit={handleSendMessage}
-            className="mx-auto flex max-w-3xl items-center gap-3 rounded-2xl border bg-background/80 p-2 shadow-lg"
-          >
-            <Input
-              value={input}
-              onChange={(event) => setInput(event.currentTarget.value)}
-              placeholder="Type your action or dialogue here..."
-              disabled={isGenerating}
-              className="border-0 bg-transparent shadow-none focus-visible:ring-0"
-            />
-            <Button type="submit" disabled={isGenerating || !input.trim()}>
-              <SendHorizontal data-icon="inline-end" />
-              {isGenerating ? "Generating" : "Send"}
-            </Button>
-          </form>
-        </div>
-      </section>
+          <div className="border-t bg-card/80 p-5 backdrop-blur">
+            <form
+              onSubmit={handleSendMessage}
+              className="mx-auto flex max-w-3xl items-center gap-3 rounded-2xl border bg-background/80 p-2 shadow-lg"
+            >
+              <Input
+                value={input}
+                onChange={(event) => setInput(event.currentTarget.value)}
+                placeholder="Type your action or dialogue here..."
+                disabled={isGenerating}
+                className="border-0 bg-transparent shadow-none focus-visible:ring-0"
+              />
+              <Button type="submit" disabled={isGenerating || !input.trim()}>
+                <SendHorizontal data-icon="inline-end" />
+                {isGenerating ? "Generating" : "Send"}
+              </Button>
+            </form>
+          </div>
+        </section>
       </div>
     </StudioShell>
   );
@@ -561,28 +528,6 @@ function buildSessionTitle(currentTitle: string, firstMessage: string) {
   return firstMessage.slice(0, 42) || currentTitle;
 }
 
-function compileScenarioOverrideMessages(override: ScenarioOverride) {
-  const content = [
-    override.context ? `Context: ${override.context}` : "",
-    override.setting ? `Setting: ${override.setting}` : "",
-    override.scene ? `Scene: ${override.scene}` : "",
-    override.dynamic ? `Dynamic: ${override.dynamic}` : "",
-  ].filter(Boolean).join("\n");
-
-  return content
-    ? [
-        {
-          role: "system",
-          content: [
-            "SCENARIO OVERRIDE FOR THIS CHAT:",
-            content,
-            "Use this only as scene setup. Do not write {{user}} decisions, private thoughts, dialogue, consent, or actions.",
-          ].join("\n"),
-        },
-      ]
-    : [];
-}
-
 function SceneTrackerSummary(props: {
   override: ScenarioOverride;
   relationshipState: RelationshipState;
@@ -611,12 +556,11 @@ function SceneTrackerSummary(props: {
     relationshipDynamic: props.relationshipState.type,
     scenario: props.override.scene || "Using character card scenario.",
     sceneAtmosphere: props.override.setting || "Atmosphere is forming from chat.",
-    tensionConflict:
-      props.relationshipState.rupture.active
-        ? props.relationshipState.rupture.type ?? "Active rupture"
-        : props.relationshipState.chemistry.tension > 45
-          ? "Romantic tension is active."
-          : "No major unresolved conflict detected.",
+    tensionConflict: props.relationshipState.rupture.active
+      ? (props.relationshipState.rupture.type ?? "Active rupture")
+      : props.relationshipState.chemistry.tension > 45
+        ? "Romantic tension is active."
+        : "No major unresolved conflict detected.",
   };
 
   return (
@@ -673,10 +617,10 @@ function readChatSession(value: unknown): ChatSession | null {
 function isRoleplayMessage(value: unknown): value is RoleplayMessage {
   return Boolean(
     value &&
-      typeof value === "object" &&
-      ((value as RoleplayMessage).role === "user" ||
-        (value as RoleplayMessage).role === "assistant") &&
-      Array.isArray((value as RoleplayMessage).parts),
+    typeof value === "object" &&
+    ((value as RoleplayMessage).role === "user" ||
+      (value as RoleplayMessage).role === "assistant") &&
+    Array.isArray((value as RoleplayMessage).parts),
   );
 }
 
