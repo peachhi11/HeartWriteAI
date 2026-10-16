@@ -64,3 +64,8 @@ state fields, and scopes. Private callers must inject the private selector
 intentionally. The compiler emits only prompt signals, state fields, and
 memory-routing hints; it does not embed skill bodies or private fixture text in
 the prompt.
+
+Active context routing is deliberately narrow: an active StoryBook supplies
+`prompt_book`, an active scenario supplies `scenario_book` plus explicit
+scenario tags, and inactive scenarios contribute no ordinary tags. Summaries
+and free-text scenario prose are not treated as routing instructions.

@@ -130,3 +130,39 @@ test("selects runtime skills by mode, trigger, scope, and state field", () => {
   });
   assert.match(state.contextBlock, /Explicit memory core \(explicit-memory-core\)/);
 });
+
+test("routes active StoryBook and scenario state into bounded skill selection", () => {
+  const compiled = compileChatPrompt({
+    appSystemPrompt: "Use the public romance safety contract.",
+    activeStoryBook: {
+      status: "active",
+      runtimeSkillTags: ["emotional_continuity"],
+    },
+    activeScenario: {
+      active: true,
+      tags: ["scene_coherence"],
+    },
+    card: { data: { name: "Rowan" } },
+  });
+
+  assert.match(compiled.contextBlock, /Emotional continuity \(emotional-continuity\)/);
+  assert.match(compiled.contextBlock, /Scene coherence playfield \(scene-coherence-playfield\)/);
+  assert.doesNotMatch(compiled.contextBlock, /Summary:/);
+  assert.doesNotMatch(compiled.contextBlock, /No scenario selected/);
+});
+
+test("does not route inactive scenario tags without an explicit runtime override", () => {
+  const compiled = compileChatPrompt({
+    appSystemPrompt: "Use the public romance safety contract.",
+    activeScenario: {
+      active: false,
+      tags: ["scene_coherence"],
+    },
+    card: { data: { name: "Rowan" } },
+  });
+
+  assert.doesNotMatch(
+    compiled.contextBlock,
+    /Scene coherence playfield \(scene-coherence-playfield\)/,
+  );
+});

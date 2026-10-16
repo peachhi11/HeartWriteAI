@@ -76,6 +76,12 @@ selected records' prompt signals, state fields, and memory-routing hints to a
 summaries, source links, guardrails, or fixture text into the prompt, and it
 does not change the prompt when no runtime-skill inputs are supplied.
 
+The compiler also accepts bounded active context: an active StoryBook contributes
+the `prompt_book` scope, while an active scenario contributes the
+`scenario_book` scope and only its explicit runtime tags. Inactive scenarios do
+not route their ordinary tags. This bridge does not infer skills from scenario
+summaries, free text, or trope prose.
+
 ## Migration Sequence
 
 1. Add the structured metadata schema and one complete metadata record as a proof of shape. (Complete.)

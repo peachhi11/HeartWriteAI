@@ -13,6 +13,19 @@ export interface RuntimeChatMessage {
   content: string;
 }
 
+export interface ActiveRuntimeStoryBook {
+  status: "draft" | "active" | "archived";
+  runtimeSkillTags?: readonly string[];
+  runtimeSkillScopes?: readonly StoryRuntimeSkill["scope"][number][];
+}
+
+export interface ActiveRuntimeScenario {
+  active?: boolean;
+  tags?: readonly string[];
+  runtimeSkillTags?: readonly string[];
+  runtimeSkillScopes?: readonly StoryRuntimeSkill["scope"][number][];
+}
+
 export interface RuntimeCharacterCard {
   data?: {
     name?: string;
@@ -39,6 +52,8 @@ export interface CompileChatPromptArgs {
   activeLoreEntries?: RuntimeLoreEntry[];
   retrievedMemories?: string[];
   chatHistory?: RuntimeChatMessage[];
+  activeStoryBook?: ActiveRuntimeStoryBook;
+  activeScenario?: ActiveRuntimeScenario;
   runtimeSkillSlugs?: readonly string[];
   runtimeSkillModes?: readonly StoryRuntimeSkill["activationMode"][];
   runtimeSkillTags?: readonly string[];
@@ -64,6 +79,8 @@ export function compileChatPrompt({
   activeLoreEntries = [],
   retrievedMemories = [],
   chatHistory = [],
+  activeStoryBook,
+  activeScenario,
   runtimeSkillSlugs = [],
   runtimeSkillModes = [],
   runtimeSkillTags = [],
@@ -85,10 +102,13 @@ export function compileChatPrompt({
     selector: runtimeSkillSelector,
     slugs: runtimeSkillSlugs,
     modes: runtimeSkillModes,
-    tags: runtimeSkillTags,
+    tags: [...deriveRuntimeSkillTags({ activeStoryBook, activeScenario }), ...runtimeSkillTags],
     triggers: runtimeSkillTriggers,
     stateFields: runtimeSkillStateFields,
-    scopes: runtimeSkillScopes,
+    scopes: [
+      ...deriveRuntimeSkillScopes({ activeStoryBook, activeScenario }),
+      ...runtimeSkillScopes,
+    ],
   });
 
   const contextBlock = [
@@ -128,6 +148,31 @@ export function compileChatPrompt({
     postHistoryInstructions,
     contextBlock,
   };
+}
+
+function deriveRuntimeSkillTags(input: {
+  activeStoryBook?: ActiveRuntimeStoryBook;
+  activeScenario?: ActiveRuntimeScenario;
+}): string[] {
+  return [
+    ...(input.activeStoryBook?.runtimeSkillTags ?? []),
+    ...(input.activeScenario?.active !== false ? (input.activeScenario?.tags ?? []) : []),
+    ...(input.activeScenario?.runtimeSkillTags ?? []),
+  ];
+}
+
+function deriveRuntimeSkillScopes(input: {
+  activeStoryBook?: ActiveRuntimeStoryBook;
+  activeScenario?: ActiveRuntimeScenario;
+}): StoryRuntimeSkill["scope"][number][] {
+  return [
+    ...(input.activeStoryBook?.status === "active" ? ["prompt_book" as const] : []),
+    ...(input.activeScenario && input.activeScenario.active !== false
+      ? ["scenario_book" as const]
+      : []),
+    ...(input.activeStoryBook?.runtimeSkillScopes ?? []),
+    ...(input.activeScenario?.runtimeSkillScopes ?? []),
+  ];
 }
 
 function selectRuntimeSkills(input: {
