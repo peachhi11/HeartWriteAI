@@ -45,6 +45,7 @@ export const chatRequestSchema = z.object({
       physicalTellState: physicalTellRuntimeStateSchema.optional(),
     })
     .optional(),
+  model: z.string().trim().min(1).max(200).optional(),
   messages: z.array(chatMessageSchema),
 });
 
@@ -52,9 +53,7 @@ export type ChatMessage = z.infer<typeof chatMessageSchema>;
 export type PostHistoryRuntime = z.infer<typeof postHistoryRuntimeSchema>;
 export type SensoryRuntime = z.infer<typeof SensoryPerceptionSchema>;
 
-export function createPostHistoryOverride(
-  postHistory: PostHistoryRuntime | undefined,
-) {
+export function createPostHistoryOverride(postHistory: PostHistoryRuntime | undefined) {
   const normalized = postHistoryRuntimeSchema.parse(postHistory ?? {});
 
   return [
@@ -94,13 +93,8 @@ export function appendSensoryPerceptionContext(
   }
 
   const latestUserMessage =
-    [...messages].reverse().find((message) => message.role === "user")
-      ?.content ?? "";
-  const matchedGates = resolveSensoryGateMatches(
-    latestUserMessage,
-    sensoryPerception,
-    events,
-  );
+    [...messages].reverse().find((message) => message.role === "user")?.content ?? "";
+  const matchedGates = resolveSensoryGateMatches(latestUserMessage, sensoryPerception, events);
   const matchedPhysicalTellGates = resolvePhysicalTellGateMatches(
     latestUserMessage,
     sensoryPerception,

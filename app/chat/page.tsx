@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Brain, Route, SendHorizontal, Sparkles } from "lucide-react";
+import { Brain, Route, SendHorizontal, Settings2, Sparkles } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,7 @@ import type { RelationshipState } from "@/features/relationship/schema";
 import { compileLocalChatRuntimePrompt } from "@/lib/chat/localChatRuntime";
 
 const CHAT_ENDPOINT = "/api/chat";
+const CHAT_MODEL_OVERRIDE_KEY = "heartwriteai:chat-model-override";
 
 const initialMessages: RoleplayMessage[] = [
   createRoleplayMessage(
@@ -46,6 +47,14 @@ type ChatSession = {
   messages: RoleplayMessage[];
   scenarioOverride: ScenarioOverride;
   updatedAt: number;
+};
+
+type ChatProviderStatus = {
+  enabled: boolean;
+  provider?: string;
+  model?: string;
+  credentialConfigured?: boolean;
+  error?: string;
 };
 
 const CHAT_STORAGE_KEY = "heartwriteai:chat-sessions";
@@ -84,6 +93,8 @@ export default function RoleplayChat() {
   const [scenarioId, setScenarioId] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [runtimeError, setRuntimeError] = useState<string | null>(null);
+  const [providerStatus, setProviderStatus] = useState<ChatProviderStatus | null>(null);
+  const [modelOverride, setModelOverride] = useState(() => loadModelOverride());
   const chatEndRef = useRef<HTMLDivElement>(null);
   const activeSession = sessions.find((session) => session.id === activeSessionId) ?? sessions[0]!;
   const messages = activeSession.messages;
@@ -106,6 +117,25 @@ export default function RoleplayChat() {
       // Chat preview can still run without persistence.
     }
   }, [sessions]);
+
+  useEffect(() => {
+    window.localStorage.setItem(CHAT_MODEL_OVERRIDE_KEY, modelOverride);
+  }, [modelOverride]);
+
+  useEffect(() => {
+    void fetch("/api/chat", {
+      body: JSON.stringify({ status: "config" }),
+      headers: { "Content-Type": "application/json" },
+      method: "POST",
+    })
+      .then(async (response) => {
+        const status = (await response.json()) as ChatProviderStatus;
+        setProviderStatus(status);
+      })
+      .catch(() => {
+        setProviderStatus({ enabled: false, error: "Chat status is unavailable." });
+      });
+  }, []);
 
   function updateActiveSession(patch: Partial<ChatSession>) {
     setSessions((current) =>
@@ -203,6 +233,7 @@ export default function RoleplayChat() {
             },
             ...toChatCompletionMessages(updatedMessages),
           ],
+          ...(modelOverride.trim() ? { model: modelOverride.trim() } : {}),
         }),
       });
 
@@ -290,6 +321,50 @@ export default function RoleplayChat() {
                 <p className="text-sm font-medium">HeartWrite Preview</p>
                 <p className="text-xs text-muted-foreground">Provider-neutral chat preview</p>
               </div>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-card/85">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Settings2 className="size-4 text-muted-foreground" />
+                Provider Settings
+              </CardTitle>
+              <CardDescription>
+                Safe local controls. Provider URLs and API keys stay in the server environment.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-3">
+              <div className="rounded-md border bg-background/60 p-3 text-xs">
+                <div className="font-medium">Configured provider</div>
+                <div className="mt-1 text-muted-foreground">
+                  {!providerStatus
+                    ? "Checking..."
+                    : !providerStatus.enabled
+                      ? "Private chat is disabled."
+                      : providerStatus.error
+                        ? providerStatus.error
+                        : `${providerStatus.provider} · ${providerStatus.model}`}
+                </div>
+                {providerStatus?.enabled && !providerStatus.error ? (
+                  <div className="mt-1 text-muted-foreground">
+                    {providerStatus.credentialConfigured
+                      ? "Credential configured"
+                      : "No remote credential"}
+                  </div>
+                ) : null}
+              </div>
+              <Input
+                value={modelOverride}
+                onChange={(event) => setModelOverride(event.currentTarget.value)}
+                placeholder="Optional model override"
+                aria-label="Optional model override"
+              />
+              {modelOverride ? (
+                <Button type="button" variant="ghost" onClick={() => setModelOverride("")}>
+                  Clear model override
+                </Button>
+              ) : null}
             </CardContent>
           </Card>
 
@@ -497,6 +572,18 @@ function createChatSession(title: string): ChatSession {
     title,
     updatedAt: Date.now(),
   };
+}
+
+function loadModelOverride() {
+  try {
+    if (typeof window === "undefined") {
+      return "";
+    }
+
+    return window.localStorage.getItem(CHAT_MODEL_OVERRIDE_KEY) ?? "";
+  } catch {
+    return "";
+  }
 }
 
 function loadInitialChatSessions() {

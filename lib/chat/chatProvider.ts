@@ -68,6 +68,30 @@ export function isChatRouteEnabled(env: NodeJS.ProcessEnv = process.env) {
   return env.HEARTWRITE_CHAT_ENABLED === "1";
 }
 
+export function getChatRoutePolicy(env: NodeJS.ProcessEnv = process.env) {
+  if (!isChatRouteEnabled(env)) {
+    return { enabled: false as const };
+  }
+
+  try {
+    const provider = getChatProviderConfig(env);
+    return {
+      enabled: true as const,
+      provider: provider.provider,
+      model: provider.model,
+      credentialConfigured: Boolean(provider.apiKey),
+    };
+  } catch (error) {
+    return {
+      enabled: true as const,
+      error:
+        error instanceof ChatProviderConfigError
+          ? error.message
+          : "Chat provider configuration is unavailable.",
+    };
+  }
+}
+
 export function buildChatCompletionUrl(baseUrl: string) {
   return `${baseUrl.replace(/\/$/, "")}/v1/chat/completions`;
 }

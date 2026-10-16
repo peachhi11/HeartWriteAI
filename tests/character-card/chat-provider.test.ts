@@ -6,6 +6,7 @@ import {
   createNormalizedChatStream,
   ChatProviderConfigError,
   getChatProviderConfig,
+  getChatRoutePolicy,
   isChatRouteEnabled,
   parseOpenAICompatibleSseLine,
 } from "../../lib/chat/chatProvider";
@@ -31,6 +32,12 @@ test("fails closed when no provider is explicitly configured", () => {
   assert.throws(() => getChatProviderConfig({}), ChatProviderConfigError);
   assert.equal(isChatRouteEnabled({}), false);
   assert.equal(isChatRouteEnabled({ HEARTWRITE_CHAT_ENABLED: "1" }), true);
+  assert.deepEqual(getChatRoutePolicy({}), { enabled: false });
+  assert.deepEqual(getChatRoutePolicy({ HEARTWRITE_CHAT_ENABLED: "1" }), {
+    enabled: true,
+    error:
+      "Set HEARTWRITE_CHAT_PROVIDER to openrouter, ollama, or openai-compatible before enabling chat.",
+  });
 });
 
 test("keeps local Ollama configuration separate from remote provider keys", () => {
@@ -42,6 +49,23 @@ test("keeps local Ollama configuration separate from remote provider keys", () =
   assert.equal(config.baseUrl, "http://localhost:11434");
   assert.equal(config.apiKey, undefined);
   assert.equal(config.model, "local-prose-model");
+});
+
+test("reports a safe route policy without exposing provider URLs or credentials", () => {
+  assert.deepEqual(
+    getChatRoutePolicy({
+      HEARTWRITE_CHAT_ENABLED: "1",
+      HEARTWRITE_CHAT_PROVIDER: "openrouter",
+      HEARTWRITE_CHAT_MODEL: "openrouter/test-model",
+      OPENROUTER_API_KEY: "secret",
+    }),
+    {
+      enabled: true,
+      provider: "openrouter",
+      model: "openrouter/test-model",
+      credentialConfigured: true,
+    },
+  );
 });
 
 test("parses OpenAI-compatible text deltas and finish events", () => {

@@ -10,6 +10,7 @@ import {
   ChatProviderConfigError,
   createNormalizedChatStream,
   getChatProviderConfig,
+  getChatRoutePolicy,
   isChatRouteEnabled,
 } from "@/lib/chat/chatProvider";
 
@@ -19,6 +20,17 @@ export async function POST(request: Request) {
   }
 
   const requestBody = await request.json().catch(() => undefined);
+
+  if (
+    requestBody &&
+    typeof requestBody === "object" &&
+    "status" in requestBody &&
+    requestBody.status === "config"
+  ) {
+    const policy = getChatRoutePolicy();
+    return Response.json(policy, policy.enabled && policy.error ? { status: 503 } : undefined);
+  }
+
   const requestResult = chatRequestSchema.safeParse(requestBody);
 
   if (!requestResult.success) {
@@ -47,10 +59,13 @@ export async function POST(request: Request) {
   );
   const optimizedMessages = appendPostHistoryOverride(sensoryAwareMessages, postHistory);
 
-  return streamChatCompletion(optimizedMessages);
+  return streamChatCompletion(optimizedMessages, requestResult.data.model);
 }
 
-async function streamChatCompletion(messages: ReturnType<typeof appendPostHistoryOverride>) {
+async function streamChatCompletion(
+  messages: ReturnType<typeof appendPostHistoryOverride>,
+  modelOverride?: string,
+) {
   let provider;
   try {
     provider = getChatProviderConfig();
@@ -64,7 +79,7 @@ async function streamChatCompletion(messages: ReturnType<typeof appendPostHistor
   let upstreamResponse: Response;
   try {
     upstreamResponse = await fetch(buildChatCompletionUrl(provider.baseUrl), {
-      body: JSON.stringify({ messages, model: provider.model, stream: true }),
+      body: JSON.stringify({ messages, model: modelOverride ?? provider.model, stream: true }),
       headers: {
         ...(provider.apiKey ? { Authorization: `Bearer ${provider.apiKey}` } : {}),
         "Content-Type": "application/json",

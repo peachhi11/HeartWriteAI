@@ -33,3 +33,13 @@ test("does not route scenario tags when the private chat has no selected scenari
   assert.match(compiled.contextBlock, /The archive doors lock behind them/);
   assert.doesNotMatch(compiled.contextBlock, /scene-coherence-playfield/);
 });
+
+test("keeps private chat on the public-safe selector until private-only behavior is needed", () => {
+  const compiled = compileLocalChatRuntimePrompt({
+    hasSelectedScenario: true,
+    scenarioOverride,
+    selectedScenarioTags: ["explicit_mode"],
+  });
+
+  assert.doesNotMatch(compiled.contextBlock, /explicit-mode-confirmed/);
+});
