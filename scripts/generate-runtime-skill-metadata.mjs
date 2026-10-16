@@ -60,21 +60,37 @@ export const ${exportName} = ${JSON.stringify(selectedRecords, null, 2)} as cons
 `;
 const generated = {
   all: await prettier.format(buildGeneratedSource("runtimeSkillMetadataRecords", records), {
-    parser: "typescript",
+    filepath: outputPaths.all,
+    printWidth: 100,
+    semi: true,
+    singleQuote: false,
+    trailingComma: "all",
   }),
   public: await prettier.format(
     buildGeneratedSource(
       "publicRuntimeSkillMetadataRecords",
       records.filter((record) => record.runtime.public_safe),
     ),
-    { parser: "typescript" },
+    {
+      filepath: outputPaths.public,
+      printWidth: 100,
+      semi: true,
+      singleQuote: false,
+      trailingComma: "all",
+    },
   ),
   private: await prettier.format(
     buildGeneratedSource(
       "privateRuntimeSkillMetadataRecords",
       records.filter((record) => !record.runtime.public_safe),
     ),
-    { parser: "typescript" },
+    {
+      filepath: outputPaths.private,
+      printWidth: 100,
+      semi: true,
+      singleQuote: false,
+      trailingComma: "all",
+    },
   ),
 };
 
