@@ -50,7 +50,10 @@ export interface MemoryRepository {
   update(storyBookId: string, memoryId: string, changes: MemoryRecordUpdate): Promise<MemoryRecord>;
 }
 
-export function createMemoryRepository(input: { now?: () => string } = {}): MemoryRepository {
+export function createMemoryRepository(input: {
+  now?: () => string;
+  storyBookExists: (storyBookId: string) => Promise<boolean>;
+}): MemoryRepository {
   const now = input.now ?? (() => new Date().toISOString());
   const records = new Map<string, MemoryRecord>();
 
@@ -81,6 +84,8 @@ export function createMemoryRepository(input: { now?: () => string } = {}): Memo
         updatedAt: parsedDraft.updatedAt ?? timestamp,
       });
 
+      await assertStoryBookExists(record.storyBookId, input.storyBookExists);
+
       records.set(memoryRecordKey(record.storyBookId, record.id), record);
       return record;
     },
@@ -88,6 +93,7 @@ export function createMemoryRepository(input: { now?: () => string } = {}): Memo
       const normalizedStoryBookId = storyBookIdSchema.parse(storyBookId);
       const normalizedMemoryId = memoryIdSchema.parse(memoryId);
       const key = memoryRecordKey(normalizedStoryBookId, normalizedMemoryId);
+      await assertStoryBookExists(normalizedStoryBookId, input.storyBookExists);
       const existing = records.get(key);
 
       if (!existing) {
@@ -105,6 +111,15 @@ export function createMemoryRepository(input: { now?: () => string } = {}): Memo
       return updated;
     },
   };
+}
+
+async function assertStoryBookExists(
+  storyBookId: string,
+  storyBookExists: (storyBookId: string) => Promise<boolean>,
+) {
+  if (!(await storyBookExists(storyBookId))) {
+    throw new Error(`StoryBook not found: ${storyBookId}`);
+  }
 }
 
 function memoryRecordKey(storyBookId: string, memoryId: string) {

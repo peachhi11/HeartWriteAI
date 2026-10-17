@@ -3,10 +3,14 @@ import assert from "node:assert/strict";
 
 import { createMemoryRepository, type MemoryRecordDraft } from "../../lib/memory/memoryRepository";
 
+const storyBookExists = async (storyBookId: string) =>
+  ["quiet-harbor", "winter-garden"].includes(storyBookId);
+
 describe("Memory Core repository", () => {
   it("saves and reads a validated memory record for a StoryBook", async () => {
     const repository = createMemoryRepository({
       now: () => "2026-10-17T00:00:00.000Z",
+      storyBookExists,
     });
     const draft: MemoryRecordDraft = {
       id: "memory-quiet-harbor-1",
@@ -29,7 +33,10 @@ describe("Memory Core repository", () => {
 
   it("updates a memory while preserving identity and creation time", async () => {
     const timestamps = ["2026-10-17T00:00:00.000Z", "2026-10-17T01:00:00.000Z"];
-    const repository = createMemoryRepository({ now: () => timestamps.shift() ?? "" });
+    const repository = createMemoryRepository({
+      now: () => timestamps.shift() ?? "",
+      storyBookExists,
+    });
     const saved = await repository.save({
       id: "memory-quiet-harbor-2",
       storyBookId: "quiet-harbor",
@@ -57,6 +64,7 @@ describe("Memory Core repository", () => {
   it("deletes a memory within its StoryBook without affecting another StoryBook", async () => {
     const repository = createMemoryRepository({
       now: () => "2026-10-17T00:00:00.000Z",
+      storyBookExists,
     });
     await repository.save({
       id: "memory-shared-id",
@@ -89,6 +97,7 @@ describe("Memory Core repository", () => {
   it("rejects invalid updates without changing the stored record", async () => {
     const repository = createMemoryRepository({
       now: () => "2026-10-17T00:00:00.000Z",
+      storyBookExists,
     });
     const saved = await repository.save({
       id: "memory-validation-1",
@@ -107,5 +116,24 @@ describe("Memory Core repository", () => {
     );
 
     assert.deepEqual(await repository.get("quiet-harbor", saved.id), saved);
+  });
+
+  it("rejects saving a memory for a StoryBook that does not exist", async () => {
+    const repository = createMemoryRepository({
+      now: () => "2026-10-17T00:00:00.000Z",
+      storyBookExists: async (storyBookId) => storyBookId === "quiet-harbor",
+    });
+
+    await assert.rejects(
+      repository.save({
+        id: "memory-orphaned-1",
+        storyBookId: "missing-storybook",
+        kind: "episodic",
+        content: "This memory has nowhere to belong.",
+        source: "authored",
+        privacy: "private",
+        status: "active",
+      }),
+    );
   });
 });
