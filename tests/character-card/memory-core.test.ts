@@ -26,4 +26,86 @@ describe("Memory Core repository", () => {
     assert.equal(saved.privacy, "private");
     assert.equal(saved.status, "active");
   });
+
+  it("updates a memory while preserving identity and creation time", async () => {
+    const timestamps = ["2026-10-17T00:00:00.000Z", "2026-10-17T01:00:00.000Z"];
+    const repository = createMemoryRepository({ now: () => timestamps.shift() ?? "" });
+    const saved = await repository.save({
+      id: "memory-quiet-harbor-2",
+      storyBookId: "quiet-harbor",
+      kind: "relationship",
+      content: "They still avoid the subject of the missing letter.",
+      source: "derived",
+      privacy: "project",
+      status: "active",
+    });
+
+    const updated = await repository.update("quiet-harbor", saved.id, {
+      content: "They finally name the missing letter between them.",
+      status: "superseded",
+    });
+
+    assert.equal(updated.id, saved.id);
+    assert.equal(updated.storyBookId, saved.storyBookId);
+    assert.equal(updated.createdAt, saved.createdAt);
+    assert.equal(updated.updatedAt, "2026-10-17T01:00:00.000Z");
+    assert.equal(updated.content, "They finally name the missing letter between them.");
+    assert.equal(updated.status, "superseded");
+    assert.deepEqual(await repository.get("quiet-harbor", saved.id), updated);
+  });
+
+  it("deletes a memory within its StoryBook without affecting another StoryBook", async () => {
+    const repository = createMemoryRepository({
+      now: () => "2026-10-17T00:00:00.000Z",
+    });
+    await repository.save({
+      id: "memory-shared-id",
+      storyBookId: "quiet-harbor",
+      kind: "episodic",
+      content: "The harbor bell rang once.",
+      source: "authored",
+      privacy: "private",
+      status: "active",
+    });
+    await repository.save({
+      id: "memory-shared-id",
+      storyBookId: "winter-garden",
+      kind: "episodic",
+      content: "The garden gate stayed open.",
+      source: "authored",
+      privacy: "private",
+      status: "active",
+    });
+
+    await repository.delete("quiet-harbor", "memory-shared-id");
+
+    assert.equal(await repository.get("quiet-harbor", "memory-shared-id"), null);
+    assert.equal(
+      (await repository.get("winter-garden", "memory-shared-id"))?.content,
+      "The garden gate stayed open.",
+    );
+  });
+
+  it("rejects invalid updates without changing the stored record", async () => {
+    const repository = createMemoryRepository({
+      now: () => "2026-10-17T00:00:00.000Z",
+    });
+    const saved = await repository.save({
+      id: "memory-validation-1",
+      storyBookId: "quiet-harbor",
+      kind: "knowledge",
+      content: "The west door is locked after sunset.",
+      source: "authored",
+      privacy: "do_not_send",
+      status: "active",
+    });
+
+    await assert.rejects(
+      repository.update("quiet-harbor", saved.id, {
+        status: "invalid-status" as "active",
+      }),
+    );
+
+    assert.deepEqual(await repository.get("quiet-harbor", saved.id), saved);
+  });
 });

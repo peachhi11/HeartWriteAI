@@ -35,10 +35,19 @@ export const MemoryRecordSchema = z
 export type MemoryRecord = z.infer<typeof MemoryRecordSchema>;
 export type MemoryRecordDraft = Omit<MemoryRecord, "createdAt" | "updatedAt"> &
   Partial<Pick<MemoryRecord, "createdAt" | "updatedAt">>;
+const MemoryRecordUpdateSchema = MemoryRecordSchema.omit({
+  id: true,
+  storyBookId: true,
+  createdAt: true,
+  updatedAt: true,
+}).partial();
+export type MemoryRecordUpdate = z.infer<typeof MemoryRecordUpdateSchema>;
 
 export interface MemoryRepository {
+  delete(storyBookId: string, memoryId: string): Promise<void>;
   get(storyBookId: string, memoryId: string): Promise<MemoryRecord | null>;
   save(draft: MemoryRecordDraft): Promise<MemoryRecord>;
+  update(storyBookId: string, memoryId: string, changes: MemoryRecordUpdate): Promise<MemoryRecord>;
 }
 
 export function createMemoryRepository(input: { now?: () => string } = {}): MemoryRepository {
@@ -46,6 +55,11 @@ export function createMemoryRepository(input: { now?: () => string } = {}): Memo
   const records = new Map<string, MemoryRecord>();
 
   return {
+    async delete(storyBookId, memoryId) {
+      records.delete(
+        memoryRecordKey(storyBookIdSchema.parse(storyBookId), memoryIdSchema.parse(memoryId)),
+      );
+    },
     async get(storyBookId, memoryId) {
       const key = memoryRecordKey(
         storyBookIdSchema.parse(storyBookId),
@@ -69,6 +83,26 @@ export function createMemoryRepository(input: { now?: () => string } = {}): Memo
 
       records.set(memoryRecordKey(record.storyBookId, record.id), record);
       return record;
+    },
+    async update(storyBookId, memoryId, changes) {
+      const normalizedStoryBookId = storyBookIdSchema.parse(storyBookId);
+      const normalizedMemoryId = memoryIdSchema.parse(memoryId);
+      const key = memoryRecordKey(normalizedStoryBookId, normalizedMemoryId);
+      const existing = records.get(key);
+
+      if (!existing) {
+        throw new Error(`Memory record not found: ${normalizedStoryBookId}/${normalizedMemoryId}`);
+      }
+
+      const parsedChanges = MemoryRecordUpdateSchema.parse(changes);
+      const updated = MemoryRecordSchema.parse({
+        ...existing,
+        ...parsedChanges,
+        updatedAt: now(),
+      });
+
+      records.set(key, updated);
+      return updated;
     },
   };
 }
