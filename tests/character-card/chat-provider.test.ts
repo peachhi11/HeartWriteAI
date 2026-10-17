@@ -52,6 +52,25 @@ test("keeps local Ollama configuration separate from remote provider keys", () =
   assert.equal(config.model, "local-prose-model");
 });
 
+test("builds a local Ollama request without remote authorization", () => {
+  const request = createChatCompletionRequest(
+    {
+      provider: "ollama",
+      baseUrl: "http://localhost:11434",
+      model: "local-prose-model",
+    },
+    [{ role: "user", content: "Hello locally" }],
+  );
+
+  assert.equal(request.url, "http://localhost:11434/v1/chat/completions");
+  assert.equal(request.init.headers.Authorization, undefined);
+  assert.deepEqual(JSON.parse(request.init.body), {
+    messages: [{ role: "user", content: "Hello locally" }],
+    model: "local-prose-model",
+    stream: true,
+  });
+});
+
 test("builds the OpenAI-compatible streaming request with provider-scoped auth", () => {
   const request = createChatCompletionRequest(
     {
@@ -125,4 +144,27 @@ test("normalizes provider SSE into the app stream event shape", async () => {
 
   assert.match(output, /"type":"text_delta","text":"Hi"/);
   assert.match(output, /"type":"finish"/);
+});
+
+test("normalizes provider error events without exposing raw provider payloads", async () => {
+  const upstream = new ReadableStream<Uint8Array>({
+    start(controller) {
+      controller.enqueue(
+        new TextEncoder().encode('data: {"error":{"message":"quota details"}}\n\n'),
+      );
+      controller.close();
+    },
+  });
+
+  const reader = createNormalizedChatStream(upstream).getReader();
+  const decoder = new TextDecoder();
+  let output = "";
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    output += decoder.decode(value);
+  }
+
+  assert.match(output, /"type":"error","message":"quota details"/);
+  assert.doesNotMatch(output, /choices|provider_payload/);
 });
