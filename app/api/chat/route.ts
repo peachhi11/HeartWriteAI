@@ -6,8 +6,8 @@ import {
 import { parseActiveLore } from "@/lib/character-card/lorebookParser";
 import { appendRelationshipStateContext } from "@/lib/chat/relationshipStateContext";
 import {
-  buildChatCompletionUrl,
   ChatProviderConfigError,
+  createChatCompletionRequest,
   createNormalizedChatStream,
   getChatProviderConfig,
   getChatRoutePolicy,
@@ -78,14 +78,8 @@ async function streamChatCompletion(
 
   let upstreamResponse: Response;
   try {
-    upstreamResponse = await fetch(buildChatCompletionUrl(provider.baseUrl), {
-      body: JSON.stringify({ messages, model: modelOverride ?? provider.model, stream: true }),
-      headers: {
-        ...(provider.apiKey ? { Authorization: `Bearer ${provider.apiKey}` } : {}),
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-    });
+    const request = createChatCompletionRequest(provider, messages, modelOverride);
+    upstreamResponse = await fetch(request.url, request.init);
   } catch {
     return Response.json(
       { error: "The configured chat provider could not be reached." },

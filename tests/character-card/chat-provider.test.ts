@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   buildChatCompletionUrl,
   createNormalizedChatStream,
+  createChatCompletionRequest,
   ChatProviderConfigError,
   getChatProviderConfig,
   getChatRoutePolicy,
@@ -49,6 +50,28 @@ test("keeps local Ollama configuration separate from remote provider keys", () =
   assert.equal(config.baseUrl, "http://localhost:11434");
   assert.equal(config.apiKey, undefined);
   assert.equal(config.model, "local-prose-model");
+});
+
+test("builds the OpenAI-compatible streaming request with provider-scoped auth", () => {
+  const request = createChatCompletionRequest(
+    {
+      provider: "openrouter",
+      baseUrl: "https://provider.test/",
+      apiKey: "test-secret",
+      model: "default-model",
+    },
+    [{ role: "user", content: "Hello" }],
+    "override-model",
+  );
+
+  assert.equal(request.url, "https://provider.test/v1/chat/completions");
+  assert.equal(request.init.method, "POST");
+  assert.equal(request.init.headers.Authorization, "Bearer test-secret");
+  assert.deepEqual(JSON.parse(request.init.body), {
+    messages: [{ role: "user", content: "Hello" }],
+    model: "override-model",
+    stream: true,
+  });
 });
 
 test("reports a safe route policy without exposing provider URLs or credentials", () => {

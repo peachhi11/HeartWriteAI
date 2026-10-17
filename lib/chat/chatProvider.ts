@@ -96,6 +96,28 @@ export function buildChatCompletionUrl(baseUrl: string) {
   return `${baseUrl.replace(/\/$/, "")}/v1/chat/completions`;
 }
 
+export function createChatCompletionRequest(
+  provider: ChatProviderConfig,
+  messages: ChatCompletionMessage[],
+  modelOverride?: string,
+) {
+  return {
+    url: buildChatCompletionUrl(provider.baseUrl),
+    init: {
+      body: JSON.stringify({
+        messages,
+        model: modelOverride ?? provider.model,
+        stream: true,
+      }),
+      headers: {
+        ...(provider.apiKey ? { Authorization: `Bearer ${provider.apiKey}` } : {}),
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+    },
+  };
+}
+
 export function parseOpenAICompatibleSseLine(line: string): ChatStreamEvent | null {
   if (!line.startsWith("data:")) return null;
 
