@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Build Companion</title>
+    <style>
+      :root {
+        --paper: #f6f3ec;
+        --card: #ffffff;
+        --soft: #fbf9f4;
+        --text: #2e2a23;
+        --muted: #8c8474;
+        --line: #e6e0d3;
+        --line2: #d8d1c0;
+        --attn: #b0620f;
+        --attn-bg: #fbefdd;
+        --attn-line: #e8cfa6;
+        --prod: #3e7a56;
+        --prod-bg: #eaf2ec;
+        --prod-line: #c3d8c9;
+        --held: #9a7b33;
+        --held-bg: #f7f0de;
+        --held-line: #e2d2a9;
+        --serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, serif;
+        --sans: "Avenir Next", "Segoe UI", system-ui, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      body {
+        background: var(--paper);
+        color: var(--text);
+        font-family: var(--sans);
+        font-size: 14px;
+        line-height: 1.45;
+        padding: 22px 26px 70px;
+        max-width: 1560px;
+        margin: 0 auto;
+      }
+      h1,
+      h2,
+      h3,
+      .serif {
+        font-family: var(--serif);
+        font-weight: 700;
+      }
+      h1 {
+        font-size: 22px;
+      }
+      h2 {
+        font-size: 18px;
+      }
+      h3 {
+        font-size: 15px;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      .small {
+        font-size: 12.5px;
+      }
+      .tiny {
+        font-size: 11.5px;
+      }
+      .eyebrow {
+        font-size: 10.5px;
+        font-weight: 800;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      a {
+        color: inherit;
+      }
+      code {
+        background: var(--soft);
+        padding: 1px 5px;
+        border-radius: 4px;
+        font-size: 0.92em;
+      }
+      button {
+        font-family: inherit;
+        font-size: inherit;
+        cursor: pointer;
+      }
+      .linky {
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-size: 12px;
+        text-decoration: underline;
+        padding: 0;
+      }
+      .linky:hover {
+        color: var(--text);
+      }
+      .chip {
+        border: 1px solid var(--line2);
+        background: var(--card);
+        border-radius: 999px;
+        padding: 4px 12px;
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .chip[aria-pressed="true"] {
+        background: var(--text);
+        border-color: var(--text);
+        color: var(--paper);
+      }
+      .card {
+        background: var(--soft);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 12px 14px;
+      }
+      .dot {
+        display: inline-block;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--attn);
+        margin-right: 7px;
+        animation: pulse 1.6s ease-in-out infinite;
+        vertical-align: middle;
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.3;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .dot {
+          animation: none;
+        }
+      }
+
+      .mast {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        align-items: flex-start;
+        justify-content: space-between;
+        padding-bottom: 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      .lastdeploy {
+        background: var(--prod-bg);
+        border: 1px solid var(--prod-line);
+        border-radius: 10px;
+        padding: 10px 14px;
+        min-width: 270px;
+        max-width: 420px;
+      }
+      .tally {
+        display: flex;
+        flex-wrap: wrap;
+        margin: 14px 0 0;
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        background: var(--card);
+        overflow: hidden;
+      }
+      .tally div {
+        padding: 9px 16px;
+        border-right: 1px solid var(--line);
+        flex: 1 1 auto;
+        min-width: 118px;
+      }
+      .tally div:last-child {
+        border-right: none;
+      }
+      .tally b {
+        font-family: var(--serif);
+        font-size: 20px;
+        font-weight: 700;
+        display: block;
+        line-height: 1.2;
+      }
+
+      .board {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--card);
+        overflow: hidden;
+        margin-top: 8px;
+      }
+      .row {
+        display: grid;
+        grid-template-columns: 246px repeat(5, minmax(0, 1fr));
+        border-bottom: 1px solid var(--line);
+      }
+      .row:last-child {
+        border-bottom: none;
+      }
+      .row.head {
+        background: var(--soft);
+        position: sticky;
+        top: 0;
+        z-index: 5;
+      }
+      .row.head > div {
+        padding: 9px 12px;
+        border-left: 1px solid var(--line);
+      }
+      .row.head > div:first-child {
+        border-left: none;
+      }
+      .cell {
+        padding: 11px 12px;
+        border-left: 1px solid var(--line);
+        min-height: 66px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .cell.empty {
+        background: repeating-linear-gradient(
+          135deg,
+          transparent,
+          transparent 7px,
+          #faf7f0 7px,
+          #faf7f0 14px
+        );
+      }
+      .featcell {
+        padding: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        justify-content: center;
+      }
+      .featname {
+        background: none;
+        border: none;
+        padding: 0;
+        text-align: left;
+        font-family: var(--serif);
+        font-size: 15.5px;
+        font-weight: 700;
+        color: var(--text);
+        line-height: 1.25;
+      }
+      .featname:hover {
+        text-decoration: underline;
+      }
+      .bar {
+        display: flex;
+        height: 6px;
+        border-radius: 3px;
+        overflow: hidden;
+        background: var(--line);
+      }
+      .bar i {
+        display: block;
+        height: 100%;
+      }
+
+      .story {
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--line2);
+        background: var(--card);
+        border-radius: 7px;
+        padding: 7px 9px;
+        font-size: 12.5px;
+        text-align: left;
+        width: 100%;
+        line-height: 1.35;
+        color: var(--text);
+      }
+      .story:hover {
+        background: var(--soft);
+      }
+      .story.prod {
+        border-left-color: var(--prod);
+        background: var(--prod-bg);
+        border-color: var(--prod-line);
+      }
+      .story.held {
+        border-left-color: var(--held);
+        background: var(--held-bg);
+        border-color: var(--held-line);
+      }
+      .story.now {
+        border-left-color: var(--attn);
+        background: var(--attn-bg);
+        border-color: var(--attn-line);
+      }
+      .badge {
+        display: inline-block;
+        font-size: 10px;
+        font-weight: 800;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-top: 5px;
+      }
+      .b-prod {
+        background: #dce9e0;
+        color: #2c5a3e;
+      }
+      .b-held {
+        background: #efe3c4;
+        color: #7a6024;
+      }
+      .b-check {
+        background: #ede7d8;
+        color: #6e6450;
+      }
+
+      .panels {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+        gap: 16px;
+        margin-top: 22px;
+      }
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: var(--card);
+        padding: 14px 16px;
+      }
+      .lotitem {
+        padding: 9px 0;
+        border-bottom: 1px dashed var(--line);
+      }
+      .lotitem:last-child {
+        border-bottom: none;
+      }
+      .dep {
+        display: flex;
+        gap: 10px;
+        padding: 8px 0;
+        border-bottom: 1px solid var(--line);
+      }
+      .dep:last-child {
+        border-bottom: none;
+      }
+      .attn-card {
+        background: var(--attn-bg);
+        border: 1.5px solid var(--attn-line);
+        border-radius: 10px;
+        padding: 12px 15px;
+        margin-top: 16px;
+      }
+
+      .detail {
+        display: grid;
+        grid-template-columns: minmax(0, 2fr) minmax(250px, 1fr);
+        gap: 22px;
+        margin-top: 18px;
+      }
+      .back {
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 600;
+        padding: 0;
+        margin-top: 16px;
+      }
+      .storyrow {
+        display: flex;
+        gap: 12px;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--line);
+        align-items: flex-start;
+      }
+      .storyrow:last-child {
+        border-bottom: none;
+      }
+      .unsure {
+        border-left: 3px solid var(--held-line);
+        padding: 2px 0 2px 11px;
+      }
+      pre {
+        font-size: 11.5px;
+        background: var(--soft);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 14px;
+        overflow-x: auto;
+        line-height: 1.5;
+        color: #4a4438;
+        white-space: pre-wrap;
+      }
+      :focus-visible {
+        outline: 2px solid var(--attn);
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+
+      @media (max-width: 1080px) {
+        body {
+          padding: 18px 14px 60px;
+        }
+        .row {
+          grid-template-columns: 1fr;
+          border: 1px solid var(--line);
+          border-radius: 10px;
+          margin-bottom: 12px;
+        }
+        .row.head {
+          display: none;
+        }
+        .cell {
+          border-left: none;
+          border-top: 1px solid var(--line);
+          min-height: 0;
+        }
+        .cell.empty {
+          display: none;
+        }
+        .cell::before {
+          content: attr(data-col);
+          font-size: 10.5px;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          color: var(--muted);
+        }
+        .detail {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <p class="muted" style="margin-top: 40px">Looking for <code>build-status.json</code>…</p>
+    </div>
+
+    <script>
+      const STATES = ["idea", "planning", "building", "testing", "done"];
+      const LABEL = {
+        idea: "Idea",
+        planning: "Planning",
+        building: "Building",
+        testing: "Testing",
+        done: "Done",
+      };
+      const COLHINT = {
+        idea: "raised, not started",
+        planning: "deciding what it does",
+        building: "being written now",
+        testing: "checking it works",
+        done: "finished — green means it's in prod",
+      };
+
+      let data = null,
+        lastRaw = "",
+        err = null;
+      let view = { page: "board", featureId: null, file: false, only: null };
+      const $ = (s) => document.querySelector(s);
+      const esc = (s) =>
+        String(s ?? "").replace(
+          /[&<>"']/g,
+          (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c],
+        );
+
+      async function poll() {
+        try {
+          const r = await fetch("build-status.json?t=" + Date.now(), { cache: "no-store" });
+          if (!r.ok) throw new Error(r.status);
+          const raw = await r.text();
+          if (raw !== lastRaw) {
+            data = JSON.parse(raw);
+            lastRaw = raw;
+            err = null;
+            render();
+          } else if (err) {
+            err = null;
+            render();
+          }
+        } catch (e) {
+          if (!data)
+            $("#app").innerHTML = `<div class="muted" style="margin-top:40px;max-width:520px">
+      Can't read <code>build-status.json</code> yet. Serve this page from your project folder
+      (<code>python3 -m http.server 4321</code>) once Claude has created the file.</div>`;
+          else if (!err) {
+            err = "Lost sight of the status file — showing the last thing I saw.";
+            render();
+          }
+        }
+      }
+
+      function stories(f) {
+        if (Array.isArray(f.stories))
+          return f.stories.map((s, i) => ({
+            id: s.id || f.id + "s" + (i + 1),
+            title: s.title || s.name || "",
+            state: STATES.includes(s.state) ? s.state : "idea",
+            env: s.env || null,
+            note: s.note || "",
+            when: s.when || s.at || "",
+            unsure: s.unsure || "",
+          }));
+        return (f.pieces || []).map((p, i) => ({
+          id: f.id + "s" + (i + 1),
+          title: p.name || "",
+          state: p.done ? "done" : p.current ? "building" : f.stage >= 2 ? "planning" : "idea",
+          env: p.done && f.stage === 4 ? "prod" : null,
+          note: "",
+          when: "",
+          unsure: "",
+        }));
+      }
+      const inProd = (s) => s.env === "prod";
+      const heldBack = (s) => s.state === "done" && s.env !== "prod";
+      const inFlight = (s) => s.state === "building" || s.state === "testing";
+
+      function counts(list) {
+        const c = { prod: 0, held: 0, flight: 0, todo: 0, total: list.length };
+        list.forEach((s) => {
+          if (inProd(s)) c.prod++;
+          else if (heldBack(s)) c.held++;
+          else if (inFlight(s)) c.flight++;
+          else c.todo++;
+        });
+        return c;
+      }
+      function bar(c) {
+        if (!c.total) return `<div class="bar"></div>`;
+        const seg = (n, col) => (n ? `<i style="flex:${n};background:${col}"></i>` : "");
+        return `<div class="bar">${seg(c.prod, "var(--prod)")}${seg(c.held, "var(--held)")}${seg(c.flight, "var(--attn)")}${seg(c.todo, "var(--line2)")}</div>`;
+      }
+      const allStories = () => (data.features || []).flatMap((f) => stories(f));
+
+      function passes(s) {
+        if (!view.only) return true;
+        if (view.only === "held") return heldBack(s);
+        if (view.only === "flight") return inFlight(s);
+        if (view.only === "todo") return !inProd(s) && !heldBack(s) && !inFlight(s);
+        return true;
+      }
+      const chip = (v, label) => `<button class="chip" aria-pressed="${view.only === v}"
+  onclick="setOnly(${v ? `'${v}'` : "null"})">${label}</button>`;
+
+      function board() {
+        const fs = data.features || [],
+          c = counts(allStories());
+        let h = "";
+
+        fs.filter((f) => f.needsYou).forEach((f) => {
+          h += `<div class="attn-card">
+      <div class="eyebrow" style="color:var(--attn)">Waiting on you</div>
+      <div class="serif" style="font-size:15px;margin-top:3px">${esc(f.name)}: ${esc(f.needsYou.title)}</div>
+      <div class="small" style="color:#6B5334;margin-top:3px">${esc(f.needsYou.text || "")}
+        Reply in the chat — nothing reaches prod until you say so.
+        <button class="linky" onclick="openFeature('${esc(f.id)}')">open ${esc(f.name)}</button></div></div>`;
+        });
+
+        const busy = fs.find((f) => f.building);
+        if (busy)
+          h += `<div class="card" style="margin-top:16px"><span class="dot"></span>
+    <b>${esc(busy.name)}</b> — ${esc(busy.currentAction || "working…")}</div>`;
+
+        h += `<div style="display:flex;gap:8px;flex-wrap:wrap;margin:22px 0 10px;align-items:center">
+    <span class="eyebrow" style="margin-right:4px">Show</span>
+    ${chip(null, "Everything")}${chip("flight", "Being worked on (" + c.flight + ")")}
+    ${chip("held", "Built, not in prod (" + c.held + ")")}${chip("todo", "Not started (" + c.todo + ")")}</div>`;
+
+        h += `<div class="board"><div class="row head"><div><span class="eyebrow">Feature</span></div>`;
+        STATES.forEach((s) => {
+          h += `<div><span class="eyebrow">${LABEL[s]}</span>
+    <div class="tiny muted">${COLHINT[s]}</div></div>`;
+        });
+        h += `</div>`;
+
+        if (!fs.length)
+          h += `<div style="padding:26px;text-align:center" class="muted">
+    Nothing here yet. As soon as you agree a feature in the chat, it lands on this board.</div>`;
+
+        fs.forEach((f) => {
+          const st = stories(f),
+            fc = counts(st),
+            shown = st.filter(passes);
+          if (view.only && !shown.length) return;
+          h += `<div class="row"><div class="featcell">
+      <button class="featname" onclick="openFeature('${esc(f.id)}')">${f.building ? '<span class="dot"></span>' : ""}${esc(f.name)}</button>
+      <div class="tiny muted">${esc(f.oneLiner || "")}</div>
+      ${bar(fc)}
+      <div class="tiny" style="color:${fc.total && fc.prod === fc.total ? "var(--prod)" : "var(--muted)"}">
+        ${fc.prod} of ${fc.total} in prod${fc.held ? ` · <span style="color:var(--held)">${fc.held} waiting to deploy</span>` : ""}</div>
+    </div>`;
+          STATES.forEach((state) => {
+            const inCol = shown.filter((s) => s.state === state);
+            h += `<div class="cell ${inCol.length ? "" : "empty"}" data-col="${LABEL[state]}">`;
+            inCol.forEach((s) => {
+              const cls = inProd(s)
+                ? "prod"
+                : heldBack(s)
+                  ? "held"
+                  : s.state === "building"
+                    ? "now"
+                    : "";
+              h += `<button class="story ${cls}" onclick="openFeature('${esc(f.id)}')">${esc(s.title)}
+          ${inProd(s) ? '<span class="badge b-prod">in prod</span>' : ""}
+          ${heldBack(s) ? '<span class="badge b-held">not deployed</span>' : ""}
+          ${s.unsure ? '<span class="badge b-check">unchecked</span>' : ""}</button>`;
+            });
+            h += `</div>`;
+          });
+          h += `</div>`;
+        });
+        h += `</div>`;
+
+        const lot = data.parkingLot || [],
+          deps = data.deploys || [];
+        h += `<div class="panels"><div class="panel"><h3>Discussed, never built</h3>
+      <div class="tiny muted" style="margin-bottom:8px">Nothing here is lost — say the word and it moves onto the board.</div>`;
+        h += lot.length
+          ? lot
+              .map(
+                (p) => `<div class="lotitem">
+        <b style="font-size:13px">${esc(p.name)}</b> <span class="tiny muted">· ${esc(p.tag || "")}</span>
+        <div class="small muted">${esc(p.note || "")}</div></div>`,
+              )
+              .join("")
+          : `<div class="small muted">Empty — everything discussed so far is on the board.</div>`;
+        h += `</div><div class="panel"><h3>Deploy history</h3>
+      <div class="tiny muted" style="margin-bottom:8px">Every time something reached real users.</div>`;
+        h += deps.length
+          ? deps
+              .slice(0, 12)
+              .map(
+                (d) => `<div class="dep">
+        <span class="badge ${d.env === "prod" ? "b-prod" : "b-held"}" style="margin:2px 0 0;flex:none">${esc(d.env || "prod")}</span>
+        <div><div style="font-size:13px">${esc(d.what)}</div>
+        <div class="tiny muted">${esc(d.when || fmt(d.at))}${d.note ? " · " + esc(d.note) : ""}</div></div></div>`,
+              )
+              .join("")
+          : `<div class="small muted">Nothing has gone to prod yet.</div>`;
+        h += `</div></div>`;
+        return h;
+      }
+
+      function detail(f) {
+        const st = stories(f),
+          c = counts(st);
+        let h = `<button class="back" onclick="goBoard()">← Back to the board</button>
+    <h2 style="margin-top:6px">${esc(f.name)}</h2>
+    <p class="muted" style="margin:4px 0 2px;max-width:64ch">${esc(f.oneLiner || "")}</p>
+    <div style="max-width:440px;margin-top:10px">${bar(c)}
+      <div class="tiny muted" style="margin-top:5px">${c.prod} in prod · ${c.held} built but not deployed ·
+      ${c.flight} being worked on · ${c.todo} not started</div></div>`;
+        if (f.needsYou)
+          h += `<div class="attn-card" style="max-width:660px">
+      <div class="serif" style="font-size:15px;color:var(--attn)">${esc(f.needsYou.title)}</div>
+      <div class="small" style="color:#6B5334;margin-top:4px">${esc(f.needsYou.text || "")}</div>
+      <div class="tiny" style="color:#6B5334;font-weight:800;margin-top:6px">→ Reply in the chat: "ship it" or "not yet"</div></div>`;
+        if (f.building)
+          h += `<div class="card" style="margin-top:14px;max-width:660px">
+      <span class="dot"></span>${esc(f.currentAction || "working…")}</div>`;
+
+        h += `<div class="detail"><div><div class="eyebrow" style="margin-bottom:6px">User stories</div>`;
+        st.forEach((s) => {
+          const tag = inProd(s)
+            ? `<span class="badge b-prod">in prod</span>`
+            : heldBack(s)
+              ? `<span class="badge b-held">not deployed</span>`
+              : `<span class="tiny muted">${LABEL[s.state]}</span>`;
+          h += `<div class="storyrow"><div style="flex:1">
+        <div style="font-size:13.5px">${esc(s.title)}</div>
+        ${s.note ? `<div class="small muted">${esc(s.note)}</div>` : ""}
+        ${s.unsure ? `<div class="unsure small" style="color:#6E6450;margin-top:5px">${esc(s.unsure)}</div>` : ""}
+      </div><div style="flex:none;text-align:right">${tag}
+        ${s.when ? `<div class="tiny muted" style="margin-top:3px">${esc(fmt(s.when))}</div>` : ""}</div></div>`;
+        });
+        if (!st.length)
+          h += `<div class="small muted">No stories written down for this one yet.</div>`;
+
+        if (f.decisions && f.decisions.length) {
+          h +=
+            `<div class="eyebrow" style="margin:24px 0 6px">What we agreed</div>` +
+            f.decisions
+              .map(
+                (
+                  d,
+                ) => `<div class="storyrow"><div style="flex:1;font-size:13.5px">${esc(d.what)}</div>
+        <div class="tiny muted" style="flex:none">${esc(d.when || fmt(d.at))}</div></div>`,
+              )
+              .join("");
+        }
+        h += `</div><div>`;
+        if (f.unsure && f.unsure.length) {
+          h +=
+            `<div class="eyebrow" style="margin-bottom:8px">Not yet checked</div>` +
+            f.unsure
+              .map(
+                (u) =>
+                  `<div class="unsure small" style="color:#6E6450;margin-bottom:10px">${esc(u)}</div>`,
+              )
+              .join("");
+        }
+        if (f.activity && f.activity.length) {
+          h +=
+            `<div class="eyebrow" style="margin:18px 0 6px">Recently</div>` +
+            f.activity
+              .slice(0, 10)
+              .map(
+                (a) => `<div class="small" style="padding:4px 0;color:${
+                  a.kind === "live" ? "var(--prod)" : a.kind === "back" ? "#7A6A4A" : "#5C5546"
+                }">
+        ${a.kind === "back" ? "↩" : a.kind === "live" ? "▲" : "·"} ${esc(a.what)}
+        <span class="tiny muted">· ${esc(a.when || fmt(a.at))}</span></div>`,
+              )
+              .join("");
+        }
+        h += `</div></div>`;
+        return h;
+      }
+
+      function render() {
+        if (!data) return;
+        const p = data.project || {},
+          c = counts(allStories()),
+          last = (data.deploys || [])[0];
+        let h = `<div class="mast"><div style="flex:1 1 420px;min-width:0">
+      <h1>${esc(p.name || "Project")}</h1>
+      <div class="muted small" style="max-width:72ch;margin-top:4px">${esc(p.summary || "")}</div>
+      <div class="tiny muted" style="margin-top:6px">Compiled as Claude builds${
+        data.updated ? ` · updated ${esc(fmt(data.updated))}` : ""
+      } ·
+        <button class="linky" onclick="toggleFile()">${view.file ? "back to the board" : "view the raw file"}</button></div>
+    </div><div class="lastdeploy">
+      <div class="eyebrow" style="color:var(--prod)">Last deploy</div>`;
+        h += last
+          ? `<div style="font-size:13.5px;margin-top:3px">${esc(last.what)}</div>
+      <div class="tiny muted">${esc(last.env || "prod")} · ${esc(last.when || fmt(last.at))}</div>`
+          : `<div class="small muted" style="margin-top:3px">Nothing has been deployed yet.</div>`;
+        h += `</div></div>`;
+
+        h += `<div class="tally">
+    <div><b>${c.total}</b><span class="tiny muted">user stories</span></div>
+    <div><b style="color:var(--prod)">${c.prod}</b><span class="tiny muted">live in prod</span></div>
+    <div><b style="color:var(--held)">${c.held}</b><span class="tiny muted">built, not deployed</span></div>
+    <div><b style="color:var(--attn)">${c.flight}</b><span class="tiny muted">being worked on</span></div>
+    <div><b>${c.todo}</b><span class="tiny muted">not started</span></div>
+    <div><b>${(data.parkingLot || []).length}</b><span class="tiny muted">discussed, not built</span></div></div>`;
+
+        if (err) h += `<div class="card" style="margin-top:14px">${esc(err)}</div>`;
+
+        if (view.file) {
+          h += `<p class="small muted" style="margin:18px 0 8px;max-width:72ch">This board is only a view of
+      <code>build-status.json</code> in your project folder. It's yours — open it, edit it, commit it.</p>
+      <pre>${esc(JSON.stringify(data, null, 2))}</pre>`;
+        } else if (view.page === "feature") {
+          const f = (data.features || []).find((x) => x.id === view.featureId);
+          h += f ? detail(f) : board();
+        } else h += board();
+        $("#app").innerHTML = h;
+      }
+
+      function fmt(iso) {
+        if (!iso) return "";
+        const d = new Date(iso);
+        if (isNaN(d)) return iso;
+        const s = (Date.now() - d.getTime()) / 1000;
+        if (s < 0) return d.toLocaleDateString();
+        if (s < 90) return "just now";
+        if (s < 3600) return Math.round(s / 60) + " min ago";
+        if (s < 86400) return Math.round(s / 3600) + " h ago";
+        if (s < 604800) return Math.round(s / 86400) + " days ago";
+        return d.toLocaleDateString();
+      }
+
+      window.openFeature = (id) => {
+        view.page = "feature";
+        view.featureId = id;
+        view.file = false;
+        render();
+        scrollTo(0, 0);
+      };
+      window.goBoard = () => {
+        view.page = "board";
+        view.featureId = null;
+        render();
+      };
+      window.setOnly = (v) => {
+        view.only = v;
+        render();
+      };
+      window.toggleFile = () => {
+        view.file = !view.file;
+        render();
+      };
+      addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && view.page === "feature") goBoard();
+      });
+
+      poll();
+      setInterval(poll, 2000);
+    </script>
+  </body>
+</html>

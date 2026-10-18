@@ -1,0 +1,141 @@
+{
+  "project": {
+    "name": "HeartWrite",
+    "summary": "A private, local-first writing and roleplay workspace organized around StoryBooks."
+  },
+  "updated": "2026-10-18T10:12:17Z",
+  "deploys": [],
+  "features": [
+    {
+      "id": "f1",
+      "name": "Local StoryBook memory",
+      "oneLiner": "Authors can preserve, recover, revise, and safely prepare StoryBook memories for later context.",
+      "stories": [
+        {
+          "id": "f1s1",
+          "title": "Save and read a memory for a StoryBook",
+          "state": "done",
+          "env": null,
+          "note": "Built and checked locally; not deployed to real users."
+        },
+        {
+          "id": "f1s2",
+          "title": "Keep the original when a memory is revised",
+          "state": "done",
+          "env": null,
+          "note": "Revisions create separate records so the original remains recoverable."
+        },
+        {
+          "id": "f1s3",
+          "title": "Reload saved memories after the app opens again",
+          "state": "done",
+          "env": null,
+          "note": "Checked through the local persistence seam; packaged write-path verification remains limited."
+        },
+        {
+          "id": "f1s4",
+          "title": "Recover a memory that needs a StoryBook",
+          "state": "done",
+          "env": null,
+          "note": "The ownership transition is tested; the author-facing recovery screen is not built yet."
+        },
+        {
+          "id": "f1s5",
+          "title": "Prepare safe memories for a StoryBook prompt",
+          "state": "done",
+          "env": null,
+          "note": "The read boundary is built and checked; live prompt-compiler wiring is not built yet."
+        },
+        {
+          "id": "f1s6",
+          "title": "Move memories aside when a StoryBook is archived",
+          "state": "idea",
+          "env": null,
+          "unsure": "The repository operation exists, but StoryBook archive and deletion do not call it yet."
+        }
+      ],
+      "decisions": [
+        {
+          "at": "2026-10-18T10:12:17Z",
+          "what": "Keep local memory contracts provider- and UI-independent before wiring cloud services or a larger writing surface."
+        },
+        {
+          "at": "2026-10-18T10:12:17Z",
+          "what": "Preserve memories for author recovery instead of deleting them automatically when a StoryBook is archived."
+        }
+      ],
+      "unsure": [
+        "The packaged desktop write path has not been fully verified through the live UI.",
+        "The prompt projection has not yet been connected to a live generation request."
+      ],
+      "activity": [
+        {
+          "at": "2026-10-18T10:12:17Z",
+          "kind": "ok",
+          "what": "Local memory ownership, recovery, persistence, and prompt-boundary checks passed."
+        }
+      ]
+    },
+    {
+      "id": "f2",
+      "name": "Private StoryEval review",
+      "oneLiner": "Power users can inspect aggregate evaluation runs without exposing private fixture text.",
+      "stories": [
+        {
+          "id": "f2s1",
+          "title": "Save and compare local evaluation runs",
+          "state": "done",
+          "env": null,
+          "note": "Built and checked behind the private tools boundary; not deployed."
+        },
+        {
+          "id": "f2s2",
+          "title": "Export an aggregate evaluation report",
+          "state": "done",
+          "env": null,
+          "note": "Exports are checked for raw fixture leakage."
+        },
+        {
+          "id": "f2s3",
+          "title": "Use the private review board in the packaged desktop app",
+          "state": "testing",
+          "env": null,
+          "unsure": "Browser flow is verified; packaged desktop private-mode verification has had a separate lifecycle caveat."
+        }
+      ],
+      "decisions": [
+        {
+          "at": "2026-10-18T10:12:17Z",
+          "what": "Keep StoryEval as a private power-user tool and remove it from the public production surface."
+        }
+      ],
+      "unsure": [
+        "The board reflects the latest recorded verification; no production deployment exists."
+      ],
+      "activity": [
+        {
+          "at": "2026-10-18T10:12:17Z",
+          "kind": "ok",
+          "what": "Local history, comparison, export, and leakage checks are covered by the test suite."
+        }
+      ]
+    }
+  ],
+  "parkingLot": [
+    {
+      "name": "Cloud sync and Supabase expansion",
+      "tag": "Proposed, not built",
+      "note": "Keep the private local-first foundation stable before adding accounts, sync, or cloud persistence."
+    },
+    {
+      "name": "Public production app",
+      "tag": "Proposed, not built",
+      "note": "The current work is intentionally private and local-first; public product surfaces are not the active phase."
+    },
+    {
+      "name": "Full packaged desktop distribution",
+      "tag": "Started, paused",
+      "note": "Development packaging exists, but distribution signing and broader release work are outside the current foundation slice."
+    }
+  ]
+}
