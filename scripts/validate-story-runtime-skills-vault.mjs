@@ -1,15 +1,10 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { loadRuntimeSkillCatalog } from "./runtime-skill-catalog.mjs";
 
 const scriptPath = fileURLToPath(import.meta.url);
 const repoRoot = path.resolve(path.dirname(scriptPath), "..");
-const registryPath = path.join(
-  repoRoot,
-  "lib",
-  "character-card",
-  "storyRuntimeSkills.ts",
-);
 const defaultVaultPath = path.resolve(
   repoRoot,
   "..",
@@ -17,8 +12,7 @@ const defaultVaultPath = path.resolve(
   "obsidian-tools",
   "HeartWriteAI Memory Vault",
 );
-const vaultPath =
-  process.env.HEARTWRITE_MEMORY_VAULT_PATH || defaultVaultPath;
+const vaultPath = process.env.HEARTWRITE_MEMORY_VAULT_PATH || defaultVaultPath;
 const skillRoot = path.join(vaultPath, "01_Project_State", "Agents", "Skills");
 
 function fail(message) {
@@ -70,27 +64,7 @@ function resolveWikilinkTarget(title) {
   return null;
 }
 
-function parseRegistryEntries(source) {
-  const entries = [];
-  const entryPattern =
-    /\{\n\s+slug: "([^"]+)",[\s\S]*?source: "([^"]+)",[\s\S]*?sourceVaultLinks: \[([\s\S]*?)\],/g;
-
-  for (const match of source.matchAll(entryPattern)) {
-    entries.push({
-      slug: match[1],
-      source: match[2],
-      sourceVaultLinks: [...match[3].matchAll(/"([^"]+)"/g)].map((link) => link[1]),
-    });
-  }
-
-  return entries;
-}
-
 const failures = [];
-
-if (!fs.existsSync(registryPath)) {
-  fail(`Registry file does not exist: ${registryPath}`);
-}
 
 if (!fs.existsSync(vaultPath)) {
   fail(`Memory Vault path does not exist: ${vaultPath}`);
@@ -100,17 +74,15 @@ if (!fs.existsSync(skillRoot)) {
   fail(`Memory Vault skill root does not exist: ${skillRoot}`);
 }
 
-const registrySource = fs.existsSync(registryPath)
-  ? fs.readFileSync(registryPath, "utf8")
-  : "";
 const vaultMarkdownFiles = fs.existsSync(vaultPath)
   ? walkFiles(vaultPath).filter((file) => file.endsWith(".md"))
   : [];
-const entries = parseRegistryEntries(registrySource);
-
-if (entries.length === 0) {
-  fail("No story runtime skill entries were parsed from the registry.");
-}
+const { records } = loadRuntimeSkillCatalog(repoRoot);
+const entries = records.map((record) => ({
+  slug: record.identity.slug,
+  source: record.provenance.source,
+  sourceVaultLinks: record.provenance.source_links,
+}));
 
 for (const entry of entries) {
   const hasResolvableVaultSource = entry.sourceVaultLinks.some((link) => {

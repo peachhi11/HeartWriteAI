@@ -53,3 +53,11 @@ Define the narrow reassignment operation for preserved memories that are in `Nee
 ## Phase Advancement Rule
 
 Advance only when the current phase done condition is verified and the user approves the next phase. A passing build does not advance the roadmap by itself.
+
+## 2026-10-18 Approved Metadata Maintenance Exception
+
+The user explicitly prioritized a bounded metadata-validation fix. Consolidate
+manifest, Markdown body, and runtime JSON reading/validation into one source path;
+treat generated TypeScript as output with a separate freshness check. Keep runtime
+selection, providers, UI, cloud, and Memory Core behavior outside this slice.
+After verification, return to the existing Memory Core reassignment decision.

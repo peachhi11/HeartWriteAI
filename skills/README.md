@@ -30,12 +30,15 @@ current. `storyRuntimeSkills.ts` remains an internal compatibility export;
 public surfaces should import `publicStoryRuntimeSkills.ts` so private records
 are excluded at module-boundary level.
 
-Run `npm run validate:skills` to verify that the manifest and generated runtime
-metadata have the same stable slugs, labels, categories, and source
-classifications, and that any linked runtime metadata records agree with the
-manifest.
-Run `npm run check:skill-equivalence` for the focused runtime-metadata check;
-this does not change runtime imports or prompt selection.
+`scripts/runtime-skill-catalog.mjs` is the shared source reader and validator.
+It checks manifest identity, reviewed Markdown bodies, and linked JSON records
+before returning records in manifest order. Generation and vault-source checks
+use this same reader. Generated TypeScript is an output, never a validation input.
+
+Run `npm run validate:skills` to check source data. `npm run check:skill-equivalence`
+is retained as a compatibility command for the same source identity checks.
+Use `npm run check:generated-runtime-skill-metadata` separately to detect stale
+or edited output. Source regression tests run as part of `npm test`.
 
 ## Migration rule
 

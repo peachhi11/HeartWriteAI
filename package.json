@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "test": "tsc -p tsconfig.test.json && node --test .tmp-tests/tests/character-card/*.js",
+    "test": "tsc -p tsconfig.test.json && node --test .tmp-tests/tests/character-card/*.js && node --test scripts/tests/*.test.mjs",
     "lint": "eslint app components features hooks lib types tests --ext .js,.jsx,.ts,.tsx",
     "check:agent-setup": "node scripts/check-agent-setup.mjs",
     "check:skill-equivalence": "node scripts/check-runtime-skill-equivalence.mjs",

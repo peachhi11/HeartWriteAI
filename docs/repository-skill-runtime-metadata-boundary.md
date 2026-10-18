@@ -20,7 +20,7 @@ Keep three concerns separate:
 
 The current `skills/manifest.json` remains the migration and governance inventory. It should continue to own stable identity and review status, but it should not become a partial duplicate of the runtime registry.
 
-## Proposed Shape
+## Structured Source Path
 
 Add a structured metadata file or directory with one complete record per runtime skill, for example:
 
@@ -28,26 +28,23 @@ Add a structured metadata file or directory with one complete record per runtime
 skills/runtime-metadata/<slug>.json
 ```
 
-The proof-of-shape contract is now present in
-`skills/runtime-metadata.schema.json`, with one linked record at
-`skills/runtime-metadata/romantic-erotic-storytelling-generator.json`. The
-record is deliberately richer than the current TypeScript interface: it adds
-runtime status, activation mode, public-safety status, explicit agency and
-consent handling, and a namespaced `extensions` object for future metadata
-without forcing an immediate registry migration.
+All 37 manifest entries have linked JSON records described by
+`skills/runtime-metadata.schema.json`.
 
-Each record should contain the complete `StoryRuntimeSkill` shape. The generator should:
+`scripts/runtime-skill-catalog.mjs` owns the shared read-and-validate path for
+manifest identity, reviewed Markdown bodies, and structured runtime metadata.
+The generator, repository validator, equivalence compatibility command, and
+vault validator all consume its validated records. Invalid public/private flags
+are rejected before generation. Parse errors name the source path without
+printing raw record contents.
 
-- validate the slug, label, category, and source against `skills/manifest.json`
-- validate every scope value against the existing `MemoryVaultBookType` union
-- reject duplicate slugs, empty routing arrays, broken local skill links, and unknown continuity targets when a link is intended to be repository-owned
-- preserve explicit source links without copying private fixture text
-- emit stable, formatted TypeScript in manifest order
-- fail when generated output differs from the checked-in runtime artifact
+Generated TypeScript is output only. `--check` compares freshly rendered output
+against checked-in files for freshness; it does not parse generated code to
+recover metadata. Runtime imports and public/private partitions are unchanged.
 
 The generated artifacts are:
 
-- `lib/character-card/generatedRuntimeSkillMetadata.ts` for internal validation
+- `lib/character-card/generatedRuntimeSkillMetadata.ts` for internal runtime
   and private tooling.
 - `lib/character-card/generatedPublicRuntimeSkillMetadata.ts` for public-safe
   browser surfaces.
@@ -94,7 +91,7 @@ runtime skill selector until a private-only feature requires deliberate opt-in.
 ## Migration Sequence
 
 1. Add the structured metadata schema and one complete metadata record as a proof of shape. (Complete.)
-2. Add a generator that produces a temporary or checked-in artifact. (Complete; the artifact currently contains the linked proof record.)
+2. Add a generator that produces a temporary or checked-in artifact. (Complete; all 37 records are generated.)
 3. Compare generated metadata to the current registry for all 37 entries. (Complete.)
 4. Add a CI/pre-commit stale-generated-output check. (Complete.)
 5. Switch runtime imports only after equivalence is exact and focused compiler tests remain green. (Compatibility export complete; public-surface adoption remains a follow-up.)
