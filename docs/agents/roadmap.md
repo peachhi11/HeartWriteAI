@@ -42,13 +42,17 @@ Verified on 2026-10-18: the local Memory Core contract now covers validated crea
 
 ### Next Allowed Slice
 
-Define the narrow reassignment operation for preserved memories that are in `Needs a StoryBook` state. Keep permanent deletion explicit and preserve the original record during reassignment.
+Define the narrow prompt-compiler read projection for Memory Core records. Exclude superseded originals by default, preserve privacy boundaries, and keep the projection provider- and UI-independent.
 
 ### Ranked Follow-Up After The First Slice
 
-1. Add the remaining Memory Core record lifecycle behavior through the selected seam.
-2. Add a prompt-compiler read projection that excludes superseded originals by default and respects privacy.
-3. Add a private recovery/reassignment surface only after the reassignment contract is explicit.
+1. Add the prompt-compiler read projection through the selected repository seam.
+2. Wire StoryBook deletion or archival to the explicit `Needs a StoryBook` transition, with an integration test.
+3. Add a private recovery/reassignment surface only after the read projection and ownership transition are both stable.
+
+## 2026-10-18 Memory Reassignment Slice
+
+The repository now supports explicit `unassign`, `listNeedsStoryBook`, and `reassign` operations. Preserved records can be moved into `Needs a StoryBook` without changing their content, then assigned to an existing StoryBook after target validation. Ambiguous orphan IDs and target collisions are rejected rather than guessed.
 
 ## Phase Advancement Rule
 

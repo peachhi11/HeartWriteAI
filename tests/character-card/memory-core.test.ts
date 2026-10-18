@@ -197,4 +197,31 @@ describe("Memory Core repository", () => {
       }),
     );
   });
+
+  it("moves a preserved memory through Needs a StoryBook and reassigns it", async () => {
+    const repository = createMemoryRepository({
+      now: () => "2026-10-17T00:00:00.000Z",
+      storyBookExists,
+    });
+    const saved = await repository.save({
+      id: "memory-reassign-1",
+      storyBookId: "quiet-harbor",
+      kind: "episodic",
+      content: "The lantern stayed lit after the StoryBook was archived.",
+      source: "authored",
+      privacy: "private",
+      status: "active",
+    });
+
+    const unassigned = await repository.unassign("quiet-harbor", saved.id);
+
+    assert.equal(unassigned.storyBookId, null);
+    assert.deepEqual(await repository.listNeedsStoryBook(), [unassigned]);
+
+    const reassigned = await repository.reassign(saved.id, "winter-garden");
+
+    assert.equal(reassigned.storyBookId, "winter-garden");
+    assert.equal((await repository.listNeedsStoryBook()).length, 0);
+    assert.deepEqual(await repository.get("winter-garden", saved.id), reassigned);
+  });
 });
