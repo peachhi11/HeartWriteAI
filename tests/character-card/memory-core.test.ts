@@ -31,7 +31,7 @@ describe("Memory Core repository", () => {
     assert.equal(saved.status, "active");
   });
 
-  it("updates a memory while preserving identity and creation time", async () => {
+  it("updates memory metadata while preserving identity and content", async () => {
     const timestamps = ["2026-10-17T00:00:00.000Z", "2026-10-17T01:00:00.000Z"];
     const repository = createMemoryRepository({
       now: () => timestamps.shift() ?? "",
@@ -48,7 +48,6 @@ describe("Memory Core repository", () => {
     });
 
     const updated = await repository.update("quiet-harbor", saved.id, {
-      content: "They finally name the missing letter between them.",
       status: "superseded",
     });
 
@@ -56,9 +55,71 @@ describe("Memory Core repository", () => {
     assert.equal(updated.storyBookId, saved.storyBookId);
     assert.equal(updated.createdAt, saved.createdAt);
     assert.equal(updated.updatedAt, "2026-10-17T01:00:00.000Z");
-    assert.equal(updated.content, "They finally name the missing letter between them.");
+    assert.equal(updated.content, saved.content);
     assert.equal(updated.status, "superseded");
     assert.deepEqual(await repository.get("quiet-harbor", saved.id), updated);
+  });
+
+  it("creates an editable revision while preserving the original record", async () => {
+    const repository = createMemoryRepository({
+      now: () => "2026-10-17T00:00:00.000Z",
+      storyBookExists,
+    });
+    const original = await repository.save({
+      id: "memory-revision-1",
+      storyBookId: "quiet-harbor",
+      kind: "relationship",
+      content: "They still avoid the subject of the missing letter.",
+      source: "authored",
+      privacy: "project",
+      status: "active",
+    });
+
+    const revision = await repository.revise("quiet-harbor", original.id, {
+      content: "They finally name the missing letter between them.",
+    });
+
+    assert.notEqual(revision.id, original.id);
+    assert.equal(revision.storyBookId, original.storyBookId);
+    assert.equal(revision.content, "They finally name the missing letter between them.");
+    assert.equal(revision.status, "active");
+    assert.equal(revision.originalMemoryId, original.id);
+    assert.deepEqual(await repository.get("quiet-harbor", original.id), {
+      ...original,
+      status: "superseded",
+    });
+    assert.deepEqual(await repository.get("quiet-harbor", revision.id), revision);
+  });
+
+  it("rejects direct content updates and keeps the original revision chain", async () => {
+    const repository = createMemoryRepository({
+      now: () => "2026-10-17T00:00:00.000Z",
+      storyBookExists,
+    });
+    const original = await repository.save({
+      id: "memory-revision-2",
+      storyBookId: "quiet-harbor",
+      kind: "episodic",
+      content: "The door stayed closed.",
+      source: "authored",
+      privacy: "private",
+      status: "active",
+    });
+
+    await assert.rejects(
+      repository.update("quiet-harbor", original.id, { content: "The door opened." }),
+      /Use revise\(\)/,
+    );
+    const firstRevision = await repository.revise("quiet-harbor", original.id, {
+      content: "The door opened once.",
+    });
+    const secondRevision = await repository.revise("quiet-harbor", firstRevision.id, {
+      content: "The door opened twice.",
+    });
+
+    assert.equal(firstRevision.originalMemoryId, original.id);
+    assert.equal(secondRevision.originalMemoryId, original.id);
+    assert.equal((await repository.get("quiet-harbor", original.id))?.content, original.content);
   });
 
   it("deletes a memory within its StoryBook without affecting another StoryBook", async () => {
