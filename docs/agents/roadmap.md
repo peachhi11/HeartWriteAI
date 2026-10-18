@@ -42,17 +42,21 @@ Verified on 2026-10-18: the local Memory Core contract now covers validated crea
 
 ### Next Allowed Slice
 
-Define the narrow prompt-compiler read projection for Memory Core records. Exclude superseded originals by default, preserve privacy boundaries, and keep the projection provider- and UI-independent.
+Wire StoryBook deletion or archival to the explicit `Needs a StoryBook` transition, with an integration test. Keep the transition reversible and preserve the author-controlled permanent deletion path.
 
 ### Ranked Follow-Up After The First Slice
 
-1. Add the prompt-compiler read projection through the selected repository seam.
-2. Wire StoryBook deletion or archival to the explicit `Needs a StoryBook` transition, with an integration test.
-3. Add a private recovery/reassignment surface only after the read projection and ownership transition are both stable.
+1. Wire StoryBook deletion or archival to `unassign()` through a narrow coordinator seam.
+2. Add a private recovery/reassignment surface after the ownership transition is integration-tested.
+3. Add prompt selection and budget policy only after the repository projection boundary has a concrete caller.
 
 ## 2026-10-18 Memory Reassignment Slice
 
 The repository now supports explicit `unassign`, `listNeedsStoryBook`, and `reassign` operations. Preserved records can be moved into `Needs a StoryBook` without changing their content, then assigned to an existing StoryBook after target validation. Ambiguous orphan IDs and target collisions are rejected rather than guessed.
+
+## 2026-10-18 Prompt Projection Slice
+
+Added the provider- and UI-independent Memory Core prompt projection. It reads through the repository `list(storyBookId)` seam, excludes superseded and retired records, excludes `do_not_send` records in every mode, and exposes private records only in `local` mode. The output is intentionally minimal: memory id, kind, and content.
 
 ## Phase Advancement Rule
 

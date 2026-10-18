@@ -2,6 +2,7 @@ import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 
 import { createMemoryRepository, type MemoryRecordDraft } from "../../lib/memory/memoryRepository";
+import { readMemoryPromptProjection } from "../../lib/memory/memoryPromptProjection";
 
 const storyBookExists = async (storyBookId: string) =>
   ["quiet-harbor", "winter-garden"].includes(storyBookId);
@@ -223,5 +224,90 @@ describe("Memory Core repository", () => {
     assert.equal(reassigned.storyBookId, "winter-garden");
     assert.equal((await repository.listNeedsStoryBook()).length, 0);
     assert.deepEqual(await repository.get("winter-garden", saved.id), reassigned);
+  });
+
+  it("projects only active prompt-safe memories for a StoryBook", async () => {
+    const repository = createMemoryRepository({
+      now: () => "2026-10-17T00:00:00.000Z",
+      storyBookExists,
+    });
+    await repository.save({
+      id: "memory-prompt-active",
+      storyBookId: "quiet-harbor",
+      kind: "episodic",
+      content: "The lantern stayed lit after the argument.",
+      source: "authored",
+      privacy: "project",
+      status: "active",
+    });
+    await repository.save({
+      id: "memory-prompt-private",
+      storyBookId: "quiet-harbor",
+      kind: "secret",
+      content: "The private letter is hidden in the desk.",
+      source: "authored",
+      privacy: "private",
+      status: "active",
+    });
+    await repository.save({
+      id: "memory-prompt-do-not-send",
+      storyBookId: "quiet-harbor",
+      kind: "knowledge",
+      content: "Never include this in generated context.",
+      source: "authored",
+      privacy: "do_not_send",
+      status: "active",
+    });
+    await repository.save({
+      id: "memory-prompt-superseded",
+      storyBookId: "quiet-harbor",
+      kind: "residue",
+      content: "This older version must stay out of the prompt.",
+      source: "authored",
+      privacy: "project",
+      status: "superseded",
+    });
+    await repository.save({
+      id: "memory-prompt-other-story",
+      storyBookId: "winter-garden",
+      kind: "episodic",
+      content: "This belongs to another StoryBook.",
+      source: "authored",
+      privacy: "project",
+      status: "active",
+    });
+
+    assert.deepEqual(
+      await readMemoryPromptProjection(repository, {
+        storyBookId: "quiet-harbor",
+        privacyMode: "local",
+      }),
+      [
+        {
+          id: "memory-prompt-active",
+          kind: "episodic",
+          content: "The lantern stayed lit after the argument.",
+        },
+        {
+          id: "memory-prompt-private",
+          kind: "secret",
+          content: "The private letter is hidden in the desk.",
+        },
+      ],
+    );
+
+    assert.deepEqual(
+      await readMemoryPromptProjection(repository, {
+        storyBookId: "quiet-harbor",
+        privacyMode: "provider_safe",
+      }),
+      [
+        {
+          id: "memory-prompt-active",
+          kind: "episodic",
+          content: "The lantern stayed lit after the argument.",
+        },
+      ],
+    );
   });
 });

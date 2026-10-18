@@ -54,6 +54,7 @@ export interface MemoryRepositoryStorageAdapter {
 export interface MemoryRepository {
   delete(storyBookId: string, memoryId: string): Promise<void>;
   get(storyBookId: string, memoryId: string): Promise<MemoryRecord | null>;
+  list(storyBookId: string): Promise<MemoryRecord[]>;
   listNeedsStoryBook(): Promise<MemoryRecord[]>;
   reassign(memoryId: string, storyBookId: string): Promise<MemoryRecord>;
   revise(storyBookId: string, memoryId: string, changes: MemoryRecordUpdate): Promise<MemoryRecord>;
@@ -97,6 +98,13 @@ export function createMemoryRepository(input: {
       );
 
       return record ? MemoryRecordSchema.parse(record) : null;
+    },
+    async list(storyBookId) {
+      const normalizedStoryBookId = storyBookIdSchema.parse(storyBookId);
+
+      return (await readRecords(storage))
+        .filter((record) => record.storyBookId === normalizedStoryBookId)
+        .map((record) => MemoryRecordSchema.parse(record));
     },
     async listNeedsStoryBook() {
       return (await readRecords(storage))
