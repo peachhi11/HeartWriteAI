@@ -15,6 +15,7 @@ Establish the smallest durable local contract for StoryBook identity and Memory 
 - Define a minimal validated Memory Book record shape.
 - Define a local repository seam for memory records.
 - Add an in-memory adapter for deterministic tests.
+- Add a local Tauri Store/browser fallback adapter and prove reload behavior.
 - Prove save, read, update, delete, provenance, privacy, and status behavior through public tests.
 
 ### Explicitly Out Of Scope
@@ -35,15 +36,19 @@ The implementer must state the public seam, write one failing test, observe the 
 
 The phase is complete only when a validated local Memory Core contract can create, read, update, and delete bounded memory records, preserve source/provenance and privacy metadata, reject invalid records, and be consumed without importing provider or UI code.
 
+### Phase Gate Result
+
+Verified on 2026-10-18: the local Memory Core contract now covers validated create, read, metadata update, revision, delete, provenance, privacy, status, StoryBook ownership, original preservation, and reload through the local adapter. It remains provider- and UI-independent.
+
 ### Next Allowed Slice
 
-Design two small candidate public seams for the Memory Core, compare them on locality and scope, and wait for the user to select one before writing production code.
+Define the narrow reassignment operation for preserved memories that are in `Needs a StoryBook` state. Keep permanent deletion explicit and preserve the original record during reassignment.
 
 ### Ranked Follow-Up After The First Slice
 
 1. Add the remaining Memory Core record lifecycle behavior through the selected seam.
-2. Add a local file/Tauri-backed adapter only after the in-memory contract is stable.
-3. Add a prompt-compiler read projection only after persistence and privacy behavior are proven.
+2. Add a prompt-compiler read projection that excludes superseded originals by default and respects privacy.
+3. Add a private recovery/reassignment surface only after the reassignment contract is explicit.
 
 ## Phase Advancement Rule
 

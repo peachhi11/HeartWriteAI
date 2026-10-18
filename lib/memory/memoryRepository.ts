@@ -45,6 +45,11 @@ const MemoryRecordUpdateSchema = MemoryRecordSchema.omit({
 }).partial();
 export type MemoryRecordUpdate = z.infer<typeof MemoryRecordUpdateSchema>;
 
+export interface MemoryRepositoryStorageAdapter {
+  get(): Promise<unknown | null>;
+  set(records: MemoryRecord[]): Promise<void>;
+}
+
 export interface MemoryRepository {
   delete(storyBookId: string, memoryId: string): Promise<void>;
   get(storyBookId: string, memoryId: string): Promise<MemoryRecord | null>;
@@ -56,24 +61,36 @@ export interface MemoryRepository {
 export function createMemoryRepository(input: {
   createRevisionId?: (record: MemoryRecord) => string;
   now?: () => string;
+  storage?: MemoryRepositoryStorageAdapter;
   storyBookExists: (storyBookId: string) => Promise<boolean>;
 }): MemoryRepository {
   const now = input.now ?? (() => new Date().toISOString());
-  const records = new Map<string, MemoryRecord>();
+  const storage = input.storage ?? createMemoryRepositoryStorage();
   let revisionSequence = 0;
 
   return {
     async delete(storyBookId, memoryId) {
-      records.delete(
-        memoryRecordKey(storyBookIdSchema.parse(storyBookId), memoryIdSchema.parse(memoryId)),
+      const records = await readRecords(storage);
+      const key = memoryRecordKey(
+        storyBookIdSchema.parse(storyBookId),
+        memoryIdSchema.parse(memoryId),
       );
+      const nextRecords = records.filter(
+        (record) => memoryRecordKey(record.storyBookId, record.id) !== key,
+      );
+
+      if (nextRecords.length !== records.length) {
+        await storage.set(nextRecords);
+      }
     },
     async get(storyBookId, memoryId) {
       const key = memoryRecordKey(
         storyBookIdSchema.parse(storyBookId),
         memoryIdSchema.parse(memoryId),
       );
-      const record = records.get(key);
+      const record = (await readRecords(storage)).find(
+        (candidate) => memoryRecordKey(candidate.storyBookId, candidate.id) === key,
+      );
 
       return record ? MemoryRecordSchema.parse(record) : null;
     },
@@ -82,7 +99,11 @@ export function createMemoryRepository(input: {
       const normalizedMemoryId = memoryIdSchema.parse(memoryId);
       const key = memoryRecordKey(normalizedStoryBookId, normalizedMemoryId);
       await assertStoryBookExists(normalizedStoryBookId, input.storyBookExists);
-      const existing = records.get(key);
+      const records = await readRecords(storage);
+      const existingIndex = records.findIndex(
+        (record) => memoryRecordKey(record.storyBookId, record.id) === key,
+      );
+      const existing = existingIndex === -1 ? undefined : records[existingIndex];
 
       if (!existing) {
         throw new Error(`Memory record not found: ${normalizedStoryBookId}/${normalizedMemoryId}`);
@@ -103,8 +124,9 @@ export function createMemoryRepository(input: {
         updatedAt: revisionTimestamp,
       });
 
-      records.set(key, { ...existing, status: "superseded", updatedAt: now() });
-      records.set(memoryRecordKey(revision.storyBookId, revision.id), revision);
+      records[existingIndex] = { ...existing, status: "superseded", updatedAt: now() };
+      records.push(revision);
+      await storage.set(records);
       return revision;
     },
     async save(draft) {
@@ -121,7 +143,19 @@ export function createMemoryRepository(input: {
 
       await assertStoryBookExists(record.storyBookId, input.storyBookExists);
 
-      records.set(memoryRecordKey(record.storyBookId, record.id), record);
+      const records = await readRecords(storage);
+      const existingIndex = records.findIndex(
+        (candidate) =>
+          memoryRecordKey(candidate.storyBookId, candidate.id) ===
+          memoryRecordKey(record.storyBookId, record.id),
+      );
+
+      if (existingIndex === -1) {
+        records.push(record);
+      } else {
+        records[existingIndex] = record;
+      }
+      await storage.set(records);
       return record;
     },
     async update(storyBookId, memoryId, changes) {
@@ -129,7 +163,11 @@ export function createMemoryRepository(input: {
       const normalizedMemoryId = memoryIdSchema.parse(memoryId);
       const key = memoryRecordKey(normalizedStoryBookId, normalizedMemoryId);
       await assertStoryBookExists(normalizedStoryBookId, input.storyBookExists);
-      const existing = records.get(key);
+      const records = await readRecords(storage);
+      const existingIndex = records.findIndex(
+        (record) => memoryRecordKey(record.storyBookId, record.id) === key,
+      );
+      const existing = existingIndex === -1 ? undefined : records[existingIndex];
 
       if (!existing) {
         throw new Error(`Memory record not found: ${normalizedStoryBookId}/${normalizedMemoryId}`);
@@ -145,10 +183,35 @@ export function createMemoryRepository(input: {
         updatedAt: now(),
       });
 
-      records.set(key, updated);
+      records[existingIndex] = updated;
+      await storage.set(records);
       return updated;
     },
   };
+}
+
+export function createMemoryRepositoryStorage(
+  seed: MemoryRecord[] = [],
+): MemoryRepositoryStorageAdapter & { readRawStoredValue(): unknown } {
+  let records = [...seed];
+
+  return {
+    async get() {
+      return records;
+    },
+    async set(nextRecords) {
+      records = [...nextRecords];
+    },
+    readRawStoredValue() {
+      return records;
+    },
+  };
+}
+
+async function readRecords(storage: MemoryRepositoryStorageAdapter): Promise<MemoryRecord[]> {
+  const stored = await storage.get();
+
+  return z.array(MemoryRecordSchema).parse(stored ?? []);
 }
 
 async function assertStoryBookExists(
