@@ -3,6 +3,11 @@ import assert from "node:assert/strict";
 
 import { createMemoryRepository, type MemoryRecordDraft } from "../../lib/memory/memoryRepository";
 import { readMemoryPromptProjection } from "../../lib/memory/memoryPromptProjection";
+import {
+  createMemoryStoryBookStorage,
+  createStoryBookRepository,
+} from "../../lib/storybook/storyBookRepository";
+import { createStoryBookLifecycle } from "../../lib/storybook/storyBookLifecycle";
 
 const storyBookExists = async (storyBookId: string) =>
   ["quiet-harbor", "winter-garden"].includes(storyBookId);
@@ -309,5 +314,85 @@ describe("Memory Core repository", () => {
         },
       ],
     );
+  });
+});
+
+describe("StoryBook lifecycle", () => {
+  it("archives a StoryBook while preserving its memories for recovery", async () => {
+    const storyBookStorage = createMemoryStoryBookStorage();
+    const storyBookRepository = createStoryBookRepository({
+      now: () => "2026-10-17T00:00:00.000Z",
+      storage: storyBookStorage,
+    });
+    await storyBookRepository.save({
+      id: "quiet-harbor",
+      title: "Quiet Harbor",
+      summary: "A story by the sea.",
+      status: "active",
+    });
+    const memoryRepository = createMemoryRepository({
+      now: () => "2026-10-17T01:00:00.000Z",
+      storyBookExists: async (storyBookId) => (await storyBookRepository.get(storyBookId)) !== null,
+    });
+    const memory = await memoryRepository.save({
+      id: "memory-archive-1",
+      storyBookId: "quiet-harbor",
+      kind: "episodic",
+      content: "The harbor bell rang after the argument.",
+      source: "authored",
+      privacy: "private",
+      status: "active",
+    });
+    const lifecycle = createStoryBookLifecycle({
+      memoryRepository,
+      storyBookRepository,
+    });
+
+    const archived = await lifecycle.archive("quiet-harbor");
+
+    assert.equal(archived.status, "archived");
+    assert.equal((await storyBookRepository.get("quiet-harbor"))?.status, "archived");
+    assert.equal(await memoryRepository.get("quiet-harbor", memory.id), null);
+    assert.deepEqual(await memoryRepository.listNeedsStoryBook(), [
+      { ...memory, storyBookId: null, updatedAt: "2026-10-17T01:00:00.000Z" },
+    ]);
+  });
+
+  it("detaches memories before permanently deleting a StoryBook", async () => {
+    const storyBookStorage = createMemoryStoryBookStorage();
+    const storyBookRepository = createStoryBookRepository({
+      now: () => "2026-10-17T00:00:00.000Z",
+      storage: storyBookStorage,
+    });
+    await storyBookRepository.save({
+      id: "winter-garden",
+      title: "Winter Garden",
+      summary: "A story among the hedges.",
+      status: "active",
+    });
+    const memoryRepository = createMemoryRepository({
+      now: () => "2026-10-17T01:00:00.000Z",
+      storyBookExists: async (storyBookId) => (await storyBookRepository.get(storyBookId)) !== null,
+    });
+    const memory = await memoryRepository.save({
+      id: "memory-delete-1",
+      storyBookId: "winter-garden",
+      kind: "relationship",
+      content: "They kept the promise despite the distance.",
+      source: "authored",
+      privacy: "project",
+      status: "active",
+    });
+    const lifecycle = createStoryBookLifecycle({
+      memoryRepository,
+      storyBookRepository,
+    });
+
+    await lifecycle.delete("winter-garden");
+
+    assert.equal(await storyBookRepository.get("winter-garden"), null);
+    assert.deepEqual(await memoryRepository.listNeedsStoryBook(), [
+      { ...memory, storyBookId: null, updatedAt: "2026-10-17T01:00:00.000Z" },
+    ]);
   });
 });

@@ -3,7 +3,7 @@
     "name": "HeartWrite",
     "summary": "A private, local-first writing and roleplay workspace organized around StoryBooks."
   },
-  "updated": "2026-10-18T10:12:17Z",
+  "updated": "2026-10-19T05:10:00Z",
   "deploys": [],
   "features": [
     {
@@ -49,9 +49,9 @@
         {
           "id": "f1s6",
           "title": "Move memories aside when a StoryBook is archived",
-          "state": "idea",
+          "state": "testing",
           "env": null,
-          "unsure": "The repository operation exists, but StoryBook archive and deletion do not call it yet."
+          "unsure": "The lifecycle coordinator and integration tests exist; no author-facing archive/delete control calls it yet."
         }
       ],
       "decisions": [
@@ -98,9 +98,9 @@
         {
           "id": "f2s3",
           "title": "Use the private review board in the packaged desktop app",
-          "state": "testing",
+          "state": "done",
           "env": null,
-          "unsure": "Browser flow is verified; packaged desktop private-mode verification has had a separate lifecycle caveat."
+          "note": "Installed packaged app opens the private StoryEval board; fixture execution and export remain covered by automated checks."
         }
       ],
       "decisions": [
@@ -117,6 +117,131 @@
           "at": "2026-10-18T10:12:17Z",
           "kind": "ok",
           "what": "Local history, comparison, export, and leakage checks are covered by the test suite."
+        },
+        {
+          "at": "2026-10-18T11:39:49Z",
+          "kind": "ok",
+          "what": "Installed packaged HeartWriteAI app visibly rendered the private StoryEval Review Dashboard and its run, history, compare, and export controls."
+        }
+      ]
+    },
+    {
+      "id": "f3",
+      "name": "Local Character Book storage",
+      "oneLiner": "Reusable Character Book records have a validated repository boundary before StoryBook attachment is added.",
+      "stories": [
+        {
+          "id": "f3s1",
+          "title": "Save and reload reusable Character Book records",
+          "state": "done",
+          "env": null,
+          "note": "Repository and shared local persistence adapter are tested locally; no UI or StoryBook attachment is claimed."
+        }
+      ],
+      "decisions": [
+        {
+          "at": "2026-10-19T03:34:26Z",
+          "what": "Treat Character Book records as reusable masters; StoryBook attachment will be a separate relationship contract."
+        }
+      ],
+      "unsure": [
+        "Character, Persona, Prompt, and broader StoryBook storage contracts are not complete."
+      ],
+      "activity": [
+        {
+          "at": "2026-10-19T04:02:00Z",
+          "kind": "ok",
+          "what": "Character Book records now reload through the shared browser/Tauri local persistence seam; no UI or StoryBook attachment was added."
+        }
+      ]
+    },
+    {
+      "id": "f4",
+      "name": "Local Persona Book storage",
+      "oneLiner": "Reusable user-persona records have a validated local repository boundary before legacy library migration or StoryBook attachment.",
+      "stories": [
+        {
+          "id": "f4s1",
+          "title": "Save and reload reusable Persona Book records",
+          "state": "done",
+          "env": null,
+          "note": "Repository and shared local persistence adapter are tested locally; the existing persona hook and UI still use their legacy library path."
+        }
+      ],
+      "decisions": [
+        {
+          "at": "2026-10-19T04:18:00Z",
+          "what": "Keep Persona Book storage provider- and UI-independent; migrate the existing persona library only after the repository contract is stable."
+        }
+      ],
+      "unsure": [
+        "Persona-to-StoryBook attachment and the migration path from the existing persona library remain open."
+      ],
+      "activity": [
+        {
+          "at": "2026-10-19T04:18:00Z",
+          "kind": "ok",
+          "what": "Persona records now validate, save, list, delete, and reload through the shared browser/Tauri local persistence seam; no UI migration was added."
+        }
+      ]
+    },
+    {
+      "id": "f5",
+      "name": "Prompt Library storage",
+      "oneLiner": "Reusable operational and author-facing prompt records have a validated local repository boundary before stacks and Prompt Books are composed.",
+      "stories": [
+        {
+          "id": "f5s1",
+          "title": "Save and reload reusable Prompt Library records",
+          "state": "done",
+          "env": null,
+          "note": "Prompt records validate kind, scope, source, and status through the shared local persistence adapter; Prompt Stacks and Prompt Books remain separate slices."
+        }
+      ],
+      "decisions": [
+        {
+          "at": "2026-10-19T04:42:00Z",
+          "what": "Use Prompt Library as the storage layer for all reusable prompts while keeping Prompt Stack and Prompt Book as later composition layers."
+        }
+      ],
+      "unsure": [
+        "Prompt Stack ordering, activation rules, and StoryBook-specific Prompt Book selection remain open."
+      ],
+      "activity": [
+        {
+          "at": "2026-10-19T04:42:00Z",
+          "kind": "ok",
+          "what": "Prompt records now validate, save, list, delete, and reload through the shared browser/Tauri local persistence seam; no stack or UI composition was added."
+        }
+      ]
+    },
+    {
+      "id": "f6",
+      "name": "Prompt Stack storage",
+      "oneLiner": "Reusable prompts can be composed into model-neutral, author-friendly guidance stacks before compiler rendering is added.",
+      "stories": [
+        {
+          "id": "f6s1",
+          "title": "Save and reload modular Prompt Stack records",
+          "state": "done",
+          "env": null,
+          "note": "Stack entries validate intent, duration, semantic placement, strength, enabled state, order, and optional relative or absolute injection metadata through the shared local persistence adapter. No compiler or UI wiring is claimed."
+        }
+      ],
+      "decisions": [
+        {
+          "at": "2026-10-19T05:10:00Z",
+          "what": "Keep reusable Prompt Library definitions separate from Prompt Stack composition rules; expose author-friendly intent and duration while retaining provider-neutral placement metadata underneath."
+        }
+      ],
+      "unsure": [
+        "Prompt Book selection, model-specific Prompt Profiles, compiler rendering, and prompt-reference existence checks remain separate contracts."
+      ],
+      "activity": [
+        {
+          "at": "2026-10-19T05:10:00Z",
+          "kind": "ok",
+          "what": "Prompt Stack repository and local persistence tests passed; the UI/interface layer remains parked."
         }
       ]
     }
